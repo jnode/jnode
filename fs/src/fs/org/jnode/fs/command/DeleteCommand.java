@@ -22,6 +22,8 @@ package org.jnode.fs.command;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.IOException;
 
 import javax.naming.NameNotFoundException;
 
@@ -42,22 +44,32 @@ import org.jnode.shell.syntax.FlagArgument;
  * @author crawley@jnode.org
  */
 public class DeleteCommand extends AbstractCommand {
+    
+    private static final String help_file = "the files or directories to be deleted";
+    private static final String help_recurse = "if set, any directories are deleted recursively";
+    private static final String help_force = "ignore non-existant files, never prompt";
+    private static final String help_interact = "prompt before every delete";
+    private static final String help_verbose = "give information on what is happening";
 
-    private final FileArgument ARG_PATHS = new FileArgument(
-            "paths", Argument.MANDATORY | Argument.MULTIPLE | Argument.EXISTING, 
-            "the files or directories to be deleted");
-    private final FlagArgument FLAG_RECURSIVE = new FlagArgument(
-            "recursive", Argument.OPTIONAL, 
-            "if set, any directories are deleted recursively");
+    private final FileArgument ArgPaths 
+        = new FileArgument("paths", Argument.MANDATORY | Argument.MULTIPLE | Argument.EXISTING, help_file);
+    private final FlagArgument FlagRecurse = new FlagArgument("recursive", Argument.OPTIONAL, help_recurse);
+    private final FlagArgument FlagForce = new FlagArgument("force", Argument.OPTIONAL, help_force);
+    private final FlagArgument FlagInteract = new FlagArgument("interactive", Argument.OPTIONAL, help_interact);
+    private final FlagArgument FlagVerbose = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
     
     private FileSystemService fss;
     private boolean recursive;
+    private boolean force;
+    private boolean interactive;
+    private boolean verbose;
     private PrintWriter err;
-    
+    private PrintWriter out;
+    private Reader in;
 
     public DeleteCommand() {
         super("delete files or directories");
-        registerArguments(ARG_PATHS, FLAG_RECURSIVE);
+        registerArguments(ArgPaths, FlagRecurse, FlagForce, FlagInteract, FlagVerbose);
     }
 
     public static void main(String[] args) throws Exception {
@@ -67,9 +79,17 @@ public class DeleteCommand extends AbstractCommand {
     public void execute() throws NameNotFoundException {
         // Lookup the Filesystem service
         fss = InitialNaming.lookup(FileSystemService.NAME);
-        recursive = FLAG_RECURSIVE.isSet();
-        File[] paths = ARG_PATHS.getValues();
-        this.err = getError().getPrintWriter();
+        
+        recursive    = FlagRecurse.isSet();
+        force        = FlagForce.isSet();
+        interactive  = FlagInteract.isSet();
+        verbose      = FlagVerbose.isSet();
+        File[] paths = ArgPaths.getValues();
+        
+        err = getError().getPrintWriter();
+        out = getOutput().getPrintWriter();
+        in = getInput().getReader();
+        
         boolean ok = true;
         for (File file : paths) {
             ok &= deleteFile(file);
@@ -81,9 +101,19 @@ public class DeleteCommand extends AbstractCommand {
 
     private boolean deleteFile(File file) {
         if (!file.exists()) {
-            err.println(file + " does not exist");
+            if (!force) {
+                err.println(file + " does not exist");
+            }
             return false;
         }
+        if (file.isDirectory() && !recursive) {
+            err.println("cannot remove " + file + ": Is a directory");
+            return false;
+        }
+        if (file.isFile() && interactive && !prompt_yn("remove regular file " + file.getAbsolutePath() + "?")) {
+            return false;
+        }
+        
         boolean deleteOk = true;
 
         // FIXME the following doesn't handle mounted filesystems correctly (I think).
@@ -91,31 +121,51 @@ public class DeleteCommand extends AbstractCommand {
         // give an error message and then refuse to delete the parent directory because
         // it cannot be emptied.
         if (file.isDirectory() && !fss.isMount(file.getAbsolutePath())) {
+            if (interactive && !prompt_yn("descend into directory " + file.getAbsolutePath() + "?")) {
+                return false;
+            }
             for (File f : file.listFiles()) {
                 final String name = f.getName();
 
                 if (!name.equals(".") && !name.equals("..")) {
-                    if (!recursive) {
-                        err.println("Directory is not empty " + file);
-                        deleteOk = false;
-                        break;
-                    } else {
-                        deleteOk &= deleteFile(f);
-                    }
+                    deleteOk &= deleteFile(f);
                 }
             }
+            if (deleteOk && interactive && !prompt_yn("remove directory " + file.getAbsolutePath() + "?")) {
+                return false;
+            }
         }
-
+        
         if (deleteOk) {
             // FIXME ... this is going to attempt to delete "directories" that are 
             // mounted filesystems.  Is this right?  What will it do?
             // FIXME ... this does not report the reason that the delete failed.
             // How should we do that?
+            if (verbose) {
+                if (file.isFile()) out.println("removed " + file.getAbsolutePath());
+                if (file.isDirectory()) out.println("removed directory " + file.getAbsolutePath());
+            }
             deleteOk = file.delete();
             if (!deleteOk) {
                 err.println(file + " was not deleted");
             }
         }
         return deleteOk;
+    }
+    
+    private boolean prompt_yn(String s) {
+        int choice;
+        for (;;) {
+            out.print(s + "  [y/n]");
+            try {
+                choice = in.read();
+            } catch (IOException _) {
+                choice = 0;
+            }
+            out.println();
+            if (choice == 'y' || choice == 'n') break;
+        }
+        
+        return choice == 'y';
     }
 }
