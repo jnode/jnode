@@ -38,6 +38,7 @@ import org.jnode.test.fs.filesystem.tests.ConcurrentAccessFSTest;
 import org.jnode.test.fs.filesystem.tests.FileFSTest;
 import org.jnode.test.fs.filesystem.tests.TreeFSTest;
 import org.jnode.util.OsUtils;
+import javax.naming.NamingException;
 
 /**
  * This class runs a suite of functional tests on the JNode file system
@@ -49,13 +50,22 @@ import org.jnode.util.OsUtils;
  * @author crawley@jnode.org
  */
 public class FSTestSuite extends JFuncSuite {
+    private static boolean setup = false;
     public static void main(String[] args) throws Throwable {
-        if (!OsUtils.isJNode()) {
+        setUp();
+
+        JFuncRunner.run(FSTestSuite.suite());
+        //JFuncRunner.main(new String[]{"-v", "--color", FSTestSuite.class.getName()});
+        //JFuncRunner.main(new String[]{"-v", FSTestSuite.class.getName()});
+    }
+
+    private static void setUp() throws NamingException {
+        if (!setup && !OsUtils.isJNode()) {
             // We are not running in JNode, emulate a JNode environment.
-            
+
             InitialNaming.setNameSpace(new BasicNameSpace());
-            
-            // Build a plugin descriptor that is sufficient for the FileSystemPlugin to 
+
+            // Build a plugin descriptor that is sufficient for the FileSystemPlugin to
             // configure file system types for testing.
             DummyPluginDescriptor desc = new DummyPluginDescriptor(true);
             DummyExtensionPoint ep = new DummyExtensionPoint("types", "org.jnode.fs.types", "types");
@@ -67,17 +77,15 @@ public class FSTestSuite extends JFuncSuite {
                 extension.addElement(element);
                 ep.addExtension(extension);
             }
-            
+
             FileSystemService fss = new FileSystemPlugin(desc);
             InitialNaming.bind(FileSystemService.class, fss);
         }
-        
-        JFuncRunner.run(FSTestSuite.suite());
-        //JFuncRunner.main(new String[]{"-v", "--color", FSTestSuite.class.getName()});
-        //JFuncRunner.main(new String[]{"-v", FSTestSuite.class.getName()});
+        setup = true;
     }
 
     public static JFuncSuite suite() throws Throwable {
+        setUp();
         JFuncSuite suite = new JFuncSuite();
 
         for (FSTestConfig config : new FSConfigurations()) {

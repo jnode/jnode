@@ -37,6 +37,7 @@ import org.jnode.test.fs.driver.factories.MockIDEDeviceFactory;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 import org.jnode.test.fs.driver.stubs.StubNameSpace;
 import org.jnode.test.fs.filesystem.config.OsType;
+import org.jnode.emu.naming.BasicNameSpace;
 
 
 public class ContextManager {
@@ -88,7 +89,7 @@ public class ContextManager {
 
     protected void initNaming() throws PluginException {
         if (OsType.OTHER_OS.isCurrentOS()) {
-            NameSpace namespace = new StubNameSpace();
+            NameSpace namespace = new BasicNameSpace();
             InitialNaming.setNameSpace(namespace);
             populateNameSpace(namespace);
 

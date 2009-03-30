@@ -22,6 +22,7 @@ package java.io;
 
 import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.java.io.VMFileHandle;
+import org.jnode.java.io.VMFileSystemAPI;
 
 //todo serious review is needed
 /**
