@@ -57,6 +57,9 @@
       <sequence description="delete files and directories">
         <optionSet>
           <option argLabel="recursive" shortName="r" longName="recursive"/>
+          <option argLabel="force" shortName="f" longName="force" />
+          <option argLabel="interactive" shortName="i" longName="interactive" />
+          <option argLabel="verbose" shortName="v" longName="verbose" />
         </optionSet>
         <repeat minCount="1"><argument argLabel="paths"/></repeat>
       </sequence>
