@@ -54,7 +54,7 @@ final class FileSystemTypeManager implements ExtensionPointListener {
      * 
      * @throws IllegalArgumentException if typesEP is null;
      */
-    protected FileSystemTypeManager(ExtensionPoint typesEP) throws IllegalArgumentException{
+    protected FileSystemTypeManager(ExtensionPoint typesEP) throws IllegalArgumentException {
         this.typesEP = typesEP;
         if (typesEP == null) {
             throw new IllegalArgumentException("The types extension-point cannot be null");

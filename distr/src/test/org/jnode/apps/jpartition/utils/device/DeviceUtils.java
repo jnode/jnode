@@ -37,19 +37,16 @@ import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.bus.ide.IDEDevice;
-import org.jnode.fs.service.FileSystemService;
-import org.jnode.fs.service.def.FileSystemPlugin;
-import org.jnode.emu.naming.BasicNameSpace;
 import org.jnode.emu.plugin.model.DummyConfigurationElement;
 import org.jnode.emu.plugin.model.DummyExtension;
 import org.jnode.emu.plugin.model.DummyExtensionPoint;
 import org.jnode.emu.plugin.model.DummyPluginDescriptor;
+import org.jnode.fs.service.FileSystemService;
+import org.jnode.fs.service.def.FileSystemPlugin;
 import org.jnode.naming.InitialNaming;
-import org.jnode.naming.NameSpace;
-import org.jnode.plugin.PluginDescriptor;
-import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 import org.jnode.test.fs.filesystem.config.FSType;
 import org.jnode.util.OsUtils;
+
 
 public class DeviceUtils {
     private static final long DEFAULT_FILE_SIZE = 1024 * 1024;

@@ -52,7 +52,6 @@ import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.InputHistory;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.textscreen.KeyboardReader;
-import org.jnode.driver.console.textscreen.KeyboardReaderAction;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
@@ -726,8 +725,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     
     /**
      * This method is called by the console input driver to perform command line
-     * completion in response to a {@link KeyboardReaderAction#KR_COMPLETE} action; 
-     * typically a TAB character.
+     * completion in response to a 
+     * {@link org.jnode.driver.console.textscreen.KeyboardReaderAction#KR_COMPLETE} 
+     * action; typically a TAB character.
      */
     public CompletionInfo complete(String partial) {
         if (!readingCommand) {
@@ -768,7 +768,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     
     /**
      * This method is responsible for generating incremental help in response
-     * to a @link KeyboardReaderAction#KR_HELP} action.
+     * to a @link org.jnode.driver.console.textscreen.KeyboardReaderAction#KR_HELP}
+     * action.
      */
     public boolean help(String partial, PrintWriter pw) {
         if (!readingCommand) {

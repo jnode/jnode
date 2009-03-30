@@ -20,17 +20,15 @@
  
 package org.jnode.fs.ftpfs;
 
-import org.jnode.fs.FSDirectory;
-import org.jnode.fs.ReadOnlyFileSystemException;
-
 import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.security.AccessControlContext;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedExceptionAction;
+
+import org.jnode.fs.FSDirectory;
+import org.jnode.fs.ReadOnlyFileSystemException;
 
 import com.enterprisedt.net.ftp.FTPFile;
 

@@ -27,7 +27,6 @@ import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.fs.FileSystemException;
-import org.jnode.fs.FileSystemType;
 import org.jnode.partitions.PartitionTableEntry;
 
 /**

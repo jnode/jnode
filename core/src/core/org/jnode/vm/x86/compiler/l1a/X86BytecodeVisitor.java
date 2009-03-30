@@ -1647,8 +1647,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup2_x2()
      */
     public final void visit_dup2_x2() {
-
-	// TODO: port to ORP style
+        // TODO: port to ORP style
 
         // Push all on the stack, since this opcode is just too complicated
         vstack.push(eContext);
@@ -1670,7 +1669,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         os.writePUSH(helper.ABX); // Value2
         os.writePUSH(helper.AAX); // Value1
 
-        // Now update the operandstack
+        // Now update the operand stack
         // cope with brain-dead definition from Sun (look-like somebody there
         // was to eager to optimize this and it landed in the compiler...
         if (c2 == 2) {

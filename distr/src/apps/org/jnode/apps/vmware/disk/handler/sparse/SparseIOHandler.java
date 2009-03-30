@@ -22,7 +22,6 @@ package org.jnode.apps.vmware.disk.handler.sparse;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import org.apache.log4j.Logger;
 import org.jnode.apps.vmware.disk.descriptor.Descriptor;
 import org.jnode.apps.vmware.disk.extent.Extent;
 import org.jnode.apps.vmware.disk.handler.IOHandler;

@@ -1155,7 +1155,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
             + "+" + dstIdxReg + "*" + scale + "]," + srcReg);
     }
 
-   public void writeMOV(int operandSize, GPR dstReg, GPR srcReg,
+    public void writeMOV(int operandSize, GPR dstReg, GPR srcReg,
                          GPR srcIdxReg, int scale, int srcDisp) {
         println("\tmov " + dstReg + "," + size(operandSize) + "[" + srcReg
             + disp(srcDisp) + "+" + srcIdxReg + "*" + scale + "]");

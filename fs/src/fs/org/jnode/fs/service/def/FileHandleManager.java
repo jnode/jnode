@@ -172,7 +172,7 @@ final class FileHandleManager {
                     hasWriters = false;
                 }
             } else {
-            	throw new IOException("FileHandle is not known in FileData.close!!");
+                throw new IOException("FileHandle is not known in FileData.close!!");
             }
         }
 

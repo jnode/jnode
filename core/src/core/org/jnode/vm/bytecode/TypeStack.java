@@ -20,10 +20,8 @@
  
 package org.jnode.vm.bytecode;
 
-import org.jnode.vm.JvmType;
-
 /**
- * A TypeStack is a stack of internal type numbers represented as {@link JvmType} 
+ * A TypeStack is a stack of internal type numbers represented as {@link org.jnode.vm.JvmType} 
  * values; i.e. integers.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -35,7 +33,7 @@ public final class TypeStack {
     private int tos;
 
     /**
-     * Initialize a new instance.
+     * Create a new empty TypeStack instance.
      */
     public TypeStack() {
         stack = new byte[8];
@@ -43,14 +41,18 @@ public final class TypeStack {
     }
 
     /**
-     * Initialize a new instance.
+     * Create a new empty TypeStack instance as copy of an existing one.
+     * @param src the stack whose contents is to be copied.
      */
     public TypeStack(TypeStack src) {
         copyFrom(src);
     }
 
     /**
-     * Initialize a new instance.
+     * Set this stack's contents to be same as another stack.  The
+     * current state of the stack (if any) is discarded.
+     * 
+     * @param src the stack whose contents is to be copied.
      */
     public void copyFrom(TypeStack src) {
         if (src != null) {
@@ -64,14 +66,14 @@ public final class TypeStack {
     }
 
     /**
-     * Empty the tstack.
+     * Empty the TypeStack.
      */
     public void clear() {
         tos = 0;
     }
 
     /**
-     * Is this stack empty.
+     * Is this TypeStack empty.
      *
      * @return {@code true} if the stack is empty, otherwise {@code false}.
      */
@@ -80,7 +82,7 @@ public final class TypeStack {
     }
 
     /**
-     * Is this stack equal to the given TypeStack.  Note that this is an
+     * Is this TypeStack equal to the given TypeStack.  Note that this is an
      * overload for {@link java.lang.Object#equals(java.lang.Object)} not
      * an override.
      */
@@ -99,11 +101,6 @@ public final class TypeStack {
         return true;
     }
 
-    /**
-     * Is this stack equal to the given object?
-     *
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     public boolean equals(Object o) {
         if (o instanceof TypeStack) {
             return equals((TypeStack) o);
@@ -113,9 +110,9 @@ public final class TypeStack {
     }
 
     /**
-     * Push a type of the stack.
+     * Push a type onto the TypeStack.
      *
-     * @param type
+     * @param type a {@link org.jnode.vm.JvmType} value
      */
     public final void push(int type) {
         if (tos == stack.length) grow();
@@ -123,7 +120,10 @@ public final class TypeStack {
     }
 
     /**
-     * Pop an item of the stack and return its given type.
+     * Pop a type from the TypeStack and return it.
+     * 
+     * @return a {@link org.jnode.vm.JvmType} value
+     * @throws Error if the stack is empty
      */
     public final int pop() {
         if (tos <= 0) {
@@ -133,11 +133,12 @@ public final class TypeStack {
     }
 
     /**
-     * Pop an item of the stack and expect a given type.
+     * Pop a type from the stack and check that it is the expected type.
      *
-     * @param type
+     * @param type the expected {@link org.jnode.vm.JvmType} value.
+     * @throws Error if there is a type mismatch
      */
-    public final void pop(int type) {
+    public final void pop(int type) throws Error {
         if (tos <= 0) {
             throw new Error("Stack is empty");
         }
@@ -163,7 +164,7 @@ public final class TypeStack {
      * @param stackIndex the stack index.  This should be a number in the range
      * {@code 0 .. size() - 1} inclusive where {@code size() - 1} is the top element 
      * on the stack.
-     * @return the internal type number at the given offset.
+     * @return the {@link org.jnode.vm.JvmType} value at the given offset.
      */
     public final int getType(int stackIndex) {
         return stack[stackIndex];

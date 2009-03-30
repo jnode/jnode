@@ -21,7 +21,6 @@
 package org.jnode.vm.x86.compiler;
 
 import org.jnode.assembler.x86.X86Register;
-import org.jnode.vm.JvmType;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -32,7 +31,7 @@ public interface AbstractX86StackManager {
      * Write code to push the contents of the given register on the stack
      *
      * @param reg
-     * @see JvmType
+     * @param jvmType the type of the register contents as a {@link org.jnode.vm.JvmType}.
      */
     public void writePUSH(int jvmType, X86Register.GPR reg);
 
@@ -41,7 +40,7 @@ public interface AbstractX86StackManager {
      *
      * @param lsbReg
      * @param msbReg
-     * @see JvmType
+     * @param jvmType the type of the registers contents as a {@link org.jnode.vm.JvmType}.
      */
     public void writePUSH64(int jvmType, X86Register.GPR lsbReg,
                             X86Register.GPR msbReg);
@@ -50,7 +49,7 @@ public interface AbstractX86StackManager {
      * Write code to push a 64-bit word on the stack
      *
      * @param reg
-     * @see JvmType
+     * @param jvmType the type of the register contents as a {@link org.jnode.vm.JvmType}.
      */
     public void writePUSH64(int jvmType, X86Register.GPR64 reg);
 }

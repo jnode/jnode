@@ -955,7 +955,7 @@ public final class VmSystem {
         public void write(int b) throws IOException {
             final char ch = (char) (b & 0xFF);
             Unsafe.debug(ch);
-            if(data == null) {
+            if (data == null) {
                 synchronized (this) {
                     data = new StringBuffer();
                 }
@@ -969,9 +969,7 @@ public final class VmSystem {
          * @return data written to the system output stream
          */
         public String getData() {
-            if(data == null)
-                return "";
-            return data.toString();
+            return (data == null) ? "" : data.toString();
         }
     }
 
