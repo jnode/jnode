@@ -37,8 +37,6 @@
 
 package java.security;
 
-import org.jnode.vm.VmAccessControlContext;
-
 /**
  * AccessControlContext makes system resource access decsion based on
  * permission rights.
@@ -54,7 +52,7 @@ import org.jnode.vm.VmAccessControlContext;
  */
 public final class AccessControlContext {
 
-    private final VmAccessControlContext vmContext;
+    final Object vmContext;
 
     private final DomainCombiner combiner;
 
@@ -67,9 +65,11 @@ public final class AccessControlContext {
      *            The ProtectionDomains to use
      */
     public AccessControlContext(ProtectionDomain[] context) {
-        this.vmContext = new VmAccessControlContext(context, null);
+        this.vmContext = createContext2(context);
         this.combiner = null;
     }
+
+    private static native Object createContext2(ProtectionDomain[] context);
 
     /**
      * Construct a new AccessControlContext with the specified
@@ -79,7 +79,7 @@ public final class AccessControlContext {
      * @param context
      *            The context to use
      */
-    AccessControlContext(VmAccessControlContext context) {
+    AccessControlContext(Object context) {
         this.vmContext = context;
         this.combiner = null;
     }
@@ -93,11 +93,12 @@ public final class AccessControlContext {
      * 
      * @since JDK 1.3
      */
-    public AccessControlContext(AccessControlContext acc,
-            DomainCombiner combiner) {
-        this.vmContext = new VmAccessControlContext(null, acc.vmContext);
+    public AccessControlContext(AccessControlContext acc, DomainCombiner combiner) {
+        this.vmContext = createContext(acc);
         this.combiner = combiner;
     }
+
+    private static native Object createContext(AccessControlContext acc);
 
     /**
      * Returns the Domain Combiner associated with the AccessControlContext
@@ -118,9 +119,7 @@ public final class AccessControlContext {
      * @throws AccessControlException
      *             if the permssion is not permitted
      */
-    public void checkPermission(Permission perm) throws AccessControlException {
-        vmContext.checkPermission(perm);
-    }
+    public native void checkPermission(Permission perm) throws AccessControlException;
 
     /**
      * Checks if two AccessControlContexts are equal.
@@ -153,7 +152,7 @@ public final class AccessControlContext {
     /**
      * @return Returns the vmContext.
      */
-    final VmAccessControlContext getVmContext() {
+    final Object getVmContext() {
         return this.vmContext;
     }
 }
