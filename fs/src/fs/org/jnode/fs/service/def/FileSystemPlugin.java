@@ -22,7 +22,7 @@ package org.jnode.fs.service.def;
 
 import java.io.IOException;
 import java.io.VMFile;
-import java.io.VMFileSystemAPI;
+import org.jnode.java.io.VMFileSystemAPI;
 import java.io.VMIOUtils;
 import java.security.AccessController;
 import java.security.PrivilegedAction;

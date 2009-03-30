@@ -21,7 +21,7 @@
 package org.jnode.fs.service;
 
 import java.io.IOException;
-import java.io.VMFileSystemAPI;
+import org.jnode.java.io.VMFileSystemAPI;
 import java.util.Collection;
 import java.util.Map;
 
