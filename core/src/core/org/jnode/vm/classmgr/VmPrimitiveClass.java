@@ -22,8 +22,6 @@ package org.jnode.vm.classmgr;
 
 import java.security.ProtectionDomain;
 
-import org.jnode.vm.JvmType;
-
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -31,7 +29,7 @@ import org.jnode.vm.JvmType;
 public final class VmPrimitiveClass<T> extends VmNormalClass<T> {
 
     /**
-     * Is this a floatingpoint type?
+     * Is this a floating point type?
      */
     private final boolean floatingPoint;
 
@@ -41,7 +39,7 @@ public final class VmPrimitiveClass<T> extends VmNormalClass<T> {
     private final boolean wide;
 
     /**
-     * JvmType of this type
+     * The {@link org.jnode.vm.JvmType} for this type
      */
     private final int jvmType;
 
@@ -84,9 +82,9 @@ public final class VmPrimitiveClass<T> extends VmNormalClass<T> {
     }
 
     /**
-     * Gets the {@link JvmType} value for this type.
+     * Gets the {@link org.jnode.vm.JvmType} value for this type.
      *
-     * @return the {@link JvmType} (integer) value
+     * @return the {@link org.jnode.vm.JvmType} (integer) value
      */
     public int getJvmType() {
         return jvmType;

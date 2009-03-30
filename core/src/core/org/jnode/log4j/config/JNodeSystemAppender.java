@@ -25,14 +25,14 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
 
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.WriterAppender;
 
 /**
  * Custom Log4j appender class for appending to the current System.out or System.err.
- * Unlike {@link ConsoleAppender}, this class tracks the changes to the System streams.
- * (This is an interim solution until we get the equivalent of /dev/console.)
+ * Unlike {@link org.apache.log4j.ConsoleAppender}, this class tracks the changes to 
+ * the System streams.  (This is an interim solution until JNode gets the equivalent 
+ * of UNIX /dev/console.)
  * 
  * @author crawley@jnode.org
  */
