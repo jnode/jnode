@@ -35,7 +35,6 @@ import org.jnode.plugin.PluginException;
 import org.jnode.test.fs.driver.factories.MockFloppyDeviceFactory;
 import org.jnode.test.fs.driver.factories.MockIDEDeviceFactory;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
-import org.jnode.test.fs.driver.stubs.StubNameSpace;
 import org.jnode.test.fs.filesystem.config.OsType;
 import org.jnode.emu.naming.BasicNameSpace;
 
