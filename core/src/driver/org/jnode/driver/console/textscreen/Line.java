@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.SortedSet;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.ScrollableTextConsole;
@@ -35,7 +36,7 @@ import org.jnode.driver.console.spi.ConsoleWriter;
 
 /**
  * A class that handles the content of the current command line in the shell.
- * That can be : - a new command that the user is beeing editing - an existing
+ * That can be : - a new command that the user is being editing - an existing
  * command (from the command history)
  * <p/>
  * This class also handles the current cursor position in the command line and
@@ -386,8 +387,7 @@ class Line {
             }
             console.setCursorVisible(true);
         } catch (Exception e) {
-            // TODO - why ignore these exceptions?  Are they due to the console methods
-            // not being thread-safe???
+            Logger.getLogger(Line.class).debug("Exception in Line.refreshCurrentLine()", e);
         }
     }
 
