@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.command.archive"
+        name="JNode archive commands"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+
+  <requires>
+    <import plugin="org.apache.tools.archive" />
+    <import plugin="org.jnode.shell" />
+  </requires>
+  
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.command.archive.*" />
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.shell.aliases">
+    <alias name="bzip2" class="org.jnode.fs.command.archive.BZipCommand" />
+    <alias name="bunzip2" class="org.jnode.fs.command.archive.BUnzipCommand" />
+    <alias name="bzcat" class="org.jnode.fs.command.archive.BZCatCommand" />
+    <alias name="gzip" class="org.jnode.fs.command.archive.GZipCommand" />
+    <alias name="gunzip" class="org.jnode.fs.command.archive.GUnzipCommand" />
+    <alias name="tar" class="org.jnode.fs.command.archive.TarCommand" />
+    <alias name="unzip" class="org.jnode.fs.command.archive.UnzipCommand" />
+    <alias name="zcat" class="org.jnode.fs.command.archive.ZCatCommand" />
+    <alias name="zip" class="org.jnode.fs.command.archive.ZipCommand" />
+  </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    
+    <syntax alias="tar">
+      <sequence>
+      <alternatives description="tar operations">
+          <option argLabel="doAppend" shortName="r" longName="append" />
+          <option argLabel="doCreate" shortName="c" longName="create" />
+          <option argLabel="doConcat" shortName="A" longName="concatenate" />
+          <option argLabel="doDelete" longName="delete" />
+          <option argLabel="doDiff" shortName="d" longName="diff" />
+          <option argLabel="doExtract" shortName="x" longName="extract" />
+          <option argLabel="doList" shortName="t" longName="list" />
+          <option argLabel="doUpdate" shortName="u" longName="update" />
+        </alternatives>
+        <optionSet description="tar options">
+          <option argLabel="backup" longName="backup" />
+          <option argLabel="bzip" shortName="j" longName="bzip2" />
+          <option argLabel="debug" longName="debug" />
+          <option argLabel="dir" shortName="C" longName="directory" />
+          <option argLabel="exclude" longName="exclude" label="pattern" />
+          <option argLabel="file" shortName="f" longName="file" />
+          <option argLabel="fileList" shortName="T" longName="files-from"/>
+          <option argLabel="gzip" shortName="z" longName="gzip" />
+          <option argLabel="interact" shortName="w" longName="interactive" />
+          <option argLabel="keepFiles" shortName="k" longName="keep-old-files" />
+          <option argLabel="noRecurse" longName="no-recursion" />
+          <option argLabel="recurse" longName="recursion" />
+          <option argLabel="removeFiles" longName="remove-files" />
+          <option argLabel="showTotals" longName="totals" />
+          <option argLabel="suffix" longName="suffix" />
+          <option argLabel="useStdout" shortName="O" longName="to-stdout" />
+          <option argLabel="verbose" shortName="v" longName="verbose" />
+          <option argLabel="verify" shortName="W" longName="verify" />
+          <option argLabel="xfile" shortName="X" longName="exclude-from"/>
+          <!--
+          <option argLabel="minDate" shortName="N" longName="newer" />
+          <option argLabel="minMTime" longName="newer-mtime" />
+          -->
+        </optionSet>
+        <repeat minCount="0">
+          <argument argLabel="paths" label="file/dir"/>
+        </repeat>
+      </sequence>
+    </syntax>
+    <syntax alias="gzip">
+      <empty description="compress standard input to standard output" />
+      <sequence description="compress files">
+        <optionSet>
+          <option argLabel="decompress" shortName="d" longName="decompress" />
+          <option argLabel="noname" shortName="n" longName="no-name" />
+          <option argLabel="name" shortName="N" longName="name" />
+          <option argLabel="stdout" shortName="c" longName="stdout" />
+          <option argLabel="force" shortName="f" longName="force" />
+          <option argLabel="quiet" shortName="q" longName="quiet" />
+          <option argLabel="verbose" shortName="v" longName="verbose" />
+          <option argLabel="lvl1" shortName="1" longName="fast" />
+          <option argLabel="debug" longName="debug" />
+          <option argLabel="recursive" shortName="r" longName="recursive" />
+          <option argLabel="test" shortName="t" longName="test" />
+          <option argLabel="list" shortName="l" longName="list" />
+          <option argLabel="lvl9" shortName="9" longName="best" />
+        </optionSet>
+        <optional eager="true"><option argLabel="suffix" shortName="S" longName="suffix" /></optional>
+        <repeat minCount="1">
+          <argument argLabel="file" />
+        </repeat>
+      </sequence>
+    </syntax>
+    <syntax alias="gunzip">
+      <empty description="decompress standard input to standard output" />
+      <sequence description="decompress files">
+        <optionSet>
+          <option argLabel="debug" longName="debug" />
+          <option argLabel="recursive" shortName="r" longName="recursive" />
+          <option argLabel="test" shortName="t" longName="test" />
+          <option argLabel="list" shortName="l" longName="list" />
+          <option argLabel="noname" shortName="n" longName="no-name" />
+          <option argLabel="name" shortName="N" longName="name" />
+          <option argLabel="stdout" shortName="c" longName="stdout" />
+          <option argLabel="force" shortName="f" longName="force" />
+          <option argLabel="quiet" shortName="q" longName="quiet" />
+          <option argLabel="verbose" shortName="v" longName="verbose" />
+        </optionSet>
+        <optional eager="true"><option argLabel="suffix" shortName="S" longName="suffix" /></optional>
+        <repeat minCount="1">
+          <argument argLabel="file" />
+        </repeat>
+      </sequence>
+    </syntax>
+    <syntax alias="zcat">
+      <empty description="decompress standard input to standard output" />
+      <sequence description="decompress files to standard output">
+        <optionSet>
+          <option argLabel="quiet" shortName="q" longName="quiet" />
+          <option argLabel="verbose" shortName="v" longName="verbose" />
+          <option argLabel="debug" longName="debug" />
+        </optionSet>
+        <repeat minCount="1">
+          <argument argLabel="file" />
+        </repeat>
+      </sequence>
+    </syntax>
+    <syntax alias="zip">
+    </syntax>
+    <syntax alias="unzip">
+    </syntax>
+    <syntax alias="bzip2">
+    </syntax>
+    <syntax alias="bunzip2">
+    </syntax>
+    <syntax alias="bzcat">
+    </syntax>
+  </extension>
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write,delete"/>
+    <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
+    <permission class="java.util.PropertyPermission" name="user.dir" actions="read,write"/>
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+    <permission class="java.net.NetPermission" name="specifyStreamHandler"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
+    <permission class="java.lang.RuntimePermission" name="exitVM"/>
+    <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
+  </extension>
+</plugin>
