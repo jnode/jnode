@@ -30,6 +30,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.classpath.ext.security"/>
     <plugin id="org.classpath.tools"/>
 
+    <plugin id="org.apache.tools.archive" />
     <plugin id="org.apache.jakarta.commons.net"/>
     <plugin id="org.xbill.dns"/>
 
@@ -114,6 +115,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.driver.video.vesa"/>
 
     <plugin id="org.jnode.fs.command"/>
+    <plugin id="org.jnode.fs.command.archive" />
     <plugin id="org.jnode.fs.ext2"/>
     <plugin id="org.jnode.fs.ext2.command"/>
     <plugin id="org.jnode.fs.hfsplus"/>
