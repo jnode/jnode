@@ -6,6 +6,7 @@
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
   <property name="my-src.dir"     value="${basedir}/src"/>
   <property name="my.jar"         value="${jnode-fs.jar}"/>
+  <property name="my-report.dir"  value="${my-build.dir}/report"/>
 	
 <!-- Subproject specific classpath -->
   <path id="my-cp">
@@ -71,12 +72,19 @@
 	
 <!-- tests FileSystems -->
 	<target name="tests" depends="compile" description="Run FS tests with JUnit">
+	  <mkdir dir="${my-report.dir}"/>
 	  <junit fork="yes" haltonerror="false" haltonfailure="false" printsummary="on" includeantruntime="true">
 	    <classpath refid="cp-jnode" />
-			  	
-	    <formatter type="plain" usefile="false" />
-	    <test name="org.jnode.test.fs.filesystem.FSTestSuite" />
+	  	<formatter type="xml" />
+	    <test name="org.jnode.test.fs.filesystem.FSTestSuite" outfile="${my-report.dir}/TEST-fs"/>
 	  </junit>
+	  <junitreport todir="${my-report.dir}">
+	    <fileset dir="${my-report.dir}">
+		    <include name="TEST*.xml"/>
+		</fileset>
+	    <report todir="${my-report.dir}" format="frames"/>
+	  </junitreport>
+      <echo message="HTML report: ${my-report.dir}/index.html" />  
 	</target>			
 </project>
 

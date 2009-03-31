@@ -20,8 +20,8 @@
  
 package org.jnode.test.fs.filesystem.tests;
 
-import java.io.IOException;
 import java.util.Iterator;
+
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.ReadOnlyFileSystemException;
@@ -34,30 +34,30 @@ import org.jnode.test.support.TestUtils;
  * @author Fabien DUMINY
  */
 public class BasicFSTest extends AbstractFSTest {
-    public BasicFSTest() {
-        super();
+    public BasicFSTest(FSTestConfig config) {
+        super(config);
     }
 
     public BasicFSTest(String name) {
         super(name);
     }
-
-    public void testGetRootEntry(FSTestConfig config) throws Exception {
-        setUp(config);
+    
+    public void testGetRootEntry() throws Exception {
+        setUp();
         FSEntry rootEntry = getFs().getRootEntry();
         log.debug(FSUtils.toString(rootEntry, false));
     }
 
-    public void testListRootEntries(FSTestConfig config) throws Exception {
-        setUp(config);
+    public void testListRootEntries() throws Exception {
 
+        setUp();
         Iterator<? extends FSEntry> iterator = getFs().getRootEntry().getDirectory().iterator();
         TestUtils.listEntries(iterator);
     }
 
-    public void testAddDirectory(FSTestConfig config) throws Exception {
-        setUp(config);
+    public void testAddDirectory() throws Exception {
 
+        setUp();
         FSDirectory rootDir = getFs().getRootEntry().getDirectory();
         String dirName = "A new directory.text";
 
@@ -89,8 +89,8 @@ public class BasicFSTest extends AbstractFSTest {
         TestUtils.listEntries(rootDir.iterator());
     }
 
-    public void testAddFile(FSTestConfig config) throws Exception {
-        setUp(config);
+    public void testAddFile() throws Exception {
+        setUp();
 
         FSDirectory rootDir = getFs().getRootEntry().getDirectory();
         String fileName = "A new file.text";
@@ -124,9 +124,9 @@ public class BasicFSTest extends AbstractFSTest {
         TestUtils.listEntries(rootDir.iterator());
     }
 
-    public void testAddFileThenRemountFSAndGetFile(FSTestConfig config) throws IOException, Exception {
+    public void testAddFileThenRemountFSAndGetFile() throws Exception {
         if (!config.isReadOnly()) {
-            setUp(config);
+            setUp();
 
             String filename = "a file to test.text";
             FSDirectory rootDir = getFs().getRootEntry().getDirectory();
@@ -149,10 +149,10 @@ public class BasicFSTest extends AbstractFSTest {
         }
     }
 
-    public void testRemoveThenRemountFSAndGetEntry(FSTestConfig config) throws Exception {
+    public void testRemoveThenRemountFSAndGetEntry() throws Exception {
 
         if (!config.isReadOnly()) {
-            setUp(config);
+            setUp();
 
             String filename = "a file to test.text";
             FSDirectory rootDir = getFs().getRootEntry().getDirectory();
