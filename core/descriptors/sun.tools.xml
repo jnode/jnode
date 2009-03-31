@@ -50,5 +50,7 @@
       <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
       <permission class="java.lang.RuntimePermission" name="writeFileDescriptor"/>
       <permission class="java.lang.RuntimePermission" name="readFileDescriptor"/>
-  </extension>       
+      <permission class="java.lang.RuntimePermission" name="exitVM"/>
+      <permission class="java.util.PropertyPermission" name="sun.tools.jar.useExtractionTime" actions="read"/>
+  </extension>
 </plugin>
