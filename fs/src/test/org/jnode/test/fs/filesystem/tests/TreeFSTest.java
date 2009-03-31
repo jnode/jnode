@@ -31,17 +31,17 @@ import org.jnode.test.fs.filesystem.config.FSTestConfig;
  * @author Fabien DUMINY
  */
 public class TreeFSTest extends AbstractFSTest {
-    public TreeFSTest() {
-        super();
+    public TreeFSTest(FSTestConfig config) {
+        super(config);
     }
 
     public TreeFSTest(String name) {
         super(name);
     }
 
-    public void testFSTree(FSTestConfig config) throws IOException, Exception {
+    public void testFSTree() throws IOException, Exception {
         if (!config.isReadOnly()) {
-            setUp(config);
+            setUp();
 
             FSDirectory rootDir = getFs().getRootEntry().getDirectory();
             FSEntry dir1 = rootDir.addDirectory("dir1");
@@ -62,17 +62,17 @@ public class TreeFSTest extends AbstractFSTest {
         }
     }
 
-    public void testFSTreeWithRemountAndShortName(FSTestConfig config) throws Exception {
+    public void testFSTreeWithRemountAndShortName() throws Exception {
         doTestFSTreeWithRemount(config, "dir1");
     }
 
-    public void testFSTreeWithRemountAndLongName(FSTestConfig config) throws Exception {
+    public void testFSTreeWithRemountAndLongName() throws Exception {
         doTestFSTreeWithRemount(config, "This is a Long FileName.extension");
     }
 
     private void doTestFSTreeWithRemount(FSTestConfig config, String fileName) throws Exception {
         if (!config.isReadOnly()) {
-            setUp(config);
+            setUp();
 
             FSDirectory rootDir = getFs().getRootEntry().getDirectory();
             log.debug("### testFSTreeWithRemount: rootDir=\n" + FSUtils.toString(rootDir, true));

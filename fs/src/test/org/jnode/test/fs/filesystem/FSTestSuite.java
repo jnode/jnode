@@ -20,8 +20,12 @@
  
 package org.jnode.test.fs.filesystem;
 
+import javax.naming.NamingException;
+
 import junit.extensions.jfunc.JFuncSuite;
 import junit.extensions.jfunc.textui.JFuncRunner;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.jnode.emu.naming.BasicNameSpace;
 import org.jnode.emu.plugin.model.DummyConfigurationElement;
@@ -38,7 +42,6 @@ import org.jnode.test.fs.filesystem.tests.ConcurrentAccessFSTest;
 import org.jnode.test.fs.filesystem.tests.FileFSTest;
 import org.jnode.test.fs.filesystem.tests.TreeFSTest;
 import org.jnode.util.OsUtils;
-import javax.naming.NamingException;
 
 /**
  * This class runs a suite of functional tests on the JNode file system
@@ -84,36 +87,40 @@ public class FSTestSuite extends JFuncSuite {
         setup = true;
     }
 
-    public static JFuncSuite suite() throws Throwable {
+    public static TestSuite suite() throws Throwable {
         setUp();
-        JFuncSuite suite = new JFuncSuite();
-
+        TestSuite allTestsSuite = new TestSuite("All FS Tests");
+                
         for (FSTestConfig config : new FSConfigurations()) {
-            BasicFSTest basicTest = (BasicFSTest) suite.getTestProxy(new BasicFSTest());
-            basicTest.testAddDirectory(config);
-            basicTest.testAddFile(config);
-            basicTest.testAddFileThenRemountFSAndGetFile(config);
-            basicTest.testGetRootEntry(config);
-            basicTest.testListRootEntries(config);
-            basicTest.testRemoveThenRemountFSAndGetEntry(config);
+            TestSuite tests = new TestSuite();
+            tests.setName(config.getFileSystem().toString());
+            addTest(tests, new BasicFSTest(config), "testAddDirectory");
+            addTest(tests, new BasicFSTest(config), "testAddFile");
+            addTest(tests, new BasicFSTest(config), "testAddFileThenRemountFSAndGetFile");
+            addTest(tests, new BasicFSTest(config), "testGetRootEntry");
+            addTest(tests, new BasicFSTest(config), "testListRootEntries");
+            addTest(tests, new BasicFSTest(config), "testRemoveThenRemountFSAndGetEntry");
 
-            FileFSTest fileTest = (FileFSTest) suite.getTestProxy(new FileFSTest());
-            fileTest.testSetLength(config);
-            fileTest.testWriteFileInReadOnlyMode(config);
-            fileTest.testWriteFileThenRemountFSAndRead(config);
+            addTest(tests, new FileFSTest(config), "testSetLength");
+            addTest(tests, new FileFSTest(config), "testWriteFileInReadOnlyMode");
+            addTest(tests, new FileFSTest(config), "testWriteFileThenRemountFSAndRead");
+            
+            addTest(tests, new TreeFSTest(config), "testFSTree");
+            addTest(tests, new TreeFSTest(config), "testFSTreeWithRemountAndLongName");
+            addTest(tests, new TreeFSTest(config), "testFSTreeWithRemountAndShortName");
 
-            TreeFSTest treeTest = (TreeFSTest) suite.getTestProxy(new TreeFSTest());
-            treeTest.testFSTree(config);
-            treeTest.testFSTreeWithRemountAndLongName(config);
-            treeTest.testFSTreeWithRemountAndShortName(config);
+            addTest(tests, new ConcurrentAccessFSTest(config), "testRead");
+            addTest(tests, new ConcurrentAccessFSTest(config), "testWrite");
+            addTest(tests, new ConcurrentAccessFSTest(config), "testReadWrite");
 
-            ConcurrentAccessFSTest threadTest = (ConcurrentAccessFSTest)
-                suite.getTestProxy(new ConcurrentAccessFSTest());
-            threadTest.testRead(config);
-            threadTest.testWrite(config);
-            threadTest.testReadWrite(config);
+            allTestsSuite.addTest(tests);
         }
-
-        return suite;
+        
+        return allTestsSuite;
+    }
+    
+    private static void addTest(TestSuite suite, TestCase test, String name) {
+        test.setName(name);
+        suite.addTest(test);
     }
 }

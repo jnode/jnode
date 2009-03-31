@@ -33,16 +33,16 @@ import org.jnode.test.support.TestUtils;
  * @author Fabien DUMINY
  */
 public class FileFSTest extends AbstractFSTest {
-    public FileFSTest() {
-        super();
+    public FileFSTest(FSTestConfig config) {
+        super(config);
     }
 
     public FileFSTest(String name) {
         super(name);
     }
 
-    public void testWriteFileThenRemountFSAndRead(FSTestConfig config) throws Exception {
-        setUp(config);
+    public void testWriteFileThenRemountFSAndRead() throws Exception {
+        setUp();
 
         final String fileName = "RWTest";
 
@@ -82,9 +82,9 @@ public class FileFSTest extends AbstractFSTest {
         }
     }
 
-    public void testWriteFileInReadOnlyMode(FSTestConfig config) throws Exception {
+    public void testWriteFileInReadOnlyMode() throws Exception {
         if (config.isReadOnly()) {
-            setUp(config);
+            setUp();
 
             final String fileName = "RWTest";
 
@@ -104,8 +104,8 @@ public class FileFSTest extends AbstractFSTest {
         }
     }
 
-    public void testSetLength(FSTestConfig config) throws Exception {
-        setUp(config);
+    public void testSetLength() throws Exception {
+        setUp();
 
         final int newSize = 128;
         final String fileName = "RWTest";

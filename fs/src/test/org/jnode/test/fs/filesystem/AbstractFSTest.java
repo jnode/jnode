@@ -26,8 +26,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.naming.NameNotFoundException;
-import junit.extensions.jfunc.JFuncTestCase;
+
+import junit.framework.TestCase;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.fs.FSDirectory;
@@ -41,18 +44,19 @@ import org.jnode.test.support.TestUtils;
 /**
  * @author Fabien DUMINY
  */
-public abstract class AbstractFSTest extends JFuncTestCase {
+public abstract class AbstractFSTest extends TestCase {
     protected final Logger log = Logger.getLogger(getClass());
 
     //public static final int FILE_SIZE_IN_WORDS = 256 * 1024; // 512 Ko = 256 K Words
     public static final int FILE_SIZE_IN_WORDS = 128; // 512 Ko = 128 K Words
 
     private FileSystem fs;
-    private FSTestConfig config;
+    protected FSTestConfig config;
     private Device device;
 
-    public AbstractFSTest() {
+    public AbstractFSTest(FSTestConfig config) {
         super();
+        this.config = config;
     }
 
     /**
@@ -62,10 +66,9 @@ public abstract class AbstractFSTest extends JFuncTestCase {
         super(name);
     }
 
-    protected final void setUp(FSTestConfig config) throws NameNotFoundException, FileSystemException, IOException,
+    public final void setUp() throws NameNotFoundException, FileSystemException, IOException,
         InstantiationException, IllegalAccessException, Exception {
         super.setUp();
-        this.config = config;
         this.device = config.getDeviceParam().createDevice();
         this.fs = config.getFileSystem().format(this.device);
         this.fs = config.getFileSystem().mount(this.device);
@@ -141,9 +144,9 @@ public abstract class AbstractFSTest extends JFuncTestCase {
 //        return (FSContext) ContextManager.getInstance().getContext();
 //    }
 
-    protected void assertFalse(String message, boolean condition) {
-        assertTrue(message, !condition);
-    }
+//    protected void assertFalse(String message, boolean condition) {
+//        assertTrue(message, !condition);
+//    }
 
     protected void assertContainsOnly(String errorMessage, Iterator<? extends FSEntry> it, String[] requiredNames) {
         boolean ok = true;

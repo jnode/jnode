@@ -41,16 +41,16 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
 
     protected static final int NB_WRITERS = 10;
 
-    public ConcurrentAccessFSTest() {
-        super();
+    public ConcurrentAccessFSTest(FSTestConfig config) {
+        super(config);
     }
 
     public ConcurrentAccessFSTest(String name) {
         super(name);
     }
 
-    public void testRead(FSTestConfig config) throws Throwable {
-        setUp(config);
+    public void testRead() throws Throwable {
+        setUp();
 
         FSFile file = prepareFile(config);
 
@@ -61,9 +61,9 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
         monitor.waitAll();
     }
 
-    public void testWrite(FSTestConfig config) throws Throwable {
+    public void testWrite() throws Throwable {
         if (!config.isReadOnly()) {
-            setUp(config);
+            setUp();
 
             FSFile file = prepareFile(config);
             Monitor monitor = new Monitor("testWrite");
@@ -73,8 +73,8 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
         }
     }
 
-    public void testReadWrite(FSTestConfig config) throws Throwable {
-        setUp(config);
+    public void testReadWrite() throws Throwable {
+        setUp();
 
         FSFile file = prepareFile(config);
         Monitor monitor = new Monitor("testReadWrite");
