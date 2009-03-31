@@ -72,11 +72,12 @@
 	
 <!-- tests FileSystems -->
 	<target name="tests" depends="compile" description="Run FS tests with JUnit">
+      <delete dir="${my-report.dir}" />
 	  <mkdir dir="${my-report.dir}"/>
 	  <junit fork="yes" haltonerror="false" haltonfailure="false" printsummary="on" includeantruntime="true">
 	    <classpath refid="cp-jnode" />
 	  	<formatter type="xml" />
-	    <test name="org.jnode.test.fs.filesystem.FSTestSuite" outfile="${my-report.dir}/TEST-fs"/>
+	    <test name="org.jnode.test.fs.filesystem.FSTestSuite" todir="${my-report.dir}" outfile="TEST-fs"/>
 	  </junit>
 	  <junitreport todir="${my-report.dir}">
 	    <fileset dir="${my-report.dir}">
