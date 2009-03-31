@@ -18,9 +18,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jnode.shell.command;
+package org.jnode.fs.command.archive;
 
-import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -37,7 +36,7 @@ import org.jnode.shell.syntax.StringArgument;
  *
  * @author Chris Boertien
  */
-public class GZIPCommand extends AbstractCommand {
+public class GZipCommand extends GZip {
 
     private static final String msg_stdout  = "Write output on standard output, keep original files";
     private static final String msg_decomp  = "decompress";
@@ -70,38 +69,36 @@ public class GZIPCommand extends AbstractCommand {
     private final FlagArgument ArgLvl9     = new FlagArgument("lvl9", Argument.OPTIONAL, msg_best);
     private final FlagArgument ArgDebug    = new FlagArgument("debug", Argument.OPTIONAL, " ");
     
-    public GZIPCommand() {
+    public GZipCommand() {
         super("compresses and decompresses files/data");
-        registerArguments(ArgFile,ArgSuffix,ArgDecomp,ArgNoname,ArgName,ArgStdout,ArgForce,
-                          ArgQuiet,ArgVerbose,ArgLvl1,ArgLvl9,ArgRecurse,ArgTest,ArgList,ArgDebug);
+        registerArguments(ArgFile, ArgSuffix, ArgDecomp, ArgNoname, ArgName, ArgStdout, ArgForce,
+                          ArgQuiet, ArgVerbose, ArgLvl1, ArgLvl9, ArgRecurse, ArgTest, ArgList, ArgDebug);
     }
     
     public void execute() {
-        GZIP gzip = new GZIP( ArgFile.getValues() , ArgSuffix.getValue() , getInput() , getOutput() , getError() );
-        
-        if(ArgDebug.isSet())
-            gzip.verbosity(2);
-        else if(ArgVerbose.isSet())
-            gzip.verbosity(1);
-        else if(ArgQuiet.isSet())
-            gzip.verbosity(-1);
-        
-        try {
-            if(ArgList.isSet()) {
-                gzip.list();
+        if (ArgQuiet.isSet()) {
+            outMode = 0;
+        } else {
+            if (ArgDebug.isSet()) {
+                outMode |= OUT_DEBUG;
             }
-            else if(ArgTest.isSet()) {
-                gzip.test();
-            }
-            else if(ArgDecomp.isSet()) {
-                gzip.decompress( ArgForce.isSet() , ArgStdout.isSet() , ArgRecurse.isSet() );
-            }
-            else {
-                gzip.compress( ArgForce.isSet() , ArgStdout.isSet() ,ArgRecurse.isSet() );
+            if (ArgVerbose.isSet()) {
+                outMode |= OUT_NOTICE;
             }
         }
-        catch(Exception e) {
+        
+        if (ArgSuffix.isSet()) suffix = ArgSuffix.getValue();
+        
+        if (ArgList.isSet())        mode = GZIP_LIST;
+        else if (ArgTest.isSet())   mode = GZIP_TEST;
+        else if (ArgDecomp.isSet()) mode = GZIP_DECOMPRESS;
+        else                        mode = GZIP_COMPRESS;
+        
+        try {
+            execute(ArgFile.getValues(), ArgForce.isSet(), ArgStdout.isSet(), ArgRecurse.isSet());
+        } catch (Exception e) {
             e.printStackTrace();
+            exit(1);
         }
     }
     

@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jnode.shell.command;
+package org.jnode.fs.command.archive;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
@@ -27,27 +27,16 @@ import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.StringArgument;
 
 /**
- * Outputs compressed files to standard out.
+ * @author chris boertien
  */
+public class UnzipCommand extends Zip {
 
-public class ZCATCommand extends AbstractCommand {
-
-    private static final String msg_file    = "the files to compress, use stdin if FILE is '-' or no files are listed";
-    
-    private final FileArgument ArgFile     = new FileArgument("file", Argument.OPTIONAL | Argument.MULTIPLE, msg_file);
-    
-    public ZCATCommand() {
-        super("decompresses files to standard output");
-        registerArguments(ArgFile);
+    public UnzipCommand() {
+        super("extracts entries from zip archives");
+        //registerArguments(ZipfileArg,PatternsArg);
     }
     
     public void execute() {
-        GZIP gzip = new GZIP( ArgFile.getValues() , null , getInput() , getOutput() , getError() );
-        try {
-            gzip.decompress(false,true,false);
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
+        setup();
     }
 }
