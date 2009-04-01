@@ -58,22 +58,21 @@ public class CatalogNode extends AbstractNode {
         this.records = new ArrayList<NodeRecord>(this.descriptor.getNumRecords());
         this.offsets = new ArrayList<Integer>(this.descriptor.getNumRecords() + 1);
         int offset;
-        for(int i = 0; i < this.descriptor.getNumRecords() + 1; i++){
+        for (int i = 0; i < this.descriptor.getNumRecords() + 1; i++) {
             offset = BigEndian.getInt16(nodeData, size - ((i + 1) * 2));
             offsets.add(Integer.valueOf(offset));
         }
         CatalogKey key;
-        for(int i = 0; i < this.descriptor.getNumRecords(); i++){
+        for (int i = 0; i < this.descriptor.getNumRecords(); i++) {
             offset = offsets.get(i);
             key = new CatalogKey(nodeData, offset);
-            if(isIndexNode()){
-                records.add(new IndexRecord(key,nodeData, offset));
+            if (isIndexNode()) {
+                records.add(new IndexRecord(key, nodeData, offset));
             } else {
-                int recordSize = offsets.get(i+1) - offset;
-                records.add(new LeafRecord(key,nodeData, offset, recordSize));
+                int recordSize = offsets.get(i + 1) - offset;
+                records.add(new LeafRecord(key, nodeData, offset, recordSize));
             }
         }
-        
     }
 
     @Override

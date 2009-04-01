@@ -64,7 +64,7 @@ public abstract class AbstractNode implements Node {
         System.arraycopy(descriptor.getBytes(), 0, datas, 0, NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH);
         int offsetIndex = 0;
         int offset;
-        for(NodeRecord record : records){
+        for (NodeRecord record : records) {
             offset = offsets.get(offsetIndex);
             System.arraycopy(record.getBytes(), 0, datas, offset, record.getSize());
             BigEndian.setInt16(datas, size - ((offsetIndex + 1) * 2), offset);
