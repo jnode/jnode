@@ -29,6 +29,7 @@ import org.jnode.fs.FSEntry;
 import org.jnode.fs.jifs.JIFSDirectory;
 import org.jnode.fs.jifs.JIFSFile;
 import org.jnode.fs.jifs.files.JIFSFthread;
+import org.jnode.vm.annotation.DoPrivileged;
 
 
 /**
@@ -49,6 +50,7 @@ public class JIFSDthreads extends JIFSDirectory {
         setParent(parent);
     }
 
+    @DoPrivileged
     public void refresh() {
         super.clear();
         ThreadGroup grp = Thread.currentThread().getThreadGroup();
