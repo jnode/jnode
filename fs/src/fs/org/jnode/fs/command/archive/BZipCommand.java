@@ -20,13 +20,31 @@
 
 package org.jnode.fs.command.archive;
 
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
+
 public class BZipCommand extends BZip {
+
+    private static final String help_fast = "compress faster";
+    private static final String help_best = "compress better";
+    
+    private final FlagArgument C1 = new FlagArgument("c1", Argument.OPTIONAL, help_fast);
+    private final FlagArgument C2 = new FlagArgument("c2", Argument.OPTIONAL, " ");
+    private final FlagArgument C3 = new FlagArgument("c3", Argument.OPTIONAL, " ");
+    private final FlagArgument C4 = new FlagArgument("c4", Argument.OPTIONAL, " ");
+    private final FlagArgument C5 = new FlagArgument("c5", Argument.OPTIONAL, " ");
+    private final FlagArgument C6 = new FlagArgument("c6", Argument.OPTIONAL, " ");
+    private final FlagArgument C7 = new FlagArgument("c7", Argument.OPTIONAL, " ");
+    private final FlagArgument C8 = new FlagArgument("c8", Argument.OPTIONAL, " ");
+    private final FlagArgument C9 = new FlagArgument("c9", Argument.OPTIONAL, help_best);
 
     public BZipCommand() {
         super("compresses data with bzip2");
+        registerArguments(C1, C2, C3, C4, C5, C6, C7, C8, C9);
     }
     
     public void execute() {
-        setup();
+        compress = true;
+        super.execute();
     }
 }

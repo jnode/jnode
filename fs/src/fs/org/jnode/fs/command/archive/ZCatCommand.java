@@ -20,46 +20,19 @@
 
 package org.jnode.fs.command.archive;
 
-import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.FileArgument;
-import org.jnode.shell.syntax.FlagArgument;
-
 /**
  * Outputs compressed files to standard out.
  */
 
 public class ZCatCommand extends GZip {
 
-    private static final String msg_file    = "the files to compress, use stdin if FILE is '-' or no files are listed";
-    
-    private final FileArgument ArgFile = new FileArgument("file", Argument.OPTIONAL | Argument.MULTIPLE, msg_file);
-    private final FlagArgument ArgDebug = new FlagArgument("debug", Argument.OPTIONAL, " ");
-    private final FlagArgument ArgVerbose = new FlagArgument("verbose", Argument.OPTIONAL, " ");
-    private final FlagArgument ArgQuiet = new FlagArgument("quiet", Argument.OPTIONAL, " ");
-    
     public ZCatCommand() {
         super("decompresses files to standard output");
-        registerArguments(ArgFile, ArgDebug, ArgVerbose, ArgQuiet);
     }
     
     public void execute() {
-        if (ArgQuiet.isSet()) {
-            outMode = 0;
-        } else {
-            if (ArgDebug.isSet()) {
-                outMode |= OUT_DEBUG;
-            }
-            if (ArgVerbose.isSet()) {
-                outMode |= OUT_NOTICE;
-            }
-        }
-        
-        mode = GZIP_DECOMPRESS;
-        
-        try {
-            execute(ArgFile.getValues(), false, true, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        use_stdout = true;
+        compress = false;
+        super.execute();
     }
 }

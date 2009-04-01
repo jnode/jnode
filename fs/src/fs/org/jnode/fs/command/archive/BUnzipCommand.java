@@ -28,6 +28,7 @@ public class BUnzipCommand extends BZip {
     }
     
     public void execute() {
-        setup();
+        compress = false;
+        super.execute();
     }
 }
