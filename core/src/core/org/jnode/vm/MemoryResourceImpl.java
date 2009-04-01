@@ -21,7 +21,7 @@
 package org.jnode.vm;
 
 import java.nio.ByteBuffer;
-import java.nio.VMDirectByteBuffer;
+import java.nio.MemoryRawData;
 
 import org.jnode.system.MemoryResource;
 import org.jnode.system.MultiMediaMemoryResource;
@@ -139,7 +139,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @return a bytebuffer that has the same content as this resource
      */
     public ByteBuffer asByteBuffer() {
-        return VMDirectByteBuffer.wrap(this);
+        return MemoryRawData.wrap(this);
     }
 
     /**

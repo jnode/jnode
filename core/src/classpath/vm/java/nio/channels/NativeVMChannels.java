@@ -1,0 +1,58 @@
+package java.nio.channels;
+
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.OutputStream;
+import java.io.FileOutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import gnu.java.nio.channels.FileChannelImpl;
+import gnu.java.nio.ChannelInputStream;
+import gnu.java.nio.ChannelOutputStream;
+
+/**
+ *
+ */
+public class NativeVMChannels {
+    /**
+     * Constructs a stream that reads bytes from the given channel.
+     */
+    static InputStream newInputStream(ReadableByteChannel ch) {
+        if (ch instanceof FileChannelImpl)
+            return (FileInputStream) createStream(FileInputStream.class, ch);
+
+        return new ChannelInputStream(ch);
+    }
+
+    /**
+     * Constructs a stream that writes bytes to the given channel.
+     */
+    static OutputStream newOutputStream(WritableByteChannel ch) {
+        if (ch instanceof FileChannelImpl)
+            return (FileOutputStream) createStream(FileOutputStream.class, ch);
+
+        return new ChannelOutputStream(ch);
+    }
+
+    private static Object createStream(Class streamClass, Channel ch) {
+        try {
+            Class[] argTypes = new Class[1];
+            argTypes[0] = FileChannelImpl.class;
+            Constructor constructor = streamClass.getDeclaredConstructor(argTypes);
+            constructor.setAccessible(true);
+            Object[] args = new Object[1];
+            args[0] = ch;
+            return constructor.newInstance(args);
+        } catch (IllegalAccessException e) {
+            // Ignored.
+        } catch (InstantiationException e) {
+            // Ignored.
+        } catch (InvocationTargetException e) {
+            // Ignored.
+        } catch (NoSuchMethodException e) {
+            // Ignored.
+        }
+
+        return null;
+    }
+}
