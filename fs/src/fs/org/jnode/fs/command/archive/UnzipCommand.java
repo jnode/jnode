@@ -37,6 +37,6 @@ public class UnzipCommand extends Zip {
     }
     
     public void execute() {
-        setup();
+        //setup();
     }
 }
