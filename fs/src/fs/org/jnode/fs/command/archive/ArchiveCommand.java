@@ -21,6 +21,8 @@
 package org.jnode.fs.command.archive;
 
 import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,33 +33,131 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.IOException;
 
+import java.util.ArrayList;
+
 public class ArchiveCommand extends AbstractCommand {
     
-    protected static final int OUT_ERROR = 0x01;
-    protected static final int OUT_WARN  = 0x02;
-    protected static final int OUT_NOTICE = 0x04;
+    private static final String help_verbose = "show the compression ratio for each file compressed";
+    private static final String help_debug = "internal debug output";
+    private static final String help_quiet = "supress non-essential warning messages";
+    private static final String help_stdout = "pipe data to stdout";
+    private static final String help_force = "force overwrite of output files";
+    protected static final String help_decompress = "force decompression";
+    
+    protected static final String prompt_overwrite = " already exists. Do you wish to overwrite? [Y/n]: ";
+    
+    protected static final String err_exception_uncaught = "Unhandled Exception thrown";
+    protected static final String err_file_create = "Could not create file: ";
+    protected static final String err_file_not_exist = "Could not find file: ";
+    protected static final String err_stream_create = "Could not create stream: ";
+    
+    protected static final String fmt_size_diff = "%s:\t%f.2%% -- replaced with %s";
+    
+    protected final FlagArgument Quiet = new FlagArgument("quiet", Argument.OPTIONAL, help_quiet);
+    protected final FlagArgument Verbose = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
+    protected final FlagArgument Debug = new FlagArgument("debug", Argument.OPTIONAL, help_debug);
+    protected final FlagArgument Stdout = new FlagArgument("stdout", Argument.OPTIONAL, help_stdout);
+    protected final FlagArgument Force = new FlagArgument("force", Argument.OPTIONAL, help_force);
+    
+    protected static final int OUT_FATAL = 0x01;
+    protected static final int OUT_ERROR = 0x02;
+    protected static final int OUT_WARN  = 0x04;
+    protected static final int OUT_NOTICE = 0x08;
     protected static final int OUT_DEBUG = 0x80;
+    
+    protected static final int BUFFER_SIZE = 4096;
     
     protected int outMode = OUT_ERROR | OUT_WARN;
     
     protected PrintWriter stdoutWriter;
     protected PrintWriter stderrWriter;
     protected Reader stdinReader;
+    protected InputStream stdin;
+    protected OutputStream stdout;
+    
+    protected String commandName;
+    protected boolean use_stdout;
+    protected boolean force;
+    protected boolean compress;
     
     private byte[] buffer;
     
+    private ArchiveCommand() {}
+    
     protected ArchiveCommand(String s) {
         super(s);
+        registerArguments(Quiet, Verbose, Debug, Stdout, Force);
     }
     
-    protected void setup() {
+    public void execute() {
         stdoutWriter = getOutput().getPrintWriter();
         stderrWriter = getError().getPrintWriter();
         stdinReader  = getInput().getReader();
+        stdin = getInput().getInputStream();
+        stdout = getOutput().getOutputStream();
+        
+        if (Quiet.isSet()) {
+            outMode = 0;
+        } else {
+            if (Verbose.isSet()) {
+                outMode |= OUT_NOTICE;
+            }
+            if (Debug.isSet()) {
+                outMode |= OUT_DEBUG;
+            }
+        }
+        
+        if (!use_stdout) use_stdout = Stdout.isSet();
+        force      = Force.isSet();
     }
     
     protected void createStreamBuffer(int size) {
         buffer = new byte[size];
+    }
+    
+    protected File[] processFileList(File[] files, boolean recurse) {
+        if (files == null || files.length == 0) return null;
+        
+        if (files.length == 1 && !files[0].isDirectory()) {
+            if (files[0].getName().equals("-")) return null;
+            return files;
+        }
+        
+        ArrayList<File> _files = new ArrayList<File>();
+        
+        for (File file : files) {
+            debug(file.getName());
+            if (file.getName().equals("-")) {
+                if (use_stdout) {
+                    // A special case where '-' is found amongst a list of files and are
+                    // being piped to stdout. The idea is that the content from - should
+                    // be concated amongst the list of files. Its more of an error if the
+                    // destination is not stdout.
+                    _files.add(file);
+                } else {
+                    fatal("Found stdin in file list.", 1);
+                }
+            }
+            if (!file.exists()) {
+                error(err_file_not_exist + file);
+                continue;
+            }
+            if (file.isDirectory() && recurse) {
+                File[] dirList = file.listFiles();
+                for (File subFile : dirList) {
+                    if (subFile.isFile()) {
+                        _files.add(subFile);
+                    }
+                }
+            } else {
+                if (file.isFile()) {
+                    _files.add(file);
+                }
+            }
+        }
+        
+        if (_files.size() == 0) return null;
+        return _files.toArray(files);
     }
     
     /**
@@ -93,12 +193,17 @@ public class ArchiveCommand extends AbstractCommand {
     protected OutputStream openFileWrite(File file , boolean delete , boolean forced) {
         try {
             boolean createNew = true;
+            if (file == null) {
+                error(err_file_create + "null");
+                return null;
+            }
+            
             if (file.exists()) {
                 if (delete) {
                     if (forced) {
                         file.delete();
                     } else {
-                        if (prompt_yn(file + "exists. Overwrite? ")) {
+                        if (prompt_yn(file + prompt_overwrite, true)) {
                             file.delete();
                         } else {
                             notice("Skipping " + file);
@@ -110,12 +215,12 @@ public class ArchiveCommand extends AbstractCommand {
                 }
             }
             if (createNew && !file.createNewFile()) {
-                error("Could not create file: " + file);
+                error(err_file_create + file);
                 return null;
             }
             return new FileOutputStream(file);
         } catch (IOException ioe) {
-            error("Could not open stream: " + file + " : " + ioe.getLocalizedMessage());
+            error(err_stream_create + file);
             return null;
         }
     }
@@ -131,9 +236,13 @@ public class ArchiveCommand extends AbstractCommand {
      */
     protected InputStream openFileRead(File file) {
         try {
+            if (file == null || !file.exists()) {
+                error(err_file_not_exist + file);
+                return null;
+            }
             return new FileInputStream(file);
         } catch (IOException ioe) {
-            error("Cannot open stream: " + file + " : " + ioe.getLocalizedMessage());
+            error(err_stream_create + file);
             return null;
         }
     }
@@ -144,24 +253,28 @@ public class ArchiveCommand extends AbstractCommand {
      * @param String the question to ask the user
      * @return true if the user said yes, false if the user said no
      */
-    protected boolean prompt_yn(String s) {
+    protected boolean prompt_yn(String s, boolean defaultY) {
         int choice;
         for (;;) {
-            stdoutWriter.print(s + " [y/n]");
+            stdoutWriter.print(s);
             try {
                 choice = stdinReader.read();
             } catch (IOException _) {
-                choice = 0;
+                throw new RuntimeException("Problem with stdin");
             }
             stdoutWriter.println();
-            if (choice == 'y' || choice == 'n') break;
+            if (choice == 'y') return true;
+            if (choice == 'n') return false;
+            if (choice == '\n') return defaultY;
         }
-        
-        return choice == 'y';
     }
     
     protected void out(String s) {
         stdoutWriter.println(s);
+    }
+    
+    protected void err(String s) {
+        stderrWriter.println(s);
     }
     
     protected void debug(String s) {
@@ -181,5 +294,10 @@ public class ArchiveCommand extends AbstractCommand {
     
     protected void error(String s) {
         if ((outMode & OUT_ERROR) == OUT_ERROR) stderrWriter.println(s);
+    }
+    
+    protected void fatal(String s, int exit_code) {
+        stderrWriter.println("Fatal error: " + s);
+        exit(exit_code);
     }
 }

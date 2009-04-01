@@ -24,9 +24,13 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.StringArgument;
 
 /**
  *
@@ -37,139 +41,138 @@ import java.util.zip.GZIPOutputStream;
  */
 public class GZip extends ArchiveCommand {
     
-    private static final String msg_exists_prompt = " already exists; do you wish to overwrite (y or n)? ";
-    private static final String msg_exists_skip   = "gzip: skipping file: ";
-    private static final String msg_err_open = "gzip: Cannot open file: ";
-    private static final String msg_err_create = "gzip: Cannot create file: ";
-    private static final String msg_err_bad_suffix = "gzip: Invalid suffix, expecting ";
-
-    private static final int BUFFER_SIZE = 4096;
+    private static final String help_suffix  = "append <suffix> on compressed files";
+    private static final String help_list    = "list compressed file contents";
+    private static final String help_noname  = "do not save or restore the original name and time stamp";
+    private static final String help_name    = "save or restore the original name and time stamp";
+    private static final String help_recurse = "operate recursively on directories";
+    private static final String help_test    = "test compressed file integrity";
+    private static final String help_file    = "the files to compress, use stdin if FILE is '-' or no files are listed";
     
-    private File[] files;
-    private InputStream stdinStream;
-    private OutputStream stdoutStream;
-    
-    protected static final int GZIP_LIST = 1;
-    protected static final int GZIP_TEST = 2;
-    protected static final int GZIP_DECOMPRESS = 3;
-    protected static final int GZIP_COMPRESS = 4;
+    private final FileArgument Files     = new FileArgument("files", Argument.OPTIONAL | Argument.MULTIPLE, help_file);
+    private final FlagArgument List      = new FlagArgument("list", Argument.OPTIONAL, help_list);
+    private final FlagArgument NoName    = new FlagArgument("noname", Argument.OPTIONAL, help_noname);
+    private final FlagArgument Name      = new FlagArgument("name", Argument.OPTIONAL, help_name);
+    private final FlagArgument Recurse   = new FlagArgument("recurse", Argument.OPTIONAL, help_recurse);
+    private final FlagArgument Test      = new FlagArgument("test", Argument.OPTIONAL, help_test);
+    private final StringArgument Suffix  = new StringArgument("suffix", Argument.OPTIONAL, help_suffix);
     
     protected String suffix = ".gz";
-    protected int mode;
+    protected boolean recurse;
     
     protected GZip(String s) {
         super(s);
-        createStreamBuffer(BUFFER_SIZE);
+        registerArguments(Files, List, NoName, Name, Recurse, Test, Suffix);
+        createStreamBuffer(4096);
     }
     
-    public void execute(File[] files , boolean forced , boolean use_stdout , boolean recurse) throws IOException {
-        setup();
-        stdinStream = getInput().getInputStream();
-        stdoutStream = getOutput().getOutputStream();
+    public void execute() {
+        super.execute();
         
-        switch(mode) {
-            case GZIP_LIST : 
-                list(processFiles(files, recurse)); return;
-            case GZIP_TEST : 
-                test(processFiles(files, recurse)); return;
-            case GZIP_COMPRESS : 
-                compress(processFiles(files, recurse), forced, use_stdout); return;
-            case GZIP_DECOMPRESS : 
-                decompress(processFiles(files, recurse), forced, use_stdout); return;
+        if (Suffix.isSet()) suffix = Suffix.getValue();
+        
+        recurse = Recurse.isSet();
+        
+        try {
+            if (compress) {
+                compress(processFileList(Files.getValues(), recurse));
+            } else {
+                decompress(processFileList(Files.getValues(), recurse));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            fatal(err_exception_uncaught, 1);
         }
     }
     
-    protected void compress(File[] files , boolean forced , boolean use_stdout) throws IOException {
+    private void compress(File[] files) throws IOException {
         InputStream in;
         OutputStream out = null;
         GZIPOutputStream gzout = null;
-        File gzFile = null;
+        File gzfile = null;
         float sizeDiff;
         
-        debug("Compress");
-        debug("forced=" + forced);
-        debug("use_stdout=" + use_stdout);
-        
         if (files == null) {
-            debug("stdin > stdout");
-            processStream(stdinStream, new GZIPOutputStream(stdoutStream, BUFFER_SIZE));
-        } else {
-            if (use_stdout) gzout = new GZIPOutputStream(stdoutStream, BUFFER_SIZE);
-            if (use_stdout) debug("files > stdout");
-            else debug("files > files");
+            processStream(stdin, new GZIPOutputStream(stdout, BUFFER_SIZE));
+            return;
+        }
         
-            for (File file : files) {
-                debug(file.getName());
-                if (!file.exists()) {
-                    error("File does not exist: " + file.getName());
-                    continue;
-                }
-                if (!use_stdout) {
-                    gzFile = new File(file.getAbsolutePath() + suffix);
-                    if ((out = openFileWrite(gzFile, true, forced)) == null) continue;
-                    gzout = new GZIPOutputStream(out, BUFFER_SIZE);
-                }
-                if ((in = openFileRead(file)) == null) continue;
-                processStream(in, gzout);
-                if (!use_stdout) {
-                    gzout.finish();
-                    gzout.close();
-                    sizeDiff = ((float) gzFile.length() / (float) file.length()) * 100;
-                    notice(file + ":\t" + sizeDiff + "% -- replaced with " + gzFile);
-                    file.delete();
-                }
-                in.close();
+        if (use_stdout) {
+            gzout = new GZIPOutputStream(stdout, BUFFER_SIZE);
+        }
+    
+        for (File file : files) {
+            if (!use_stdout) {
+                gzfile = new File(file.getAbsolutePath() + suffix);
+                if ((out = openFileWrite(gzfile, true, force)) == null) continue;
+                gzout = new GZIPOutputStream(out, BUFFER_SIZE);
             }
-            if (use_stdout) gzout.finish();
+            
+            if (file.getName().equals("-")) {
+                processStream(stdin, gzout);
+                continue;
+            }
+            
+            if ((in = openFileRead(file)) == null) {
+                if (!use_stdout) gzout.close();
+                continue;
+            }
+            processStream(in, gzout);
+            
+            if (!use_stdout) {
+                gzout.finish();
+                gzout.close();
+                sizeDiff = ((float) gzfile.length() / (float) file.length()) * 100;
+                notice(String.format(fmt_size_diff, file, sizeDiff, gzfile));
+                file.delete();
+            }
+            in.close();
+        }
+        
+        if (use_stdout) {
+            gzout.finish();
+            gzout.close();
         }
     }
     
-    protected void decompress(File[] files , boolean forced , boolean use_stdout) throws IOException {
+    private void decompress(File[] files) throws IOException {
         InputStream in;
         OutputStream out = null;
-        String name;
         File file = null;
         float sizeDiff;
         
-        debug("Decompress");
-        debug("forced=" + forced);
-        debug("use_stdout=" + use_stdout);
-        
-        if (use_stdout) out = stdoutStream;
-        
         if (files == null) {
-            debug("stdin > stdout");
-            processStream(new GZIPInputStream(stdinStream, BUFFER_SIZE), stdoutStream);
-        } else {
-            if (use_stdout) debug("files > stdout");
-            else debug("files > files");
+            processStream(new GZIPInputStream(stdin, BUFFER_SIZE), stdout);
+            return;
+        }
+        
+        if (use_stdout) {
+            out = stdout;
+        }
+        
+        for (File gzfile : files) {
+            if (!use_stdout) {
+                file = stripSuffix(gzfile);
+                if ((out = openFileWrite(file, true, force)) == null) continue;
+            }
             
-            for (File gzFile : files) {
-                debug(gzFile.getName());
-                if (!gzFile.exists()) {
-                    error("File not found: " + gzFile);
-                    continue;
-                }
-                if (!gzFile.getName().endsWith(suffix)) {
-                    notice("gzip: " + file + ": unknown suffix -- ignored");
-                    continue;
-                }
-                if (!use_stdout) {
-                    name = gzFile.getAbsolutePath();
-                    name = name.substring(0, name.length() - suffix.length());
-                    file = new File(name);
-                    if ((out = openFileWrite(file, true, forced)) == null) continue;
-                }
-                
-                if ((in = new GZIPInputStream(openFileRead(gzFile), BUFFER_SIZE)) == null) continue;
-                processStream(in, out);
-                in.close();
-                if (!use_stdout) {
-                    sizeDiff = ((float) gzFile.length() / (float) file.length()) * 100;
-                    notice(gzFile + ":\t" + sizeDiff + "% -- replaced with " + file);
-                    gzFile.delete();
-                    out.close();
-                }
+            if (gzfile.getName().equals("-")) {
+                processStream(new GZIPInputStream(stdin, BUFFER_SIZE), out);
+                continue;
+            }
+            
+            if ((in = new GZIPInputStream(openFileRead(gzfile), BUFFER_SIZE)) == null) {
+                if (!use_stdout) out.close();
+                continue;
+            }
+            processStream(in, out);
+            in.close();
+            
+            if (!use_stdout) {
+                out.close();
+                sizeDiff = ((float) gzfile.length() / (float) file.length()) * 100;
+                notice(String.format(fmt_size_diff, gzfile, sizeDiff, file));
+                gzfile.delete();
             }
         }
     }
@@ -178,43 +181,16 @@ public class GZip extends ArchiveCommand {
     
     protected void list(File[] files) {}
     
-    private File[] processFiles(File[] files , boolean recurse) {
-        if (files == null || files.length == 0) return null;
+    private File stripSuffix(File file) {
+        String name = file.getAbsolutePath();
         
-        debug("processFiles(files(" + files.length + ")," + recurse + ")");
-        
-        ArrayList<File> _files = new ArrayList<File>();
-        
-        for (File file : files) {
-            debug(file.getName());
-            if (file.getName().equals("-")) {
-                debug("found stdin");
-                return null;
-            }
-            if (!file.exists()) {
-                error("Cannot find file: " + file);
-                continue;
-            }
-            if (file.isDirectory() && recurse) {
-                debug("searching directory: " + file);
-                File[] dirList = file.listFiles();
-                for (File subFile : dirList) {
-                    debug(subFile.getName());
-                    if (subFile.isFile()) {
-                        debug(subFile + " added");
-                        _files.add(subFile);
-                    }
-                }
-            } else {
-                if (file.isFile()) {
-                    debug(file + " added");
-                    _files.add(file);
-                }
-            }
+        if (!name.endsWith(suffix)) {
+            notice(name + " unknown suffix -- ignore");
+            return null;
         }
         
-        if (_files.size() == 0) return null;
-        debug("Found " + _files.size() + " files");
-        return _files.toArray(files);
+        name = name.substring(0, name.length() - suffix.length());
+        
+        return new File(name);
     }
 }

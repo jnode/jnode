@@ -12,7 +12,7 @@
     <library name="ant.jar">
       <export name="org.apache.tools.tar.*" />
       <export name="org.apache.tools.zip.*" />
-      <export name="org.apache.tools.bzip.*" />
+      <export name="org.apache.tools.bzip2.*" />
     </library>
   </runtime>
   

@@ -68,6 +68,8 @@ public class TarCommand extends ArchiveCommand {
     private static final String help_verify    = "verify the archive after writing it";
     private static final String help_xfile     = "exclude files matching patterns in <file>";
     
+    private static final String err_options    = "required options -Acdtrux not found, or multiple options set";
+    
     private static final int TAR_APPEND  = 0x01;
     private static final int TAR_CREATE  = 0x02;
     private static final int TAR_CONCAT  = 0x04;
@@ -89,21 +91,18 @@ public class TarCommand extends ArchiveCommand {
     
     private final FlagArgument Backup      = new FlagArgument("backup", Argument.OPTIONAL, help_backup);
     private final FlagArgument UseBzip     = new FlagArgument("bzip", Argument.OPTIONAL, help_bzip);
-    private final FlagArgument Debug       = new FlagArgument("debug", Argument.OPTIONAL, " ");
     private final FileArgument ChangeDir   = new FileArgument("dir", Argument.OPTIONAL, help_dir);
     private final StringArgument Exclude   = new StringArgument("exclude", Argument.OPTIONAL, help_exclude);
     private final FileArgument Archive     = new FileArgument("file", Argument.OPTIONAL, help_file);
     private final FileArgument FileList    = new FileArgument("fileList", Argument.OPTIONAL, help_file_list);
     private final FlagArgument UseGzip     = new FlagArgument("gzip", Argument.OPTIONAL, help_gzip);
     private final FlagArgument Interact    = new FlagArgument("interact", Argument.OPTIONAL, help_interact);
-    private final FlagArgument KeepFiles   = new FlagArgument("keepFiles", Argument.OPTIONAL, help_keep_old);
+    private final FlagArgument Keep        = new FlagArgument("keep", Argument.OPTIONAL, help_keep_old);
     private final FlagArgument NoRecurse   = new FlagArgument("noRecurse", Argument.OPTIONAL, help_norecurse);
     private final FlagArgument Recurse     = new FlagArgument("recurse", Argument.OPTIONAL, help_recurse);
     private final FlagArgument RemoveFiles = new FlagArgument("removeFiles", Argument.OPTIONAL, help_remove);
     private final FlagArgument ShowTotals  = new FlagArgument("showTotals", Argument.OPTIONAL, help_totals);
     private final StringArgument Suffix    = new StringArgument("suffix", Argument.OPTIONAL, help_suffix);
-    private final FlagArgument UseStdout   = new FlagArgument("useStdout", Argument.OPTIONAL, help_stdout);
-    private final FlagArgument Verbose     = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
     private final FlagArgument Verify      = new FlagArgument("verify", Argument.OPTIONAL, help_verify);
     private final FileArgument ExcludeFile = new FileArgument("xfile", Argument.OPTIONAL, help_xfile);
     
@@ -122,23 +121,20 @@ public class TarCommand extends ArchiveCommand {
     private boolean gzip;
     private boolean interact;
     private boolean verify;
-    private boolean use_stdout;
     private boolean showTotals;
-    private boolean keepOldFiles;
+    private boolean keep;
     
     public TarCommand() {
         super("Create/Modify/Extract tape archives");
         registerArguments(DoAppend, DoConcat, DoCreate, DoDelete, DoDiff, DoExtract, DoList, DoUpdate,
-                          Backup, UseBzip, Debug, ChangeDir, Exclude, Archive, FileList, UseGzip, Interact,
-                          KeepFiles, NoRecurse, Recurse, RemoveFiles, ShowTotals, Suffix, UseStdout, Verbose,
-                          Verify, Paths, ExcludeFile);
+                          Backup, UseBzip, ChangeDir, Exclude, Archive, FileList, UseGzip, Interact,
+                          Keep, NoRecurse, Recurse, RemoveFiles, ShowTotals, Suffix, Verify, Paths, ExcludeFile);
     }
     
     public void execute() {
-        setup();
+        super.execute();
         if (!checkMode()) {
-            error("required options -Acdtrux not found, or multiple options set");
-            exit(1);
+            fatal(err_options, 1);
         }
         if (DoAppend.isSet())       mode = TAR_APPEND;
         else if (DoConcat.isSet())  mode = TAR_CONCAT;
@@ -148,9 +144,6 @@ public class TarCommand extends ArchiveCommand {
         else if (DoExtract.isSet()) mode = TAR_EXTRACT;
         else if (DoList.isSet())    mode = TAR_LIST;
         else if (DoUpdate.isSet())  mode = TAR_UPDATE;
-        
-        if (Debug.isSet())   outMode |= OUT_DEBUG;
-        if (Verbose.isSet()) outMode |= OUT_NOTICE;
         
         if (Suffix.isSet())      suffix      = Suffix.getValue();
         if (Exclude.isSet())     exclude     = Exclude.getValue();
@@ -162,9 +155,8 @@ public class TarCommand extends ArchiveCommand {
         gzip         = UseGzip.isSet();
         interact     = Interact.isSet();
         verify       = Verify.isSet();
-        use_stdout   = UseStdout.isSet();
         showTotals   = ShowTotals.isSet();
-        keepOldFiles = KeepFiles.isSet();
+        keep         = Keep.isSet();
         recurse      = !NoRecurse.isSet();
         if (Archive.isSet()) archive = Archive.getValue();
         else error("No archive given");
@@ -183,7 +175,7 @@ public class TarCommand extends ArchiveCommand {
         debug("Recurse: " + recurse);
         debug("Verify: " + verify);
         debug("Use StdOut: " + use_stdout);
-        debug("Keep Old Files: " + keepOldFiles);
+        debug("Keep Old Files: " + keep);
         debug("Show Totals: " + showTotals);
         debug("pipeInOut: " + pipeInOut);
         
@@ -202,7 +194,7 @@ public class TarCommand extends ArchiveCommand {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            exit(2);
+            fatal(err_exception_uncaught, 1);
         }
     }
     
@@ -217,8 +209,7 @@ public class TarCommand extends ArchiveCommand {
             if (mode == TAR_CREATE || (mode == TAR_APPEND && !archive.exists())) createArchive();
             
             if ((out = openFileWrite(archive, false, false)) == null) {
-                error("Could not open stream: " + archive);
-                exit(1);
+                fatal(err_stream_create + archive, 1);
             }
         } else {
             debug("out=stdout");
@@ -250,13 +241,10 @@ public class TarCommand extends ArchiveCommand {
         TarInputStream tin;
         File file;
         
+        // add support for reading compress archives with gzip/bzip
+        
         if (archive != null) {
-            if (archive.exists()) {
-                if ((in = openFileRead(archive)) == null) {
-                    exit(1);
-                }
-            } else {
-                error("File does not exist: " + archive);
+            if ((in = openFileRead(archive)) == null) {
                 exit(1);
             }
         } else {
@@ -295,10 +283,6 @@ public class TarCommand extends ArchiveCommand {
         InputStream in = null;
         TarInputStream tin;
         
-        if (archive == null || !archive.exists()) {
-            error("Cannot find file: " + archive);
-            exit(1);
-        }
         if ((in = openFileRead(archive)) == null) {
             exit(1);
         }
@@ -316,10 +300,6 @@ public class TarCommand extends ArchiveCommand {
         TarInputStream tin;
         File file;
         
-        if (archive == null || !archive.exists()) {
-            error("Cannot find file: " + archive);
-            exit(1);
-        }
         if ((in = openFileRead(archive)) == null) {
             exit(1);
         }
@@ -348,11 +328,9 @@ public class TarCommand extends ArchiveCommand {
             if (archive.exists()) {
                 archive.delete();
             }
-            debug("creating archive: " + archive);
             archive.createNewFile();
         } catch (IOException e) {
-            error("Could not create file: " + archive);
-            exit(1);
+            fatal(err_file_create + archive, 1);
         }
     }
     

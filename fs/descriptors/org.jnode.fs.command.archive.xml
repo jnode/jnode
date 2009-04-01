@@ -54,13 +54,13 @@
           <option argLabel="fileList" shortName="T" longName="files-from"/>
           <option argLabel="gzip" shortName="z" longName="gzip" />
           <option argLabel="interact" shortName="w" longName="interactive" />
-          <option argLabel="keepFiles" shortName="k" longName="keep-old-files" />
+          <option argLabel="keep" shortName="k" longName="keep-old-files" />
           <option argLabel="noRecurse" longName="no-recursion" />
           <option argLabel="recurse" longName="recursion" />
           <option argLabel="removeFiles" longName="remove-files" />
           <option argLabel="showTotals" longName="totals" />
           <option argLabel="suffix" longName="suffix" />
-          <option argLabel="useStdout" shortName="O" longName="to-stdout" />
+          <option argLabel="stdout" shortName="O" longName="to-stdout" />
           <option argLabel="verbose" shortName="v" longName="verbose" />
           <option argLabel="verify" shortName="W" longName="verify" />
           <option argLabel="xfile" shortName="X" longName="exclude-from"/>
@@ -70,7 +70,7 @@
           -->
         </optionSet>
         <repeat minCount="0">
-          <argument argLabel="paths" label="file/dir"/>
+          <argument argLabel="paths"/>
         </repeat>
       </sequence>
     </syntax>
@@ -85,16 +85,16 @@
           <option argLabel="force" shortName="f" longName="force" />
           <option argLabel="quiet" shortName="q" longName="quiet" />
           <option argLabel="verbose" shortName="v" longName="verbose" />
-          <option argLabel="lvl1" shortName="1" longName="fast" />
+          <option argLabel="c1" shortName="1" longName="fast" />
           <option argLabel="debug" longName="debug" />
-          <option argLabel="recursive" shortName="r" longName="recursive" />
+          <option argLabel="recurse" shortName="r" longName="recursive" />
           <option argLabel="test" shortName="t" longName="test" />
           <option argLabel="list" shortName="l" longName="list" />
-          <option argLabel="lvl9" shortName="9" longName="best" />
+          <option argLabel="c9" shortName="9" longName="best" />
         </optionSet>
         <optional eager="true"><option argLabel="suffix" shortName="S" longName="suffix" /></optional>
         <repeat minCount="1">
-          <argument argLabel="file" />
+          <argument argLabel="files" />
         </repeat>
       </sequence>
     </syntax>
@@ -103,7 +103,7 @@
       <sequence description="decompress files">
         <optionSet>
           <option argLabel="debug" longName="debug" />
-          <option argLabel="recursive" shortName="r" longName="recursive" />
+          <option argLabel="recurse" shortName="r" longName="recursive" />
           <option argLabel="test" shortName="t" longName="test" />
           <option argLabel="list" shortName="l" longName="list" />
           <option argLabel="noname" shortName="n" longName="no-name" />
@@ -115,7 +115,7 @@
         </optionSet>
         <optional eager="true"><option argLabel="suffix" shortName="S" longName="suffix" /></optional>
         <repeat minCount="1">
-          <argument argLabel="file" />
+          <argument argLabel="files" />
         </repeat>
       </sequence>
     </syntax>
@@ -128,7 +128,7 @@
           <option argLabel="debug" longName="debug" />
         </optionSet>
         <repeat minCount="1">
-          <argument argLabel="file" />
+          <argument argLabel="files" />
         </repeat>
       </sequence>
     </syntax>
@@ -137,10 +137,62 @@
     <syntax alias="unzip">
     </syntax>
     <syntax alias="bzip2">
+      <empty description="compress stdin to stdout" />
+      <sequence description="compress files">
+        <optionSet>
+          <option argLabel="stdout" shortName="c" longName="stdout" />
+          <option argLabel="decompress" shortName="d" longName="decompress" />
+          <option argLabel="compress" shortName="z" longName="compress" />
+          <option argLabel="test" shortName="t" longName="test" />
+          <option argLabel="force" shortName="f" longName="force" />
+          <option argLabel="keep" shortName="k" longName="keep" />
+          <option argLabel="small" shortName="s" longName="small" />
+          <option argLabel="verbose" shortName="v" longName="verbose" />
+          <option argLabel="quiet" shortName="q" longName="quiet" />
+          <option argLabel="debug" longName="debug" />
+          <option argLabel="c1" shortName="1" longName="fast" />
+          <option argLabel="c2" shortName="2" />
+          <option argLabel="c3" shortName="3" />
+          <option argLabel="c4" shortName="4" />
+          <option argLabel="c5" shortName="5" />
+          <option argLabel="c6" shortName="6" />
+          <option argLabel="c7" shortName="7" />
+          <option argLabel="c8" shortName="8" />
+          <option argLabel="c9" shortName="9" longName="best" />
+        </optionSet>
+        <repeat>
+          <argument argLabel="files" />
+        </repeat>
+      </sequence>
     </syntax>
     <syntax alias="bunzip2">
+      <empty description="decompress stdin to stdout" />
+      <sequence description="decompress files">
+        <optionSet>
+          <option argLabel="stdout" shortName="c" longName="stdout" />
+          <option argLabel="test" shortName="t" longName="test" />
+          <option argLabel="force" shortName="f" longName="force" />
+          <option argLabel="keep" shortName="k" longName="keep" />
+          <option argLabel="small" shortName="s" longName="small" />
+          <option argLabel="verbose" shortName="v" longName="verbose" />
+          <option argLabel="quiet" shortName="q" longName="quiet" />
+          <option argLabel="debug" longName="debug" />
+        </optionSet>
+        <repeat>
+          <argument argLabel="files" />
+        </repeat>
+      </sequence>
     </syntax>
     <syntax alias="bzcat">
+      <empty description="decompress stdin to stdout" />
+      <sequence description="decompress files to stdout">
+        <optionSet>
+          <option argLabel="small" shortName="s" longName="small" />
+        </optionSet>
+        <repeat>
+          <argument argLabel="files" />
+        </repeat>
+      </sequence>
     </syntax>
   </extension>
   
