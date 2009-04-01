@@ -42,6 +42,7 @@
   <extension point="org.jnode.security.permissions">
     <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
     <permission class="java.lang.RuntimePermission" name="setIO"/>
+    <permission class="java.lang.RuntimePermission" name="exitVM"/>
     <permission class="java.net.SocketPermission" name="*:1-" actions="resolve,listen,connect"/>
   </extension>
         
