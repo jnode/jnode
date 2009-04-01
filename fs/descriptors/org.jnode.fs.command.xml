@@ -33,6 +33,7 @@
     <alias name="touch" class="org.jnode.fs.command.TouchCommand"/>
     <alias name="hexdump" class="org.jnode.fs.command.HexdumpCommand"/>
     <alias name="md5sum" class="org.jnode.fs.command.Md5SumCommand"/>
+    <alias name="find" class="org.jnode.fs.command.FindCommand"/>
   </extension>
 
   <extension point="org.jnode.shell.syntaxes">
@@ -111,6 +112,20 @@
     </syntax>
     <syntax alias="touch">
       <argument argLabel="file" description="touch the given file"/>
+    </syntax>
+    <syntax alias="find">
+      <sequence description="find files or directories">
+        <repeat minCount="1">
+          <argument argLabel="directory"/>
+        </repeat>
+        <optionSet>
+          <option argLabel="type" longName="type"/>
+          <option argLabel="maxdepth" longName="maxdepth"/>
+          <option argLabel="mindepth" longName="mindepth"/>
+          <option argLabel="name" longName="name"/>
+          <option argLabel="iname" longName="iname"/>
+        </optionSet>
+      </sequence>
     </syntax>
   </extension>
 
