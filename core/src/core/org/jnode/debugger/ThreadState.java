@@ -80,7 +80,7 @@ public class ThreadState extends DebugState {
     private void showThread(PrintStream out, Thread thread) {
         DebuggerUtils.showThreadHeading(out, thread);
         out.println();
-        final Object[] trace = VmThread.getStackTrace(thread.getVmThread());
+        final Object[] trace = VmThread.getStackTrace(ThreadHelper.getVmThread(thread));
         final int traceLen = Math.min(trace.length, 10);
         for (int k = 0; k < traceLen; k++) {
             out.println(trace[k]);

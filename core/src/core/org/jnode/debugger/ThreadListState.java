@@ -126,7 +126,7 @@ public class ThreadListState extends DebugState {
         for (int i = 0; i < max; i++) {
             final Thread t = ts[i];
             if (t != null) {
-                final VmThread vmThread = t.getVmThread();
+                final VmThread vmThread = ThreadHelper.getVmThread(t);
                 final boolean add;
                 switch (state) {
                     case ST_ALL:

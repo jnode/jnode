@@ -64,7 +64,7 @@ final class IRQThread extends Thread implements SystemThread {
         this.handledIrqCount = 0;
         this.shared = shared;
         this.actions = new IRQAction(owner, handler);
-        this.vmThread = getVmThreadKS();
+        this.vmThread = ThreadHelper.getVmThreadKS(this);
         this.vmThread.setRequiredProcessor(processor);
     }
 

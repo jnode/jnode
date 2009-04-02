@@ -37,6 +37,7 @@ import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmArray;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.Vm;
@@ -500,7 +501,7 @@ class NativeUnsafe {
                         }
                     });
         }
-        return loader.getVmClassLoader().defineClass(name, b, off, len, protDomain).asClass();
+        return ((VmClassLoader)loader.getVmClassLoader()).defineClass(name, b, off, len, protDomain).asClass();
 
     }
 

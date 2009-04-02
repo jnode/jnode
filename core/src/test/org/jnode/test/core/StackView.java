@@ -75,7 +75,7 @@ public class StackView {
             }
         }
 
-        VmThread vmThread = thread.getVmThread();
+        VmThread vmThread = ThreadHelper.getVmThread(thread);
 
         final int stackSize = vmThread.getStackSize();
         final Object stack = invoke("getStack", VmThread.class, vmThread);

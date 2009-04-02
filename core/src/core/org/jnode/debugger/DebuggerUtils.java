@@ -30,6 +30,6 @@ public class DebuggerUtils {
 
     public static void showThreadHeading(PrintStream out, Thread thread) {
         out.print(thread.getName() + ", " + thread.getPriority() + ", "
-            + thread.getVmThread().getThreadStateName());
+            + ThreadHelper.getVmThread(thread).getThreadStateName());
     }
 }
