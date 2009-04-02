@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package java.lang;
 
 import gnu.classpath.SystemProperties;
@@ -42,19 +42,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.jnode.security.JNodePermission;
-import org.jnode.vm.VmJavaClassLoader;
-import org.jnode.vm.VmSystem;
-import org.jnode.vm.VmSystemClassLoader;
-import org.jnode.vm.classmgr.VmClassLoader;
-import org.jnode.vm.classmgr.VmType;
 import sun.reflect.Reflection;
 
 public abstract class ClassLoader {
 
     private final ClassLoader parent;
 
-    private final VmClassLoader vmClassLoader;
+    //this is always a VmClassLoaderInstance
+    final Object vmClassLoader;
 
     private ProtectionDomain defaultProtectionDomain;
 
@@ -182,13 +177,14 @@ public abstract class ClassLoader {
             sm.checkCreateClassLoader();
         }
         this.parent = parent;
-        this.vmClassLoader = new VmJavaClassLoader(this);
+        this.vmClassLoader = createVmJavaClassLoader0(this);
     }
+
+    private static native Object createVmJavaClassLoader0(ClassLoader instance);
 
     /**
      * Create a new instance
      * 
-     * @see java.lang.Object#Object()
      */
     protected ClassLoader() {
         this(getSystemClassLoader());
@@ -199,7 +195,7 @@ public abstract class ClassLoader {
      * 
      * @param vmClassLoader
      */
-    protected ClassLoader(VmSystemClassLoader vmClassLoader, int discriminator) {
+    protected ClassLoader(Object vmClassLoader, int discriminator) {
         /* May we create a new classloader? */
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
@@ -208,13 +204,12 @@ public abstract class ClassLoader {
         if (vmClassLoader == null) {
             throw new IllegalArgumentException("vmClassLoader cannot be null");
         }
-        if (!vmClassLoader.isSystemClassLoader()) {
-            throw new IllegalArgumentException(
-                    "vmClassLoader must be system classloader");
-        }
+        checkArg0(vmClassLoader);
         this.parent = null;
         this.vmClassLoader = vmClassLoader;
     }
+
+    private static native void checkArg0(Object vmClassLoader);
 
     /**
      * Create a new classloader wrapped around a given VmClassLoader,
@@ -222,36 +217,25 @@ public abstract class ClassLoader {
      * 
      * @param vmClassLoader
      */
-    protected ClassLoader(ClassLoader parent, VmClassLoader vmClassLoader) {
+    protected ClassLoader(ClassLoader parent, Object vmClassLoader) {
         /* May we create a new classloader? */
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkCreateClassLoader();
-            sm.checkPermission(new JNodePermission("wrapVmClassLoader"));
-        }
-        if (vmClassLoader == null) {
-            throw new IllegalArgumentException("vmClassLoader cannot be null");
-        }
-        if (vmClassLoader.isSystemClassLoader()) {
-            throw new IllegalArgumentException(
-                    "vmClassLoader must not be system classloader");
-        }
+        checkArgs0(vmClassLoader);
         this.parent = parent;
         this.vmClassLoader = vmClassLoader;
     }
-    
+
+    private static native void checkArgs0(Object vmClassLoader);
+
     /**
      * Gets the VmClassLoader that is used by this classloader.
      * This method requires special permission.
      * @return
      */
-    public final VmClassLoader getVmClassLoader() {
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(new JNodePermission("getVmClassLoader"));
-        }
-        return vmClassLoader;
+    public final Object getVmClassLoader() {
+        return getVmClassLoader0();
     }
+
+    private native Object getVmClassLoader0();
 
     /**
      * Load and resolve a class with a given name.
@@ -285,7 +269,7 @@ public abstract class ClassLoader {
         /* Can the class been loaded by a parent? */
         try {
             if ((parent == null) || skipParentLoader(name)) {
-                return VmSystem.getSystemClassLoader().loadClass(name, resolve).asClass();
+                return loadClass0(name, resolve);
             } else {
                 return parent.loadClass(name, resolve);
             }
@@ -299,6 +283,8 @@ public abstract class ClassLoader {
         }
         return c;
     }
+
+    private static native Class loadClass0(String name, boolean resolve) throws ClassNotFoundException;
 
     /**
      * Define a byte-array of class data into a loaded class.
@@ -407,22 +393,20 @@ public abstract class ClassLoader {
                         }
                     });
         }
-        return vmClassLoader
-                .defineClass(name, data, offset, length, protDomain).asClass();
+        return defineClass0(name, data, offset, length, protDomain);
     }
+
+    private native Class defineClass0(String name, byte[] data, int offset, int length, ProtectionDomain protDomain);
 
     /**
      * Define a byte-array of class data into a loaded class.
      * 
      * @param name
      * @param data
-     * @param offset
-     * @param length
      * @param protDomain
      * @return Class
      */
-    protected final Class defineClass(String name, ByteBuffer data,
-            ProtectionDomain protDomain) {
+    protected final Class defineClass(String name, ByteBuffer data, ProtectionDomain protDomain) {
         if (data == null) {
             throw new NullPointerException();
         }
@@ -434,8 +418,10 @@ public abstract class ClassLoader {
                         }
                     });
         }
-        return vmClassLoader.defineClass(name, data, protDomain).asClass();
+        return defineClass0(name, data, protDomain);
     }
+
+    private native Class defineClass0(String name, ByteBuffer data, ProtectionDomain protDomain);
 
     private ProtectionDomain getDefaultProtectionDomain() {
         if (defaultProtectionDomain == null) {
@@ -464,14 +450,7 @@ public abstract class ClassLoader {
      * @param name
      * @return the Class object, or null if the class has not been loaded
      */
-    protected final Class findLoadedClass(String name) {
-        VmType< ? > vmClass = vmClassLoader.findLoadedClass(name);
-        if (vmClass != null) {
-            return vmClass.asClass();
-        } else {
-            return null;
-        }
-    }
+    protected native final Class findLoadedClass(String name);
 
     /**
      * Finds the specified class. This method should be overridden by class
@@ -500,8 +479,7 @@ public abstract class ClassLoader {
         if (name == null) {
             throw new NullPointerException();
         } else {
-            return VmSystem.getSystemClassLoader().loadClass(name, true)
-                    .asClass();
+            return loadClass0(name, true);
         }
     }
 
@@ -513,11 +491,13 @@ public abstract class ClassLoader {
      */
     public static final InputStream getSystemResourceAsStream(String name) {
         try {
-            return VmSystem.getSystemClassLoader().getResourceAsStream(name);
+            return getSystemResourceAsStream0(name);
         } catch (IOException ex) {
             return null;
         }
     }
+
+    private static native InputStream getSystemResourceAsStream0(String name) throws IOException;
 
     /**
      * Gets a resource as stream by name.
@@ -568,7 +548,7 @@ public abstract class ClassLoader {
         URL result = null;
 
         if (parent == null) {
-            if (vmClassLoader.resourceExists(name)) {
+            if (resourceExists0(name)) {
                 try {
                     if (name.startsWith("/")) {
                         result = new URL("system://" + name);
@@ -589,6 +569,8 @@ public abstract class ClassLoader {
         }
         return result;
     }
+
+    private native boolean resourceExists0(String name);
 
     public Enumeration getResources(String name) throws IOException {    	
         final List<URL> urls = new ArrayList<URL>();
@@ -611,7 +593,7 @@ public abstract class ClassLoader {
     protected boolean getResourcesImpl(String name, List<URL> urls) throws IOException {
     	URL result = null;
         if (parent == null) {
-            if (vmClassLoader.resourceExists(name)) {
+            if (resourceExists0(name)) {
                 try {
                     if (name.startsWith("/")) {
                         //todo:  adjust the rt.jar path to match the future configurations
@@ -753,9 +735,7 @@ public abstract class ClassLoader {
      * 
      * @return ClassLoader
      */
-    public static ClassLoader getSystemClassLoader() {
-        return VmSystem.getSystemClassLoader().asClassLoader();
-    }
+    public static native ClassLoader getSystemClassLoader();
 
     public static Enumeration getSystemResources(String name)
             throws IOException {
@@ -781,7 +761,7 @@ public abstract class ClassLoader {
      * @param name
      *            the (system specific) name of the requested library
      * @return the full pathname to the requested library, or null
-     * @see Runtime#loadLibrary()
+     * @see Runtime#loadLibrary(String)
      * @since 1.2
      */
     protected String findLibrary(String name) {
@@ -825,7 +805,7 @@ public abstract class ClassLoader {
      *            the package (and subpackages) to affect
      * @param enabled
      *            true to set the default to enabled
-     * @see #setDefaultAssertionStatus(String, boolean)
+     * @see #setDefaultAssertionStatus(boolean)
      * @see #setClassAssertionStatus(String, boolean)
      * @see #clearAssertionStatus()
      * @since 1.4
@@ -848,7 +828,7 @@ public abstract class ClassLoader {
      *            true to set the default to enabled
      * @throws NullPointerException
      *             if name is null
-     * @see #setDefaultAssertionStatus(String, boolean)
+     * @see #setDefaultAssertionStatus(boolean)
      * @see #setPackageAssertionStatus(String, boolean)
      * @see #clearAssertionStatus()
      * @since 1.4

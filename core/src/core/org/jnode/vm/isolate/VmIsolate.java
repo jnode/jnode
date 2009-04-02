@@ -463,13 +463,13 @@ public final class VmIsolate {
             for (int i = 0; i < rc; i++) {
                 Thread thread = ta[i];
                 if (current != thread) {
-                    thread.getVmThread().stopForced(null);
+                    ThreadHelper.getVmThread(thread).stopForced(null);
                 } else {
                     found = true;
                 }
             }
             if (found) {
-                current.getVmThread().stop(new ThreadDeath());
+                ThreadHelper.getVmThread(current).stop(new ThreadDeath());
             } else {
                 doExit();
             }

@@ -107,7 +107,7 @@ public class ThreadCommand extends AbstractCommand {
                     VmThread vmThread = AccessController
                     .doPrivileged(new PrivilegedAction<VmThread>() {
                         public VmThread run() {
-                            return t.getVmThread();
+                            return ThreadHelper.getVmThread(t);
                         }
                     });
                     out.println(SLASH_T + t.getId() + SEPARATOR + t.getName() + SEPARATOR +
