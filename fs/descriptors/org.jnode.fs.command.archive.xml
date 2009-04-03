@@ -31,7 +31,6 @@
   </extension>
   
   <extension point="org.jnode.shell.syntaxes">
-    
     <syntax alias="tar">
       <sequence>
       <alternatives description="tar operations">
@@ -54,13 +53,15 @@
           <option argLabel="fileList" shortName="T" longName="files-from"/>
           <option argLabel="gzip" shortName="z" longName="gzip" />
           <option argLabel="interact" shortName="w" longName="interactive" />
-          <option argLabel="keep" shortName="k" longName="keep-old-files" />
+          <option argLabel="keep_old" shortName="k" longName="keep-old-files" />
+          <option argLabel="keep_new" longName="keep-newer-files" />
           <option argLabel="noRecurse" longName="no-recursion" />
           <option argLabel="recurse" longName="recursion" />
           <option argLabel="removeFiles" longName="remove-files" />
           <option argLabel="showTotals" longName="totals" />
           <option argLabel="suffix" longName="suffix" />
           <option argLabel="stdout" shortName="O" longName="to-stdout" />
+          <option argLabel="unlink" longName="unlink" />
           <option argLabel="verbose" shortName="v" longName="verbose" />
           <option argLabel="verify" shortName="W" longName="verify" />
           <option argLabel="xfile" shortName="X" longName="exclude-from"/>
@@ -198,10 +199,8 @@
   
   <extension point="org.jnode.security.permissions">
     <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write,delete"/>
-    <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
     <permission class="java.util.PropertyPermission" name="user.dir" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
-    <permission class="java.net.NetPermission" name="specifyStreamHandler"/>
     <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
     <permission class="java.lang.RuntimePermission" name="exitVM"/>
     <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>

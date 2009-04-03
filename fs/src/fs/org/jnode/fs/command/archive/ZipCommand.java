@@ -52,6 +52,6 @@ public class ZipCommand extends Zip {
     }
     
     public void execute() {
-        //setup();
+        super.execute();
     }
 }
