@@ -36,10 +36,14 @@ public class GUnzipCommand extends GZip {
     
     public GUnzipCommand() {
         super("decompresses files/data");
+        // from ArchiveCommand
+        registerArguments(Quiet, Verbose, Debug, Force, Stdout);
+        // from GZip
+        registerArguments(Files, List, NoName, Name, Recurse, Test, Suffix);
     }
     
     public void execute() {
         compress = false;
-        super.execute();
+        super.execute("gunzip");
     }
 }

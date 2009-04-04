@@ -24,11 +24,14 @@ public class BUnzipCommand extends BZip {
     
     public BUnzipCommand() {
         super("decompresses data in bzip2 format");
-        registerArguments();
+        // from ArchiveCommand
+        registerArguments(Quiet, Verbose, Stdout, Force, Debug);
+        // from BZip
+        registerArguments(Compress, Decompress, Files, Keep, Small, Test);
     }
     
     public void execute() {
         compress = false;
-        super.execute();
+        super.execute("bunzip2");
     }
 }

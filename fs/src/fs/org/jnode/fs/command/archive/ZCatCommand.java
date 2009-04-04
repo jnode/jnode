@@ -28,11 +28,13 @@ public class ZCatCommand extends GZip {
 
     public ZCatCommand() {
         super("decompresses files to standard output");
+        // from GZip
+        registerArguments(Files);
     }
     
     public void execute() {
         use_stdout = true;
         compress = false;
-        super.execute();
+        super.execute("zcat");
     }
 }

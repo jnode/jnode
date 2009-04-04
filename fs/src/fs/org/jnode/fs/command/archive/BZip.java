@@ -53,29 +53,33 @@ public class BZip extends ArchiveCommand {
     protected final FlagArgument Small      = new FlagArgument("small", Argument.OPTIONAL, help_small);
     protected final FlagArgument Test       = new FlagArgument("test", Argument.OPTIONAL, help_test);
     
-    protected int clevel = 9;
+    protected int clevel;
     protected boolean keep;
+    protected boolean small;
     
     public BZip(String s) {
         super(s);
-        registerArguments(Compress, Decompress, Files, Keep, Small, Test);
         createStreamBuffer(4096);
     }
     
-    public void execute() {
-        super.execute();
+    public void execute(String command) {
+        super.execute(command);
         
-        if (compress && Decompress.isSet()) {
-            compress = false;
-        }
-        if (!compress && Compress.isSet()) {
-            compress = true;
-        }
+        small = Small.isSet();
         
-        keep  = Keep.isSet();
-        
-        if (!keep && use_stdout) {
-            keep = true;
+        if (!command.equals("bzcat")) {
+            if (compress && Decompress.isSet()) {
+                compress = false;
+            }
+            if (!compress && Compress.isSet()) {
+                compress = true;
+            }
+            
+            keep  = Keep.isSet();
+            
+            if (!keep && use_stdout) {
+                keep = true;
+            }
         }
         
         try {

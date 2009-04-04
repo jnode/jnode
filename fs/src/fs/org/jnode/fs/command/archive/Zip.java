@@ -51,8 +51,8 @@ public class Zip extends ArchiveCommand {
         super(s);
     }
     
-    public void execute() {
-        super.execute();
+    public void execute(String command) {
+        super.execute(command);
     }
     
     void extract() throws IOException {

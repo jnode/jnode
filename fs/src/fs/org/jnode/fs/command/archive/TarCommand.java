@@ -207,11 +207,11 @@ public class TarCommand extends ArchiveCommand {
     private static final String help_list    = "list the contents of an archive";
     private static final String help_update  = "only append files that are newer than the copy in the archive";
     
+    private static final String help_archive   = "use the given archive";
     private static final String help_backup    = "backup files instead of overwriting";
     private static final String help_bzip      = "compress the archive with bzip2";
     private static final String help_dir       = "change to directory";
     private static final String help_exclude   = "exclude files matching <pattern>";
-    private static final String help_file      = "use the given archive";
     private static final String help_file_list = "get names to extract or archive from <file>";
     private static final String help_gzip      = "compress the archive with gzip";
     private static final String help_interact  = "ask for confirmation for every action";
@@ -224,7 +224,8 @@ public class TarCommand extends ArchiveCommand {
     private static final String help_stdout    = "extract files to stdout";
     private static final String help_suffix    = "append <suffix> to backup files (default ~)";
     private static final String help_totals    = "display total bytes written after creating the archive";
-    private static final String help_unlink    = "when extracting, delete files if they exist";
+    private static final String help_unlink    = "when extracting, delete files if they exist. This is the default" +
+                                                 "action and is used to override other options if they were set";
     private static final String help_verbose   = "list files processed";
     private static final String help_verify    = "verify the archive after writing it";
     private static final String help_xfile     = "exclude files matching patterns in <file>";
@@ -263,7 +264,7 @@ public class TarCommand extends ArchiveCommand {
     private final FlagArgument UseBzip     = new FlagArgument("bzip", Argument.OPTIONAL, help_bzip);
     private final FileArgument ChangeDir   = new FileArgument("dir", Argument.OPTIONAL, help_dir);
     private final StringArgument Exclude   = new StringArgument("exclude", Argument.OPTIONAL, help_exclude);
-    private final FileArgument Archive     = new FileArgument("file", Argument.OPTIONAL, help_file);
+    private final FileArgument Archive     = new FileArgument("archive", Argument.OPTIONAL, help_archive);
     private final FileArgument FileList    = new FileArgument("fileList", Argument.OPTIONAL, help_file_list);
     private final FlagArgument UseGzip     = new FlagArgument("gzip", Argument.OPTIONAL, help_gzip);
     private final FlagArgument Interact    = new FlagArgument("interact", Argument.OPTIONAL, help_interact);
@@ -302,36 +303,42 @@ public class TarCommand extends ArchiveCommand {
     
     public TarCommand() {
         super("Create/Modify/Extract tape archives");
-        registerArguments(DoAppend, DoConcat, DoCreate, DoDelete, DoDiff, DoExtract, DoList, DoUpdate,
-                          Backup, UseBzip, ChangeDir, Exclude, Archive, FileList, UseGzip, Interact, KeepNew, Unlink,
-                          KeepOld, NoRecurse, Recurse, RemoveFiles, ShowTotals, Suffix, Verify, Paths, ExcludeFile);
+        // from ArchiveCommand
+        registerArguments(Verbose, Debug, Stdout);
+        
+        // tar Operations
+        registerArguments(DoAppend, DoConcat, DoCreate, DoDelete, DoDiff, DoExtract, DoList, DoUpdate);
+        
+        // tar Global Options
+        registerArguments(Backup, Suffix, UseBzip, UseGzip, Archive, FileList, ExcludeFile, Interact, KeepNew, KeepOld,
+                           Unlink, RemoveFiles, ShowTotals, Verify, Paths);
+        // tar Parsing Options
+        registerArguments(ChangeDir, Exclude, NoRecurse, Recurse);
     }
     
     // TODO Allow working directory to be changed
     public void execute() {
-        super.execute();
+        super.execute("tar");
         if (!checkMode()) {
             fatal(err_options, 1);
         }
         
+        if (Archive.isSet())     archive     = Archive.getValue();
         if (Suffix.isSet())      suffix      = Suffix.getValue();
         if (Exclude.isSet())     exclude     = Exclude.getValue();
         if (ExcludeFile.isSet()) excludeFile = ExcludeFile.getValue();
         if (FileList.isSet())    fileList    = FileList.getValue();
         
-        backup       = Backup.isSet();
-        bzip         = UseBzip.isSet();
-        gzip         = UseGzip.isSet();
-        interact     = Interact.isSet();
-        verify       = Verify.isSet();
-        showTotals   = ShowTotals.isSet();
-        keepOld      = KeepOld.isSet();
-        keepNew      = KeepNew.isSet();
-        recurse      = !NoRecurse.isSet();
-        unlink       = Unlink.isSet();
-        if (Archive.isSet()) archive = Archive.getValue();
-        else error("No archive given");
-        //if (!(pipeInOut = !Archive.isSet())) archive = Archive.getValue();
+        backup     = Backup.isSet();
+        bzip       = UseBzip.isSet();
+        gzip       = UseGzip.isSet();
+        interact   = Interact.isSet();
+        verify     = Verify.isSet();
+        showTotals = ShowTotals.isSet();
+        keepOld    = KeepOld.isSet();
+        keepNew    = KeepNew.isSet();
+        recurse    = !NoRecurse.isSet();
+        unlink     = Unlink.isSet();
         
         try {
             if ((mode & TAR_REQ_ARCH) != 0 && archive == null) {
@@ -427,7 +434,7 @@ public class TarCommand extends ArchiveCommand {
         tout = appendTarOutputStream();
         
         // Concatenate new archives
-        for(File arch : archives) {
+        for (File arch : archives) {
             if ((in = openFileRead(arch)) == null) {
                 continue;
             }
@@ -495,7 +502,7 @@ public class TarCommand extends ArchiveCommand {
         InputStream in;
         TarInputStream tin;
         TarEntry entry;
-        TreeMap<String,Long> entries = new TreeMap();
+        TreeMap<String, Long> entries = new TreeMap();
         
         if ((in = openFileRead(archive)) == null) {
             fatal(" ", 1);
@@ -675,6 +682,7 @@ public class TarCommand extends ArchiveCommand {
      * Sets up a TarOutputStream suitable for appending new entries.
      */
     private TarOutputStream appendTarOutputStream() throws IOException {
+        // FIXME this isnt working.
         OutputStream out;
         InputStream in;
         TarOutputStream tout;
@@ -762,7 +770,7 @@ public class TarCommand extends ArchiveCommand {
     /**
      * Wraps an InputStream with a decompression stream for reading compressed archives.
      */
-    private InputStream wrapInputStream( InputStream in ) throws IOException {
+    private InputStream wrapInputStream(InputStream in) throws IOException {
         if (decompress == USE_BZIP) {
             return new CBZip2InputStream(in);
         }
@@ -777,7 +785,7 @@ public class TarCommand extends ArchiveCommand {
     /**
      * Wraps an OutputStream with a compression stream for writing compressed archives.
      */
-    private OutputStream wrapOutputStream( OutputStream out ) throws IOException {
+    private OutputStream wrapOutputStream(OutputStream out) throws IOException {
         if (compress == USE_BZIP) {
             return new CBZip2OutputStream(out);
         }
