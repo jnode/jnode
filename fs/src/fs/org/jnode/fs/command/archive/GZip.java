@@ -49,29 +49,30 @@ public class GZip extends ArchiveCommand {
     private static final String help_test    = "test compressed file integrity";
     private static final String help_file    = "the files to compress, use stdin if FILE is '-' or no files are listed";
     
-    private final FileArgument Files     = new FileArgument("files", Argument.OPTIONAL | Argument.MULTIPLE, help_file);
-    private final FlagArgument List      = new FlagArgument("list", Argument.OPTIONAL, help_list);
-    private final FlagArgument NoName    = new FlagArgument("noname", Argument.OPTIONAL, help_noname);
-    private final FlagArgument Name      = new FlagArgument("name", Argument.OPTIONAL, help_name);
-    private final FlagArgument Recurse   = new FlagArgument("recurse", Argument.OPTIONAL, help_recurse);
-    private final FlagArgument Test      = new FlagArgument("test", Argument.OPTIONAL, help_test);
-    private final StringArgument Suffix  = new StringArgument("suffix", Argument.OPTIONAL, help_suffix);
+    protected final FileArgument Files    = new FileArgument("files", Argument.OPTIONAL | Argument.MULTIPLE, help_file);
+    protected final FlagArgument List     = new FlagArgument("list", Argument.OPTIONAL, help_list);
+    protected final FlagArgument NoName   = new FlagArgument("noname", Argument.OPTIONAL, help_noname);
+    protected final FlagArgument Name     = new FlagArgument("name", Argument.OPTIONAL, help_name);
+    protected final FlagArgument Recurse  = new FlagArgument("recurse", Argument.OPTIONAL, help_recurse);
+    protected final FlagArgument Test     = new FlagArgument("test", Argument.OPTIONAL, help_test);
+    protected final StringArgument Suffix = new StringArgument("suffix", Argument.OPTIONAL, help_suffix);
     
     protected String suffix = ".gz";
     protected boolean recurse;
     
     protected GZip(String s) {
         super(s);
-        registerArguments(Files, List, NoName, Name, Recurse, Test, Suffix);
         createStreamBuffer(4096);
     }
     
-    public void execute() {
-        super.execute();
+    public void execute(String command) {
+        super.execute(command);
         
-        if (Suffix.isSet()) suffix = Suffix.getValue();
+        if (!command.equals("zcat")) {
+            if (Suffix.isSet()) suffix = Suffix.getValue();
         
-        recurse = Recurse.isSet();
+            recurse = Recurse.isSet();
+        }
         
         try {
             if (compress) {

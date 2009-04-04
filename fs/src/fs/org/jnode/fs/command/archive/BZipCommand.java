@@ -40,11 +40,26 @@ public class BZipCommand extends BZip {
 
     public BZipCommand() {
         super("compresses data with bzip2");
+        // from ArchiveCommand
+        registerArguments(Quiet, Verbose, Stdout, Force, Debug);
+        // from BZip
+        registerArguments(Compress, Decompress, Files, Keep, Small, Test);
         registerArguments(C1, C2, C3, C4, C5, C6, C7, C8, C9);
     }
     
     public void execute() {
         compress = true;
-        super.execute();
+        if (C1.isSet()) clevel = 1;
+        if (C2.isSet()) clevel = 2;
+        if (C3.isSet()) clevel = 3;
+        if (C4.isSet()) clevel = 4;
+        if (C5.isSet()) clevel = 5;
+        if (C6.isSet()) clevel = 6;
+        if (C7.isSet()) clevel = 7;
+        if (C8.isSet()) clevel = 8;
+        if (C9.isSet()) clevel = 9;
+        else clevel = 6;
+        
+        super.execute("bzip2");
     }
 }

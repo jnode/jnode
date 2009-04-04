@@ -20,12 +20,6 @@
 
 package org.jnode.fs.command.archive;
 
-import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.FileArgument;
-import org.jnode.shell.syntax.FlagArgument;
-import org.jnode.shell.syntax.StringArgument;
-
 /**
  * @author chris boertien
  */
@@ -37,6 +31,6 @@ public class UnzipCommand extends Zip {
     }
     
     public void execute() {
-        super.execute();
+        super.execute("unzip");
     }
 }

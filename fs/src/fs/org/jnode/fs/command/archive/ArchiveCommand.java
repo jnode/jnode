@@ -86,29 +86,28 @@ public class ArchiveCommand extends AbstractCommand {
     
     protected ArchiveCommand(String s) {
         super(s);
-        registerArguments(Quiet, Verbose, Debug, Stdout, Force);
     }
     
-    public void execute() {
+    public void execute(String command) {
         stdoutWriter = getOutput().getPrintWriter();
         stderrWriter = getError().getPrintWriter();
         stdinReader  = getInput().getReader();
         stdin = getInput().getInputStream();
         stdout = getOutput().getOutputStream();
         
-        if (Quiet.isSet()) {
-            outMode = 0;
-        } else {
-            if (Verbose.isSet()) {
-                outMode |= OUT_NOTICE;
-            }
-            if (Debug.isSet()) {
-                outMode |= OUT_DEBUG;
-            }
+        if (command.equals("zcat") || command.equals("bzcat")) return;
+        
+        if (!command.equals("tar")) {
+            if (Quiet.isSet()) outMode = 0;
+            force = Force.isSet();
         }
         
         if (!use_stdout) use_stdout = Stdout.isSet();
-        force      = Force.isSet();
+        
+        if (outMode != 0) {
+            if (Verbose.isSet()) outMode |= OUT_NOTICE;
+            if (Debug.isSet()) outMode |= OUT_DEBUG;
+        }
     }
     
     protected void createStreamBuffer(int size) {

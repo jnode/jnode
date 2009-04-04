@@ -45,11 +45,15 @@ public class GZipCommand extends GZip {
     
     public GZipCommand() {
         super("compresses and decompresses files/data");
+        // from ArchiveCommand
+        registerArguments(Quiet, Verbose, Debug, Force, Stdout);
+        // from GZip
+        registerArguments(Files, List, NoName, Name, Recurse, Test, Suffix);
         registerArguments(Decompress, C1, C9);
     }
     
     public void execute() {
         compress = !Decompress.isSet();
-        super.execute();
+        super.execute("gzip");
     }
 }
