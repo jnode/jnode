@@ -11,8 +11,10 @@
     <import plugin="org.jnode.fs"/>
     <import plugin="org.jnode.fs.ext2"/>    
     <import plugin="org.jnode.fs.fat"/>
+    <import plugin="org.jnode.fs.jfat"/>
     <import plugin="org.jnode.fs.ntfs"/>
     <import plugin="org.jnode.fs.iso9660"/>
+    <import plugin="org.jnode.fs.hfsplus"/>
     <import plugin="org.jnode.shell"/>
     <import plugin="org.jnode.driver.bus.ide"/>
     <import plugin="org.jnode.driver.bus.scsi"/> 
@@ -20,7 +22,7 @@
     <import plugin="org.jnode.driver.block.scsi.cdrom"/> 
     <import plugin="org.jnode.driver.block.usb.storage"/> 
         
-	<import plugin="org.junit" version="3.8"/>
+	<import plugin="org.junit"/>
 	<import plugin="org.objectweb.asm" version="1"/>
 	<import plugin="net.sf.cglib" version="2.1"/>	
 	<import plugin="org.jmock" version="1.0.1"/>
