@@ -8,7 +8,7 @@
     provider-name="JNode.org">
 
     <requires>
-        <import plugin="org.junit" version="3.8"/>
+        <import plugin="org.junit"/>
     </requires>
 
     <runtime>
@@ -35,7 +35,8 @@
         
         <!-- TestSecurityManager -->
         <permission class="java.lang.RuntimePermission" name="createSecurityManager"/>
-        <permission class="java.lang.RuntimePermission" name="setSecurityManager"/>
+        <permission class="java.lang.RuntimePermission" name="setSecurityManager"/>        
+        <permission class="java.lang.RuntimePermission" name="accessDeclaredMembers"/>         
     </extension>
 
 </plugin>
