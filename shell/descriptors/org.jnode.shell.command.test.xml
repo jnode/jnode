@@ -9,7 +9,7 @@
 
     <requires> 
         <import plugin="org.jnode.runtime.core"/>
-	    <import plugin="org.junit" version="3.8"/>
+	    <import plugin="org.junit"/>
 	    <import plugin="org.jnode.shell.help"/>
 		<import plugin="org.jnode.testrunner"/>
     </requires>
@@ -50,6 +50,7 @@
 	<permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write,delete"/>
 	
 	<permission class="java.lang.reflect.ReflectPermission" name="*" actions="suppressAccessChecks"/>	    
+    <permission class="java.lang.RuntimePermission" name="*" actions="accessDeclaredMembers"/>
   </extension>
 
 </plugin>

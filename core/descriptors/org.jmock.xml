@@ -10,7 +10,7 @@
         license-url="http://jmock.org/license.html">
 
   <requires>        
-	<import plugin="org.junit" version="3.8"/>
+	<import plugin="org.junit"/>
   </requires>
         
   <runtime>
