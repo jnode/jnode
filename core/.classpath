@@ -24,11 +24,17 @@
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/template"/>
 	<classpathentry kind="lib" path="lib/ant.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
-	<classpathentry kind="lib" path="lib/junit.jar"/>
-	<classpathentry kind="lib" path="lib/mmtk/mmtk.jar" sourcepath="D:/epr/cvswork/MMTk/src"/>
+	<classpathentry kind="lib" path="lib/junit-4.5.jar"/>
+	<classpathentry kind="lib" path="lib/mmtk/mmtk.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-1.5.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-attrs-1.5.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-util-1.5.3.jar"/>
-	<classpathentry kind="lib" path="lib/mauve.jar" sourcepath="lib/mauve-src.jar"/>
+	<classpathentry kind="lib" path="lib/mauve.jar" sourcepath="lib/mauve-src.jar">
+		<accessrules>
+			<accessrule kind="nonaccessible" pattern="junit.framework/**"/>
+			<accessrule kind="nonaccessible" pattern="netsourceforge.nanoxml/**"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/ant-contrib-1.0b3.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
