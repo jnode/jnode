@@ -26,13 +26,15 @@ public abstract class AbstractDirectoryWalker {
     private volatile Long minDepth = null;
 
     public synchronized void walk(final File... dirs) throws IOException {
+        if (dirs == null) {
+            throw new NullPointerException("Directory to walk from must not be null");
+        }
         for (File dir : dirs) {
-            if (dir == null)
+            if (dir == null || !dir.isDirectory())
                 throw new IOException("No such directroy " + dir);
-            dir = dir.getAbsoluteFile(); // to be able to handle relative paths
-            if (!dir.canRead() || !dir.isDirectory()) {
-                throw new IOException("Cannot read directroy " + dir);
-            }
+            dir = dir.getCanonicalFile(); // to be able to handle relative paths
+            // and . / ..
+            handleStartingDir(dir);
             stack.push(new FileObject(dir, 0L));
             while (!cancelled && !stack.isEmpty()) {
                 go1(stack.pop());
@@ -41,22 +43,29 @@ public abstract class AbstractDirectoryWalker {
     }
 
     private void go1(final FileObject file) throws IOException {
-        if ((minDepth != null && file.depth < minDepth) || (maxDepth != null && file.depth > maxDepth)) {
+        if ((minDepth != null && file.depth < minDepth) ||
+                (maxDepth != null && file.depth > maxDepth)) {
             // out of boundaries
-        } else if (!file.file.canRead()) {
-            // ignore for now
-        } else if (validFileOrDirectory(file)) {
+        } else if (notFiltered(file)) {
             handleFileOrDir(file);
         } else {
             // filtered out
         }
-        go2(file);
+        try {
+            go2(file);
+        } catch (SecurityException e) {
+            handleRestrictedFile(file.file);
+        }
     }
 
-    private void go2(final FileObject file) throws IOException {
+    private void go2(final FileObject file) throws IOException, SecurityException {
         final Stack<File> stack = new Stack<File>();
         final File[] content = file.file.listFiles();
-        if (content != null) {
+        if (content == null) {
+            // I/O Error or file
+        } else if (content.length == 0) {
+            // dir is empty
+        } else {
             for (File f : content) {
                 if (f.toString().equals(f.getCanonicalPath())) {
                     stack.push(f);
@@ -65,11 +74,10 @@ public abstract class AbstractDirectoryWalker {
                 }
             }
             while (!stack.isEmpty()) {
-                File tmp = stack.pop();
-                // addToStack(stack.pop(), file.depth + 1);
-                this.stack.push(new FileObject(tmp, file.depth + 1));
+                this.stack.push(new FileObject(stack.pop(), file.depth + 1));
             }
         }
+
     }
 
     private void handleFileOrDir(final FileObject file) {
@@ -82,7 +90,7 @@ public abstract class AbstractDirectoryWalker {
         }
     }
 
-    private boolean validFileOrDirectory(final FileObject file) {
+    private boolean notFiltered(final FileObject file) {
         if (!filters.isEmpty())
             for (FileFilter filter : filters)
                 if (!filter.accept(file.file))
@@ -106,8 +114,16 @@ public abstract class AbstractDirectoryWalker {
         filters.add(filter);
     }
 
-    public abstract void handleDir(File f);
+    protected void handleRestrictedFile(final File file) throws IOException {
+        throw new IOException("Permission denied for " + file);
+    }
 
-    public abstract void handleFile(File f);
+    protected void handleStartingDir(final File file) {
+        // do nothing
+    }
+
+    public abstract void handleDir(final File file);
+
+    public abstract void handleFile(final File file);
 
 }

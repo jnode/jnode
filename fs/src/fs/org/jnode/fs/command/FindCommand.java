@@ -18,6 +18,11 @@ public class FindCommand extends AbstractCommand {
     private class Walker extends AbstractDirectoryWalker {
 
         @Override
+        protected void handleRestrictedFile(File file) throws IOException {
+            err.println("Permission denied for \"" + file + "\"");
+        }
+
+        @Override
         public void handleDir(File f) {
             out.println(f);
         }
@@ -29,15 +34,20 @@ public class FindCommand extends AbstractCommand {
 
     }
 
-    private final StringArgument nameArg = new StringArgument("name", Argument.OPTIONAL);
-    private final StringArgument inameArg = new StringArgument("iname", Argument.OPTIONAL);
-    private final LongArgument maxdepthArg = new LongArgument("maxdepth", Argument.OPTIONAL);
-    private final LongArgument mindepthArg = new LongArgument("mindepth", Argument.OPTIONAL);
-    private final StringArgument typeArg = new StringArgument("type", Argument.OPTIONAL);
-    private final FileArgument dirArg =
-        new FileArgument("directory", Argument.MANDATORY | Argument.EXISTING
-            | Argument.MULTIPLE);
+    private final StringArgument nameArg = new StringArgument("name", Argument.OPTIONAL,
+        "filter results to show only files that match given pattern");
+    private final StringArgument inameArg = new StringArgument("iname", Argument.OPTIONAL,
+        "same like 'name', but case insensitive");
+    private final LongArgument maxdepthArg = new LongArgument("maxdepth", Argument.OPTIONAL,
+        "descent at most to given level of directories");
+    private final LongArgument mindepthArg = new LongArgument("mindepth", Argument.OPTIONAL,
+        "ignore files and directories at levels less than given level");
+    private final StringArgument typeArg = new StringArgument( "type", Argument.OPTIONAL,
+        "filter results to show only files of given type. valid types are 'd' for directory and 'f' for file");
+    private final FileArgument dirArg = new FileArgument("directory", Argument.OPTIONAL | Argument.MULTIPLE,
+        "directory to start searching from");
     private PrintWriter out = null;
+    private PrintWriter err = null;
 
     public FindCommand() {
         super("Find files and directories");
@@ -51,6 +61,7 @@ public class FindCommand extends AbstractCommand {
 
     public void execute() throws IOException {
         out = getOutput().getPrintWriter();
+        err = getError().getPrintWriter();
         final Walker walker = new Walker();
 
         if (maxdepthArg.isSet()) {
@@ -103,6 +114,10 @@ public class FindCommand extends AbstractCommand {
                 });
             }
         }
-        walker.walk(dirArg.getValues());
+        if (dirArg.isSet()) {
+            walker.walk(dirArg.getValues());
+        } else {
+            walker.walk(new File(System.getProperty("user.dir")));
+        }
     }
 }
