@@ -3,7 +3,7 @@
 
 <plugin id="org.junit" 
         name="JUnit classes"
-        version="3.8"
+        version="4.5"
         provider-name="JUnit"
         provider-url="http://junit.org"
         license-name="cpl">
@@ -17,6 +17,7 @@
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
 	<permission class="java.io.FilePermission" name="/jnode/home/junit.properties" actions="read"/>
+    <permission class="java.lang.RuntimePermission" name="*" actions="accessDeclaredMembers"/>
   </extension>
 
 </plugin>
