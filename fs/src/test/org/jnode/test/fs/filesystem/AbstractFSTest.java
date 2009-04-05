@@ -33,19 +33,36 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
+import org.jnode.emu.naming.BasicNameSpace;
+import org.jnode.emu.plugin.model.DummyConfigurationElement;
+import org.jnode.emu.plugin.model.DummyExtension;
+import org.jnode.emu.plugin.model.DummyExtensionPoint;
+import org.jnode.emu.plugin.model.DummyPluginDescriptor;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.service.FileSystemService;
+import org.jnode.fs.service.def.FileSystemPlugin;
+import org.jnode.naming.InitialNaming;
 import org.jnode.test.fs.filesystem.config.FSTestConfig;
+import org.jnode.test.fs.filesystem.config.FSType;
 import org.jnode.test.support.TestUtils;
+import org.jnode.util.OsUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * @author Fabien DUMINY
  */
+@RunWith(Parameterized.class)
 public abstract class AbstractFSTest extends TestCase {
     protected final Logger log = Logger.getLogger(getClass());
+    private static boolean setup = false;
 
     //public static final int FILE_SIZE_IN_WORDS = 256 * 1024; // 512 Ko = 256 K Words
     public static final int FILE_SIZE_IN_WORDS = 128; // 512 Ko = 128 K Words
@@ -59,6 +76,15 @@ public abstract class AbstractFSTest extends TestCase {
         this.config = config;
     }
 
+    @Parameters
+    public static List<FSTestConfig[]> getData() {
+        List<FSTestConfig[]> config = new ArrayList<FSTestConfig[]>();
+        for (FSTestConfig cfg : new FSConfigurations()) {
+            config.add(new FSTestConfig[] {cfg});
+        }
+        return config;
+    }
+    
     /**
      *
      */
@@ -66,14 +92,38 @@ public abstract class AbstractFSTest extends TestCase {
         super(name);
     }
 
+    @Before
     public final void setUp() throws NameNotFoundException, FileSystemException, IOException,
         InstantiationException, IllegalAccessException, Exception {
         super.setUp();
+        if (!setup && !OsUtils.isJNode()) {
+            // We are not running in JNode, emulate a JNode environment.
+
+            InitialNaming.setNameSpace(new BasicNameSpace());
+
+            // Build a plugin descriptor that is sufficient for the FileSystemPlugin to
+            // configure file system types for testing.
+            DummyPluginDescriptor desc = new DummyPluginDescriptor(true);
+            DummyExtensionPoint ep = new DummyExtensionPoint("types", "org.jnode.fs.types", "types");
+            desc.addExtensionPoint(ep);
+            for (FSType fsType : FSType.values()) {
+                DummyExtension extension = new DummyExtension();
+                DummyConfigurationElement element = new DummyConfigurationElement();
+                element.addAttribute("class", fsType.getFsTypeClass().getName());
+                extension.addElement(element);
+                ep.addExtension(extension);
+            }
+
+            FileSystemService fss = new FileSystemPlugin(desc);
+            InitialNaming.bind(FileSystemService.class, fss);
+        }
+        setup = true;
         this.device = config.getDeviceParam().createDevice();
         this.fs = config.getFileSystem().format(this.device);
         this.fs = config.getFileSystem().mount(this.device);
     }
 
+    @After
     public final void tearDown() throws Exception {
         // Some tests don't call setup(config), which means that config will be null when teardown is called.
         if (config != null) {

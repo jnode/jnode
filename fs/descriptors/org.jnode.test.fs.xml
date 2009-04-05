@@ -25,8 +25,6 @@
 	<import plugin="net.sf.cglib" version="2.1"/>	
 	<import plugin="org.jmock" version="1.0.1"/>
 	<import plugin="org.jmock.cglib" version="1.0.1"/>
-	<import plugin="jcfe" version="1"/>
-	<import plugin="jfunc" version="1.1"/>
 				
     <import plugin="org.jnode.driver.block"/>
     <import plugin="org.jnode.driver.block.ramdisk"/>    

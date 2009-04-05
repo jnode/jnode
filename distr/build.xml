@@ -15,7 +15,7 @@
     <pathelement location="${jnode-shell.jar}"/>
   	<pathelement location="${jnode-fs.jar}"/>
   	
-    <pathelement location="${junit4.jar}"/>
+    <pathelement location="${junit.jar}"/>
   	<pathelement location="${telnetd.jar}"/>
 
     <pathelement location="${jetty.jar}"/>

@@ -29,6 +29,7 @@ import org.jnode.fs.util.FSUtils;
 import org.jnode.test.fs.filesystem.AbstractFSTest;
 import org.jnode.test.fs.filesystem.config.FSTestConfig;
 import org.jnode.test.support.TestUtils;
+import org.junit.Test;
 
 /**
  * @author Fabien DUMINY
@@ -37,17 +38,15 @@ public class BasicFSTest extends AbstractFSTest {
     public BasicFSTest(FSTestConfig config) {
         super(config);
     }
-
-    public BasicFSTest(String name) {
-        super(name);
-    }
     
+    @Test
     public void testGetRootEntry() throws Exception {
         setUp();
         FSEntry rootEntry = getFs().getRootEntry();
         log.debug(FSUtils.toString(rootEntry, false));
     }
 
+    @Test
     public void testListRootEntries() throws Exception {
 
         setUp();
@@ -55,6 +54,7 @@ public class BasicFSTest extends AbstractFSTest {
         TestUtils.listEntries(iterator);
     }
 
+    @Test
     public void testAddDirectory() throws Exception {
 
         setUp();
@@ -89,6 +89,7 @@ public class BasicFSTest extends AbstractFSTest {
         TestUtils.listEntries(rootDir.iterator());
     }
 
+    @Test
     public void testAddFile() throws Exception {
         setUp();
 
@@ -124,6 +125,7 @@ public class BasicFSTest extends AbstractFSTest {
         TestUtils.listEntries(rootDir.iterator());
     }
 
+    @Test
     public void testAddFileThenRemountFSAndGetFile() throws Exception {
         if (!config.isReadOnly()) {
             setUp();
@@ -149,6 +151,7 @@ public class BasicFSTest extends AbstractFSTest {
         }
     }
 
+    @Test
     public void testRemoveThenRemountFSAndGetEntry() throws Exception {
 
         if (!config.isReadOnly()) {

@@ -50,7 +50,7 @@
     <property name="commons-net.jar" value="${root.dir}/core/lib/commons-net-1.1.0.jar"/>
     <property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-1.6.6.jar"/>
     <property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.24.jar"/>
-    <property name="junit.jar" value="${root.dir}/core/lib/junit.jar"/>
+    <property name="junit.jar" value="${root.dir}/core/lib/junit-4.5.jar"/>
     <property name="mmtk.jar" value="${root.dir}/core/lib/mmtk/mmtk.jar"/>
 	<property name="mauve.jar" value="${root.dir}/core/lib/mauve.jar"/>
     <property name="edtftpj.jar" value="${root.dir}/fs/lib/edtftpj-1.5.2.jar"/>
@@ -79,9 +79,6 @@
     <property name="asm.jar" value="${root.dir}/core/lib/asm-1.5.3.jar"/>
 	<property name="asm-attrs.jar" value="${root.dir}/core/lib/asm-attrs-1.5.3.jar"/>
 	<property name="asm-util.jar" value="${root.dir}/core/lib/asm-util-1.5.3.jar"/>
-	<property name="jcfe.jar" value="${root.dir}/core/lib/jcfe.jar"/>
-	<property name="jfunc.jar" value="${root.dir}/core/lib/jfunc.jar"/>
-    <property name="junit4.jar" value="${root.dir}/distr/lib/junit-4.1.jar"/>
 	
     <property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
     <property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b5.jar"/>
@@ -121,8 +118,6 @@
         <pathelement location="${basedir}/conf"/>
         <pathelement location="${beanshell.jar}"/>
         <pathelement location="${js.jar}"/>
-        <pathelement location="${jcfe.jar}"/>
-        <pathelement location="${jfunc.jar}"/>
         <pathelement location="${oncrpc.jar}"/>
         <pathelement location="${edtftpj.jar}"/>
         <pathelement location="${jcifs.jar}"/>
@@ -249,8 +244,6 @@
         	<libalias name="asm-util.jar" alias="${asm-util.jar}"/>
             <libalias name="cglib.jar" alias="${cglib.jar}"/>
         	<libalias name="mauve.jar" alias="${mauve.jar}"/>
-        	<libalias name="jcfe.jar" alias="${jcfe.jar}"/>
-        	<libalias name="jfunc.jar" alias="${jfunc.jar}"/>
 
             <libalias name="ant.jar" alias="${ant.jar}"/>
             <libalias name="ant-launcher.jar" alias="${ant-launcher.jar}"/>

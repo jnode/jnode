@@ -12,8 +12,6 @@
 	<classpathentry kind="lib" path="/core/lib/ant.jar"/>
 	<classpathentry kind="lib" path="/core/lib/cglib-2.1.jar"/>
 	<classpathentry kind="lib" path="/core/lib/commons-net-1.1.0.jar"/>
-	<classpathentry kind="lib" path="/core/lib/jcfe.jar"/>
-	<classpathentry kind="lib" path="/core/lib/jfunc.jar"/>
 	<classpathentry kind="lib" path="/core/lib/jmock-1.0.1.jar"/>
 	<classpathentry kind="lib" path="/core/lib/jmock-cglib-1.0.1.jar"/>
 	<classpathentry kind="lib" path="/core/lib/junit.jar"/>
