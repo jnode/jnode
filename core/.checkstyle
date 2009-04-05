@@ -11,6 +11,7 @@
     </filter>
     <filter name="FilesFromPackage" enabled="true">
         <filter-data value="src/openjdk/vm"/>
+        <filter-data value="src/openjdk/svm"/>
         <filter-data value="src/endorsed/nanoxml"/>
         <filter-data value="src/openjdk/sun"/>
         <filter-data value="src/openjdk/org"/>
