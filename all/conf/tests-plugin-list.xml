@@ -23,10 +23,6 @@
   <plugin id="org.jnode.test.net"/>
   <plugin id="org.jnode.test.shell"/>
   <plugin id="org.jnode.shell.command.test"/>
-  
-  <!-- JUnit extensions -->
-  <plugin id="jcfe"/> <!-- not a JUnit extension, but needed by jfunc -->
-  <plugin id="jfunc"/>
 	
   <plugin id="org.jnode.testrunner"/>
 </plugin-list>

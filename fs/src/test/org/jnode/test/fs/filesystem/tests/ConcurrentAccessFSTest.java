@@ -28,6 +28,7 @@ import org.jnode.fs.FSFile;
 import org.jnode.test.fs.filesystem.AbstractFSTest;
 import org.jnode.test.fs.filesystem.config.FSTestConfig;
 import org.jnode.test.support.TestUtils;
+import org.junit.Test;
 
 /**
  * @author Fabien DUMINY
@@ -45,10 +46,7 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
         super(config);
     }
 
-    public ConcurrentAccessFSTest(String name) {
-        super(name);
-    }
-
+    @Test
     public void testRead() throws Throwable {
         setUp();
 
@@ -61,6 +59,7 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
         monitor.waitAll();
     }
 
+    @Test
     public void testWrite() throws Throwable {
         if (!config.isReadOnly()) {
             setUp();
@@ -73,6 +72,7 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
         }
     }
 
+    @Test
     public void testReadWrite() throws Throwable {
         setUp();
 

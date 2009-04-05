@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+
+import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import org.apache.log4j.Logger;
@@ -158,7 +160,7 @@ public final class TestManager implements ExtensionPointListener {
         for (Class<? extends TestSuite> suiteClass : suites) {
             if (!matchCategory(wantedCategories, categories.get(suiteClass))) continue;
 
-            suite.addTestSuite(suiteClass);
+            suite.addTest(new JUnit4TestAdapter(suiteClass));
             log.debug("added TestSuite " + suiteClass.getName());
         }
 

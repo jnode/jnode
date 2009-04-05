@@ -26,6 +26,7 @@ import org.jnode.fs.FSEntry;
 import org.jnode.fs.util.FSUtils;
 import org.jnode.test.fs.filesystem.AbstractFSTest;
 import org.jnode.test.fs.filesystem.config.FSTestConfig;
+import org.junit.Test;
 
 /**
  * @author Fabien DUMINY
@@ -35,10 +36,7 @@ public class TreeFSTest extends AbstractFSTest {
         super(config);
     }
 
-    public TreeFSTest(String name) {
-        super(name);
-    }
-
+    @Test
     public void testFSTree() throws IOException, Exception {
         if (!config.isReadOnly()) {
             setUp();
@@ -62,10 +60,12 @@ public class TreeFSTest extends AbstractFSTest {
         }
     }
 
+    @Test
     public void testFSTreeWithRemountAndShortName() throws Exception {
         doTestFSTreeWithRemount(config, "dir1");
     }
 
+    @Test
     public void testFSTreeWithRemountAndLongName() throws Exception {
         doTestFSTreeWithRemount(config, "This is a Long FileName.extension");
     }

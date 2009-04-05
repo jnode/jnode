@@ -28,6 +28,7 @@ import org.jnode.fs.util.FSUtils;
 import org.jnode.test.fs.filesystem.AbstractFSTest;
 import org.jnode.test.fs.filesystem.config.FSTestConfig;
 import org.jnode.test.support.TestUtils;
+import org.junit.Test;
 
 /**
  * @author Fabien DUMINY
@@ -37,10 +38,7 @@ public class FileFSTest extends AbstractFSTest {
         super(config);
     }
 
-    public FileFSTest(String name) {
-        super(name);
-    }
-
+    @Test
     public void testWriteFileThenRemountFSAndRead() throws Exception {
         setUp();
 
@@ -82,6 +80,7 @@ public class FileFSTest extends AbstractFSTest {
         }
     }
 
+    @Test
     public void testWriteFileInReadOnlyMode() throws Exception {
         if (config.isReadOnly()) {
             setUp();
@@ -104,6 +103,7 @@ public class FileFSTest extends AbstractFSTest {
         }
     }
 
+    @Test
     public void testSetLength() throws Exception {
         setUp();
 
