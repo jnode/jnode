@@ -115,15 +115,15 @@
     </syntax>
     <syntax alias="find">
       <sequence description="find files or directories">
-        <repeat minCount="1">
-          <argument argLabel="directory"/>
+        <repeat minCount="0">
+          <argument argLabel="directory" description="directory to start searching from"/>
         </repeat>
         <optionSet>
-          <option argLabel="type" longName="type"/>
-          <option argLabel="maxdepth" longName="maxdepth"/>
-          <option argLabel="mindepth" longName="mindepth"/>
-          <option argLabel="name" longName="name"/>
-          <option argLabel="iname" longName="iname"/>
+          <option argLabel="type" longName="type" shortName="t" description="filter results to show only files of given type. valid types are 'd' for directory and 'f' for file"/>
+          <option argLabel="maxdepth" longName="maxdepth" shortName="D" description="descent at most to given level of directories"/>
+          <option argLabel="mindepth" longName="mindepth" shortName="d" description="ignore files and directories at levels less than given level"/>
+          <option argLabel="name" longName="name" shortName="n" description="filter results to show only files that match given pattern"/>
+          <option argLabel="iname" longName="iname" shortName="N" description="same like 'n', but case insensitive"/>
         </optionSet>
       </sequence>
     </syntax>
