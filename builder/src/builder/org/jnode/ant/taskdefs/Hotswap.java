@@ -75,7 +75,6 @@ Adapted to JNode by Levente S\u00e1ntha.
  * <fileset dir="build/classes" includes="<star><star>/Hot*.class"/>
  * <!-- This line matches all classes in the taskefs package (and below) -->
  * <fileset dir="build/classes" includes="<star><star>/taskdefs"/>
- * </hotswap>
  * </code>
  * <br/>
  * The preferred way to build the <fileset> would be based on modification time.
