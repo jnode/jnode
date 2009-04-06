@@ -163,7 +163,7 @@ public class RepeatSyntax extends GroupSyntax {
 
     @Override
     public XMLElement toXML() {
-        XMLElement element = basicElement("optionSet");
+        XMLElement element = basicElement("repeat");
         if (minCount > 0) {
             element.setAttribute("minCount", minCount);
         }
