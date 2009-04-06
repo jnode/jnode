@@ -57,15 +57,12 @@ public class CatCommand extends AbstractCommand {
     private final URLArgument ARG_URL = 
         new URLArgument("url", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING, 
                 "the urls to be concatenated");
-    
-    private final FlagArgument FLAG_URLS =
-        new FlagArgument("urls", Argument.OPTIONAL, "If set, arguments will be urls");
-
+                
     private PrintWriter err;
     
     public CatCommand() {
         super("Concatenate the contents of files, urls or standard input to standard output");
-        registerArguments(ARG_FILE, ARG_URL, FLAG_URLS);
+        registerArguments(ARG_FILE, ARG_URL);
     }
 
     private static final int BUFFER_SIZE = 8192;
@@ -103,7 +100,8 @@ public class CatCommand extends AbstractCommand {
                     }
                 }
             }
-        } else if (files != null && files.length > 0) {
+        }
+        if (files != null && files.length > 0) {
             for (File file : files) {
                 InputStream is = null;
                 try {
