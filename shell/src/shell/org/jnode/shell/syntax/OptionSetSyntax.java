@@ -166,7 +166,7 @@ public class OptionSetSyntax extends GroupSyntax {
         }
         for (int i = 0; i < optionSyntaxes.length; i++) {
             OptionSyntax optionSyntax = optionSyntaxes[i];
-            if (!shortFlagOpts.contains(optionSyntax)) {
+            if (optionSyntax.getShortOptName() == null || !shortFlagOpts.contains(optionSyntax)) {
                 if (sb.length() > 0) {
                     sb.append(' ');
                 }
