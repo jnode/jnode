@@ -92,7 +92,7 @@ import org.jnode.driver.video.FrameBufferAPIOwner;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.UnknownConfigurationException;
 import org.jnode.naming.InitialNaming;
-import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.annotation.SharedStatics;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 import sun.awt.image.ToolkitImage;

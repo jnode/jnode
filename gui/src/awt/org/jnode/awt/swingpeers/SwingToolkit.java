@@ -97,7 +97,7 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
 import org.jnode.awt.JNodeAwtContext;
 import org.jnode.awt.JNodeToolkit;
-import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.annotation.SharedStatics;
 import sun.awt.AWTAutoShutdown;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;

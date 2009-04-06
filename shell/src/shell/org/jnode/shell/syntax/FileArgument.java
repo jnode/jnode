@@ -26,7 +26,7 @@ import java.security.PrivilegedAction;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
-import org.jnode.vm.annotation.DoPrivileged;
+import org.jnode.annotation.DoPrivileged;
 import sun.security.action.GetPropertyAction;
 
 /**

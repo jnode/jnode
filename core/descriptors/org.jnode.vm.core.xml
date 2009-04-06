@@ -20,7 +20,7 @@
       <export name="org.vmmagic.unboxed.*"/>
       <export name="org.jnode.assembler.*"/>
       <export name="org.jnode.vm.*"/>
-      <export name="org.jnode.vm.annotation.*"/>
+      <export name="org.jnode.annotation.*"/>
       <export name="org.jnode.vm.bytecode.*"/>
       <export name="org.jnode.vm.classmgr.*"/>
       <export name="org.jnode.vm.compiler.*"/>

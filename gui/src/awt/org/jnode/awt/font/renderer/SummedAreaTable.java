@@ -22,7 +22,7 @@ package org.jnode.awt.font.renderer;
 
 import java.util.BitSet;
 import org.jnode.vm.Vm;
-import org.jnode.vm.annotation.Inline;
+import org.jnode.annotation.Inline;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
