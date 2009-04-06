@@ -167,7 +167,7 @@ public class RepeatSyntax extends GroupSyntax {
         if (minCount > 0) {
             element.setAttribute("minCount", minCount);
         }
-        if (minCount != Integer.MAX_VALUE) {
+        if (maxCount != Integer.MAX_VALUE) {
             element.setAttribute("maxCount", maxCount);
         }
         return element;
