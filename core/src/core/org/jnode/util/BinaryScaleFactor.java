@@ -20,7 +20,7 @@
  
 package org.jnode.util;
 
-import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.annotation.SharedStatics;
 
 @SharedStatics
 public enum BinaryScaleFactor implements ScaleFactor {

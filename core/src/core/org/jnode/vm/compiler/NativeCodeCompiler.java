@@ -30,7 +30,7 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmSystemObject;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.ControlFlowGraph;
 import org.jnode.vm.classmgr.VmAddressMap;

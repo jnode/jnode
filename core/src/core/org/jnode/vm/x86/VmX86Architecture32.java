@@ -24,7 +24,7 @@ import static org.jnode.vm.VirtualMemoryRegion.ACPI;
 
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VirtualMemoryRegion;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;

@@ -101,7 +101,7 @@ public final class VmAnnotation extends VmSystemObject {
         if (value == null) {
             final VmType<? extends Annotation> annType = annotationType(loader);
             //todo will be obsolate when annotation paring is migrated to openjdk
-            if (!annType.getName().equals(org.jnode.vm.annotation.AllowedPackages.class.getName())) {
+            if (!annType.getName().equals(org.jnode.annotation.AllowedPackages.class.getName())) {
                 int dmc = annType.getNoDeclaredMethods();
                 Map vmap = new HashMap();
                 for (int i = 0; i < dmc; i++) {

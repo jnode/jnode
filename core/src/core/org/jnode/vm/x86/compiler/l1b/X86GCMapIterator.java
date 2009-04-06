@@ -20,7 +20,7 @@
  
 package org.jnode.vm.x86.compiler.l1b;
 
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.compiler.GCMapIterator;
 import org.vmmagic.unboxed.Address;

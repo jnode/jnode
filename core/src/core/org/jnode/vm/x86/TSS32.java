@@ -21,7 +21,7 @@
 package org.jnode.vm.x86;
 
 import org.jnode.vm.VmMagic;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
 /**

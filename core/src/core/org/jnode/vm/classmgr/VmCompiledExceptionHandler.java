@@ -21,7 +21,7 @@
 package org.jnode.vm.classmgr;
 
 import org.jnode.vm.VmAddress;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
 /**

@@ -14,7 +14,7 @@
 package org.mmtk.vm;
 
 import org.jnode.vm.VmMagic;
-import org.jnode.vm.annotation.Inline;
+import org.jnode.annotation.Inline;
 import org.mmtk.utility.scan.MMType;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;

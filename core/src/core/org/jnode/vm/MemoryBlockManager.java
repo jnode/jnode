@@ -20,9 +20,9 @@
  
 package org.jnode.vm;
 
-import org.jnode.vm.annotation.MagicPermission;
-import org.jnode.vm.annotation.SharedStatics;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.annotation.MagicPermission;
+import org.jnode.annotation.SharedStatics;
+import org.jnode.annotation.Uninterruptible;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmThread;
 import org.vmmagic.unboxed.Address;

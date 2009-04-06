@@ -22,8 +22,8 @@ package org.jnode.vm.scheduler;
 
 import org.jnode.system.IRQHandler;
 import org.jnode.system.ResourceOwner;
-import org.jnode.vm.annotation.KernelSpace;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.Uninterruptible;
 
 /**
  * Thread for IRQ handler.

@@ -23,7 +23,7 @@ package java.lang;
 import org.jnode.vm.scheduler.VmThread;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.VmStackFrame;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmInstanceField;

@@ -40,7 +40,6 @@ exception statement from your version. */
 package gnu.classpath.jdwp.transport;
 
 import java.util.HashMap;
-import gnu.classpath.jdwp.JNodeSocketTransport;
 
 /**
  * A factory class that constructs transports for use by
@@ -69,9 +68,11 @@ public class TransportFactory
   private static TransportMethod[] _transportMethods = new TransportMethod[]
   {
           //jnode
-    new TransportMethod (SocketTransport.NAME, JNodeSocketTransport.class)
+    new TransportMethod (SocketTransport.NAME, getTransportClass())
     //new TransportMethod (ShmemTransport.NAME, ShmemTransport.class)
   };
+
+    private static native Class getTransportClass();
 
   /**
    * Get a transport configured as specified in the properties

@@ -1,8 +1,8 @@
 package java.lang;
 
 import org.jnode.vm.scheduler.VmThread;
-import org.jnode.vm.annotation.KernelSpace;
-import org.jnode.vm.annotation.Internal;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.Internal;
 import org.jnode.security.JNodePermission;
 
 /**

@@ -13,7 +13,7 @@
 
 package org.mmtk.vm;
 
-import org.jnode.vm.annotation.Inline;
+import org.jnode.annotation.Inline;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.mmtk.plan.NoGC;
 import org.vmmagic.pragma.Uninterruptible;

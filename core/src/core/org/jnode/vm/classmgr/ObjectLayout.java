@@ -20,7 +20,7 @@
  
 package org.jnode.vm.classmgr;
 
-import org.jnode.vm.annotation.Inline;
+import org.jnode.annotation.Inline;
 
 /**
  * <description>

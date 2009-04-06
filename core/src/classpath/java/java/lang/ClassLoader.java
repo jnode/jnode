@@ -89,8 +89,7 @@ public abstract class ClassLoader {
          * The System Class Loader (a.k.a. Application Class Loader). The one
          * returned by ClassLoader.getSystemClassLoader.
          */
-        static final ClassLoader systemClassLoader = VMClassLoader
-                .getSystemClassLoader();
+        static final ClassLoader systemClassLoader = VMClassLoader.getSystemClassLoader();
         static {
             // Find out if we have to install a default security manager. Note
             // that
@@ -143,16 +142,14 @@ public abstract class ClassLoader {
          * This map is never modified, so it does not need to be synchronized.
          */
         // Package visible for use by Class.
-        static final Map<String, Boolean> systemPackageAssertionStatus = VMClassLoader
-                .packageAssertionStatus();
+        static final Map<String, Boolean> systemPackageAssertionStatus = VMClassLoader.packageAssertionStatus();
 
         /**
          * The command-line state of the class assertion status overrides. This
          * map is never modified, so it does not need to be synchronized.
          */
         // Package visible for use by Class.
-        static final Map<String, Boolean> systemClassAssertionStatus = VMClassLoader
-                .classAssertionStatus();
+        static final Map<String, Boolean> systemClassAssertionStatus = VMClassLoader.classAssertionStatus();
     }
 
     /**

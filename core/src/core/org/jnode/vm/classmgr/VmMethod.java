@@ -28,7 +28,7 @@ import org.jnode.vm.LoadCompileService;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.InternString;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.isolate.VmIsolateLocal;
 import org.vmmagic.unboxed.Address;
 

@@ -14,7 +14,7 @@
 package org.mmtk.vm;
 
 import org.jnode.vm.Vm;
-import org.jnode.vm.annotation.Inline;
+import org.jnode.annotation.Inline;
 import org.mmtk.utility.Constants;
 import org.mmtk.utility.deque.AddressDeque;
 import org.mmtk.utility.deque.AddressPairDeque;

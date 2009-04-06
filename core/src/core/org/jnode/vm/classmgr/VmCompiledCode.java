@@ -22,9 +22,9 @@ package org.jnode.vm.classmgr;
 
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.VmAddress;
-import org.jnode.vm.annotation.KernelSpace;
-import org.jnode.vm.annotation.MagicPermission;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.MagicPermission;
+import org.jnode.annotation.Uninterruptible;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.vmmagic.unboxed.Address;
 

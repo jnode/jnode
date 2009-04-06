@@ -13,8 +13,8 @@
 
 package org.mmtk.vm;
 
-import org.jnode.vm.annotation.NoReadBarrier;
-import org.jnode.vm.annotation.NoWriteBarrier;
+import org.jnode.annotation.NoReadBarrier;
+import org.jnode.annotation.NoWriteBarrier;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;

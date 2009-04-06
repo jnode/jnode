@@ -20,17 +20,11 @@
  
 package sun.misc;
 
-import java.lang.reflect.Field;
-import java.security.PrivilegedAction;
-import java.security.AccessController;
-import org.jnode.vm.classmgr.VmInstanceField;
-import org.vmmagic.unboxed.ObjectReference;
-
 /**
  * @author Levente S\u00e1ntha
  *
  */
-@org.jnode.vm.annotation.MagicPermission
+@org.jnode.annotation.MagicPermission
 class UnsafeHelper { //todo remove this class if not used
     /*
     private static final int OFFSET_OF_vmField_IN_Field = AccessController.doPrivileged(new PrivilegedAction<Integer>(){

@@ -20,8 +20,8 @@
  
 package org.jnode.vm;
 
-import org.jnode.vm.annotation.MagicPermission;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.annotation.MagicPermission;
+import org.jnode.annotation.Uninterruptible;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmMethod;

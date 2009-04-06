@@ -56,7 +56,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
-import org.jnode.vm.classmgr.VmType;
 
 /**
  * A class representing the VirtualMachine Command Set.

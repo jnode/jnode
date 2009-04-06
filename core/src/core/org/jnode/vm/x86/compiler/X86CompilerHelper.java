@@ -31,7 +31,7 @@ import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
-import org.jnode.vm.annotation.PrivilegedActionPragma;
+import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmIsolatedStaticsEntry;

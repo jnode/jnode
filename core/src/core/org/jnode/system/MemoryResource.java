@@ -22,8 +22,8 @@ package org.jnode.system;
 
 import java.nio.ByteBuffer;
 
-import org.jnode.vm.annotation.KernelSpace;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.Uninterruptible;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Offset;

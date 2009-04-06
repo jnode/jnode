@@ -1295,10 +1295,12 @@ public class Thread implements Runnable
             g = new ThreadGroup();
         }catch (Exception e){
             e.printStackTrace();
-            org.jnode.vm.Unsafe.die("Root ThreadGroup creation failure.");
+            die0();
         }
         ROOT_GROUP = g;
     }
+
+    private static native void die0();
 
     /**
      * The argument supplied to the current call to

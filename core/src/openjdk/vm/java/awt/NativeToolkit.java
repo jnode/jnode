@@ -20,6 +20,8 @@
  
 package java.awt;
 
+import org.jnode.vm.VmSystem;
+
 /**
  * @see java.awt.Toolkit
  */
@@ -29,5 +31,9 @@ class NativeToolkit {
      */
     private static void initIDs() {
         //empty
+    }
+
+    private static ClassLoader getSystemClassLoader0() {
+        return VmSystem.getSystemClassLoader().asClassLoader();
     }
 }

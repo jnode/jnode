@@ -25,10 +25,10 @@ import org.jnode.system.IRQResource;
 import org.jnode.system.Resource;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
-import org.jnode.vm.annotation.Internal;
-import org.jnode.vm.annotation.KernelSpace;
-import org.jnode.vm.annotation.PrivilegedActionPragma;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.annotation.Internal;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.PrivilegedActionPragma;
+import org.jnode.annotation.Uninterruptible;
 
 /**
  * IRQ manager implementation.

@@ -24,6 +24,7 @@ import java.io.PrintStream;
 import java.io.InputStream;
 import java.util.Properties;
 import org.jnode.vm.VmSystem;
+import org.jnode.util.SystemInputStream;
 import gnu.classpath.SystemProperties;
 
 
@@ -35,6 +36,16 @@ public class NativeSystem {
 
     private static void registerNatives() {
     }
+
+    private static InputStream makeSystemIn0() {
+        return SystemInputStream.getInstance();
+    }
+
+    private static PrintStream makeSystemOut0() {
+        return VmSystem.getSystemOut();
+    }
+
+
 
     private static void setIn0(InputStream in) {
         VmSystem.setIn(in);

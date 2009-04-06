@@ -20,9 +20,9 @@
  
 package org.jnode.vm;
 
-import org.jnode.vm.annotation.Internal;
-import org.jnode.vm.annotation.KernelSpace;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.Internal;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.vmmagic.unboxed.Address;

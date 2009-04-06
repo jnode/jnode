@@ -37,8 +37,6 @@ import sun.reflect.Reflection;
 import sun.security.util.SecurityConstants;
 import sun.reflect.annotation.AnnotationType;
 import gnu.classpath.SystemProperties;
-import org.jnode.util.SystemInputStream;
-import org.jnode.vm.VmSystem;
 
 /**
  * The <code>System</code> class contains several useful class fields
@@ -71,7 +69,9 @@ public final class System {
      * corresponds to keyboard input or another input source specified by
      * the host environment or user.
      */
-    public final static InputStream in = SystemInputStream.getInstance();//jnode nullInputStream();
+    public final static InputStream in = makeSystemIn0();//jnode nullInputStream();
+
+    private static native InputStream makeSystemIn0();
 
 
     /**
@@ -99,7 +99,9 @@ public final class System {
      * @see     java.io.PrintStream#println(java.lang.Object)
      * @see     java.io.PrintStream#println(java.lang.String)
      */
-    public final static PrintStream out = VmSystem.getSystemOut();//jnode nullPrintStream();
+    public final static PrintStream out = makeSystemOut0();//jnode nullPrintStream();
+
+    private static native PrintStream makeSystemOut0();
 
 
     /**
@@ -114,7 +116,7 @@ public final class System {
      * variable <code>out</code>, has been redirected to a file or other
      * destination that is typically not continuously monitored.
      */
-    public final static PrintStream err = VmSystem.getSystemOut();//jnode nullPrintStream();
+    public final static PrintStream err = makeSystemOut0();//jnode nullPrintStream();
 
 
     /* The security manager for the system.
