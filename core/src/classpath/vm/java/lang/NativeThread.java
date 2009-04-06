@@ -134,4 +134,8 @@ class NativeThread {
     private static boolean holdsLock(Object obj) {
         return MonitorManager.holdsLock(obj);
     }
+
+    private static void die0() {
+        org.jnode.vm.Unsafe.die("Root ThreadGroup creation failure.");
+    }
 }

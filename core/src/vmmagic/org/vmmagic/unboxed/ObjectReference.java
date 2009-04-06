@@ -13,7 +13,7 @@
 
 package org.vmmagic.unboxed;
 
-import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.annotation.KernelSpace;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**

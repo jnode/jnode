@@ -61,7 +61,6 @@ import sun.awt.SunToolkit;
 import sun.security.util.SecurityConstants;
 
 import sun.util.CoreResourceBundleControl;
-import org.jnode.vm.VmSystem;
 
 /**
  * This class is the abstract superclass of all actual
@@ -852,7 +851,7 @@ public abstract class  Toolkit {
                                 if(cl == null)
                                     cl = Toolkit.class.getClassLoader();
                                 if(cl == null)
-                                    cl = VmSystem.getSystemClassLoader().asClassLoader();
+                                    cl = getSystemClassLoader0();
                                 cls = cl.loadClass(nm);
                             } catch (ClassNotFoundException e) {
                                 ClassLoader cl = ClassLoader.getSystemClassLoader();
@@ -886,6 +885,8 @@ public abstract class  Toolkit {
         }
         return toolkit;
     }
+    //jnode todo refactor it
+    private static native ClassLoader getSystemClassLoader0();
 
     /**
      * Returns an image which gets pixel data from the specified file,

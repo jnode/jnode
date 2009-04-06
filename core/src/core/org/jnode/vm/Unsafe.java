@@ -25,10 +25,10 @@ import java.io.StringWriter;
 
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.security.JNodePermission;
-import org.jnode.vm.annotation.Inline;
-import org.jnode.vm.annotation.Internal;
-import org.jnode.vm.annotation.KernelSpace;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.Inline;
+import org.jnode.annotation.Internal;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.scheduler.VmProcessor;

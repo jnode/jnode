@@ -25,7 +25,7 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemObject;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.memmgr.GCStatistics;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;

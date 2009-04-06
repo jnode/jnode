@@ -37,7 +37,6 @@ import java.lang.reflect.*;
  * @author John R. Rose
  * @see #getUnsafe
  */
-@org.jnode.vm.annotation.MagicPermission
 public final class Unsafe {
 
     private static native void registerNatives();

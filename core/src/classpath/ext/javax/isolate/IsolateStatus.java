@@ -20,7 +20,7 @@
  
 package javax.isolate;
 
-import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.annotation.SharedStatics;
 
 /**
  * Represents isolate status, capturing such information as isolate state, exit code, and exit reason.

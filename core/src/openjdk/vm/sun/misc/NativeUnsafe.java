@@ -42,8 +42,8 @@ import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmReflection;
-import org.jnode.vm.annotation.MagicPermission;
-import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.annotation.MagicPermission;
+import org.jnode.annotation.SharedStatics;
 
 /**
  * @author Levente S\u00e1ntha

@@ -20,6 +20,10 @@
  
 package java.lang;
 
+import org.jnode.vm.VmSystem;
+import org.jnode.vm.VmIOContext;
+import java.util.Map;
+
 /**
  * @see java.lang.ProcessEnvironment
  */
@@ -31,5 +35,17 @@ class NativeProcessEnvironment {
         //todo implement it
         //throw new UnsupportedOperationException();
         return new byte[0][];
+    }
+
+    private static String getenv(String name) {
+        return VmSystem.getIOContext().getEnv().get(name);
+    }
+
+    private static Map<String,String> getenv() {
+        return VmSystem.getIOContext().getEnv();
+    }
+
+    private static void setGlobalEnv0(Map<String,String> env) {
+        VmIOContext.setGlobalEnv(env);
     }
 }

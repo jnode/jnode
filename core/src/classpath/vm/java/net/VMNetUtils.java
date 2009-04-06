@@ -20,7 +20,7 @@
  
 package java.net;
 
-import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.annotation.SharedStatics;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

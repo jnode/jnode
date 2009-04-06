@@ -49,7 +49,6 @@ import gnu.java.awt.ClasspathToolkit;
 import gnu.javax.imageio.bmp.BMPImageReaderSpi;
 import gnu.javax.imageio.gif.GIFImageReaderSpi;
 import gnu.javax.imageio.png.PNGImageReaderSpi;
-import org.jnode.imageio.jpeg.JPEGImageReaderSpi;
 import com.sun.imageio.plugins.wbmp.WBMPImageReaderSpi;
 import com.sun.imageio.plugins.wbmp.WBMPImageWriterSpi;
 import com.sun.imageio.plugins.gif.GIFImageWriterSpi;
@@ -94,7 +93,7 @@ public final class IIORegistry extends ServiceRegistry
     registerServiceProvider(new PNGImageReaderSpi()); // Register PNG decoder.
     registerServiceProvider(new GIFImageReaderSpi()); // Register GIF decoder.
     registerServiceProvider(new BMPImageReaderSpi());
-    registerServiceProvider(new JPEGImageReaderSpi());
+    registerServiceProvider(createJPEGImageReaderSpi());
     registerServiceProvider(new BMPImageWriterSpi());
 
       registerServiceProvider(new WBMPImageReaderSpi());
@@ -109,7 +108,9 @@ public final class IIORegistry extends ServiceRegistry
     registerApplicationClasspathSpis();
   }
 
-  /**
+    private static native Object createJPEGImageReaderSpi();
+
+    /**
    * Registers all available service providers found on the application
    * classpath.
    */

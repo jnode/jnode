@@ -22,10 +22,10 @@ package org.jnode.vm.scheduler;
 
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmSystemObject;
-import org.jnode.vm.annotation.Inline;
-import org.jnode.vm.annotation.MagicPermission;
-import org.jnode.vm.annotation.NoFieldAlignments;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.annotation.Inline;
+import org.jnode.annotation.MagicPermission;
+import org.jnode.annotation.NoFieldAlignments;
+import org.jnode.annotation.Uninterruptible;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 

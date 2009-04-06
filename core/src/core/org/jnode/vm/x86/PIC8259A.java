@@ -27,10 +27,10 @@ import org.jnode.system.IOResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.SimpleResourceOwner;
-import org.jnode.vm.annotation.Inline;
-import org.jnode.vm.annotation.KernelSpace;
-import org.jnode.vm.annotation.PrivilegedActionPragma;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.annotation.Inline;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.PrivilegedActionPragma;
+import org.jnode.annotation.Uninterruptible;
 import org.jnode.vm.scheduler.ProcessorLock;
 
 /**

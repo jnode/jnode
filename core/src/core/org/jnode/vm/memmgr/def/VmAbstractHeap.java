@@ -21,8 +21,8 @@
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
-import org.jnode.vm.annotation.Inline;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.Inline;
+import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.scheduler.SpinLock;

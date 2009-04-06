@@ -20,10 +20,10 @@
  
 package org.jnode.vm;
 
-import org.jnode.vm.annotation.LoadStatics;
-import org.jnode.vm.annotation.MagicPermission;
-import org.jnode.vm.annotation.PrivilegedActionPragma;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.annotation.LoadStatics;
+import org.jnode.annotation.MagicPermission;
+import org.jnode.annotation.PrivilegedActionPragma;
+import org.jnode.annotation.Uninterruptible;
 import org.jnode.vm.classmgr.TIBLayout;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassLoader;

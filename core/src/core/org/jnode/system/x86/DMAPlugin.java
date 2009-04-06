@@ -33,7 +33,7 @@ import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
 /**

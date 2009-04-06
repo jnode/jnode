@@ -1,6 +1,6 @@
 package java.net;
 
-import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.annotation.SharedStatics;
 
 /**
  * @see java.net.InetAddress

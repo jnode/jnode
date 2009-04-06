@@ -20,7 +20,7 @@
  
 package org.jnode.vm.classmgr;
 
-import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.annotation.KernelSpace;
 import org.jnode.vm.InternString;
 import org.vmmagic.pragma.Uninterruptible;
 
@@ -138,7 +138,7 @@ abstract class VmMember extends VmAnnotatedElement implements Uninterruptible {
      * @return VmClass
      */
     @KernelSpace
-    @org.jnode.vm.annotation.Uninterruptible
+    @org.jnode.annotation.Uninterruptible
     public final VmType<?> getDeclaringClass() {
         return declaringClass;
     }

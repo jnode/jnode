@@ -21,7 +21,7 @@
 package org.jnode.vm.x86;
 
 import org.jnode.vm.VirtualMemoryRegion;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;

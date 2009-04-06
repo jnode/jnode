@@ -30,9 +30,9 @@ import org.jnode.plugin.model.PluginRegistryModel;
 import org.jnode.system.BootLog;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmSystem;
-import org.jnode.vm.annotation.LoadStatics;
-import org.jnode.vm.annotation.SharedStatics;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.annotation.LoadStatics;
+import org.jnode.annotation.SharedStatics;
+import org.jnode.annotation.Uninterruptible;
 
 /**
  * First class that is executed when JNode boots.

@@ -21,7 +21,7 @@
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.VmMagic;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmWriteBarrier;

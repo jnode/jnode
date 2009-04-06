@@ -57,10 +57,6 @@ package java.lang;
 import java.io.*;
 import java.util.*;
 
-import org.jnode.vm.VmIOContext;
-import org.jnode.vm.VmSystem;
-
-
 final class ProcessEnvironment
 {
     // FIXME ... this class needs some work for JNode,  Redo / remove the
@@ -85,19 +81,16 @@ final class ProcessEnvironment
         theUnmodifiableEnvironment
             = Collections.unmodifiableMap
             (new StringEnvironment(theEnvironment));
-        
-        VmIOContext.setGlobalEnv(theUnmodifiableEnvironment);
+
+        setGlobalEnv0(theUnmodifiableEnvironment);
     }
+
+    private native static void setGlobalEnv0(Map<String,String> env);
 
     /* Only for use by System.getenv(String) */
-    static String getenv(String name) {
-        return VmSystem.getIOContext().getEnv().get(name);
-    }
-
+    static native String getenv(String name);
     /* Only for use by System.getenv() */
-    static Map<String,String> getenv() {
-        return VmSystem.getIOContext().getEnv();
-    }
+    static native Map<String,String> getenv();
 
     /* Only for use by ProcessBuilder.environment() */
     static Map<String,String> environment() {

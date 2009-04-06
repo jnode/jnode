@@ -22,8 +22,8 @@ package org.jnode.vm.x86;
 
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmMagic;
-import org.jnode.vm.annotation.Internal;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.Internal;
+import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.scheduler.VmThread;

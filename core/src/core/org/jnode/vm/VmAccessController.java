@@ -27,9 +27,9 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 
-import org.jnode.vm.annotation.CheckPermission;
-import org.jnode.vm.annotation.DoPrivileged;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.CheckPermission;
+import org.jnode.annotation.DoPrivileged;
+import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.scheduler.VmProcessor;

@@ -22,8 +22,8 @@ package org.jnode.vm.classmgr;
 
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmSystemObject;
-import org.jnode.vm.annotation.KernelSpace;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.Uninterruptible;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 

@@ -29,7 +29,7 @@ import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
-import org.jnode.vm.annotation.PrivilegedActionPragma;
+import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.VmType;
 
 public class DefaultNameSpace extends AbstractNameSpace {

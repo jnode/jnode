@@ -25,7 +25,7 @@ import java.util.Map;
 import org.jnode.util.BootableHashMap;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.annotation.SharedStatics;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

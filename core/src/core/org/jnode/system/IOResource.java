@@ -20,8 +20,8 @@
  
 package org.jnode.system;
 
-import org.jnode.vm.annotation.KernelSpace;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.Uninterruptible;
 
 /**
  * I/O port resource.

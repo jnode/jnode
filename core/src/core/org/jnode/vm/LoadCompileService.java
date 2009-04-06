@@ -25,11 +25,11 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 
 import org.jnode.assembler.ObjectResolver;
-import org.jnode.vm.annotation.Inline;
-import org.jnode.vm.annotation.Internal;
-import org.jnode.vm.annotation.KernelSpace;
-import org.jnode.vm.annotation.MagicPermission;
-import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.annotation.Inline;
+import org.jnode.annotation.Internal;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.MagicPermission;
+import org.jnode.annotation.SharedStatics;
 import org.jnode.vm.classmgr.ClassDecoder;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmMethod;

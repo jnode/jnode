@@ -27,11 +27,11 @@ import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmStackReader;
 import org.jnode.vm.VmSystem;
-import org.jnode.vm.annotation.Inline;
-import org.jnode.vm.annotation.Internal;
-import org.jnode.vm.annotation.KernelSpace;
-import org.jnode.vm.annotation.MagicPermission;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.annotation.Inline;
+import org.jnode.annotation.Internal;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.MagicPermission;
+import org.jnode.annotation.Uninterruptible;
 
 /**
  * Thread scheduler. This scheduler is used by all processors in the system, so

@@ -32,13 +32,13 @@ import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemObject;
-import org.jnode.vm.annotation.Inline;
-import org.jnode.vm.annotation.Internal;
-import org.jnode.vm.annotation.KernelSpace;
-import org.jnode.vm.annotation.LoadStatics;
-import org.jnode.vm.annotation.MagicPermission;
-import org.jnode.vm.annotation.NoFieldAlignments;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.annotation.Inline;
+import org.jnode.annotation.Internal;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.LoadStatics;
+import org.jnode.annotation.MagicPermission;
+import org.jnode.annotation.NoFieldAlignments;
+import org.jnode.annotation.Uninterruptible;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.GCMapIterator;
@@ -208,7 +208,7 @@ public abstract class VmProcessor extends VmSystemObject {
      * @return the current processor
      */
     @Inline
-    @org.jnode.vm.annotation.Uninterruptible
+    @org.jnode.annotation.Uninterruptible
     @KernelSpace
     public static VmProcessor current() {
         return VmMagic.currentProcessor();

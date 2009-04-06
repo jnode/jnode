@@ -20,7 +20,7 @@
  
 package org.jnode.vm.memmgr.mmtk.nogc;
 
-import org.jnode.vm.annotation.Inline;
+import org.jnode.annotation.Inline;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.mmtk.plan.NoGC;
