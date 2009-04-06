@@ -40,7 +40,7 @@ import org.jnode.net.TransportLayer;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.util.Statistics;
 import org.jnode.util.TimeoutException;
-import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.annotation.SharedStatics;
 
 /**
  * @author epr

@@ -21,7 +21,7 @@
 package org.jnode.driver.video.vesa;
 
 import org.vmmagic.unboxed.Address;
-import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.annotation.MagicPermission;
 
 @MagicPermission
 public class VesaUtils {

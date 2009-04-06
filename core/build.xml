@@ -23,8 +23,6 @@
 	<pathelement location="${my-src.dir}/classpath/gnu"/>
 	<pathelement location="${my-src.dir}/classpath/java"/>
 	<pathelement location="${my-src.dir}/classpath/javax"/>
-	<pathelement location="${my-src.dir}/classpath/ext"/>
-	<pathelement location="${my-src.dir}/classpath/vm"/>    	
 	<pathelement location="${my-src.dir}/classpath/tools"/>
 	<pathelement location="${my-src.dir}/openjdk/java"/>
 	<pathelement location="${my-src.dir}/openjdk/javax"/>
@@ -32,7 +30,13 @@
 	<pathelement location="${my-src.dir}/openjdk/com"/>
 	<pathelement location="${my-src.dir}/openjdk/sun"/>
 	<pathelement location="${my-src.dir}/openjdk/svm"/>
-	<pathelement location="${my-src.dir}/openjdk/vm"/>
+    <pathelement location="${my-src.dir}/icedtea"/>
+    <pathelement location="${my-src.dir}/classlib"/>
+  </path>
+  <path id="classpath-sources-vm">
+    <pathelement location="${my-src.dir}/classpath/ext"/>  
+    <pathelement location="${my-src.dir}/classpath/vm"/>
+    <pathelement location="${my-src.dir}/openjdk/vm"/>
   </path>
   <path id="classpath-sources-corba">
     <pathelement location="${my-src.dir}/openjdk/corba"/>
@@ -44,13 +48,12 @@
     <pathelement location="${my-src.dir}/openjdk/langtools"/>
   </path>
   <path id="my-sources1">
-	<path refid="classpath-sources"/>
+	<path refid="classpath-sources-vm"/>
 	<pathelement location="${my-src.dir}/core"/>
 	<pathelement location="${my-src.dir}/endorsed/nanoxml"/>
 	<pathelement location="${my-src.dir}/vmmagic"/>
 	<pathelement location="${my-src.dir}/mmtk-vm"/>
 	<pathelement location="${my-src.dir}/driver"/>
-	<pathelement location="${my-src.dir}/icedtea"/>
 	<pathelement location="${my-src.dir}/test"/>
 	<pathelement location="${my-src.dir}/emu"/>
   </path>
@@ -138,6 +141,14 @@
 
   <!-- Compile all subproject java files -->
   <target name="compile" depends="prepare">
+    <jnode.compile>
+      <bootclasspath>
+      	<pathelement location="${classpath-sources}" />
+		<pathelement location="${mx4j.jar}"/> <!-- should be in GNU Classpath since java 5.0 -->
+      </bootclasspath>
+      <src refid="classpath-sources" />
+      <classpath refid="my-cp"/>
+    </jnode.compile>
     <jnode.compile>
       <bootclasspath>
       	<pathelement location="${classpath-sources}" />
