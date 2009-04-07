@@ -88,6 +88,12 @@ public class NewSyntaxHelp extends TextHelpBase implements EnhancedHelp {
                     pw.println("\n" + HelpFactory.getLocalizedHelp("help.options") + ":");
                     first = false;
                 }
+                // If there is no key in the flagMap for this args label, which is caused
+                // when the option doesnt exist in the syntax, this will throw an NPE.
+                // We should have caught this problem by here.
+                if (!flagMap.containsKey(arg.getLabel())) {
+                    throw new NullPointerException("No option in syntax for this label: " + arg.getLabel());
+                }
                 describeOption((FlagArgument) arg, flagMap.get(arg.getLabel()), pw);
             }
         }
