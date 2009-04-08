@@ -97,22 +97,9 @@
     </syntax>
     <syntax alias="cat">
       <empty description="copy standard input to standard output"/>
-      <sequence description="concatenate urls and files to standard output">
-        <repeat minCount="1">
-          <alternatives>
-            <sequence>
-              <alternatives>
-                <symbol symbol="-u"/>
-                <symbol symbol="--urls"/>
-              </alternatives>
-              <repeat minCount="1">
-                <argument argLabel="url"/>
-              </repeat>
-            </sequence>
-            <argument argLabel="file"/>
-          </alternatives>
-        </repeat>
-      </sequence>
+      <repeat>
+        <argument argLabel="sources"/>
+      </repeat>
     </syntax>
     <syntax alias="class" description="Show details of a Java class">
       <argument argLabel="className"/>
