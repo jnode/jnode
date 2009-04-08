@@ -22,16 +22,18 @@ package org.jnode.shell.command;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.net.MalformedURLException;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.StringArgument;
+import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.URLArgument;
 
 /**
  * Read files or network resources and write the concatenation to standard output.  If
@@ -48,15 +50,22 @@ import org.jnode.shell.syntax.StringArgument;
  */
 public class CatCommand extends AbstractCommand {
 
-    private static final String help_sources = "A list of data sources, either files or urls to remote files";
+    private final FileArgument ARG_FILE = 
+        new FileArgument("file", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING, 
+                "the files to be concatenated");
+
+    private final URLArgument ARG_URL = 
+        new URLArgument("url", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING, 
+                "the urls to be concatenated");
     
-    private final StringArgument Sources = new StringArgument("sources", Argument.MULTIPLE, help_sources);
-                
+    private final FlagArgument FLAG_URLS =
+        new FlagArgument("urls", Argument.OPTIONAL, "If set, arguments will be urls");
+
     private PrintWriter err;
     
     public CatCommand() {
         super("Concatenate the contents of files, urls or standard input to standard output");
-        registerArguments(Sources);
+        registerArguments(ARG_FILE, ARG_URL, FLAG_URLS);
     }
 
     private static final int BUFFER_SIZE = 8192;
@@ -69,48 +78,54 @@ public class CatCommand extends AbstractCommand {
     public void execute() throws IOException {
         this.err = getError().getPrintWriter();
         OutputStream out = getOutput().getOutputStream();
-        
-        if (!Sources.isSet()) {
-            process(getInput().getInputStream(), out);
-            return;
-        }
+        File[] files = ARG_FILE.getValues();
+        URL[] urls = ARG_URL.getValues();
         
         boolean ok = true;
-        URL url;
-        File file;
-        InputStream in;
-        
-        for (String source : Sources.getValues()) {
-            in = null;
-            if (source.equals("-")) {
-                process(getInput().getInputStream(), out);
-                continue;
-            }
-            
-            try {
-                url = new URL(source);
-                in = openURL(url);
-            } catch (MalformedURLException e) {
-                file = new File(source);
-                if (file.exists()) {
-                    in = openFile(file);
-                } else {
-                    err.println("Malformed url, or non-existant file: " + source);
-                }
-            }
-            
-            if (in != null) {
-                process(in, out);
+        if (urls != null && urls.length > 0) {
+            for (URL url : urls) {
+                InputStream is = null;
                 try {
-                    in.close();
-                } catch (IOException e) {
-                    /* ignore */
+                    is = url.openStream();
+                } catch (IOException ex) {
+                    err.println("Can't fetch url '" + url + "': " + ex.getLocalizedMessage());
+                    ok = false;
                 }
-            } else {
-                ok = false;
+                if (is != null) {
+                    try {
+                        process(is, out);
+                    } finally {
+                        try { 
+                            is.close();
+                        } catch (IOException ex) { 
+                            /* ignore */
+                        }
+                    }
+                }
             }
+        } else if (files != null && files.length > 0) {
+            for (File file : files) {
+                InputStream is = null;
+                try {
+                    is = openFile(file);
+                    if (is == null) {
+                        ok = false;
+                    } else {
+                        process(is, out);
+                    }
+                } finally {
+                    if (is != null) {
+                        try { 
+                            is.close();
+                        } catch (IOException ex) {
+                            /* ignore */
+                        }
+                    }
+                }
+            }
+        } else {
+            process(getInput().getInputStream(), out);
         }
-        
         out.flush();
         if (!ok) { 
             exit(1); 
@@ -132,25 +147,12 @@ public class CatCommand extends AbstractCommand {
     }
 
     /**
-     * Attempt to open a url, writing an error message on failure.
-     * @param url the url of the remote source to be opened.
-     * @return An open stream, or <code>null</code>
-     */
-    private InputStream openURL(URL url) {
-        try {
-            return url.openStream();
-        } catch (IOException ex) {
-            err.println("Cannot open url '" + url + "': " + ex.getLocalizedMessage());
-            return null;
-        }
-    }
-    
-    /**
      * Attempt to open a file, writing an error message on failure.
      * @param fname the filename of the file to be opened
-     * @return An open stream, or <code>null</code>. 
+     * @return An open stream, or <code>null</code>.
+     * @throws FileNotFoundException 
      */
-    private InputStream openFile(File file) {
+    private InputStream openFile(File file) throws FileNotFoundException {
         try {
             return new FileInputStream(file);
         } catch (IOException ex) {
