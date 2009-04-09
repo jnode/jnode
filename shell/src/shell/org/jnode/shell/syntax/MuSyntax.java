@@ -34,12 +34,10 @@ import java.util.HashSet;
  * @author crawley@jnode.org
  */
 public abstract class MuSyntax {
-    public static final int SYMBOL = 0;
-    public static final int ARGUMENT = 1;
-    public static final int PRESET = 2;
-    public static final int ALTERNATION = 3;
-    public static final int SEQUENCE = 4;
-    public static final int BACK_REFERENCE = 5;
+    
+    public static enum MuSyntaxKind {
+        SYMBOL, ARGUMENT, PRESET, ALTERNATION, SEQUENCE, BACK_REFERENCE
+    }
     
     String label;
     
@@ -54,7 +52,7 @@ public abstract class MuSyntax {
         return label;
     }
     
-    public abstract int getKind();
+    public abstract MuSyntaxKind getKind();
     
     static class FormatState {
         final ArrayDeque<MuSyntax> work = new ArrayDeque<MuSyntax>();
@@ -74,7 +72,7 @@ public abstract class MuSyntax {
                 if (l == null) {
                     l = (syntax == start) ? "*Start*" : ("*P" + count + "*");
                 }
-                ll = (syntax.getKind() == BACK_REFERENCE) ?
+                ll = (syntax.getKind() == MuSyntaxKind.BACK_REFERENCE) ?
                         ("<[" + l + "]>") : ('<' + l + '>');
                 syntaxToLabel.put(syntax, ll);
             }

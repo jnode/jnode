@@ -60,8 +60,8 @@ public class MuSequence extends MuSyntax {
     }
 
     @Override
-    public int getKind() {
-        return SEQUENCE;
+    public MuSyntaxKind getKind() {
+        return MuSyntaxKind.SEQUENCE;
     }
 
     @Override

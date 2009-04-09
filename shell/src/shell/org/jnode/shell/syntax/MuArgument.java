@@ -48,8 +48,8 @@ public class MuArgument extends MuSyntax {
     }
 
     @Override
-    public int getKind() {
-        return ARGUMENT;
+    public MuSyntaxKind getKind() {
+        return MuSyntaxKind.ARGUMENT;
     }
 
     public String getArgName() {

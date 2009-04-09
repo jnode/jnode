@@ -45,8 +45,8 @@ public class MuBackReference extends MuSyntax {
     }
 
     @Override
-    public int getKind() {
-        return BACK_REFERENCE;
+    public MuSyntaxKind getKind() {
+        return MuSyntaxKind.BACK_REFERENCE;
     }
 
     @Override

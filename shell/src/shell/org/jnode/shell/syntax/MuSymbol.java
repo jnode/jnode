@@ -52,8 +52,8 @@ public class MuSymbol extends MuSyntax {
     }
 
     @Override
-    public int getKind() {
-        return SYMBOL;
+    public MuSyntaxKind getKind() {
+        return MuSyntaxKind.SYMBOL;
     }
 
     @Override
