@@ -50,8 +50,8 @@ public class MuPreset extends MuSyntax {
     }
 
     @Override
-    public int getKind() {
-        return PRESET;
+    public MuSyntaxKind getKind() {
+        return MuSyntaxKind.PRESET;
     }
 
     public String getArgName() {

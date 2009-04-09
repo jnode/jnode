@@ -143,144 +143,149 @@ public class MuParser {
         List<Context> argFailures = new LinkedList<Context>();
         syntaxStack.addFirst(rootSyntax);
         int stepCount = 0;
-        while (!syntaxStack.isEmpty()) {
+        while (true) {
             if (stepLimit > 0 && ++stepCount > stepLimit) {
                 throw new SyntaxFailureException("Parse exceeded the step limit (" + stepLimit + "). " +
-                        "Either the command line is too large, or the syntax is too complex (or pathological)");
+                        "Either the command line is too large, " +
+                        "or the syntax is too complex (or pathological)");
             }
             boolean backtrack = false;
             if (DEBUG) {
                 log.debug("syntaxStack % " + showStack(syntaxStack, true));
-            }
-            MuSyntax syntax = syntaxStack.removeFirst();
-            if (DEBUG) {
-                log.debug("Trying kind = " + syntax.getKind() + ", syntax = " + syntax.format());
-                if (source.hasNext()) {
-                    log.debug("source -> " + source.peek().text);
-                } else {
-                    log.debug("source at end");
-                }
-            }
-            CommandLine.Token token = null;
-            switch (syntax.getKind()) {
-                case MuSyntax.SYMBOL:
-                    String symbol = ((MuSymbol) syntax).getSymbol();
-                    token = source.hasNext() ? source.next() : null;
-
-                    if (completion == null || source.hasNext()) {
-                        backtrack = token == null || !token.text.equals(symbol);
-                    } else {
-                        if (token == null) {
-                            completion.addCompletion(symbol);
-                            backtrack = true;
-                        } else if (source.whitespaceAfterLast()) {
-                            if (!token.text.equals(symbol)) {
-                                backtrack = true;
-                            }
-                        } else {
-                            if (symbol.startsWith(token.text)) {
-                                completion.addCompletion(symbol);
-                                completion.setCompletionStart(token.start);
-                            }
-                            backtrack = true;
-                        }
-                    }
-                    break;
-                case MuSyntax.ARGUMENT:
-                    String argName = ((MuArgument) syntax).getArgName();
-                    Argument<?> arg = bundle.getArgument(argName);
-                    try {
-                        if (source.hasNext()) {
-                            token = source.next();
-                            if (completion == null || source.hasNext() || source.whitespaceAfterLast()) {
-                                arg.accept(token);
-                                if (!backtrackStack.isEmpty()) {
-                                    backtrackStack.getFirst().argsModified.add(arg);
-                                    if (DEBUG) {
-                                        log.debug("recording undo for arg " + argName);
-                                    }
-                                }
-                            } else {
-                                arg.complete(completion, token.text);
-                                completion.setCompletionStart(token.start);
-                                backtrack = true;
-                            }
-                        } else {
-                            if (completion != null) {
-                                arg.complete(completion, "");
-                            }
-                            backtrack = true;
-                        }
-                    } catch (CommandSyntaxException ex) {
-                        argFailures.add(new Context(token, syntax, source.tell(), ex));
-                        if (DEBUG) {
-                            log.debug("accept for arg " + argName + " threw SyntaxErrorException('" + 
-                                    ex.getMessage() + "'");
-                        }
-                        backtrack = true;
-                    }
-                    break;
-                case MuSyntax.PRESET:
-                    MuPreset preset = (MuPreset) syntax;
-                    arg = bundle.getArgument(preset.getArgName());
-                    try {
-                        arg.accept(new CommandLine.Token(preset.getPreset()));
-                        if (!backtrackStack.isEmpty()) {
-                            backtrackStack.getFirst().argsModified.add(arg);
-                            if (DEBUG) {
-                                log.debug("recording undo for preset arg " + arg.getLabel());
-                            }
-                        }
-                    } catch (CommandSyntaxException ex) {
-                        argFailures.add(new Context(null, syntax, source.tell(), ex));
-                        backtrack = true;
-                    }
-                    break;
-                case MuSyntax.SEQUENCE:
-                    MuSyntax[] elements = ((MuSequence) syntax).getElements();
-                    for (int i = elements.length - 1; i >= 0; i--) {
-                        syntaxStack.addFirst(elements[i]);
-                    }
-                    break;
-                case MuSyntax.ALTERNATION:
-                    MuSyntax[] choices = ((MuAlternation) syntax).getAlternatives();
-
-                    // The test below optimizes the case where there is only one
-                    // alternative. This
-                    // avoids the non-trivial cost of creating a choicepoint,
-                    // backtracking, etc.
-                    if (choices.length > 1) {
-                        ChoicePoint choicePoint = new ChoicePoint(source.tell(), syntaxStack, choices);
-                        backtrackStack.addFirst(choicePoint);
-                        syntaxStack = new SharedStack<MuSyntax>(syntaxStack);
-                        if (DEBUG) {
-                            log.debug("pushed choicePoint - " + choicePoint);
-                        }
-                    }
-                    if (choices[0] != null) {
-                        syntaxStack.addFirst(choices[0]);
-                    }
-                    if (DEBUG) {
-                        log.debug("syntaxStack " + showStack(syntaxStack, true));
-                    }
-                    break;
-                case MuSyntax.BACK_REFERENCE:
-                    throw new SyntaxFailureException("Found an unresolved MuBackReference");
-                default:
-                    throw new SyntaxFailureException("Unknown MuSyntax kind (" + syntax.getKind() + ")");
             }
             if (syntaxStack.isEmpty()) {
                 if (source.hasNext()) {
                     if (DEBUG) {
                         log.debug("exhausted syntax stack too soon");
                     }
-                    backtrack = true;
-                }
-                if (completion != null && !backtrackStack.isEmpty()) {
+                } else if (completion != null && !backtrackStack.isEmpty()) {
                     if (DEBUG) {
                         log.debug("try alternatives for completion");
                     }
-                    backtrack = true;
+                } else {
+                    if (DEBUG) {
+                        log.debug("parse succeeded");
+                    }
+                    return;
+                }
+                backtrack = true;
+            } else {
+                MuSyntax syntax = syntaxStack.removeFirst();
+                if (DEBUG) {
+                    log.debug("Trying kind = " + syntax.getKind() + ", syntax = " + syntax.format());
+                    if (source.hasNext()) {
+                        log.debug("source -> " + source.peek().text);
+                    } else {
+                        log.debug("source at end");
+                    }
+                }
+                CommandLine.Token token = null;
+                switch (syntax.getKind()) {
+                    case SYMBOL:
+                        String symbol = ((MuSymbol) syntax).getSymbol();
+                        token = source.hasNext() ? source.next() : null;
+
+                        if (completion == null || source.hasNext()) {
+                            backtrack = token == null || !token.text.equals(symbol);
+                        } else {
+                            if (token == null) {
+                                completion.addCompletion(symbol);
+                                backtrack = true;
+                            } else if (source.whitespaceAfterLast()) {
+                                if (!token.text.equals(symbol)) {
+                                    backtrack = true;
+                                }
+                            } else {
+                                if (symbol.startsWith(token.text)) {
+                                    completion.addCompletion(symbol);
+                                    completion.setCompletionStart(token.start);
+                                }
+                                backtrack = true;
+                            }
+                        }
+                        break;
+                    case ARGUMENT:
+                        String argName = ((MuArgument) syntax).getArgName();
+                        Argument<?> arg = bundle.getArgument(argName);
+                        try {
+                            if (source.hasNext()) {
+                                token = source.next();
+                                if (completion == null || source.hasNext() || source.whitespaceAfterLast()) {
+                                    arg.accept(token);
+                                    if (!backtrackStack.isEmpty()) {
+                                        backtrackStack.getFirst().argsModified.add(arg);
+                                        if (DEBUG) {
+                                            log.debug("recording undo for arg " + argName);
+                                        }
+                                    }
+                                } else {
+                                    arg.complete(completion, token.text);
+                                    completion.setCompletionStart(token.start);
+                                    backtrack = true;
+                                }
+                            } else {
+                                if (completion != null) {
+                                    arg.complete(completion, "");
+                                }
+                                backtrack = true;
+                            }
+                        } catch (CommandSyntaxException ex) {
+                            argFailures.add(new Context(token, syntax, source.tell(), ex));
+                            if (DEBUG) {
+                                log.debug("accept for arg " + argName + " threw SyntaxErrorException('" + 
+                                        ex.getMessage() + "'");
+                            }
+                            backtrack = true;
+                        }
+                        break;
+                    case PRESET:
+                        MuPreset preset = (MuPreset) syntax;
+                        arg = bundle.getArgument(preset.getArgName());
+                        try {
+                            arg.accept(new CommandLine.Token(preset.getPreset()));
+                            if (!backtrackStack.isEmpty()) {
+                                backtrackStack.getFirst().argsModified.add(arg);
+                                if (DEBUG) {
+                                    log.debug("recording undo for preset arg " + arg.getLabel());
+                                }
+                            }
+                        } catch (CommandSyntaxException ex) {
+                            argFailures.add(new Context(null, syntax, source.tell(), ex));
+                            backtrack = true;
+                        }
+                        break;
+                    case SEQUENCE:
+                        MuSyntax[] elements = ((MuSequence) syntax).getElements();
+                        for (int i = elements.length - 1; i >= 0; i--) {
+                            syntaxStack.addFirst(elements[i]);
+                        }
+                        break;
+                    case ALTERNATION:
+                        MuSyntax[] choices = ((MuAlternation) syntax).getAlternatives();
+
+                        // The test below optimizes the case where there is only one
+                        // alternative. This avoids the non-trivial cost of creating 
+                        // a choicepoint, backtracking, etc.
+                        if (choices.length > 1) {
+                            ChoicePoint choicePoint = new ChoicePoint(source.tell(), syntaxStack, choices);
+                            backtrackStack.addFirst(choicePoint);
+                            syntaxStack = new SharedStack<MuSyntax>(syntaxStack);
+                            if (DEBUG) {
+                                log.debug("pushed choicePoint #" + backtrackStack.size() + 
+                                        " - " + choicePoint);
+                            }
+                        }
+                        if (choices[0] != null) {
+                            syntaxStack.addFirst(choices[0]);
+                        }
+                        if (DEBUG) {
+                            log.debug("syntaxStack " + showStack(syntaxStack, true));
+                        }
+                        break;
+                    case BACK_REFERENCE:
+                        throw new SyntaxFailureException("Found an unresolved MuBackReference");
+                    default:
+                        throw new SyntaxFailureException("Unknown MuSyntax kind (" + syntax.getKind() + ")");
                 }
             }
             if (backtrack) {
@@ -301,8 +306,7 @@ public class MuParser {
                         arg.undoLastValue();
                     }
                     // If possible, take the next choice in the current choice
-                    // point
-                    // and stop backtracking
+                    // point and stop backtracking
                     int lastChoice = choicePoint.choices.length - 1;
                     int choiceNo = ++choicePoint.choiceNo;
                     if (choiceNo <= lastChoice) {
@@ -310,8 +314,8 @@ public class MuParser {
                         choicePoint.argsModified.clear();
                         source.seek(choicePoint.sourcePos);
                         // (If this is the last choice in the choice point, we
-                        // won't need to
-                        // use this choice point's saved syntax stack again ...)
+                        // won't need to use this choice point's saved syntax 
+                        // stack again ...)
                         if (choiceNo == lastChoice) {
                             syntaxStack = choicePoint.syntaxStack;
                         } else {
@@ -319,7 +323,7 @@ public class MuParser {
                         }
                         if (choice != null) {
                             syntaxStack.addFirst(choice);
-                        }
+                        } 
                         backtrack = false;
                         if (DEBUG) {
                             log.debug("taking choice #" + choiceNo);
@@ -329,7 +333,7 @@ public class MuParser {
                     }
                     // Otherwise, pop the choice point and keep going.
                     if (DEBUG) {
-                        log.debug("popped choice point");
+                        log.debug("popped choice point #" + backtrackStack.size());
                     }
                     backtrackStack.removeFirst();
                 }
@@ -348,9 +352,6 @@ public class MuParser {
                     log.debug("end backtracking");
                 }
             }
-        }
-        if (DEBUG) {
-            log.debug("succeeded");
         }
     }
 

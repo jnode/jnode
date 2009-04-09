@@ -64,8 +64,8 @@ public class MuAlternation extends MuSyntax {
     }
 
     @Override
-    public int getKind() {
-        return ALTERNATION;
+    public MuSyntaxKind getKind() {
+        return MuSyntaxKind.ALTERNATION;
     }
     
     @Override
