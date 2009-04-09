@@ -44,6 +44,10 @@ import org.jnode.util.WriterOutputStream;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class Log4jConfigurePlugin extends Plugin {
+    
+    // FIXME ... we need to be able to enable/disable this from the
+    // command line and via a boot option.
+    private static final boolean LOG_TO_KERNEL_DEBUGGER = false;
 
     public static final String LAYOUT = "%-5p [%c{1}]: %m%n";
 
@@ -92,6 +96,11 @@ public class Log4jConfigurePlugin extends Plugin {
                 if (appender != debugApp && appender != infoApp) {
                     root.removeAppender(appender);
                 }
+            }
+            if (LOG_TO_KERNEL_DEBUGGER) {
+                UnsafeDebugAppender kdbApp = new UnsafeDebugAppender(new PatternLayout(LAYOUT));
+                kdbApp.setThreshold(Level.DEBUG);
+                root.addAppender(kdbApp);
             }
         } catch (NameNotFoundException ex) {
             root.error("ConsoleManager not found", ex);
