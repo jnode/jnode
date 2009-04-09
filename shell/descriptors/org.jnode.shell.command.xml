@@ -173,19 +173,15 @@
     </syntax>
     <syntax alias="head">
       <sequence>
-        <optionSet label="global">
+        <optionSet>
           <option argLabel="quiet" shortName="q" longName="quiet"/>
           <option argLabel="quiet" longName="silent"/>
           <option argLabel="verbose" shortName="v" longName="verbose"/>
+          <option argLabel="bytes" shortName="c" longName="bytes"/>
+          <option argLabel="lines" shortName="n" longName="lines"/>
         </optionSet>
         <repeat>
-          <sequence>
-            <optionSet label="quantifiers">
-              <option argLabel="bytes" shortName="c" longName="bytes"/>
-              <option argLabel="lines" shortName="n" longName="lines"/>
-            </optionSet>
-            <argument argLabel="files"/> <!-- argument argLabel="files" save="quantifiers" -->
-          </sequence>
+          <argument argLabel="files" />
         </repeat>
       </sequence>
     </syntax>
@@ -332,19 +328,15 @@
           <option argLabel="followr" shortName="F"/>
           <option argLabel="retry" longName="retry"/>
           <option argLabel="unchanged" longName="max-unchanged-stats"/>
-          <option argLabel="pid" longName="pid"/>
+          <!--<option argLabel="pid" longName="pid"/> disabled -->
           <option argLabel="sleep" shortName="s" longName="sleep-interval"/>
           <option argLabel="quiet" shortName="q" longName="quiet"/>
           <option argLabel="verbose" shortName="v" longName="verbose"/>
+          <option argLabel="bytes" shortName="c" longName="bytes"/>
+          <option argLabel="lines" shortName="n" longName="lines"/>
         </optionSet>
         <repeat>
-          <sequence>
-            <optionSet label="quantifiers">
-              <option argLabel="bytes" shortName="c" longName="bytes"/>
-              <option argLabel="lines" shortName="n" longName="lines"/>
-            </optionSet>
-            <argument argLabel="files"/> <!-- argument argLabel="files" save="quantifiers" -->
-          </sequence>
+          <argument argLabel="files"/>
         </repeat>
       </sequence>
     </syntax>
