@@ -142,43 +142,23 @@
   <!-- Compile all subproject java files -->
   <target name="compile" depends="prepare">
     <jnode.compile>
-      <bootclasspath>
-      	<pathelement location="${classpath-sources}" />
-		<pathelement location="${mx4j.jar}"/> <!-- should be in GNU Classpath since java 5.0 -->
-      </bootclasspath>
       <src refid="classpath-sources" />
-      <classpath refid="my-cp"/>
-    </jnode.compile>
-    <jnode.compile>
-      <bootclasspath>
-      	<pathelement location="${classpath-sources}" />
-		<pathelement location="${mx4j.jar}"/> <!-- should be in GNU Classpath since java 5.0 -->
-      </bootclasspath>
-      <src refid="my-sources" />
       <classpath refid="my-cp"/>
     </jnode.compile>
     <parallel >
       <jnode.compile>
-        <bootclasspath>
-      	  <pathelement location="${classpath-sources}" />
-		  <pathelement location="${mx4j.jar}"/> <!-- should be in GNU Classpath since java 5.0 -->
-        </bootclasspath>
+        <src refid="my-sources" />
+        <classpath refid="my-cp"/>
+      </jnode.compile>
+      <jnode.compile>
         <src refid="classpath-sources-corba" />
         <classpath refid="my-cp"/>
       </jnode.compile>
       <jnode.compile>
-        <bootclasspath>
-          <pathelement location="${classpath-sources}" />
-          <pathelement location="${mx4j.jar}"/> <!-- should be in GNU Classpath since java 5.0 -->
-        </bootclasspath>
         <src refid="classpath-sources-jaxws" />
         <classpath refid="my-cp"/>
       </jnode.compile>
       <jnode.compile>
-        <bootclasspath>
-          <pathelement location="${classpath-sources}" />
-          <pathelement location="${mx4j.jar}"/> <!-- should be in GNU Classpath since java 5.0 -->
-        </bootclasspath>
         <src refid="classpath-sources-langtools" />
         <classpath refid="my-cp"/>
       </jnode.compile>
