@@ -26,7 +26,6 @@ import org.jnode.shell.CommandLine.Token;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.ArgumentSnapshot;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.StringArgument;
