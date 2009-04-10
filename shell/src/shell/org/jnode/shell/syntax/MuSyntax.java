@@ -28,8 +28,14 @@ import java.util.HashSet;
 /**
  * The MuSyntax class and related classes provide an in-memory representation of BNF-like 
  * grammars for use in the command line syntax subsystem.  The key difference between the
- * Mu and BNF grammar families is that the former has hooks for custom token recognition and 
- * state capture via the MuArgument construct.
+ * Mu and BNF grammar families is that the Mu uses dynamic token recognition and 
+ * state capture via the MuArgument to Argument binding; e.g. "fred" might be a File or
+ * a URI, depending on context.  By contrast, BNF assumes a separate context insensitive
+ * token recognition mechanism.
+ * <p>
+ * It is a given that a MuSyntax tree may represent an ambiguous grammar; i.e. that it may
+ * allow multiple parses for a given input token sequence.  In reality this is pretty much
+ * unavoidable given the way we handle tokenization.
  * 
  * @author crawley@jnode.org
  */

@@ -34,11 +34,13 @@ import org.jnode.shell.syntax.CommandSyntaxException.Context;
 /**
  * This class implements parsing of a token stream against a MuSyntax graph.  The parser 
  * binds token values against Argument instances as it goes, and does full backtracking 
- * when it reaches a point where it cannot make forward progress.  
+ * when it reaches a point where it cannot make forward progress.  The backtracking mechanism
+ * manages the parser state and also records the Arguments that have been 'set', and 
+ * therefore need to be 'unset' when we backtrack.
  * <p>
  * When we are doing a normal parse, the various alternatives in the MuSyntax graph are
- * explored until either there is a successful parse, or we run out of alternatives.  The
- * latter case results in an exception and a failed parse.
+ * explored until either there is a successful parse (consuming all tokens), or we run 
+ * out of alternatives.  The latter case results in an exception and a failed parse.
  * <p>
  * When we are doing a completion parse, all alternatives are explored irrespective of 
  * parse success.
@@ -47,6 +49,11 @@ import org.jnode.shell.syntax.CommandSyntaxException.Context;
  * excessive backtracking.  To avoid problems, the 'parse' method takes a 
  * 'stepLimit' parameter that causes the parse to fail if it has not terminated
  * soon enough.
+ * <p>
+ * The MuParser uses the SharedStack class to record syntax stacks for backtracking.
+ * This is a special purpose Deque that avoids unnecessary copying of the stack
+ * state.  If you suspect that this is causing problems, replace {@code new SharedStack(...)}
+ * with {@code new LinkedList(...)}.
  * 
  * @author crawley@jnode.org
  */
@@ -145,7 +152,8 @@ public class MuParser {
         int stepCount = 0;
         while (true) {
             if (stepLimit > 0 && ++stepCount > stepLimit) {
-                throw new SyntaxFailureException("Parse exceeded the step limit (" + stepLimit + "). " +
+                throw new SyntaxFailureException(
+                        "Parse exceeded the step limit (" + stepLimit + "). " +
                         "Either the command line is too large, " +
                         "or the syntax is too complex (or pathological)");
             }
@@ -267,7 +275,8 @@ public class MuParser {
                         // alternative. This avoids the non-trivial cost of creating 
                         // a choicepoint, backtracking, etc.
                         if (choices.length > 1) {
-                            ChoicePoint choicePoint = new ChoicePoint(source.tell(), syntaxStack, choices);
+                            ChoicePoint choicePoint = 
+                                new ChoicePoint(source.tell(), syntaxStack, choices);
                             backtrackStack.addFirst(choicePoint);
                             syntaxStack = new SharedStack<MuSyntax>(syntaxStack);
                             if (DEBUG) {
@@ -283,9 +292,11 @@ public class MuParser {
                         }
                         break;
                     case BACK_REFERENCE:
-                        throw new SyntaxFailureException("Found an unresolved MuBackReference");
+                        throw new SyntaxFailureException(
+                                "Found an unresolved MuBackReference");
                     default:
-                        throw new SyntaxFailureException("Unknown MuSyntax kind (" + syntax.getKind() + ")");
+                        throw new SyntaxFailureException(
+                                "Unknown MuSyntax kind (" + syntax.getKind() + ")");
                 }
             }
             if (backtrack) {
