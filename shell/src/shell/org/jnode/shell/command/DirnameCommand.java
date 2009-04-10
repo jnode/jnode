@@ -50,7 +50,7 @@ public class DirnameCommand extends AbstractCommand {
             if (end == -1) {
                 name = ".";
             } else {
-                name = name.substring(0,end);
+                name = name.substring(0, end);
             }
         }
         

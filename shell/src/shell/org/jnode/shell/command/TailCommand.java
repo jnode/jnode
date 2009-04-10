@@ -245,7 +245,7 @@ public class TailCommand extends AbstractCommand {
         
         buffer = new byte[bufsize];
         while ((len = in.read(buffer)) > 0) {
-            out.write(buffer,0,len);
+            out.write(buffer, 0, len);
         }
     }
     

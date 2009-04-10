@@ -20,10 +20,6 @@
 
 package org.jnode.shell.command;
 
-import org.jnode.shell.syntax.ArgumentBundle;
-import org.jnode.driver.console.CompletionInfo;
-import org.jnode.shell.CommandLine.Token;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -210,7 +206,7 @@ public class HeadCommand extends AbstractCommand {
         buffer = new byte[Math.min(n, bufsize)];
         while (n > 0 && (len = in.read(buffer)) > 0) {
             len = Math.min(n, len);
-            out.write(buffer,0,len);
+            out.write(buffer, 0, len);
             n -= len;
         }
     }
