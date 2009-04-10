@@ -52,6 +52,6 @@ public class BasenameCommand extends AbstractCommand {
             }
         }
         
-        getOutput().getPrintWriter().println(name.substring(start,end));
+        getOutput().getPrintWriter().println(name.substring(start, end));
     }
 }

@@ -42,7 +42,7 @@ public class FindCommand extends AbstractCommand {
         "descent at most to given level of directories");
     private final LongArgument mindepthArg = new LongArgument("mindepth", Argument.OPTIONAL,
         "ignore files and directories at levels less than given level");
-    private final StringArgument typeArg = new StringArgument( "type", Argument.OPTIONAL,
+    private final StringArgument typeArg = new StringArgument("type", Argument.OPTIONAL,
         "filter results to show only files of given type. valid types are 'd' for directory and 'f' for file");
     private final FileArgument dirArg = new FileArgument("directory", Argument.OPTIONAL | Argument.MULTIPLE,
         "directory to start searching from");
