@@ -30,18 +30,20 @@ public class MuPreset extends MuSyntax {
     
     private final String argName;
     private final String preset;
+    private final int flags;
     
     public MuPreset(String argName, String preset) {
-        this (null, argName, preset);
+        this(null, argName, preset, 0);
     }
     
-    public MuPreset(String label, String argName, String preset) {
+    public MuPreset(String label, String argName, String preset, int flags) {
         super(label);
         if (argName.length() == 0) {
             throw new IllegalArgumentException("empty argName");
         }
         this.argName = argName;
         this.preset = preset;
+        this.flags = flags;
     }
 
     @Override
@@ -68,5 +70,9 @@ public class MuPreset extends MuSyntax {
 
     public String getPreset() {
         return preset;
+    }
+    
+    public int getFlags() {
+        return flags;
     }
 }

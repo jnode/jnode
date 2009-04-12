@@ -53,7 +53,7 @@ public class URLArgument extends Argument<URL> {
     }
 
     @Override
-    protected URL doAccept(Token value) throws CommandSyntaxException {
+    protected URL doAccept(Token value, int flags) throws CommandSyntaxException {
         try {
             return new URL(value.text);
         } catch (MalformedURLException ex) {
@@ -62,7 +62,7 @@ public class URLArgument extends Argument<URL> {
     }
 
     @Override
-    public void complete(final CompletionInfo completion, final String partial) {
+    public void doComplete(final CompletionInfo completion, final String partial, final int flags) {
         try {
             // If 'partial' is a well-formed "file:" URL with no host, port, 
             // user or query, do completion on the path component.
@@ -73,7 +73,7 @@ public class URLArgument extends Argument<URL> {
                 // Use a FileArgument to do the work of completing the pathname, 
                 // capturing the results using our own CompletionInfo object.
                 CompletionInfo myCompletion = new CommandCompletions();
-                new FileArgument(null, getFlags()).complete(myCompletion, url.getPath());
+                new FileArgument(null, getFlags()).complete(myCompletion, url.getPath(), flags);
                 // Then turn the completions back into "file:" URLs
                 for (String c : myCompletion.getCompletions()) {
                     // (Kludge - the 'true' argument prevents an extra space

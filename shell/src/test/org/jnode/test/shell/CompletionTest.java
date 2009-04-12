@@ -127,7 +127,7 @@ public class CompletionTest extends TestCase {
                 new EmptySyntax(null, "Print all available aliases and corresponding classnames"),
                 new SequenceSyntax(null, "Set an aliases for given classnames",
                     new ArgumentSyntax("alias"), new ArgumentSyntax("classname")),
-                new OptionSyntax("remove", 'r', "Remove an alias")));
+                new OptionSyntax("remove", 'r', null, "Remove an alias")));
         }
     }
 

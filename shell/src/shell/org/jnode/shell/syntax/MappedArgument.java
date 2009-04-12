@@ -62,7 +62,7 @@ public abstract class MappedArgument<V> extends Argument<V> {
      * Complete partial against the domain of the valueMap.
      */
     @Override
-    public void complete(CompletionInfo completion, String partial) {
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
         if (caseInsensitive) {
             partial = partial.toLowerCase();
         }
@@ -77,7 +77,7 @@ public abstract class MappedArgument<V> extends Argument<V> {
      * Accept token if it is in the domain of the valueMap.
      */
     @Override
-    protected V doAccept(Token token) throws CommandSyntaxException {
+    protected V doAccept(Token token, int flags) throws CommandSyntaxException {
         String t = caseInsensitive ? token.text.toLowerCase() : token.text;
         V value = valueMap.get(t);
         if (value == null) {

@@ -38,7 +38,7 @@ public class FlagArgument extends Argument<Boolean> {
     }
 
     @Override
-    protected Boolean doAccept(Token token) throws CommandSyntaxException {
+    protected Boolean doAccept(Token token, int flags) throws CommandSyntaxException {
         return Boolean.TRUE;
     }
   

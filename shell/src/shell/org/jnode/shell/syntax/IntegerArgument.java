@@ -55,7 +55,7 @@ public class IntegerArgument extends Argument<Integer> {
     }
 
     @Override
-    protected Integer doAccept(Token token) throws CommandSyntaxException {
+    protected Integer doAccept(Token token, int flags) throws CommandSyntaxException {
         try {
             int tmp = Integer.parseInt(token.text);
             if (tmp < min || tmp > max) {
@@ -68,7 +68,7 @@ public class IntegerArgument extends Argument<Integer> {
     }
   
     @Override
-    public void complete(CompletionInfo completion, String partial) {
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
         // FIXME ... maybe someone could figure out how to partial
         // completion efficiently when max - min is large?
         if (max - min >= 0 && max - min < COMPLETION_THRESHOLD) {

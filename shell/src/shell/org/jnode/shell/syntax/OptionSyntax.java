@@ -35,34 +35,35 @@ public class OptionSyntax extends ArgumentSyntax {
     private final String longOptName;
     private final String shortOptName;
 
-    public OptionSyntax(String argName, String optionName, char optionChar, String description) {
-        super(null, argName, description);
+    public OptionSyntax(String argName, String optionName, char optionChar, 
+            String flags, String description) {
+        super(null, argName, flags, description);
         this.longOptName = "--" + optionName;
         this.shortOptName = "-" + optionChar;
     }
 
-    public OptionSyntax(String argName, char optionChar, String description) {
-        super(null, argName, description);
+    public OptionSyntax(String argName, char optionChar, String flags, String description) {
+        super(null, argName, flags, description);
         this.longOptName = null;
         this.shortOptName = "-" + optionChar;
     }
 
-    public OptionSyntax(String argName, String optionName, String description) {
-        super(null, argName, description);
+    public OptionSyntax(String argName, String optionName, String flags, String description) {
+        super(null, argName, flags, description);
         this.longOptName = "--" + optionName;
         this.shortOptName = null;
     }
 
     public OptionSyntax(String argName, String optionName, char optionChar) {
-        this(argName, optionName, optionChar, null);
+        this(argName, optionName, optionChar, null, null);
     }
 
     public OptionSyntax(String argName, char optionChar) {
-        this(argName, optionChar, null);
+        this(argName, optionChar, null, null);
     }
 
     public OptionSyntax(String argName, String optionName) {
-        this(argName, optionName, null);
+        this(argName, optionName, null, null);
     }
 
     @Override

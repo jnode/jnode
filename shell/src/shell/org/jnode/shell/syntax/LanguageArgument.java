@@ -28,7 +28,7 @@ import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
 
 /**
- * This argument accepts an ISO country code.
+ * This argument accepts an ISO language code.
  * 
  * @author crawley@jnode.org
  */
@@ -41,7 +41,7 @@ public class LanguageArgument extends Argument<String> {
     }
 
     @Override
-    protected String doAccept(Token token) throws CommandSyntaxException {
+    protected String doAccept(Token token, int flags) throws CommandSyntaxException {
         if (validLanguages.contains(token.text)) {
             return token.text;
         } else {
@@ -50,7 +50,7 @@ public class LanguageArgument extends Argument<String> {
     }
     
     @Override
-    public void complete(CompletionInfo completion, String partial) {
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
         for (String language : validLanguages) {
             if (language.startsWith(partial)) {
                 completion.addCompletion(language);

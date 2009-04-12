@@ -32,21 +32,23 @@ import org.jnode.nanoxml.XMLElement;
 public class ArgumentSyntax extends Syntax {
 
     private final String argName;
+    private final String flags;
     
-    public ArgumentSyntax(String label, String argName, String description) {
+    public ArgumentSyntax(String label, String argName, String flags, String description) {
         super(label, description);
         this.argName = argName;
+        this.flags = flags;
         if (argName.length() == 0) {
             throw new IllegalArgumentException("empty argName");
         }
     }
 
     public ArgumentSyntax(String label, String argName) {
-        this(label, argName, null);
+        this(label, argName, null, null);
     }
 
     public ArgumentSyntax(String argName) {
-        this(null, argName, null);
+        this(null, argName, null, null);
     }
 
     @Override
@@ -61,12 +63,19 @@ public class ArgumentSyntax extends Syntax {
 
     @Override
     public String toString() {
-        return "ArgumentSyntax{" + super.toString() + ",argName=" + argName + "}";
+        return "ArgumentSyntax{" + super.toString() + ",argName=" + 
+                argName + ",flags=" + flags + "}";
     }
 
     @Override
     public MuSyntax prepare(ArgumentBundle bundle) {
-        return new MuArgument(label, argName);
+        int flags;
+        if (this.flags == null || this.flags.length() == 0) {
+            flags = 0;
+        } else {
+            flags = bundle.getArgument(argName).namesToFlags(this.flags);
+        }
+        return new MuArgument(label, argName, flags);
     }
 
     public String getArgName() {

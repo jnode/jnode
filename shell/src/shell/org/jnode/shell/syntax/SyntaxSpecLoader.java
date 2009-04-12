@@ -84,21 +84,22 @@ public class SyntaxSpecLoader {
             }
             String shortName = syntaxElement.getAttribute("shortName");
             String longName = syntaxElement.getAttribute("longName");
+            String flags = syntaxElement.getAttribute("flags");
             if (shortName == null) {
                 if (longName == null) {
                     throw new SyntaxFailureException(
                             "<option> element has must have a 'shortName' or 'longName' attribute");
                 }
-                return new OptionSyntax(argLabel, longName, description);
+                return new OptionSyntax(argLabel, longName, flags, description);
             } else {
                 if (shortName.length() != 1) {
                     throw new SyntaxFailureException(
                             "<option> elements 'shortName' attribute must be one character long");
                 }
                 if (longName == null) {
-                    return new OptionSyntax(argLabel, shortName.charAt(0), description);
+                    return new OptionSyntax(argLabel, shortName.charAt(0), flags, description);
                 } else {
-                    return new OptionSyntax(argLabel, longName, shortName.charAt(0), description);
+                    return new OptionSyntax(argLabel, longName, shortName.charAt(0), flags, description);
                 }
             }
         } else if (kind.equals("powerset")) {
@@ -135,11 +136,12 @@ public class SyntaxSpecLoader {
             return new OptionalSyntax(label, description, eager, seq);
         } else if (kind.equals("argument")) {
             String argLabel = syntaxElement.getAttribute("argLabel");
+            String flags = syntaxElement.getAttribute("flags");
             if (argLabel == null) {
                 System.out.println(syntaxElement);
                 throw new SyntaxFailureException("<argument> element has no 'argLabel' attribute");
             }
-            return new ArgumentSyntax(label, argLabel, description);
+            return new ArgumentSyntax(label, argLabel, flags, description);
         } else if (kind.equals("verb")) {
             String symbol = syntaxElement.getAttribute("symbol");
             if (symbol == null) {
@@ -150,7 +152,8 @@ public class SyntaxSpecLoader {
                 System.out.println(syntaxElement);
                 throw new SyntaxFailureException("<argument> element has no 'argLabel' attribute");
             }
-            return new VerbSyntax(label, symbol, argLabel, description);
+            String flags = syntaxElement.getAttribute("flags");
+            return new VerbSyntax(label, symbol, argLabel, flags, description);
         } else if (kind.equals("symbol")) {
             String symbol = syntaxElement.getAttribute("symbol");
             if (symbol == null) {

@@ -40,7 +40,7 @@ public class PluginArgument extends StringArgument {
     }
   
     @Override
-    public void complete(CompletionInfo completion, String partial) {
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
         try {
             // get the plugin manager
             final PluginManager piMgr = InitialNaming.lookup(PluginManager.NAME);

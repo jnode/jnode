@@ -45,12 +45,12 @@ public class PropertyNameArgument extends Argument<String> {
     }
     
     @Override
-    protected String doAccept(Token token) throws CommandSyntaxException {
+    protected String doAccept(Token token, int flags) throws CommandSyntaxException {
         return token.text;
     }
     
     @Override
-    public void complete(CompletionInfo completion, String partial) {
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
         for (Object key : System.getProperties().keySet()) {
             String name = (String) key;
             if (name.startsWith(partial)) {

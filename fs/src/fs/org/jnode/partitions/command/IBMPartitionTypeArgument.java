@@ -38,7 +38,7 @@ public class IBMPartitionTypeArgument extends Argument<IBMPartitionTypes> {
     }
 
     @Override
-    protected IBMPartitionTypes doAccept(Token value) throws CommandSyntaxException {
+    protected IBMPartitionTypes doAccept(Token value, int flags) throws CommandSyntaxException {
         try {
             int code = Integer.parseInt(value.text, 16);
             return IBMPartitionTypes.valueOf(code);
@@ -50,7 +50,7 @@ public class IBMPartitionTypeArgument extends Argument<IBMPartitionTypes> {
     }
 
     @Override
-    public void complete(CompletionInfo completion, String partial) {
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
         partial = partial.toLowerCase();
         for (IBMPartitionTypes pt : IBMPartitionTypes.values()) {
             String code = Integer.toHexString(pt.getCode());

@@ -60,7 +60,7 @@ public abstract class EnumArgument<E extends Enum<E>> extends Argument<E> {
     }
     
     @Override
-    protected E doAccept(Token token) throws CommandSyntaxException {
+    protected E doAccept(Token token, int flags) throws CommandSyntaxException {
         try {
             return E.valueOf(clazz, token.text);
         } catch (IllegalArgumentException ex) {
@@ -69,7 +69,7 @@ public abstract class EnumArgument<E extends Enum<E>> extends Argument<E> {
     }
     
     @Override
-    public void complete(CompletionInfo completion, String partial) {
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
         for (E e : clazz.getEnumConstants()) {
             String eName = e.name();
             if (eName.startsWith(partial)) {

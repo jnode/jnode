@@ -54,7 +54,7 @@ public class DeviceArgument extends Argument<Device> {
     }
 
     @Override
-    protected Device doAccept(Token token) throws CommandSyntaxException {
+    protected Device doAccept(Token token, int flags) throws CommandSyntaxException {
         try {
             final DeviceManager devMgr = getDeviceManager();
             final Device device = devMgr.getDevice(token.text);
@@ -70,7 +70,7 @@ public class DeviceArgument extends Argument<Device> {
     }
 
     @Override
-    public void complete(CompletionInfo completion, String partial) {
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
         final DeviceManager devMgr = getDeviceManager();
 
         // collect matching devices

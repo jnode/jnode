@@ -45,7 +45,7 @@ public class IPv4AddressArgument extends Argument<IPv4Address> {
     }
 
     @Override
-    protected IPv4Address doAccept(Token value) throws CommandSyntaxException {
+    protected IPv4Address doAccept(Token value, int flags) throws CommandSyntaxException {
         if (value.text.equals("default")) {
             return new IPv4Address(new byte[]{0, 0, 0, 0}, 0);
         }

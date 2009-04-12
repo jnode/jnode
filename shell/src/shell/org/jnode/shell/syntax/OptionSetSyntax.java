@@ -52,7 +52,7 @@ public class OptionSetSyntax extends GroupSyntax {
         }
 
         @Override
-        protected Boolean doAccept(Token token) throws CommandSyntaxException {
+        protected Boolean doAccept(Token token, int argumentFlags) throws CommandSyntaxException {
             String value = token.text;
             int len = value.length();
             if (len < 2 || value.charAt(0) != '-') {
@@ -64,7 +64,7 @@ public class OptionSetSyntax extends GroupSyntax {
                 boolean found = false;
                 for (OptionSyntax flagOption : flagOptions) {
                     if (shortOptName.equals(flagOption.getShortOptName())) {
-                        bundle.getArgument(flagOption).accept(new Token(shortOptName));
+                        bundle.getArgument(flagOption).accept(new Token(shortOptName), 0);
                         found = true;
                         break;
                     }
