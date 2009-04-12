@@ -29,6 +29,7 @@ public class AllTests {
         TestSuite suite = new TestSuite("Tests for org.jnode.test.shell");
         //$JUnit-BEGIN$
         suite.addTestSuite(CompletionInfoTest.class);
+        suite.addTestSuite(PathnamePatternTest.class);
         suite.addTestSuite(CompletionTest.class);
         suite.addTestSuite(DefaultSyntaxCompletionTest.class);
         //$JUnit-END$
