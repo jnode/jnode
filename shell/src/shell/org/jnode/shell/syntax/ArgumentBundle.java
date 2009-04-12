@@ -111,7 +111,7 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
         try {
             doParse(commandLine, syntaxes, null);
             for (Argument<?> element : arguments) {
-                if (!element.isSatisfied() && element.isMandatory()) {
+                if (!element.isSet() && element.isMandatory()) {
                     throw new CommandSyntaxException(
                             "Command syntax error: required argument '"
                             + element.getLabel() + "' not supplied");
@@ -195,7 +195,7 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
             return new EmptySyntax("default", null);
         } else if (arguments.length == 1) {
             String label = arguments[0].getLabel();
-            return new OptionSyntax(label, label, null);
+            return new OptionSyntax(label, label, null, null);
         } else {
             // A better default syntax would only allow one Option repetition
             // for any Argument that accepts only one value, and would use mandatory
@@ -203,7 +203,7 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
             Syntax[] syntaxes = new OptionSyntax[arguments.length];
             for (int i = 0; i < syntaxes.length; i++) {
                 String label = arguments[i].getLabel();
-                syntaxes[i] = new OptionSyntax(label, label, null);
+                syntaxes[i] = new OptionSyntax(label, label, null, null);
             }
             return new PowersetSyntax("default", syntaxes);
         }

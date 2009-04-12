@@ -32,11 +32,44 @@ import sun.security.action.GetPropertyAction;
 /**
  * This argument class performs completion against the file system namespace.  This
  * Argument class understands the {@link Argument#EXISTING} and {@link Argument#NONEXISTENT}
- * flags when accepting argument values, but not (yet) when completing them.
+ * flags when accepting argument values.  Neither {@link Argument#EXISTING} or 
+ * {@link Argument#NONEXISTENT} currently affect completion.  (You might expect that
+ * {@link Argument#NONEXISTENT} would suppress completion, but consider that the user
+ * may want to complete the directory path for some file to be created by a command.)
+ * <p>
+ * FileArgument normally treats pathname components starting with a "-" as invalid pathnames
+ * and won't accept them.  (The rationale is that they are probably a misplaced or unknown
+ * option names.)  This behavior can be changed using the {@link #ALLOW_DODGY_NAMES} flag.
+ * <p>
+ * Some commands use "-" to denote (for example) "standard input" instead of a file named
+ * "-".  To support this, FileArgument provides a {@link #HYPHEN_IS_SPECIAL} flag which
+ * suppresses the {@link Argument#EXISTING} and {@link Argument#NONEXISTENT} flags so that
+ * a "-" argument is always accepted.  It is up to the command to deal with the resulting
+ * {@code File("-")} instance, which of course should not be opened in the normal way.
+ * (Note: this is an experimental feature, and may be replaced with a conceptually cleaner
+ * solution in the future.)
  *
  * @author crawley@jnode.org
  */
 public class FileArgument extends Argument<File> {
+    
+    /**
+     * This Argument flag tells the FileArgument to accept filenames that,
+     * while strictly legal, will cause problems.  At the moment, this means
+     * pathnames where one or more component names starts with a '-'.  (Such
+     * names may be problematic for some commands, and are probably entered
+     * by mistake.)
+     */
+    public static final int ALLOW_DODGY_NAMES = 0x00010000;
+    
+    /**
+     * This Argument flag tells the FileArgument that the command will
+     * interpret {@code File("-")} as meaning something other than a regular 
+     * pathname, and that FileArgument should allow "-" as a valid argument
+     * or completion, not withstanding the existence of a real file with
+     * that name.  This flag cannot be set by a Syntax. 
+     */
+    public static final int HYPHEN_IS_SPECIAL = 0x01000000;
 
     public FileArgument(String label, int flags, String description) {
         super(label, flags, new File[0], description);
@@ -48,14 +81,31 @@ public class FileArgument extends Argument<File> {
 
     @Override
     @DoPrivileged
-    protected File doAccept(Token token) throws CommandSyntaxException {
+    protected File doAccept(Token token, int flags) throws CommandSyntaxException {
         if (token.text.length() > 0) {
             File file = new File(token.text);
-            if (isExisting() && !file.exists()) {
-                throw new CommandSyntaxException("this file or directory does not exist");
-            }
-            if (isNonexistent() && file.exists()) {
-                throw new CommandSyntaxException("this file or directory already exist");
+            if ((flags & HYPHEN_IS_SPECIAL) == 0 || !file.getPath().equals("-")) {
+                if (isExisting(flags) && !file.exists()) {
+                    throw new CommandSyntaxException("this file or directory does not exist");
+                }
+                if (isNonexistent(flags) && file.exists()) {
+                    throw new CommandSyntaxException("this file or directory already exist");
+                }
+                if ((flags & ALLOW_DODGY_NAMES) == 0) {
+                    File f = file;
+                    do {
+                        // This assumes that option names start with '-'.
+                        if (f.getName().startsWith("-")) {
+                            if (f == file && !file.isAbsolute() && f.getParent() == null) {
+                                // The user most likely meant this to be an option name ...
+                                throw new CommandSyntaxException("unexpected or unknown option");
+                            } else {
+                                throw new CommandSyntaxException("file or directory name starts with a '-'");
+                            }
+                        }
+                        f = f.getParentFile();
+                    } while (f != null);
+                }
             }
             return file;
         } else {
@@ -64,7 +114,8 @@ public class FileArgument extends Argument<File> {
     }
 
     @Override
-    public void complete(final CompletionInfo completion, final String partial) {
+    public void doComplete(final CompletionInfo completion, 
+            final String partial, final int flags) {
         // Get last full directory from the partial pathname.
         final int idx = partial.lastIndexOf(File.separatorChar);
         final String dir;
@@ -121,10 +172,26 @@ public class FileArgument extends Argument<File> {
             (tmp == 2 && partial.endsWith("."))) {
             completion.addCompletion(partial + File.separatorChar, true);
         }
+        
+        // Add "-" as a possible completion?
+        if ((flags & HYPHEN_IS_SPECIAL) != 0) {
+            completion.addCompletion("-");
+        }
     }
 
     @Override
     protected String argumentKind() {
         return "file";
+    }
+
+    @Override
+    public int nameToFlag(String name) throws IllegalArgumentException {
+        if (name.equals("ALLOW_DODGY_NAMES")) {
+            return ALLOW_DODGY_NAMES;
+        } else if (name.equals("HYPHEN_IS_SPECIAL")) {
+            return HYPHEN_IS_SPECIAL;
+        } else{
+            return super.nameToFlag(name);
+        }
     }
 }

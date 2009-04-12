@@ -97,7 +97,7 @@ public class SuiteCommand extends AbstractCommand {
             super(label, flags, description);        
         }
 
-        public void complete(CompletionInfo completion, String partial) {
+        public void doComplete(CompletionInfo completion, String partial, int flags) {
             Set<String> availCategories = TestManager.getInstance().getCategories();
             for (String availCategory : availCategories) {
                 if (availCategory.startsWith(partial)) {

@@ -51,7 +51,7 @@ public class ThreadNameArgument extends StringArgument {
      * Complete the 'partial' against the names of all existing Thread objects
      * by traversing the ThreadGroup / Thread hierarchy from its root.
      */
-    public void complete(final CompletionInfo completion, final String partial) {
+    public void doComplete(final CompletionInfo completion, final String partial, final int flags) {
         ThreadGroup grp = Thread.currentThread().getThreadGroup();
         while (grp.getParent() != null) {
             grp = grp.getParent();

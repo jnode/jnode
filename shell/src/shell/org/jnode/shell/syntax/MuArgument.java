@@ -29,17 +29,19 @@ package org.jnode.shell.syntax;
 public class MuArgument extends MuSyntax {
     
     private final String argName;
+    private final int flags;
     
     public MuArgument(String argName) {
-        this (null, argName);
+        this (null, argName, 0);
     }
     
-    public MuArgument(String label, String argName) {
+    public MuArgument(String label, String argName, int flags) {
         super(label);
         if (argName.length() == 0) {
             throw new IllegalArgumentException("empty argName");
         }
         this.argName = argName;
+        this.flags = flags;
     }
 
     @Override
@@ -62,5 +64,9 @@ public class MuArgument extends MuSyntax {
             state.refMap.put(label, this);
         }
         return this;
+    }
+
+    public int getFlags() {
+        return flags;
     }
 }

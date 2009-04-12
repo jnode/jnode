@@ -55,44 +55,70 @@ import org.jnode.shell.CommandLine.Token;
 public abstract class Argument<V> {
     
     /**
-     * This Argument flag indicates that the Argument is optional.
+     * This Argument flag indicates that the Argument is optional.  This is the
+     * opposite of MANDATORY, and is the default if neither are specified.
      */
     public static final int OPTIONAL = 0x001;
     
     /**
-     * This Argument flag indicates that the Argument is mandatory.  At least
-     * one instance of this Argument must be supplied.
+     * This Argument flag indicates that the Argument is mandatory; i.e that least
+     * one instance of this Argument must be supplied in a command line.  This is
+     * the opposite of OPTIONAL.
      */
     public static final int MANDATORY = 0x002;
 
     /**
      * This Argument flag indicates that the Argument may have at most one value.
+     * This is the opposite of MULTIPLE and the default if neither are specified.
      */
     public static final int SINGLE = 0x004;
     
     /**
      * This Argument flag indicates that multiple instances of this Argument may 
-     * be provided.
+     * be provided.  This is the opposite of SINGLE.
      */
     public static final int MULTIPLE = 0x008;
 
     /**
      * This Argument flag indicates that an Argument's value must denote an entity
      * that already exists in whatever domain that the Argument values corresponds to.
+     * Note that this is <b>not</b> the logical negation of NONEXISTENT!
      */
     public static final int EXISTING = 0x010;
     
     /**
      * This Argument flag indicates that an Argument's value must denote an entity
      * that does not exists in whatever domain that the Argument values corresponds to.
+     * Note that this is <b>not</b> the logical negation of EXISTING!
      */
     public static final int NONEXISTENT = 0x020;
+
+    /**
+     * Flag bits in this bitset are either common flags, or reserved for future use as
+     * common flags.
+     */
+    public static final int COMMON_FLAGS = 0x0000ffff;
+    
+    /**
+     * Flag bits in this bitset are available for use as Argument-subclass specific flags.
+     * Flags in this range may be overridden by a Syntax.
+     */
+    public static final int SPECIFIC_OVERRIDABLE_FLAGS = 0x00ff0000;
+
+    /**
+     * Flag bits in this bitset are available for use as Argument-subclass specific flags.
+     * Flags in this range may NOT be overridden by a Syntax.
+     */
+    private static final int SPECIFIC_NONOVERRIDABLE_FLAGS = 0xff000000;
+    
+    /**
+     * Flag bits in this bitset may not be overridden by a Syntax. 
+     */
+    public static final int NONOVERRIDABLE_FLAGS = 
+        SINGLE | MULTIPLE | MANDATORY | OPTIONAL | SPECIFIC_NONOVERRIDABLE_FLAGS;
     
     private final String label;
-    private final boolean mandatory;
-    private final boolean multiple;
-    private final boolean existing;
-    private final boolean nonexistent;
+    private final int flags;
     private final String description;
     
     protected final List<V> values = new ArrayList<V>();
@@ -114,6 +140,22 @@ public abstract class Argument<V> {
     protected Argument(String label, int flags, V[] vArray, String description) 
         throws IllegalArgumentException {
         super();
+        checkFlags(flags);
+        this.label = label;
+        this.description = description;
+        this.flags = flags;
+        this.vArray = vArray;
+    }
+    
+    /**
+     * Check that the supplied flags are consistent.  
+     * <p>
+     * Note: this method may be overridden in child classes, but an override should 
+     * call this method to check the common flags. 
+     * @param flags the flags to be checked.
+     * @throws IllegalArgumentException
+     */
+    protected void checkFlags(int flags) throws IllegalArgumentException {
         if ((flags & EXISTING) != 0 && (flags & NONEXISTENT) != 0) {
             throw new IllegalArgumentException("inconsistent flags: EXISTING and NONEXISTENT");
         }
@@ -123,22 +165,63 @@ public abstract class Argument<V> {
         if ((flags & MANDATORY) != 0 && (flags & OPTIONAL) != 0) {
             throw new IllegalArgumentException("inconsistent flags: MANDATORY and OPTIONAL");
         }
-        this.label = label;
-        this.description = description;
-        this.mandatory = (flags & MANDATORY) != 0;
-        this.multiple = (flags & MULTIPLE) != 0;
-        this.existing = (flags & EXISTING) != 0;
-        this.nonexistent = (flags & NONEXISTENT) != 0;
-        this.vArray = vArray;
     }
     
     /**
-     * Reconstruct and return Argument flags equiivalent to those passed to the constructor.
+     * Return the flags as passed to the constructor.
      * @return the flags.
      */
     public int getFlags() {
-        return ((mandatory ? MANDATORY : OPTIONAL) | (multiple ? MULTIPLE : SINGLE) |
-                (existing ? EXISTING : 0) | (nonexistent ? NONEXISTENT : 0));
+        return flags;
+    }
+    
+    /**
+     * Convert a comma-separated list of names to a flags word.  The current implementation
+     * will silently ignore empty names; e.g. in {@code "MANDATORY,,SINGLE"} or 
+     * {@code ",SINGLE"}.
+     * 
+     * @param names the names separated by commas and optional whitespace.
+     * @return the flags
+     * @throws IllegalArgument if the list contains unknown flag names.
+     */
+    public final int namesToFlags(String names) throws IllegalArgumentException {
+        String[] nameList = names.trim().split("\\s*,\\s*");
+        int res = 0;
+        for (String name : nameList) {
+            if (name != null && name.length() > 0) {
+                res |= nameToFlag(name);
+            }
+        }
+        return res;
+    }
+    
+    /**
+     * Convert a flag name to a flag.  
+     * <p>
+     * Note: this method may be overridden in child 
+     * classes, but an override should end by calling this method to deal
+     * with flag names that it doesn't understand.
+     * 
+     * @param name the name to be converted
+     * @return the corresponding flag
+     * @throws IllegalArgumentWxception if the name is not recognized
+     */
+    public int nameToFlag(String name) throws IllegalArgumentException {
+        if (name.equals("MANDATORY")) {
+            return MANDATORY;
+        } else if (name.equals("OPTIONAL")) {
+            return OPTIONAL;
+        } else if (name.equals("SINGLE")) {
+            return SINGLE;
+        } else if (name.equals("MULTIPLE")) {
+            return MULTIPLE;
+        } else if (name.equals("EXISTING")) {
+            return EXISTING;
+        } else if (name.equals("NONEXISTENT")) {
+            return NONEXISTENT;
+        } else {
+            throw new IllegalArgumentException("unknown flag name '" + name + "'");
+        }
     }
 
     /**
@@ -146,7 +229,95 @@ public abstract class Argument<V> {
      * argument in a CommandLine if it is used in a given concrete syntax.
      */
     public boolean isMandatory() {
-        return mandatory;
+        return isMandatory(flags);
+    }
+    
+    /**
+     * If this method returns <code>true</code>, this Argument need not be bound to an
+     * argument in a CommandLine if it is used in a given concrete syntax.
+     */
+    public boolean isOptional() {
+        return isOptional(flags);
+    }
+    
+    /**
+     * If this method returns <code>true</code>, this element may have
+     * multiple instances in a CommandLine.
+     */
+    public boolean isMultiple() {
+        return isMultiple(flags);
+    }
+    
+    /**
+     * If this method returns <code>true</code>, this element must have at
+     * most one instance in a CommandLine.
+     */
+    public boolean isSingle() {
+        return isSingle(flags);
+    }
+    
+    /**
+     * If this method returns <code>true</code>, an Argument value must correspond 
+     * to an existing entity in the domain of entities denoted by the Argument type.
+     */
+    public boolean isExisting() {
+        return isExisting(flags);
+    }
+
+    /**
+     * If this method returns <code>true</code>, an Argument value must <i>not</i> correspond 
+     * to an existing entity in the domain of entities denoted by the Argument type.
+     */
+    public boolean isNonexistent() {
+        return isNonexistent(flags);
+    }
+    
+    /**
+     * If this method returns <code>true</code>, the flags say that the corresponding Argument 
+     * must be bound to an argument in a CommandLine if it is used in a given concrete syntax.
+     */
+    public static boolean isMandatory(int flags) {
+        return (flags & MANDATORY) != 0;
+    }
+    
+    /**
+     * If this method returns <code>true</code>, the flags say that the corresponding Argument 
+     * need not be bound to an argument in a CommandLine if it is used in a given concrete syntax.
+     */
+    public static boolean isOptional(int flags) {
+        return (flags & MANDATORY) == 0;
+    }
+    
+    /**
+     * If this method returns <code>true</code>, the corresponding Argument may have
+     * multiple instances in a CommandLine.
+     */
+    public static boolean isMultiple(int flags) {
+        return (flags & MULTIPLE) != 0;
+    }
+    
+    /**
+     * If this method returns <code>true</code>, the corresponding Argument must have at
+     * most one instance in a CommandLine.
+     */
+    public static boolean isSingle(int flags) {
+        return (flags & MULTIPLE) == 0;
+    }
+    
+    /**
+     * If this method returns <code>true</code>, the corresponding Argument value must denote 
+     * an existing entity.
+     */
+    public static boolean isExisting(int flags) {
+        return (flags & EXISTING) != 0;
+    }
+
+    /**
+     * If this method returns <code>true</code>, the corresponding Argument value must 
+     * <i>not</i> denote an existing entity.
+     */
+    public boolean isNonexistent(int flags) {
+        return (flags & NONEXISTENT) != 0;
     }
     
     /**
@@ -207,12 +378,18 @@ public abstract class Argument<V> {
      * the caller should treat the Token as consumed.
      * 
      * @param value the token that will supply the Argument's value.
+     * @param flags extra flags from the syntax system.  These will be OR'ed with
+     *     the Arguments existing flags.  Note the cardinality flags cannot be 
+     *     overridden.
      */
-    public final void accept(Token value) throws CommandSyntaxException {
+    public final void accept(Token value, int flags) 
+        throws CommandSyntaxException, IllegalArgumentException {
         if (isSet() && !isMultiple()) {
             throw new SyntaxMultiplicityException("this argument cannot be repeated");
         }
-        addValue(doAccept(value));
+        flags = (flags & ~NONOVERRIDABLE_FLAGS) | this.flags;
+        checkFlags(flags);
+        addValue(doAccept(value, flags));
     }
 
     /**
@@ -220,8 +397,9 @@ public abstract class Argument<V> {
      * should either return a non-null V to be accepted, or throw an exception.
      * 
      * @param value the token that will supply the Argument's value.
+     * @param flags the flags to be used.
      */
-    protected abstract V doAccept(Token value) throws CommandSyntaxException;
+    protected abstract V doAccept(Token value, int flags) throws CommandSyntaxException;
 
     /**
      * Perform argument completion on the supplied (partial) argument value.  The
@@ -235,40 +413,29 @@ public abstract class Argument<V> {
      * @param completion the CompletionInfo object for registering any completions.
      * @param partial the argument string to be completed.
      */
-    public void complete(CompletionInfo completion, String partial) {
-        // set no completion
-    }
-    
-    /**
-     * Test if sufficient values have been bound to the Argument to satisfy the
-     * the Argument's specified cardinality constraints.
-     */
-    public boolean isSatisfied() {
-        return !isMandatory() || isSet();
-    }
-    
-    /**
-     * If this method returns <code>true</code>, this element may have
-     * multiple instances in a CommandLine.
-     */
-    public boolean isMultiple() {
-        return multiple;
-    }
-    
-    /**
-     * If this method returns <code>true</code>, an Argument value must correspond 
-     * to an existing entity in the domain of entities denoted by the Argument type.
-     */
-    public boolean isExisting() {
-        return existing;
+    public final void complete(CompletionInfo completion, String partial, int flags) {
+        if (isSet() && !isMultiple()) {
+            throw new SyntaxMultiplicityException("this argument cannot be repeated");
+        }
+        flags = (flags & ~NONOVERRIDABLE_FLAGS) | this.flags;
+        checkFlags(flags);
+        doComplete(completion, partial, flags);
     }
 
     /**
-     * If this method returns <code>true</code>, an Argument value must <i>not</i> correspond 
-     * to an existing entity in the domain of entities denoted by the Argument type.
+     * Perform argument completion on the supplied (partial) argument value.  The
+     * results of the completion should be added to the supplied CompletionInfo.
+     * <p>
+     * The default behavior is to set no completion.  
+     * Subtypes of Argument should override this method if they are capable of doing
+     * non-trivial completion.  Completions should be registered by calling one
+     * of the 'addCompletion' methods on the CompletionInfo.
+     * 
+     * @param completion the CompletionInfo object for registering any completions.
+     * @param partial the argument string to be completed.
      */
-    public boolean isNonexistent() {
-        return nonexistent;
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
+        // set no completion
     }
 
     void setBundle(ArgumentBundle bundle) {

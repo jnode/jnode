@@ -56,7 +56,7 @@ public class LongArgument extends Argument<Long> {
     }
 
     @Override
-    protected Long doAccept(Token token) throws CommandSyntaxException {
+    protected Long doAccept(Token token, int flags) throws CommandSyntaxException {
         try {
             long tmp = Long.parseLong(token.text);
             if (tmp < min || tmp > max) {
@@ -69,7 +69,7 @@ public class LongArgument extends Argument<Long> {
     }
   
     @Override
-    public void complete(CompletionInfo completion, String partial) {
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
         // FIXME ... maybe someone could figure out how to partial
         // completion efficiently when max - min is large?
         if (max - min >= 0 && max - min < COMPLETION_THRESHOLD) {

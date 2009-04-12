@@ -48,7 +48,7 @@ public class Log4jLoggerArgument extends Argument<Logger> {
      * Any token is an acceptable Logger name.
      */
     @Override
-    protected Logger doAccept(Token value) throws CommandSyntaxException {
+    protected Logger doAccept(Token value, int flags) throws CommandSyntaxException {
         return Logger.getLogger(value.text);
     }
 
@@ -56,7 +56,7 @@ public class Log4jLoggerArgument extends Argument<Logger> {
      * Complete against existing logger names.
      */
     @Override
-    public void complete(CompletionInfo completion, String partial) {
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
         Enumeration<?> en = LogManager.getCurrentLoggers();
         while (en.hasMoreElements()) {
             String loggerName = ((Logger) en.nextElement()).getName();

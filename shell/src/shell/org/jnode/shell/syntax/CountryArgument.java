@@ -41,7 +41,7 @@ public class CountryArgument extends Argument<String> {
     }
 
     @Override
-    protected String doAccept(Token token) throws CommandSyntaxException {
+    protected String doAccept(Token token, int flags) throws CommandSyntaxException {
         if (validCountries.contains(token.text)) {
             return token.text;
         } else {
@@ -50,7 +50,7 @@ public class CountryArgument extends Argument<String> {
     }
     
     @Override
-    public void complete(CompletionInfo completion, String partial) {
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
         for (String country : validCountries) {
             if (country.startsWith(partial)) {
                 completion.addCompletion(country);

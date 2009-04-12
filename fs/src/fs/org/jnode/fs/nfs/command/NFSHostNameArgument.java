@@ -43,7 +43,7 @@ public class NFSHostNameArgument extends Argument<String> {
         super(name, flags, new String[0], description);
     }
 
-    public void complete(CompletionInfo completion, String partial) {
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
         int index = partial.indexOf(':');
         if (index <= 0) {
             return;
@@ -117,7 +117,7 @@ public class NFSHostNameArgument extends Argument<String> {
     }
 
     @Override
-    protected String doAccept(Token value) throws CommandSyntaxException {
+    protected String doAccept(Token value, int flags) throws CommandSyntaxException {
         int index = value.text.indexOf(':');
         if (index == -1) {
             throw new CommandSyntaxException("missing ':'");

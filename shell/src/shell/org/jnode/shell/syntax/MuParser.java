@@ -213,13 +213,15 @@ public class MuParser {
                         }
                         break;
                     case ARGUMENT:
-                        String argName = ((MuArgument) syntax).getArgName();
+                        MuArgument muArg = (MuArgument) syntax;
+                        String argName = muArg.getArgName();
+                        int flags = muArg.getFlags();
                         Argument<?> arg = bundle.getArgument(argName);
                         try {
                             if (source.hasNext()) {
                                 token = source.next();
                                 if (completion == null || source.hasNext() || source.whitespaceAfterLast()) {
-                                    arg.accept(token);
+                                    arg.accept(token, flags);
                                     if (!backtrackStack.isEmpty()) {
                                         backtrackStack.getFirst().argsModified.add(arg);
                                         if (DEBUG) {
@@ -227,13 +229,13 @@ public class MuParser {
                                         }
                                     }
                                 } else {
-                                    arg.complete(completion, token.text);
+                                    arg.complete(completion, token.text, flags);
                                     completion.setCompletionStart(token.start);
                                     backtrack = true;
                                 }
                             } else {
                                 if (completion != null) {
-                                    arg.complete(completion, "");
+                                    arg.complete(completion, "", flags);
                                 }
                                 backtrack = true;
                             }
@@ -247,10 +249,11 @@ public class MuParser {
                         }
                         break;
                     case PRESET:
-                        MuPreset preset = (MuPreset) syntax;
-                        arg = bundle.getArgument(preset.getArgName());
+                        MuPreset muPreset = (MuPreset) syntax;
+                        arg = bundle.getArgument(muPreset.getArgName());
+                        flags = muPreset.getFlags();
                         try {
-                            arg.accept(new CommandLine.Token(preset.getPreset()));
+                            arg.accept(new CommandLine.Token(muPreset.getPreset()), flags);
                             if (!backtrackStack.isEmpty()) {
                                 backtrackStack.getFirst().argsModified.add(arg);
                                 if (DEBUG) {

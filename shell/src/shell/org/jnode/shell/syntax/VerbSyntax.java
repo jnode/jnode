@@ -34,8 +34,8 @@ public class VerbSyntax extends ArgumentSyntax {
     private final String symbol;
     private final String argName;
     
-    public VerbSyntax(String label, String symbol, String argName, String description) {
-        super(label, argName, description);
+    public VerbSyntax(String label, String symbol, String argName, String flags, String description) {
+        super(label, argName, flags, description);
         this.symbol = symbol;
         if (symbol.length() == 0) {
             throw new IllegalArgumentException("empty symbol");

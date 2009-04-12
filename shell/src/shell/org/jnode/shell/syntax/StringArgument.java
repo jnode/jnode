@@ -42,7 +42,7 @@ public class StringArgument extends Argument<String> {
     }
 
     @Override
-    protected String doAccept(Token token) throws CommandSyntaxException {
+    protected String doAccept(Token token, int flags) throws CommandSyntaxException {
         return token.text;
     }
 

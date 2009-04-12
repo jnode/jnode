@@ -58,22 +58,22 @@ public class MuSyntaxTest extends TestCase {
 
     public void testMuArgumentConstructor() {
         new MuArgument("arg1");
-        new MuArgument("label", "arg1");
+        new MuArgument("label", "arg1", 0);
 
         try {
-            new MuArgument(null, null);
+            new MuArgument(null, null, 0);
             fail("expected NPE");
         } catch (NullPointerException ex) {
             // expected
         }
         try {
-            new MuArgument(null, "");
+            new MuArgument(null, "", 0);
             fail("expected IAE");
         } catch (IllegalArgumentException ex) {
             // expected
         }
         try {
-            new MuArgument("", "arg1");
+            new MuArgument("", "arg1", 0);
             fail("expected IAE");
         } catch (IllegalArgumentException ex) {
             // expected
@@ -135,7 +135,7 @@ public class MuSyntaxTest extends TestCase {
 
     public void testFormat() {
         assertEquals("<*Start*> ::= <<arg1>>", new MuArgument("arg1").format());
-        assertEquals("<l1> ::= <<arg1>>", new MuArgument("l1", "arg1").format());
+        assertEquals("<l1> ::= <<arg1>>", new MuArgument("l1", "arg1", 0).format());
 
         assertEquals("<*Start*> ::= 'hi'", new MuSymbol("hi").format());
         assertEquals("<l1> ::= 'hi'", new MuSymbol("l1", "hi").format());

@@ -43,7 +43,7 @@ public class IPv4HostArgument extends Argument<IPv4Address> {
     }
 
     @Override
-    protected IPv4Address doAccept(Token value) throws CommandSyntaxException {
+    protected IPv4Address doAccept(Token value, int flags) throws CommandSyntaxException {
         try {
             return new IPv4Address(value.text);
         } catch (IllegalArgumentException ex) {

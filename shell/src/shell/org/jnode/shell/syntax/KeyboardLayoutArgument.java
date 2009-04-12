@@ -46,12 +46,12 @@ public class KeyboardLayoutArgument extends StringArgument {
     }
     
     @Override
-    protected String doAccept(Token token) throws CommandSyntaxException {
+    protected String doAccept(Token token, int flags) throws CommandSyntaxException {
         return token.text; 
     }
 
     @Override
-    public void complete(CompletionInfo completion, String partial) {
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
         try {
             KeyboardLayoutManager mgr = InitialNaming.lookup(KeyboardLayoutManager.NAME);
             // collect matching devices

@@ -20,7 +20,6 @@
  
 package org.jnode.shell.syntax;
 
-import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
 import org.jnode.util.BinaryScaleFactor;
 import org.jnode.util.DecimalScaleFactor;
@@ -45,7 +44,7 @@ public class SizeArgument extends Argument<Long> {
     }
 
     @Override
-    protected Long doAccept(Token token) throws CommandSyntaxException {
+    protected Long doAccept(Token token, int flags) throws CommandSyntaxException {
         String str = token.text;
         ScaleFactor factor = scaleFactor(str);
         if (factor != null) { 
@@ -71,11 +70,6 @@ public class SizeArgument extends Argument<Long> {
         return null;
     }
   
-    @Override
-    public void complete(CompletionInfo completion, String partial) {
-        // No completion for now
-    }
-
     @Override
     protected String state() {
         return super.state() + "binaryScaling=" + binaryScaling;
