@@ -20,6 +20,9 @@
  
 package org.jnode.test.shell;
 
+import java.io.File;
+import java.util.LinkedList;
+
 import junit.framework.TestCase;
 
 import org.jnode.shell.PathnamePattern;
@@ -79,5 +82,18 @@ public class PathnamePatternTest extends TestCase {
         // not incorrect.  In practice, we should never encounter an empty pathname component.
         assertEquals("PathnamePattern{source='*',absolute=false,pattern=['^(|[^\\.].*)$']}", 
                 PathnamePattern.compilePathPattern("*", DF).toRegexString());
+    }
+    
+    public void testExpand() {
+        PathnamePattern pat = PathnamePattern.compilePathPattern("/tmp/*");
+        LinkedList<String> list = pat.expand(new File("."));
+        for (String path : list) {
+            assertTrue(new File(path).exists());
+        }
+        pat = PathnamePattern.compilePathPattern("*");
+        list = pat.expand(new File("."));
+        for (String path : list) {
+            assertTrue(new File(path).exists());
+        }
     }
 }

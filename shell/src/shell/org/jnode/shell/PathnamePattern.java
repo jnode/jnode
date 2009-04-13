@@ -252,6 +252,9 @@ public class PathnamePattern {
 
         for (File match : matches) {
             String name = match.getName();
+            if (pos == 0 && isAbsolute) {
+                name = File.separator + name;
+            }
             if (pos == pattern.length - 1) {
                 res.add(name);
             } else if (match.isDirectory()) {
