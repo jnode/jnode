@@ -54,6 +54,7 @@ public class TestHarness {
     private InputStream savedIn;
     private PrintStream savedOut;
     private PrintStream savedErr;
+    private boolean preserveTempFiles;
 
     private boolean debug;
     private boolean verbose;
@@ -61,6 +62,7 @@ public class TestHarness {
     private boolean stopOnFailure;
     private boolean useResources;
     private File root;
+    private File tempDir;
 
     public TestHarness(String[] args) {
         this.args = args;
@@ -115,7 +117,9 @@ public class TestHarness {
             usage();
             return;
         }
-
+        
+        prepareTmpDir();
+        
         for (int i = firstArg; i < args.length; i++) {
             String arg = args[i];
             try {
@@ -134,6 +138,26 @@ public class TestHarness {
             " test failures and " + exceptionCount + " errors (exceptions)");
     }
     
+    private void prepareTmpDir() {
+        tempDir = new File(System.getProperty("java.io.tmpdir"), "jnodeTestDir");
+        if (tempDir.isDirectory()) {
+            cleanDir(tempDir);
+        } else if (tempDir.isFile()) {
+            tempDir.delete();
+            tempDir.mkdir();
+        } else {
+            tempDir.mkdirs();
+        }
+    }
+    
+    void cleanDir(File directory) {
+        for (File f : directory.listFiles()) {
+            if (f.isDirectory()) {
+                cleanDir(f);
+            }
+            f.delete();
+        }
+    }
 
     public TestSetSpecification loadTestSetSpecification(String specName, String base) throws Exception {
         TestSpecificationParser parser = new TestSpecificationParser();
@@ -215,6 +239,7 @@ public class TestHarness {
                 int tmp = runner.run();
                 failureCount += tmp;
                 if (tmp > 0 && stopOnFailure) {
+                    preserveTempFiles = true;
                     throw new TestsAbandonedException("Stopped due to test failure");
                 }
             } finally {
@@ -318,13 +343,21 @@ public class TestHarness {
     public boolean isDebug() {
         return debug;
     }
+    
+    public boolean preserveTempFiles() {
+        return preserveTempFiles;
+    }
 
     public File tempFile(File file) {
-        return new File(System.getProperty("java.io.tmpdir"), file.toString());
+        return new File(tempDir, file.toString());
     }
 
     public boolean fail(String msg) {
         report("Incorrect test result in test " + asString(spec.getTitle()) + ": " + msg);
         return false;
+    }
+
+    public File tempDir() {
+        return tempDir;
     }
 }
