@@ -640,16 +640,6 @@ arg1 arg2
                 echo @TEMP_DIR@/'*'
                 echo "@TEMP_DIR@/*"
                 echo '@TEMP_DIR@/*'
-                PWD=`pwd`
-                # echo $PWD
-                cd @TEMP_DIR@
-                # pwd
-                echo *
-                echo \*
-                echo "*"
-                echo '*'
-                cd $PWD
-                # pwd
         </script>
         <file name="xyzzy" input="false">Hi mum
 </file>
@@ -659,10 +649,6 @@ arg1 arg2
 /tmp/jnodeTestDir/*
 /tmp/jnodeTestDir/*
 /tmp/jnodeTestDir/*
-xyzzy
-*
-*
-*
 </output>
     </testSpec>
     <testSpec title="redirection" command="test" runMode="AS_SCRIPT" rc="0">

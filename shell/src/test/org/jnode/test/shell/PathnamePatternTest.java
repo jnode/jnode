@@ -82,6 +82,18 @@ public class PathnamePatternTest extends TestCase {
         // not incorrect.  In practice, we should never encounter an empty pathname component.
         assertEquals("PathnamePattern{source='*',absolute=false,pattern=['^(|[^\\.].*)$']}", 
                 PathnamePattern.compilePathPattern("*", DF).toRegexString());
+        
+        assertEquals("PathnamePattern{source='\"*\"',absolute=false,pattern=['^\\*$']}", 
+                PathnamePattern.compilePathPattern("\"*\"", DF).toRegexString());
+
+        assertEquals("PathnamePattern{source='a/b',absolute=false,pattern=['a','b']}", 
+                PathnamePattern.compilePathPattern("a/b", DF).toRegexString());
+        
+        assertEquals("PathnamePattern{source='a/*',absolute=false,pattern=['a','^(|[^\\.].*)$']}", 
+                PathnamePattern.compilePathPattern("a/*", DF).toRegexString());
+        
+        assertEquals("PathnamePattern{source='/a/*',absolute=true,pattern=['a','^(|[^\\.].*)$']}", 
+                PathnamePattern.compilePathPattern("/a/*", DF).toRegexString());
     }
     
     public void testExpand() {
