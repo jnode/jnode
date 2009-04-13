@@ -468,6 +468,7 @@ clean             Remove all intermediate build results.
     <target name="javadoc-small" description="generate documentation of the basic JNode APIs">
         <jnode.javadoc destdir="${build.dir}/javadoc/small">
             <sourcepath>
+                <pathelement location="${root.dir}/core/src/classlib"/>
                 <pathelement location="${root.dir}/core/src/classpath/gnu"/>
                 <pathelement location="${root.dir}/core/src/classpath/java"/>
                 <pathelement location="${root.dir}/core/src/classpath/javax"/>
@@ -497,6 +498,7 @@ clean             Remove all intermediate build results.
     <target name="javadoc-mmtk">
         <jnode.javadoc destdir="${build.dir}/javadoc/mmtk">
             <sourcepath>
+                <pathelement location="${root.dir}/core/src/classlib"/>
                 <pathelement location="${root.dir}/core/src/vmmagic"/>
                 <pathelement location="${root.dir}/core/src/mmtk-vm"/>
                 <pathelement location="${root.dir}/core/src/core"/>
@@ -518,6 +520,7 @@ clean             Remove all intermediate build results.
     <target name="javadoc" description="generate documentation of all java source files">
         <jnode.javadoc destdir="${build.dir}/javadoc/full">
             <sourcepath>
+                <pathelement location="${root.dir}/core/src/classlib"/>
                 <pathelement location="${root.dir}/core/src/classpath/gnu"/>
                 <pathelement location="${root.dir}/core/src/classpath/java"/>
                 <pathelement location="${root.dir}/core/src/classpath/javax"/>
