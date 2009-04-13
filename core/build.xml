@@ -141,15 +141,18 @@
 
   <!-- Compile all subproject java files -->
   <target name="compile" depends="prepare">
+      <!--
     <jnode.compile>
       <src refid="classpath-sources" />
       <classpath refid="my-cp"/>
     </jnode.compile>
+    -->
     <parallel >
       <jnode.compile>
         <src refid="my-sources" />
         <classpath refid="my-cp"/>
       </jnode.compile>
+        <!--
       <jnode.compile>
         <src refid="classpath-sources-corba" />
         <classpath refid="my-cp"/>
@@ -162,6 +165,7 @@
         <src refid="classpath-sources-langtools" />
         <classpath refid="my-cp"/>
       </jnode.compile>
+      -->
     </parallel>
 
     <!-- Copy all non java files to class dir -->
@@ -190,7 +194,7 @@
 	    <fileset dir="${my-src.dir}/driver" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/test" excludes="${my-non-resources}"/>
     </copy>
-  	
+
   	<!-- Create & compile plan classes -->
 	<CreatePlan package="org.jnode.vm.memmgr.mmtk.genrc"/>
 	<CreatePlan package="org.jnode.vm.memmgr.mmtk.ms"/>

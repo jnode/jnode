@@ -45,6 +45,7 @@
 	<property name="jnode-mmtk-ms.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.ms"/>
 	<property name="jnode-mmtk-nogc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.nogc"/>
 
+    <property name="classlib.jar" value="${root.dir}/all/lib/classlib.jar"/>
     <property name="ant.jar" value="${root.dir}/core/lib/ant.jar"/>
     <property name="ant-launcher.jar" value="${root.dir}/core/lib/ant-launcher.jar"/>
     <property name="commons-net.jar" value="${root.dir}/core/lib/commons-net-1.1.0.jar"/>
@@ -197,6 +198,35 @@
         <mkdir dir="${descriptors.dir}"/>
         <mkdir dir="${plugins.dir}"/>
         <mkdir dir="${initjars.dir}"/>
+        <if>
+          <or>
+              <not>
+                <available file="${classlib.jar}" />
+              </not>
+              <uptodate srcfile="${classlib.jar}" targetfile="${root.dir}/all/lib/classlib.pack.gz"/>
+          </or>
+          <then>
+            <delete file="${classlib.jar}"/>
+            <echo message="Creating ${classlib.jar}"/>
+            <exec executable="unpack200">
+              <arg file="${root.dir}/all/lib/classlib.pack.gz"/>
+              <arg file="${classlib.jar}"/>
+            </exec>
+          </then>
+        </if>
+        <property name="classlib.stamp" value="${root.dir}/all/build/classlib.stamp" />
+        <if>
+            <or>
+              <not>
+                <available file="${classlib.stamp}" />
+              </not>
+              <uptodate srcfile="${classlib.stamp}" targetfile="${classlib.jar}"/>
+            </or>
+            <then>
+              <unjar src="${classlib.jar}" dest="${jnode-core.jar}"/>
+              <touch file="${classlib.stamp}"/>  
+            </then>
+        </if>
     </target>
 
     <!-- Call the assemble target of all subprojects -->
