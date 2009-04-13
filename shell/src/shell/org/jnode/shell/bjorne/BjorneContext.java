@@ -339,69 +339,109 @@ public class BjorneContext {
     void undefineAlias(String aliasName) {
         aliases.remove(aliasName);
     }
+    
+    /**
+     * Perform expand-and-split processing on an array of word tokens. The resulting
+     * wordTokens are assembled into a CommandLine.  
+     * 
+     * @param tokens the tokens to be expanded and split into words
+     * @return the command line
+     * @throws ShellException
+     */
+    public CommandLine buildCommandLine(BjorneToken ... tokens) throws ShellException {
+        List<BjorneToken> wordTokens = expandAndSplit(tokens);
+        int nosWords = wordTokens.size();
+        if (nosWords == 0) {
+            return new CommandLine(null, null);
+        } else {
+            BjorneToken alias = wordTokens.remove(0);
+            BjorneToken[] args = wordTokens.toArray(new BjorneToken[nosWords - 1]);
+            return new CommandLine(alias, args, null);
+        }
+    }
+    
+    /**
+     * Perform expand-and-split processing on a list of word tokens.
+     * 
+     * @param tokens the tokens to be expanded and split into words
+     * @throws ShellException
+     */
+    public List<BjorneToken> expandAndSplit(Iterable<BjorneToken> tokens) 
+        throws ShellException {
+        List<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
+        for (BjorneToken token : tokens) {
+            dollarBacktickSplit(token, wordTokens);
+        }
+        wordTokens = doFileExpansions(wordTokens);
+        wordTokens = dequote(wordTokens);
+        return wordTokens;
+    }
+    
+    /**
+     * Perform full expand-and-split processing on an array of word tokens.
+     * 
+     * @param tokens the tokens to be expanded and split into words
+     * @throws ShellException
+     */
+    public List<BjorneToken> expandAndSplit(BjorneToken ... tokens) 
+        throws ShellException {
+        List<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
+        for (BjorneToken token : tokens) {
+            dollarBacktickSplit(token, wordTokens);
+        }
+        wordTokens = doFileExpansions(wordTokens);
+        wordTokens = dequote(wordTokens);
+        return wordTokens;
+    }
+    
+    private List<BjorneToken> dequote(List<BjorneToken> wordTokens) {
+        List<BjorneToken> resTokens = new LinkedList<BjorneToken>();
+        for (BjorneToken token : wordTokens) {
+            String text = token.getText();
+            int len = text.length();
+            StringBuffer sb = new StringBuffer(len);
+            int quote = 0;
+            for (int i = 0; i < len; i++) {
+                char ch = text.charAt(i);
+                switch (ch) {
+                    case '"':
+                    case '\'':
+                        if (quote == 0) {
+                            quote = ch;
+                        } else if (quote == ch) {
+                            quote = 0;
+                        } else {
+                            sb.append(ch);
+                        }
+                        break;
+                    case '\\':
+                        if (i + 1 < len) {
+                            ch = text.charAt(++i);
+                        }
+                        sb.append(ch);
+                        break;
+                    default:
+                        sb.append(ch);
+                        break;
+                }
+            }
+            resTokens.add(token.remake(sb));
+        }
+        return resTokens;
+    }
 
     /**
-     * Perform expand-and-split processing on a list of word tokens. The resulting
-     * wordTokens are assembled into a CommandLine.  
+     * Do dollar and backtick expansion on a token, split into words, retokenize and
+     * append the resulting tokens to 'wordTokens.
      * 
-     * @param tokens the tokens to be expanded and split into words
-     * @return the command line
+     * @param token
+     * @param wordTokens
      * @throws ShellException
      */
-    public CommandLine expandAndSplit(Iterable<BjorneToken> tokens) throws ShellException {
-        List<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
-        expandAndSplit(tokens, wordTokens);
-        return makeCommandLine(wordTokens);
-    }
-    
-    /**
-     * Perform expand-and-split processing on an array of word tokens. The resulting
-     * wordTokens are assembled into a CommandLine.  
-     * 
-     * @param tokens the tokens to be expanded and split into words
-     * @return the command line
-     * @throws ShellException
-     */
-    public CommandLine expandAndSplit(BjorneToken[] tokens) throws ShellException {
-        List<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
-        expandAndSplit(tokens, wordTokens);
-        return makeCommandLine(wordTokens);
-    }
-    
-    /**
-     * Perform expand-and-split processing on a list of word tokens. The resulting
-     * tokens are appended to wordTokens.  
-     * 
-     * @param tokens the tokens to be expanded and split into words
-     * @param wordTokens append expanded/split tokens to this list
-     * @throws ShellException
-     */
-    public void expandAndSplit(Iterable<BjorneToken> tokens, List<BjorneToken> wordTokens) 
-        throws ShellException {
-        for (BjorneToken token : tokens) {
-            expandSplitAndAppend(token, wordTokens);
-        }
-    }
-    
-    /**
-     * Perform expand-and-split processing on an array of word tokens. The resulting
-     * tokens are appended to wordTokens.  
-     * 
-     * @param tokens the tokens to be expanded and split into words
-     * @param wordTokens append expanded/split tokens to this list
-     * @throws ShellException
-     */
-    public void expandAndSplit(BjorneToken[] tokens, List<BjorneToken> wordTokens) 
-        throws ShellException {
-        for (BjorneToken token : tokens) {
-            expandSplitAndAppend(token, wordTokens);
-        }
-    }
-    
-    private void expandSplitAndAppend(BjorneToken token, List<BjorneToken> wordTokens) 
+    private void dollarBacktickSplit(BjorneToken token, List<BjorneToken> wordTokens) 
         throws ShellException {
         String word = token.getText();
-        CharSequence expanded = expand(word);
+        CharSequence expanded = dollarBacktickExpand(word);
         if (expanded == word) {
             splitAndAppend(token, wordTokens);
         } else {
@@ -411,21 +451,8 @@ public class BjorneContext {
             }
         }
     }
-
-    /**
-     * Perform expand-and-split processing on a sequence of characters.  This method is only 
-     * used in tests at the moment, and probably should be removed.  (It does not set token
-     *  attributes properly ...)
-     * 
-     * @param text the characters to be split
-     * @return the command line 
-     * @throws ShellException
-     */
-    public List<BjorneToken> expandAndSplit(CharSequence text) throws ShellException {
-        return split(expand(text));
-    }
-
-    private CommandLine makeCommandLine(List<BjorneToken> wordTokens) {
+    
+    private List<BjorneToken> doFileExpansions(List<BjorneToken> wordTokens) {
         if (globbing || tildeExpansion) {
             List<BjorneToken> globbedWordTokens = new LinkedList<BjorneToken>();
             for (BjorneToken wordToken : wordTokens) {
@@ -438,15 +465,9 @@ public class BjorneContext {
                     globbedWordTokens.add(wordToken);
                 }
             }
-            wordTokens = globbedWordTokens;
-        }
-        int nosWords = wordTokens.size();
-        if (nosWords == 0) {
-            return new CommandLine(null, null);
+            return globbedWordTokens;
         } else {
-            BjorneToken alias = wordTokens.remove(0);
-            BjorneToken[] args = wordTokens.toArray(new BjorneToken[nosWords - 1]);
-            return new CommandLine(alias, args, null);
+            return wordTokens;
         }
     }
     
@@ -476,6 +497,7 @@ public class BjorneContext {
             return;
         }
         PathnamePattern pattern = PathnamePattern.compilePathPattern(word);
+        // Expand using the current directory as the base for relative path patterns.
         LinkedList<String> paths = pattern.expand(new File("."));
         // If it doesn't match anything, a pattern 'expands' to itself.
         if (paths.isEmpty()) {
@@ -486,24 +508,10 @@ public class BjorneContext {
             }
         }
     }
-
-    /**
-     * Split a character sequence into word tokens, dealing with and removing any
-     * non-literal quotes.
-     * 
-     * @param text the characters to be split
-     * @return the resulting list of tokens.
-     * @throws ShellException
-     */
-    public List<BjorneToken> split(CharSequence text) throws ShellException {
-        List<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
-        splitAndAppend(new BjorneToken(BjorneToken.TOK_WORD, text.toString(), -1, -1), wordTokens);
-        return wordTokens;
-    }
     
     /**
-     * Split a token into a series of word tokens, dealing with and removing any
-     * non-literal quotes.  The resulting tokens are appended to a supplied list.
+     * Split a token into a series of word tokens, leaving quoting intact.  
+     * The resulting tokens are appended to a supplied list.
      * 
      * @param token the token to be split
      * @param wordTokens the destination for the tokens.
@@ -522,14 +530,10 @@ public class BjorneContext {
                 case '\'':
                     if (quote == 0) {
                         quote = ch;
-                        if (sb == null) {
-                            sb = new StringBuffer();
-                        }
                     } else if (quote == ch) {
                         quote = 0;
-                    } else {
-                        sb = accumulate(sb, ch);
-                    }
+                    } 
+                    sb = accumulate(sb, ch);
                     break;
                 case ' ':
                 case '\t':
@@ -544,6 +548,7 @@ public class BjorneContext {
                     break;
                 case '\\':
                     if (i + 1 < len) {
+                        sb = accumulate(sb, ch);
                         ch = text.charAt(++i);
                     }
                     sb = accumulate(sb, ch);
@@ -577,13 +582,14 @@ public class BjorneContext {
     }
 
     /**
-     * Perform '$' expansion and backtick substitution. Any quotes and escapes should be preserved (?!?!?)
+     * Perform '$' expansion and backtick substitution. Any quotes and escapes must 
+     * be preserved so that they escape globbing and tilde expansion.
      * 
      * @param text the characters to be expanded
      * @return the result of the expansion.
      * @throws ShellException
      */
-    public CharSequence expand(CharSequence text) throws ShellException {
+    public CharSequence dollarBacktickExpand(CharSequence text) throws ShellException {
         CharIterator ci = new CharIterator(text);
         StringBuffer sb = new StringBuffer(text.length());
         char quote = 0;
@@ -1066,7 +1072,7 @@ public class BjorneContext {
                     throw new ShellFailureException("misplaced '=' in assignment");
                 }
                 String name = assignment.substring(0, pos);
-                String value = expand(assignment.substring(pos + 1)).toString();
+                String value = dollarBacktickExpand(assignment.substring(pos + 1)).toString();
                 this.setVariable(name, value);
             }
         }
@@ -1141,7 +1147,7 @@ public class BjorneContext {
                     case REDIR_DLESSDASH:
                         String here = redir.getHereDocument();
                         if (redir.isHereDocumentExpandable()) {
-                            here = expand(here).toString();
+                            here = dollarBacktickExpand(here).toString();
                         }
                         in = new CommandInput(new StringReader(here));
                         stream = new CommandIOHolder(in, true);
