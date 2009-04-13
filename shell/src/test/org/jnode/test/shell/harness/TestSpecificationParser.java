@@ -145,13 +145,22 @@ public class TestSpecificationParser {
         throws TestSpecificationException {
         String fileName = extractAttribute(elem, "name");
         boolean isInput = extractAttribute(elem, "input", "false").equals("true");
+        boolean isDirectory = extractAttribute(elem, "directory", "false").equals("true");
         String content = extractElementValue(elem, null, "");
         File file = new File(fileName);
         if (file.isAbsolute()) {
             throw new TestSpecificationException(
                     "A '" + elem.getName() + "' element must have a relative 'name''");
         }
-        res.addFile(new TestSpecification.FileSpecification(file, isInput, content));
+        if (isDirectory) {
+            if (content.length() > 0) {
+                throw new TestSpecificationException(
+                        "A '" + elem.getName() + "' element for a directory cannot have content'");
+            }
+            res.addFile(new TestSpecification.FileSpecification(file, isInput));
+        } else {
+            res.addFile(new TestSpecification.FileSpecification(file, isInput, content));
+        }
     }
     
     @SuppressWarnings("unused")

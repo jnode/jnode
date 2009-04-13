@@ -91,12 +91,6 @@ public abstract class TestRunnerBase implements TestRunnable {
     }
 
     public CommandShell getShell() throws ShellException {
-//      CommandShell shell = TestEmu.getShell(); 
-//      if (shell == null) {
-//      shell = new TestCommandShell(System.in, System.out, System.err);
-//      shell.configureShell();
-//      }
-//      return shell;
         CommandShell shell = new TestCommandShell(System.in, System.out, System.err);
         shell.configureShell();
         return shell;
@@ -104,11 +98,14 @@ public abstract class TestRunnerBase implements TestRunnable {
     
     @Override
     public void cleanup() {
-        if (!harness.isDebug()) {
+        if (!harness.preserveTempFiles()) {
             for (FileSpecification fs : spec.getFiles()) {
-                if (fs.isInput()) {
-                    File tempFile = harness.tempFile(fs.getFile());
-                    tempFile.delete();
+                File f = harness.tempFile(fs.getFile());
+                if (f.isFile()) {
+                    f.delete();
+                } else if (f.isDirectory()) {
+                    harness.cleanDir(f);
+                    f.delete();
                 }
             }
         }
@@ -144,18 +141,21 @@ public abstract class TestRunnerBase implements TestRunnable {
         System.setErr(new PrintStream(err));
         
         for (FileSpecification fs : spec.getFiles()) {
-            File tempFile = harness.tempFile(fs.getFile());
+            File f = harness.tempFile(fs.getFile());
             if (fs.isInput()) {
-                OutputStream os = new FileOutputStream(tempFile);
-                try {
-                    byte[] bytes = fs.getFileContent().getBytes();
-                    os.write(bytes);
-                } finally {
-                    os.close();
+                if (fs.isDirectory()) {
+                    f.mkdirs();
+                } else {
+                    f.getParentFile().mkdirs();
+                    OutputStream os = new FileOutputStream(f);
+                    try {
+                        byte[] bytes = fs.getFileContent().getBytes();
+                        os.write(bytes);
+                    } finally {
+                        os.close();
+                    }
                 }
-            } else {
-                tempFile.delete();
-            }
+            } 
         }
     }
     
@@ -168,23 +168,37 @@ public abstract class TestRunnerBase implements TestRunnable {
     protected boolean checkFiles() throws IOException {
         boolean ok = true;
         for (FileSpecification fs : spec.getFiles()) {
-            File tempFile = harness.tempFile(fs.getFile());
+            File f = harness.tempFile(fs.getFile());
             if (!fs.isInput()) {
-                if (!tempFile.exists()) {
-                    harness.fail("file not created: '" + tempFile + "'"); 
-                    ok = false;
-                } else {
-                    int fileLength = (int) tempFile.length();
-                    byte[] bytes = new byte[fileLength];
-                    InputStream is = new FileInputStream(tempFile);
-                    try {
-                        is.read(bytes);
-                    } finally {
-                        is.close();
+                if (fs.isDirectory()) {
+                    if (!f.exists()) {
+                        harness.fail("directory not created: '" + f + "'"); 
+                        ok = false;
+                    } else if (!f.isDirectory()) {
+                        harness.fail("object created is not a directory: '" + f + "'"); 
+                        ok = false;
                     }
-                    String content = new String(bytes);
-                    ok = ok & harness.expect(content, fs.getFileContent(), "file content (" + tempFile + ")");
-                } 
+                } else {
+                    if (!f.exists()) {
+                        harness.fail("file not created: '" + f + "'"); 
+                        ok = false;
+                    } else if (!f.isFile()) {
+                        harness.fail("object created is not a file: '" + f + "'"); 
+                        ok = false;
+                    } else {
+                        int fileLength = (int) f.length();
+                        byte[] bytes = new byte[fileLength];
+                        InputStream is = new FileInputStream(f);
+                        try {
+                            is.read(bytes);
+                        } finally {
+                            is.close();
+                        }
+                        String content = new String(bytes);
+                        ok = ok & harness.expect(
+                                content, fs.getFileContent(), "file content (" + f + ")");
+                    } 
+                }
             }
         }
         return ok;

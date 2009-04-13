@@ -39,14 +39,22 @@ public class TestSpecification {
     
     public static class FileSpecification {
         private final File file;
+        private final boolean directory;
         private final boolean input;
         private final String fileContent;
         
-        public FileSpecification(File file, boolean input,
-                String fileContent) {
+        public FileSpecification(File file, boolean input) {
+            this.file = file;
+            this.input = input;
+            this.fileContent = "";
+            this.directory = true;
+        }
+
+        public FileSpecification(File file, boolean input, String fileContent) {
             this.file = file;
             this.input = input;
             this.fileContent = fileContent;
+            this.directory = false;
         }
 
         public File getFile() {
@@ -59,6 +67,10 @@ public class TestSpecification {
 
         public String getFileContent() {
             return fileContent;
+        }
+
+        public boolean isDirectory() {
+            return directory;
         }
     }
     
