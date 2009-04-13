@@ -28,6 +28,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.jnode.shell.CommandLine;
+import org.jnode.shell.PathnamePattern;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.bjorne.BjorneContext;
 import org.jnode.shell.bjorne.BjorneToken;
@@ -41,83 +42,88 @@ public class BjorneContextTests extends TestCase {
 
     public void testExpand1() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        List<BjorneToken> expansion = context.expandAndSplit("");
-        checkExpansion(expansion, new String[] {});
-    }
-
-    public void testExpand2() throws ShellException {
-        BjorneContext context = new BjorneContext(null, null);
-        List<BjorneToken> expansion = context.expandAndSplit("  ");
+        List<BjorneToken> expansion = context.expandAndSplit();
         checkExpansion(expansion, new String[] {});
     }
 
     public void testExpand3() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        List<BjorneToken> expansion = context.expandAndSplit("hi");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("hi"));
         checkExpansion(expansion, new String[] {"hi"});
     }
 
     public void testExpand4() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        List<BjorneToken> expansion = context.expandAndSplit("hi there ");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("hi there"));
         checkExpansion(expansion, new String[] {"hi", "there"});
     }
 
     public void testExpand5() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        List<BjorneToken> expansion = context.expandAndSplit("'hi there '");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("'hi there '"));
         checkExpansion(expansion, new String[] {"hi there "});
     }
 
     public void testExpand6() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        List<BjorneToken> expansion = context.expandAndSplit("\"hi there \" ");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("\"hi there \" "));
         checkExpansion(expansion, new String[] {"hi there "});
     }
 
     public void testExpand7() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        List<BjorneToken> expansion = context.expandAndSplit("hi\\ there");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("hi\\ there"));
         checkExpansion(expansion, new String[] {"hi there"});
     }
 
     public void testExpand8() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        List<BjorneToken> expansion = context.expandAndSplit("\\\"hi\\ there\\\"");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("\\\"hi\\ there\\\""));
         checkExpansion(expansion, new String[] {"\"hi there\""});
     }
 
     public void testExpand9() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        List<BjorneToken> expansion = context.expandAndSplit("$?");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("$?"));
         checkExpansion(expansion, new String[] {"0"});
     }
 
     public void testExpand10() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
         context.setVariable("A", "A");
-        List<BjorneToken> expansion = context.expandAndSplit("$A");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("$A"));
         checkExpansion(expansion, new String[] {"A"});
     }
 
     public void testExpand11() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
         context.setVariable("A", "A");
-        List<BjorneToken> expansion = context.expandAndSplit("\\$A");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("\\$A"));
         checkExpansion(expansion, new String[] {"$A"});
     }
 
     public void testExpand12() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
         context.setVariable("A", "A");
-        List<BjorneToken> expansion = context.expandAndSplit("\"$A\"");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("\"$A\""));
         checkExpansion(expansion, new String[] {"A"});
     }
 
     public void testExpand13() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
         context.setVariable("A", "A");
-        List<BjorneToken> expansion = context.expandAndSplit("'$A'");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("'$A'"));
         checkExpansion(expansion, new String[] {"$A"});
     }
 
@@ -125,31 +131,43 @@ public class BjorneContextTests extends TestCase {
         BjorneContext parentContext = new BjorneContext(null, new CommandIOHolder[0]);
         parentContext.setVariable("A", "A");
         BjorneContext context = new BjorneContext(parentContext);
-        List<BjorneToken> expansion = context.expandAndSplit("'$A'");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("'$A'"));
         checkExpansion(expansion, new String[] {"$A"});
     }
 
     public void testExpand15() throws Exception {
+        PathnamePattern.clearCache();
         BjorneContext context = new BjorneContext(null, null);
         assertEquals(true, context.isGlobbing());
         assertEquals(true, context.isTildeExpansion());
         if (new File("../README.txt").exists()) {
-            CommandLine expansion = context.expandAndSplit(context.split("../README.*"));
+            CommandLine expansion = context.buildCommandLine(new BjorneToken("../README.*"));
             checkExpansion(expansion, new String[] {"../README.txt"});
+            expansion = context.buildCommandLine(new BjorneToken("../README.\\*"));
+            checkExpansion(expansion, new String[] {"../README.*"});
+            expansion = context.buildCommandLine(new BjorneToken("\"../README.*\""));
+            checkExpansion(expansion, new String[] {"../README.*"});
+            expansion = context.buildCommandLine(new BjorneToken("\'../README.*\'"));
+            checkExpansion(expansion, new String[] {"../README.*"});
+            
+            context.setGlobbing(false);
+            expansion = context.buildCommandLine(new BjorneToken("../README.*"));
+            checkExpansion(expansion, new String[] {"../README.*"});
+        } else {
+            System.err.println("skipping 'glob' tests ... no ../README.txt");
         }
-        context.setGlobbing(false);
-        CommandLine expansion = context.expandAndSplit(context.split("../README.*"));
-        checkExpansion(expansion, new String[] {"../README.*"});
+        
     }
 
     public void testExpand16() throws Exception {
         BjorneContext context = new BjorneContext(null, null);
         assertEquals(true, context.isGlobbing());
         assertEquals(true, context.isTildeExpansion());
-        CommandLine expansion = context.expandAndSplit(context.split("~"));
+        CommandLine expansion = context.buildCommandLine(new BjorneToken("~"));
         checkExpansion(expansion, new String[] {System.getProperty("user.home")});
         context.setTildeExpansion(false);
-        expansion = context.expandAndSplit(context.split("~"));
+        expansion = context.buildCommandLine(new BjorneToken("~"));
         checkExpansion(expansion, new String[] {"~"});
     }
 

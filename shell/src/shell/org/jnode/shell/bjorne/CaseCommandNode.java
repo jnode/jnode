@@ -62,11 +62,11 @@ public class CaseCommandNode extends CommandNode {
     public int execute(BjorneContext context) throws ShellException {
         int rc = 0;
 
-        CharSequence expandedWord = context.expand(word.text);
+        CharSequence expandedWord = context.dollarBacktickExpand(word.text);
     LOOP:
         for (CaseItemNode caseItem : caseItems) {
             for (BjorneToken pattern : caseItem.getPattern()) {
-                CharSequence pat = context.expand(pattern.text);
+                CharSequence pat = context.dollarBacktickExpand(pattern.text);
                 if (context.patternMatch(expandedWord, pat)) {
                     rc = caseItem.getBody().execute(context);
                     break LOOP;

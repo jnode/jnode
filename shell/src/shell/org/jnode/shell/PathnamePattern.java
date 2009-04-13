@@ -117,43 +117,51 @@ public class PathnamePattern {
      * match "a'c"; i.e. a filename containing a single-quote character.
      */
     public static final int SINGLE_QUOTE_ESCAPES = 0x10;
+    
+    /**
+     * When set, this flag causes characters inside matching double-quote
+     * characters to be match literal characters in the pathname. Only a '\' is
+     * unaffected. Thus ""a*c"" will match the file "a*c", but ""a\"c"" will
+     * match "a"c"; i.e. a filename containing a double-quote character.
+     */
+    public static final int DOUBLE_QUOTE_ESCAPES = 0x20;
 
     /**
      * When set, this flag causes the [...] character class syntax to be
      * recognized.
      */
-    public static final int CHARACTER_CLASSES = 0x20;
+    public static final int CHARACTER_CLASSES = 0x40;
     
     /**
      * When set, the pattern is anchored to the left of the string to be searched. 
      * This is set implicitly by the pathname matching methods.
      */
-    public static final int ANCHOR_LEFT = 0x40;
+    public static final int ANCHOR_LEFT = 0x80;
     
     /**
      * When set, the pattern is anchored to the right of the string to be searched.  
      * This is set implicitly by the pathname matching methods.
      */
-    public static final int ANCHOR_RIGHT = 0x80;
+    public static final int ANCHOR_RIGHT = 0x100;
     
     /**
      * When set, '*' is eager, matching as many characters as possible.  
      * This is set implicitly by the pathname matching methods. 
      * matching is always eager.
      */
-    public static final int EAGER = 0x100;
+    public static final int EAGER = 0x200;
     
     /**
      * When set, an unescaped '/' inside a character class causes the entire class
      * to be interpreted as a literal character sequence.  
      * This is set implicitly by the pathname matching methods.
      */
-    public static final int SLASH_DISABLES_CHARACTER_CLASSES = 0x200;
+    public static final int SLASH_DISABLES_CHARACTER_CLASSES = 0x400;
     
 
     public static final int DEFAULT_FLAGS = SORT_MATCHES | HIDE_DOT_FILENAMES
             | INCLUDE_DOT_AND_DOTDOT | BACKSLASH_ESCAPES | SINGLE_QUOTE_ESCAPES
-            | CHARACTER_CLASSES;
+            | DOUBLE_QUOTE_ESCAPES | CHARACTER_CLASSES;
 
     private static final boolean DEBUG = false;
 
@@ -322,6 +330,15 @@ public class PathnamePattern {
         }
         return pat;
     }
+    
+    /**
+     * Clear the pattern cache
+     */
+    public static void clearCache() {
+        synchronized (PathnamePattern.class) {
+            cache = null;
+        }
+    }
 
     /**
      * Provide a fast determination if a string requires pattern expansion,
@@ -365,6 +382,11 @@ public class PathnamePattern {
                         return true;
                     }
                     break;
+                case '\"':
+                    if ((flags & DOUBLE_QUOTE_ESCAPES) != 0) {
+                        return true;
+                    }
+                    break;
                 default:
             }
         }
@@ -384,7 +406,7 @@ public class PathnamePattern {
         // meta-characters.
         int len = pattern.length();
         StringBuffer sb = new StringBuffer(len);
-        boolean quoted = false;
+        char quote = 0;
         boolean eager = (flags & EAGER) != 0;
         if ((flags & ANCHOR_LEFT) != 0) {
             sb.append('^');
@@ -393,8 +415,8 @@ public class PathnamePattern {
             char ch = pattern.charAt(i);
             switch (ch) {
                 case '?':
-                    if (quoted) {
-                        sb.append(ch);
+                    if (quote != 0) {
+                        sb.append(protect(ch));
                     } else if (i == 0 && (flags & HIDE_DOT_FILENAMES) != 0) {
                         sb.append("[^\\.]");
                     } else {
@@ -402,8 +424,8 @@ public class PathnamePattern {
                     }
                     break;
                 case '*':
-                    if (quoted) {
-                        sb.append(ch);
+                    if (quote != 0) {
+                        sb.append(protect(ch));
                     } else if (i == 0 && (flags & HIDE_DOT_FILENAMES) != 0) {
                         sb.append("(|[^\\.]").append(eager ? ".*" : ".*?").append(")");
                     } else {
@@ -461,7 +483,26 @@ public class PathnamePattern {
                     break;
                 case '\'':
                     if ((flags & SINGLE_QUOTE_ESCAPES) != 0) {
-                        quoted = !quoted;
+                        if (quote == '\'') {
+                            quote = 0;
+                        } else if (quote == 0) {
+                            quote = '\'';
+                        } else {
+                            sb.append(protect(ch));
+                        }
+                    } else {
+                        sb.append(protect(ch));
+                    }
+                    break;
+                case '\"':
+                    if ((flags & DOUBLE_QUOTE_ESCAPES) != 0) {
+                        if (quote == '\"') {
+                            quote = 0;
+                        } else if (quote == 0) {
+                            quote = '\"';
+                        } else {
+                            sb.append(protect(ch));
+                        }
                     } else {
                         sb.append(protect(ch));
                     }
@@ -498,5 +539,20 @@ public class PathnamePattern {
 
     public String toString() {
         return source;
+    }
+
+    public String toRegexString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("PathnamePattern{source='").append(this.source);
+        sb.append("',absolute=").append(this.isAbsolute);
+        sb.append(",pattern=[");
+        for (int i = 0; i < this.pattern.length; i++) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append('\'').append(pattern[i]).append('\'');
+        }
+        sb.append("]}");
+        return sb.toString();
     }
 }

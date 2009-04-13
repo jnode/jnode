@@ -86,7 +86,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
                 // FIXME ... strictly speaking, alias substitution should be performed
                 // before "applying the grammatical rules" (i.e. parsing).
                 words = context.substituteAliases(words);
-                CommandLine command = context.expandAndSplit(words);
+                CommandLine command = context.buildCommandLine(words);
                 // Assignments and redirections are done in the command's context
                 BjorneContext childContext = new BjorneContext(context);
                 childContext.performAssignments(assignments);
@@ -118,7 +118,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
     
     public CommandThread fork(CommandShell shell, BjorneContext context) 
         throws ShellException {
-        CommandLine command = context.expandAndSplit(getWords());
+        CommandLine command = context.buildCommandLine(getWords());
         command.setStreams(context.getIOs());
         CommandInfo cmdInfo = command.parseCommandLine(shell);
         return shell.invokeAsynchronous(command, cmdInfo);
@@ -128,7 +128,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
     public void complete(CompletionInfo completion, BjorneContext context, CommandShell shell)
         throws CompletionException {
         try {
-            CommandLine command = context.expandAndSplit(words);
+            CommandLine command = context.buildCommandLine(words);
             command.complete(completion, shell);
         } catch (ShellException ex) {
             throw new CompletionException("Shell exception", ex);

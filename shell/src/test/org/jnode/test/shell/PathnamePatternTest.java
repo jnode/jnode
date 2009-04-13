@@ -48,17 +48,36 @@ public class PathnamePatternTest extends TestCase {
     public void testCompilePosixShellPattern() {
         assertEquals("abc", PathnamePattern.compilePosixShellPattern("abc", 0).toString());
         assertEquals("abc", PathnamePattern.compilePosixShellPattern("abc", DF).toString());
+        
         assertEquals(".", PathnamePattern.compilePosixShellPattern("?", 0).toString());
         assertEquals("[^\\.]", PathnamePattern.compilePosixShellPattern("?", DF).toString());
+        
         assertEquals(".*?", PathnamePattern.compilePosixShellPattern("*", 0).toString());
         assertEquals("(|[^\\.].*?)", PathnamePattern.compilePosixShellPattern("*", DF).toString());
+        
         assertEquals(".*?a.*?", PathnamePattern.compilePosixShellPattern("*a*", 0).toString());
         assertEquals("(|[^\\.].*?)a.*?", PathnamePattern.compilePosixShellPattern("*a*", DF).toString());
+        
         assertEquals("\".*?a.*?\"", PathnamePattern.compilePosixShellPattern("\"*a*\"", 0).toString());
         assertEquals("\\*a\\*", PathnamePattern.compilePosixShellPattern("\"*a*\"", DF).toString());
+        
         assertEquals("\'.*?a.*?\'", PathnamePattern.compilePosixShellPattern("\'*a*\'", 0).toString());
         assertEquals("\\*a\\*", PathnamePattern.compilePosixShellPattern("\'*a*\'", DF).toString());
+        
         assertEquals("\\\\.*?a.*?", PathnamePattern.compilePosixShellPattern("\\*a*", 0).toString());
         assertEquals("\\*a.*?", PathnamePattern.compilePosixShellPattern("\\*a*", DF).toString());
+    }
+    
+    public void testCompilePathPattern() {
+        assertEquals("PathnamePattern{source='abc',absolute=false,pattern=['abc']}", 
+                PathnamePattern.compilePathPattern("abc", DF).toRegexString());
+
+        assertEquals("PathnamePattern{source='?',absolute=false,pattern=['^[^\\.]$']}", 
+                PathnamePattern.compilePathPattern("?", DF).toRegexString());
+
+        // The following (which matches an empty pathname component) is suboptimal but 
+        // not incorrect.  In practice, we should never encounter an empty pathname component.
+        assertEquals("PathnamePattern{source='*',absolute=false,pattern=['^(|[^\\.].*)$']}", 
+                PathnamePattern.compilePathPattern("*", DF).toRegexString());
     }
 }

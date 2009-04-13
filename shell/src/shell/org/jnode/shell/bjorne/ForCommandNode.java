@@ -20,7 +20,6 @@
  
 package org.jnode.shell.bjorne;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.jnode.shell.CommandRunnable;
@@ -94,8 +93,7 @@ public class ForCommandNode extends CommandNode {
     @Override
     public int execute(BjorneContext context) throws ShellException {
         int rc = 0;
-        List<BjorneToken> expanded = new LinkedList<BjorneToken>();
-        context.expandAndSplit(words, expanded);
+        List<BjorneToken> expanded = context.expandAndSplit(words);
         for (BjorneToken word : expanded) {
             context.setVariable(var.getText(), word.getText());
             rc = body.execute(context);
