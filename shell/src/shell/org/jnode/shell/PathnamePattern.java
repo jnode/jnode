@@ -299,16 +299,17 @@ public class PathnamePattern {
             }
         }
 
+        String src = source;
         boolean isAbsolute;
-        if (source.startsWith(File.separator)) {
-            while (source.startsWith(File.separator)) {
-                source = source.substring(1);
+        if (src.startsWith(File.separator)) {
+            while (src.startsWith(File.separator)) {
+                src = src.substring(1);
             }
             isAbsolute = true;
         } else {
             isAbsolute = false;
         }
-        String[] parts = source.split(File.separator + "+", -1);
+        String[] parts = src.split(File.separator + "+", -1);
         Object[] res = new Object[parts.length];
         for (int i = 0; i < parts.length; i++) {
             String part = parts[i];
