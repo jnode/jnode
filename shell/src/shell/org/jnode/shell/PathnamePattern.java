@@ -23,6 +23,7 @@ package org.jnode.shell;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -166,16 +167,16 @@ public class PathnamePattern {
     private static final boolean DEBUG = false;
 
     private final String source;
-    private final Object[] pattern;
-    private final boolean isAbsolute;
+    private ArrayList<Object> patterns;
+    private boolean isAbsolute;
+    private char lastQuote;
 
     // Use a weak reference for the pattern cache to avoid storage leakage.
     private static WeakReference<HashMap<String, PathnamePattern>> cache;
 
-    private PathnamePattern(String source, Object[] pattern, boolean isAbsolute) {
+    private PathnamePattern(String source) {
         this.source = source;
-        this.pattern = pattern;
-        this.isAbsolute = isAbsolute;
+        this.patterns = new ArrayList<Object>();
     }
 
     /**
@@ -218,13 +219,13 @@ public class PathnamePattern {
     private LinkedList<String> doGlob(File current, int pos, int flags) {
         LinkedList<File> matches = new LinkedList<File>();
         LinkedList<String> res = new LinkedList<String>();
-        if (pattern[pos] instanceof String) {
-            File file = new File(current, (String) pattern[pos]);
+        if (patterns.get(pos) instanceof String) {
+            File file = new File(current, (String) patterns.get(pos));
             if (file.exists()) {
                 matches.add(file);
             }
         } else {
-            final Pattern pat = (Pattern) pattern[pos];
+            final Pattern pat = (Pattern) patterns.get(pos);
             final Matcher mat = pat.matcher("");
             final FilenameFilter filter = new FilenameFilter() {
                 public boolean accept(File dir, String name) {
@@ -255,7 +256,7 @@ public class PathnamePattern {
             if (pos == 0 && isAbsolute) {
                 name = File.separator + name;
             }
-            if (pos == pattern.length - 1) {
+            if (pos == patterns.size() - 1) {
                 res.add(name);
             } else if (match.isDirectory()) {
                 LinkedList<String> subList = doGlob(match, pos + 1, flags);
@@ -299,40 +300,37 @@ public class PathnamePattern {
             }
         }
 
-        String src = source;
-        boolean isAbsolute;
-        if (src.startsWith(File.separator)) {
-            while (src.startsWith(File.separator)) {
-                src = src.substring(1);
-            }
-            isAbsolute = true;
-        } else {
-            isAbsolute = false;
-        }
-        String[] parts = src.split(File.separator + "+", -1);
-        Object[] res = new Object[parts.length];
+        PathnamePattern pp = new PathnamePattern(source);
+        String[] parts = source.split(File.separator + "+", -1);
         for (int i = 0; i < parts.length; i++) {
             String part = parts[i];
-            if (isPattern(part, flags)) {
-                res[i] = compilePosixShellPattern(part, 
-                        flags | ANCHOR_LEFT | ANCHOR_RIGHT | EAGER | SLASH_DISABLES_CHARACTER_CLASSES);
+            Object pat = (isPattern(part, flags)) ?
+                compilePosixShellPattern(part, 
+                        flags | ANCHOR_LEFT | ANCHOR_RIGHT | EAGER | SLASH_DISABLES_CHARACTER_CLASSES,
+                        pp) : part;
+            if (pat == null || pat.toString().length() == 0) {
+                if (i == 0) {
+                    pp.isAbsolute = true;
+                }
             } else {
-                res[i] = part;
+                pp.patterns.add(pat);
             }
             if (DEBUG) {
-                System.err.println(i + ": " + res[i]);
+                System.err.println(i + ": " + pat);
             }
         }
-        PathnamePattern pat = new PathnamePattern(source, res, isAbsolute);
+        if (pp.lastQuote != 0) {
+            throw new IllegalArgumentException("Unbalanced quotes in pattern");
+        }
         synchronized (PathnamePattern.class) {
             HashMap<String, PathnamePattern> cp = null;
             if (cache == null || (cp = cache.get()) == null) {
                 cp = new HashMap<String, PathnamePattern>();
                 cache = new WeakReference<HashMap<String, PathnamePattern>>(cp);
             }
-            cp.put(key, pat);
+            cp.put(key, pp);
         }
-        return pat;
+        return pp;
     }
     
     /**
@@ -402,19 +400,28 @@ public class PathnamePattern {
      * generates a {@link Pattern} that can be matched against a character sequence.
      * 
      * @param pattern the pattern in shell syntax.
+     * @param flags compilation flags
      * @return the corresponding regex as a {@link Pattern}.
      */
     public static Pattern compilePosixShellPattern(CharSequence pattern, int flags) {
+        return compilePosixShellPattern(pattern, flags, null);
+    }
+    
+    /**
+     * @param pattern the pattern in shell syntax.
+     * @param flags compilation flags
+     * @param pp if not {@code null}, 
+     * @return the corresponding regex as a {@link Pattern}.
+     */
+    private static Pattern compilePosixShellPattern(
+            CharSequence pattern, int flags, PathnamePattern pp) {
         // This method needs to be really careful to avoid 'ordinary' characters
         // in the source pattern being accidentally mapped to Java regex
         // meta-characters.
         int len = pattern.length();
         StringBuffer sb = new StringBuffer(len);
-        char quote = 0;
+        char quote = (pp == null) ? ((char) 0) : pp.lastQuote;
         boolean eager = (flags & EAGER) != 0;
-        if ((flags & ANCHOR_LEFT) != 0) {
-            sb.append('^');
-        }
         for (int i = 0; i < len; i++) {
             char ch = pattern.charAt(i);
             switch (ch) {
@@ -515,6 +522,15 @@ public class PathnamePattern {
                     sb.append(protect(ch));
             }
         }
+        if (pp != null) {
+            pp.lastQuote = quote;
+        }
+        if (sb.length() == 0) {
+            return null;
+        }
+        if ((flags & ANCHOR_LEFT) != 0) {
+            sb.insert(0, '^');
+        }
         if ((flags & ANCHOR_RIGHT) != 0) {
             sb.append('$');
         }
@@ -549,12 +565,13 @@ public class PathnamePattern {
         StringBuffer sb = new StringBuffer();
         sb.append("PathnamePattern{source='").append(this.source);
         sb.append("',absolute=").append(this.isAbsolute);
-        sb.append(",pattern=[");
-        for (int i = 0; i < this.pattern.length; i++) {
+        sb.append(",patterns=[");
+        int len = this.patterns.size();
+        for (int i = 0; i < len; i++) {
             if (i > 0) {
                 sb.append(",");
             }
-            sb.append('\'').append(pattern[i]).append('\'');
+            sb.append('\'').append(patterns.get(i)).append('\'');
         }
         sb.append("]}");
         return sb.toString();
