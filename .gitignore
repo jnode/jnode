@@ -6,3 +6,4 @@ build
 *.patch
 jnode.properties
 local/
+classlib.jar

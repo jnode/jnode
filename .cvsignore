@@ -11,3 +11,4 @@ jnode.properties
 udpout.log
 local
 bin
+classlib.jar
