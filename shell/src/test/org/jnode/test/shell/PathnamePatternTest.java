@@ -61,6 +61,9 @@ public class PathnamePatternTest extends TestCase {
         assertEquals(".*?a.*?", PathnamePattern.compilePosixShellPattern("*a*", 0).toString());
         assertEquals("(|[^\\.].*?)a.*?", PathnamePattern.compilePosixShellPattern("*a*", DF).toString());
         
+        assertEquals("a.*?a.*?a", PathnamePattern.compilePosixShellPattern("a*a*a", 0).toString());
+        assertEquals("a.*?a.*?a", PathnamePattern.compilePosixShellPattern("a*a*a", DF).toString());
+        
         assertEquals("\".*?a.*?\"", PathnamePattern.compilePosixShellPattern("\"*a*\"", 0).toString());
         assertEquals("\\*a\\*", PathnamePattern.compilePosixShellPattern("\"*a*\"", DF).toString());
         
@@ -72,28 +75,43 @@ public class PathnamePatternTest extends TestCase {
     }
     
     public void testCompilePathPattern() {
-        assertEquals("PathnamePattern{source='abc',absolute=false,pattern=['abc']}", 
+        assertEquals("PathnamePattern{source='abc',absolute=false,patterns=['abc']}", 
                 PathnamePattern.compilePathPattern("abc", DF).toRegexString());
 
-        assertEquals("PathnamePattern{source='?',absolute=false,pattern=['^[^\\.]$']}", 
+        assertEquals("PathnamePattern{source='?',absolute=false,patterns=['^[^\\.]$']}", 
                 PathnamePattern.compilePathPattern("?", DF).toRegexString());
 
         // The following (which matches an empty pathname component) is suboptimal but 
         // not incorrect.  In practice, we should never encounter an empty pathname component.
-        assertEquals("PathnamePattern{source='*',absolute=false,pattern=['^(|[^\\.].*)$']}", 
+        assertEquals("PathnamePattern{source='*',absolute=false,patterns=['^(|[^\\.].*)$']}", 
                 PathnamePattern.compilePathPattern("*", DF).toRegexString());
         
-        assertEquals("PathnamePattern{source='\"*\"',absolute=false,pattern=['^\\*$']}", 
+        assertEquals("PathnamePattern{source='\"*\"',absolute=false,patterns=['^\\*$']}", 
                 PathnamePattern.compilePathPattern("\"*\"", DF).toRegexString());
 
-        assertEquals("PathnamePattern{source='a/b',absolute=false,pattern=['a','b']}", 
+        assertEquals("PathnamePattern{source='a/b',absolute=false,patterns=['a','b']}", 
                 PathnamePattern.compilePathPattern("a/b", DF).toRegexString());
         
-        assertEquals("PathnamePattern{source='a/*',absolute=false,pattern=['a','^(|[^\\.].*)$']}", 
+        assertEquals("PathnamePattern{source='a/*',absolute=false,patterns=['a','^(|[^\\.].*)$']}", 
                 PathnamePattern.compilePathPattern("a/*", DF).toRegexString());
         
-        assertEquals("PathnamePattern{source='/a/*',absolute=true,pattern=['a','^(|[^\\.].*)$']}", 
+        assertEquals("PathnamePattern{source='/a/*',absolute=true,patterns=['a','^(|[^\\.].*)$']}", 
                 PathnamePattern.compilePathPattern("/a/*", DF).toRegexString());
+
+        assertEquals("PathnamePattern{source='/a/\\*',absolute=true,patterns=['a','^\\*$']}", 
+                PathnamePattern.compilePathPattern("/a/\\*", DF).toRegexString());
+        
+        assertEquals("PathnamePattern{source='a//\"*\"',absolute=false,patterns=['a','^\\*$']}", 
+                PathnamePattern.compilePathPattern("a//\"*\"", DF).toRegexString());
+        
+        assertEquals("PathnamePattern{source='/a/\"*\"',absolute=true,patterns=['a','^\\*$']}", 
+                PathnamePattern.compilePathPattern("/a/\"*\"", DF).toRegexString());
+
+        assertEquals("PathnamePattern{source='\"/a/*\"',absolute=true,patterns=['a','^\\*$']}", 
+                PathnamePattern.compilePathPattern("\"/a/*\"", DF).toRegexString());
+
+        assertEquals("PathnamePattern{source='\"/a/*\"',absolute=true,patterns=['a','^\\*$']}", 
+                PathnamePattern.compilePathPattern("\"/a/*\"", DF).toRegexString());
     }
     
     public void testExpand() {
