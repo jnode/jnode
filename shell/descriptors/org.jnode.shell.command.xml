@@ -159,12 +159,69 @@
       <option argLabel="show" longName="show" description="Show heap debug flags"/>
     </syntax>
     <syntax alias="grep">
+      <!-- grep [Options] <pattern> [<file>...] or
+           grep [Options] (-e <pattern> | -f <file>)... [<file>...] -->
       <sequence description="Search for lines that match a string or regex">
         <optionSet>
-          <option argLabel="inverse" shortName="i"/>
-          <option argLabel="isRegex" shortName="r"/>
+          <!-- Matcher type -->
+          <option argLabel="matcher-fixed" shortName="F" longName="fixed-strings"/>
+          <option argLabel="matcher-ext" shortName="E" longName="extended-regexp"/>
+          <option argLabel="matcher-basic" shortName="G" longName="basic-regexp"/>
+          <option argLabel="matcher-perl" shortName="P" longName="perl-regexp"/>
+          <!-- Matching options -->
+          <option argLabel="ignore-case" shortName="i" longName="ignore-case"/>
+          <option argLabel="invert" shortName="v" longName="invert-match"/>
+          <option argLabel="word-match" shortName="w" longName="word-regexp"/>
+          <option argLabel="line-match" shortName="x" longName="line-regexp"/>
+          <!-- Output options -->
+          <option argLabel="show-count" shortName="c" longName="count"/>
+          <option argLabel="show-files-nomatch" shortName="L" longName="files-without-match"/>
+          <option argLabel="show-files-match" shortName="l" longName="files-with-match"/>
+          <option argLabel="show-only-match" shortName="o" longName="only-matching"/>
+          <option argLabel="max-matches" shortName="m" longName="max-count"/>
+          <option argLabel="quiet" shortName="q" longName="quiet"/>
+          <option argLabel="quiet" longName="silent"/>
+          <option argLabel="suppress" shortName="s" longName="no-messages"/>
+          <!-- Output prefix control -->
+          <option argLabel="prefix-byte" shortName="b" longName="byte-offset"/>
+          <option argLabel="prefix-file" shortName="H" longName="with-filename"/>
+          <option argLabel="prefix-nofile" shortName="h" longName="no-filename"/>
+          <option argLabel="prefix-label" longName="label"/>
+          <option argLabel="prefix-line" shortName="n" longName="line-number"/>
+          <option argLabel="prefix-tab" shortName="T" longName="initial-tab"/>
+          <option argLabel="prefix-null" shortName="Z" longName="null"/>
+          <!-- Context lines -->
+          <option argLabel="show-context-after" shortName="A" longName="after-context"/>
+          <option argLabel="show-context-before" shortName="B" longName="before-context"/>
+          <option argLabel="show-context-both" shortName="C" longName="context"/>
+          <!-- File/Directory selection -->
+          <option argLabel="mode-binary" longName="binary-files"/>
+          <option argLabel="mode-binary-text" shortName="a" longName="text"/>
+          <option argLabel="mode-binary-skip" shortName="I"/>
+          <option argLabel="mode-device" shortName="D" longName="devices"/>
+          <option argLabel="mode-dir" shortName="d" longName="directories"/>
+          <option argLabel="mode-dir-recurse" shortName="r" longName="recursive"/>
+          <option argLabel="mode-dir-recurse" shortName="R"/>
+          <option argLabel="pattern-exclude" longName="exclude"/>
+          <option argLabel="pattern-exclude-file" longName="exclude-from"/>
+          <option argLabel="pattern-exclude-dir" longName="exclude-dir"/>
+          <option argLabel="pattern-include" longName="include"/>
+          <!-- Other options -->
+          <option argLabel="null-term" shortName="z" longName="null-data"/>
+          <option argLabel="debug" longName="debug"/>
         </optionSet>
-        <argument argLabel="expression"/>
+        <alternatives>
+          <repeat minCount="1">
+            <alternatives>
+              <option argLabel="patterns" shortName="e"/>
+              <option argLabel="pattern-files" shortName="f"/>
+            </alternatives>
+          </repeat>
+          <argument argLabel="patterns"/>
+        </alternatives>
+        <repeat>
+          <argument argLabel="files"/>
+        </repeat>
       </sequence>
     </syntax>
     <syntax alias="help">
