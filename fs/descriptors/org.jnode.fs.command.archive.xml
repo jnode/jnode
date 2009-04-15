@@ -31,112 +31,38 @@
   </extension>
   
   <extension point="org.jnode.shell.syntaxes">
-    <syntax alias="tar">
-      <sequence>
-        <optionSet description="tar options">
-          <!-- Tar Operations -->
-          <option argLabel="doAppend" shortName="r" longName="append" />
-          <option argLabel="doCreate" shortName="c" longName="create" />
-          <option argLabel="doConcat" shortName="A" longName="concatenate" />
-          <option argLabel="doDelete" longName="delete" />
-          <option argLabel="doDiff" shortName="d" longName="diff" />
-          <option argLabel="doExtract" shortName="x" longName="extract" />
-          <option argLabel="doList" shortName="t" longName="list" />
-          <option argLabel="doUpdate" shortName="u" longName="update" />
-          <!-- Tar Global Options -->
-          <option argLabel="archive" shortName="f" longName="file" />
-          <option argLabel="backup" longName="backup" />
-          <option argLabel="bzip" shortName="j" longName="bzip2" />
-          <option argLabel="fileList" shortName="T" longName="files-from"/>
-          <option argLabel="gzip" shortName="z" longName="gzip" />
-          <option argLabel="interact" shortName="w" longName="interactive" />
-          <option argLabel="keep_old" shortName="k" longName="keep-old-files" />
-          <option argLabel="keep_new" longName="keep-newer-files" />
-          <option argLabel="removeFiles" longName="remove-files" />
-          <option argLabel="showTotals" longName="totals" />
-          <option argLabel="suffix" longName="suffix" />
-          <option argLabel="unlink" longName="unlink" />
-          <option argLabel="verify" shortName="W" longName="verify" />
-          <option argLabel="xfile" shortName="X" longName="exclude-from"/>
-          <!-- Tar Path Parser Options -->
-          <!-- These need to be changed out of here once the syntax allows for specifying positional arguments. -->
-          <option argLabel="exclude" longName="exclude" label="pattern" />
-          <option argLabel="noRecurse" longName="no-recursion" />
-          <option argLabel="recurse" longName="recursion" />
-          <option argLabel="dir" shortName="C" longName="directory" />
-          <!-- ArchiveCommand -->
-          <option argLabel="verbose" shortName="v" longName="verbose" />
-          <option argLabel="debug" longName="debug" />
-          <option argLabel="stdout" shortName="O" longName="to-stdout" />
-          <!--
-          <option argLabel="minDate" shortName="N" longName="newer" />
-          <option argLabel="minMTime" longName="newer-mtime" />
-          -->
-        </optionSet>
-        <repeat minCount="0">
-          <argument argLabel="paths"/>
-        </repeat>
-      </sequence>
-    </syntax>
-    <syntax alias="gzip">
-      <empty description="compress standard input to standard output" />
-      <sequence description="compress files">
-        <optionSet>
-          <!-- GZipCommand -->
-          <option argLabel="c1" shortName="1" longName="fast" />
-          <option argLabel="c9" shortName="9" longName="best" />
-          <option argLabel="decompress" shortName="d" longName="decompress" />
-          <!-- GZip -->
-          <option argLabel="test" shortName="t" longName="test" />
-          <option argLabel="list" shortName="l" longName="list" />
-          <option argLabel="recurse" shortName="r" longName="recursive" />
-          <option argLabel="noname" shortName="n" longName="no-name" />
-          <option argLabel="name" shortName="N" longName="name" />
-          <!-- ArchiveCommand -->
-          <option argLabel="stdout" shortName="c" longName="stdout" />
-          <option argLabel="force" shortName="f" longName="force" />
-          <option argLabel="quiet" shortName="q" longName="quiet" />
-          <option argLabel="verbose" shortName="v" longName="verbose" />
-          <option argLabel="debug" longName="debug" />
-        </optionSet>
-        <optional eager="true"><option argLabel="suffix" shortName="S" longName="suffix" /></optional>
-        <repeat minCount="1">
-          <argument argLabel="files" />
-        </repeat>
-      </sequence>
-    </syntax>
-    <syntax alias="gunzip">
-      <empty description="decompress standard input to standard output" />
+    <syntax alias="bunzip2">
+      <empty description="decompress stdin to stdout" />
       <sequence description="decompress files">
         <optionSet>
-          <!-- GZip -->
+          <!-- BZip -->
+          <option argLabel="compress" shortName="z" longName="compress"/>
+          <option argLabel="decompress" shortName="d" longName="decompress"/>
           <option argLabel="test" shortName="t" longName="test" />
-          <option argLabel="list" shortName="l" longName="list" />
-          <option argLabel="recurse" shortName="r" longName="recursive" />
-          <option argLabel="noname" shortName="n" longName="no-name" />
-          <option argLabel="name" shortName="N" longName="name" />
+          <option argLabel="keep" shortName="k" longName="keep" />
+          <option argLabel="small" shortName="s" longName="small" />
           <!-- ArchiveCommand -->
           <option argLabel="stdout" shortName="c" longName="stdout" />
           <option argLabel="force" shortName="f" longName="force" />
-          <option argLabel="quiet" shortName="q" longName="quiet" />
           <option argLabel="verbose" shortName="v" longName="verbose" />
+          <option argLabel="quiet" shortName="q" longName="quiet" />
           <option argLabel="debug" longName="debug" />
         </optionSet>
-        <optional eager="true"><option argLabel="suffix" shortName="S" longName="suffix" /></optional>
-        <repeat minCount="1">
+        <repeat>
           <argument argLabel="files" />
         </repeat>
       </sequence>
     </syntax>
-    <syntax alias="zcat">
-      <empty description="decompress standard input to standard output" />
-      <repeat minCount="1">
-        <argument argLabel="files" />
-      </repeat>
-    </syntax>
-    <syntax alias="zip">
-    </syntax>
-    <syntax alias="unzip">
+    <syntax alias="bzcat">
+      <empty description="decompress stdin to stdout" />
+      <sequence description="decompress files to stdout">
+        <optionSet>
+          <option argLabel="small" shortName="s" longName="small" />
+        </optionSet>
+        <repeat>
+          <argument argLabel="files" />
+        </repeat>
+      </sequence>
     </syntax>
     <syntax alias="bzip2">
       <empty description="compress stdin to stdout" />
@@ -170,37 +96,177 @@
         </repeat>
       </sequence>
     </syntax>
-    <syntax alias="bunzip2">
-      <empty description="decompress stdin to stdout" />
+    <syntax alias="gunzip">
+      <empty description="decompress standard input to standard output" />
       <sequence description="decompress files">
         <optionSet>
-          <!-- BZip -->
-          <option argLabel="compress" shortName="z" longName="compress"/>
-          <option argLabel="decompress" shortName="d" longName="decompress"/>
+          <!-- GZip -->
           <option argLabel="test" shortName="t" longName="test" />
-          <option argLabel="keep" shortName="k" longName="keep" />
-          <option argLabel="small" shortName="s" longName="small" />
+          <option argLabel="list" shortName="l" longName="list" />
+          <option argLabel="recurse" shortName="r" longName="recursive" />
+          <option argLabel="noname" shortName="n" longName="no-name" />
+          <option argLabel="name" shortName="N" longName="name" />
           <!-- ArchiveCommand -->
           <option argLabel="stdout" shortName="c" longName="stdout" />
           <option argLabel="force" shortName="f" longName="force" />
-          <option argLabel="verbose" shortName="v" longName="verbose" />
           <option argLabel="quiet" shortName="q" longName="quiet" />
+          <option argLabel="verbose" shortName="v" longName="verbose" />
           <option argLabel="debug" longName="debug" />
         </optionSet>
-        <repeat>
+        <optional eager="true"><option argLabel="suffix" shortName="S" longName="suffix" /></optional>
+        <repeat minCount="1">
           <argument argLabel="files" />
         </repeat>
       </sequence>
     </syntax>
-    <syntax alias="bzcat">
-      <empty description="decompress stdin to stdout" />
-      <sequence description="decompress files to stdout">
+    <syntax alias="gzip">
+      <empty description="compress standard input to standard output" />
+      <sequence description="compress files">
         <optionSet>
-          <option argLabel="small" shortName="s" longName="small" />
+          <!-- GZipCommand -->
+          <option argLabel="c1" shortName="1" longName="fast" />
+          <option argLabel="c9" shortName="9" longName="best" />
+          <option argLabel="decompress" shortName="d" longName="decompress" />
+          <!-- GZip -->
+          <option argLabel="test" shortName="t" longName="test" />
+          <option argLabel="list" shortName="l" longName="list" />
+          <option argLabel="recurse" shortName="r" longName="recursive" />
+          <option argLabel="noname" shortName="n" longName="no-name" />
+          <option argLabel="name" shortName="N" longName="name" />
+          <!-- ArchiveCommand -->
+          <option argLabel="stdout" shortName="c" longName="stdout" />
+          <option argLabel="force" shortName="f" longName="force" />
+          <option argLabel="quiet" shortName="q" longName="quiet" />
+          <option argLabel="verbose" shortName="v" longName="verbose" />
+          <option argLabel="debug" longName="debug" />
         </optionSet>
-        <repeat>
+        <optional eager="true"><option argLabel="suffix" shortName="S" longName="suffix" /></optional>
+        <repeat minCount="1">
           <argument argLabel="files" />
         </repeat>
+      </sequence>
+    </syntax>
+    <syntax alias="tar">
+      <sequence>
+        <optionSet description="tar options">
+          <!-- Tar Operations -->
+          <option argLabel="doAppend" shortName="r" longName="append" />
+          <option argLabel="doCreate" shortName="c" longName="create" />
+          <option argLabel="doConcat" shortName="A" longName="concatenate" />
+          <option argLabel="doDelete" longName="delete" />
+          <option argLabel="doDiff" shortName="d" longName="diff" />
+          <option argLabel="doExtract" shortName="x" longName="extract" />
+          <option argLabel="doList" shortName="t" longName="list" />
+          <option argLabel="doUpdate" shortName="u" longName="update" />
+          <!-- Tar Global Options -->
+          <option argLabel="archive" shortName="f" longName="file" />
+          <option argLabel="backup" longName="backup" />
+          <option argLabel="bzip" shortName="j" longName="bzip2" />
+          <option argLabel="fileList" shortName="T" longName="files-from"/>
+          <option argLabel="gzip" shortName="z" longName="gzip" />
+          <option argLabel="interact" shortName="w" longName="interactive" />
+          <option argLabel="keep_old" shortName="k" longName="keep-old-files" />
+          <option argLabel="keep_new" longName="keep-newer-files" />
+          <option argLabel="removeFiles" longName="remove-files" />
+          <option argLabel="showTotals" longName="totals" />
+          <option argLabel="suffix" longName="suffix" />
+          <option argLabel="unlink" longName="unlink" />
+          <option argLabel="verify" shortName="W" longName="verify" />
+          <option argLabel="xfile" shortName="X" longName="exclude-from"/>
+          <!-- Tar Path Parser Options -->
+          <option argLabel="exclude" longName="exclude" label="pattern" />
+          <option argLabel="noRecurse" longName="no-recursion" />
+          <option argLabel="recurse" longName="recursion" />
+          <option argLabel="dir" shortName="C" longName="directory" />
+          <!-- ArchiveCommand -->
+          <option argLabel="verbose" shortName="v" longName="verbose" />
+          <option argLabel="debug" longName="debug" />
+          <option argLabel="stdout" shortName="O" longName="to-stdout" />
+          <!--
+          <option argLabel="minDate" shortName="N" longName="newer" />
+          <option argLabel="minMTime" longName="newer-mtime" />
+          -->
+        </optionSet>
+        <repeat>
+          <argument argLabel="paths"/>
+        </repeat>
+      </sequence>
+    </syntax>
+    <syntax alias="unzip">
+      <sequence>
+        <optionSet>
+          <!-- UnzipCommand -->
+          <option argLabel="backup" shortName="B"/>
+          <option argLabel="ignore-case" shortName="C"/>
+          <option argLabel="keep" shortName="n"/>
+          <option argLabel="overwrite" shortName="o"/>
+          <!-- Zip -->
+          <option argLabel="no-path" shortName="j"/>
+          <!-- Zip Operations -->
+          <option argLabel="freshen" shortName="f"/>
+          <option argLabel="list" shortName="l"/>
+          <option argLabel="test" shortName="t"/>
+          <option argLabel="update" shortName="u"/>
+          <!-- ArchiveCommand -->
+          <option argLabel="stdout" shortName="p"/>
+          <option argLabel="verbose" shortName="v"/>
+          <option argLabel="quiet" shortName="q"/>
+          <option argLabel="debug" longName="debug"/>
+        </optionSet>
+        <argument argLabel="archive"/>
+        <repeat>
+          <argument argLabel="patterns"/>
+        </repeat>
+        <!-- TODO
+        <repeat>
+          <option argLabel="exclude" shortName="x"/>
+        </repeat>
+        <optional>
+          <option argLabel="extract-dir" shortName="d"/>
+        </optional>
+        -->
+      </sequence>
+    </syntax>
+    <syntax alias="zcat">
+      <empty description="decompress standard input to standard output" />
+      <repeat minCount="1">
+        <argument argLabel="files" />
+      </repeat>
+    </syntax>
+    <syntax alias="zip">
+      <sequence>
+        <optionSet>
+          <!-- ZipCommand -->
+          <option argLabel="files-stdin" shortName="@"/>
+          <option argLabel="tmp-dir" shortName="b"/>
+          <option argLabel="no-dirs" shortName="D"/>
+          <option argLabel="no-compress" shortName="n"/>
+          <option argLabel="recurse" shortName="r"/>
+          <!--<option argLabel="recurse-cd" shortName="R"/>-->
+          <option argLabel="newer" shortName="t"/>
+          <!--<option argLabel="older" shortName="tt"/>-->
+          <!-- Zip -->
+          <option argLabel="no-path" shortName="j"/>
+          <!-- Zip Operations -->
+          <option argLabel="delete" shortName="d"/>
+          <option argLabel="freshen" shortName="f"/>
+          <option argLabel="move" shortName="m"/>
+          <option argLabel="update" shortName="u"/>
+          <!-- ArchiveCommand -->
+          <option argLabel="quiet" shortName="q"/>
+          <option argLabel="verbose" shortName="v"/>
+          <option argLabel="debug" longName="debug"/>
+        </optionSet>
+        <argument argLabel="archive"/>
+        <repeat>
+          <argument argLabel="patterns"/>
+        </repeat>
+        <!-- TODO
+        <repeat>
+          <option argLabel="include" shortName="i"/>
+          <option argLabel="exclude" shortName="x"/>
+        </repeat>
+        -->
       </sequence>
     </syntax>
   </extension>
