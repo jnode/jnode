@@ -7,16 +7,11 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/classlib" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/ext" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/classpath/gnu" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/classpath/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/classpath/javax" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/classpath/tools" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/vm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/core" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/driver" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/emu" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/endorsed/nanoxml" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/icedtea" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/mmtk-vm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/vm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/template" isTestSource="false" />
