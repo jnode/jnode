@@ -3,6 +3,7 @@
 	<name>textui</name>
 	<comment></comment>
 	<projects>
+		<project>all</project>
 		<project>JNode-Core</project>
 		<project>JNode-Shell</project>
 	</projects>

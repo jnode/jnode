@@ -2,19 +2,8 @@
 <classpath>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/openjdk/vm"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/classlib"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/openjdk/svm"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/emu"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/endorsed/nanoxml"/>
-	<classpathentry excluding="**/*-template.java|**/.svn/**" kind="src" path="src/openjdk/sun"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/openjdk/org"/>
-	<classpathentry excluding="**/*-template.java|**/.svn/**" kind="src" path="src/openjdk/com"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/icedtea"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/gnu"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/openjdk/java"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/openjdk/javax"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/tools"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/java"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/javax"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/ext"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/vm"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/core"/>
@@ -37,5 +26,6 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/ant-contrib-1.0b3.jar"/>
+	<classpathentry kind="lib" path="/all/lib/classlib.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
