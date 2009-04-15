@@ -3,6 +3,7 @@
 	<name>builder</name>
 	<comment></comment>
 	<projects>
+		<project>all</project>
 		<project>JNode-Core</project>
 		<project>JNode-FS</project>
 	</projects>
