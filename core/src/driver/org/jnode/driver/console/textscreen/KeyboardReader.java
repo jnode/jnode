@@ -34,7 +34,7 @@ import org.jnode.util.ConsoleStream;
 
 
 /**
- * KeyboardInputStream maps keyboard events into a stream of characters.  Current functionality includes:
+ * KeyboardReader maps keyboard events into a stream of characters.  Current functionality includes:
  * <ul>
  * <li>line buffering and line editing, using a text console,
  * <li>integrated input history and completion,
