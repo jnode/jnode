@@ -20,32 +20,57 @@
 
 package org.jnode.fs.command.archive;
 
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.StringArgument;
+
 /**
  * @author chris boertien
  */
 public class ZipCommand extends Zip {
-/*
-    private static final String help_refresh = "freshen: only changed files";
-    private static final String help_delete = "delete entries in zip file";
-    private static final String help_move = "move into zipfile (delete files)";
-    private static final String help_recurse = "recurse into directories";
-    private static final String help_zfile = "zip file to oeprate on";
-    private static final String help_patterns = "search patterns";
+
+    private static final String help_files_stdin = "Read files from stdin";
+    private static final String help_tmpdir      = "Use this directory for storing the tmp archive";
+    private static final String help_no_dir      = "Do not add entries for directories";
+    private static final String help_no_compress = "Comma delimited list of suffixes that should be stored";
+    private static final String help_recurse     = "recurse into directories";
+    private static final String help_newer_than  = "only include files newer than the specified time";
+    private static final String help_older_than  = "only include files older than the specified time";
     
-    private final FileArgument ArgZipfile = new FileArgument("zipFile" , Argument.OPTIONAL , help_zfile);
-    private final StringArgument ArgPatterns 
-        = new StringArgument("patterns" , Argument.OPTIONAL | Argument.MULTIPLE , help_patterns);
-    private final FlagArgument ArgDelete = new FlagArgument("doDelete" , Argument.OPTIONAL , help_delete);
-    private final FlagArgument ArgRefresh = new FlagArgument("doRefresh" , Argument.OPTIONAL , help_refresh);
-    private final FlagArgument ArgMove = new FlagArgument("doMove" , Argument.OPTIONAL , help_move);
-    private final FlagArgument ArgRecurse = new FlagArgument("recurse" , Argument.OPTIONAL , help_recurse);
-    */
+    private final FlagArgument FilesStdin;
+    private final FlagArgument NoDirEntry;
+    private final FlagArgument Recurse;
+    private final FileArgument TmpDir;
+    private final StringArgument NoCompress;
+    private final StringArgument NewerThan;
+    private final StringArgument OlderThan;
+    
     public ZipCommand() {
         super("compress files into a zip archive");
-        //registerArguments(ArgZipfile, ArgPatterns, ArgDelete, ArgRefresh, ArgMove, ArgRecurse);
+        // from ArchiveCommand
+        registerArguments(Verbose, Quiet, Debug);
+        // from Zip
+        registerArguments(Archive, Patterns, NoPath, Delete, Freshen, Move, Update);
+        
+        FilesStdin   = new FlagArgument("files-stdin", Argument.OPTIONAL, help_files_stdin);
+        NoDirEntry   = new FlagArgument("no-dirs", Argument.OPTIONAL, help_no_dir);
+        Recurse      = new FlagArgument("recurse", Argument.OPTIONAL, help_recurse);
+        TmpDir       = new FileArgument("tmp-dir", Argument.OPTIONAL, help_tmpdir);
+        NoCompress   = new StringArgument("no-compress", Argument.OPTIONAL, help_no_compress);
+        NewerThan    = new StringArgument("newer", Argument.OPTIONAL, help_newer_than);
+        OlderThan    = new StringArgument("older", Argument.OPTIONAL, help_older_than);
+        registerArguments(FilesStdin, TmpDir, NoDirEntry, NoCompress, Recurse, NewerThan, OlderThan);
     }
     
+    @Override
     public void execute() {
+        recurse = Recurse.isSet();
+        noDirEntry = NoDirEntry.isSet();
+        filesStdin = FilesStdin.isSet();
+        if (NoCompress.isSet()) noCompress = NoCompress.getValue();
+        if (TmpDir.isSet()) tmpDir = TmpDir.getValue();
+        
         super.execute("zip");
     }
 }
