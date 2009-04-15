@@ -24,6 +24,7 @@ import org.jnode.shell.AbstractCommand;
 import org.jnode.vm.VmSystem;
 
 /**
+ * Show the system uptime.
  * @author Petri Airio (petriai@gmailcom)
  */
 public class UptimeCommand extends AbstractCommand {
