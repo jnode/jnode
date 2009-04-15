@@ -42,6 +42,7 @@ import java.util.ArrayList;
 /**
  * TODO add follow support
  * TODO add support for -c +<int> on stdin
+ * 
  * @author chris boertien
  */
 public class TailCommand extends AbstractCommand {
@@ -294,7 +295,7 @@ public class TailCommand extends AbstractCommand {
         }
         return false;
     }
-    
+
     private int parseInt(String s) {
         if (s.charAt(0) == '+') {
             s = s.substring(1);
