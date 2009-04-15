@@ -190,7 +190,7 @@ public class FileArgument extends Argument<File> {
             return ALLOW_DODGY_NAMES;
         } else if (name.equals("HYPHEN_IS_SPECIAL")) {
             return HYPHEN_IS_SPECIAL;
-        } else{
+        } else {
             return super.nameToFlag(name);
         }
     }

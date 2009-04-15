@@ -39,18 +39,14 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import org.jnode.shell.CommandLine.Token;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.IntegerArgument;
 import org.jnode.shell.syntax.StringArgument;
-import org.jnode.shell.syntax.CommandSyntaxException;
 
 /**
- * FIXME SHELL : shell expands globbers within quotes.
- * 
  * TODO check performance of prefixing, probably needs some buffering.
  * TODO implement outputting context lines (requires buffering output lines)
  * TODO implement Fixed/Basic/Ext matchers
