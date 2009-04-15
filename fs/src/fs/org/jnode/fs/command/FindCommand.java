@@ -1,3 +1,23 @@
+/*
+ * $Id: CdCommand.java 4975 2009-02-02 08:30:52Z lsantha $
+ *
+ * Copyright (C) 2003-2009 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 package org.jnode.fs.command;
 
 import java.io.File;
@@ -13,6 +33,13 @@ import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.LongArgument;
 import org.jnode.shell.syntax.StringArgument;
 
+/**
+ * <code>FindCommand</code> - search for files in a directory hierarchy
+ * 
+ * @author Alexander Kerner
+ * @see AbstractDirectoryWalker
+ * 
+ */
 public class FindCommand extends AbstractCommand {
 
     private class Walker extends AbstractDirectoryWalker {
@@ -31,21 +58,27 @@ public class FindCommand extends AbstractCommand {
         public void handleFile(File f) {
             out.println(f);
         }
-
     }
 
-    private final StringArgument nameArg = new StringArgument("name", Argument.OPTIONAL,
-        "filter results to show only files that match given pattern");
-    private final StringArgument inameArg = new StringArgument("iname", Argument.OPTIONAL,
-        "same like 'name', but case insensitive");
-    private final LongArgument maxdepthArg = new LongArgument("maxdepth", Argument.OPTIONAL,
-        "descent at most to given level of directories");
-    private final LongArgument mindepthArg = new LongArgument("mindepth", Argument.OPTIONAL,
-        "ignore files and directories at levels less than given level");
-    private final StringArgument typeArg = new StringArgument("type", Argument.OPTIONAL,
-        "filter results to show only files of given type. valid types are 'd' for directory and 'f' for file");
-    private final FileArgument dirArg = new FileArgument("directory", Argument.OPTIONAL | Argument.MULTIPLE,
-        "directory to start searching from");
+    private final StringArgument nameArg =
+            new StringArgument("name", Argument.OPTIONAL,
+                    "filter results to show only files that match given pattern");
+    private final StringArgument inameArg =
+            new StringArgument("iname", Argument.OPTIONAL, "same like 'name', but case insensitive");
+    private final LongArgument maxdepthArg =
+            new LongArgument("maxdepth", Argument.OPTIONAL,
+                    "descent at most to given level of directories");
+    private final LongArgument mindepthArg =
+            new LongArgument("mindepth", Argument.OPTIONAL,
+                    "ignore files and directories at levels less than given level");
+    private final StringArgument typeArg =
+            new StringArgument(
+                "type",
+                Argument.OPTIONAL,
+                "filter results to show only files of given type. valid types are 'd' for directory and 'f' for file");
+    private final FileArgument dirArg =
+            new FileArgument("directory", Argument.OPTIONAL | Argument.MULTIPLE,
+                    "directory to start searching from");
     private PrintWriter out = null;
     private PrintWriter err = null;
 
@@ -55,7 +88,6 @@ public class FindCommand extends AbstractCommand {
     }
 
     public static void main(String[] args) throws IOException {
-
         new FindCommand().execute();
     }
 
