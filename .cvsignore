@@ -12,3 +12,4 @@ udpout.log
 local
 bin
 classlib.jar
+all/lib/classlib-src.jar

@@ -7,3 +7,4 @@ build
 jnode.properties
 local/
 classlib.jar
+all/lib/classlib-src.jar
