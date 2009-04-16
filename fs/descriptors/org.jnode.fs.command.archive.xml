@@ -15,6 +15,7 @@
   <runtime>
     <library name="jnode-fs.jar">
       <export name="org.jnode.fs.command.archive.*" />
+      <export name="org.jnode.fs.command.AbstractDirectoryWalker" />
     </library>
   </runtime>
   
@@ -244,7 +245,7 @@
           <option argLabel="recurse" shortName="r"/>
           <!--<option argLabel="recurse-cd" shortName="R"/>-->
           <option argLabel="newer" shortName="t"/>
-          <!--<option argLabel="older" shortName="tt"/>-->
+          <option argLabel="older" longName="tt"/> 
           <!-- Zip -->
           <option argLabel="no-path" shortName="j"/>
           <!-- Zip Operations -->
@@ -259,14 +260,12 @@
         </optionSet>
         <argument argLabel="archive"/>
         <repeat>
-          <argument argLabel="patterns"/>
+          <alternatives>
+            <option argLabel="exclude" shortName="x"/>
+            <option argLabel="include" shortName="i"/>
+            <argument argLabel="patterns"/>
+          </alternatives>
         </repeat>
-        <!-- TODO
-        <repeat>
-          <option argLabel="include" shortName="i"/>
-          <option argLabel="exclude" shortName="x"/>
-        </repeat>
-        -->
       </sequence>
     </syntax>
   </extension>
