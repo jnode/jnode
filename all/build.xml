@@ -46,6 +46,7 @@
 	<property name="jnode-mmtk-nogc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.nogc"/>
 
     <property name="classlib.jar" value="${root.dir}/all/lib/classlib.jar"/>
+    <property name="classlib-src.jar" value="${root.dir}/all/lib/classlib-src.jar"/>
     <property name="ant.jar" value="${root.dir}/core/lib/ant.jar"/>
     <property name="ant-launcher.jar" value="${root.dir}/core/lib/ant-launcher.jar"/>
     <property name="commons-net.jar" value="${root.dir}/core/lib/commons-net-1.1.0.jar"/>
@@ -212,6 +213,19 @@
               <arg file="${root.dir}/all/lib/classlib.pack.gz"/>
               <arg file="${classlib.jar}"/>
             </exec>
+          </then>
+        </if>
+        <if>
+          <or>
+              <not>
+                <available file="${classlib-src.jar}" />
+              </not>
+              <uptodate srcfile="${classlib-src.jar}" targetfile="${root.dir}/all/lib/classlib-src.jar.bz2"/>
+          </or>
+          <then>
+            <delete file="${classlib-src.jar}"/>
+            <echo message="Creating ${classlib-src.jar}"/>
+            <bunzip2 src="${root.dir}/all/lib/classlib-src.jar.bz2" dest="${classlib-src.jar}"/>
           </then>
         </if>
         <property name="classlib.stamp" value="${root.dir}/all/build/classlib.stamp" />
