@@ -51,6 +51,7 @@ import org.jnode.driver.console.ConsoleListener;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.InputHistory;
 import org.jnode.driver.console.TextConsole;
+import org.jnode.driver.console.spi.ConsoleWriter;
 import org.jnode.driver.console.textscreen.KeyboardReader;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.alias.AliasManager;
@@ -62,6 +63,8 @@ import org.jnode.shell.io.CommandOutput;
 import org.jnode.shell.io.FanoutWriter;
 import org.jnode.shell.io.NullInputStream;
 import org.jnode.shell.io.NullOutputStream;
+import org.jnode.shell.io.ShellConsoleReader;
+import org.jnode.shell.io.ShellConsoleWriter;
 import org.jnode.shell.isolate.IsolateCommandInvoker;
 import org.jnode.shell.proclet.ProcletCommandInvoker;
 import org.jnode.shell.syntax.ArgumentBundle;
@@ -197,11 +200,14 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         debugEnabled = true;
         try {
             console = cons;
-            Reader in = console.getIn();
+            KeyboardReader in = (KeyboardReader) console.getIn();
+            ConsoleWriter out = (ConsoleWriter) console.getOut();
+            ConsoleWriter err = (ConsoleWriter) console.getErr();
             if (in == null) {
                 throw new ShellException("console input stream is null");
             }
-            setupStreams(in, console.getOut(), console.getErr());
+            setupStreams(new ShellConsoleReader(in), new ShellConsoleWriter(out),
+                    new ShellConsoleWriter(err));
             SystemInputStream.getInstance().initialize(new ReaderInputStream(in));
             cons.setCompleter(this);
 
