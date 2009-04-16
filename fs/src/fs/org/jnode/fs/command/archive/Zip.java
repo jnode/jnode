@@ -20,33 +20,24 @@
 
 package org.jnode.fs.command.archive;
 
-import org.jnode.shell.PathnamePattern;
-import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.FlagArgument;
-import org.jnode.shell.syntax.FileArgument;
-import org.jnode.shell.syntax.StringArgument;
-
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.io.PrintWriter;
-import java.io.IOException;
-
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.ArrayList;
-
 import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-
-import org.apache.tools.zip.AsiExtraField;
+import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipExtraField;
 import org.apache.tools.zip.ZipFile;
-import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipOutputStream;
+import org.jnode.shell.PathnamePattern;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.StringArgument;
 
 /**
  * @author chris boeriten
