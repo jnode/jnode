@@ -24,6 +24,7 @@ import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -35,6 +36,13 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
+import org.apache.tools.zip.ZipFile;
+
+/**
+ * This is a base class that holds some convenience methods for implementing archive commands.
+ *
+ * @author chris boertien
+ */
 public class ArchiveCommand extends AbstractCommand {
     
     private static final String help_verbose = "show the compression ratio for each file compressed";
@@ -76,6 +84,7 @@ public class ArchiveCommand extends AbstractCommand {
     protected OutputStream stdout;
     
     protected String commandName;
+    protected int rc;
     protected boolean use_stdout;
     protected boolean force;
     protected boolean compress;
@@ -95,6 +104,7 @@ public class ArchiveCommand extends AbstractCommand {
         stdin = getInput().getInputStream();
         stdout = getOutput().getOutputStream();
         
+        // FIXME get rid of this {
         if (command.equals("zcat") || command.equals("bzcat")) return;
         
         if (!command.equals("tar")) {
@@ -108,6 +118,7 @@ public class ArchiveCommand extends AbstractCommand {
             if (Verbose.isSet()) outMode |= OUT_NOTICE;
             if (Debug.isSet()) outMode |= OUT_DEBUG;
         }
+        // }
     }
     
     protected void createStreamBuffer(int size) {
@@ -247,14 +258,45 @@ public class ArchiveCommand extends AbstractCommand {
     }
     
     /**
+     * Convenience method for closing streams and writers.
+     */
+    protected void close(Closeable obj) {
+        if (obj != null) {
+            try {
+                obj.close();
+            } catch (IOException _) {
+                //ignore
+            }
+        }
+    }
+    
+    /**
+     * Convenience method for closing org.apache.tools.zip.ZipFile
+     */
+    protected void close(ZipFile zfile) {
+        if (zfile != null) {
+            try {
+                zfile.close();
+            } catch (IOException _) {
+                // ignore
+            }
+        }
+    }
+    
+    /**
      * Prompt the user with a question asking for a yes or no answer.
+     *
+     * FIXME This is unsafe as it will trigger an endless loop if stdin
+     *       is not the terminal.
      *
      * @param String the question to ask the user
      * @return true if the user said yes, false if the user said no
      */
     protected boolean prompt_yn(String s, boolean defaultY) {
         int choice;
-        for (;;) {
+        // put a cap on the looping to prevent non-terminal stdin 
+        // from an infinte loop
+        for (int i = 0; i < 10; i++) {
             stdoutWriter.print(s);
             try {
                 choice = stdinReader.read();
@@ -266,6 +308,8 @@ public class ArchiveCommand extends AbstractCommand {
             if (choice == 'n') return false;
             if (choice == '\n') return defaultY;
         }
+        
+        return false;
     }
     
     protected void out(String s) {

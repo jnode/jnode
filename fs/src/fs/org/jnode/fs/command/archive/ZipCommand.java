@@ -20,6 +20,9 @@
 
 package org.jnode.fs.command.archive;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.FileArgument;
@@ -37,6 +40,11 @@ public class ZipCommand extends Zip {
     private static final String help_recurse     = "recurse into directories";
     private static final String help_newer_than  = "only include files newer than the specified time";
     private static final String help_older_than  = "only include files older than the specified time";
+    private static final String help_exclude     = "do not includes files matching a pattern";
+    private static final String help_include     = "only includes files matching a pattern";
+    
+    private static final String fatal_bad_newer = "Invalid newer-than date: ";
+    private static final String fatal_bad_older = "Invalid older-than date: ";
     
     private final FlagArgument FilesStdin;
     private final FlagArgument NoDirEntry;
@@ -45,6 +53,8 @@ public class ZipCommand extends Zip {
     private final StringArgument NoCompress;
     private final StringArgument NewerThan;
     private final StringArgument OlderThan;
+    private final StringArgument Exclude;
+    private final StringArgument Include;
     
     public ZipCommand() {
         super("compress files into a zip archive");
@@ -56,11 +66,13 @@ public class ZipCommand extends Zip {
         FilesStdin   = new FlagArgument("files-stdin", Argument.OPTIONAL, help_files_stdin);
         NoDirEntry   = new FlagArgument("no-dirs", Argument.OPTIONAL, help_no_dir);
         Recurse      = new FlagArgument("recurse", Argument.OPTIONAL, help_recurse);
-        TmpDir       = new FileArgument("tmp-dir", Argument.OPTIONAL, help_tmpdir);
+        TmpDir       = new FileArgument("tmp-dir", Argument.OPTIONAL | Argument.EXISTING, help_tmpdir);
         NoCompress   = new StringArgument("no-compress", Argument.OPTIONAL, help_no_compress);
         NewerThan    = new StringArgument("newer", Argument.OPTIONAL, help_newer_than);
         OlderThan    = new StringArgument("older", Argument.OPTIONAL, help_older_than);
-        registerArguments(FilesStdin, TmpDir, NoDirEntry, NoCompress, Recurse, NewerThan, OlderThan);
+        Exclude      = new StringArgument("exclude", Argument.OPTIONAL | Argument.MULTIPLE, help_exclude);
+        Include      = new StringArgument("include", Argument.OPTIONAL | Argument.MULTIPLE, help_include);
+        registerArguments(FilesStdin, TmpDir, NoDirEntry, NoCompress, Recurse, NewerThan, OlderThan, Exclude, Include);
     }
     
     @Override
@@ -68,9 +80,40 @@ public class ZipCommand extends Zip {
         recurse = Recurse.isSet();
         noDirEntry = NoDirEntry.isSet();
         filesStdin = FilesStdin.isSet();
-        if (NoCompress.isSet()) noCompress = NoCompress.getValue();
         if (TmpDir.isSet()) tmpDir = TmpDir.getValue();
-        
+        /* FIXME
+        if (NewerThan.isSet()) {
+            try {
+                newer = DateFormat.getInstance().parse(NewerThan.getValue()).getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+                exit(1);
+            }
+        }
+        if (OlderThan.isSet()) {
+            try {
+                older = DateFormat.getInstance().parse(OlderThan.getValue()).getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+                exit(1);
+            }
+        }
+        */
+        if (NoCompress.isSet()) {
+            noCompress = NoCompress.getValue().split(":");
+        }
+        if (Exclude.isSet()) {
+            excludes = new ArrayList<String>(Exclude.getValues().length);
+            for (String pattern : Exclude.getValues()) {
+                excludes.add(pattern);
+            }
+        }
+        if (Include.isSet()) {
+            includes = new ArrayList<String>(Include.getValues().length);
+            for (String pattern : Include.getValues()) {
+                includes.add(pattern);
+            }
+        }
         super.execute("zip");
     }
 }

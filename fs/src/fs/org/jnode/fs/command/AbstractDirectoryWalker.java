@@ -28,6 +28,10 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.List;
 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+import org.jnode.shell.PathnamePattern;
 /**
  * <p>
  * <code>AbstractDirectoryWalker</code> - walk through a directory hierarchy
@@ -52,6 +56,66 @@ public abstract class AbstractDirectoryWalker {
         FileObject(File file, Long depth) {
             this.file = file;
             this.depth = depth;
+        }
+    }
+    
+    public static class PathnamePatternFilter implements FileFilter {
+        
+        private Matcher matcher;
+        private boolean exclude;
+        
+        public PathnamePatternFilter(String pattern, boolean exclude) {
+            this.exclude = exclude;
+            this.matcher = PathnamePattern.compilePosixShellPattern(pattern, 0).matcher("");
+        }
+        
+        public boolean accept(File file) {
+            return matcher.reset(file.getName()).matches() ^ exclude;
+        }
+    }
+    
+    public static class RegexPatternFilter implements FileFilter {
+        
+        private Matcher matcher;
+        private boolean exclude;
+        
+        public RegexPatternFilter(String pattern, boolean exclude) {
+            this.exclude = exclude;
+            this.matcher = Pattern.compile(pattern).matcher("");
+        }
+        
+        public boolean accept(File file) {
+            return matcher.reset(file.getName()).matches() ^ exclude;
+        }
+    }
+    
+    public static class ModTimeFilter implements FileFilter {
+        
+        private long modTime;
+        private boolean newer;
+        
+        public ModTimeFilter(long time, boolean newer) {
+            this.modTime = time;
+            this.newer = newer;
+        }
+        
+        public boolean accept(File file) {
+            return file.lastModified() == modTime || ((file.lastModified() < modTime) ^ newer);
+        }
+    }
+    
+    public static class SizeFilter implements FileFilter {
+        
+        private long size;
+        private boolean greater;
+        
+        public SizeFilter(long size, boolean greater) {
+            this.size = size;
+            this.greater = greater;
+        }
+        
+        public boolean accept(File file) {
+            return file.length() == size || ((file.length() < size) ^ greater);
         }
     }
 
@@ -87,7 +151,7 @@ public abstract class AbstractDirectoryWalker {
     }
     
     public synchronized void walk(final List<File> dirs) throws IOException {
-        walk(dirs.toArray(new File[0]));
+        walk(dirs.toArray(new File[dirs.size() ]));
     }
     
     private void handle(final FileObject file) throws IOException {
