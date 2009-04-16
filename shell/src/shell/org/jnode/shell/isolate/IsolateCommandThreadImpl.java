@@ -43,6 +43,7 @@ import org.jnode.shell.CommandThread;
 import org.jnode.shell.ShellInvocationException;
 import org.jnode.shell.ThreadExitListener;
 import org.jnode.shell.io.CommandIO;
+import org.jnode.shell.io.ShellConsoleWriter;
 import org.jnode.util.ReaderInputStream;
 import org.jnode.util.WriterOutputStream;
 import org.jnode.vm.isolate.ObjectLinkMessage;
@@ -110,7 +111,8 @@ public class IsolateCommandThreadImpl implements CommandThread {
     private Socket createSocketForOutput(Closeable closeable) throws IOException {
         OutputStream out;
         if (closeable instanceof Writer) {
-            out = new WriterOutputStream((Writer) closeable);        
+            boolean isConsole = closeable instanceof ShellConsoleWriter;
+            out = new WriterOutputStream((Writer) closeable, !isConsole);        
         } else {
             out = (OutputStream) closeable;
         }

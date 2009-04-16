@@ -67,7 +67,8 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
     
     public synchronized OutputStream getOutputStream() {
         if (outputStream == null) {
-            outputStream = new WriterOutputStream(writer, getEncoding());
+            boolean isConsole = writer instanceof ShellConsoleWriter;
+            outputStream = new WriterOutputStream(writer, getEncoding(), !isConsole);
         }
         return outputStream;
     }

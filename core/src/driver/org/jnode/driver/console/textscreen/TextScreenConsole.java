@@ -110,8 +110,8 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
         this.scrHeight = screen.getHeight();
         this.out = new ConsoleWriter(this, 0x07);
         this.err = new ConsoleWriter(this, 0x04);
-        this.savedOut = new PrintStream(new WriterOutputStream(this.out), true);
-        this.savedErr = new PrintStream(new WriterOutputStream(this.err), true);
+        this.savedOut = new PrintStream(new WriterOutputStream(this.out, false), true);
+        this.savedErr = new PrintStream(new WriterOutputStream(this.err, false), true);
         this.claimSystemOutErr = false;
         this.myIsolate = VmIsolate.currentIsolate();
     }

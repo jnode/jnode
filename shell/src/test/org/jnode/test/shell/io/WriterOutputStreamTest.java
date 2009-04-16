@@ -32,7 +32,7 @@ public class WriterOutputStreamTest extends TestCase {
     public void testEmpty() throws Exception {
         String LINE = "";
         StringWriter sw = new StringWriter();
-        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8");
+        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8", true);
         byte[] buffer = LINE.getBytes();
         wos.write(buffer);
         wos.flush();
@@ -42,7 +42,7 @@ public class WriterOutputStreamTest extends TestCase {
     public void testLine() throws Exception {
         String LINE = "The quick brown fox jumped over the lazy doc";
         StringWriter sw = new StringWriter();
-        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8");
+        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8", true);
         byte[] buffer = LINE.getBytes();
         wos.write(buffer);
         wos.flush();
@@ -52,7 +52,7 @@ public class WriterOutputStreamTest extends TestCase {
     public void testByteAtATime() throws Exception {
         String LINE = "The quick brown fox jumped over the lazy doc";
         StringWriter sw = new StringWriter();
-        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8");
+        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8", true);
         byte[] buffer = LINE.getBytes();
         for (byte b : buffer) {
             wos.write(b);
@@ -64,7 +64,7 @@ public class WriterOutputStreamTest extends TestCase {
     public void testByteAtATimeWithFlushes() throws Exception {
         String LINE = "The quick brown fox jumped over the lazy doc";
         StringWriter sw = new StringWriter();
-        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8");
+        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8", true);
         byte[] buffer = LINE.getBytes();
         for (int i = 0; i < buffer.length; i++) {
             wos.write(buffer[i]);
@@ -81,7 +81,7 @@ public class WriterOutputStreamTest extends TestCase {
         }
         byte[] buffer = new String(chars).getBytes();
         StringWriter sw = new StringWriter();
-        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8");
+        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8", true);
         wos.write(buffer);
         wos.flush();
         StringBuffer sb = sw.getBuffer();
@@ -94,7 +94,7 @@ public class WriterOutputStreamTest extends TestCase {
     public void testBadUnicode() throws Exception {
         byte[] BAD = new byte[] {(byte) 0x80};
         StringWriter sw = new StringWriter();
-        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8");
+        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8", true);
         try {
             wos.write(BAD);
             wos.flush();
@@ -107,7 +107,7 @@ public class WriterOutputStreamTest extends TestCase {
     public void testBadUnicode2() throws Exception {
         byte[] BAD = new byte[] {(byte) 'h', (byte) 'i', (byte) 0x80};
         StringWriter sw = new StringWriter();
-        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8");
+        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8", true);
         try {
             wos.write(BAD);
             wos.flush();
@@ -121,7 +121,7 @@ public class WriterOutputStreamTest extends TestCase {
     public void testBadUnicode3() throws Exception {
         byte[] BAD = new byte[] {(byte) 'h', (byte) 'i', (byte) 0xc2, (byte) 0x00};
         StringWriter sw = new StringWriter();
-        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8");
+        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8", true);
         try {
             wos.write(BAD);
             wos.flush();
@@ -135,7 +135,7 @@ public class WriterOutputStreamTest extends TestCase {
     public void testBadUnicode4() throws Exception {
         byte[] BAD = new byte[] {(byte) 'h', (byte) 'i', (byte) 0xc2};
         StringWriter sw = new StringWriter();
-        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8");
+        WriterOutputStream wos = new WriterOutputStream(sw, "UTF-8", true);
         wos.write(BAD);
         wos.flush();
         try {

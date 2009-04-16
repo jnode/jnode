@@ -41,6 +41,9 @@ public class ShellConsoleWriter extends ConsoleWriter {
         this.writer = writer;
     }
 
+    /**
+     * The close method flushes the underlying stream but does not close it.
+     */
     @Override
     public void close() throws IOException {
         flush();

@@ -44,6 +44,9 @@ public class ShellConsoleReader extends KeyboardReader {
         this.reader = reader;
     }
 
+    /**
+     * Calling close has no effect.
+     */
     @Override
     public void close() throws IOException {
         // Do nothing

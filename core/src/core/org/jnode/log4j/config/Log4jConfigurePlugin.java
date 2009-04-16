@@ -79,7 +79,7 @@ public class Log4jConfigurePlugin extends Plugin {
             final VirtualConsoleAppender debugApp =
                 new VirtualConsoleAppender(new PatternLayout(LAYOUT), console, false);
             debugApp.setThreshold(Level.DEBUG);
-            BootLog.setDebugOut(new PrintStream(new WriterOutputStream(console.getOut()), true));
+            BootLog.setDebugOut(new PrintStream(new WriterOutputStream(console.getOut(), false), true));
 
             TextConsole atc = new ActiveTextConsole(conMgr);
             final VirtualConsoleAppender infoApp = new VirtualConsoleAppender(
