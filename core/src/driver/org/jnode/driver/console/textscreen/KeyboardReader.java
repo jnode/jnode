@@ -93,7 +93,25 @@ public class KeyboardReader extends Reader
 
     private final KeyboardHandler keyboardHandler;
     private final FocusListener focusListener;
+    
+    /**
+     * This constructor is used by wrappers.
+     */
+    protected KeyboardReader() {
+        this.keyboardHandler = null;
+        this.focusListener = null;
+        this.currentLine = null;
+        this.out = null;
+        this.console = null;
+    }
 
+    /**
+     * Create KeyboardReader using the supplied handler as the source of
+     * keyboard events and the supplied TextConsole to echo typed characters.
+     * 
+     * @param kbHandler
+     * @param console
+     */
     public KeyboardReader(KeyboardHandler kbHandler, TextConsole console) {
         this.keyboardHandler = kbHandler;
         this.console = console;
