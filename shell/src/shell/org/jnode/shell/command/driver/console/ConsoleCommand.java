@@ -120,8 +120,8 @@ public class ConsoleCommand extends AbstractCommand {
                 final PrintWriter out = new PrintWriter(new OutputStreamWriter(System.out));
                 TextConsole console = createConsoleWithShell(conMgr, out);
                 System.setIn(new ReaderInputStream(console.getIn()));
-                System.setOut(new PrintStream(new WriterOutputStream(console.getOut()), true));
-                System.setErr(new PrintStream(new WriterOutputStream(console.getErr()), true));
+                System.setOut(new PrintStream(new WriterOutputStream(console.getOut(), false), true));
+                System.setErr(new PrintStream(new WriterOutputStream(console.getErr(), false), true));
             } catch (Exception ex) {
                 // FIXME
                 System.out.println("Problem creating the isolated console");

@@ -62,8 +62,8 @@ public class TextScreenConsolePlugin extends Plugin {
                 (ConsoleManager.CreateOptions.TEXT |
                     ConsoleManager.CreateOptions.SCROLLABLE));
             mgr.focus(first);
-            System.setOut(new PrintStream(new WriterOutputStream(first.getOut()), true));
-            System.setErr(new PrintStream(new WriterOutputStream(first.getErr()), true));
+            System.setOut(new PrintStream(new WriterOutputStream(first.getOut(), false), true));
+            System.setErr(new PrintStream(new WriterOutputStream(first.getErr(), false), true));
             System.out.println(VmSystem.getBootLog());
         } catch (ConsoleException ex) {
             throw new PluginException(ex);

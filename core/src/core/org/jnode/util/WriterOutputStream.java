@@ -42,16 +42,31 @@ public class WriterOutputStream extends OutputStream {
     
     private Writer writer;
     private CharsetDecoder decoder;
+    private final boolean reallyClose;
     
-    public WriterOutputStream(Writer writer) {
-        this(writer, Charset.defaultCharset().name());
+    /**
+     * Construct an OutputStream that encodes the data in the default character coding system.
+     * @param writer the Writer to be wrapped
+     * @param reallyClose if {@code true}, calling {@link #close()} will close
+     *    the Writer; otherwise {@link #close()} means {@link #flush()}.
+     */
+    public WriterOutputStream(Writer writer, boolean reallyClose) {
+        this(writer, Charset.defaultCharset().name(), reallyClose);
     }
 
-    public WriterOutputStream(Writer writer, String encoding) {
+    /**
+     * Construct an OutputStream that encodes the data in the supplied character coding system.
+     * @param writer the Writer to be wrapped
+     * @param encoding the name of a character coding system.
+     * @param reallyClose if {@code true}, calling {@link #close()} will close
+     *    the Writer; otherwise {@link #close()} means {@link #flush()}.
+     */
+    public WriterOutputStream(Writer writer, String encoding, boolean reallyClose) {
         this.writer = writer;
         this.decoder = Charset.forName(encoding).newDecoder();
-        bytes.clear();
-        chars.clear();
+        this.bytes.clear();
+        this.chars.clear();
+        this.reallyClose = reallyClose;
     }
 
     @Override
@@ -70,7 +85,7 @@ public class WriterOutputStream extends OutputStream {
     
     @Override
     public void close() throws IOException {
-        flush(true);
+        flush(reallyClose);
         writer.close();
     }
 
