@@ -363,9 +363,15 @@ public abstract class Argument<V> {
             throw new SyntaxFailureException(
                     "This Argument is not associated with an ArgumentBundle");
         }
-        // FIXME ... complete this
-        switch (bundle.getStatus()) {
         
+        switch (bundle.getStatus()) {
+            case ArgumentBundle.UNPARSED:
+                throw new SyntaxFailureException(
+                        "This Argument's ArgumentBundle has not been " +
+                        "populated by the syntax parser");
+            case ArgumentBundle.PARSE_FAILED:
+                throw new SyntaxFailureException(
+                        "The syntax parser failed for this Argument's ArgumentBundle");
         }
     }
 
