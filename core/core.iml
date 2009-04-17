@@ -87,12 +87,14 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" exported="">
-      <library>
+      <library name="classlib">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../all/lib/classlib.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/../all/lib/classlib-src.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>
