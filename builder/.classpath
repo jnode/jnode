@@ -10,6 +10,6 @@
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/bcel-5.1.jar"/>
 	<classpathentry kind="lib" path="/shell/lib/nanoxml-2.2.3.jar"/>
-	<classpathentry kind="lib" path="/all/lib/classlib.jar"/>
+	<classpathentry kind="lib" path="/all/lib/classlib.jar" sourcepath="/all/lib/classlib-src.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
