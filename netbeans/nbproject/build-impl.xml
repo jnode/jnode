@@ -68,7 +68,10 @@ is divided into following sections:
         </condition>
         <condition property="have.sources">
             <or>
+                <available file="${src.template.dir}"/>
+                <available file="${src.emu3.dir}"/>
                 <available file="${src.core.dir}"/>
+                <available file="${src.emu2.dir}"/>
                 <available file="${src.apps.dir}"/>
                 <available file="${src.emu.dir}"/>
                 <available file="${src.install.dir}"/>
@@ -93,23 +96,13 @@ is divided into following sections:
                 <available file="${src.textui.dir}"/>
                 <available file="${src.driver5.dir}"/>
                 <available file="${src.nanoxml.dir}"/>
-                <available file="${src.icedtea.dir}"/>
                 <available file="${src.mmtk-vm.dir}"/>
-                <available file="${src.com.dir}"/>
-                <available file="${src.java.dir}"/>
-                <available file="${src.javax.dir}"/>
-                <available file="${src.org.dir}"/>
-                <available file="${src.sun.dir}"/>
                 <available file="${src.vm.dir}"/>
                 <available file="${src.test7.dir}"/>
                 <available file="${src.vmmagic.dir}"/>
                 <available file="${src.dir}"/>
                 <available file="${configure.dir}"/>
                 <available file="${ext.dir}"/>
-                <available file="${gnu.dir}"/>
-                <available file="${java.dir}"/>
-                <available file="${javax.dir}"/>
-                <available file="${tools.dir}"/>
                 <available file="${vm.dir}"/>
             </or>
         </condition>
@@ -164,7 +157,10 @@ is divided into following sections:
         <!-- You can override this target in the ../build.xml file. -->
     </target>
     <target depends="-pre-init,-init-private,-init-user,-init-project,-do-init" name="-init-check">
+        <fail unless="src.template.dir">Must set src.template.dir</fail>
+        <fail unless="src.emu3.dir">Must set src.emu3.dir</fail>
         <fail unless="src.core.dir">Must set src.core.dir</fail>
+        <fail unless="src.emu2.dir">Must set src.emu2.dir</fail>
         <fail unless="src.apps.dir">Must set src.apps.dir</fail>
         <fail unless="src.emu.dir">Must set src.emu.dir</fail>
         <fail unless="src.install.dir">Must set src.install.dir</fail>
@@ -189,23 +185,13 @@ is divided into following sections:
         <fail unless="src.textui.dir">Must set src.textui.dir</fail>
         <fail unless="src.driver5.dir">Must set src.driver5.dir</fail>
         <fail unless="src.nanoxml.dir">Must set src.nanoxml.dir</fail>
-        <fail unless="src.icedtea.dir">Must set src.icedtea.dir</fail>
         <fail unless="src.mmtk-vm.dir">Must set src.mmtk-vm.dir</fail>
-        <fail unless="src.com.dir">Must set src.com.dir</fail>
-        <fail unless="src.java.dir">Must set src.java.dir</fail>
-        <fail unless="src.javax.dir">Must set src.javax.dir</fail>
-        <fail unless="src.org.dir">Must set src.org.dir</fail>
-        <fail unless="src.sun.dir">Must set src.sun.dir</fail>
         <fail unless="src.vm.dir">Must set src.vm.dir</fail>
         <fail unless="src.test7.dir">Must set src.test7.dir</fail>
         <fail unless="src.vmmagic.dir">Must set src.vmmagic.dir</fail>
         <fail unless="src.dir">Must set src.dir</fail>
         <fail unless="configure.dir">Must set configure.dir</fail>
         <fail unless="ext.dir">Must set ext.dir</fail>
-        <fail unless="gnu.dir">Must set gnu.dir</fail>
-        <fail unless="java.dir">Must set java.dir</fail>
-        <fail unless="javax.dir">Must set javax.dir</fail>
-        <fail unless="tools.dir">Must set tools.dir</fail>
         <fail unless="vm.dir">Must set vm.dir</fail>
         <fail unless="build.dir">Must set build.dir</fail>
         <fail unless="dist.dir">Must set dist.dir</fail>
@@ -227,13 +213,13 @@ is divided into following sections:
     </target>
     <target name="-init-macrodef-javac">
         <macrodef name="javac" uri="http://www.netbeans.org/ns/j2se-project/3">
-            <attribute default="${src.core.dir}:${src.apps.dir}:${src.emu.dir}:${src.install.dir}:${src.test.dir}:${src.driver.dir}:${src.fs.dir}:${src.test2.dir}:${src.awt.dir}:${src.desktop.dir}:${src.driver2.dir}:${src.font.dir}:${src.test3.dir}:${src.thinlet.dir}:${src.driver3.dir}:${src.net.dir}:${src.test4.dir}:${src.shell.dir}:${src.test5.dir}:${src.driver4.dir}:${src.sound.dir}:${src.test6.dir}:${src.textui.dir}:${src.driver5.dir}:${src.nanoxml.dir}:${src.icedtea.dir}:${src.mmtk-vm.dir}:${src.com.dir}:${src.java.dir}:${src.javax.dir}:${src.org.dir}:${src.sun.dir}:${src.vm.dir}:${src.test7.dir}:${src.vmmagic.dir}:${src.dir}:${configure.dir}:${ext.dir}:${gnu.dir}:${java.dir}:${javax.dir}:${tools.dir}:${vm.dir}" name="srcdir"/>
+            <attribute default="${src.template.dir}:${src.emu3.dir}:${src.core.dir}:${src.emu2.dir}:${src.apps.dir}:${src.emu.dir}:${src.install.dir}:${src.test.dir}:${src.driver.dir}:${src.fs.dir}:${src.test2.dir}:${src.awt.dir}:${src.desktop.dir}:${src.driver2.dir}:${src.font.dir}:${src.test3.dir}:${src.thinlet.dir}:${src.driver3.dir}:${src.net.dir}:${src.test4.dir}:${src.shell.dir}:${src.test5.dir}:${src.driver4.dir}:${src.sound.dir}:${src.test6.dir}:${src.textui.dir}:${src.driver5.dir}:${src.nanoxml.dir}:${src.mmtk-vm.dir}:${src.vm.dir}:${src.test7.dir}:${src.vmmagic.dir}:${src.dir}:${configure.dir}:${ext.dir}:${vm.dir}" name="srcdir"/>
             <attribute default="${build.classes.dir}" name="destdir"/>
             <attribute default="${javac.classpath}" name="classpath"/>
             <attribute default="${includes}" name="includes"/>
             <attribute default="${excludes}" name="excludes"/>
             <attribute default="${javac.debug}" name="debug"/>
-            <attribute default="" name="sourcepath"/>
+            <attribute default="/does/not/exist" name="sourcepath"/>
             <element name="customize" optional="true"/>
             <sequential>
                 <javac debug="@{debug}" deprecation="${javac.deprecation}" destdir="@{destdir}" encoding="${source.encoding}" excludes="@{excludes}" includeantruntime="false" includes="@{includes}" source="${javac.source}" sourcepath="@{sourcepath}" srcdir="@{srcdir}" target="${javac.target}">
@@ -246,7 +232,7 @@ is divided into following sections:
             </sequential>
         </macrodef>
         <macrodef name="depend" uri="http://www.netbeans.org/ns/j2se-project/3">
-            <attribute default="${src.core.dir}:${src.apps.dir}:${src.emu.dir}:${src.install.dir}:${src.test.dir}:${src.driver.dir}:${src.fs.dir}:${src.test2.dir}:${src.awt.dir}:${src.desktop.dir}:${src.driver2.dir}:${src.font.dir}:${src.test3.dir}:${src.thinlet.dir}:${src.driver3.dir}:${src.net.dir}:${src.test4.dir}:${src.shell.dir}:${src.test5.dir}:${src.driver4.dir}:${src.sound.dir}:${src.test6.dir}:${src.textui.dir}:${src.driver5.dir}:${src.nanoxml.dir}:${src.icedtea.dir}:${src.mmtk-vm.dir}:${src.com.dir}:${src.java.dir}:${src.javax.dir}:${src.org.dir}:${src.sun.dir}:${src.vm.dir}:${src.test7.dir}:${src.vmmagic.dir}:${src.dir}:${configure.dir}:${ext.dir}:${gnu.dir}:${java.dir}:${javax.dir}:${tools.dir}:${vm.dir}" name="srcdir"/>
+            <attribute default="${src.template.dir}:${src.emu3.dir}:${src.core.dir}:${src.emu2.dir}:${src.apps.dir}:${src.emu.dir}:${src.install.dir}:${src.test.dir}:${src.driver.dir}:${src.fs.dir}:${src.test2.dir}:${src.awt.dir}:${src.desktop.dir}:${src.driver2.dir}:${src.font.dir}:${src.test3.dir}:${src.thinlet.dir}:${src.driver3.dir}:${src.net.dir}:${src.test4.dir}:${src.shell.dir}:${src.test5.dir}:${src.driver4.dir}:${src.sound.dir}:${src.test6.dir}:${src.textui.dir}:${src.driver5.dir}:${src.nanoxml.dir}:${src.mmtk-vm.dir}:${src.vm.dir}:${src.test7.dir}:${src.vmmagic.dir}:${src.dir}:${configure.dir}:${ext.dir}:${vm.dir}" name="srcdir"/>
             <attribute default="${build.classes.dir}" name="destdir"/>
             <attribute default="${javac.classpath}" name="classpath"/>
             <sequential>
@@ -295,13 +281,13 @@ is divided into following sections:
             </sequential>
         </macrodef>
     </target>
-    <target name="-init-macrodef-nbjpda">
+    <target depends="-init-debug-args" name="-init-macrodef-nbjpda">
         <macrodef name="nbjpdastart" uri="http://www.netbeans.org/ns/j2se-project/1">
             <attribute default="${main.class}" name="name"/>
             <attribute default="${debug.classpath}" name="classpath"/>
             <attribute default="" name="stopclassname"/>
             <sequential>
-                <nbjpdastart addressproperty="jpda.address" name="@{name}" stopclassname="@{stopclassname}" transport="dt_socket">
+                <nbjpdastart addressproperty="jpda.address" name="@{name}" stopclassname="@{stopclassname}" transport="${debug-transport}">
                     <classpath>
                         <path path="@{classpath}"/>
                     </classpath>
@@ -332,6 +318,12 @@ is divided into following sections:
         <condition else="-Xdebug" property="debug-args-line" value="-Xdebug -Xnoagent -Djava.compiler=none">
             <istrue value="${have-jdk-older-than-1.4}"/>
         </condition>
+        <condition else="dt_socket" property="debug-transport-by-os" value="dt_shmem">
+            <os family="windows"/>
+        </condition>
+        <condition else="${debug-transport-by-os}" property="debug-transport" value="${debug.transport}">
+            <isset property="debug.transport"/>
+        </condition>
     </target>
     <target depends="-init-debug-args" name="-init-macrodef-debug">
         <macrodef name="debug" uri="http://www.netbeans.org/ns/j2se-project/3">
@@ -341,7 +333,7 @@ is divided into following sections:
             <sequential>
                 <java classname="@{classname}" dir="${work.dir}" fork="true">
                     <jvmarg line="${debug-args-line}"/>
-                    <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+                    <jvmarg value="-Xrunjdwp:transport=${debug-transport},address=${jpda.address}"/>
                     <jvmarg line="${run.jvmargs}"/>
                     <classpath>
                         <path path="@{classpath}"/>
@@ -388,6 +380,13 @@ is divided into following sections:
                 ===================
             -->
     <target depends="init" name="deps-jar" unless="no.deps"/>
+    <target depends="init,-check-automatic-build,-clean-after-automatic-build" name="-verify-automatic-build"/>
+    <target depends="init" name="-check-automatic-build">
+        <available file="${build.classes.dir}/.netbeans_automatic_build" property="netbeans.automatic.build"/>
+    </target>
+    <target depends="init" if="netbeans.automatic.build" name="-clean-after-automatic-build">
+        <antcall target="clean"/>
+    </target>
     <target depends="init,deps-jar" name="-pre-pre-compile">
         <mkdir dir="${build.classes.dir}"/>
     </target>
@@ -401,7 +400,10 @@ is divided into following sections:
     <target depends="init,deps-jar,-pre-pre-compile,-pre-compile,-compile-depend" if="have.sources" name="-do-compile">
         <j2seproject3:javac/>
         <copy todir="${build.classes.dir}">
+            <fileset dir="${src.template.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
+            <fileset dir="${src.emu3.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${src.core.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
+            <fileset dir="${src.emu2.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${src.apps.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${src.emu.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${src.install.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
@@ -426,23 +428,13 @@ is divided into following sections:
             <fileset dir="${src.textui.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${src.driver5.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${src.nanoxml.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
-            <fileset dir="${src.icedtea.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${src.mmtk-vm.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
-            <fileset dir="${src.com.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
-            <fileset dir="${src.java.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
-            <fileset dir="${src.javax.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
-            <fileset dir="${src.org.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
-            <fileset dir="${src.sun.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${src.vm.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${src.test7.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${src.vmmagic.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${src.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${configure.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${ext.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
-            <fileset dir="${gnu.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
-            <fileset dir="${java.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
-            <fileset dir="${javax.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
-            <fileset dir="${tools.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${vm.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
         </copy>
     </target>
@@ -450,7 +442,7 @@ is divided into following sections:
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target depends="init,deps-jar,-pre-pre-compile,-pre-compile,-do-compile,-post-compile" description="Compile project." name="compile"/>
+    <target depends="init,deps-jar,-verify-automatic-build,-pre-pre-compile,-pre-compile,-do-compile,-post-compile" description="Compile project." name="compile"/>
     <target name="-pre-compile-single">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
@@ -458,13 +450,13 @@ is divided into following sections:
     <target depends="init,deps-jar,-pre-pre-compile" name="-do-compile-single">
         <fail unless="javac.includes">Must select some files in the IDE or set javac.includes</fail>
         <j2seproject3:force-recompile/>
-        <j2seproject3:javac excludes="" includes="${javac.includes}" sourcepath="${src.core.dir}:${src.apps.dir}:${src.emu.dir}:${src.install.dir}:${src.test.dir}:${src.driver.dir}:${src.fs.dir}:${src.test2.dir}:${src.awt.dir}:${src.desktop.dir}:${src.driver2.dir}:${src.font.dir}:${src.test3.dir}:${src.thinlet.dir}:${src.driver3.dir}:${src.net.dir}:${src.test4.dir}:${src.shell.dir}:${src.test5.dir}:${src.driver4.dir}:${src.sound.dir}:${src.test6.dir}:${src.textui.dir}:${src.driver5.dir}:${src.nanoxml.dir}:${src.icedtea.dir}:${src.mmtk-vm.dir}:${src.com.dir}:${src.java.dir}:${src.javax.dir}:${src.org.dir}:${src.sun.dir}:${src.vm.dir}:${src.test7.dir}:${src.vmmagic.dir}:${src.dir}:${configure.dir}:${ext.dir}:${gnu.dir}:${java.dir}:${javax.dir}:${tools.dir}:${vm.dir}"/>
+        <j2seproject3:javac excludes="" includes="${javac.includes}" sourcepath="${src.template.dir}:${src.emu3.dir}:${src.core.dir}:${src.emu2.dir}:${src.apps.dir}:${src.emu.dir}:${src.install.dir}:${src.test.dir}:${src.driver.dir}:${src.fs.dir}:${src.test2.dir}:${src.awt.dir}:${src.desktop.dir}:${src.driver2.dir}:${src.font.dir}:${src.test3.dir}:${src.thinlet.dir}:${src.driver3.dir}:${src.net.dir}:${src.test4.dir}:${src.shell.dir}:${src.test5.dir}:${src.driver4.dir}:${src.sound.dir}:${src.test6.dir}:${src.textui.dir}:${src.driver5.dir}:${src.nanoxml.dir}:${src.mmtk-vm.dir}:${src.vm.dir}:${src.test7.dir}:${src.vmmagic.dir}:${src.dir}:${configure.dir}:${ext.dir}:${vm.dir}"/>
     </target>
     <target name="-post-compile-single">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target depends="init,deps-jar,-pre-pre-compile,-pre-compile-single,-do-compile-single,-post-compile-single" name="compile-single"/>
+    <target depends="init,deps-jar,-verify-automatic-build,-pre-pre-compile,-pre-compile-single,-do-compile-single,-post-compile-single" name="compile-single"/>
     <!--
                 ====================
                 JAR BUILDING SECTION
@@ -592,7 +584,16 @@ is divided into following sections:
             <classpath>
                 <path path="${javac.classpath}"/>
             </classpath>
+            <fileset dir="${src.template.dir}" excludes="${excludes}" includes="${includes}">
+                <filename name="**/*.java"/>
+            </fileset>
+            <fileset dir="${src.emu3.dir}" excludes="${excludes}" includes="${includes}">
+                <filename name="**/*.java"/>
+            </fileset>
             <fileset dir="${src.core.dir}" excludes="${excludes}" includes="${includes}">
+                <filename name="**/*.java"/>
+            </fileset>
+            <fileset dir="${src.emu2.dir}" excludes="${excludes}" includes="${includes}">
                 <filename name="**/*.java"/>
             </fileset>
             <fileset dir="${src.apps.dir}" excludes="${excludes}" includes="${includes}">
@@ -667,25 +668,7 @@ is divided into following sections:
             <fileset dir="${src.nanoxml.dir}" excludes="${excludes}" includes="${includes}">
                 <filename name="**/*.java"/>
             </fileset>
-            <fileset dir="${src.icedtea.dir}" excludes="${excludes}" includes="${includes}">
-                <filename name="**/*.java"/>
-            </fileset>
             <fileset dir="${src.mmtk-vm.dir}" excludes="${excludes}" includes="${includes}">
-                <filename name="**/*.java"/>
-            </fileset>
-            <fileset dir="${src.com.dir}" excludes="${excludes}" includes="${includes}">
-                <filename name="**/*.java"/>
-            </fileset>
-            <fileset dir="${src.java.dir}" excludes="${excludes}" includes="${includes}">
-                <filename name="**/*.java"/>
-            </fileset>
-            <fileset dir="${src.javax.dir}" excludes="${excludes}" includes="${includes}">
-                <filename name="**/*.java"/>
-            </fileset>
-            <fileset dir="${src.org.dir}" excludes="${excludes}" includes="${includes}">
-                <filename name="**/*.java"/>
-            </fileset>
-            <fileset dir="${src.sun.dir}" excludes="${excludes}" includes="${includes}">
                 <filename name="**/*.java"/>
             </fileset>
             <fileset dir="${src.vm.dir}" excludes="${excludes}" includes="${includes}">
@@ -704,18 +687,6 @@ is divided into following sections:
                 <filename name="**/*.java"/>
             </fileset>
             <fileset dir="${ext.dir}" excludes="${excludes}" includes="${includes}">
-                <filename name="**/*.java"/>
-            </fileset>
-            <fileset dir="${gnu.dir}" excludes="${excludes}" includes="${includes}">
-                <filename name="**/*.java"/>
-            </fileset>
-            <fileset dir="${java.dir}" excludes="${excludes}" includes="${includes}">
-                <filename name="**/*.java"/>
-            </fileset>
-            <fileset dir="${javax.dir}" excludes="${excludes}" includes="${includes}">
-                <filename name="**/*.java"/>
-            </fileset>
-            <fileset dir="${tools.dir}" excludes="${excludes}" includes="${includes}">
                 <filename name="**/*.java"/>
             </fileset>
             <fileset dir="${vm.dir}" excludes="${excludes}" includes="${includes}">
