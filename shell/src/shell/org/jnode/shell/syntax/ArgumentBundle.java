@@ -229,8 +229,12 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
         }
     }
 
-    int getStatus() {
+    public int getStatus() {
         return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     /**
