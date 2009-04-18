@@ -28,6 +28,8 @@ import java.io.PrintWriter;
  */
 public class IsolateStartupException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     private final String remoteName;
 
     private final String remoteMessage;

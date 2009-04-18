@@ -23,6 +23,9 @@ package org.jnode.imageio.jpeg;
 import javax.imageio.IIOException;
 
 public class JPEGException extends IIOException {
+    
+    private static final long serialVersionUID = 1L;
+
     public JPEGException(String message) {
         super(message);
     }

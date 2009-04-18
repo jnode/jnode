@@ -27,6 +27,8 @@ import java.security.BasicPermission;
  */
 public class IsolatePermission extends BasicPermission {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * @param name
      * @param actions

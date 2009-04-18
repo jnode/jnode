@@ -38,12 +38,14 @@ class NativeFontManager {
     private static void initIDs() {
         //todo implement it
     }
+    
     /**
      * @see sun.font.FontManager#setFont2D(java.awt.Font, sun.font.Font2DHandle)
      */
     private static void setFont2D(Font arg1, Font2DHandle arg2) {
         //todo implement it
     }
+    
     /**
      * @see sun.font.FontManager#isCreatedFont(java.awt.Font)
      */
@@ -51,18 +53,22 @@ class NativeFontManager {
         //todo implement it
         return false;
     }
+    
     /**
      * @see sun.font.FontManager#setCreatedFont(java.awt.Font)
      */
     private static void setCreatedFont(Font arg1) {
         //todo implement it
     }
+    
     /**
      * @see sun.font.FontManager#populateFontFileNameMap(java.util.HashMap, java.util.HashMap, java.util.HashMap, java.util.Locale)
      */
-    private static void populateFontFileNameMap(HashMap arg1, HashMap arg2, HashMap arg3, Locale arg4) {
+    private static void populateFontFileNameMap(
+            HashMap<?, ?> arg1, HashMap<?, ?> arg2, HashMap<?, ?> arg3, Locale arg4) {
         //todo implement it
     }
+    
     /**
      * @see sun.font.FontManager#getFont2D(java.awt.Font)
      */

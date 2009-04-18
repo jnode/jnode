@@ -77,7 +77,7 @@ public abstract class NativeStream {
      * @return The object info for the started object
      * @see ObjectInfo
      */
-    public abstract ObjectInfo startObject(VmType cls);
+    public abstract ObjectInfo startObject(VmType<?> cls);
 
     /**
      * Gets an objectref for a given object.
@@ -99,7 +99,7 @@ public abstract class NativeStream {
      *
      * @return Collection
      */
-    public abstract Collection getUnresolvedObjectRefs();
+    public abstract Collection<?> getUnresolvedObjectRefs();
 
     /**
      * Are there unresolved references?

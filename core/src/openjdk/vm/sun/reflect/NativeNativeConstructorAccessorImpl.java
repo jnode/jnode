@@ -33,10 +33,10 @@ class NativeNativeConstructorAccessorImpl {
     /**
      * @see sun.reflect.NativeConstructorAccessorImpl#newInstance0(java.lang.reflect.Constructor, java.lang.Object[])
      */
-    private static Object newInstance0(Constructor arg1, Object[] arg2) throws InstantiationException,
+    private static Object newInstance0(Constructor<?> arg1, Object[] arg2) throws InstantiationException,
                IllegalArgumentException,
         InvocationTargetException{
-        VmType vmt = VmType.fromClass(arg1.getDeclaringClass());
+        VmType<?> vmt = VmType.fromClass(arg1.getDeclaringClass());
         VmMethod vmm = vmt.getDeclaredMethod(arg1.getSlot());
         try {
             return VmReflection.newInstance(vmm, arg2);

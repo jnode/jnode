@@ -156,7 +156,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
      *
      * @return Collection
      */
-    public abstract Collection getUnresolvedObjectRefs();
+    public abstract Collection<?> getUnresolvedObjectRefs();
 
     /**
      * Gets the size of a word in bytes.
@@ -275,7 +275,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
      * @param cls
      * @return The info for the started object
      */
-    public abstract ObjectInfo startObject(VmType cls);
+    public abstract ObjectInfo startObject(VmType<?> cls);
 
     /**
      * Remove count bytes from the end of the generated stream.

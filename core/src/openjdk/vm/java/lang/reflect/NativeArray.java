@@ -285,7 +285,7 @@ class NativeArray { //TODO OPTIMIZE IT!
     /**
      * @see java.lang.reflect.Array#newArray(java.lang.Class, int)
      */
-    private static Object newArray(Class arg1, int arg2) {
+    private static Object newArray(Class<?> arg1, int arg2) {
         if (!((Class<?>) arg1).isPrimitive())
             return createObjectArray((Class<?>) arg1, arg2);
         if ((Class<?>) arg1 == boolean.class)
@@ -311,32 +311,32 @@ class NativeArray { //TODO OPTIMIZE IT!
     /**
      * @see java.lang.reflect.Array#multiNewArray(java.lang.Class, int[])
      */
-    private static Object multiNewArray(Class arg1, int[] arg2) {
+    private static Object multiNewArray(Class<?> arg1, int[] arg2) {
         if (arg2.length <= 0)
             throw new IllegalArgumentException("Empty dimensions array.");
 
         if (arg2.length - 1 == 0)
             return newInstance((Class<?>) arg1, arg2[0]);
 
-        Object toAdd = createMultiArray((Class) (Class<?>) arg1, arg2, arg2.length - 1 - 1);
-        Class thisType = toAdd.getClass();
+        Object toAdd = createMultiArray((Class<?>) arg1, arg2, arg2.length - 1 - 1);
+        Class<?> thisType = toAdd.getClass();
         Object[] retval
             = (Object[]) createObjectArray(thisType, arg2[(arg2.length - 1)]);
         if (arg2[(arg2.length - 1)] > 0)
             retval[0] = toAdd;
         int i = arg2[(arg2.length - 1)];
         while (--i > 0)
-            retval[i] = createMultiArray((Class) (Class<?>) arg1, arg2, arg2.length - 1 - 1);
+            retval[i] = createMultiArray((Class<?>) arg1, arg2, arg2.length - 1 - 1);
         return retval;
     }
 
-    static Object createMultiArray(Class type, int[] dimensions,
+    static Object createMultiArray(Class<?> type, int[] dimensions,
                                    int index) {
         if (index == 0)
             return newInstance(type, dimensions[0]);
 
         Object toAdd = createMultiArray(type, dimensions, index - 1);
-        Class thisType = toAdd.getClass();
+        Class<?> thisType = toAdd.getClass();
         Object[] retval
             = (Object[]) createObjectArray(thisType, dimensions[index]);
         if (dimensions[index] > 0)
@@ -391,16 +391,16 @@ class NativeArray { //TODO OPTIMIZE IT!
      * @throws NegativeArraySizeException if dim is negative
      * @throws OutOfMemoryError           if memory allocation fails
      */
-    static Object createObjectArray(final Class type, int dim) {
-        final VmType vmClass = AccessController.doPrivileged(
-            new PrivilegedAction<VmType>() {
-                public VmType run() {
+    static Object createObjectArray(final Class<?> type, int dim) {
+        final VmType<?> vmClass = AccessController.doPrivileged(
+            new PrivilegedAction<VmType<?>>() {
+                public VmType<?> run() {
                     return VmType.fromClass(type);
                 }
             });
 
         final String arrClsName = vmClass.getArrayClassName();
-        final VmType arrCls;
+        final VmType<?> arrCls;
         try {
             final VmClassLoader curLoader = vmClass.getLoader();
             arrCls = curLoader.loadClass(arrClsName, true);
@@ -411,7 +411,7 @@ class NativeArray { //TODO OPTIMIZE IT!
             throw new NoClassDefFoundError(arrClsName);
         }
 
-        return Vm.getHeapManager().newArray((VmArrayClass) arrCls, dim);
+        return Vm.getHeapManager().newArray((VmArrayClass<?>) arrCls, dim);
     }
 
 }

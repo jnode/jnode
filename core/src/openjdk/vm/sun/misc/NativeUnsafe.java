@@ -441,18 +441,18 @@ class NativeUnsafe {
         return vmClass.getDeclaredField(f.getSlot());
     }
 
-    public static void ensureClassInitialized(Unsafe instance, Class c) {
+    public static void ensureClassInitialized(Unsafe instance, Class<?> c) {
         VmType.fromClass(c).initialize();
     }
 
-    public static int arrayBaseOffset(Unsafe instance, Class arrayClass) {
+    public static int arrayBaseOffset(Unsafe instance, Class<?> arrayClass) {
         return VmArray.DATA_OFFSET * VmProcessor.current().getArchitecture().getReferenceSize();
     }
 
-    public static int arrayIndexScale(Unsafe instance, Class arrayClass) {
+    public static int arrayIndexScale(Unsafe instance, Class<?> arrayClass) {
         //see VmHeapManager.newArray()
         final int elemSize;
-        VmType arrayCls = VmType.fromClass(arrayClass);
+        VmType<?> arrayCls = VmType.fromClass(arrayClass);
         if (arrayCls.isPrimitiveArray()) {
             switch (arrayCls.getSecondNameChar()) {
                 case 'B': // byte
@@ -488,9 +488,8 @@ class NativeUnsafe {
         throw new UnsupportedOperationException();
     }
 
-    public static Class defineClass(Unsafe instance, String name, byte[] b, int off, int len,
-                                    ClassLoader loader,
-                                    ProtectionDomain protDomain) {
+    public static Class<?> defineClass(Unsafe instance, String name, byte[] b, int off, int len,
+            ClassLoader loader, ProtectionDomain protDomain) {
         if (protDomain == null) {
             protDomain = AccessController
                     .doPrivileged(new PrivilegedAction<ProtectionDomain>() {
@@ -501,15 +500,16 @@ class NativeUnsafe {
                         }
                     });
         }
-        return ((VmClassLoader)loader.getVmClassLoader()).defineClass(name, b, off, len, protDomain).asClass();
+        return ((VmClassLoader) loader.getVmClassLoader()).
+                defineClass(name, b, off, len, protDomain).asClass();
 
     }
 
-    public static Class defineClass(Unsafe instance, String name, byte[] b, int off, int len) {
+    public static Class<?> defineClass(Unsafe instance, String name, byte[] b, int off, int len) {
         throw new UnsupportedOperationException();
     }
 
-    public static Object allocateInstance(Unsafe instance, Class cls)
+    public static Object allocateInstance(Unsafe instance, Class<?> cls)
             throws InstantiationException {
         //todo improve exception handling
         try {

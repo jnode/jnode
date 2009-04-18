@@ -75,7 +75,7 @@ public class UDPOutputStream extends OutputStream {
         if (!inWrite) {
             inWrite = true;
             try {
-                AccessController.doPrivileged(new PrivilegedExceptionAction() {
+                AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
                     public Object run() throws IOException {
                         final DatagramPacket p = new DatagramPacket(b, off, len);
                         p.setSocketAddress(address);

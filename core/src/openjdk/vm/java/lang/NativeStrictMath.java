@@ -53,8 +53,6 @@ package java.lang;
 
 import gnu.classpath.Configuration;
 
-import java.util.Random;
-
 /**
  * Helper class containing useful mathematical functions and constants.
  * This class mirrors {@link Math}, but is 100% portable, because it uses
