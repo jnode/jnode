@@ -20,17 +20,35 @@
  
 package org.jnode.apps.jpartition.commands.framework;
 
+/**
+ * Class of exception thrown while a {@link Command} is running when and error happens.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class CommandException extends Exception {
     private static final long serialVersionUID = -8340890789850970389L;
 
-    public CommandException(String s, Throwable cause) {
-        super(s, cause);
+    /**
+     * Constructor. 
+     * @param message
+     * @param cause root cause of the exception.
+     */
+    public CommandException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public CommandException(String s) {
-        super(s);
+    /**
+     * Constructor.
+     * @param message
+     */
+    public CommandException(String message) {
+        super(message);
     }
 
+    /**
+     * Constructor.
+     * @param cause root cause of the exception.
+     */
     public CommandException(Throwable cause) {
         super(cause);
     }

@@ -20,15 +20,45 @@
  
 package org.jnode.apps.jpartition.commands.framework;
 
+/**
+ * Status for a command.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public enum CommandStatus {
-    NOT_RUNNING("not running"), RUNNING("running"), SUCCESS("success"), FAILED("failed");
+    /**
+     * The command is not running.
+     */
+    NOT_RUNNING("not running"),
 
+    /**
+     * The command is running.
+     */
+    RUNNING("running"),
+
+    /**
+     * The command has run and finished with success.
+     */
+    SUCCESS("success"),
+
+    /**
+     * The command has run and failed.
+     */
+    FAILED("failed");
+
+    /**
+     * printable name of the status.
+     */
     private final String name;
 
     private CommandStatus(String name) {
         this.name = name;
     }
 
+    /**
+     * Get a printable representation of the command.
+     * @return printable representation of the command.
+     */
     public final String toString() {
         return name;
     }

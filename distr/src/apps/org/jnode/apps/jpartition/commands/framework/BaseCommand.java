@@ -22,6 +22,11 @@ package org.jnode.apps.jpartition.commands.framework;
 
 import org.apache.log4j.Logger;
 
+/** 
+ * Abstract implementation of the {@link Command} interface.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public abstract class BaseCommand implements Command {
     private static final Logger log = Logger.getLogger(BaseCommand.class);
 
@@ -32,6 +37,11 @@ public abstract class BaseCommand implements Command {
         this.name = name;
     }
 
+    /**
+     * Implementation of the command life cycle. 
+     * The actual work of the command is delegated to the abstract {@link #doExecute()}
+     * command.
+     */
     public final void execute(CommandProcessor processor) throws CommandException {
         try {
             status = CommandStatus.RUNNING;
@@ -50,12 +60,19 @@ public abstract class BaseCommand implements Command {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final CommandStatus getStatus() {
         return status;
     }
 
     protected abstract void doExecute() throws CommandException;
 
+    /**
+     * Get a printable representation of the command.
+     * @return printable representation of the command.
+     */
     @Override
     public String toString() {
         return status + " - " + name;
