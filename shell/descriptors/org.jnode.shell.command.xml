@@ -146,7 +146,11 @@
         <argument argLabel="text"/>
       </repeat>
     </syntax>
-    <syntax alias="env" description="Print the system properties"/>
+    <syntax alias="env">
+      <empty description="Print the system properties"/>
+      <option argLabel="env" shortName="e" longName="env" 
+          description="Print the system environment variables"/>
+    </syntax>
     <syntax alias="exit" description="Exit the current shell"/>
     <syntax alias="gc">
       <empty description="Run the garbage collector"/>
@@ -350,12 +354,11 @@
       <empty description="Filter standard input a page (screen) at a time"/>
       <argument argLabel="file" description="Output the file a page (screen) at a time"/>
     </syntax>
-    <syntax alias="env" description="Print the environment variables"/>
     <syntax alias="run" description="Run a command file">
       <argument argLabel="file"/>
     </syntax>
     <syntax alias="set">
-      <sequence description="Set a system property">
+      <sequence description="Set a system property or environment variable">
         <argument argLabel="key"/>
         <argument argLabel="value"/>
       </sequence>
