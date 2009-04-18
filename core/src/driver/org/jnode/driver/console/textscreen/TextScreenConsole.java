@@ -149,21 +149,32 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
      */
     @Override
     public void putChar(char v[], int offset, int length, int color) {
+    	// This method tries to paint runs of characters on the current screen
+    	// line with one call to screen.set(int, char[], int, int, int).  The
+    	// 'mark' is the offset of the start of the current run.  The 'limit'
+    	// is the offset at which we must end (or have ended) the current run.
         int mark = 0;
+        int limit = Math.min(length, scrWidth - curX) - 1;
         for (int i = 0; i < length; i++) {
             char c = v[i + offset];
-            if (c == '\n' || c == '\b' || c == '\t' || curX + i == scrWidth - 1 || i == length - 1) {
+            if (c == '\n' || c == '\b' || c == '\t' || i == limit) {
+            	// The current run ends now.  First, output all but 'c' directly to the
+            	// current screen line, adjusting curX and curY when we're done.
                 final int ln = i - mark;
                 if (ln > 0) {
                     screen.set(screen.getOffset(curX, curY), v, offset + mark, ln, color);
                     curX += ln;
                     if (curX >= scrWidth) {
                         curY++;
-                        curX = curX - scrWidth;
+                        curX -= scrWidth;
                     }
                 }
-                mark = i + 1;
+                // Then output 'c' using doPutChar.  This knows how to deal with 
+                // '\n', '\b' and '\t', and adjusts curX and curY accordingly.
                 doPutChar(c, color);
+                // Finally update 'mark' and 'limit' for the next run of characters.
+                mark = i + 1;
+                limit = Math.min(length - 1, i + scrWidth - curX);
             }
         }
         ensureVisible(screen, curY);
