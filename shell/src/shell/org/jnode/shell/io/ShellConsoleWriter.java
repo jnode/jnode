@@ -91,8 +91,7 @@ public class ShellConsoleWriter extends ConsoleWriter {
     }
 
     @Override
-    public Writer append(CharSequence csq, int start, int end)
-            throws IOException {
+    public Writer append(CharSequence csq, int start, int end) throws IOException {
         return writer.append(csq, start, end);
     }
 

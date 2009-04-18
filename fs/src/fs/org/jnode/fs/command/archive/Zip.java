@@ -22,7 +22,6 @@ package org.jnode.fs.command.archive;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.LineNumberReader;
@@ -30,7 +29,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.regex.Pattern;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipExtraField;
 import org.apache.tools.zip.ZipFile;
