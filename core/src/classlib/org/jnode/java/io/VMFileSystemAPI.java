@@ -34,123 +34,123 @@ import java.io.VMOpenMode;
  */
 public interface VMFileSystemAPI {
 
-	/**
-	 * Does a given file exist?
-	 */
-	public boolean fileExists(String file);
+   /**
+     * Does a given file exist?
+     */
+    public boolean fileExists(String file);
 
-	/**
-	 * Is the given File a plain file?
-	 */
-	public boolean isFile(String file);
+    /**
+     * Is the given File a plain file?
+     */
+    public boolean isFile(String file);
 
-	/**
-	 * Is the given File a directory?
-	 */
-	public boolean isDirectory(String file);
+    /**
+     * Is the given File a directory?
+     */
+    public boolean isDirectory(String file);
 
-	/**
-	 * Can the given file be read?
-	 * 
-	 * @param file
-	 */
-	public boolean canRead(String file) throws IOException;
+    /**
+     * Can the given file be read?
+     * 
+     * @param file
+     */
+    public boolean canRead(String file) throws IOException;
 
-	/**
-	 * Can the given file be written to?
-	 * 
-	 * @param file
-	 */
-	public boolean canWrite(String file) throws IOException;
+    /**
+     * Can the given file be written to?
+     * 
+     * @param file
+     */
+    public boolean canWrite(String file) throws IOException;
 
-	public boolean canExecute(String file) throws IOException;
-	
-	/**
-	 * Gets the length in bytes of the given file or 0 if the file does not exist.
-	 * 
-	 * @param file
-	 */
-	public long getLength(String file);
+    public boolean canExecute(String file) throws IOException;
+    
+    /**
+     * Gets the length in bytes of the given file or 0 if the file does not exist.
+     * 
+     * @param file
+     */
+    public long getLength(String file);
 
-	/**
-	 * Gets the last modification date of the given file.
-	 * 
-	 * @param file
-	 */
-	public long getLastModified(String file);
+    /**
+     * Gets the last modification date of the given file.
+     * 
+     * @param file
+     */
+    public long getLastModified(String file);
 
-	/**
-	 * Sets the last modification date of the given file.
-	 * 
-	 * @param file
-	 */
-	public void setLastModified(String file, long time) throws IOException;
+    /**
+     * Sets the last modification date of the given file.
+     * 
+     * @param file
+     */
+    public void setLastModified(String file, long time) throws IOException;
 
-	/**
-	 * Mark the given file as readonly.
-	 * 
-	 * @param file
-	 * @throws IOException
-	 */
-	public void setReadOnly(String file) throws IOException;
+    /**
+     * Mark the given file as readonly.
+     * 
+     * @param file
+     * @throws IOException
+     */
+    public void setReadOnly(String file) throws IOException;
 
-	public boolean setReadable(String normalizedPath, boolean enable,
-			boolean owneronly) throws IOException;
+    public boolean setReadable(String normalizedPath, boolean enable,
+            boolean owneronly) throws IOException;
 
-	public boolean setWritable(String normalizedPath, boolean enable,
-			boolean owneronly) throws IOException;
+    public boolean setWritable(String normalizedPath, boolean enable,
+            boolean owneronly) throws IOException;
 
-	public boolean setExecutable(String normalizedPath, boolean enable,
-			boolean owneronly) throws IOException;
+    public boolean setExecutable(String normalizedPath, boolean enable,
+            boolean owneronly) throws IOException;
 
-	/**
-	 * Delete the given file.
-	 * 
-	 * @param file
-	 * @throws IOException
-	 */
-	public void delete(String file) throws IOException;
+    /**
+     * Delete the given file.
+     * 
+     * @param file
+     * @throws IOException
+     */
+    public void delete(String file) throws IOException;
 
-	/**
-	 * This method returns an array of filesystem roots.
-	 */
-	public File[] getRoots();
-	
-	/**
-	 * Gets an array of names of all entries of the given directory. All names are relative to the
-	 * given directory.
-	 * 
-	 * @param directory
-	 */
-	public String[] list(String directory) throws IOException;
+    /**
+     * This method returns an array of filesystem roots.
+     */
+    public File[] getRoots();
+    
+    /**
+     * Gets an array of names of all entries of the given directory. All names are relative to the
+     * given directory.
+     * 
+     * @param directory
+     */
+    public String[] list(String directory) throws IOException;
 
-	/**
-	 * Open a given file
-	 * 
-	 * @param file
-	 * @throws IOException
-	 */
-	public VMFileHandle open(String file, VMOpenMode mode) throws IOException;
+    /**
+     * Open a given file
+     * 
+     * @param file
+     * @throws IOException
+     */
+    public VMFileHandle open(String file, VMOpenMode mode) throws IOException;
 
-	/**
-	 * Make a directory
-	 * 
-	 * @param file
-	 * @throws IOException
-	 */
-	public boolean mkDir(String file) throws IOException;
-	
-	/**
-	 * Make a file
-	 * 
-	 * @param file
-	 * @throws IOException
-	 */
-	public boolean mkFile(String file, VMOpenMode mode) throws IOException;
+    /**
+     * Make a directory
+     * 
+     * @param file
+     * @throws IOException
+     */
+    public boolean mkDir(String file) throws IOException;
+    
+    /**
+     * Make a file
+     * 
+     * @param file
+     * @throws IOException
+     */
+    public boolean mkFile(String file, VMOpenMode mode) throws IOException;
 
-	public long getTotalSpace(String normalizedPath) throws IOException;
+    public long getTotalSpace(String normalizedPath) throws IOException;
 
-	public long getFreeSpace(String normalizedPath) throws IOException;
+    public long getFreeSpace(String normalizedPath) throws IOException;
 
-	public long getUsableSpace(String normalizedPath) throws IOException;
+    public long getUsableSpace(String normalizedPath) throws IOException;
 }
