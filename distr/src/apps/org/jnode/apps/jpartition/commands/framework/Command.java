@@ -20,8 +20,22 @@
  
 package org.jnode.apps.jpartition.commands.framework;
 
+/**
+ * Interface for a command.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public interface Command {
+    /**
+     * Query the given #@link {@link CommandProcessor} to execute this command. 
+     * @param processor the command processor to use
+     * @throws CommandException
+     */
     public void execute(CommandProcessor processor) throws CommandException;
 
+    /**
+     * Get the actual status of the command.
+     * @return actual status of the command.
+     */
     public CommandStatus getStatus();
 }
