@@ -12,7 +12,7 @@ public class JNodeSecurityManagerSettings {
         if (ENABLED) {
             enabled = Boolean.valueOf("@jnode.security.enabled@");
         }
-        if (enabled){
+        if (enabled) {
             sm.defaultCheckPermission(perm);
         }
     }
