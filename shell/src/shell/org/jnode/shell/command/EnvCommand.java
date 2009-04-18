@@ -20,6 +20,7 @@
  
 package org.jnode.shell.command;
 
+import gnu.java.security.action.GetEnvAction;
 import gnu.java.security.action.GetPropertiesAction;
 
 import java.io.PrintWriter;
@@ -29,15 +30,22 @@ import java.util.Properties;
 import java.util.TreeMap;
 
 import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
 
 /**
  * @author epr
  */
 public class EnvCommand extends AbstractCommand {
     // FIXME ... this class and the corresponding alias are incorrectly named
+	
+	private final FlagArgument envArg = new FlagArgument(
+			"env", Argument.OPTIONAL + Argument.SINGLE,
+			"If set, print the System 'env' variables rather that the System properties.");
 
     public EnvCommand() {
-        super("Print the system properties");
+        super("Print the System properties");
+        registerArguments(envArg);
     }
 
     public static void main(String[] args) throws Exception {
@@ -48,8 +56,16 @@ public class EnvCommand extends AbstractCommand {
      * Execute this command
      */
     public void execute() throws Exception {
-        final Properties ps = (Properties) AccessController.doPrivileged(new GetPropertiesAction());
-        final TreeMap<Object, Object> sortedPs = new TreeMap<Object, Object>(ps);
+    	final TreeMap<Object, Object> sortedPs;
+        if (envArg.isSet()) {
+        	Map<String, String> ps = 
+        		(Map<String, String>) AccessController.doPrivileged(new GetEnvAction());
+        	sortedPs = new TreeMap<Object, Object>(ps);
+        } else {
+        	Properties ps = AccessController.doPrivileged(new GetPropertiesAction());
+        	sortedPs = new TreeMap<Object, Object>(ps);
+        }
+         
         final PrintWriter out = getOutput().getPrintWriter();
         for (Map.Entry<Object, Object> entry : sortedPs.entrySet()) {
             final String key = entry.getKey().toString();
