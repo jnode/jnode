@@ -718,7 +718,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
      * @return The info for the started object
      * @see ObjectInfo
      */
-    public final ObjectInfo startObject(VmType cls) {
+    public final ObjectInfo startObject(VmType<?> cls) {
         if (inObject) {
             throw new RuntimeException(
                 "Cannot start an object within an object");

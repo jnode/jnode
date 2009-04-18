@@ -27,7 +27,7 @@ import org.jnode.vm.VmAddress;
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class Label extends VmAddress implements Comparable {
+public class Label extends VmAddress implements Comparable<Object> {
 
     private final String label;
 

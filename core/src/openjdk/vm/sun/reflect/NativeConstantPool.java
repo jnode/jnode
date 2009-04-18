@@ -31,11 +31,11 @@ public class NativeConstantPool {
         throw new UnsupportedOperationException();
     }
 
-    private static Class getClassAt0(ConstantPool instance, Object constantPoolOop, int index) {
+    private static Class<?> getClassAt0(ConstantPool instance, Object constantPoolOop, int index) {
         throw new UnsupportedOperationException();
     }
 
-    private static Class getClassAtIfLoaded0(ConstantPool instance, Object constantPoolOop, int index) {
+    private static Class<?> getClassAtIfLoaded0(ConstantPool instance, Object constantPoolOop, int index) {
         throw new UnsupportedOperationException();
     }
 

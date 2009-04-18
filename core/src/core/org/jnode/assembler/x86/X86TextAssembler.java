@@ -246,7 +246,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         return null;
     }
 
-    public Collection getUnresolvedObjectRefs() {
+    public Collection<?> getUnresolvedObjectRefs() {
         return null;
     }
 
@@ -315,7 +315,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     public void setResolver(ObjectResolver resolver) {
     }
 
-    public ObjectInfo startObject(VmType cls) {
+    public ObjectInfo startObject(VmType<?> cls) {
         println(";\n; -- Start of object --\n;");
         return new ObjectInfoImpl();
     }

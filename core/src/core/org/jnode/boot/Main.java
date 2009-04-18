@@ -75,7 +75,7 @@ public final class Main {
 
             final ClassLoader loader = pluginRegistry.getPluginsClassLoader();
             final String mainClassName = proc.getMainClassName();
-            final Class mainClass;
+            final Class<?> mainClass;
             if (mainClassName != null) {
                 mainClass = loader.loadClass(mainClassName);
             } else {
@@ -87,7 +87,8 @@ public final class Main {
 
             if (mainClass != null) {
                 try {
-                    final Method mainMethod = mainClass.getMethod("main", new Class[]{String[].class});
+                    final Method mainMethod = 
+                        mainClass.getMethod("main", new Class[]{String[].class});
                     mainMethod.invoke(null, new Object[]{proc.getMainClassArguments()});
                 } catch (NoSuchMethodException x) {
                     final Object insatnce = mainClass.newInstance();

@@ -30,9 +30,10 @@ class NativeJPEGImageDecoder {
     /**
      * @see sun.awt.image.JPEGImageDecoder#initIDs(java.lang.Class)
      */
-    private static void initIDs(Class arg1) {
+    private static void initIDs(Class<?> arg1) {
         //todo implement it
     }
+    
     /**
      * @see sun.awt.image.JPEGImageDecoder#readImage(java.io.InputStream, byte[])
      */

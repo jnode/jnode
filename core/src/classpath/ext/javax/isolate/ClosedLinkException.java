@@ -27,6 +27,8 @@ import java.io.IOException;
  */
 public class ClosedLinkException extends IOException {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Initialize this instance.
      */

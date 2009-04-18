@@ -14,10 +14,11 @@ class NativeJarFile {
     private static String[] getMetaInfEntryNames(JarFile instance) {
         ArrayList<String> ret = new ArrayList<String>();
 
-        for (Enumeration e = instance.entries(); e.hasMoreElements(); ) {
+        for (Enumeration<?> e = instance.entries(); e.hasMoreElements(); ) {
             String name = ((ZipEntry) e.nextElement()).getName();
-            if (name.startsWith("META-INF/"))
+            if (name.startsWith("META-INF/")) {
                 ret.add(name);
+            }
         }
 
         return ret.isEmpty() ? null : ret.toArray(new String[ret.size()]);

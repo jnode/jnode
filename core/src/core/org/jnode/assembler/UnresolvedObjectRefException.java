@@ -25,6 +25,8 @@ package org.jnode.assembler;
  */
 public class UnresolvedObjectRefException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      *
      */
