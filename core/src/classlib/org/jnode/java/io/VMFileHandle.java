@@ -62,7 +62,7 @@ public interface VMFileHandle {
      * @param dest
      * @return the number of bytes read.
      * @throws IOException
-     */	
+     */
     public int read(ByteBuffer dest) throws IOException;
 
 
@@ -70,7 +70,7 @@ public interface VMFileHandle {
      * Write bytes from the {@code src} buffer.
      * @param src
      * @throws IOException
-     */	
+     */
     public void write(ByteBuffer src) throws IOException;
 
     /**
