@@ -40,7 +40,7 @@ public abstract class BaseCommand implements Command {
     /**
      * Implementation of the command life cycle. 
      * The actual work of the command is delegated to the abstract {@link #doExecute()}
-     * command.
+     * method.
      */
     public final void execute(CommandProcessor processor) throws CommandException {
         try {
