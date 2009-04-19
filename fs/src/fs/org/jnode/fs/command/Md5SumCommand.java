@@ -49,15 +49,26 @@ import org.jnode.shell.syntax.FlagArgument;
  */
 public class Md5SumCommand extends AbstractCommand {
 
-    private final FileArgument ARG_PATHS = new FileArgument(
-        "paths", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING,
-        "the files (or directories) to be calculate MD5 digests for");
-    private final FlagArgument FLAG_RECURSIVE = new FlagArgument(
-        "recursive", Argument.OPTIONAL,
-        "if set, recursively calculate MD5 digests for the contents of any directory");
-    private final FileArgument ARG_CHECKFILE = new FileArgument(
-        "checkfile", Argument.OPTIONAL | Argument.SINGLE | Argument.EXISTING,
-        "check MD5 digests for files listed in this file");
+    private static final String help_paths = "the files (or directories) to calculate the MD5 digests for";
+    private static final String help_recurse = "if set, recursively calculate the MD5 digests for the contents of " +
+                                               "a directory";
+    private static final String help_check = "check the MD5 digests for files listed in this file";
+    private static final String help_super = "Calculate or check MD5 digests";
+    private static final String fmt_err_open = "Cannot open %s: %s%n";
+    private static final String str_ok = "Ok";
+    private static final String str_fail = "Failed";
+    private static final String fmt_io_ex = "%s : IO Exception - %s%n";
+    private static final String fmt_fail_count = "%d file(s) failed%n";
+    private static final String fmt_err_read = "Problem reading file %s: %s";
+    private static final String err_norecurse = "Cannot calculate MD5 on directory, use recurse flag";
+    private static final String fmt_err_md5 = "%s was not processed: %s%n";
+    private static final String str_input = "Input";
+    
+    private final FileArgument argPaths 
+        = new FileArgument("paths", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING, help_paths);
+    private final FlagArgument flagRecursive = new FlagArgument("recursive", Argument.OPTIONAL, help_recurse);
+    private final FileArgument argCheckfile 
+        = new FileArgument("checkfile", Argument.OPTIONAL | Argument.SINGLE | Argument.EXISTING, help_check);
 
 
     private static final int BUFFER_SIZE = 1048576;  // 1Mb
@@ -68,8 +79,8 @@ public class Md5SumCommand extends AbstractCommand {
     
     
     public Md5SumCommand() {
-        super("Calculate or check MD5 digests");
-        registerArguments(ARG_PATHS, FLAG_RECURSIVE, ARG_CHECKFILE);
+        super(help_super);
+        registerArguments(argPaths, flagRecursive, argCheckfile);
     }
 
     public void execute() throws Exception {
@@ -80,11 +91,11 @@ public class Md5SumCommand extends AbstractCommand {
         digestEngine = MessageDigest.getInstance("md5");
 
         boolean ok = true;
-        if (ARG_CHECKFILE.isSet()) {
-            ok = checkFile(ARG_CHECKFILE.getValue());
-        } else if (ARG_PATHS.isSet()) {
-            boolean recursive = FLAG_RECURSIVE.isSet();
-            File[] paths = ARG_PATHS.getValues();
+        if (argCheckfile.isSet()) {
+            ok = checkFile(argCheckfile.getValue());
+        } else if (argPaths.isSet()) {
+            boolean recursive = flagRecursive.isSet();
+            File[] paths = argPaths.getValues();
             for (File file : paths) {
                 ok &= processFile(file, recursive);
             }
@@ -113,7 +124,7 @@ public class Md5SumCommand extends AbstractCommand {
             try {
                 br = new BufferedReader(new FileReader(checkFile));
             } catch (FileNotFoundException ex) {
-                err.println("Cannot open " + checkFile + ": " + ex.getMessage());
+                err.format(fmt_err_open, checkFile, ex.getLocalizedMessage());
                 return false;
             }
             String readLine;
@@ -131,17 +142,17 @@ public class Md5SumCommand extends AbstractCommand {
                             failCount++;
                         }
                     } catch (IOException ex) {
-                        out.println(line[1] + " : IO EXCEPTION - " + ex.getMessage());
+                        out.format(fmt_io_ex, line[1], ex.getLocalizedMessage());
                         failCount++;
                     }
                 }
             }
             if (failCount > 0) {
-                err.println(failCount + " file(s) failed");
+                err.format(fmt_fail_count, failCount);
                 return false;
             }
         } catch (IOException ex) {
-            err.println("problem reading file " + checkFile + ": " + ex.getMessage());
+            err.format(fmt_err_read, checkFile, ex.getLocalizedMessage());
             return false;
         } finally {
             if (br != null) {
@@ -176,14 +187,14 @@ public class Md5SumCommand extends AbstractCommand {
                     }
                 }
             } else {
-                err.println("Cannot calculate md5sum on folder: " + file);
+                err.println(err_norecurse);
                 res = false;
             }
         } else {
             try {
                 out.println(toHexString(computeDigest(file)) + "    " + file);
             } catch (IOException ex) {
-                err.println(file + " was not md5summed: " + ex.getMessage());
+                err.format(fmt_err_md5, file, ex.getLocalizedMessage());
             }
         }
         return res;
@@ -198,7 +209,7 @@ public class Md5SumCommand extends AbstractCommand {
             out.println(toHexString(computeDigest(null)));
             return true;
         } catch (IOException ex) {
-            err.println("Input was not md5summed: " + ex.getMessage());
+            err.format(fmt_err_md5, str_input, ex.getLocalizedMessage());
             return false;
         }
     }

@@ -43,32 +43,56 @@ import org.jnode.shell.syntax.FlagArgument;
  */
 public class CpCommand extends AbstractCommand {
 
+    private static final String help_source = "source files or directories";
+    private static final String help_target = "target file or directory";
+    private static final String help_force = "if set, force overwrite of existing files";
+    private static final String help_interactive = "if set, ask before overwriting existing files";
+    private static final String help_update = "if set, overwrite existing files older than their source";
+    private static final String help_recurse = "if set, recursively copy source directories";
+    private static final String help_verbose = "if set, output a line for each file copied";
+    private static final String help_super = "Copy files and directories";
+    private static final String err_no_source = "No source files or directories supplied";
+    private static final String err_no_write = "Target directory is not writable";
+    private static final String err_multi_dir = "Multi-file copy requires the target to be a directory";
+    private static final String err_copy_dir_file = "Cannot copy a directory to a file";
+    private static final String err_copy_dev = "Cannot copy to a device";
+    private static final String fmt_verbose_copy = "File copied: %d, directories created: %d%n";
+    private static final String err_mutex_flags = "The force, interactive and update flags are mutually exclusive";
+    private static final String fmt_no_write = "directory '%s' is not writeable";
+    private static final String fmt_dir_create = "Creating directory '%s'%n";
+    private static final String fmt_dir_replace = "Replacing file '%s' with a directory%n";
+    private static final String fmt_dir_skip = "not overwriting '%s' with a directory";
+    private static final String fmt_is_dir = "'%s' is a directory";
+    private static final String fmt_copy_file = "Copying file '%s' as '%s'%n";
+    private static final String fmt_src_noexist = "'%s' does not exist";
+    private static final String fmt_src_noread = "'%s' cannot be read";
+    private static final String fmt_src_device = "'%s' is a device";
+    private static final String fmt_copy_dir_self = "Cannot copy directory '%s' into itself";
+    private static final String fmt_copy_file_self = "Cannot copy file '%s' to itself";
+    private static final String fmt_copy_sub = "Cannot copy directory '%s' into a subdirectory ('%s')";
+    private static final String fmt_no_copy_dir = "Cannot copy '%s' onto directory '%s'";
+    private static final String fmt_no_copy_dev = "Cannot copy '%s' to device '%s'";
+    private static final String fmt_exists = "'%s' already exists";
+    private static final String fmt_newer = "'%s' is newer than '%s'";
+    private static final String fmt_ask_overwrite = "Overwrite '%s' with '%s'? [y/n]%n";
+    private static final String err_copy_eof = "EOF - abandoning copying";
+    private static final String err_copy_ioex = "IO Error - abandoning copying";
+    private static final String str_ask_again = "Answer 'y' or 'n'";
+    private static final String fmt_skip = "%s: skipping%n";
+    
     static final byte MODE_NORMAL = 0;
     static final byte MODE_INTERACTIVE = 1;
     static final byte MODE_FORCE = 2;
     static final byte MODE_UPDATE = 3;
 
-    private final FileArgument ARG_SOURCE = 
-        new FileArgument("source", Argument.MANDATORY | Argument.MULTIPLE | Argument.EXISTING, 
-                "source files or directories");
-
-    private final FileArgument ARG_TARGET = 
-        new FileArgument("target", Argument.MANDATORY, "target file or directory");
-
-    private final FlagArgument FLAG_FORCE = 
-        new FlagArgument("force", Argument.OPTIONAL, "if set, force overwrite of existing files");
-    
-    private final FlagArgument FLAG_INTERACTIVE = 
-        new FlagArgument("interactive", Argument.OPTIONAL, "if set, ask before overwriting existing files");
-    
-    private final FlagArgument FLAG_UPDATE = 
-        new FlagArgument("update", Argument.OPTIONAL, "if set, overwrite existing files older than their source");
-    
-    private final FlagArgument FLAG_RECURSIVE = 
-        new FlagArgument("recursive", Argument.OPTIONAL, "if set, recursively copy source directories");
-    
-    private final FlagArgument FLAG_VERBOSE = 
-        new FlagArgument("verbose", Argument.OPTIONAL, "if set, output a line for each file copied");
+    private final FileArgument argSource = 
+        new FileArgument("source", Argument.MANDATORY | Argument.MULTIPLE | Argument.EXISTING, help_source);
+    private final FileArgument argTarget = new FileArgument("target", Argument.MANDATORY, help_target);
+    private final FlagArgument argForce = new FlagArgument("force", Argument.OPTIONAL, help_force);
+    private final FlagArgument argInteractive = new FlagArgument("interactive", Argument.OPTIONAL, help_interactive);
+    private final FlagArgument argUpdate = new FlagArgument("update", Argument.OPTIONAL, help_update);
+    private final FlagArgument argRecursive = new FlagArgument("recursive", Argument.OPTIONAL, help_recurse);
+    private final FlagArgument argVerbose = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
 
     private byte mode = MODE_NORMAL;
     private boolean recursive = false;
@@ -81,9 +105,9 @@ public class CpCommand extends AbstractCommand {
     private byte[] buffer = new byte[1024 * 8];
 
     public CpCommand() {
-        super("Copy files or directories");
-        registerArguments(ARG_SOURCE, ARG_TARGET, FLAG_FORCE, FLAG_INTERACTIVE, FLAG_RECURSIVE,
-                FLAG_UPDATE, FLAG_VERBOSE);
+        super(help_super);
+        registerArguments(argSource, argTarget, argForce, argInteractive, argRecursive,
+                argUpdate, argVerbose);
     }
     
     public static void main(String[] args) throws Exception {
@@ -97,14 +121,14 @@ public class CpCommand extends AbstractCommand {
         if (mode == MODE_INTERACTIVE) {
             this.in = new BufferedReader(getInput().getReader());
         }
-        File[] sources = ARG_SOURCE.getValues();
-        File target = ARG_TARGET.getValue();
+        File[] sources = argSource.getValues();
+        File target = argTarget.getValue();
         if (sources.length == 0) {
-            error("No source files or directories supplied");
+            error(err_no_source);
         }
         if (target.isDirectory()) {
             if (!target.canWrite()) {
-                error("Target directory is not writable");
+                error(err_no_write);
             }
             for (File source : sources) {
                 if (checkSafe(source, target)) {
@@ -112,13 +136,13 @@ public class CpCommand extends AbstractCommand {
                 }
             }
         } else if (sources.length > 1) {
-            error("Multi-file copy requires the target to be a directory");
+            error(err_multi_dir);
         } else {
             File source = sources[0];
             if (source.isDirectory()) {
-                error("Cannot copy a directory to a file");
+                error(err_copy_dir_file);
             } else if (target.exists() && !target.isFile()) {
-                error("Cannot copy to a device");
+                error(err_copy_dev);
             } else {
                 if (checkSafe(source, target)) {
                     copyToFile(source, target);
@@ -126,26 +150,26 @@ public class CpCommand extends AbstractCommand {
             }
         }
         if (verbose) {
-            out.println("Files copied: " + filesCopied + ", directories created: " + directoriesCreated);
+            out.format(fmt_verbose_copy, filesCopied, directoriesCreated);
         }
     }
-
+    
     private void processFlags() {
-        recursive = FLAG_RECURSIVE.isSet();
-        verbose = FLAG_VERBOSE.isSet();
+        recursive = argRecursive.isSet();
+        verbose = argVerbose.isSet();
         // The mode flags are mutually exclusive ...
-        if (FLAG_FORCE.isSet()) {
+        if (argForce.isSet()) {
             mode = MODE_FORCE;
         }
-        if (FLAG_INTERACTIVE.isSet()) {
+        if (argInteractive.isSet()) {
             if (mode != MODE_NORMAL) {
-                error("The 'force', 'interactive' and 'update' flags are mutually exclusive");
+                error(err_mutex_flags);
             }
             mode = MODE_INTERACTIVE;
         }
-        if (FLAG_UPDATE.isSet()) {
+        if (argUpdate.isSet()) {
             if (mode != MODE_NORMAL) {
-                error("The 'force', 'interactive' and 'update' flags are mutually exclusive");
+                error(err_mutex_flags);
             }
             mode = MODE_UPDATE;
         }
@@ -160,26 +184,26 @@ public class CpCommand extends AbstractCommand {
      */
     private void copyIntoDirectory(File source, File targetDir) throws IOException {
         if (!targetDir.canWrite()) {
-            skip("directory '" + targetDir + "' is not writable");
+            skip(String.format(fmt_no_write, targetDir));
         } else if (source.isDirectory()) {
             if (recursive) {
                 File newDir = new File(targetDir, source.getName());
                 if (!newDir.exists()) {
                     if (verbose) {
-                        out.println("Creating directory '" + newDir + "'");
+                        out.format(fmt_dir_create, newDir);
                     }
                     newDir.mkdir();
                     directoriesCreated++;
                 } else if (!newDir.isDirectory()) {
                     if (mode == MODE_FORCE) {
                         if (verbose) {
-                            out.println("Replacing file '" + newDir + "' with a directory");
+                            out.format(fmt_dir_replace, newDir);
                         }
                         newDir.delete();
                         newDir.mkdir();
                         directoriesCreated++;
                     } else {
-                        skip("not overwriting '" + newDir + "' with a directory");
+                        skip(String.format(fmt_dir_skip, newDir));
                         return;
                     }
                 }
@@ -191,7 +215,7 @@ public class CpCommand extends AbstractCommand {
                     copyIntoDirectory(new File(source, name), newDir);
                 }
             } else {
-                skip("'" + source + "' is a directory");
+                skip(String.format(fmt_is_dir, source));
             }
         } else {
             File newFile = new File(targetDir, source.getName());
@@ -213,7 +237,7 @@ public class CpCommand extends AbstractCommand {
             return;
         }
         if (verbose) {
-            out.println("Copying file '" + sourceFile + "' as '" + targetFile + "'");
+            out.format(fmt_copy_file, sourceFile, targetFile);
         }
         
         InputStream sin = null;
@@ -256,11 +280,11 @@ public class CpCommand extends AbstractCommand {
      */
     private boolean checkSource(File source) {
         if (!source.exists()) {
-            return skip("'" + source + "' does not exist");
+            return skip(String.format(fmt_src_noexist, source));
         } else if (!source.canRead()) {
-            return skip("'" + source + "' cannot be read");
+            return skip(String.format(fmt_src_noread, source));
         } else if (!(source.isFile() || source.isDirectory())) {
-            return vskip("'" + source + "' is a device");
+            return vskip(String.format(fmt_src_device, source));
         } else {
             return true;
         }
@@ -283,19 +307,18 @@ public class CpCommand extends AbstractCommand {
         if (target.isDirectory()) {
             if (recursive && source.isDirectory()) {
                 if (sourcePath.equals(targetPath)) {
-                    return skip("Cannot copy directory '" + source + "' into itself");
+                    return skip(String.format(fmt_copy_dir_self, source));
                 }
                 if (!sourcePath.endsWith(File.separator)) {
                     sourcePath = sourcePath + File.separatorChar;
                 }
                 if (targetPath.startsWith(sourcePath)) {
-                    return skip("Cannot copy directory '" + source + 
-                            "' into a subdirectory ('" + target + "')");
+                    return skip(String.format(fmt_copy_sub, source, target));
                 }
             }
         } else {
             if (sourcePath.equals(targetPath)) {
-                return skip("Cannot copy file '" + source + "' to itself");
+                return skip(String.format(fmt_copy_file_self, source));
             }
         }
         return true;
@@ -317,26 +340,26 @@ public class CpCommand extends AbstractCommand {
             return true;
         }
         if (target.isDirectory() && !source.isDirectory()) {
-            return skip("Cannot copy '" + source + "' onto directory '" + target + "'");
+            return skip(String.format(fmt_no_copy_dir, source, target));
         }
         if (!target.isFile()) {
-            return vskip("Cannot copy '" + source + "' to device '" + target + "'");
+            return vskip(String.format(fmt_no_copy_dev, source, target));
         }
         switch (mode) {
             case MODE_NORMAL:
-                return vskip("'" + target + "' already exists");
+                return vskip(String.format(fmt_exists, target));
             case MODE_FORCE:
                 return true;
             case MODE_UPDATE:
                 return (source.lastModified() > target.lastModified() ||
-                        vskip("'" + target + "' is newer than '" + source + "'"));
+                        vskip(String.format(fmt_newer, target, source)));
             case MODE_INTERACTIVE:
-                out.print("Overwrite '" + target + "' with '" + source + "'? [y/n]");
+                out.format(fmt_ask_overwrite, target, source);
                 while (true) {
                     try {
                         String line = in.readLine();
                         if (line == null) {
-                            error("EOF - abandoning copying");
+                            error(err_copy_eof);
                         }
                         if (line.length() > 0) {
                             if (line.charAt(0) == 'y' || line.charAt(0) == 'Y') {
@@ -345,9 +368,9 @@ public class CpCommand extends AbstractCommand {
                                 return vskip("'" + target + "'");
                             }
                         }
-                        out.print("Answer 'y' or 'n'");
+                        out.print(str_ask_again);
                     } catch (IOException ex) {
-                        error("IO Error - abandoning copying");
+                        error(err_copy_ioex);
                     }
                 }
         }
@@ -360,13 +383,13 @@ public class CpCommand extends AbstractCommand {
     }
     
     private boolean skip(String msg) {
-        err.println(msg + ": skipping");
+        err.format(fmt_skip, msg);
         return false;
     }
     
     private boolean vskip(String msg) {
         if (verbose) {
-            err.println(msg + ": skipping");
+            err.format(fmt_skip, msg);
         }
         return false;
     }

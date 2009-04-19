@@ -59,31 +59,29 @@ public class FindCommand extends AbstractCommand {
             out.println(f);
         }
     }
-
-    private final StringArgument nameArg =
-            new StringArgument("name", Argument.OPTIONAL,
-                    "filter results to show only files that match given pattern");
-    private final StringArgument inameArg =
-            new StringArgument("iname", Argument.OPTIONAL, "same like 'name', but case insensitive");
-    private final LongArgument maxdepthArg =
-            new LongArgument("maxdepth", Argument.OPTIONAL,
-                    "descent at most to given level of directories");
-    private final LongArgument mindepthArg =
-            new LongArgument("mindepth", Argument.OPTIONAL,
-                    "ignore files and directories at levels less than given level");
-    private final StringArgument typeArg =
-            new StringArgument(
-                "type",
-                Argument.OPTIONAL,
-                "filter results to show only files of given type. valid types are 'd' for directory and 'f' for file");
-    private final FileArgument dirArg =
-            new FileArgument("directory", Argument.OPTIONAL | Argument.MULTIPLE,
-                    "directory to start searching from");
-    private PrintWriter out = null;
-    private PrintWriter err = null;
+    
+    private static final String help_name = "filter results to show only files that match a given pattern";
+    private static final String help_iname = "same as name, but case insensitive";
+    private static final String help_max_depth = "descend at most to the given level of directories";
+    private static final String help_min_depth = "ignore files and directories below the given level";
+    private static final String help_type = "filter results to show only files of a given type. Valid types are 'd' " +
+                                            "for directories and 'f' for files";
+    private static final String help_dir = "directory to start searching from";
+    private static final String help_super = "Find files and directories";
+    
+    private final StringArgument nameArg = new StringArgument("name", Argument.OPTIONAL, help_name);
+    private final StringArgument inameArg = new StringArgument("iname", Argument.OPTIONAL, help_iname);
+    private final LongArgument maxdepthArg = new LongArgument("maxdepth", Argument.OPTIONAL, help_max_depth);
+    private final LongArgument mindepthArg = new LongArgument("mindepth", Argument.OPTIONAL, help_min_depth);
+    private final StringArgument typeArg = new StringArgument("type", Argument.OPTIONAL, help_type);
+    private final FileArgument dirArg 
+        = new FileArgument("directory", Argument.OPTIONAL | Argument.MULTIPLE, help_dir);
+    
+    private PrintWriter out;
+    private PrintWriter err;
 
     public FindCommand() {
-        super("Find files and directories");
+        super(help_super);
         registerArguments(dirArg, mindepthArg, maxdepthArg, inameArg, nameArg, typeArg);
     }
 

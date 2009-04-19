@@ -28,8 +28,11 @@ import org.jnode.shell.AbstractCommand;
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 public class PwdCommand extends AbstractCommand {
+    
+    private static final String help_super = "Show the pathname of the current working directory";
+    
     public PwdCommand() {
-        super("show the pathname of current working directory");
+        super(help_super);
     }
 
     public static void main(String[] args) throws Exception {

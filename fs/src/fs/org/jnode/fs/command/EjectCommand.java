@@ -35,13 +35,14 @@ import org.jnode.shell.syntax.DeviceArgument;
  */
 public class EjectCommand extends AbstractCommand {
 
-    private final DeviceArgument ARG_DEVICE = new DeviceArgument(
-            "device", Argument.MANDATORY | Argument.EXISTING, "device to eject the medium from",
-            RemovableDeviceAPI.class);
+    private static final String help_device = "Device to eject the medium from";
+    private static final String fmt_failed = "Eject failed for %s: %s";
+    private final DeviceArgument argDevice 
+        = new DeviceArgument("device", Argument.MANDATORY | Argument.EXISTING, help_device, RemovableDeviceAPI.class);
 
     public EjectCommand() {
         super("Eject the medium from a given device");
-        registerArguments(ARG_DEVICE);
+        registerArguments(argDevice);
     }
 
     public static void main(String[] args) throws Exception {
@@ -50,12 +51,12 @@ public class EjectCommand extends AbstractCommand {
 
     public void execute() 
         throws ApiNotFoundException, IOException {
-        final Device dev = ARG_DEVICE.getValue();
+        final Device dev = argDevice.getValue();
         final RemovableDeviceAPI api = dev.getAPI(RemovableDeviceAPI.class);
         try {
             api.eject();
         } catch (IOException ex) {
-            getError().getPrintWriter().println("eject failed for " + dev.getId() + ": " + ex.getMessage());
+            getError().getPrintWriter().format(fmt_failed, dev.getId(), ex.getLocalizedMessage());
             exit(1);
         }
     }

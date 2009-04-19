@@ -43,31 +43,41 @@ import org.jnode.shell.syntax.DeviceArgument;
  * @author Levente S\u00e1ntha
  */
 public class DFCommand extends AbstractCommand {
-
-    private final DeviceArgument ARG_DEVICE = new DeviceArgument(
-        "device", Argument.OPTIONAL | Argument.EXISTING,
-        "The device for which disk usage inforrmation should be displayed");
+    
+    private static final String help_device = "The device for which disk usage information should be displayed";
+    private static final String help_super = "Print file system usage information";
+    private static final String str_id = "ID";
+    private static final String str_size = "Size";
+    private static final String str_used = "Used";
+    private static final String str_free = "Free";
+    private static final String str_mount = "Mount";
+    private static final String str_no_fs = "No filesystem on device";
+    private static final String str_unknown = "unknown";
+    private static final String err_get_info = "\tError getting disk usage information for %s on %s : %s%n";
+    
+    private final DeviceArgument argDevice 
+        = new DeviceArgument("device", Argument.OPTIONAL | Argument.EXISTING, help_device);
 
     public DFCommand() {
-        super("Print file system usage information");
-        registerArguments(ARG_DEVICE);
+        super(help_super);
+        registerArguments(argDevice);
     }
 
     public void execute() throws NameNotFoundException {
         final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
         final Map<String, String> mountPoints = fss.getDeviceMountPoints();
         PrintWriter out = getOutput().getPrintWriter(false);
-        format(out, "ID", true);
-        format(out, "Size", false);
-        format(out, "Used", false);
-        format(out, "Free", false);
-        out.println("Mount");
+        format(out, str_id, true);
+        format(out, str_size, false);
+        format(out, str_used, false);
+        format(out, str_free, false);
+        out.println(str_mount);
         out.println();
-        if (ARG_DEVICE.isSet()) {
-            final Device dev = ARG_DEVICE.getValue();
+        if (argDevice.isSet()) {
+            final Device dev = argDevice.getValue();
             FileSystem<?> fs = fss.getFileSystem(dev);
             if (fs == null) {
-                out.println("No filesystem on device");
+                out.println(str_no_fs);
             } else {
                 displayInfo(out, dev, fs, mountPoints.get(fs.getDevice().getId()));
             }
@@ -96,20 +106,19 @@ public class DFCommand extends AbstractCommand {
             format(out, str, true);
 
             final long total = fs.getTotalSpace();
-            str = total < 0 ? "unknown" : String.valueOf(total);
+            str = total < 0 ? str_unknown : String.valueOf(total);
             format(out, str, false);
 
             final long free = fs.getFreeSpace();
-            str = total < 0 ? "unknown" : String.valueOf(total - free);
+            str = total < 0 ? str_unknown : String.valueOf(total - free);
             format(out, str, false);
 
-            str = free < 0 ? "unknown" : String.valueOf(free);
+            str = free < 0 ? str_unknown : String.valueOf(free);
             format(out, str, false);
 
             out.println(mountPoint);
         } catch (IOException ex) {
-            out.println("\tError getting disk usage information for " + mountPoint + " on " + dev.getId() +
-                " : " + ex.getLocalizedMessage());
+            out.format(err_get_info, mountPoint, dev.getId(), ex.getLocalizedMessage());
         }
     }
 

@@ -50,13 +50,22 @@ public class DeleteCommand extends AbstractCommand {
     private static final String help_force = "ignore non-existant files, never prompt";
     private static final String help_interact = "prompt before every delete";
     private static final String help_verbose = "give information on what is happening";
+    private static final String help_super = "Delete files or directories";
+    private static final String fmt_not_exist = "'%s' does not exist%n";
+    private static final String fmt_is_dir = "Cannot remove '%s': Is a directory%n";
+    private static final String fmt_ask_overwrite = "Remove regular file '%s'?";
+    private static final String fmt_ask_descend = "Descend into directory '%s'?";
+    private static final String fmt_ask_remove = "Remove directory '%s'?";
+    private static final String fmt_removed_file = "Removed '%s'";
+    private static final String fmt_removed_dir = "Removed directory '%s'";
+    private static final String fmt_not_removed = "'%s' was not removed";
 
-    private final FileArgument ArgPaths 
+    private final FileArgument argPaths 
         = new FileArgument("paths", Argument.MANDATORY | Argument.MULTIPLE | Argument.EXISTING, help_file);
-    private final FlagArgument FlagRecurse = new FlagArgument("recursive", Argument.OPTIONAL, help_recurse);
-    private final FlagArgument FlagForce = new FlagArgument("force", Argument.OPTIONAL, help_force);
-    private final FlagArgument FlagInteract = new FlagArgument("interactive", Argument.OPTIONAL, help_interact);
-    private final FlagArgument FlagVerbose = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
+    private final FlagArgument flagRecurse = new FlagArgument("recursive", Argument.OPTIONAL, help_recurse);
+    private final FlagArgument flagForce = new FlagArgument("force", Argument.OPTIONAL, help_force);
+    private final FlagArgument flagInteract = new FlagArgument("interactive", Argument.OPTIONAL, help_interact);
+    private final FlagArgument flagVerbose = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
     
     private FileSystemService fss;
     private boolean recursive;
@@ -68,8 +77,8 @@ public class DeleteCommand extends AbstractCommand {
     private Reader in;
 
     public DeleteCommand() {
-        super("delete files or directories");
-        registerArguments(ArgPaths, FlagRecurse, FlagForce, FlagInteract, FlagVerbose);
+        super(help_super);
+        registerArguments(argPaths, flagRecurse, flagForce, flagInteract, flagVerbose);
     }
 
     public static void main(String[] args) throws Exception {
@@ -80,11 +89,11 @@ public class DeleteCommand extends AbstractCommand {
         // Lookup the Filesystem service
         fss = InitialNaming.lookup(FileSystemService.NAME);
         
-        recursive    = FlagRecurse.isSet();
-        force        = FlagForce.isSet();
-        interactive  = FlagInteract.isSet();
-        verbose      = FlagVerbose.isSet();
-        File[] paths = ArgPaths.getValues();
+        recursive    = flagRecurse.isSet();
+        force        = flagForce.isSet();
+        interactive  = flagInteract.isSet();
+        verbose      = flagVerbose.isSet();
+        File[] paths = argPaths.getValues();
         
         err = getError().getPrintWriter();
         out = getOutput().getPrintWriter();
@@ -98,19 +107,19 @@ public class DeleteCommand extends AbstractCommand {
             exit(1);
         }
     }
-
+    
     private boolean deleteFile(File file) {
         if (!file.exists()) {
             if (!force) {
-                err.println(file + " does not exist");
+                err.format(fmt_not_exist, file);
             }
             return false;
         }
         if (file.isDirectory() && !recursive) {
-            err.println("cannot remove " + file + ": Is a directory");
+            err.format(fmt_is_dir, file);
             return false;
         }
-        if (file.isFile() && interactive && !prompt_yn("remove regular file " + file.getAbsolutePath() + "?")) {
+        if (file.isFile() && interactive && !prompt_yn(String.format(fmt_ask_overwrite, file))) {
             return false;
         }
         
@@ -121,7 +130,7 @@ public class DeleteCommand extends AbstractCommand {
         // give an error message and then refuse to delete the parent directory because
         // it cannot be emptied.
         if (file.isDirectory() && !fss.isMount(file.getAbsolutePath())) {
-            if (interactive && !prompt_yn("descend into directory " + file.getAbsolutePath() + "?")) {
+            if (interactive && !prompt_yn(String.format(fmt_ask_descend, file))) {
                 return false;
             }
             for (File f : file.listFiles()) {
@@ -131,7 +140,7 @@ public class DeleteCommand extends AbstractCommand {
                     deleteOk &= deleteFile(f);
                 }
             }
-            if (deleteOk && interactive && !prompt_yn("remove directory " + file.getAbsolutePath() + "?")) {
+            if (deleteOk && interactive && !prompt_yn(String.format(fmt_ask_remove, file))) {
                 return false;
             }
         }
@@ -142,12 +151,12 @@ public class DeleteCommand extends AbstractCommand {
             // FIXME ... this does not report the reason that the delete failed.
             // How should we do that?
             if (verbose) {
-                if (file.isFile()) out.println("removed " + file.getAbsolutePath());
-                if (file.isDirectory()) out.println("removed directory " + file.getAbsolutePath());
+                if (file.isFile()) out.format(fmt_removed_file, file);
+                if (file.isDirectory()) out.format(fmt_removed_dir, file);
             }
             deleteOk = file.delete();
             if (!deleteOk) {
-                err.println(file + " was not deleted");
+                err.format(fmt_not_removed, file);
             }
         }
         return deleteOk;

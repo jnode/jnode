@@ -43,13 +43,16 @@ public class DirCommand extends AbstractCommand {
     private static final int LEFT_MARGIN = 14;
     private static final SimpleDateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm");
 
-    private final FileArgument ARG_PATH = new FileArgument(
-            "path", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING, 
-            "the file or directory to list");
+    private static final String help_path = "the file or directory to list";
+    private static final String help_super = "List files or directories";
+    private static final String fmt_no_path = "No such path: %s%n";
+    
+    private final FileArgument argPath 
+        = new FileArgument("path", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING, help_path);
     
     public DirCommand() {
-        super("List files or directories");
-        registerArguments(ARG_PATH);
+        super(help_super);
+        registerArguments(argPath);
     }
 
     public static void main(String[] args) throws Exception {
@@ -58,7 +61,7 @@ public class DirCommand extends AbstractCommand {
 
     public void execute() 
         throws IOException {
-        File[] paths = ARG_PATH.getValues();
+        File[] paths = argPath.getValues();
         if (paths.length == 0) {
             paths = new File[] {new File(System.getProperty("user.dir"))};
         }
@@ -66,7 +69,7 @@ public class DirCommand extends AbstractCommand {
         PrintWriter err = getError().getPrintWriter();
         for (File path : paths) {
             if (!path.exists()) {
-                err.println("No such path: " + path);
+                err.format(fmt_no_path, path);
             } else {
                 if (paths.length > 1) {
                     out.println(path + ":");

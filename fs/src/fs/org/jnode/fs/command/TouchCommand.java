@@ -36,12 +36,17 @@ import org.jnode.shell.syntax.FileArgument;
  */
 public class TouchCommand extends AbstractCommand {
 
-    private final FileArgument ARG_FILE = new FileArgument(
-            "file", Argument.MANDATORY, "the file to touch");
+    private static final String help_file = "the file to touch";
+    private static final String help_super = "touch a file";
+    private static final String err_parent_dir = "Cannot create parent directories";
+    private static final String str_created = "File created";
+    private static final String err_file = "Cannot create file";
+    
+    private final FileArgument argFile = new FileArgument("file", Argument.MANDATORY, help_file);
 
     public TouchCommand() {
-        super("touch a file");
-        registerArguments(ARG_FILE);
+        super(help_super);
+        registerArguments(argFile);
     }
 
     public static void main(String[] args) throws Exception {
@@ -49,7 +54,7 @@ public class TouchCommand extends AbstractCommand {
     }
 
     public void execute() throws Exception {
-        File file = ARG_FILE.getValue();
+        File file = argFile.getValue();
         PrintWriter out = getOutput().getPrintWriter();
         PrintWriter err = getError().getPrintWriter();
         if (!file.exists()) {
@@ -57,14 +62,14 @@ public class TouchCommand extends AbstractCommand {
             if (parentFile != null && !parentFile.exists()) {
                 // FIXME ... this is wrong.  Touch should not do this.
                 if (!parentFile.mkdirs()) {
-                    err.println("Cannot create parent directories");
+                    err.println(err_parent_dir);
                     exit(2);
                 }
             }            
             if (file.createNewFile()) {
-                out.println("File created");
+                out.println(str_created);
             } else {
-                err.println("Cannot create file");
+                err.println(err_file);
                 exit(1);
             }
         } else {

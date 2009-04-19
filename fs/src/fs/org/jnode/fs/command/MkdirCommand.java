@@ -33,12 +33,17 @@ import org.jnode.shell.syntax.FileArgument;
  */
 public class MkdirCommand extends AbstractCommand {
 
-    private final FileArgument ARG_DIR = new FileArgument(
-            "directory", Argument.MANDATORY | Argument.NONEXISTENT, "the directory to create");
+    private static final String help_dir = "the directory to create";
+    private static final String help_super = "Create a new directory";
+    private static final String fmt_exists = "%s already exists%n";
+    private static final String err_cant_create = "Cannot create directory";
+    
+    private final FileArgument argDir 
+        = new FileArgument("directory", Argument.MANDATORY | Argument.NONEXISTENT, help_dir);
 
     public MkdirCommand() {
-        super("Create a new directory");
-        registerArguments(ARG_DIR);
+        super(help_super);
+        registerArguments(argDir);
     }
 
     public static void main(String[] args) throws Exception {
@@ -46,14 +51,14 @@ public class MkdirCommand extends AbstractCommand {
     }
 
     public void execute() {
-        File dir = ARG_DIR.getValue();
+        File dir = argDir.getValue();
         PrintWriter err = getError().getPrintWriter();
         if (dir.exists()) {
-            err.println(dir.getPath() + " already exists.");
+            err.format(fmt_exists, dir);
             exit(1);
         }
         if (!dir.mkdir()) {
-            err.println("Can't create directory.");
+            err.println(err_cant_create);
             exit(1);
         }
     }
