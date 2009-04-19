@@ -33,6 +33,7 @@ import org.jnode.apps.jpartition.model.TestRemovePartitionFromDevice;
 import org.jnode.apps.jpartition.swingview.FileDeviceView;
 import org.jnode.apps.jpartition.utils.device.AbstractIDEDevice;
 import org.jnode.apps.jpartition.utils.device.DeviceUtils;
+import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.fs.jfat.command.JGrub;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -61,8 +62,10 @@ public class JPartitionTest extends TestSuite {
      * @throws Throwable
      */
     public static void main(String[] args) throws Throwable {
+        
         final ViewFactory vf = new ConsoleViewFactory(System.in, System.out, System.err);
         final ErrorReporter errorReporter = vf.createErrorReporter();
+/*        
         final Thread t = new Thread() {
             public void run() {
                 try {
@@ -73,12 +76,13 @@ public class JPartitionTest extends TestSuite {
             }
         };
         t.start();
-
+*/
         // DeviceUtils.createFakeDevice(new ErrorReporter());
-        AbstractIDEDevice dev = DeviceUtils.createFileDevice();
+        IDEDevice dev = DeviceUtils.createFileDevice(errorReporter);
         JGrub jgrub = new JGrub(new PrintWriter(new OutputStreamWriter(System.out)), dev);
-        jgrub.install();
-
-        JPartitionCommand.main(args);
+        
+//        jgrub.install();
+        
+        new JPartitionCommand().doExecute(true, System.in, System.out, System.err, true, false);
     }
 }

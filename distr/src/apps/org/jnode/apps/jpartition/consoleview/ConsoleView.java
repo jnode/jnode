@@ -104,10 +104,10 @@ class ConsoleView extends Component {
         List<Device> devices = UserFacade.getInstance().getDevices();
         if ((devices != null) && !devices.isEmpty()) {
             Options devicesOpt = new Options(context);
-            int choice =
-                    (int) devicesOpt.show("Select a device", devices, DeviceLabelizer.INSTANCE);
+            Device choice =
+                    devicesOpt.show("Select a device", devices, DeviceLabelizer.INSTANCE);
 
-            String device = devices.get(choice - 1).getName();
+            String device = choice.getName();
             UserFacade.getInstance().selectDevice(device);
             println("device=" + device);
             deviceSelected = true;
@@ -130,11 +130,9 @@ class ConsoleView extends Component {
             partitions = UserFacade.getInstance().getPartitions();
 
             Options partitionsOpt = new Options(context);
-            int choice =
-                    (int) partitionsOpt.show("Select a partition", partitions,
+            selectedPartition = 
+                    partitionsOpt.show("Select a partition", partitions,
                             PartitionLabelizer.INSTANCE);
-
-            selectedPartition = partitions.get(choice - 1);
         }
 
         if (selectedPartition != null) {
@@ -154,31 +152,49 @@ class ConsoleView extends Component {
         return UserFacade.getInstance().createPartition(freePart.getStart(), size);
     }
 
-    private void modifyPartition(Partition partition) throws Exception {
-        if (partition.isUsed()) {
-            final String[] operations = new String[] {"format partition", "remove partition"};
-
-            Options partitionsOpt = new Options(context);
-            int choice = (int) partitionsOpt.show("Select an operation", operations);
-            switch (choice) {
-                case 0:
-                    formatPartition(partition);
-                    break;
-                case 1:
-                    removePartition(partition);
-                    break;
+    private enum Operation {
+        FORMAT_PARTITION("format partition") {
+            @Override
+            public void execute(ConsoleView view, Partition partition) throws Exception {
+                view.formatPartition(partition);
             }
-        } else {
-            final String[] operations = new String[] {"add partition"};
-
-            Options partitionsOpt = new Options(context);
-            int choice = (int) partitionsOpt.show("Select an operation", operations);
-            switch (choice) {
-                case 0:
-                    createPartition(partition);
-                    break;
+        },
+        ADD_PARTITION("add partition") {
+            @Override
+            public void execute(ConsoleView view, Partition partition) throws Exception {
+                view.createPartition(partition);
             }
+        },
+        REMOVE_PARTITION("remove partition") {
+            @Override
+            public void execute(ConsoleView view, Partition partition) throws Exception {
+                view.removePartition(partition);
+            }
+        };
+        
+        private String label;
+        
+        private Operation(String label) {
+            this.label = label;
         }
+        
+        @Override
+        public String toString() {
+            return label;
+        }
+        
+        public abstract void execute(ConsoleView view, Partition partition) throws Exception;
+    }
+    private void modifyPartition(Partition partition) throws Exception {
+        Operation[] choices;
+        if (partition.isUsed()) {
+            choices = new Operation[] {Operation.FORMAT_PARTITION, Operation.REMOVE_PARTITION}; 
+        } else {
+            choices = new Operation[] {Operation.ADD_PARTITION}; 
+        }
+        Options partitionsOpt = new Options(context);
+        Operation choice = partitionsOpt.show("Select an operation", choices);
+        choice.execute(this, partition);
     }
 
     private void removePartition(Partition partition) throws Exception {
@@ -193,8 +209,7 @@ class ConsoleView extends Component {
     private void formatPartition(Partition partition) throws Exception {
         String[] formatters = UserFacade.getInstance().getFormatters();
         Options partitionsOpt = new Options(context);
-        int choice = (int) partitionsOpt.show("Select a filesystem", formatters);
-        String formatter = formatters[choice];
+        String formatter = partitionsOpt.show("Select a filesystem", formatters);
 
         UserFacade.getInstance().selectFormatter(formatter);
 
