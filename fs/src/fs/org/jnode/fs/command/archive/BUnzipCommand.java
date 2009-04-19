@@ -20,6 +20,9 @@
 
 package org.jnode.fs.command.archive;
 
+/**
+ * @author chris boertien
+ */
 public class BUnzipCommand extends BZip {
     
     public BUnzipCommand() {
