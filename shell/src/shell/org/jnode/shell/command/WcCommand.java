@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.command.posix.TrueCommand;
 import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
 
@@ -44,124 +44,113 @@ import org.jnode.shell.syntax.FlagArgument;
  */
 public class WcCommand extends AbstractCommand {
 
-    private static final String str_super = "Print newline, word, and byte counts for each file.";
-    /** The Constant HELP_bytes. */
+    private static final String STR_SUPER = "Print newline, word, and byte counts for each file.";
+    private static final String STR_TOTAL = "total";
+    private static final String STR_ERROR_DIR = "File is a directoy : ";
+    private static final String STR_ERROR_NOT_EXIST = "File not exist : ";
+    private static final String STR_ERROR_CANT_READ = "File can't be read : ";
+    private static final String STR_ERROR_IO_EX = "IO error";
     private static final String HELP_BYTES = "Write to the standard output the number of bytes.";
-
-    /** The Constant HELP_LINES. */
     private static final String HELP_LINES = "Write to the standard output the number of newline characters.";
-
-    /** The Constant HELP_CHARS. */
     private static final String HELP_CHARS = "Write to the standard output the number of characters.";
-
-    /** The Constant HELP_WORDS. */
     private static final String HELP_WORDS = "Write to the standard output the number of words.";
+    private static final String HELP_MAX_CHARS = "Write to the standard output the number of characters of "
+            + "the longest line.";
 
-    /** The Constant HELP_maxCharsInLine. */
-    private static final String HELP_MAX_CHARS_IN_LINE = "Write to the standard output the number of characters of " +
-                                                         "the longest line.";
-
-    /** Print bytes. */
     private boolean printBytes = false;
-
-    /** Print lines. */
     private boolean printLines = false;
-
-    /** Print chars. */
     private boolean printChars = false;
-
-    /** Print words count. */
     private boolean printWordsCount = false;
-
-    /** Print max chars in line. */
     private boolean printMaxCharsInLine = false;
 
-    /** The Files flags. */
-    private final FileArgument Files;
-
-    /** The Bytes flags. */
-    private final FlagArgument Bytes;
-
-    /** The Lines flags. */
-    private final FlagArgument Lines;
-
-    /** The Chars flags. */
-    private final FlagArgument Chars;
-
-    /** The Worlds flags. */
-    private final FlagArgument Words;
-
-    /** The Max chars in line flags. */
-    private final FlagArgument MaxCharsInLine;
+    private final FileArgument filesArgs;
+    private final FlagArgument bytesArgs;
+    private final FlagArgument linesArgs;
+    private final FlagArgument charsArgs;
+    private final FlagArgument wordsArgs;
+    private final FlagArgument maxChars;
 
     /**
      * Instantiates a new word count command.
      */
     public WcCommand() {
-        super(str_super);
-        this.Files = new FileArgument("files", Argument.OPTIONAL | Argument.EXISTING | Argument.MULTIPLE);
-        this.Bytes = new FlagArgument("bytes", Argument.OPTIONAL, HELP_BYTES);
-        this.Lines = new FlagArgument("lines", Argument.OPTIONAL, HELP_LINES);
-        this.Chars = new FlagArgument("chars", Argument.OPTIONAL, HELP_CHARS);
-        this.Words = new FlagArgument("worlds", Argument.OPTIONAL, HELP_WORDS);
-        this.MaxCharsInLine = new FlagArgument("maxCharLine", Argument.OPTIONAL, HELP_MAX_CHARS_IN_LINE);
-        registerArguments(this.Files, this.Bytes, this.Lines, this.Chars, this.Words, this.MaxCharsInLine);
+        super(STR_SUPER);
+        this.filesArgs = new FileArgument("files", Argument.OPTIONAL | Argument.EXISTING | Argument.MULTIPLE);
+        this.bytesArgs = new FlagArgument("bytes", Argument.OPTIONAL, HELP_BYTES);
+        this.linesArgs = new FlagArgument("lines", Argument.OPTIONAL, HELP_LINES);
+        this.charsArgs = new FlagArgument("chars", Argument.OPTIONAL, HELP_CHARS);
+        this.wordsArgs = new FlagArgument("worlds", Argument.OPTIONAL, HELP_WORDS);
+        this.maxChars = new FlagArgument("maxCharLine", Argument.OPTIONAL, HELP_MAX_CHARS);
+        registerArguments(this.filesArgs, this.bytesArgs, this.linesArgs, this.charsArgs, this.wordsArgs, this.maxChars);
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.jnode.shell.AbstractCommand#execute()
-     */
+    
     @Override
     public void execute() {
-
-        try {
-            final List<WcStream> results = new ArrayList<WcStream>(1);
-            // Initialize arguments
-            initArgs();
-            // Read from files
-            if (this.Files.isSet()) {
-                for (final File file : this.Files.getValues()) {
-                    final WcStream wcStream = new WcStream();
-                    FileInputStream fis = null;
-                    try {
-                        fis = new FileInputStream(file);
-                        wcStream.processStream(file.getName(), fis);
-                    } finally {
-                        fis.close();
+        final List<WcStream> results = new ArrayList<WcStream>(1);
+        FileInputStream fis = null;
+        // Initialize arguments
+        initArgs();
+        // Read from files
+        if (this.filesArgs.isSet()) {
+            for (final File file : this.filesArgs.getValues()) {
+                checkFile(file);
+                try {
+                    fis = new FileInputStream(file);
+                    results.add(new WcStream().processStream(file.getName(), fis));
+                } catch (IOException io) {
+                    getError().getPrintWriter().println(STR_ERROR_IO_EX + " : " + file.getAbsolutePath());
+                    exit(1);
+                } finally {
+                    if (fis != null) {
+                        try {
+                            fis.close();
+                        } catch (IOException e) {
+                            //
+                        }
+                        fis = null;
                     }
-                    results.add(wcStream);
                 }
-                // Or read from input stream
-            } else {
-                final WcStream wcStream = new WcStream();
-                wcStream.processStream(null, getInput().getInputStream());
-                results.add(wcStream);
             }
-            // Print results
-            printResults(getOutput().getPrintWriter(), results);
-        } catch (final Exception e) {
-            // TODO best error message
-            getError().getPrintWriter().append(e.getMessage());
+        } else {
+            try {
+                // Or read from input stream
+                results.add(new WcStream().processStream(null, getInput().getInputStream()));
+            } catch (IOException io) {
+                getError().getPrintWriter().println(STR_ERROR_IO_EX);
+                exit(1);
+            }
+        }
+        // Print results
+        printResults(getOutput().getPrintWriter(), results);
+        exit(0);
+    }
+
+    private void checkFile(final File file) {
+        if (!file.exists()) {
+            getError().getPrintWriter().println(STR_ERROR_NOT_EXIST + " " + file.getAbsolutePath());
+            exit(1);
+        } else if (file.isDirectory()) {
+            getError().getPrintWriter().println(STR_ERROR_DIR + " " + file.getAbsolutePath());
+            exit(1);
+        } else if (!file.canRead()) {
+            getError().getPrintWriter().println(STR_ERROR_CANT_READ + " " + file.getAbsolutePath());
             exit(1);
         }
-        exit(0);
     }
 
     /**
      * Initialize arguments.
      */
     private void initArgs() {
-        if (this.Bytes.isSet() || this.Lines.isSet() || this.Chars.isSet() || this.Words.isSet()
-                || this.MaxCharsInLine.isSet()) {
-            this.printBytes = this.Bytes.isSet();
-            this.printChars = this.Chars.isSet();
-            this.printLines = this.Lines.isSet();
-            this.printWordsCount = this.Words.isSet();
-            this.printMaxCharsInLine = this.MaxCharsInLine.isSet();
+        if (this.bytesArgs.isSet() || this.linesArgs.isSet() || this.charsArgs.isSet() || this.wordsArgs.isSet()
+                || this.maxChars.isSet()) {
+            this.printBytes = this.bytesArgs.isSet();
+            this.printChars = this.charsArgs.isSet();
+            this.printLines = this.linesArgs.isSet();
+            this.printWordsCount = this.wordsArgs.isSet();
+            this.printMaxCharsInLine = this.maxChars.isSet();
         } else {
-            // Default args
+            // Default arguments
             this.printLines = true;
             this.printBytes = true;
             this.printChars = false;
@@ -185,7 +174,6 @@ public class WcCommand extends AbstractCommand {
         long totalLinesCount = 0;
         long totalWordsCount = 0;
         long maxCharsInLine = 0;
-
         int paddingSize = 0;
 
         for (final WcStream wc : listWc) {
@@ -214,29 +202,21 @@ public class WcCommand extends AbstractCommand {
         if (listWc.size() > 1) {
             printLine(printWriter, paddingSize, totalLinesCount, totalWordsCount, totalCharsCount, totalBytesRead,
                     maxCharsInLine);
-            printWriter.print(" total");
-            printWriter.println();
+            printWriter.println(" " + STR_TOTAL);
         }
         printWriter.flush();
     }
 
     /**
-     * Prints the line.
+     * Print a line result
      * 
      * @param printWriter
-     *            the print writer
      * @param paddingSize
-     *            the padding size
      * @param linesCount
-     *            the lines count
      * @param wordsCount
-     *            the words count
      * @param charsCount
-     *            the chars count
      * @param bytesRead
-     *            the bytes read
      * @param charsInLine
-     *            the chars in line
      */
     private void printLine(final PrintWriter printWriter, final int paddingSize, final long linesCount,
             final long wordsCount, final long charsCount, final long bytesRead, final long charsInLine) {
@@ -264,16 +244,12 @@ public class WcCommand extends AbstractCommand {
     }
 
     /**
-     * Print a number.
+     * Print a result
      * 
      * @param printWriter
-     *            the print writer
      * @param first
-     *            the first
-     * @param value
-     *            the value
      * @param paddingSize
-     *            the padding size
+     * @param value
      */
     private void print(final PrintWriter printWriter, final boolean first, final int paddingSize, final long value) {
         final StringBuffer sValue = new StringBuffer(paddingSize + 1);
@@ -298,10 +274,8 @@ public class WcCommand extends AbstractCommand {
          */
         private static class ByteCountInputStream extends InputStream {
 
-            /** The is. */
             private final InputStream inputStream;
 
-            /** The bytes read. */
             private long bytesRead = 0;
 
             /**
@@ -311,49 +285,8 @@ public class WcCommand extends AbstractCommand {
              *            the input stream
              */
             private ByteCountInputStream(final InputStream inputStream) {
+                super();
                 this.inputStream = inputStream;
-            }
-
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.io.InputStream#read()
-             */
-            @Override
-            public int read() throws IOException {
-                final int rchar = this.inputStream.read();
-                if (rchar != -1) {
-                    this.bytesRead++;
-                }
-                return rchar;
-            }
-
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.io.InputStream#read(byte[], int, int)
-             */
-            @Override
-            public int read(final byte[] b, final int off, final int len) throws IOException {
-                final int wasRead = this.inputStream.read(b, off, len);
-                if (wasRead > 0) {
-                    this.bytesRead += wasRead;
-                }
-                return wasRead;
-            }
-
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.io.InputStream#read(byte[])
-             */
-            @Override
-            public int read(final byte[] b) throws IOException {
-                final int wasRead = this.inputStream.read(b);
-                if (wasRead > 0) {
-                    this.bytesRead += wasRead;
-                }
-                return wasRead;
             }
 
             /**
@@ -365,135 +298,107 @@ public class WcCommand extends AbstractCommand {
                 return this.bytesRead;
             }
 
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.io.InputStream#available()
-             */
+            @Override
+            public int read() throws IOException {
+                final int rchar = this.inputStream.read();
+                if (rchar != -1) {
+                    this.bytesRead++;
+                }
+                return rchar;
+            }
+
+            @Override
+            public int read(final byte[] b, final int off, final int len) throws IOException {
+                final int wasRead = this.inputStream.read(b, off, len);
+                if (wasRead > 0) {
+                    this.bytesRead += wasRead;
+                }
+                return wasRead;
+            }
+
+            @Override
+            public int read(final byte[] b) throws IOException {
+                final int wasRead = this.inputStream.read(b);
+                if (wasRead > 0) {
+                    this.bytesRead += wasRead;
+                }
+                return wasRead;
+            }
+
             @Override
             public int available() throws IOException {
                 return this.inputStream.available();
             }
 
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.io.InputStream#markSupported()
-             */
             @Override
             public boolean markSupported() {
                 return false;
             }
 
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.io.InputStream#skip(long)
-             */
             @Override
             public long skip(final long n) throws IOException {
-                final long rs = this.inputStream.skip(n);
-                if (rs > 0) {
-                    this.bytesRead += rs;
+                final long rChar = this.inputStream.skip(n);
+                if (rChar > 0) {
+                    this.bytesRead += rChar;
                 }
-                return rs;
+                return rChar;
             }
         }
 
-        /** The file name. */
         private String fileName = null;
 
-        /** The bytes read. */
         private long bytesRead = 0;
 
-        /** The chars count. */
         private long charsCount = 0;
 
-        /** The lines count. */
         private long linesCount = 0;
 
-        /** The words count. */
         private long wordsCount = 0;
 
-        /** The max chars in line. */
         private int maxCharsInLine = 0;
 
-        /** The chars in line. */
         private int charsInLine = 0;
 
-        /**
-         * Instantiates a new wc stream.
-         */
         private WcStream() {
-
+            // default constructor
         }
 
-        /**
-         * Gets the file name.
-         * 
-         * @return the file name
-         */
         public String getFileName() {
             return this.fileName;
         }
 
-        /**
-         * Gets the bytes read.
-         * 
-         * @return the bytes read
-         */
         public long getBytesRead() {
             return this.bytesRead;
         }
 
-        /**
-         * Gets the chars count.
-         * 
-         * @return the chars count
-         */
         public long getCharsCount() {
             return this.charsCount;
         }
 
-        /**
-         * Gets the lines count.
-         * 
-         * @return the lines count
-         */
         public long getLinesCount() {
             return this.linesCount;
         }
 
-        /**
-         * Gets the words count.
-         * 
-         * @return the words count
-         */
         public long getWordsCount() {
             return this.wordsCount;
         }
 
-        /**
-         * Gets the max chars in line.
-         * 
-         * @return the max chars in line
-         */
         public int getMaxCharsInLine() {
             return this.maxCharsInLine;
         }
 
         /**
-         * Process stream.
+         * Process the stream.
          * 
          * @param fileName
-         *            the file name
+         *            the file name, can be null
          * @param inputStream
          *            the input stream
          * 
          * @throws IOException
          *             Signals that an I/O exception has occurred.
          */
-        private void processStream(final String fileName, final InputStream inputStream) throws IOException {
+        private WcStream processStream(final String fileName, final InputStream inputStream) throws IOException {
             final ByteCountInputStream bic = new ByteCountInputStream(inputStream);
             InputStreamReader reader = null;
             this.fileName = fileName;
@@ -501,13 +406,10 @@ public class WcCommand extends AbstractCommand {
             reader = new InputStreamReader(bic);
             boolean wasR = false;
             boolean wasWord = false;
-            do {
-                final int r = reader.read();
-                if (r == -1) {
-                    break;
-                }
-                final char ch = (char) r;
-                if (ch == '\r') {
+            int iChar = reader.read();
+            for (; iChar >= 0; iChar = reader.read()) {
+                final char cChar = (char) iChar;
+                if (cChar == '\r') {
                     wasWord = false;
                     wasR = true;
                     this.linesCount++;
@@ -516,8 +418,7 @@ public class WcCommand extends AbstractCommand {
                         this.maxCharsInLine = this.charsInLine;
                         this.charsInLine = 0;
                     }
-                } else if (ch == '\n') {
-                    wasWord = false;
+                } else if (cChar == '\n') {
                     if (!wasR) {
                         this.linesCount++;
                         if (this.charsInLine > this.maxCharsInLine) {
@@ -525,9 +426,10 @@ public class WcCommand extends AbstractCommand {
                             this.charsInLine = 0;
                         }
                     }
+                    wasWord = false;
                     wasR = false;
                     this.charsCount++;
-                } else if (ch == ' ' || ch == '\t') {
+                } else if (cChar == ' ' || cChar == '\t') {
                     wasR = false;
                     wasWord = false;
                     this.charsCount++;
@@ -540,10 +442,9 @@ public class WcCommand extends AbstractCommand {
                     this.charsCount++;
                     this.charsInLine++;
                 }
-            } while (true);
-            // if( charsCount > 0 )
-            // linesCount++;
+            }
             this.bytesRead = bic.getBytesRead();
+            return this;
         }
     }
 
@@ -551,12 +452,9 @@ public class WcCommand extends AbstractCommand {
      * The main method.
      * 
      * @param args
-     *            the arguments
-     * 
      * @throws Exception
-     *             the exception
      */
     public static void main(final String[] args) throws Exception {
-        new TrueCommand().execute(args);
+        new WcCommand().execute(args);
     }
 }
