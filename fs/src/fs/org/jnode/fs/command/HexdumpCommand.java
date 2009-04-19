@@ -39,21 +39,25 @@ import org.jnode.util.NumberUtils;
  * @author crawley@jnode.org
  */
 public class HexdumpCommand extends AbstractCommand {
-    private final FileArgument ARG_FILE = new FileArgument(
-            "file", Argument.OPTIONAL | Argument.EXISTING, "the file to print out");
-
-    private final URLArgument ARG_URL = new URLArgument(
-            "url", Argument.OPTIONAL | Argument.EXISTING, "the url to print out");
+    
+    private static final String help_file = "the file to print out";
+    private static final String help_url = "the url to print out";
+    private static final String help_super = "Print a hexadecimal dump of a given file (or URL)";
+    private static final String fmt_cant_open = "Cannot open %s: %s%n";
+    private static final String fmt_cant_open_url = "Cannot access URL %s: %s%n";
+    
+    private final FileArgument argFile = new FileArgument("file", Argument.OPTIONAL | Argument.EXISTING, help_file);
+    private final URLArgument argURL = new URLArgument("url", Argument.OPTIONAL | Argument.EXISTING, help_url);
 
     public HexdumpCommand() {
-        super("Print a hexadecimal dump of a given file (or URL)");
-        registerArguments(ARG_FILE, ARG_URL);
+        super(help_super);
+        registerArguments(argFile, argURL);
     }
 
     public static void main(String[] args) throws Exception {
         new HexdumpCommand().execute(args);
     }
-
+    
     public void execute() throws IOException {
         boolean myInput = false;
         InputStream is = null;
@@ -61,20 +65,20 @@ public class HexdumpCommand extends AbstractCommand {
         PrintWriter err = getError().getPrintWriter();
         try {
             // Set up the stream to be dumped.
-            File file = ARG_FILE.getValue();
-            if (ARG_FILE.isSet()) {
+            File file = argFile.getValue();
+            if (argFile.isSet()) {
                 try {
                     is = new FileInputStream(file);
                 } catch (FileNotFoundException ex) {
-                    err.println("Cannot open " + file + ": " + ex.getMessage());
+                    err.format(fmt_cant_open, file, ex.getLocalizedMessage());
                     exit(1);
                 }
-            } else if (ARG_URL.isSet()) {
-                URL url = ARG_URL.getValue();
+            } else if (argURL.isSet()) {
+                URL url = argURL.getValue();
                 try {
                     is = url.openStream();
                 } catch (IOException ex) {
-                    err.println("Cannot access URL '" + url + "': " + ex.getMessage());
+                    err.format(fmt_cant_open_url, url, ex.getLocalizedMessage());
                     exit(1);
                 }
             } else {

@@ -37,12 +37,17 @@ import org.jnode.shell.syntax.FileArgument;
  */
 public class CdCommand extends AbstractCommand {
 
-    private final FileArgument ARG_DIR = new FileArgument(
-            "directory", Argument.OPTIONAL | Argument.EXISTING, "the directory to change to");
+    private static final String help_dir = "the directory to change to";
+    private static final String help_super = "Change the current directory";
+    private static final String err_home = "user.home is not set";
+    private static final String err_dir_invalid = "%s is not a valid directory%n";
+    
+    private final FileArgument argDir = new FileArgument(
+            "directory", Argument.OPTIONAL | Argument.EXISTING, help_dir);
 
     public CdCommand() {
-        super("Change the current directory");
-        registerArguments(ARG_DIR);
+        super(help_super);
+        registerArguments(argDir);
     }
 
     public static void main(String[] args) throws Exception {
@@ -51,13 +56,13 @@ public class CdCommand extends AbstractCommand {
 
     public void execute() 
         throws IOException {
-        File dir = ARG_DIR.getValue();
+        File dir = argDir.getValue();
         PrintWriter err = getError().getPrintWriter();
         if (dir == null) {
             // If no directory argument was given, change to the "user.home" directory.
             String home = System.getProperty("user.home");
             if (home == null || home.isEmpty()) {
-                err.println("user.home is not set");
+                err.println(err_home);
                 exit(1);
             }
             dir = new File(home);
@@ -65,7 +70,7 @@ public class CdCommand extends AbstractCommand {
         if (dir.exists() && dir.isDirectory()) {
             System.setProperty("user.dir", dir.getAbsoluteFile().getCanonicalPath());
         } else {
-            err.println(dir + " is not a valid directory");
+            err.format(err_dir_invalid, dir);
             exit(1);
         }
     }

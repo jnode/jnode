@@ -39,18 +39,21 @@ import org.jnode.shell.syntax.FileArgument;
  */
 public class MountCommand extends AbstractCommand {
 
-    private final DeviceArgument ARG_DEV = new DeviceArgument("device",
-            Argument.OPTIONAL, "the device to mount", BlockDeviceAPI.class);
-
-    private final FileArgument ARG_DIR = new FileArgument("directory",
-            Argument.OPTIONAL, "the mount point");
-
-    private final FileArgument ARG_FSPATH = new FileArgument("fsPath",
-            Argument.OPTIONAL, "the subdirectory within the filesystem to use as root");
+    private static final String help_device = "the device to mount";
+    private static final String help_dir = "the mount point";
+    private static final String help_fspath = "the subdirectory within the filesystem to use as root";
+    private static final String help_super = "Mount a filesystem";
+    private static final String fmt_mount = "%s on %s type %s (%s)%n";
+    private static final String fmt_err_nofs = "No filesystem found on %s%n";
+    
+    private final DeviceArgument argDevice 
+        = new DeviceArgument("device", Argument.OPTIONAL, help_device, BlockDeviceAPI.class);
+    private final FileArgument argDir = new FileArgument("directory", Argument.OPTIONAL, help_dir);
+    private final FileArgument argFspath = new FileArgument("fsPath", Argument.OPTIONAL, help_fspath);
 
     public MountCommand() {
-        super("Mount a filesystem");
-        registerArguments(ARG_DEV, ARG_DIR, ARG_FSPATH);
+        super(help_super);
+        registerArguments(argDevice, argDir, argFspath);
     }
 
     public static void main(String[] args) throws Exception {
@@ -62,7 +65,7 @@ public class MountCommand extends AbstractCommand {
         final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
         PrintWriter out = getOutput().getPrintWriter();
         PrintWriter err = getError().getPrintWriter();
-        if (!ARG_DEV.isSet()) {
+        if (!argDevice.isSet()) {
             // List all mounted file systems
             Map<String, FileSystem<?>> filesystems = fss.getMountPoints();
             for (String mountPoint : filesystems.keySet()) {
@@ -70,18 +73,18 @@ public class MountCommand extends AbstractCommand {
                 Device device = fs.getDevice();
                 String mode = fs.isReadOnly() ? "ro" : "rw";
                 String type = fs.getType().getName();
-                out.println(device.getId() + " on " + mountPoint + " type " + type + " (" + mode + ')');
+                out.format(fmt_mount, device.getId(), mountPoint, type, mode);
             }
         } else {
             // Get the parameters
-            final Device dev = ARG_DEV.getValue();
-            final File mountPoint = ARG_DIR.getValue();
-            final File fsPath = ARG_FSPATH.getValue();
+            final Device dev = argDevice.getValue();
+            final File mountPoint = argDir.getValue();
+            final File fsPath = argFspath.getValue();
 
             // Find the filesystem
             final FileSystem<?> fs = fss.getFileSystem(dev);
             if (fs == null) {
-                err.println("No filesystem found on " + dev.getId());
+                err.format(fmt_err_nofs, dev.getId());
                 exit(1);
             } else {
                 // Mount it
