@@ -116,8 +116,8 @@ public class UserFacade {
                 userListener.deviceRemoved(removedDevice.getName());
 
                 if ((selectedDevice != null) && selectedDevice.equals(removedDevice)) {
-                    selectDevice(null, true); // not called by user => need to
-                                                // notify
+                    // not called by user => need to notify
+                    selectDevice(null, true);
                 }
             }
 
@@ -190,10 +190,10 @@ public class UserFacade {
 
         Formatter<? extends FileSystem<?>> formatter = selectedFormatter.clone();
         selectedDevice.formatPartition(offset, formatter);
+        
+        //TODO set parameters
         Command cmd =
-                new FormatPartitionCommand((IDEDevice) selectedDevice.getDevice(), 0, formatter); // TODO
-                                                                                                    // set
-                                                                                                    // parameters
+                new FormatPartitionCommand((IDEDevice) selectedDevice.getDevice(), 0, formatter);
         cmdProcessor.addCommand(cmd);
     }
 
@@ -223,8 +223,8 @@ public class UserFacade {
                 devices.put(device.getName(), device);
             }
 
-            selectDevice(selectedDev, true); // not called by user => need to
-                                                // notify
+            // not called by user => need to notify
+            selectDevice(selectedDev, true);
         } catch (OSFacadeException e) {
             if (errorReporter != null) {
                 errorReporter.reportError(LOG, this, e);
