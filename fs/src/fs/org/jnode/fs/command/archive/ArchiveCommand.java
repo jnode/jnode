@@ -84,7 +84,7 @@ public class ArchiveCommand extends AbstractCommand {
     protected OutputStream stdout;
     
     protected String commandName;
-    protected int rc;
+    protected int rc = 1;
     protected boolean use_stdout;
     protected boolean force;
     protected boolean compress;
@@ -123,51 +123,6 @@ public class ArchiveCommand extends AbstractCommand {
     
     protected void createStreamBuffer(int size) {
         buffer = new byte[size];
-    }
-    
-    protected File[] processFileList(File[] files, boolean recurse) {
-        if (files == null || files.length == 0) return null;
-        
-        if (files.length == 1 && !files[0].isDirectory()) {
-            if (files[0].getName().equals("-")) return null;
-            return files;
-        }
-        
-        ArrayList<File> _files = new ArrayList<File>();
-        
-        for (File file : files) {
-            debug(file.getName());
-            if (file.getName().equals("-")) {
-                if (use_stdout) {
-                    // A special case where '-' is found amongst a list of files and are
-                    // being piped to stdout. The idea is that the content from - should
-                    // be concated amongst the list of files. Its more of an error if the
-                    // destination is not stdout.
-                    _files.add(file);
-                } else {
-                    fatal("Found stdin in file list.", 1);
-                }
-            }
-            if (!file.exists()) {
-                error(err_file_not_exist + file);
-                continue;
-            }
-            if (file.isDirectory() && recurse) {
-                File[] dirList = file.listFiles();
-                for (File subFile : dirList) {
-                    if (subFile.isFile()) {
-                        _files.add(subFile);
-                    }
-                }
-            } else {
-                if (file.isFile()) {
-                    _files.add(file);
-                }
-            }
-        }
-        
-        if (_files.size() == 0) return null;
-        return _files.toArray(files);
     }
     
     /**

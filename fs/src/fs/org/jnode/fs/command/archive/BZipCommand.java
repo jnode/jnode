@@ -23,6 +23,9 @@ package org.jnode.fs.command.archive;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 
+/**
+ * @author chris boertien
+ */
 public class BZipCommand extends BZip {
 
     private static final String help_fast = "compress faster";

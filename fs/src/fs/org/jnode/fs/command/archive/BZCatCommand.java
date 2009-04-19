@@ -19,6 +19,9 @@
  */
 package org.jnode.fs.command.archive;
 
+/**
+ * @author chris boertien
+ */
 public class BZCatCommand extends BZip {
 
     public BZCatCommand() {

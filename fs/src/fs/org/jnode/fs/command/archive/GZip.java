@@ -24,9 +24,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.FileArgument;
@@ -57,6 +58,7 @@ public class GZip extends ArchiveCommand {
     protected final FlagArgument Test     = new FlagArgument("test", Argument.OPTIONAL, help_test);
     protected final StringArgument Suffix = new StringArgument("suffix", Argument.OPTIONAL, help_suffix);
     
+    private List<File> files;
     protected String suffix = ".gz";
     protected boolean recurse;
     
@@ -67,113 +69,117 @@ public class GZip extends ArchiveCommand {
     
     public void execute(String command) {
         super.execute(command);
-        
-        if (!command.equals("zcat")) {
-            if (Suffix.isSet()) suffix = Suffix.getValue();
-        
-            recurse = Recurse.isSet();
-        }
+        parseOptions(command);
         
         try {
             if (compress) {
-                compress(processFileList(Files.getValues(), recurse));
+                compress();
             } else {
-                decompress(processFileList(Files.getValues(), recurse));
+                decompress();
             }
+            rc = 0;
         } catch (IOException e) {
-            e.printStackTrace();
-            fatal(err_exception_uncaught, 1);
+            error(err_exception_uncaught);
+            rc = 1;
+        } finally {
+            exit(rc);
         }
     }
     
-    private void compress(File[] files) throws IOException {
-        InputStream in;
+    private void compress() throws IOException {
+        InputStream in = null;
         OutputStream out = null;
         GZIPOutputStream gzout = null;
-        File gzfile = null;
-        float sizeDiff;
-        
-        if (files == null) {
-            processStream(stdin, new GZIPOutputStream(stdout, BUFFER_SIZE));
-            return;
-        }
         
         if (use_stdout) {
             gzout = new GZIPOutputStream(stdout, BUFFER_SIZE);
         }
-    
+        
         for (File file : files) {
-            if (!use_stdout) {
-                gzfile = new File(file.getAbsolutePath() + suffix);
-                if ((out = openFileWrite(gzfile, true, force)) == null) continue;
-                gzout = new GZIPOutputStream(out, BUFFER_SIZE);
-            }
-            
             if (file.getName().equals("-")) {
                 processStream(stdin, gzout);
                 continue;
             }
-            
-            if ((in = openFileRead(file)) == null) {
-                if (!use_stdout) gzout.close();
-                continue;
+            try {
+                if (use_stdout) {
+                    if ((in = openFileRead(file)) == null) {
+                        rc = 1;
+                        continue;
+                    }
+                    processStream(in, gzout);
+                    continue;
+                }
+                try {
+                    File gzfile = new File(file.getAbsolutePath() + suffix);
+                    if ((out = openFileWrite(gzfile, true, force)) == null) {
+                        rc = 1;
+                        continue;
+                    }
+                    gzout = new GZIPOutputStream(out, BUFFER_SIZE);
+                    if ((in = openFileRead(file)) == null) {
+                        rc = 1;
+                        continue;
+                    }
+                    processStream(in, gzout);
+                    gzout.finish();
+                    float sizeDiff = ((float) gzfile.length() / (float) file.length()) * 100;
+                    notice(String.format(fmt_size_diff, file, sizeDiff, gzfile));
+                    file.delete();
+                } finally {
+                    close(gzout);
+                }
+            } finally {
+                close(in);
             }
-            processStream(in, gzout);
-            
-            if (!use_stdout) {
-                gzout.finish();
-                gzout.close();
-                sizeDiff = ((float) gzfile.length() / (float) file.length()) * 100;
-                notice(String.format(fmt_size_diff, file, sizeDiff, gzfile));
-                file.delete();
-            }
-            in.close();
         }
         
         if (use_stdout) {
             gzout.finish();
+            // TEST need to see if this is even necessary, and if it is
+            // should it be within a finally block
             gzout.close();
         }
     }
     
-    private void decompress(File[] files) throws IOException {
-        InputStream in;
-        OutputStream out = null;
-        File file = null;
-        float sizeDiff;
-        
-        if (files == null) {
-            processStream(new GZIPInputStream(stdin, BUFFER_SIZE), stdout);
-            return;
-        }
-        
-        if (use_stdout) {
-            out = stdout;
-        }
+    private void decompress() throws IOException {
+        InputStream in = null;
+        OutputStream out = stdout;
         
         for (File gzfile : files) {
-            if (!use_stdout) {
-                file = stripSuffix(gzfile);
-                if ((out = openFileWrite(file, true, force)) == null) continue;
-            }
-            
             if (gzfile.getName().equals("-")) {
                 processStream(new GZIPInputStream(stdin, BUFFER_SIZE), out);
                 continue;
             }
             
-            if ((in = new GZIPInputStream(openFileRead(gzfile), BUFFER_SIZE)) == null) {
-                if (!use_stdout) out.close();
-                continue;
-            }
-            processStream(in, out);
-            in.close();
-            
-            if (!use_stdout) {
-                out.close();
-                sizeDiff = ((float) gzfile.length() / (float) file.length()) * 100;
-                notice(String.format(fmt_size_diff, gzfile, sizeDiff, file));
-                gzfile.delete();
+            try {
+                if (use_stdout) {
+                    if ((in = new GZIPInputStream(openFileRead(gzfile), BUFFER_SIZE)) == null) {
+                        continue;
+                    }
+                    processStream(in, out);
+                    continue;
+                }
+                try {
+                    File file = stripSuffix(gzfile);
+                    if (file == null) {
+                        continue;
+                    }
+                    if ((out = openFileWrite(file, true, force)) == null) {
+                        rc = 1;
+                        continue;
+                    }
+                    if ((in = new GZIPInputStream(openFileRead(gzfile), BUFFER_SIZE)) == null) {
+                        continue;
+                    }
+                    processStream(in, out);
+                    float sizeDiff = ((float) gzfile.length() / (float) file.length()) * 100;
+                    notice(String.format(fmt_size_diff, gzfile, sizeDiff, file));
+                    gzfile.delete();
+                } finally {
+                    close(out);
+                }
+            } finally {
+                close(in);
             }
         }
     }
@@ -193,5 +199,40 @@ public class GZip extends ArchiveCommand {
         name = name.substring(0, name.length() - suffix.length());
         
         return new File(name);
+    }
+    
+    private void parseOptions(String command) {
+        if (!command.equals("zcat")) {
+            if (Suffix.isSet()) suffix = Suffix.getValue();
+        
+            recurse = Recurse.isSet();
+        }
+        
+        files = new ArrayList<File>();
+        
+        for (File file : Files.getValues()) {
+            if (file.isDirectory()) {
+                if (recurse) {
+                    for (File f : file.listFiles()) {
+                        if (!f.isDirectory()) {
+                            files.add(f);
+                        }
+                    }
+                }
+            } else {
+                if (file.getName().equals("-")) {
+                    use_stdout = true;
+                }
+                files.add(file);
+            }
+        }
+        
+        if (files.size() == 0) {
+            files.add(new File("-"));
+        }
+        
+        if (files.size() == 1 && files.get(0).getName().equals("-")) {
+            use_stdout = true;
+        }
     }
 }

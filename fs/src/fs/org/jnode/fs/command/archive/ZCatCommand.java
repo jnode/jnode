@@ -22,8 +22,9 @@ package org.jnode.fs.command.archive;
 
 /**
  * Outputs compressed files to standard out.
+ *
+ * @author chris boertien
  */
-
 public class ZCatCommand extends GZip {
 
     public ZCatCommand() {
