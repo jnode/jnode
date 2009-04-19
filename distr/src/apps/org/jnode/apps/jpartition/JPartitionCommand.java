@@ -54,15 +54,22 @@ public class JPartitionCommand extends AbstractCommand {
         InputStream in = getInput().getInputStream();
         PrintStream out = getOutput().getPrintStream();
         PrintStream err = getError().getPrintStream();
+        
+        boolean consoleView = FLAG_CONSOLE.isSet();
+        boolean swingView = FLAG_SWING.isSet();
+        doExecute(install, in, out, err, consoleView, swingView);
+    }
+
+    public void doExecute(boolean install, InputStream in, PrintStream out, PrintStream err, boolean consoleView, boolean swingView) throws Exception { 
         ViewFactory viewFactory =
-                FLAG_CONSOLE.isSet() ? new ConsoleViewFactory(in, out, err)
-                        : FLAG_SWING.isSet() ? new SwingViewFactory() : null;
+                consoleView ? new ConsoleViewFactory(in, out, err)
+                        : swingView ? new SwingViewFactory() : null;
         if (viewFactory == null) {
             err.println("No UI selected");
             exit(1);
         }
-
+    
         JPartition jpartition = new JPartition(viewFactory, install);
         jpartition.launch();
-    }
+    } 
 }

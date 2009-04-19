@@ -37,6 +37,7 @@ import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.bus.ide.IDEDevice;
+import org.jnode.emu.naming.BasicNameSpace;
 import org.jnode.emu.plugin.model.DummyConfigurationElement;
 import org.jnode.emu.plugin.model.DummyExtension;
 import org.jnode.emu.plugin.model.DummyExtensionPoint;
@@ -44,6 +45,8 @@ import org.jnode.emu.plugin.model.DummyPluginDescriptor;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.fs.service.def.FileSystemPlugin;
 import org.jnode.naming.InitialNaming;
+import org.jnode.naming.NameSpace;
+import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 import org.jnode.test.fs.filesystem.config.FSType;
 import org.jnode.util.OsUtils;
 
@@ -55,18 +58,13 @@ public class DeviceUtils {
     private static boolean coreInitialized = false;
 
     public static final void initJNodeCore() {
-        if (!OsUtils.isJNode() && !coreInitialized) {
+        if (!coreInitialized && !OsUtils.isJNode()) {
 
             try {
-//                // ShellEmu.main(new String[0]);
-//                NameSpace namespace = new BasicNameSpace();
-//                InitialNaming.setNameSpace(namespace);
-//
-//                InitialNaming.bind(DeviceManager.NAME, StubDeviceManager.INSTANCE);
-//
-//                PluginDescriptor desc = new DummyPluginDescriptor(true);
-//                FileSystemService fss = new FileSystemPlugin(desc);
-//                namespace.bind(FileSystemService.class, fss);
+                // ShellEmu.main(new String[0]);
+                NameSpace namespace = new BasicNameSpace();
+                InitialNaming.setNameSpace(namespace);
+                InitialNaming.bind(DeviceManager.NAME, StubDeviceManager.INSTANCE);
                 
                 // Build a plugin descriptor that is sufficient for the FileSystemPlugin to 
                 // configure file system types for testing.
@@ -93,6 +91,36 @@ public class DeviceUtils {
             }
             coreInitialized = true;
         }
+        
+        
+//        if (!coreInitialized && !OsUtils.isJNode()) {
+//            // We are not running in JNode, emulate a JNode environment.
+//
+//            InitialNaming.setNameSpace(new BasicNameSpace());
+//
+//            // Build a plugin descriptor that is sufficient for the FileSystemPlugin to
+//            // configure file system types for testing.
+//            DummyPluginDescriptor desc = new DummyPluginDescriptor(true);
+//            DummyExtensionPoint ep = new DummyExtensionPoint("types", "org.jnode.fs.types", "types");
+//            desc.addExtensionPoint(ep);
+//            for (FSType fsType : FSType.values()) {
+//                DummyExtension extension = new DummyExtension();
+//                DummyConfigurationElement element = new DummyConfigurationElement();
+//                element.addAttribute("class", fsType.getFsTypeClass().getName());
+//                extension.addElement(element);
+//                ep.addExtension(extension);
+//            }
+//
+//            FileSystemService fss = new FileSystemPlugin(desc);
+//            try {
+//                InitialNaming.bind(FileSystemService.class, fss);
+//            } catch (NameAlreadyBoundException e) {
+//                throw new RuntimeException(e);
+//            } catch (NamingException e) {
+//                throw new RuntimeException(e);
+//            }
+//            coreInitialized = true;
+//        }        
     }
 
     public static IDEDevice createFakeDevice(ErrorReporter errorReporter) {
@@ -129,6 +157,23 @@ public class DeviceUtils {
         return device;
     }
 
+    public static IDEDevice createFileDevice(ErrorReporter errorReporter) {
+        IDEDevice device = null;
+
+        try {
+            AbstractIDEDevice fd = createFileDevice();
+            if (addDevice(fd)) {
+                device = fd;
+            } else {
+                errorReporter.reportError(log, DeviceUtils.class.getName(), "failed to add device");
+            }
+        } catch (Exception e) {
+            log.error(e);
+        }
+
+        return device;
+    }
+
     private static AbstractIDEDevice createVMWareDevice() throws Exception {
         File tmpFile = File.createTempFile("disk", "");
         File directory = tmpFile.getParentFile();
@@ -141,7 +186,7 @@ public class DeviceUtils {
         return dev;
     }
 
-    public static AbstractIDEDevice createFileDevice() throws Exception {
+    private static AbstractIDEDevice createFileDevice() throws Exception {
         File tmpFile = File.createTempFile("disk", "");
         File directory = tmpFile.getParentFile();
         String name = tmpFile.getName();

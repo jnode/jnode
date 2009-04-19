@@ -45,6 +45,7 @@ public class StubDeviceManager extends AbstractDeviceManager {
     private List<DeviceToDriverMapper> mappers = new ArrayList<DeviceToDriverMapper>();
 
     private StubDeviceManager() {
+        super("");
     }
 
     public void removeAll() {

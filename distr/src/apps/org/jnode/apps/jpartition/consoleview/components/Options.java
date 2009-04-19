@@ -23,6 +23,7 @@ package org.jnode.apps.jpartition.consoleview.components;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.jnode.apps.jpartition.Context;
 
@@ -31,20 +32,20 @@ public class Options extends Component {
         super(context);
     }
 
-    public <T> long show(String question, T[] options) throws IOException {
+    public <T> T show(String question, T[] options) throws IOException {
         return show(question, Arrays.asList(options), null);
     }
 
-    public <T> long show(String question, T[] options, Labelizer<T> labelizer) throws IOException {
+    public <T> T show(String question, T[] options, Labelizer<T> labelizer) throws IOException {
         return show(question, Arrays.asList(options));
     }
 
     @SuppressWarnings("unchecked")
-    public <T> long show(String question, Collection<T> options) throws IOException {
-        return show(question, Arrays.asList(options), null);
+    public <T> T show(String question, List<T> options) throws IOException {
+        return show(question, options, null);
     }
 
-    public <T> long show(String question, Collection<T> options, Labelizer<T> labelizer)
+    public <T> T show(String question, List<T> options, Labelizer<T> labelizer)
         throws IOException {
         checkNonNull("question", question);
         checkNonEmpty("options", options);
@@ -60,6 +61,7 @@ public class Options extends Component {
         }
 
         NumberField choice = new NumberField(context);
-        return choice.show("Choice : ", null, 1, options.size());
+        int index = choice.show("Choice : ", null, 1, options.size()).intValue() - 1;
+        return options.get(index);
     }
 }

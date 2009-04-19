@@ -87,8 +87,16 @@ public abstract class AbstractDeviceManager implements DeviceManager {
      * Create a new instance
      */
     public AbstractDeviceManager() {
-        cmdLine = (String) AccessController.doPrivileged(new GetPropertyAction(
-            "jnode.cmdline", ""));
+        this((String) AccessController.doPrivileged(new GetPropertyAction(
+            "jnode.cmdline", "")));
+    }
+
+    /**
+     * Create a new instance
+     * @param commandLine command line or an empty string
+     */
+    protected AbstractDeviceManager(String commandLine) {
+        this.cmdLine = commandLine;
         this.systemBus = new SystemBus();
     }
 
@@ -143,7 +151,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
      * startup is delayed.
      * <li>Connect the driver to the device, if a driver is found
      * <li>Attempt to start the device. If this fails an exception is printed
-     * in the log. You can test if the device was started succesfully, by read
+     * in the log. You can test if the device was started successfully, by read
      * the <code>isStarted</code> status.
      * </ul>
      * Note that if the device already has a driver connected to it, the first
