@@ -51,24 +51,25 @@ public class JGrub {
     private final Stage1_5 stage1_5;
     private final Stage2 stage2;
     private final Device device;
-    private final String mountPoint;
+    private String mountPoint;
 
-    public JGrub(PrintWriter out, Device device) throws GrubException {
+    public JGrub(PrintWriter out, Device device) {
         this(out, device, new MBRFormatter(), new Stage1_5(), new Stage2());
     }
 
     protected JGrub(PrintWriter out, Device device, MBRFormatter stage1,
-            Stage1_5 stage1_5, Stage2 stage2) throws GrubException {
+            Stage1_5 stage1_5, Stage2 stage2) {
         this.out = out;
         this.stage1 = stage1;
         this.stage1_5 = stage1_5;
         this.stage2 = stage2;
         this.device = device;
-
-        mountPoint = getMountPoint(device);
     }
 
-    public String getMountPoint() {
+    public String getMountPoint() throws GrubException {
+        if (mountPoint == null) {
+            mountPoint = getMountPoint(device);
+        }
         return mountPoint;
     }
 
@@ -99,7 +100,7 @@ public class JGrub {
         stage1.format(parentDeviceApi);
         stage1_5.format(parentDeviceApi, partitionNumber);
 
-        stage2.format(mountPoint);
+        stage2.format(getMountPoint());
 
         restart(dm, parentDevice);
         out.println("GRUB has been successfully installed to " + deviceName + ".");
