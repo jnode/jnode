@@ -133,7 +133,7 @@ public class CompletionTest extends TestCase {
 
     public void testDefaultInterpreterNewSyntax() throws Exception {
         TestCommandShell cs = new TestCommandShell();
-        cs.setCommandInterpreter("default");
+        cs.setProperty(CommandShell.INTERPRETER_PROPERTY_NAME, "default");
 
         final String[] propertyCompletions = getExpectedPropertyNameCompletions();
 

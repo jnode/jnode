@@ -75,6 +75,4 @@ public interface SimpleCommandInvoker {
     String getName();
 
     boolean isDebugEnabled();
-
-    void setDebugEnabled(boolean enabled);
 }

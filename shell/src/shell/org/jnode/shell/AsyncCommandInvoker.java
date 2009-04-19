@@ -65,8 +65,6 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
     static final String EXECUTE_METHOD = "execute";
 
     boolean blocking;
-    
-    boolean debugEnabled;
 
     Thread blockingThread;
     CommandThread threadProcess = null;
@@ -266,11 +264,6 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
 
     @Override
     public boolean isDebugEnabled() {
-        return this.debugEnabled;
-    }
-
-    @Override
-    public void setDebugEnabled(boolean debugEnabled) {
-        this.debugEnabled = debugEnabled;
+        return commandShell.isDebugEnabled();
     }
 }

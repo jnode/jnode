@@ -57,9 +57,9 @@ public interface ShellManager {
     public void unregisterInterpreterFactory(CommandInterpreter.Factory factory);
 
     public SimpleCommandInvoker createInvoker(String name, CommandShell shell)
-        throws IllegalArgumentException;
+        throws ShellException;
 
     public CommandInterpreter createInterpreter(String name)
-        throws IllegalArgumentException;
+        throws ShellException;
 
 }
