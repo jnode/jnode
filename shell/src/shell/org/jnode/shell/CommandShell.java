@@ -37,10 +37,12 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 
 import javax.naming.NameNotFoundException;
 
@@ -93,7 +95,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     public static final String CMDLINE_PROPERTY_NAME = "jnode.cmdline";
 
     public static final String DEBUG_PROPERTY_NAME = "jnode.debug";
-    public static final String DEBUG_DEFAULT = "false";
+    public static final String DEBUG_DEFAULT = "true";
     public static final String HISTORY_PROPERTY_NAME = "jnode.history";
     public static final String HISTORY_DEFAULT = "true";
 
@@ -162,10 +164,10 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     private String lastInputLine = "";
 
     private SimpleCommandInvoker invoker;
-    private String invokerName;
 
     private CommandInterpreter interpreter;
-    private String interpreterName;
+    
+    private HashMap<String, String> propertyMap;
 
     private CompletionInfo completion;
 
@@ -214,7 +216,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             console.addConsoleListener(this);
             aliasMgr = ShellUtils.getAliasManager().createAliasManager();
             syntaxMgr = ShellUtils.getSyntaxManager().createSyntaxManager();
-            System.setProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
+            propertyMap = initShellProperties();
         } catch (NameNotFoundException ex) {
             throw new ShellException("Cannot find required resource", ex);
         } catch (Exception ex) {
@@ -235,12 +237,22 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                     new OutputStreamWriter(System.err));
             aliasMgr = ShellUtils.getAliasManager().createAliasManager();
             syntaxMgr = ShellUtils.getSyntaxManager().createSyntaxManager();
-            System.setProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
+            propertyMap = initShellProperties();
         } catch (NameNotFoundException ex) {
             throw new ShellException("Cannot find required resource", ex);
         } catch (Exception ex) {
             throw new ShellFailureException("CommandShell initialization failed", ex);
         }
+    }
+    
+    private HashMap<String, String> initShellProperties() {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
+        map.put(DEBUG_PROPERTY_NAME, DEBUG_DEFAULT);
+        map.put(HISTORY_PROPERTY_NAME, HISTORY_DEFAULT);
+        map.put(INVOKER_PROPERTY_NAME, INITIAL_INVOKER);
+        map.put(INTERPRETER_PROPERTY_NAME, INITIAL_INTERPRETER);
+        return map;
     }
     
     private void setupStreams(Reader in, Writer out, Writer err) {
@@ -279,8 +291,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         // Here, we are running in the CommandShell (main) Thread
         // so, we can register ourself as the current shell
         // (it will also be the current shell for all children Thread)
-        
-        configureShell();
+        try {
+            configureShell();
+        } catch (ShellException ex) {
+            throw new ShellFailureException("Shell setup failure", ex);
+        }
 
         // Run commands from the JNode command line first
         final String cmdLine = System.getProperty(CMDLINE_PROPERTY_NAME, "");
@@ -344,7 +359,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         while (!isExited()) {
             String input = null;
             try {
-                refreshFromProperties();
                 clearEof();
                 outPW.print(prompt());
                 readingCommand = true;
@@ -448,7 +462,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         stackTrace(ex);
     }
 
-    public void configureShell() {
+    public void configureShell() throws ShellException {
         try {
             ShellUtils.getShellManager().registerShell(this);
 
@@ -457,84 +471,98 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             ShellUtils.registerCommandInvoker(ProcletCommandInvoker.FACTORY);
             ShellUtils.registerCommandInvoker(IsolateCommandInvoker.FACTORY);
             ShellUtils.registerCommandInterpreter(DefaultInterpreter.FACTORY);
-            ShellUtils
-                    .registerCommandInterpreter(RedirectingInterpreter.FACTORY);
-        } catch (NameNotFoundException e1) {
-            e1.printStackTrace();
+            ShellUtils.registerCommandInterpreter(RedirectingInterpreter.FACTORY);
+        } catch (NameNotFoundException ex) {
+            throw new ShellFailureException(
+                    "Bailing out: fatal error during CommandShell configuration", ex);
         }
 
-        // Configure the shell based on System properties.
-        setupFromProperties();
+        try {
+            setupFromProperties();
+        } catch (ShellException ex) {
+            errPW.println("Problem shell configuration");
+            errPW.println(ex.getMessage());
+            stackTrace(ex);
+            errPW.println("Retrying shell configuration with fallback invoker/interpreter settings");
+            propertyMap.put(INVOKER_PROPERTY_NAME, FALLBACK_INVOKER);
+            propertyMap.put(INTERPRETER_PROPERTY_NAME, FALLBACK_INTERPRETER);
+            try {
+                setupFromProperties();
+            } catch (ShellException ex2) {
+                throw new ShellFailureException(
+                        "Bailing out: fatal error during CommandShell configuration", ex2);
+            }
+        }
 
         // Now become interactive
         ownThread = Thread.currentThread();
     }
-
-    private void setupFromProperties() {
-        debugEnabled = Boolean.parseBoolean(System.getProperty(
-                DEBUG_PROPERTY_NAME, DEBUG_DEFAULT));
-        historyEnabled = Boolean.parseBoolean(System.getProperty(
-                HISTORY_PROPERTY_NAME, HISTORY_DEFAULT));
-        try {
-            setCommandInvoker(System.getProperty(INVOKER_PROPERTY_NAME,
-                    INITIAL_INVOKER));
-        } catch (Exception ex) {
-            errPW.println(ex.getMessage());
-            stackTrace(ex);
-            // Use the fallback invoker
-            setCommandInvoker(FALLBACK_INVOKER);
-        }
-        try {
-            setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME,
-                    INITIAL_INTERPRETER));
-        } catch (Exception ex) {
-            errPW.println(ex.getMessage());
-            stackTrace(ex);
-            // Use the fallback interpreter
-            setCommandInterpreter(FALLBACK_INTERPRETER);
-        }
-        invoker.setDebugEnabled(debugEnabled);
+    
+    @Override
+    public String getProperty(String propName) {
+        return propertyMap.get(propName);
     }
 
-    private void refreshFromProperties() {
-        debugEnabled = Boolean.parseBoolean(System.getProperty(
-                DEBUG_PROPERTY_NAME, DEBUG_DEFAULT));
-        historyEnabled = Boolean.parseBoolean(System.getProperty(
-                HISTORY_PROPERTY_NAME, HISTORY_DEFAULT));
-        try {
-            setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME, ""));
-        } catch (Exception ex) {
-            errPW.println(ex.getMessage());
-            stackTrace(ex);
+    @Override
+    public void removeProperty(String key) throws ShellException {
+        if (key.equals(INTERPRETER_PROPERTY_NAME) || key.equals(INVOKER_PROPERTY_NAME) ||
+                key.equals(DEBUG_PROPERTY_NAME) || key.equals(PROMPT_PROPERTY_NAME) ||
+                key.equals(HISTORY_PROPERTY_NAME)) {
+            throw new ShellException("Property '" + key + "' cannot be removed");
         }
-        try {
-            setCommandInvoker(System.getProperty(INVOKER_PROPERTY_NAME, ""));
-        } catch (Exception ex) {
-            errPW.println(ex.getMessage());
-            stackTrace(ex);
-        }
-        invoker.setDebugEnabled(debugEnabled);
+        propertyMap.remove(key);
     }
 
-    public synchronized void setCommandInvoker(String name) throws IllegalArgumentException {
-        if (!name.equals(this.invokerName)) {
-            this.invoker = ShellUtils.createInvoker(name, this);
-            if (this.invokerName != null) {
+    @Override
+    public void setProperty(String propName, String value) throws ShellException {
+        String oldValue = propertyMap.get(propName);
+        propertyMap.put(propName, value);
+        try {
+            setupFromProperties();
+        } catch (ShellException ex) {
+            // Try to undo the change
+            propertyMap.put(propName, oldValue);
+            try {
+                setupFromProperties();
+            } catch (ShellException ex2) {
+                // This may be our only chance to diagnose the original exception ....
+                errPW.println(ex.getMessage());
+                stackTrace(ex);
+                throw new ShellFailureException("Failed to revert shell properties", ex2);
+            }
+            throw ex;
+        }
+    }
+
+    @Override
+    public TreeMap<String, String> getProperties() {
+        return new TreeMap<String, String>(propertyMap);
+    }
+
+    private void setupFromProperties() throws ShellException {
+        setCommandInvoker(propertyMap.get(INVOKER_PROPERTY_NAME));
+        setCommandInterpreter(propertyMap.get(INTERPRETER_PROPERTY_NAME));
+        debugEnabled = Boolean.parseBoolean(propertyMap.get(DEBUG_PROPERTY_NAME));
+        historyEnabled = Boolean.parseBoolean(propertyMap.get(HISTORY_PROPERTY_NAME));
+    }
+    
+    private synchronized void setCommandInvoker(String name) throws ShellException {
+        if (invoker == null || !name.equals(invoker.getName())) {
+            boolean alreadySet = invoker != null;
+            invoker = ShellUtils.createInvoker(name, this);
+            if (alreadySet) {
                 outPW.println("Switched to " + name + " invoker");
             }
-            this.invokerName = name;
-            System.setProperty(INVOKER_PROPERTY_NAME, name);
         }
     }
 
-    public synchronized void setCommandInterpreter(String name) throws IllegalArgumentException {
-        if (!name.equals(this.interpreterName)) {
-            this.interpreter = ShellUtils.createInterpreter(name);
-            if (this.interpreterName != null) {
+    private synchronized void setCommandInterpreter(String name) throws ShellException {
+        if (interpreter == null || !name.equals(interpreter.getName())) {
+            boolean alreadySet = interpreter != null;
+            interpreter = ShellUtils.createInterpreter(name);
+            if (alreadySet) {
                 outPW.println("Switched to " + name + " interpreter");
             }
-            this.interpreterName = name;
-            System.setProperty(INTERPRETER_PROPERTY_NAME, name);
         }
     }
 
@@ -637,7 +665,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                     Thread.currentThread().getContextClassLoader();
                 return new CommandInfo(cl.loadClass(cmd), false);
             } catch (ClassNotFoundException ex2) {
-                throw new ShellException("Cannot find an alias or load a command class for '" + cmd + "'", ex);
+                throw new ShellException(
+                        "Cannot find an alias or load a command class for '" + cmd + "'", ex);
             }
         }
     }
@@ -687,8 +716,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * Gets the expanded prompt
      */
     protected String prompt() {
-        String prompt = System
-                .getProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
+        String prompt = getProperty(PROMPT_PROPERTY_NAME);
         final StringBuffer result = new StringBuffer();
         boolean commandMode = false;
         try {
@@ -874,10 +902,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 line.append((char) b);
             }
         }
-    }
-
-    public SimpleCommandInvoker getDefaultCommandInvoker() {
-        return ShellUtils.createInvoker("default", this);
     }
 
     public int runCommandFile(File file, String alias, String[] args) throws ShellException {

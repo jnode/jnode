@@ -22,6 +22,7 @@ package org.jnode.shell;
 
 import java.io.File;
 import java.io.Writer;
+import java.util.TreeMap;
 
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.InputCompleter;
@@ -99,5 +100,47 @@ public interface Shell extends InputCompleter {
      * @return the escaped word.
      */
     public String escapeWord(String word);
+    
+    /**
+     * Set a shell property.  Some properties have special meaning to a Shell
+     * and may cause its behavior to change.
+     * 
+     * @param propName the name of the property
+     * @param value the property value
+     * @throws ShellException This may be thrown if the name / value pair is
+     *     not acceptable.
+     */
+    public void setProperty(String propName, String value) throws ShellException;
+    
+    /**
+     * Get the current value of a shell property.  
+     * 
+     * @param propName the property name.
+     * @return the property value or {@code null}
+     */
+    public String getProperty(String propName);
+    
+    /**
+     * Remove a shell property.  Special properties typically may not be removed,
+     * 
+     * @param propName the name of the property
+     * @throws ShellException This may be thrown if the property cannot be removed.
+     */
+    public void removeProperty(String key) throws ShellException;
+    
+    /**
+     * Get the shell properties for this shell instance.  The result is a copy
+     * of the shell properties object; i.e. changes to the result Map object
+     * have no effect on the shell.
+     * <p>
+     * Note that shell properties are 
+     * not the same as UNIX-style shell variables.  An interpreter that supports
+     * shell variables may mirror some of them in the properties, but it is not
+     * required to.  The recommended place for publishing (exported) shell variables 
+     * is the "environment variables"; e.g. in {@link System#getenv()}.
+     * 
+     * @return a copy of the shell properties.
+     */
+    public TreeMap<String, String> getProperties();
 
 }

@@ -20,32 +20,30 @@
  
 package org.jnode.shell.syntax;
 
-import gnu.java.security.action.GetPropertiesAction;
-
-import java.security.AccessController;
-import java.util.Properties;
+import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.console.CompletionInfo;
+import org.jnode.shell.ShellUtils;
 import org.jnode.shell.CommandLine.Token;
 
 
 /**
  * This argument class accepts property names, with completion against the
- * names in the System properties object.
+ * names in the current shell's property map.
  * 
  * @author crawley@jnode.org
  */
-public class PropertyNameArgument extends Argument<String> {
+public class ShellPropertyNameArgument extends Argument<String> {
     
-    public PropertyNameArgument(String label, int flags, String description) {
+    public ShellPropertyNameArgument(String label, int flags, String description) {
         super(label, flags, new String[0], description);
     }
 
-    public PropertyNameArgument(String label, int flags) {
+    public ShellPropertyNameArgument(String label, int flags) {
         this(label, flags, null);
     }
 
-    public PropertyNameArgument(String label) {
+    public ShellPropertyNameArgument(String label) {
         this(label, 0);
     }
     
@@ -56,12 +54,15 @@ public class PropertyNameArgument extends Argument<String> {
     
     @Override
     public void doComplete(CompletionInfo completion, String partial, int flags) {
-        Properties ps = AccessController.doPrivileged(new GetPropertiesAction());
-        for (Object key : ps.keySet()) {
-            String name = (String) key;
-            if (name.startsWith(partial)) {
-                completion.addCompletion(name);
+        try {
+            for (Object key : ShellUtils.getCurrentShell().getProperties().keySet()) {
+                String name = (String) key;
+                if (name.startsWith(partial)) {
+                    completion.addCompletion(name);
+                }
             }
+        } catch (NameNotFoundException ex) {
+            // uh oh ... no completion possible
         }
     }
 

@@ -150,6 +150,8 @@
       <empty description="Print the system properties"/>
       <option argLabel="env" shortName="e" longName="env" 
           description="Print the system environment variables"/>
+      <option argLabel="shell" shortName="s" longName="shell" 
+          description="Print the current shell properties"/>
     </syntax>
     <syntax alias="exit" description="Exit the current shell"/>
     <syntax alias="gc">
@@ -358,11 +360,21 @@
       <argument argLabel="file"/>
     </syntax>
     <syntax alias="set">
-      <sequence description="Set a system property or environment variable">
+      <sequence description="Set a shell property">
+        <option argLabel="shell" shortName="s" longName="shell"/>
+        <argument argLabel="skey"/>
+        <argument argLabel="value"/>
+      </sequence>
+      <sequence>
+      	<argument description="Remove a shell property" argLabel="skey"/>
+        <option argLabel="shell" shortName="s" longName="shell"/>
+      </sequence>
+      <sequence description="Set a system property">
         <argument argLabel="key"/>
         <argument argLabel="value"/>
       </sequence>
       <argument description="Remove a system property" argLabel="key"/>
+      
     </syntax>
     <syntax alias="sleep" description="Sleep for a given number of seconds">
       <argument argLabel="seconds"/>
@@ -378,7 +390,7 @@
         <option argLabel="file" longName="load" shortName="l"/>
         <argument argLabel="alias"/>
       </sequence>
-      <sequence description="Set a system property">
+      <sequence description="Remove the syntax for a given alias">
         <option argLabel="remove" longName="remove" shortName="r"/>
         <argument argLabel="alias"/>
       </sequence>

@@ -115,7 +115,7 @@ public class DefaultSyntaxCompletionTest extends TestCase {
 
     public void testDefaultSyntax() throws Exception {
         TestCommandShell cs = new TestCommandShell();
-        cs.setCommandInterpreter("default");
+        cs.setProperty(CommandShell.INTERPRETER_PROPERTY_NAME, "default");
 
         final String[] propertyCompletions = getExpectedPropertyNameCompletions();
 

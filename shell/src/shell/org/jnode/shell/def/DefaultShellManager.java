@@ -23,6 +23,7 @@ package org.jnode.shell.def;
 import java.util.HashMap;
 
 import org.jnode.shell.CommandInterpreter;
+import org.jnode.shell.ShellException;
 import org.jnode.shell.SimpleCommandInvoker;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.Shell;
@@ -62,18 +63,19 @@ public class DefaultShellManager implements ShellManager {
         this.currentShell.set(currentShell);
     }
 
-    public CommandInterpreter createInterpreter(String name) throws IllegalArgumentException {
+    public CommandInterpreter createInterpreter(String name) throws ShellException {
         CommandInterpreter.Factory factory = interpreterFactories.get(name);
         if (factory == null) {
-            throw new IllegalArgumentException("Unknown interpreter '" + name + "'");
+            throw new ShellException("Unknown interpreter '" + name + "'");
         }
         return factory.create();
     }
 
-    public SimpleCommandInvoker createInvoker(String name, CommandShell shell) throws IllegalArgumentException {
+    public SimpleCommandInvoker createInvoker(String name, CommandShell shell) 
+        throws ShellException {
         SimpleCommandInvoker.Factory factory = invokerFactories.get(name);
         if (factory == null) {
-            throw new IllegalArgumentException("Unknown invoker '" + name + "'");
+            throw new ShellException("Unknown invoker '" + name + "'");
         }
         return factory.create(shell);
     }

@@ -53,7 +53,6 @@ public class DefaultCommandInvoker implements SimpleCommandInvoker {
 
     private final PrintWriter err;
     private final CommandShell shell;
-    private boolean debugEnabled;
 
     private static final Class<?>[] MAIN_ARG_TYPES = new Class[] {String[].class};
 
@@ -165,12 +164,6 @@ public class DefaultCommandInvoker implements SimpleCommandInvoker {
 
     @Override
     public boolean isDebugEnabled() {
-        return this.debugEnabled;
+        return shell.isDebugEnabled();
     }
-
-    @Override
-    public void setDebugEnabled(boolean debugEnabled) {
-        this.debugEnabled = debugEnabled;
-    }
-
 }

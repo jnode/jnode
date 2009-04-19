@@ -23,28 +23,41 @@ package org.jnode.shell.command;
 import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.ShellUtils;
 import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.PropertyNameArgument;
+import org.jnode.shell.syntax.ShellPropertyNameArgument;
 import org.jnode.shell.syntax.StringArgument;
 
 
 /**
- * Shell command to set property values.
+ * Shell command to set system or shell property values.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Martin Husted Hartvig (hagar@jnode.org)
  * @author Levente S\u00e1ntha
+ * @author crawley@jnode.org
  */
 
 public class SetCommand extends AbstractCommand {
-    private PropertyNameArgument keyArg = 
-        new PropertyNameArgument("key", Argument.MANDATORY, "The name of the property to be set (or cleared)");
-    private StringArgument valueArg = 
-        new StringArgument("value", Argument.OPTIONAL, "The new property value");
+    private PropertyNameArgument keyArg = new PropertyNameArgument(
+            "key", Argument.OPTIONAL, "The name of the property to be set (or cleared)");
+    
+    private ShellPropertyNameArgument skeyArg = new ShellPropertyNameArgument(
+            "skey", Argument.OPTIONAL, "The name of the shell property to be set (or cleared)");
+    
+    private StringArgument valueArg = new StringArgument(
+            "value", Argument.OPTIONAL, "The new property value");
+    
+    private final FlagArgument shellArg = new FlagArgument(
+            "shell", Argument.OPTIONAL + Argument.SINGLE,
+            "If set, print the current shell properties rather that the System properties.");
+
     
     public SetCommand() {
         super("Set or clear the value of a property");
-        registerArguments(keyArg, valueArg);
+        registerArguments(keyArg, skeyArg, valueArg, shellArg);
     }
 
     public static void main(String[] args) throws Exception {
@@ -53,14 +66,26 @@ public class SetCommand extends AbstractCommand {
 
     public void execute() throws Exception {
         PrintWriter out = getOutput().getPrintWriter();
-        String key = keyArg.getValue();
-        if (!valueArg.isSet()) {
-            out.println("Removing " + key);
-            System.getProperties().remove(key);
+        if (shellArg.isSet()) {
+            String key = skeyArg.getValue();
+            if (!valueArg.isSet()) {
+                out.println("Removing " + key);
+                ShellUtils.getCurrentShell().removeProperty(key);
+            } else {
+                String value = valueArg.getValue();
+                out.println("Setting " + key + " to " + value);
+                ShellUtils.getCurrentShell().setProperty(key, value);
+            }
         } else {
-            String value = valueArg.getValue();
-            out.println("Setting " + key + " to " + value);
-            System.getProperties().setProperty(key, value);
+            String key = keyArg.getValue();
+            if (!valueArg.isSet()) {
+                out.println("Removing " + key);
+                System.getProperties().remove(key);
+            } else {
+                String value = valueArg.getValue();
+                out.println("Setting " + key + " to " + value);
+                System.getProperties().setProperty(key, value);
+            }
         }
     }
 }

@@ -103,7 +103,7 @@ public class ShellUtils {
     }
 
     public static SimpleCommandInvoker createInvoker(String name, CommandShell shell)
-        throws IllegalArgumentException {
+        throws ShellException {
         try {
             return getShellManager().createInvoker(name, shell);
         } catch (NameNotFoundException ex) {
@@ -112,7 +112,7 @@ public class ShellUtils {
     }
 
     public static CommandInterpreter createInterpreter(String name)
-        throws IllegalArgumentException, ShellFailureException {
+        throws ShellException {
         try {
             return getShellManager().createInterpreter(name);
         } catch (NameNotFoundException ex) {
