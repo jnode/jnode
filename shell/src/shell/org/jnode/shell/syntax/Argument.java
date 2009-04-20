@@ -389,14 +389,18 @@ public abstract class Argument<V> {
     }
 
     /**
-     * Accept the Token as the value of this argument.  If the method call returns,
+     * Try to accept the Token as the value of this argument.  If the method call returns,
      * the caller should treat the Token as consumed.
+     * <p>
+     * After merging the flags and doing some preliminary checks, this method calls
+     * the 'doAccept' method to perform the appropriate checking and token-to-value
+     * conversion.  The value returned by the 'doAccept' call is then bound to 
+     * this Argument.
      * 
      * @param value the token that will supply the Argument's value.
      * @param flags extra flags from the syntax system.  These will be OR'ed with
      *     the Arguments existing flags, after masking out an in the flag set defined
      *     by {@link #NONOVERRIDABLE_FLAGS}.
-     * @return a (non-{@code null}) value to be accepted
      * @throws CommandSyntaxException if the value is unacceptable, or if an attempt
      *     is made to repeat a single-valued Argument.
      */
