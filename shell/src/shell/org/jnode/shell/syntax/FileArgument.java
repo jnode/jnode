@@ -174,7 +174,7 @@ public class FileArgument extends Argument<File> {
         }
         
         // Add "-" as a possible completion?
-        if ((flags & HYPHEN_IS_SPECIAL) != 0) {
+        if (partial.length() == 0 && (flags & HYPHEN_IS_SPECIAL) != 0) {
             completion.addCompletion("-");
         }
     }
