@@ -24,11 +24,13 @@ import java.io.File;
 
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.swing.SwingTextScreenConsoleManager;
+import org.jnode.driver.console.textscreen.TextScreenConsole;
 import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
 import org.jnode.shell.CommandShell;
 
 /**
  * @author Levente S\u00e1ntha
+ * @author crawley@jnode.org
  */
 public class ShellEmu extends Emu {
     
@@ -46,9 +48,9 @@ public class ShellEmu extends Emu {
 
     private void run() throws Exception {
         TextScreenConsoleManager cm = new SwingTextScreenConsoleManager();
-        new Thread(new CommandShell(cm.createConsole(
-            "Console 1",
-            (ConsoleManager.CreateOptions.TEXT |
-                ConsoleManager.CreateOptions.SCROLLABLE)))).start();
+        TextScreenConsole console = cm.createConsole(
+                "Console 1",
+                (ConsoleManager.CreateOptions.TEXT | ConsoleManager.CreateOptions.SCROLLABLE));
+        new Thread(new CommandShell(console, true)).start();
     }
 }

@@ -104,6 +104,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     public static final String DIRECTORY_PROPERTY_NAME = "user.dir";
 
     public static final String INITIAL_INVOKER = "proclet";
+    // The Emu-mode invoker must be something that runs on the dev't platform;
+    // e.g. not 'isolate' or 'proclet'.
+    private static final String EMU_INVOKER = "thread";
     public static final String INITIAL_INTERPRETER = "redirecting";
     public static final String FALLBACK_INVOKER = "default";
     public static final String FALLBACK_INTERPRETER = "default";
@@ -199,6 +202,10 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     public CommandShell(TextConsole cons) throws ShellException {
+        this(cons, false);
+    }
+    
+    public CommandShell(TextConsole cons, boolean emu) throws ShellException {
         debugEnabled = true;
         try {
             console = cons;
@@ -216,7 +223,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             console.addConsoleListener(this);
             aliasMgr = ShellUtils.getAliasManager().createAliasManager();
             syntaxMgr = ShellUtils.getSyntaxManager().createSyntaxManager();
-            propertyMap = initShellProperties();
+            propertyMap = initShellProperties(emu);
         } catch (NameNotFoundException ex) {
             throw new ShellException("Cannot find required resource", ex);
         } catch (Exception ex) {
@@ -225,11 +232,12 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
     
     /**
-     * Create a CommandShell that doesn't use a TextConsole or the ConsoleManager.
+     * Create a CommandShell that doesn't use a TextConsole or the ConsoleManager
+     * for use in the TestHarness.
      * 
      * @throws ShellException
      */
-    public CommandShell() throws ShellException {
+    protected CommandShell() throws ShellException {
         debugEnabled = true;
         try {
             setupStreams(new InputStreamReader(System.in), 
@@ -237,7 +245,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                     new OutputStreamWriter(System.err));
             aliasMgr = ShellUtils.getAliasManager().createAliasManager();
             syntaxMgr = ShellUtils.getSyntaxManager().createSyntaxManager();
-            propertyMap = initShellProperties();
+            propertyMap = initShellProperties(true);
         } catch (NameNotFoundException ex) {
             throw new ShellException("Cannot find required resource", ex);
         } catch (Exception ex) {
@@ -245,12 +253,31 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
     
-    private HashMap<String, String> initShellProperties() {
+    /**
+     * This constructor builds a partial command shell for test purposes only.
+     * 
+     * @param aliasMgr test framework supplies an alias manager
+     * @param syntaxMgr test framework supplies a syntax manager
+     */
+    protected CommandShell(AliasManager aliasMgr, SyntaxManager syntaxMgr) {
+        this.debugEnabled = true;
+        this.aliasMgr = aliasMgr;
+        this.syntaxMgr = syntaxMgr;
+        propertyMap = initShellProperties(true);
+        setupStreams(
+                new InputStreamReader(System.in), 
+                new OutputStreamWriter(System.out), 
+                new OutputStreamWriter(System.err));
+        this.readingCommand = true;
+    }
+
+    
+    private HashMap<String, String> initShellProperties(boolean emu) {
         HashMap<String, String> map = new HashMap<String, String>();
         map.put(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
         map.put(DEBUG_PROPERTY_NAME, DEBUG_DEFAULT);
         map.put(HISTORY_PROPERTY_NAME, HISTORY_DEFAULT);
-        map.put(INVOKER_PROPERTY_NAME, INITIAL_INVOKER);
+        map.put(INVOKER_PROPERTY_NAME, emu ? EMU_INVOKER : INITIAL_INVOKER);
         map.put(INTERPRETER_PROPERTY_NAME, INITIAL_INTERPRETER);
         return map;
     }
@@ -263,26 +290,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         this.outPW = cout.getPrintWriter();
         this.errPW = cerr.getPrintWriter();
     }
-
     
-    /**
-     * This constructor builds a partial command shell for test purposes only.
-     * 
-     * @param aliasMgr test framework supplies an alias manager
-     * @param syntaxMgr test framework supplies a syntax manager
-     */
-    protected CommandShell(AliasManager aliasMgr, SyntaxManager syntaxMgr) {
-        this.debugEnabled = true;
-        this.aliasMgr = aliasMgr;
-        this.syntaxMgr = syntaxMgr;
-        propertyMap = initShellProperties();
-        setupStreams(
-                new InputStreamReader(System.in), 
-                new OutputStreamWriter(System.out), 
-                new OutputStreamWriter(System.err));
-        this.readingCommand = true;
-    }
-
     /**
      * Run this shell until exit.
      * 
@@ -497,11 +505,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
         // Now become interactive
         ownThread = Thread.currentThread();
-    }
-    
-    public void configureEmuShell() throws ShellException {
-        propertyMap.put(INVOKER_PROPERTY_NAME, "thread");
-        configureShell();
     }
     
     @Override
