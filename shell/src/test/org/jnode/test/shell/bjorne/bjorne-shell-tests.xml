@@ -669,6 +669,17 @@ Hi mum again
     <error>Hello mother again
 </error>
     </testSpec>
+    <testSpec title="redirection 2" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                cat &lt; @TEMP_DIR@/1 &gt; @TEMP_DIR@/2 
+        </script>
+        <file name="1" input="true">Hi mum
+Hi mum again
+</file>
+        <file name="2" input="false">Hi mum
+Hi mum again
+</file>
+    </testSpec>
     <testSpec title="here" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 cat &lt;&lt;EOF &gt; @TEMP_DIR@/1 
