@@ -144,7 +144,7 @@ public class ProcletProxyInputStream extends InputStream implements
     }
 
     public InputStream getProxiedStream() throws ProxyStreamException {
-        ProcletContext procletContext = ProcletContext.currentProcletContext();
+        Proclet procletContext = Proclet.currentProcletContext();
         int pid = (procletContext == null) ? 
                 ProcletIOContext.GLOBAL_STREAM_ID : procletContext.getPid();
         InputStream is = streamMap.get(pid);

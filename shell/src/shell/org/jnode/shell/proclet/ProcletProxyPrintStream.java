@@ -92,7 +92,7 @@ public class ProcletProxyPrintStream extends AbstractProxyPrintStream implements
      * @return the PrintStream we are currently delegating to.
      */
     private PrintStream proxiedPrintStream() throws ProxyStreamException {
-        ProcletContext procletContext = ProcletContext.currentProcletContext();
+        Proclet procletContext = Proclet.currentProcletContext();
         int pid = (procletContext == null) ? ProcletIOContext.GLOBAL_STREAM_ID : procletContext.getPid();
         PrintStream ps = getProxiedStream(pid);
         if (ps == null) {
