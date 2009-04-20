@@ -40,8 +40,8 @@ import org.jnode.shell.CommandLine.Token;
  * <ul>
  * <li>The 'argName' is a label that allows the Argument to be matched against nodes in the Syntax 
  * or MuSyntax.  It needs to be unique in the context of the ArgumentBundle containing the Argument.
- * <li>The 'mandatory' flag says whether or not a value for the Argument <i>must</i> be provided.
- * <li>The 'multiple' flag says whether or not multiple values are allowed for the Argument.
+ * <li>The 'flags' word holds common and subtype specific flags that constrain the way it may
+ *     be populated.  The common flags are described in the constants section below.
  * <li>The 'description' string contains optional documentation for the Argument.  
  * </ul>
  * 
@@ -322,8 +322,10 @@ public abstract class Argument<V> {
     
     /**
      * The label is the application's identifier for the Argument.  It is used to identify
-     * the Argument in a concrete syntax specification.  It can also be used by the
-     * application for name lookup of a bound argument's values.  
+     * the Argument in a concrete syntax specification.  The label could also be used by the
+     * application for name lookup of the Argument in the {@link ArgumentBundle}, but the
+     * normal design pattern is for a Command class to retain references to each Argument
+     * in private attributes.
      */
     public String getLabel() {
         return label;
@@ -339,22 +341,29 @@ public abstract class Argument<V> {
     
     /**
      * Get this Arguments bound values as an array. 
+     * @return an array of values, possibly empty but never {@code null}.
      */
     public V[] getValues() {
         checkArgumentsSet();
         return values.toArray(vArray);
     }
 
+    /**
+     * Get this Argument's single bound value.
+     * @return the value or {@code null}.
+     * @throws SyntaxMultiplicityException if this is a multi-valued Argument
+     *     bound to more than one value. 
+     */
     public V getValue() throws SyntaxMultiplicityException {
         checkArgumentsSet();
-        if (values.size() == 0) {
-            return null;
-        }
         int size = values.size();
-        if (size == 1) {
+        if (size == 0) {
+            return null;
+        } else if (size == 1) {
             return values.get(0);
         } else {
-            throw new SyntaxMultiplicityException(label + " is bound to " + size + " values");
+            throw new SyntaxMultiplicityException(
+                    label + " is bound to " + size + " values");
         }
     }
     
@@ -385,8 +394,11 @@ public abstract class Argument<V> {
      * 
      * @param value the token that will supply the Argument's value.
      * @param flags extra flags from the syntax system.  These will be OR'ed with
-     *     the Arguments existing flags.  Note the cardinality flags cannot be 
-     *     overridden.
+     *     the Arguments existing flags, after masking out an in the flag set defined
+     *     by {@link #NONOVERRIDABLE_FLAGS}.
+     * @return a (non-{@code null}) value to be accepted
+     * @throws CommandSyntaxException if the value is unacceptable, or if an attempt
+     *     is made to repeat a single-valued Argument.
      */
     public final void accept(Token value, int flags) 
         throws CommandSyntaxException, IllegalArgumentException {
@@ -399,11 +411,16 @@ public abstract class Argument<V> {
     }
 
     /**
-     * This method is called by 'accept' after performing multiplicity checks.  It
-     * should either return a non-null V to be accepted, or throw an exception.
+     * This method is called by 'accept' after performing multiplicity checks to
+     * check that the supplied token is valid and to convert it into a value of
+     * the required type. It should either 'accept' the value by returning
+     * a non-null V, or throw an exception whose message says why the value is
+     * unacceptable.
      * 
      * @param value the token that will supply the Argument's value.
      * @param flags the flags to be used.
+     * @return a (non-{@code null}) value to be accepted
+     * @throws CommandSyntaxException if the value is unacceptable
      */
     protected abstract V doAccept(Token value, int flags) throws CommandSyntaxException;
 
@@ -431,13 +448,18 @@ public abstract class Argument<V> {
     /**
      * Perform argument completion on the supplied (partial) argument value.  The
      * results of the completion should be added to the supplied CompletionInfo.
+     * Completions posted by calling {@link CompletionInfo#addCompletion(String)}
+     * or {@link CompletionInfo#addCompletion(String, boolean)}.
      * <p>
-     * The default behavior is to set no completion.  
-     * Subtypes of Argument should override this method if they are capable of doing
-     * non-trivial completion.  Completions should be registered by calling one
-     * of the 'addCompletion' methods on the CompletionInfo.
+     * The default behavior of this method is to do no completion.  Subtypes of 
+     * Argument should override this method if they are capable of doing <i>useful</i>
+     * completion.  Note that not all completion is useful.  For example, it is a
+     * bad idea post all legal completions for a large integer range.  Also, a 
+     * an override should avoid posting completions that would not be accepted
+     * by the {@link #doAccept} method, as this will lead to confusing behavior.
      * 
-     * @param completion the CompletionInfo object for registering any completions.
+     * @param completion the {@link CompletionInfo} object for posting possible
+     *    completions.
      * @param partial the argument string to be completed.
      */
     public void doComplete(CompletionInfo completion, String partial, int flags) {
@@ -475,6 +497,9 @@ public abstract class Argument<V> {
         return "label=" + label;
     }
 
+    /**
+     * This method is called by MuParser while backtracking.
+     */
     void undoLastValue() {
         values.remove(values.size() - 1);
     }
