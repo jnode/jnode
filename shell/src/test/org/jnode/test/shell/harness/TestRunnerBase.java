@@ -92,7 +92,7 @@ public abstract class TestRunnerBase implements TestRunnable {
 
     public CommandShell getShell() throws ShellException {
         CommandShell shell = new TestCommandShell(System.in, System.out, System.err);
-        shell.configureEmuShell();
+        shell.configureShell();
         return shell;
     }
     
