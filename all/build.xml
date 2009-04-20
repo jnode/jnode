@@ -483,22 +483,14 @@ clean             Remove all intermediate build results.
         <jnode.javadoc destdir="${build.dir}/javadoc/small">
             <sourcepath>
                 <pathelement location="${root.dir}/core/src/classlib"/>
-                <pathelement location="${root.dir}/core/src/classpath/gnu"/>
-                <pathelement location="${root.dir}/core/src/classpath/java"/>
-                <pathelement location="${root.dir}/core/src/classpath/javax"/>
                 <pathelement location="${root.dir}/core/src/classpath/ext"/>
                 <pathelement location="${root.dir}/core/src/classpath/vm"/>
-                <pathelement location="${root.dir}/core/src/icedtea"/>
-                <pathelement location="${root.dir}/core/src/openjdk/com"/>
-                <pathelement location="${root.dir}/core/src/openjdk/java"/>
-                <pathelement location="${root.dir}/core/src/openjdk/javax"/>
-                <pathelement location="${root.dir}/core/src/openjdk/org"/>
-                <pathelement location="${root.dir}/core/src/openjdk/sun"/>
                 <pathelement location="${root.dir}/core/src/openjdk/vm"/>
                 <pathelement location="${root.dir}/core/src/endorsed/nanoxml"/>
                 <pathelement location="${root.dir}/core/src/core"/>
                 <pathelement location="${root.dir}/core/src/vmmagic"/>
                 <pathelement location="${root.dir}/core/src/driver"/>
+                <pathelement location="${root.dir}/all/lib/classlib-src.jar"/>
             </sourcepath>
             <package name="org.jnode.driver"/>
             <package name="org.jnode.naming"/>
@@ -516,12 +508,11 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/vmmagic"/>
                 <pathelement location="${root.dir}/core/src/mmtk-vm"/>
                 <pathelement location="${root.dir}/core/src/core"/>
-                <pathelement location="${root.dir}/core/src/classpath/gnu"/>
                 <pathelement location="${root.dir}/core/src/classpath/ext"/>
                 <pathelement location="${root.dir}/core/src/classpath/vm"/>
-                <pathelement location="${root.dir}/core/src/openjdk/sun"/>
                 <pathelement location="${root.dir}/core/src/openjdk/vm"/>
                 <pathelement location="${root.dir}/core/src/endorsed/nanoxml"/>
+                <pathelement location="${root.dir}/all/lib/classlib-src.jar"/>
             </sourcepath>
             <package name="org.mmtk.*"/>
             <package name="org.jnode.vm.memmgr.mmtk.*"/>
@@ -535,18 +526,8 @@ clean             Remove all intermediate build results.
         <jnode.javadoc destdir="${build.dir}/javadoc/full">
             <sourcepath>
                 <pathelement location="${root.dir}/core/src/classlib"/>
-                <pathelement location="${root.dir}/core/src/classpath/gnu"/>
-                <pathelement location="${root.dir}/core/src/classpath/java"/>
-                <pathelement location="${root.dir}/core/src/classpath/javax"/>
                 <pathelement location="${root.dir}/core/src/classpath/ext"/>
                 <pathelement location="${root.dir}/core/src/classpath/vm"/>
-                <pathelement location="${root.dir}/core/src/icedtea"/>
-                <pathelement location="${root.dir}/core/src/openjdk/com"/>
-                <pathelement location="${root.dir}/core/src/openjdk/java"/>
-                <pathelement location="${root.dir}/core/src/openjdk/javax"/>
-                <pathelement location="${root.dir}/core/src/openjdk/org"/>
-                <pathelement location="${root.dir}/core/src/openjdk/sun"/>
-                <pathelement location="${root.dir}/core/src/openjdk/svm"/>
                 <pathelement location="${root.dir}/core/src/openjdk/vm"/>
                 <pathelement location="${root.dir}/core/src/core"/>
                 <pathelement location="${root.dir}/core/src/driver"/>
@@ -566,6 +547,7 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/net/src/net"/>
                 <pathelement location="${root.dir}/net/src/driver"/>
                 <pathelement location="${root.dir}/shell/src/shell"/>
+                <pathelement location="${root.dir}/all/lib/classlib-src.jar"/>
             </sourcepath>
             <package name="org.jnode.*"/>
             <package name="org.mmtk.*"/>
