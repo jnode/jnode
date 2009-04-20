@@ -272,9 +272,10 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @param syntaxMgr test framework supplies a syntax manager
      */
     protected CommandShell(AliasManager aliasMgr, SyntaxManager syntaxMgr) {
+        this.debugEnabled = true;
         this.aliasMgr = aliasMgr;
         this.syntaxMgr = syntaxMgr;
-        this.debugEnabled = true;
+        propertyMap = initShellProperties();
         setupStreams(
                 new InputStreamReader(System.in), 
                 new OutputStreamWriter(System.out), 
@@ -479,7 +480,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
         try {
             setupFromProperties();
-        } catch (ShellException ex) {
+        } catch (Throwable ex) {
             errPW.println("Problem shell configuration");
             errPW.println(ex.getMessage());
             stackTrace(ex);
@@ -488,7 +489,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             propertyMap.put(INTERPRETER_PROPERTY_NAME, FALLBACK_INTERPRETER);
             try {
                 setupFromProperties();
-            } catch (ShellException ex2) {
+            } catch (Throwable ex2) {
                 throw new ShellFailureException(
                         "Bailing out: fatal error during CommandShell configuration", ex2);
             }
@@ -496,6 +497,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
         // Now become interactive
         ownThread = Thread.currentThread();
+    }
+    
+    public void configureEmuShell() throws ShellException {
+        propertyMap.put(INVOKER_PROPERTY_NAME, "thread");
+        configureShell();
     }
     
     @Override
