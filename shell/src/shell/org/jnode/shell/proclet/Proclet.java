@@ -46,7 +46,7 @@ import org.jnode.vm.isolate.VmIsolate;
  * 
  * @author crawley@jnode.org
  */
-public class ProcletContext extends ThreadGroup {
+public class Proclet extends ThreadGroup {
     public static final int NO_SUCH_PID = 0;
     
     private Properties properties;
@@ -59,10 +59,10 @@ public class ProcletContext extends ThreadGroup {
 
     private static int nextPid = 1;
 
-    private ProcletContext(ThreadGroup parent, Properties properties,
+    private Proclet(ThreadGroup parent, Properties properties,
         Map<String, String> environment, Object[] streams) throws ProcletException {
         super(parent, nextProcletName());
-        ProcletContext parentContext = getParentContext(parent);
+        Proclet parentContext = getParentContext(parent);
         if (streams == null) {
             streams = new Object[] {
                     // FIXME ... the deproxy calls are probably redundant
@@ -131,7 +131,7 @@ public class ProcletContext extends ThreadGroup {
      * @return the context, or <code>null</code> if the current thread is not
      *         a member of a proclet.
      */
-    public static ProcletContext currentProcletContext() {
+    public static Proclet currentProcletContext() {
         if (!VmSystem.hasVmIOContext()) {
             return getParentContext(Thread.currentThread().getThreadGroup());
         } else {
@@ -148,10 +148,10 @@ public class ProcletContext extends ThreadGroup {
      * @return the context, or <code>null</code> if the thread group does not
      *         have an ancestor that is a ProcletContex.
      */
-    private static ProcletContext getParentContext(ThreadGroup threadGroup) {
+    private static Proclet getParentContext(ThreadGroup threadGroup) {
         while (threadGroup != null) {
-            if (threadGroup instanceof ProcletContext) {
-                return (ProcletContext) threadGroup;
+            if (threadGroup instanceof Proclet) {
+                return (Proclet) threadGroup;
             }
             threadGroup = threadGroup.getParent();
         }
@@ -237,7 +237,7 @@ public class ProcletContext extends ThreadGroup {
     public static CommandThreadImpl createProclet(CommandRunnable target,
             Properties properties, Map<String, String> environment,
             Object[] streams, String name, long size) {
-        ProcletContext procletContext = new ProcletContext(Thread
+        Proclet procletContext = new Proclet(Thread
                 .currentThread().getThreadGroup(), properties, environment,
                 streams);
         if (name == null) {

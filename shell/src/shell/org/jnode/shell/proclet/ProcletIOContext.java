@@ -39,7 +39,7 @@ import org.jnode.vm.VmSystem;
  */
 public class ProcletIOContext implements IOContext {
     
-    public static final int GLOBAL_STREAM_ID = ProcletContext.NO_SUCH_PID;
+    public static final int GLOBAL_STREAM_ID = Proclet.NO_SUCH_PID;
     
     public ProcletIOContext() {
     }
@@ -75,23 +75,23 @@ public class ProcletIOContext implements IOContext {
     }
     
     public Map<String, String> getEnv() {
-        return ProcletContext.currentProcletContext().getEnvironment();
+        return Proclet.currentProcletContext().getEnvironment();
     }
 
     public Properties getProperties() {
-        return ProcletContext.currentProcletContext().getProperties();
+        return Proclet.currentProcletContext().getProperties();
     }
 
     public void setEnv(Map<String, String> env) {
-        ProcletContext.currentProcletContext().setEnvironment(env);
+        Proclet.currentProcletContext().setEnvironment(env);
     }
 
     public void setProperties(Properties props) {
-        ProcletContext.currentProcletContext().setProperties(props);
+        Proclet.currentProcletContext().setProperties(props);
     }
 
     private int getCurrentPid() {
-        ProcletContext procletContext = ProcletContext.currentProcletContext();
+        Proclet procletContext = Proclet.currentProcletContext();
         return (procletContext == null) ? GLOBAL_STREAM_ID : procletContext.getPid();
     }
 
