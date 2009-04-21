@@ -1,5 +1,4 @@
-<testSet title="basename/dirname POSIX command tests">
-  <!-- basename -->
+<testSet title="POSIX basename command tests">
   <testSpec title="basename-1" command="basename"
               runMode="AS_ALIAS" rc="0">
     <arg>///</arg>
@@ -50,50 +49,6 @@
   <arg>foo/bar.c</arg>
   <arg>bar.c</arg>
   <output>bar.c
-</output>
-  </testSpec>
-  <!-- dirname -->
-  
-  <testSpec title="dirname-1" command="dirname"
-              runMode="AS_ALIAS" rc="0">
-  <arg>///</arg>
-  <output>/
-</output>
-  </testSpec>
-  <testSpec title="dirname-2" command="dirname"
-              runMode="AS_ALIAS" rc="0">
-  <arg>//</arg>
-  <output>/
-</output>
-  </testSpec>
-  <testSpec title="dirname-3" command="dirname"
-              runMode="AS_ALIAS" rc="0">
-  <arg>/foo/</arg>
-  <output>/
-</output>
-  </testSpec>
-  <testSpec title="dirname-4" command="dirname"
-              runMode="AS_ALIAS" rc="0">
-  <arg>/foo/bar</arg>
-  <output>/foo
-</output>
-  </testSpec>
-  <testSpec title="dirname-5" command="dirname"
-              runMode="AS_ALIAS" rc="0">
-  <arg>/foo/bar/</arg>
-  <output>/foo
-</output>
-  </testSpec>
-  <testSpec title="dirname-6" command="dirname"
-              runMode="AS_ALIAS" rc="0">
-  <arg>foo/bar</arg>
-  <output>foo
-</output>
-  </testSpec>
-  <testSpec title="dirname-7" command="dirname"
-              runMode="AS_ALIAS" rc="0">
-  <arg>foo</arg>
-  <output>.
 </output>
   </testSpec>
 </testSet>

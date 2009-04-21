@@ -19,13 +19,11 @@
 
   <extension point="org.jnode.shell.aliases">
     <alias name="alias" class="org.jnode.shell.command.AliasCommand"/>
-    <alias name="basename" class="org.jnode.shell.command.BasenameCommand"/>
     <alias name="bindkeys" class="org.jnode.shell.command.BindKeysCommand"/>
     <alias name="cat" class="org.jnode.shell.command.CatCommand"/>
     <alias name="class" class="org.jnode.shell.command.ClassCommand"/>
     <alias name="classpath" class="org.jnode.shell.command.ClasspathCommand" internal="yes"/>
     <alias name="compile" class="org.jnode.shell.command.CompileCommand"/>
-    <alias name="dirname" class="org.jnode.shell.command.DirnameCommand"/>
     <alias name="disasm" class="org.jnode.shell.command.DisassembleCommand"/>
     <alias name="date" class="org.jnode.shell.command.DateCommand"/>
     <alias name="echo" class="org.jnode.shell.command.EchoCommand"/>
@@ -55,7 +53,6 @@
     <alias name="terminate" class="org.jnode.shell.command.TerminateCommand"/>
     <alias name="thread" class="org.jnode.shell.command.ThreadCommand"/>
     <alias name="uptime" class="org.jnode.shell.command.UptimeCommand"/>
-    <alias name="wc" class="org.jnode.shell.command.WcCommand"/>
   </extension>
   
   <extension point="org.jnode.shell.syntaxes">
@@ -65,12 +62,6 @@
       <sequence description="Create or update an alias">
         <argument argLabel="alias"/>
         <argument argLabel="className"/>
-      </sequence>
-    </syntax>
-    <syntax alias="basename">
-      <sequence description="strip the directory prefix from a filename, as well as an option suffix">
-        <argument argLabel="name" />
-        <optional><argument argLabel="suffix"/></optional>
       </sequence>
     </syntax>
     <syntax alias="bindkeys">
@@ -128,9 +119,6 @@
       </sequence>
     </syntax>
     <syntax alias="date" description="Print the current date"/>
-    <syntax alias="dirname">
-      <argument argLabel="name"/>
-    </syntax>
     <syntax alias="disasm" description="Disassemble a native code class">
       <sequence>
         <optionSet>
@@ -422,20 +410,6 @@
         <option argLabel="groupDump" longName="groupDump" shortName="g" description="Display as a ThreadGroup dump"/>
       </optional>
       <argument argLabel="threadName" description="Display the named Thread"/>
-    </syntax>
-    <syntax alias="wc">
-      <sequence>
-        <optionSet>
-          <option argLabel="bytes" shortName="c" longName="bytes"/>
-          <option argLabel="chars" shortName="m" longName="chars"/>
-          <option argLabel="lines" shortName="l" longName="lines"/>
-          <option argLabel="worlds" shortName="w" longName="words"/>
-          <option argLabel="maxCharLine" shortName="L" longName="max-line-length"/>
-        </optionSet>
-        <repeat>
-          <argument argLabel="files"/>
-        </repeat>
-      </sequence>
     </syntax>
   </extension>
 

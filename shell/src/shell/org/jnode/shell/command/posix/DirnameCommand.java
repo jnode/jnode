@@ -18,14 +18,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.shell.command;
+package org.jnode.shell.command.posix;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.StringArgument;
 
 /**
- * The Unix
+ * Unix `dirname` command
  * @see http://www.opengroup.org/onlinepubs/000095399/utilities/dirname.html
  * @author chris boertien
  */
