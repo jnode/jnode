@@ -24,33 +24,52 @@ import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.StringArgument;
 
+/**
+ * The Unix
+ * @see http://www.opengroup.org/onlinepubs/000095399/utilities/dirname.html
+ * @author chris boertien
+ */
 public class DirnameCommand extends AbstractCommand {
 
     private static final String help_name = "Strip the non-directory suffix from this file name";
+    private static final String help_super = "Strip non-directory suffix from the file name";
     
-    private final StringArgument Name = new StringArgument("name", Argument.MANDATORY, help_name);
+    private final StringArgument argName = new StringArgument("name", Argument.MANDATORY, help_name);
     
     public DirnameCommand() {
-        super("Strip non-directory suffix from the file name");
-        registerArguments(Name);
+        super(help_super);
+        registerArguments(argName);
     }
     
     public void execute() {
-        String name = Name.getValue();
+        String name = argName.getValue();
         
-        /* The dirname on linux will not recognize a name that ends with a / as a directory, unless the
-         * only character is /. So foo/bar/ gets output as foo/, and bar/ gets output as .
-         */
-        if (name.length() == 1) {
-            if (!name.equals("/")) {
-                name = ".";
+        if (name.equals("")) {
+            name = ".";
+        }
+        
+        boolean allSlashes = true;
+        for (char c : name.toCharArray()) {
+            if (c != '/') {
+                allSlashes = false;
+                break;
             }
+        }
+        
+        if (allSlashes) {
+            name = "/";
         } else {
-            int end = name.lastIndexOf("/", name.length() - 2);
-            if (end == -1) {
+            int i = name.length() - 1;
+            if (name.endsWith("/")) {
+                i--;
+            }
+            i = name.lastIndexOf('/', i);
+            if (i == -1) {
                 name = ".";
+            } else if (i == 0) {
+                name = "/";
             } else {
-                name = name.substring(0, end);
+                name = name.substring(0, i);
             }
         }
         
