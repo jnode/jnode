@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.command;
 
 import gnu.java.security.action.GetEnvAction;
@@ -39,14 +39,14 @@ import org.jnode.shell.syntax.FlagArgument;
  */
 public class EnvCommand extends AbstractCommand {
     // FIXME ... this class and the corresponding alias are incorrectly named
-	
+
     private final FlagArgument envArg = new FlagArgument(
             "env", Argument.OPTIONAL + Argument.SINGLE,
-            "If set, print the System 'env' variables rather that the System properties.");
+    "If set, print the System 'env' variables rather that the System properties.");
 
     private final FlagArgument shellArg = new FlagArgument(
             "shell", Argument.OPTIONAL + Argument.SINGLE,
-            "If set, print the current shell properties rather that the System properties.");
+    "If set, print the current shell properties rather that the System properties.");
 
     public EnvCommand() {
         super("Print the System properties");
@@ -61,18 +61,18 @@ public class EnvCommand extends AbstractCommand {
      * Execute this command
      */
     public void execute() throws Exception {
-    	final TreeMap<?, ?> sortedPs;
-    	if (envArg.isSet()) {
+        final TreeMap<?, ?> sortedPs;
+        if (envArg.isSet()) {
             Map<String, String> ps = 
                 (Map<String, String>) AccessController.doPrivileged(new GetEnvAction());
             sortedPs = new TreeMap<Object, Object>(ps);
         } else if (shellArg.isSet()) {
             sortedPs = ShellUtils.getCurrentShell().getProperties();
         } else {
-        	Properties ps = AccessController.doPrivileged(new GetPropertiesAction());
-        	sortedPs = new TreeMap<Object, Object>(ps);
+            Properties ps = AccessController.doPrivileged(new GetPropertiesAction());
+            sortedPs = new TreeMap<Object, Object>(ps);
         }
-         
+
         final PrintWriter out = getOutput().getPrintWriter();
         for (Map.Entry<?, ?> entry : sortedPs.entrySet()) {
             final String key = entry.getKey().toString();
