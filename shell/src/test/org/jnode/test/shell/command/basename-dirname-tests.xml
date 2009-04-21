@@ -1,0 +1,99 @@
+<testSet title="basename/dirname POSIX command tests">
+  <!-- basename -->
+  <testSpec title="basename-1" command="basename"
+              runMode="AS_ALIAS" rc="0">
+    <arg>///</arg>
+    <output>/
+</output>
+  </testSpec>
+  <testSpec title="basename-2" command="basename"
+              runMode="AS_ALIAS" rc="0">
+  <arg>/foo</arg>
+  <output>foo
+</output>
+  </testSpec>
+  <testSpec title="basename-3" command="basename"
+              runMode="AS_ALIAS" rc="0">
+  <arg>/foo/</arg>
+  <output>foo
+</output>
+  </testSpec>
+  <testSpec title="basename-4" command="basename"
+              runMode="AS_ALIAS" rc="0">
+  <arg>/foo/bar</arg>
+  <output>bar
+</output>
+  </testSpec>
+  <testSpec title="basename-5" command="basename"
+              runMode="AS_ALIAS" rc="0">
+  <arg>/foo/bar.c</arg>
+  <arg>.c</arg>
+  <output>bar
+</output>
+  </testSpec>
+  <testSpec title="basename-6" command="basename"
+              runMode="AS_ALIAS" rc="0">
+  <arg>/foo/bar.h</arg>
+  <arg>.c</arg>
+  <output>bar.h
+</output>
+  </testSpec>
+  <testSpec title="basename-7" command="basename"
+              runMode="AS_ALIAS" rc="0">
+  <arg>foo/bar.h/</arg>
+  <arg>.h</arg>
+  <output>bar
+</output>
+  </testSpec>
+  <testSpec title="basename-8" command="basename"
+              runMode="AS_ALIAS" rc="0">
+  <arg>foo/bar.c</arg>
+  <arg>bar.c</arg>
+  <output>bar.c
+</output>
+  </testSpec>
+  <!-- dirname -->
+  
+  <testSpec title="dirname-1" command="dirname"
+              runMode="AS_ALIAS" rc="0">
+  <arg>///</arg>
+  <output>/
+</output>
+  </testSpec>
+  <testSpec title="dirname-2" command="dirname"
+              runMode="AS_ALIAS" rc="0">
+  <arg>//</arg>
+  <output>/
+</output>
+  </testSpec>
+  <testSpec title="dirname-3" command="dirname"
+              runMode="AS_ALIAS" rc="0">
+  <arg>/foo/</arg>
+  <output>/
+</output>
+  </testSpec>
+  <testSpec title="dirname-4" command="dirname"
+              runMode="AS_ALIAS" rc="0">
+  <arg>/foo/bar</arg>
+  <output>/foo
+</output>
+  </testSpec>
+  <testSpec title="dirname-5" command="dirname"
+              runMode="AS_ALIAS" rc="0">
+  <arg>/foo/bar/</arg>
+  <output>/foo
+</output>
+  </testSpec>
+  <testSpec title="dirname-6" command="dirname"
+              runMode="AS_ALIAS" rc="0">
+  <arg>foo/bar</arg>
+  <output>foo
+</output>
+  </testSpec>
+  <testSpec title="dirname-7" command="dirname"
+              runMode="AS_ALIAS" rc="0">
+  <arg>foo</arg>
+  <output>.
+</output>
+  </testSpec>
+</testSet>
