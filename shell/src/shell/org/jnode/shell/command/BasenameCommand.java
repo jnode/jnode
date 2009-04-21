@@ -24,34 +24,56 @@ import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.StringArgument;
 
+/**
+ * Unix `basename` command.
+ * 
+ * @see http://www.opengroup.org/onlinepubs/000095399/utilities/basename.html
+ * @author chris boertien
+ */
 public class BasenameCommand extends AbstractCommand {
 
-    private static final String help_name = "Strip this filename of its directory and optionally suffix components.";
-    private static final String help_suffix = "Strip this suffix from the filename";
+    private static final String help_name = "Strip this fileargName of its directory and optionally argSuffix components.";
+    private static final String help_suffix = "Strip this argSuffix from the fileargName";
+    private static final String help_super = "Strip directory and argSuffix from filesargNames";
     
-    private final StringArgument Name = new StringArgument("name", Argument.MANDATORY, help_name);
-    private final StringArgument Suffix = new StringArgument("suffix", Argument.OPTIONAL, help_suffix);
+    private final StringArgument argName = new StringArgument("name", Argument.MANDATORY, help_name);
+    private final StringArgument argSuffix = new StringArgument("suffix", Argument.OPTIONAL, help_suffix);
+    
     public BasenameCommand() {
-        super("Strip directory and suffix from filenames");
-        registerArguments(Name, Suffix);
+        super(help_super);
+        registerArguments(argName, argSuffix);
     }
     
     public void execute() {
-        String name = Name.getValue();
+        String name = argName.getValue();
         
-        int start = name.lastIndexOf('/') + 1;
+        int start = 0;
         int end = name.length();
         
-        if (Suffix.isSet()) {
-            String suffix = Suffix.getValue();
-            if (name.endsWith(suffix)) {
-                end -= suffix.length();
-                if ((start + 1) == end) {
-                    end = name.length();
-                }
+        boolean allSlashes = true;
+        for (char c : name.toCharArray()) {
+            if (c != '/') {
+                allSlashes = false;
+                break;
             }
         }
         
-        getOutput().getPrintWriter().println(name.substring(start, end));
+        if (allSlashes) {
+            name = "/";
+        } else {
+            if (name.endsWith("/")) {
+                end--;
+            }
+            start = name.lastIndexOf('/', end - 1) + 1;
+            name = name.substring(start, end);
+            
+            if (argSuffix.isSet()) {
+                String suffix = argSuffix.getValue();
+                if (!name.equals(suffix) && name.endsWith(suffix)) {
+                    name = name.substring(0, name.length() - suffix.length());
+                }
+            }
+        }
+        getOutput().getPrintWriter().println(name);
     }
 }
