@@ -2,4 +2,7 @@
     <include setName="bjorne/bjorne-shell-tests.xml"/>
     <include setName="bjorne/bjorne-builtin-tests.xml"/>
     <include setName="command/posix/posix-command-tests.xml"/>
+    <include setName="command/posix/basename-command-tests.xml"/>
+    <include setName="command/posix/dirname-command-tests.xml"/>
+    <include setName="command/posix/wc-command-tests.xml"/>
 </testSet>

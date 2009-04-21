@@ -23,6 +23,9 @@
     <alias name="test" class="org.jnode.shell.command.posix.UnixTestCommand"/>
     <alias name="true" class="org.jnode.shell.command.posix.TrueCommand"/>
     <alias name="[" class="org.jnode.shell.command.posix.UnixTestCommand"/>
+    <alias name="basename" class="org.jnode.shell.command.posix.BasenameCommand"/>
+    <alias name="dirname" class="org.jnode.shell.command.posix.DirnameCommand"/>
+    <alias name="wc" class="org.jnode.shell.command.posix.WcCommand"/>
   </extension>
   
   <extension point="org.jnode.shell.syntaxes">
@@ -31,6 +34,29 @@
     </syntax>
     <syntax alias="true">
       <empty description="Set a zero return code"/>
+    </syntax>
+    <syntax alias="basename">
+      <sequence description="strip the directory prefix from a filename, as well as an option suffix">
+        <argument argLabel="name" />
+        <optional><argument argLabel="suffix"/></optional>
+      </sequence>
+    </syntax>
+    <syntax alias="dirname">
+      <argument argLabel="name"/>
+    </syntax>
+    <syntax alias="wc">
+      <sequence>
+        <optionSet>
+          <option argLabel="bytes" shortName="c" longName="bytes"/>
+          <option argLabel="chars" shortName="m" longName="chars"/>
+          <option argLabel="lines" shortName="l" longName="lines"/>
+          <option argLabel="worlds" shortName="w" longName="words"/>
+          <option argLabel="maxCharLine" shortName="L" longName="max-line-length"/>
+        </optionSet>
+        <repeat>
+          <argument argLabel="files"/>
+        </repeat>
+      </sequence>
     </syntax>
   </extension>
 
