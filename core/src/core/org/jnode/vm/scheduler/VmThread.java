@@ -1268,6 +1268,7 @@ public abstract class VmThread extends VmSystemObject {
         final VmProcessor proc = VmProcessor.current();
         final VmStackReader reader = proc.getArchitecture().getStackReader();
         final VmStackFrame[] mt;
+        boolean inSystemException = false;
         // Address lastIP = null;
         if (current.isInSystemException()) {
             proc.disableReschedule(false);
@@ -1278,6 +1279,7 @@ public abstract class VmThread extends VmSystemObject {
             } finally {
                 proc.enableReschedule(false);
             }
+            inSystemException = true;
         } else if (current == proc.getCurrentThread()) {
             final Address curFrame = VmMagic.getCurrentFrame();
             mt = reader.getVmStackTrace(reader.getPrevious(curFrame), reader
@@ -1294,12 +1296,12 @@ public abstract class VmThread extends VmSystemObject {
         }
         final int cnt = (mt == null) ? 0 : mt.length;
 
-        VmType lastClass = null;
+        VmType<?> lastClass = null;
 
-        // skip the first element which is VMThrowable.fillInStackTrace()
-        int i = 1;
+        // skip the first element which is VMThrowable.fillInStackTrace() ...
+        // unless this is a system exception 
+        int i = inSystemException ? 0 : 1;
         while (i < cnt) {
-
             final VmStackFrame f = mt[i];
             if (f == null) {
                 break;
@@ -1313,9 +1315,8 @@ public abstract class VmThread extends VmSystemObject {
                 break;
             }
             final VmType<?> sClass = vmClass.getSuperClass();
-            if ((lastClass != null) && (sClass != lastClass)
-                && (vmClass != lastClass)) {
-                break;
+            if (lastClass != null && sClass != lastClass && vmClass != lastClass) {
+                break; 
             }
             final String mname = method.getName();
             if (mname == null) {
