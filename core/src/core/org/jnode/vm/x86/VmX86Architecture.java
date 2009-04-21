@@ -146,14 +146,26 @@ public abstract class VmX86Architecture extends VmArchitecture {
     /**
      * Initialize this instance.
      *
-     * @param compiler L1a to use L1A compiler, L1 compiler otherwise.
+     * @param compiler the name of the compiler to use as standard.  If 
+     * the supplied name is {@code null} or doesn't match (case insensitively) 
+     * one of the known names, the default compiler will be used.  
      */
     public VmX86Architecture(int referenceSize, String compiler) {
         super(referenceSize, new VmX86StackReader(referenceSize));
         this.compilers = new NativeCodeCompiler[2];
         this.compilers[0] = new X86StubCompiler();
-        if ("L1B".equals(compiler)) {
-            this.compilers[1] = new X86Level1BCompiler();
+        // Compare insensitively, producing a warning if the user selects
+        // an unknown compiler, and using a default where appropriate.
+        if (compiler != null && compiler.length() > 0) {
+            if ("L1B".equalsIgnoreCase(compiler)) {
+                this.compilers[1] = new X86Level1BCompiler();
+            } else {
+                if (!"L1A".equalsIgnoreCase(compiler)) {
+                    BootLog.warn("JNode native compiler '" + compiler + 
+                            "' is unknown: defaulting to 'L1A'");
+                }
+                this.compilers[1] = new X86Level1ACompiler();
+            }
         } else {
             this.compilers[1] = new X86Level1ACompiler();
         }
