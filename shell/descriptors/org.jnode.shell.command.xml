@@ -44,6 +44,7 @@
     <alias name="namespace" class="org.jnode.shell.command.NamespaceCommand"/>
     <alias name="onheap" class="org.jnode.shell.command.OnHeapCommand"/>
     <alias name="page" class="org.jnode.shell.command.PageCommand"/>
+    <alias name="propset" class="org.jnode.shell.command.SetCommand"/>
     <alias name="printenv" class="org.jnode.shell.command.PrintEnvCommand"/>
     <alias name="run" class="org.jnode.shell.command.RunCommand"/>
     <alias name="set" class="org.jnode.shell.command.SetCommand"/>
@@ -344,6 +345,22 @@
       <empty description="Filter standard input a page (screen) at a time"/>
       <argument argLabel="file" description="Output the file a page (screen) at a time"/>
     </syntax>
+    <syntax alias="propset">
+      <sequence description="Set a shell property">
+        <option argLabel="shell" shortName="s" longName="shell"/>
+        <argument argLabel="skey"/>
+        <argument argLabel="value"/>
+      </sequence>
+      <sequence>
+      	<argument description="Remove a shell property" argLabel="skey"/>
+        <option argLabel="shell" shortName="s" longName="shell"/>
+      </sequence>
+      <sequence description="Set a system property">
+        <argument argLabel="key"/>
+        <argument argLabel="value"/>
+      </sequence>
+      <argument description="Remove a system property" argLabel="key"/>
+    </syntax>
     <syntax alias="run" description="Run a command file">
       <argument argLabel="file"/>
     </syntax>
@@ -362,7 +379,6 @@
         <argument argLabel="value"/>
       </sequence>
       <argument description="Remove a system property" argLabel="key"/>
-      
     </syntax>
     <syntax alias="sleep" description="Sleep for a given number of seconds">
       <argument argLabel="seconds"/>
