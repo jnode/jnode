@@ -55,6 +55,7 @@ import org.jnode.annotation.SharedStatics;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.scheduler.VmThread;
+import gnu.classpath.SystemProperties;
 
 /**
  * VM specific implementation of the Isolate class.
@@ -960,21 +961,22 @@ public final class VmIsolate {
             //executorThread = new Thread(new TaskExecutor(), "isolate-executor");
             //executorThread.start();
 
-            // Find main method
-            final Method mainMethod = cls.getMethod("main",
-                new Class[]{String[].class});
-//                IsolatedStaticData.mainTypes);
-
             //inherit properties
             AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
-                    Properties sys_porps = System.getProperties();
+                    Properties sys_porps = SystemProperties.getProperties();
                     for (String prop : initProperties.stringPropertyNames()) {
                         sys_porps.setProperty(prop, initProperties.getProperty(prop));
                     }
                     return null;
                 }
             });
+
+            // Find main method
+            final Method mainMethod = cls.getMethod("main",
+                new Class[]{String[].class});
+//                IsolatedStaticData.mainTypes);
+
 
             //create the appcontext for this isolate
             // TODO - improve this
