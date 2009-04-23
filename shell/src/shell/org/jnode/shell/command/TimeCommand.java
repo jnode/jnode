@@ -82,10 +82,10 @@ public class TimeCommand extends AbstractCommand {
         try {
             shell = (CommandShell) ShellUtils.getShellManager().getCurrentShell();
 
-            CommandInfo cmdInfo =  shell.getCommandInfo(alias);
-            SimpleCommandInvoker invoker = shell.getDefaultCommandInvoker();
             long start = VmSystem.currentKernelMillis();
-            int ret = invoker.invoke(commandLine, cmdInfo);
+
+            int ret = shell.runCommand(commandLine.toString());
+
             long end = VmSystem.currentKernelMillis();
             out.format(TIME_COMMAND_START, start);
             out.format(TIME_COMMAND_END, end);
