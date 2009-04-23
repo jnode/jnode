@@ -21,42 +21,39 @@ package org.jnode.shell.command;
 
 import java.io.PrintWriter;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.SimpleCommandInvoker;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
-import org.jnode.shell.ShellUtils;
-import org.jnode.shell.CommandInfo;
 import org.jnode.shell.ShellException;
+import org.jnode.shell.ShellUtils;
 import org.jnode.shell.io.CommandIO;
+import org.jnode.shell.syntax.AliasArgument;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.StringArgument;
-import org.jnode.shell.syntax.AliasArgument;
-import org.jnode.vm.VmSystem;
 
 /**
  * Measures how much execution of time command takes
  * <p/>
- * Date: Apr 16, 2009
- * Time: 9:18:45 PM
  *
  * @author petriai@gmail.com
  */
 public class TimeCommand extends AbstractCommand {
 
     /* for i18n */
-    private final static String TIME_COMMAND_START = "\nstart: %d\n";
-    private final static String TIME_COMMAND_END   = "end  : %d\n";
-    private final static String TIME_COMMAND_DIFF  = "       %d\n";
+    private final static String help_alias = "command to be run";
+    private static final String help_args  = "command parameters";
+    private final static String fmt_start  = "%nstart: %d%n";
+    private final static String fmt_end    = "end  : %d%n";
+    private final static String fmt_diff   = "       %d%n";
 
-    private final AliasArgument ARG_CMD =
-        new AliasArgument("alias", Argument.MANDATORY, "command to be run");
-
-    private final StringArgument ARG_PARAMS =
-        new StringArgument("args", Argument.MULTIPLE, "command parameters");
-
+    private final AliasArgument Alias;
+    private final StringArgument Args;
+        
+    private static final boolean DEBUG = false;
+    
     public TimeCommand() {
         super("Measures execution time of command");
-        registerArguments(ARG_CMD, ARG_PARAMS);
+        Alias = new AliasArgument("alias", Argument.MANDATORY, help_alias);
+        Args = new StringArgument("args", Argument.MULTIPLE, help_args);
+        registerArguments(Alias, Args);
     }
 
     public static void main(String[] args) throws Exception {
@@ -67,34 +64,30 @@ public class TimeCommand extends AbstractCommand {
         PrintWriter out = getOutput().getPrintWriter();
         PrintWriter err = getError().getPrintWriter();
 
-        String alias = ARG_CMD.getValue();
-        String[] args = ARG_PARAMS.getValues();
+        StringBuilder sb = new StringBuilder(Alias.getValue());
+        for (String arg : Args.getValues()) {
+            sb.append(" ");
+            sb.append(arg);
+        }
         
-        CommandIO[] ios = new CommandIO[4];
-        ios[0] = getIO(0);
-        ios[1] = getIO(1);
-        ios[2] = getIO(2);
-        ios[3] = getIO(3);
-
-        CommandLine commandLine = new CommandLine(alias, args, ios);
-
         CommandShell shell = null;
+        int ret = 1;
         try {
             shell = (CommandShell) ShellUtils.getShellManager().getCurrentShell();
-
-            long start = VmSystem.currentKernelMillis();
-
-            int ret = shell.runCommand(commandLine.toString());
-
-            long end = VmSystem.currentKernelMillis();
-            out.format(TIME_COMMAND_START, start);
-            out.format(TIME_COMMAND_END, end);
-            out.format(TIME_COMMAND_DIFF, end - start);
-
+            //CommandInfo cmdInfo =  shell.getCommandInfo(alias);
+            long start = System.currentTimeMillis();
+            ret = shell.runCommand(sb.toString());
+            long end = System.currentTimeMillis();
+            out.format(fmt_start, start);
+            out.format(fmt_end, end);
+            out.format(fmt_diff, end - start);
         } catch (ShellException ex) {
-            err.println(ex.getMessage());
+            if (DEBUG) {
+                err.println(ex.getMessage());
+            }
             throw ex;
+        } finally {
+            exit(ret);
         }
     }
-
 }
