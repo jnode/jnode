@@ -20,6 +20,9 @@
 package org.jnode.shell.command;
 
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
@@ -30,19 +33,18 @@ import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.StringArgument;
 
 /**
- * Measures how much execution of time command takes
+ * Measures the execution time of a simple command.
  * <p/>
  *
  * @author petriai@gmail.com
+ * @author chris boertien
  */
 public class TimeCommand extends AbstractCommand {
 
     /* for i18n */
     private final static String help_alias = "command to be run";
     private static final String help_args  = "command parameters";
-    private final static String fmt_start  = "%nstart: %d%n";
-    private final static String fmt_end    = "end  : %d%n";
-    private final static String fmt_diff   = "       %d%n";
+    private final static String fmt_diff   = "time: %s%n";
 
     private final AliasArgument Alias;
     private final StringArgument Args;
@@ -78,9 +80,7 @@ public class TimeCommand extends AbstractCommand {
             long start = System.currentTimeMillis();
             ret = shell.runCommand(sb.toString());
             long end = System.currentTimeMillis();
-            out.format(fmt_start, start);
-            out.format(fmt_end, end);
-            out.format(fmt_diff, end - start);
+            out.format(fmt_diff, getRuntime((int) (end - start)));
         } catch (ShellException ex) {
             if (DEBUG) {
                 err.println(ex.getMessage());
@@ -89,5 +89,22 @@ public class TimeCommand extends AbstractCommand {
         } finally {
             exit(ret);
         }
+    }
+    
+    public String getRuntime(int time) {
+        int hours = time / (60 * 60 * 1000);
+        int minutes = (time / (60 * 1000)) % 60;
+        int seconds = (time / 1000) % 60;
+        int millis  = time % 1000;
+        if (hours > 0) {
+            return String.format("%2d:%2d:%2d.%3ds", hours, minutes, seconds, millis);
+        }
+        if (minutes > 0) {
+            return String.format("%2d:%2d.%3ds", minutes, seconds, millis);
+        }
+        if (seconds > 0) {
+            return String.format("%2d.%3ds", seconds, millis);
+        }
+        return String.format("%3dms", millis);
     }
 }
