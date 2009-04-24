@@ -27,6 +27,7 @@
     <alias name="df" class="org.jnode.fs.command.DFCommand"/>
     <alias name="dir" class="org.jnode.fs.command.DirCommand"/>
     <alias name="eject" class="org.jnode.fs.command.EjectCommand"/>
+    <alias name="find" class="org.jnode.fs.command.FindCommand"/>  
     <alias name="hexdump" class="org.jnode.fs.command.HexdumpCommand"/>
     <alias name="ls" class="org.jnode.fs.command.DirCommand"/>
     <alias name="md5sum" class="org.jnode.fs.command.Md5SumCommand"/>
