@@ -26,15 +26,16 @@
     <alias name="del" class="org.jnode.fs.command.DeleteCommand"/>
     <alias name="df" class="org.jnode.fs.command.DFCommand"/>
     <alias name="dir" class="org.jnode.fs.command.DirCommand"/>
-    <alias name="ls" class="org.jnode.fs.command.DirCommand"/>
     <alias name="eject" class="org.jnode.fs.command.EjectCommand"/>
+    <alias name="hexdump" class="org.jnode.fs.command.HexdumpCommand"/>
+    <alias name="ls" class="org.jnode.fs.command.DirCommand"/>
+    <alias name="md5sum" class="org.jnode.fs.command.Md5SumCommand"/>
     <alias name="mkdir" class="org.jnode.fs.command.MkdirCommand"/>
     <alias name="mount" class="org.jnode.fs.command.MountCommand"/>
+    <alias name="mv" class="org.jnode.fs.command.MoveCommand"/>
     <alias name="pwd" class="org.jnode.fs.command.PwdCommand"/>
+    <alias name="rm" class="org.jnode.fs.command.DeleteCommand"/>
     <alias name="touch" class="org.jnode.fs.command.TouchCommand"/>
-    <alias name="hexdump" class="org.jnode.fs.command.HexdumpCommand"/>
-    <alias name="md5sum" class="org.jnode.fs.command.Md5SumCommand"/>
-    <alias name="find" class="org.jnode.fs.command.FindCommand"/>
   </extension>
 
   <extension point="org.jnode.shell.syntaxes">
@@ -77,6 +78,20 @@
     <syntax alias="eject">
       <argument argLabel="device" description="eject a device with a removable medium"/>
     </syntax>
+    <syntax alias="find">
+      <sequence description="find files or directories">
+        <repeat minCount="0">
+          <argument argLabel="directory" description="directory to start searching from"/>
+        </repeat>
+        <optionSet>
+          <option argLabel="type" longName="type" shortName="t" description="filter results to show only files of given type. valid types are 'd' for directory and 'f' for file"/>
+          <option argLabel="maxdepth" longName="maxdepth" shortName="D" description="descent at most to given level of directories"/>
+          <option argLabel="mindepth" longName="mindepth" shortName="d" description="ignore files and directories at levels less than given level"/>
+          <option argLabel="name" longName="name" shortName="n" description="filter results to show only files that match given pattern"/>
+          <option argLabel="iname" longName="iname" shortName="N" description="same like 'n', but case insensitive"/>
+        </optionSet>
+      </sequence>
+    </syntax>
     <syntax alias="hexdump">
       <empty description="print a hex dump of standard input"/>
       <argument argLabel="file" description="print a hex dump of a file"/>
@@ -111,22 +126,19 @@
     <syntax alias="pwd">
       <empty description="show the pathname for the current directory"/>
     </syntax>
+    <syntax alias="rm">
+      <sequence description="delete files and directories">
+        <optionSet>
+          <option argLabel="recursive" shortName="r" longName="recursive"/>
+          <option argLabel="force" shortName="f" longName="force" />
+          <option argLabel="interactive" shortName="i" longName="interactive" />
+          <option argLabel="verbose" shortName="v" longName="verbose" />
+        </optionSet>
+        <repeat minCount="1"><argument argLabel="paths"/></repeat>
+      </sequence>
+    </syntax>
     <syntax alias="touch">
       <argument argLabel="file" description="touch the given file"/>
-    </syntax>
-    <syntax alias="find">
-      <sequence description="find files or directories">
-        <repeat minCount="0">
-          <argument argLabel="directory" description="directory to start searching from"/>
-        </repeat>
-        <optionSet>
-          <option argLabel="type" longName="type" shortName="t" description="filter results to show only files of given type. valid types are 'd' for directory and 'f' for file"/>
-          <option argLabel="maxdepth" longName="maxdepth" shortName="D" description="descent at most to given level of directories"/>
-          <option argLabel="mindepth" longName="mindepth" shortName="d" description="ignore files and directories at levels less than given level"/>
-          <option argLabel="name" longName="name" shortName="n" description="filter results to show only files that match given pattern"/>
-          <option argLabel="iname" longName="iname" shortName="N" description="same like 'n', but case insensitive"/>
-        </optionSet>
-      </sequence>
     </syntax>
   </extension>
 

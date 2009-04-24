@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jawk"
+        name="jawk"
+        version="1.02"
+        license-name="???"
+        provider-name="jawk.org"
+        provider-url="http://jawk.sourceforge.net">
+
+  <runtime>
+    <library name="jawk.jar">
+      <export name="*"/>
+    </library>
+    <library name="jnode-distr.jar">
+      <export name="org.jawk.*"/>
+    </library>
+  </runtime>
+  
+  <requires>
+    <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.shell.syntax"/>
+  </requires>
+  
+  <extension point="org.jnode.shell.aliases">
+    <alias name="awk" class="org.jawk.JawkCommand"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="awk">
+      <sequence>
+          <optionSet>
+            <option argLabel="vars" shortName="v"/>
+            <option argLabel="field-sep" shortName="F"/>
+            <option argLabel="script" shortName="f"/>
+            <option argLabel="interm-out" shortName="c"/>
+            <option argLabel="interm-file" shortName="o"/>
+            <option argLabel="compile" shortName="z"/>
+            <option argLabel="compile-exec" shortName="Z"/>
+            <option argLabel="compile-dir" shortName="d"/>
+            <option argLabel="dump-interm" shortName="s"/>
+            <option argLabel="dump-ast" shortName="S"/>
+            <option argLabel="xfuncs" shortName="x"/>
+            <option argLabel="xtypes" shortName="y"/>
+            <option argLabel="sort-arrays" shortName="t"/>
+            <option argLabel="no-fmt-trap" shortName="r"/>
+          </optionSet>
+          <optional>
+            <argument argLabel="program"/>
+          </optional>
+          <repeat>
+            <alternatives>
+              <argument argLabel="files"/>
+              <argument argLabel="vars"/>
+            </alternatives>
+          </repeat>
+      </sequence>
+    </syntax>
+  </extension>
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThread"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
+    <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
+    <permission class="java.lang.RuntimePermission" name="getenv.*"/>
+    <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
+  </extension>
+</plugin>

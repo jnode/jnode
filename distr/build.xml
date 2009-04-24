@@ -20,6 +20,8 @@
 
     <pathelement location="${jetty.jar}"/>
   	<pathelement location="${jetty-util.jar}"/>
+  	
+  	<pathelement location="${jawk.jar}"/>
 
     <path refid="cp"/>
   </path>
