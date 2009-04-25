@@ -156,17 +156,18 @@ public abstract class VmX86Architecture extends VmArchitecture {
         this.compilers[0] = new X86StubCompiler();
         // Compare insensitively, producing a warning if the user selects
         // an unknown compiler, and using a default where appropriate.
-        if (compiler != null && compiler.length() > 0) {
+        if (compiler != null && compiler.length() > 0 && 
+                !compiler.equalsIgnoreCase("default")) {
             if ("L1B".equalsIgnoreCase(compiler)) {
                 this.compilers[1] = new X86Level1BCompiler();
-            } else {
-                if (!"L1A".equalsIgnoreCase(compiler)) {
-                    BootLog.warn("JNode native compiler '" + compiler + 
-                            "' is unknown: defaulting to 'L1A'");
-                }
+            } else if ("L1A".equalsIgnoreCase(compiler)) {
                 this.compilers[1] = new X86Level1ACompiler();
+            } else { 
+                BootLog.warn("JNode native compiler '" + compiler + "' is unknown.");
             }
-        } else {
+        } 
+        if (this.compilers[1] == null) {
+            BootLog.warn("JNode native compiler defaulting to 'L1A'");
             this.compilers[1] = new X86Level1ACompiler();
         }
         this.testCompilers = null;
