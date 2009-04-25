@@ -42,4 +42,9 @@ public class IsolateSocket extends Socket {
     public IsolateSocket(OutputStream out) throws SocketException {
         super(new IsolateSocketImpl(out)); 
     }
+    
+    @Override
+    public boolean isConnected() {
+        return true;
+    }
 }
