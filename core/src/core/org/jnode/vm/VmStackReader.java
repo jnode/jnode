@@ -68,7 +68,12 @@ public abstract class VmStackReader extends VmSystemObject {
         } else {
             final VmCompiledCode cc = Vm.getCompiledMethods().get(ccid);
             if (cc == null) {
-                Unsafe.die("Unknown ccid found on stack");
+                // (This can happen if an exception is thrown while a frame
+                // for a 'native' method call is on the stack.  A panic is not a 
+                // good idea.  It is better to generate a stack trace with a missing
+                // method name.)
+                
+                // Unsafe.die("Unknown ccid found on stack");
                 return null;
             } else {
                 return cc.getMethod();
