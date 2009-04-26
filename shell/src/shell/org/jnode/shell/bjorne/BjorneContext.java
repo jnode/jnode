@@ -983,7 +983,7 @@ public class BjorneContext {
         throw new ShellFailureException("not implemented");
     }
 
-    int execute(CommandLine command, CommandIO[] streams) throws ShellException {
+    int execute(CommandLine command, CommandIO[] streams, boolean isBuiltin) throws ShellException {
         if (isEchoExpansions()) {
             StringBuilder sb = new StringBuilder();
             sb.append(" + ").append(command.getCommandName());
@@ -993,7 +993,7 @@ public class BjorneContext {
             resolvePrintStream(streams[Command.STD_ERR]).println(sb);
         }
         Map<String, String> env = buildEnvFromExports();
-        lastReturnCode = interpreter.executeCommand(command, this, streams, null, env);
+        lastReturnCode = interpreter.executeCommand(command, this, streams, null, env, isBuiltin);
         return lastReturnCode;
     }
 

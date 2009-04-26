@@ -276,6 +276,7 @@ public class BjorneParser {
         List<BjorneToken> assignments = new LinkedList<BjorneToken>();
         List<RedirectionNode> redirects = new LinkedList<RedirectionNode>();
         List<BjorneToken> words = new LinkedList<BjorneToken>();
+        boolean builtin = false;
 
         // Deal with cmd_prefix'es before the command name; i.e. assignments and
         // redirections
@@ -334,12 +335,19 @@ public class BjorneParser {
                         break LOOP;
                 }
             }
+            if (words.size() > 0) {
+                String commandWord = words.get(0).getText();
+                builtin = BjorneInterpreter.isBuiltin(commandWord);
+                // FIXME ... built-in commands should use the Syntax mechanisms so
+                // that completion, help, etc will work as expected.
+            }
         } else {
             // An empty command is legal, as are assignments and redirections
             // w/o a command.
         }
         SimpleCommandNode res = 
-            new SimpleCommandNode(CMD_COMMAND, words.toArray(new BjorneToken[words.size()]));
+            new SimpleCommandNode(CMD_COMMAND, 
+                    words.toArray(new BjorneToken[words.size()]), builtin);
         if (!redirects.isEmpty()) {
             res.setRedirects(redirects.toArray(new RedirectionNode[redirects.size()]));
         }
