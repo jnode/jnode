@@ -130,7 +130,7 @@ public class BjorneInterpreter implements CommandInterpreter {
     public static final int FLAG_PIPE = 0x0010;
 
     public static final CommandNode EMPTY = 
-        new SimpleCommandNode(CMD_EMPTY, new BjorneToken[0]);
+        new SimpleCommandNode(CMD_EMPTY, new BjorneToken[0], false);
 
     private static HashMap<String, BjorneBuiltin> BUILTINS = 
         new HashMap<String, BjorneBuiltin>();
@@ -327,14 +327,18 @@ public class BjorneInterpreter implements CommandInterpreter {
             this.shell = shell;
         }
     }
+    
+    static boolean isBuiltin(String commandWord) {
+        return BUILTINS.containsKey(commandWord);
+    }
 
     int executeCommand(CommandLine cmdLine, BjorneContext context, CommandIO[] streams, 
-            Properties sysProps, Map<String, String> env) 
+            Properties sysProps, Map<String, String> env, boolean isBuiltin)
         throws ShellException {
-        BjorneBuiltin builtin = BUILTINS.get(cmdLine.getCommandName());
-        if (builtin != null) {
+        if (isBuiltin) {
             // FIXME ... built-in commands should use the Syntax mechanisms so
-            // that completion, help, etc work as expected.
+            // that completion, help, etc will work as expected.
+            BjorneBuiltin builtin = BUILTINS.get(cmdLine.getCommandName());
             return builtin.invoke(cmdLine, this, context);
         } else {
             cmdLine.setStreams(streams);

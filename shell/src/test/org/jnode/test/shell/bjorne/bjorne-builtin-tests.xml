@@ -74,4 +74,22 @@ hi echo hi
         <output>fred='ls'
 </output>
     </testSpec>
+    <testSpec title="builtins recognized early" command="test" 
+              runMode="AS_SCRIPT" rc="0" trapException="org.jnode.shell.ShellException">
+        <script>#!bjorne
+                alias fred=ls
+                alias
+                unalias -a
+                echo done
+                UNALIAS=unalias
+                alias fred=dir
+                alias
+                $UNALIAS -a
+                echo done
+        </script>
+        <output>fred='ls'
+done
+fred='dir'
+</output>
+    </testSpec>
 </testSet>

@@ -36,10 +36,13 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
     private BjorneToken[] assignments;
 
     private final BjorneToken[] words;
+    
+    private final boolean builtin;
 
-    public SimpleCommandNode(int nodeType, BjorneToken[] words) {
+    public SimpleCommandNode(int nodeType, BjorneToken[] words, boolean builtin) {
         super(nodeType);
         this.words = words;
+        this.builtin = builtin;
     }
 
     public void setAssignments(BjorneToken[] assignments) {
@@ -54,12 +57,19 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
         return assignments;
     }
 
+    public boolean isBuiltin() {
+        return builtin;
+    }
+
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("SimpleCommand{").append(super.toString());
         if (assignments != null) {
             sb.append(",assignments=");
             appendArray(sb, assignments);
+        }
+        if (builtin) {
+            sb.append(",builtin=true");
         }
         if (words != null) {
             sb.append(",words=");
@@ -99,7 +109,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
                     throw new ShellFailureException(
                             "asynchronous execution (&) not implemented yet");
                 } else {
-                    rc = childContext.execute(command, ios);
+                    rc = childContext.execute(command, ios, builtin);
                 }
             }
         } finally {
