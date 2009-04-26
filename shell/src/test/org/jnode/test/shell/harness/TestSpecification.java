@@ -86,10 +86,11 @@ public class TestSpecification {
     private final int rc;
     private final List<FileSpecification> files = new ArrayList<FileSpecification>();
     private TestSetSpecification testSet;
+    private final Class<? extends Throwable> exception;
     
     public TestSpecification(RunMode runMode, String command, String scriptContent,
             String inputContent, String outputContent, String errorContent,
-            String title, int rc) {
+            String title, int rc, Class<? extends Throwable>  exception) {
         super();
         this.runMode = runMode;
         this.command = command;
@@ -99,6 +100,7 @@ public class TestSpecification {
         this.errorContent = errorContent;
         this.title = title;
         this.rc = rc;
+        this.exception = exception;
     }
 
     public String getOutputContent() {
@@ -163,5 +165,9 @@ public class TestSpecification {
 
     public void setTestSet(TestSetSpecification testSet) {
         this.testSet = testSet;
+    }
+
+    public Class<? extends Throwable> getException() {
+        return exception;
     }
 }

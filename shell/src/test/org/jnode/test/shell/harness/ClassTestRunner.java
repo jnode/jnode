@@ -40,7 +40,18 @@ class ClassTestRunner extends TestRunnerBase implements TestRunnable {
         Class<?> commandClass = Class.forName(spec.getCommand());
         Method method = commandClass.getMethod("main", String[].class);
         String[] args = spec.getArgs().toArray(new String[0]);
-        method.invoke(null, (Object) args);
+        try {
+            method.invoke(null, (Object) args);
+        } catch (Throwable ex) {
+            Class<? extends Throwable> exception = spec.getException();
+            if (exception != null && exception.isInstance(ex)) {
+                // continue
+            } else if (ex instanceof Error) {
+                throw (Error) ex;
+            } else {
+                throw (Exception) ex;
+            }
+        }
         flush();
         return check() ? 0 : 1;
     }
