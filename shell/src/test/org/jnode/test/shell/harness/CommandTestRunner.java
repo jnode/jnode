@@ -45,7 +45,19 @@ class CommandTestRunner extends TestRunnerBase implements TestRunnable {
         for (String arg : spec.getArgs()) {
             sb.append(" ").append(shell.escapeWord(arg));
         }
-        int rc = shell.runCommand(sb.toString());
+        int rc; 
+        try { 
+            rc = shell.runCommand(sb.toString());
+        } catch (Throwable ex) {
+            Class<? extends Throwable> exception = spec.getException();
+            if (exception != null && exception.isInstance(ex)) {
+                rc = 0;
+            } else if (ex instanceof Error) {
+                throw (Error) ex;
+            } else {
+                throw (Exception) ex;
+            }
+        }
         flush();
         return check(rc) ? 0 : 1;
     }

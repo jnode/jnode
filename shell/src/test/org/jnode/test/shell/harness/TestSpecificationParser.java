@@ -99,11 +99,23 @@ public class TestSpecificationParser {
         String inputContent = extractElementValue(elem, "input", "");
         String outputContent = extractElementValue(elem, "output", "");
         String errorContent = extractElementValue(elem, "error", "");
+        Class<? extends Throwable> exception;
         int rc;
         try {
             rc = Integer.parseInt(extractAttribute(elem, "rc", "0").trim());
         } catch (NumberFormatException ex) {
             throw new TestSpecificationException("'rc' is not an integer");
+        }
+        try {
+            String className = extractAttribute(elem, "trapException", "");
+            if (className.length() > 0) {
+                Class<?> clazz = Class.forName(className);
+                exception = clazz.asSubclass(Throwable.class);
+            } else {
+                exception = null;
+            }
+        } catch (Throwable ex) {
+            throw new TestSpecificationException("'trapException' is not an exception classname");
         }
         if (command == null) {
             if (runMode != RunMode.AS_SCRIPT) {
@@ -115,7 +127,7 @@ public class TestSpecificationParser {
         }
         TestSpecification res = new TestSpecification(
                 runMode, command, scriptContent, inputContent, outputContent, errorContent,
-                title, rc);
+                title, rc, exception);
         for (Object obj : elem.getChildren()) {
             if (obj instanceof IXMLElement) {
                 IXMLElement child = (IXMLElement) obj;

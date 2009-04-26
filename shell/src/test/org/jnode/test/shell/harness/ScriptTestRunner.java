@@ -59,8 +59,20 @@ class ScriptTestRunner extends TestRunnerBase implements TestRunnable {
         } finally {
             bw.close();
         }
-        int rc = getShell().runCommandFile(tempScriptFile, 
-                spec.getCommand(), spec.getArgs().toArray(new String[0]));
+        int rc;
+        try {
+            rc = getShell().runCommandFile(tempScriptFile, 
+                    spec.getCommand(), spec.getArgs().toArray(new String[0]));
+        } catch (Throwable ex) {
+            Class<? extends Throwable> exception = spec.getException();
+            if (exception != null && exception.isInstance(ex)) {
+                rc = 0;
+            } else if (ex instanceof Error) {
+                throw (Error) ex;
+            } else {
+                throw (Exception) ex;
+            }
+        }
         flush();
         return check(rc) ? 0 : 1;
     }
