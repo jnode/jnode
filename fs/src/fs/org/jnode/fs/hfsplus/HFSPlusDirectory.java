@@ -87,7 +87,19 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
     }
 
     private final FSEntry createFileEntry(final String name) throws IOException {
-        // TODO
+        /*if (fs.isReadOnly()) {
+            throw new ReadOnlyFileSystemException();
+        }
+        Catalog catalog = fs.getCatalog();
+        Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
+        LeafRecord fileRecord = catalog.createNode(name, this.folder
+                        .getFolderId(), new CatalogNodeId(volumeHeader.getNextCatalogId()), CatalogFile.RECORD_TYPE_FILE);
+        
+        HFSPlusEntry newEntry = new HFSPlusFile(fs, this, name, folderRecord);
+        newEntry.setDirty();
+        volumeHeader.setFileCount(volumeHeader.getFileCount() + 1);
+        log.debug("New volume header :\n" + volumeHeader.toString());*/
+
         return null;
     }
 
@@ -114,8 +126,7 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
 
     @Override
     public Iterator<? extends FSEntry> iterator() throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+        return entries.iterator();
     }
 
     public int rename(String oldName, String newName) {
@@ -215,8 +226,10 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
         Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
         LeafRecord folderRecord = catalog.createNode(name, this.folder.getFolderId(), 
             new CatalogNodeId(volumeHeader.getNextCatalogId()), CatalogFolder.RECORD_TYPE_FOLDER_THREAD);
+        folder.setValence(folder.getValence() + 1);
         
         HFSPlusEntry newEntry = new HFSPlusDirectory(fs, this, name, folderRecord);
+        newEntry.setDirty();
         volumeHeader.setFolderCount(volumeHeader.getFolderCount() + 1);
         log.debug("New volume header :\n" + volumeHeader.toString());
 
