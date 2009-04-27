@@ -26,6 +26,7 @@ import org.jnode.shell.AsyncCommandInvoker;
 import org.jnode.shell.CommandRunner;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.CommandThread;
+import org.jnode.shell.CommandThreadImpl;
 import org.jnode.shell.ShellInvocationException;
 import org.jnode.shell.SimpleCommandInvoker;
 
@@ -58,10 +59,14 @@ public class IsolateCommandInvoker extends AsyncCommandInvoker {
     @Override
     protected CommandThread createThread(CommandRunner cr) 
         throws ShellInvocationException {
-        try {
-            return new IsolateCommandThreadImpl(cr);
-        } catch (IOException ex) {
-            throw new ShellInvocationException(ex);
+        if (cr.getCommandInfo().isInternal()) {
+            return new CommandThreadImpl(cr, cr.getCommandName());
+        } else {
+            try {
+                return new IsolateCommandThreadImpl(cr);
+            } catch (IOException ex) {
+                throw new ShellInvocationException(ex);
+            }
         }
     }
 }
