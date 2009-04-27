@@ -195,6 +195,10 @@ public class CommandRunner implements CommandRunnable {
         return env;
     }
 
+    public CommandInfo getCommandInfo() {
+        return cmdInfo;
+    }
+
     public void flushStreams() {
         for (CommandIO io : ios) {
             if (io instanceof CommandOutput) {
