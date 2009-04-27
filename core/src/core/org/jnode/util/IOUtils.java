@@ -145,6 +145,7 @@ public class IOUtils {
                 try {
                     Class<FilterOutputStream> cls = FilterOutputStream.class;
                     Field field = cls.getDeclaredField("out");
+                    field.setAccessible(true);
                     Object out = field.get(outputStream);
                     return (OutputStream) out;
                 } catch (Exception ex) {
@@ -164,6 +165,7 @@ public class IOUtils {
                 try {
                     Class<Writer> cls = Writer.class;
                     Field field = cls.getDeclaredField("lock");
+                    field.setAccessible(true);
                     Object lock = field.get(writer);
                     return (OutputStream) lock;
                 } catch (Exception ex) {
@@ -183,6 +185,7 @@ public class IOUtils {
                 try {
                     Class<Reader> cls = Reader.class;
                     Field field = cls.getDeclaredField("lock");
+                    field.setAccessible(true);
                     Object lock = field.get(reader);
                     return (InputStream) lock;
                 } catch (Exception ex) {
