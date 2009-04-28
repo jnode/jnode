@@ -23,7 +23,7 @@ package org.jnode.fs.hfsplus;
 import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
 import org.jnode.util.BigEndian;
 
-public class HFSPlusForkData {
+public class HfsPlusForkData {
     public static final int FORK_DATA_LENGTH = 80;
     private static final int EXTENT_OFFSET = 16;
     /** The size in bytes of the valid data in the fork. */
@@ -41,7 +41,7 @@ public class HFSPlusForkData {
      * @param src
      * @param offset
      */
-    public HFSPlusForkData(final byte[] src, final int offset) {
+    public HfsPlusForkData(final byte[] src, final int offset) {
         byte[] data = new byte[FORK_DATA_LENGTH];
         System.arraycopy(src, offset, data, 0, FORK_DATA_LENGTH);
         totalSize = BigEndian.getInt64(data, 0);
@@ -63,7 +63,7 @@ public class HFSPlusForkData {
      * @param clumpSize
      * @param totalBlock
      */
-    public HFSPlusForkData(long totalSize, int clumpSize, int totalBlock) {
+    public HfsPlusForkData(long totalSize, int clumpSize, int totalBlock) {
         this.totalSize = totalSize;
         this.clumpSize = clumpSize;
         this.totalBlock = totalBlock;

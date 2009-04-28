@@ -20,7 +20,7 @@
 
 package org.jnode.fs.hfsplus.catalog;
 
-import org.jnode.fs.hfsplus.HFSUnicodeString;
+import org.jnode.fs.hfsplus.HfsUnicodeString;
 import org.jnode.util.BigEndian;
 
 public class CatalogThread {
@@ -37,7 +37,7 @@ public class CatalogThread {
     private CatalogNodeId parentId;
     
     /** the name of the file or folder reference by the thread record. */
-    private HFSUnicodeString nodeName;
+    private HfsUnicodeString nodeName;
 
     /**
      * Create catalog thread from existing data.
@@ -49,7 +49,7 @@ public class CatalogThread {
         System.arraycopy(src, 0, data, 0, CATALOG_THREAD_SIZE);
         recordType = BigEndian.getInt16(data, 0);
         parentId = new CatalogNodeId(data, 4);
-        nodeName = new HFSUnicodeString(data, 8);
+        nodeName = new HfsUnicodeString(data, 8);
     }
 
     /**
@@ -58,10 +58,10 @@ public class CatalogThread {
      * @param type catalog thread record type.
      * @param parent {@link CatalogNodeId} of the file or folder reference by
      *            the tread record.
-     * @param name {@link HFSUnicodeString} represent the name of the file or
+     * @param name {@link HfsUnicodeString} represent the name of the file or
      *            folder reference by the tread record.
      */
-    public CatalogThread(int type, CatalogNodeId parent, HFSUnicodeString name) {
+    public CatalogThread(int type, CatalogNodeId parent, HfsUnicodeString name) {
         this.recordType = type;
         this.parentId = parent;
         this.nodeName = name;

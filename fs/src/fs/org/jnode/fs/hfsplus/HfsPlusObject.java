@@ -22,10 +22,10 @@ package org.jnode.fs.hfsplus;
 
 import org.jnode.fs.FSObject;
 
-public class HFSPlusObject implements FSObject {
+public class HfsPlusObject implements FSObject {
     protected HfsPlusFileSystem fs;
 
-    public HFSPlusObject(final HfsPlusFileSystem fileSystem) {
+    public HfsPlusObject(final HfsPlusFileSystem fileSystem) {
         this.fs = fileSystem;
     }
 

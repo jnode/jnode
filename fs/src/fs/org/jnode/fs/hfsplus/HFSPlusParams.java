@@ -20,6 +20,9 @@
 
 package org.jnode.fs.hfsplus;
 
+import java.io.IOException;
+
+import org.jnode.driver.ApiNotFoundException;
 import org.jnode.fs.FileSystemException;
 
 public class HFSPlusParams {
@@ -66,82 +69,85 @@ public class HFSPlusParams {
     }
 
     /**
+     * Initialize default sizes (allocation, catalog node, etc...)
      * 
-     * @param blockDeviceSize
-     * @param sectorSize
-     * 
+     * @param fs
      * @throws FileSystemException
-     * 
+     * @throws IOException
      */
-    public void initializeDefaultsValues(long blockDeviceSize, long sectorSize)
-        throws FileSystemException {
-        long clumpSize = 0;
-        this.blockDeviceSize = blockDeviceSize;
-        if (resourceClumpBlocks == 0) {
-            if (blockSize > DEFAULT_BLOCK_SIZE) {
-                clumpSize = round(RESOURCE_CLUMP_FACTOR * DEFAULT_BLOCK_SIZE, blockSize);
+    public void initializeDefaultsValues(HfsPlusFileSystem fs)
+        throws FileSystemException, IOException {
+        try {
+            long clumpSize = 0;
+            this.blockDeviceSize = fs.getApi().getLength();
+            if (resourceClumpBlocks == 0) {
+                if (blockSize > DEFAULT_BLOCK_SIZE) {
+                    clumpSize = round(RESOURCE_CLUMP_FACTOR * DEFAULT_BLOCK_SIZE, blockSize);
+                } else {
+                    clumpSize = RESOURCE_CLUMP_FACTOR * blockSize;
+                }
             } else {
-                clumpSize = RESOURCE_CLUMP_FACTOR * blockSize;
+                clumpSize = clumpSizeCalculation(resourceClumpBlocks);
             }
-        } else {
-            clumpSize = clumpSizeCalculation(resourceClumpBlocks);
-        }
-        resourceClumpSize = (int) clumpSize;
-        if (dataClumpBlocks == 0) {
-            if (blockSize > DEFAULT_BLOCK_SIZE) {
-                clumpSize = round(DATA_CLUMP_FACTOR * DEFAULT_BLOCK_SIZE, blockSize);
+            resourceClumpSize = (int) clumpSize;
+            if (dataClumpBlocks == 0) {
+                if (blockSize > DEFAULT_BLOCK_SIZE) {
+                    clumpSize = round(DATA_CLUMP_FACTOR * DEFAULT_BLOCK_SIZE, blockSize);
+                } else {
+                    clumpSize = DATA_CLUMP_FACTOR * blockSize;
+                }
             } else {
-                clumpSize = DATA_CLUMP_FACTOR * blockSize;
+                clumpSize = clumpSizeCalculation(dataClumpBlocks);
             }
-        } else {
-            clumpSize = clumpSizeCalculation(dataClumpBlocks);
-        }
 
-        if (blockSize < OPTIMAL_BLOCK_SIZE || blockDeviceSize < 0x40000000) {
-            catalogNodeSize = 4096;
-        }
-        long sectorCount = blockDeviceSize / sectorSize;
-        if (catalogClumpBlocks == 0) {
-            clumpSize = getBTreeClumpSize(blockSize, catalogNodeSize, sectorCount, true);
-        } else {
-            clumpSize = clumpSizeCalculation(catalogClumpBlocks);
-            if (clumpSize % catalogNodeSize != 0) {
-                throw new FileSystemException("clump size is not a multiple of node size");
+            if (blockSize < OPTIMAL_BLOCK_SIZE || blockDeviceSize < 0x40000000) {
+                catalogNodeSize = 4096;
             }
-        }
-        catalogClumpSize = (int) clumpSize;
-        if (extentClumpBlocks == 0) {
-            clumpSize = getBTreeClumpSize(blockSize, extentNodeSize, sectorCount, false);
-        } else {
-            clumpSize = clumpSizeCalculation(extentClumpBlocks);
-        }
-        extentClumpSize = (int) clumpSize;
-
-        if (attributeClumpBlocks == 0) {
-            clumpSize = 0;
-        } else {
-            clumpSize = clumpSizeCalculation(attributeClumpBlocks);
-            if (clumpSize % attributeNodeSize != 0) {
-                throw new FileSystemException("clump size is not a multiple of attribute node size");
+            long sectorCount = blockDeviceSize / fs.getFSApi().getSectorSize();
+            if (catalogClumpBlocks == 0) {
+                clumpSize = getBTreeClumpSize(blockSize, catalogNodeSize, sectorCount, true);
+            } else {
+                clumpSize = clumpSizeCalculation(catalogClumpBlocks);
+                if (clumpSize % catalogNodeSize != 0) {
+                    throw new FileSystemException("clump size is not a multiple of node size");
+                }
             }
-        }
-        attributeClumpSize = (int) clumpSize;
-
-        long totalBlocks = this.getBlockCount();
-        long minClumpSize = this.getBlockCount() >> 3;
-        if ((totalBlocks & 7) == 0) {
-            ++minClumpSize;
-        }
-        if (bitmapClumpBlocks == 0) {
-            clumpSize = minClumpSize;
-        } else {
-            clumpSize = clumpSizeCalculation(bitmapClumpBlocks);
-            if (clumpSize < minClumpSize) {
-                throw new FileSystemException("bitmap clump size is too small.");
+            catalogClumpSize = (int) clumpSize;
+            if (extentClumpBlocks == 0) {
+                clumpSize = getBTreeClumpSize(blockSize, extentNodeSize, sectorCount, false);
+            } else {
+                clumpSize = clumpSizeCalculation(extentClumpBlocks);
             }
-        }
-        allocationClumpSize = (int) clumpSize;
+            extentClumpSize = (int) clumpSize;
 
+            if (attributeClumpBlocks == 0) {
+                clumpSize = 0;
+            } else {
+                clumpSize = clumpSizeCalculation(attributeClumpBlocks);
+                if (clumpSize % attributeNodeSize != 0) {
+                    throw new FileSystemException(
+                            "clump size is not a multiple of attribute node size");
+                }
+            }
+            attributeClumpSize = (int) clumpSize;
+
+            long totalBlocks = this.getBlockCount();
+            long minClumpSize = this.getBlockCount() >> 3;
+            if ((totalBlocks & 7) == 0) {
+                ++minClumpSize;
+            }
+            if (bitmapClumpBlocks == 0) {
+                clumpSize = minClumpSize;
+            } else {
+                clumpSize = clumpSizeCalculation(bitmapClumpBlocks);
+                if (clumpSize < minClumpSize) {
+                    throw new FileSystemException("bitmap clump size is too small.");
+                }
+            }
+            allocationClumpSize = (int) clumpSize;
+        } catch (ApiNotFoundException e) {
+            throw new FileSystemException("Unable initialize default values.", e);
+        }
     }
 
     private int[] extentClumpTable = new int[] {4, 4, 4, 5, 5, 6, 7, 8, 9, 11, 14, 16, 20, 25, 32};
@@ -151,13 +157,13 @@ public class HFSPlusParams {
     /**
      * Get the file clump size for Extent and catalog B-Tree files.
      * 
-     * @param blockSize
-     * @param nodeSize
-     * @param sectors
+     * @param blockSize Size of a block.
+     * @param nodeSize Size of a node.
+     * @param sectors  Number of sector for the device.
      * @param catalog If true, calculate catalog clump size. In the other case,
      *            calculate extent clump size.
      * 
-     * @return
+     * @return B-Tree clump size.
      */
     private long getBTreeClumpSize(int blockSize, int nodeSize, long sectors, boolean catalog) {
         int size = Math.max(blockSize, nodeSize);

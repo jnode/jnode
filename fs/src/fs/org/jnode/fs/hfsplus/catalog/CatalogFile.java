@@ -22,9 +22,9 @@ package org.jnode.fs.hfsplus.catalog;
 
 import org.jnode.fs.hfsplus.ExtendedFileInfo;
 import org.jnode.fs.hfsplus.FileInfo;
-import org.jnode.fs.hfsplus.HFSPlusBSDInfo;
-import org.jnode.fs.hfsplus.HFSPlusForkData;
-import org.jnode.fs.hfsplus.HFSUtils;
+import org.jnode.fs.hfsplus.HfsPlusBSDInfo;
+import org.jnode.fs.hfsplus.HfsPlusForkData;
+import org.jnode.fs.hfsplus.HfsUtils;
 import org.jnode.util.BigEndian;
 
 /**
@@ -57,7 +57,7 @@ public class CatalogFile {
     /** */
     private int backupDate;
     /** */
-    private HFSPlusBSDInfo permissions;
+    private HfsPlusBSDInfo permissions;
     /** */
     private FileInfo userInfo;
     /** */
@@ -65,9 +65,9 @@ public class CatalogFile {
     /** */
     private int textEncoding;
     /** data fork location and size */
-    private HFSPlusForkData datas;
+    private HfsPlusForkData datas;
     /** resource fork location and size */
-    private HFSPlusForkData resources;
+    private HfsPlusForkData resources;
 
     /**
      * 
@@ -82,8 +82,8 @@ public class CatalogFile {
         createDate = BigEndian.getInt32(data, 12);
         contentModDate = BigEndian.getInt32(data, 16);
         attrModDate = BigEndian.getInt32(data, 20);
-        datas = new HFSPlusForkData(data, 88);
-        resources = new HFSPlusForkData(data, 168);
+        datas = new HfsPlusForkData(data, 88);
+        resources = new HfsPlusForkData(data, 168);
     }
 
     /**
@@ -93,13 +93,13 @@ public class CatalogFile {
      * @param datas
      * @param resources
      */
-    public CatalogFile(int flags, CatalogNodeId fileId, HFSPlusForkData datas, HFSPlusForkData resources) {
+    public CatalogFile(int flags, CatalogNodeId fileId, HfsPlusForkData datas, HfsPlusForkData resources) {
         this.recordType = RECORD_TYPE_FILE;
         this.flags = flags;
         this.fileId = fileId;
-        this.createDate = HFSUtils.getNow();
-        this.contentModDate = HFSUtils.getNow();
-        this.attrModDate = HFSUtils.getNow();
+        this.createDate = HfsUtils.getNow();
+        this.contentModDate = HfsUtils.getNow();
+        this.attrModDate = HfsUtils.getNow();
         this.datas = datas;
         this.resources = resources;
     }
@@ -117,11 +117,11 @@ public class CatalogFile {
         s.append("Record type:").append(recordType).append("\t");
         s.append("File ID  :").append(fileId.getId()).append("\n");
         s.append("Creation Date :").append(
-                HFSUtils.printDate(createDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
+                HfsUtils.printDate(createDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
         s.append("Content Mod Date  :").append(
-                HFSUtils.printDate(contentModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
+                HfsUtils.printDate(contentModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
         s.append("Attr Mod Date  :").append(
-                HFSUtils.printDate(attrModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
+                HfsUtils.printDate(attrModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
         return s.toString();
     }
 
@@ -149,11 +149,11 @@ public class CatalogFile {
         return attrModDate;
     }
 
-    public HFSPlusForkData getDatas() {
+    public HfsPlusForkData getDatas() {
         return datas;
     }
 
-    public HFSPlusForkData getResources() {
+    public HfsPlusForkData getResources() {
         return resources;
     }
 
@@ -165,7 +165,7 @@ public class CatalogFile {
         return backupDate;
     }
 
-    public HFSPlusBSDInfo getPermissions() {
+    public HfsPlusBSDInfo getPermissions() {
         return permissions;
     }
 

@@ -40,7 +40,7 @@ import org.jnode.util.NumberUtils;
  * @author Fabien L.
  * 
  */
-public class Superblock extends HFSPlusObject {
+public class Superblock extends HfsPlusObject {
 
     public static final int HFSPLUS_SUPER_MAGIC = 0x482b;
 
@@ -107,7 +107,7 @@ public class Superblock extends HFSPlusObject {
      * @throws FileSystemException
      */
     public void create(HFSPlusParams params)
-        throws IOException, ApiNotFoundException, FileSystemException {
+        throws IOException {
         log.info("Create new HFS+ volume header (" + params.getVolumeName() +
                 ") with block size of " + params.getBlockSize() + " bytes.");
         int burnedBlocksBeforeVH = 0;
@@ -131,7 +131,7 @@ public class Superblock extends HFSPlusObject {
         this.setLastMountedVersion(0x446534a);
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
-        int macDate = HFSUtils.getNow();
+        int macDate = HfsUtils.getNow();
         this.setCreateDate(macDate);
         this.setModifyDate(macDate);
         this.setCheckedDate(macDate);
@@ -149,8 +149,8 @@ public class Superblock extends HFSPlusObject {
         long blockUsed = 2 + burnedBlocksBeforeVH + burnedBlocksAfterAltVH + bitmapBlocks;
         int startBlock = 1 + burnedBlocksBeforeVH;
         int blockCount = (int) bitmapBlocks;
-        HFSPlusForkData forkdata =
-                new HFSPlusForkData(allocationClumpSize, (int) allocationClumpSize,
+        HfsPlusForkData forkdata =
+                new HfsPlusForkData(allocationClumpSize, (int) allocationClumpSize,
                         (int) bitmapBlocks);
         ExtentDescriptor desc = new ExtentDescriptor(startBlock, blockCount);
         forkdata.addDescriptor(0, desc);
@@ -170,7 +170,7 @@ public class Superblock extends HFSPlusObject {
         // Extent B-Tree initialization
         log.info("Init extent file.");
         forkdata =
-                new HFSPlusForkData(params.getExtentClumpSize(), params.getExtentClumpSize(),
+                new HfsPlusForkData(params.getExtentClumpSize(), params.getExtentClumpSize(),
                         (params.getExtentClumpSize() / blockSize));
         desc = new ExtentDescriptor(nextBlock, forkdata.getTotalBlocks());
         forkdata.addDescriptor(0, desc);
@@ -181,7 +181,7 @@ public class Superblock extends HFSPlusObject {
         log.info("Init catalog file.");
         int totalBlocks = params.getCatalogClumpSize() / blockSize;
         forkdata =
-                new HFSPlusForkData(params.getCatalogClumpSize(), params.getCatalogClumpSize(),
+                new HfsPlusForkData(params.getCatalogClumpSize(), params.getCatalogClumpSize(),
                         totalBlocks);
         desc = new ExtentDescriptor(nextBlock, totalBlocks);
         forkdata.addDescriptor(0, desc);
@@ -390,24 +390,24 @@ public class Superblock extends HFSPlusObject {
         return result;
     }
 
-    public final HFSPlusForkData getAllocationFile() {
-        return new HFSPlusForkData(data, 112);
+    public final HfsPlusForkData getAllocationFile() {
+        return new HfsPlusForkData(data, 112);
     }
 
-    public final HFSPlusForkData getExtentsFile() {
-        return new HFSPlusForkData(data, 192);
+    public final HfsPlusForkData getExtentsFile() {
+        return new HfsPlusForkData(data, 192);
     }
 
-    public final HFSPlusForkData getCatalogFile() {
-        return new HFSPlusForkData(data, 272);
+    public final HfsPlusForkData getCatalogFile() {
+        return new HfsPlusForkData(data, 272);
     }
 
-    public final HFSPlusForkData getAttributesFile() {
-        return new HFSPlusForkData(data, 352);
+    public final HfsPlusForkData getAttributesFile() {
+        return new HfsPlusForkData(data, 352);
     }
 
-    public final HFSPlusForkData getStartupFile() {
-        return new HFSPlusForkData(data, 432);
+    public final HfsPlusForkData getStartupFile() {
+        return new HfsPlusForkData(data, 432);
     }
 
     /**
@@ -435,6 +435,10 @@ public class Superblock extends HFSPlusObject {
     public byte[] getBytes() {
         return data;
     }
+    
+    public void update() throws IOException{
+        fs.getApi().write(1024, ByteBuffer.wrap(data));
+    }
 
     public final String toString() {
         StringBuffer buffer = new StringBuffer();
@@ -443,13 +447,13 @@ public class Superblock extends HFSPlusObject {
         buffer.append("Attributes: ").append(getAttributesAsString()).append(" (").append(
                 getAttributes()).append(")").append("\n").append("\n");
         buffer.append("Create date: ").append(
-                HFSUtils.printDate(getCreateDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
+                HfsUtils.printDate(getCreateDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
         buffer.append("Modify date: ").append(
-                HFSUtils.printDate(getModifyDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
+                HfsUtils.printDate(getModifyDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
         buffer.append("Backup date: ").append(
-                HFSUtils.printDate(getBackupDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
+                HfsUtils.printDate(getBackupDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
         buffer.append("Checked date: ").append(
-                HFSUtils.printDate(getCheckedDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n")
+                HfsUtils.printDate(getCheckedDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n")
                 .append("\n");
         buffer.append("File count: ").append(getFileCount()).append("\n");
         buffer.append("Folder count: ").append(getFolderCount()).append("\n").append("\n");

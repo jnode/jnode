@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jnode.fs.hfsplus.HFSPlusParams;
-import org.jnode.fs.hfsplus.HFSUnicodeString;
+import org.jnode.fs.hfsplus.HfsUnicodeString;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
 import org.jnode.fs.hfsplus.Superblock;
 import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
@@ -90,8 +90,9 @@ public class Catalog {
      * 
      * @param params
      */
-    public Catalog(HFSPlusParams params) {
+    public Catalog(HFSPlusParams params, HfsPlusFileSystem fs) {
         log.info("Create B-Tree catalog file.");
+        this.fs = fs;
         int nodeSize = params.getCatalogNodeSize();
         int bufferLength = 0;
         log.info("Create catalog node descriptor.");
@@ -120,7 +121,7 @@ public class Catalog {
                         .getInitializeNumRecords());
         CatalogNode rootNode = new CatalogNode(nd, nodeSize);
         // First record (folder)
-        HFSUnicodeString name = new HFSUnicodeString(params.getVolumeName());
+        HfsUnicodeString name = new HfsUnicodeString(params.getVolumeName());
         CatalogKey ck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID, name);
         CatalogFolder folder =
                 new CatalogFolder(params.isJournaled() ? 2 : 0, CatalogNodeId.HFSPLUS_ROOT_CNID);
@@ -130,7 +131,7 @@ public class Catalog {
         CatalogKey tck = new CatalogKey(CatalogNodeId.HFSPLUS_ROOT_CNID, name);
         CatalogThread ct =
                 new CatalogThread(CatalogFolder.RECORD_TYPE_FOLDER_THREAD,
-                        CatalogNodeId.HFSPLUS_ROOT_CNID, new HFSUnicodeString(""));
+                        CatalogNodeId.HFSPLUS_ROOT_CNID, new HfsUnicodeString(""));
         record = new LeafRecord(tck, ct.getBytes());
         rootNode.addNodeRecord(record);
         log.debug(rootNode.toString());
@@ -140,6 +141,16 @@ public class Catalog {
         buffer.position(rootNodePosition);
         buffer.put(rootNode.getBytes());
         buffer.rewind();
+    }
+    /**
+     * Save catalog file to disk.
+     * 
+     * @throws IOException
+     */
+    public void update() throws IOException {
+        Superblock vh = fs.getVolumeHeader();
+        int offset = vh.getCatalogFile().getExtent(0).getStartOffset(vh.getBlockSize());
+        fs.getApi().write(offset, this.getBytes());
     }
 
     /**
@@ -153,7 +164,7 @@ public class Catalog {
      */
     public LeafRecord createNode(String filename, CatalogNodeId parentId, CatalogNodeId nodeId,
             int nodeType) throws IOException {
-        HFSUnicodeString name = new HFSUnicodeString(filename);
+        HfsUnicodeString name = new HfsUnicodeString(filename);
         LeafRecord record = this.getRecord(parentId, name);
         if (record == null) {
             NodeDescriptor nd = new NodeDescriptor(0, 0, NodeDescriptor.BT_LEAF_NODE, 1, 2);
@@ -263,7 +274,7 @@ public class Catalog {
      * @return the leaf node or {@code null}
      * @throws IOException
      */
-    public final LeafRecord getRecord(final CatalogNodeId parentID, final HFSUnicodeString nodeName)
+    public final LeafRecord getRecord(final CatalogNodeId parentID, final HfsUnicodeString nodeName)
         throws IOException {
         int currentNodeNumber = getBTHeaderRecord().getRootNode();
         int nodeSize = getBTHeaderRecord().getNodeSize();
