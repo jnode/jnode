@@ -20,7 +20,7 @@
 
 package org.jnode.fs.hfsplus.catalog;
 
-import org.jnode.fs.hfsplus.HFSUnicodeString;
+import org.jnode.fs.hfsplus.HfsUnicodeString;
 import org.jnode.fs.hfsplus.tree.AbstractKey;
 import org.jnode.fs.hfsplus.tree.Key;
 import org.jnode.util.BigEndian;
@@ -36,7 +36,7 @@ public class CatalogKey extends AbstractKey {
      */
     private CatalogNodeId parentId;
     /** Name of the file or folder, empty for thread records. */
-    private HFSUnicodeString nodeName;
+    private HfsUnicodeString nodeName;
 
     /**
      * Create catalog key from existing data.
@@ -55,7 +55,7 @@ public class CatalogKey extends AbstractKey {
         parentId = new CatalogNodeId(ck, 0);
         currentOffset += 4;
         if (keyLength > MINIMUM_KEY_LENGTH) {
-            nodeName = new HFSUnicodeString(src, currentOffset);
+            nodeName = new HfsUnicodeString(src, currentOffset);
         }
     }
 
@@ -67,7 +67,7 @@ public class CatalogKey extends AbstractKey {
      * @param name Name of the file or folder.
      * 
      */
-    public CatalogKey(final CatalogNodeId parentID, final HFSUnicodeString name) {
+    public CatalogKey(final CatalogNodeId parentID, final HfsUnicodeString name) {
         this.parentId = parentID;
         this.nodeName = name;
         this.keyLength = MINIMUM_KEY_LENGTH + name.getLength();
@@ -77,7 +77,7 @@ public class CatalogKey extends AbstractKey {
         return parentId;
     }
 
-    public final HFSUnicodeString getNodeName() {
+    public final HfsUnicodeString getNodeName() {
         return nodeName;
     }
 

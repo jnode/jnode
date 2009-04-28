@@ -38,16 +38,16 @@ import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.FSEntryTable;
 
-public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
+public class HfsPlusDirectory extends HfsPlusEntry implements FSDirectory {
 
-    private static final Logger log = Logger.getLogger(HFSPlusDirectory.class);
+    private static final Logger log = Logger.getLogger(HfsPlusDirectory.class);
 
     /** Table of entries of our parent */
     private FSEntryTable entries;
 
     private CatalogFolder folder;
 
-    public HFSPlusDirectory(HfsPlusFileSystem fs, HFSPlusDirectory parent, String name,
+    public HfsPlusDirectory(HfsPlusFileSystem fs, HfsPlusDirectory parent, String name,
             LeafRecord record) {
         super(fs, parent, name, record);
         this.folder = new CatalogFolder(record.getData());
@@ -200,7 +200,7 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
                 if (rec.getType() == CatalogFolder.RECORD_TYPE_FOLDER ||
                         rec.getType() == CatalogFile.RECORD_TYPE_FILE) {
                     String name = ((CatalogKey) rec.getKey()).getNodeName().getUnicodeString();
-                    HFSPlusEntry e = new HFSPlusDirectory(fs, this, name, rec);
+                    HfsPlusEntry e = new HfsPlusDirectory(fs, this, name, rec);
                     pathList.add(e);
                 }
             }
@@ -228,7 +228,7 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
             new CatalogNodeId(volumeHeader.getNextCatalogId()), CatalogFolder.RECORD_TYPE_FOLDER_THREAD);
         folder.setValence(folder.getValence() + 1);
         
-        HFSPlusEntry newEntry = new HFSPlusDirectory(fs, this, name, folderRecord);
+        HfsPlusEntry newEntry = new HfsPlusDirectory(fs, this, name, folderRecord);
         newEntry.setDirty();
         volumeHeader.setFolderCount(volumeHeader.getFolderCount() + 1);
         log.debug("New volume header :\n" + volumeHeader.toString());

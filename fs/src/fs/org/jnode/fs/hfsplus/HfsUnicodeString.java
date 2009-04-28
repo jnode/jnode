@@ -22,7 +22,7 @@ package org.jnode.fs.hfsplus;
 
 import org.jnode.util.BigEndian;
 
-public class HFSUnicodeString {
+public class HfsUnicodeString {
     /** Length of string in characters. */
     private int length;
 
@@ -34,7 +34,7 @@ public class HFSUnicodeString {
      * @param src byte array contains data.
      * @param offset start of data in the array.
      */
-    public HFSUnicodeString(final byte[] src, final int offset) {
+    public HfsUnicodeString(final byte[] src, final int offset) {
         length = BigEndian.getInt16(src, offset);
         byte[] data = new byte[2 + (length * 2)];
         System.arraycopy(src, offset, data, 0, 2);
@@ -52,7 +52,7 @@ public class HFSUnicodeString {
      * 
      * @param string
      */
-    public HFSUnicodeString(String string) {
+    public HfsUnicodeString(String string) {
         this.string = string;
         this.length = string.length();
     }

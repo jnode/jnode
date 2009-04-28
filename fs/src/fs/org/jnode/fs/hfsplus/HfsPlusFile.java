@@ -28,11 +28,11 @@ import org.jnode.fs.hfsplus.catalog.CatalogFile;
 import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 
-public class HFSPlusFile extends HFSPlusEntry implements FSFile {
+public class HfsPlusFile extends HfsPlusEntry implements FSFile {
 
     private CatalogFile file;
 
-    public HFSPlusFile(HfsPlusFileSystem fs, HFSPlusDirectory parent, String name, LeafRecord record) {
+    public HfsPlusFile(HfsPlusFileSystem fs, HfsPlusDirectory parent, String name, LeafRecord record) {
         super(fs, parent, name, record);
         this.file = new CatalogFile(record.getData());
     }

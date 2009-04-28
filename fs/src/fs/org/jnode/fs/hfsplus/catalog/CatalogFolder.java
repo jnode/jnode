@@ -20,7 +20,7 @@
  
 package org.jnode.fs.hfsplus.catalog;
 
-import org.jnode.fs.hfsplus.HFSUtils;
+import org.jnode.fs.hfsplus.HfsUtils;
 import org.jnode.util.BigEndian;
 
 public class CatalogFolder {
@@ -61,9 +61,9 @@ public class CatalogFolder {
         this.recordType = RECORD_TYPE_FOLDER;
         this.valence = valence;
         this.folderId = folderID;
-        this.createDate = HFSUtils.getNow();
-        this.contentModDate = HFSUtils.getNow();
-        this.attrModDate = HFSUtils.getNow();
+        this.createDate = HfsUtils.getNow();
+        this.contentModDate = HfsUtils.getNow();
+        this.attrModDate = HfsUtils.getNow();
     }
 
     /**
@@ -92,11 +92,11 @@ public class CatalogFolder {
         s.append("Valence: ").append(valence).append("\n");
         s.append("Folder ID: ").append(folderId.getId()).append("\n");
         s.append("Creation Date :").append(
-                HFSUtils.printDate(createDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
+                HfsUtils.printDate(createDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
         s.append("Content Mod Date  :").append(
-                HFSUtils.printDate(contentModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
+                HfsUtils.printDate(contentModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
         s.append("Attr Mod Date  :").append(
-                HFSUtils.printDate(attrModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
+                HfsUtils.printDate(attrModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
         return s.toString();
     }
 

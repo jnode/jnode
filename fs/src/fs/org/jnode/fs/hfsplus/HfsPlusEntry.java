@@ -33,10 +33,10 @@ import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.AbstractFSEntry;
 import org.jnode.fs.spi.UnixFSAccessRights;
 
-public class HFSPlusEntry implements FSEntry {
+public class HfsPlusEntry implements FSEntry {
 
     protected HfsPlusFileSystem fs;
-    protected HFSPlusDirectory parent;
+    protected HfsPlusDirectory parent;
     protected String name;
     protected LeafRecord record;
     private int type;
@@ -53,7 +53,7 @@ public class HFSPlusEntry implements FSEntry {
      * @param name
      * @param record
      */
-    public HFSPlusEntry(HfsPlusFileSystem fs, HFSPlusDirectory parent, String name,
+    public HfsPlusEntry(HfsPlusFileSystem fs, HfsPlusDirectory parent, String name,
             LeafRecord record) {
         this.fs = fs;
         this.parent = parent;
@@ -87,7 +87,7 @@ public class HFSPlusEntry implements FSEntry {
         if (!isDirectory()) {
             throw new IOException("It is not a Directory");
         }
-        return (HFSPlusDirectory) this;
+        return (HfsPlusDirectory) this;
     }
 
     @Override
@@ -95,7 +95,7 @@ public class HFSPlusEntry implements FSEntry {
         if (!isFile()) {
             throw new IOException("It is not a file");
         }
-        return (HFSPlusFile) this;
+        return (HfsPlusFile) this;
     }
 
     @Override

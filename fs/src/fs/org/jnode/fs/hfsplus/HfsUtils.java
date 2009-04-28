@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class HFSUtils {
+public class HfsUtils {
 
     /**
      * Difference in second between 01/01/1970 00:00:00 (java reference time)
@@ -67,6 +67,6 @@ public class HFSUtils {
     public static int getNow() {
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
-        return (int) HFSUtils.getDate(now.getTimeInMillis() / 1000, true);
+        return (int) HfsUtils.getDate(now.getTimeInMillis() / 1000, true);
     }
 }
