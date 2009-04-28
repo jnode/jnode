@@ -123,5 +123,29 @@ public class CatalogFolder {
     public int getAttrModDate() {
         return attrModDate;
     }
+
+    public void setRecordType(int recordType) {
+        this.recordType = recordType;
+    }
+
+    public void setValence(int valence) {
+        this.valence = valence;
+    }
+
+    public void setFolderId(CatalogNodeId folderId) {
+        this.folderId = folderId;
+    }
+
+    public void setCreateDate(int createDate) {
+        this.createDate = createDate;
+    }
+
+    public void setContentModDate(int contentModDate) {
+        this.contentModDate = contentModDate;
+    }
+
+    public void setAttrModDate(int attrModDate) {
+        this.attrModDate = attrModDate;
+    }
     
 }
