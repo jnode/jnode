@@ -29,6 +29,7 @@
     <alias name="del"     class="org.jnode.command.file.DeleteCommand"/>
     <alias name="df"      class="org.jnode.command.file.DFCommand"/>
     <alias name="dir"     class="org.jnode.command.file.DirCommand"/>
+    <alias name="du"      class="org.jnode.command.file.DuCommand"/>    
     <alias name="find"    class="org.jnode.command.file.FindCommand"/>
     <alias name="grep"    class="org.jnode.command.file.GrepCommand"/>
     <alias name="head"    class="org.jnode.command.file.HeadCommand"/>
@@ -98,10 +99,22 @@
       <empty description="list the current directory"/>
       <argument argLabel="path" description="list a file or directory"/>
     </syntax>
+    <syntax alias="du">
+      <sequence description="print file sizes">
+        <repeat minCount="0">
+          <argument argLabel="directory" description="directory to start printing sizes recursively"/>
+        </repeat>
+        <optionSet>
+          <option argLabel="sum"          shortName="s" longName="summarize"/>
+          <option argLabel="all"            shortName="a" longName="all"/>
+          <option argLabel="human-readable" shortName="h" longName="human-readable"/>
+        </optionSet>
+      </sequence>
+    </syntax>    
     <syntax alias="find">
       <sequence description="find files or directories">
         <repeat minCount="0">
-          <argument argLabel="directory" description="directory to start searching from"/>
+          <argument argLabel="directory"/>
         </repeat>
         <optionSet>
           <option argLabel="type"     shortName="t" longName="type"/>
