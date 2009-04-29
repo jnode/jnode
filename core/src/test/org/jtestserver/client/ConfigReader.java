@@ -63,16 +63,16 @@ public class ConfigReader {
     
     /**
      * Read the JTestServer configuration and the VM configuration.
-     * @param configDir Directory where configuration is stored.
+     * @param configFile File where configuration is stored.
      * @return the configuration.
      * @throws IOException
      */
-    public Config read(File configDir) throws IOException {
-        Properties properties = readProperties(configDir, "config.properties");
+    public Config read(File configFile) throws IOException {
+        Properties properties = readProperties(configFile);
         
         // read the vm configuration
         String vm = ConfigUtils.getString(properties, "use.vm");
-        Properties vmProperties = readProperties(configDir, vm + ".properties");
+        Properties vmProperties = readProperties(new File(configFile.getParentFile(), vm + ".properties"));
         VMConfig vmConfig = createVMConfig(vmProperties, vm);
             
         return new Config(properties, vmConfig);
@@ -104,14 +104,13 @@ public class ConfigReader {
     /**
      * Read a properties file.
      * 
-     * @param configDir Directory where configuration is stored.
-     * @param name of the file to read.
+     * @param configFile File where configuration is stored.
      * @return the properties file.
      * @throws IOException
      */
-    private Properties readProperties(File configDir, String name) throws IOException {
+    private Properties readProperties(File configFile) throws IOException {
         Properties properties = new Properties();
-        properties.load(new FileInputStream(new File(configDir, name)));
+        properties.load(new FileInputStream(configFile));
         expandVariables(properties);
         return properties;
     }

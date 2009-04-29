@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Properties;
 
 import org.jtestserver.client.process.VMConfig;
+import org.jtestserver.client.utils.ConfigurationUtils;
 import org.jtestserver.common.ConfigUtils;
 
 /**
@@ -83,7 +84,7 @@ public class Config {
         clientTimeout = ConfigUtils.getInt(properties, "client.timeout", 30000);
         serverName = properties.getProperty("server.name", "localhost");
         serverPort = ConfigUtils.getInt(properties, "server.port", 10000);
-        workDir = ConfigUtils.getDirectory(properties, "work.dir", new File("."));
+        workDir = new File(ConfigurationUtils.getHomeDirectory(), "workdir");
         excludingFilters = ConfigUtils.getStringArray(properties, "excluding.filters");
         forceUseMauveList = ConfigUtils.getBoolean(properties, "force.use.mauve.list", false);
         watchDogPollInterval = ConfigUtils.getInt(properties, "watchdog.poll.interval", 10000);
