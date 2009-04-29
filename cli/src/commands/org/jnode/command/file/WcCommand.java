@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jnode.command.common;
+package org.jnode.command.file;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -80,7 +80,7 @@ public class WcCommand extends AbstractCommand {
         linesArgs = new FlagArgument("lines", Argument.OPTIONAL, HELP_LINES);
         charsArgs = new FlagArgument("chars", Argument.OPTIONAL, HELP_CHARS);
         wordsArgs = new FlagArgument("worlds", Argument.OPTIONAL, HELP_WORDS);
-        maxChars = new FlagArgument("maxCharLine", Argument.OPTIONAL, HELP_MAX_CHARS);
+        maxChars  = new FlagArgument("maxCharLine", Argument.OPTIONAL, HELP_MAX_CHARS);
         registerArguments(filesArgs, bytesArgs, linesArgs, charsArgs, wordsArgs, maxChars);
     }
     

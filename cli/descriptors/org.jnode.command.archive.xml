@@ -9,12 +9,13 @@
 
   <requires>
     <import plugin="org.apache.tools.archive" />
+    <import plugin="org.jnode.shell" />
     <import plugin="org.jnode.shell.syntax" />
     <import plugin="org.jnode.command.util" />
   </requires>
   
   <runtime>
-    <library name="jnode-coreutils.jar">
+    <library name="jnode-cli.jar">
       <export name="org.jnode.command.archive.*" />
     </library>
   </runtime>
@@ -275,11 +276,8 @@
   </extension>
   
   <extension point="org.jnode.security.permissions">
-    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write,delete"/>
+    <permission class="java.io.FilePermission"       name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write,delete"/>
     <permission class="java.util.PropertyPermission" name="user.dir" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
-    <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
-    <permission class="java.lang.RuntimePermission" name="exitVM"/>
-    <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
   </extension>
 </plugin>

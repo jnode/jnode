@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.shell.command;
+package org.jnode.command.system;
 
 import java.io.PrintWriter;
 import java.util.Arrays;

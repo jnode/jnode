@@ -14,7 +14,7 @@
   </requires>
 
   <runtime>
-    <library name="jnode-coreutils.jar">
+    <library name="jnode-cli.jar">
       <export name="org.jnode.command.dev.ant.*"/>
     </library>
   </runtime>

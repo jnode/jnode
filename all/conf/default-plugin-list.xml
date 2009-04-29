@@ -51,8 +51,11 @@ The default list of (non-system) plugins to be included in the init-jar.
     
     <plugin id="org.apache.tools.archive" />
     <plugin id="org.jnode.command.archive"/>
+    <plugin id="org.jnode.command.common"/>
+    <plugin id="org.jnode.command.dev"/>
     <plugin id="org.jnode.command.file"/>
     <plugin id="org.jnode.command.net"/>
+    <plugin id="org.jnode.command.system"/>
     <plugin id="org.jnode.command.util"/>
     
     <plugin id="org.jnode.debug"/>
@@ -171,19 +174,13 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.shell.bjorne"/>
     <plugin id="org.jnode.shell.help"/>
     <plugin id="org.jnode.shell.syntax"/>
-    <plugin id="org.jnode.shell.command"/>
     <plugin id="org.jnode.shell.command.bsh"/>
-    <plugin id="org.jnode.shell.command.debug"/>
     <plugin id="org.jnode.shell.command.driver"/>
     <!-- temporally disabled
     <plugin id="org.jnode.shell.command.driver.system.acpi"/>
     -->
     <plugin id="org.jnode.shell.command.driver.system.bus"/>
     <plugin id="org.jnode.shell.command.driver.console"/>
-    <plugin id="org.jnode.shell.command.log4j"/>
-    <plugin id="org.jnode.shell.command.plugin"/>
-    <plugin id="org.jnode.shell.command.posix"/>
-    <plugin id="org.jnode.shell.command.system"/>
     <plugin id="org.beanshell"/>
     <plugin id="js"/>
 

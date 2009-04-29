@@ -60,12 +60,11 @@ public class DeleteCommand extends AbstractCommand {
     private static final String fmt_removed_dir = "Removed directory '%s'";
     private static final String fmt_not_removed = "'%s' was not removed";
 
-    private final FileArgument argPaths 
-        = new FileArgument("paths", Argument.MANDATORY | Argument.MULTIPLE | Argument.EXISTING, help_file);
-    private final FlagArgument flagRecurse = new FlagArgument("recursive", Argument.OPTIONAL, help_recurse);
-    private final FlagArgument flagForce = new FlagArgument("force", Argument.OPTIONAL, help_force);
-    private final FlagArgument flagInteract = new FlagArgument("interactive", Argument.OPTIONAL, help_interact);
-    private final FlagArgument flagVerbose = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
+    private final FileArgument argPaths;
+    private final FlagArgument flagRecurse;
+    private final FlagArgument flagForce;
+    private final FlagArgument flagInteract;
+    private final FlagArgument flagVerbose;
     
     private FileSystemService fss;
     private boolean recursive;
@@ -78,6 +77,11 @@ public class DeleteCommand extends AbstractCommand {
 
     public DeleteCommand() {
         super(help_super);
+        argPaths     = new FileArgument("paths", Argument.MANDATORY | Argument.MULTIPLE | Argument.EXISTING, help_file);
+        flagRecurse  = new FlagArgument("recursive", Argument.OPTIONAL, help_recurse);
+        flagForce    = new FlagArgument("force", Argument.OPTIONAL, help_force);
+        flagInteract = new FlagArgument("interactive", Argument.OPTIONAL, help_interact);
+        flagVerbose  = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
         registerArguments(argPaths, flagRecurse, flagForce, flagInteract, flagVerbose);
     }
 

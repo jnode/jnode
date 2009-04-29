@@ -50,7 +50,7 @@ public class WgetCommand extends AbstractCommand {
     public WgetCommand() {
         super(help_super);
         argDebug = new FlagArgument("debug", Argument.OPTIONAL, help_debug);
-        argUrl = new URLArgument("url", Argument.MANDATORY + Argument.MULTIPLE, help_url);
+        argUrl   = new URLArgument("url", Argument.MANDATORY + Argument.MULTIPLE, help_url);
         registerArguments(argUrl, argDebug);
     }
 

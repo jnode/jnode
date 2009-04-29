@@ -53,8 +53,8 @@ public class AliasCommand extends AbstractCommand {
     
     public AliasCommand() {
         super(help_super);
-        argAlias = new AliasArgument("alias", Argument.OPTIONAL, help_alias);
-        argClass = new ClassNameArgument("className", Argument.OPTIONAL, help_class);
+        argAlias  = new AliasArgument("alias", Argument.OPTIONAL, help_alias);
+        argClass  = new ClassNameArgument("className", Argument.OPTIONAL, help_class);
         argRemove = new AliasArgument("remove", Argument.OPTIONAL, help_remove);
         registerArguments(argAlias, argClass, argRemove);
     }

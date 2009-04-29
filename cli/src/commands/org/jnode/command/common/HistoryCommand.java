@@ -59,9 +59,9 @@ public class HistoryCommand extends AbstractCommand {
 
     public HistoryCommand() {
         super(help_super);
-        argIndex = new IntegerArgument("index", Argument.OPTIONAL, help_index);
+        argIndex  = new IntegerArgument("index", Argument.OPTIONAL, help_index);
         argPrefix = new StringArgument("prefix", Argument.OPTIONAL, help_prefix);
-        argTest = new FlagArgument("test", Argument.OPTIONAL, help_test);
+        argTest   = new FlagArgument("test", Argument.OPTIONAL, help_test);
         registerArguments(argIndex, argPrefix, argTest);
     }
 

@@ -38,11 +38,11 @@ public class MkdirCommand extends AbstractCommand {
     private static final String fmt_exists = "%s already exists%n";
     private static final String err_cant_create = "Cannot create directory";
     
-    private final FileArgument argDir 
-        = new FileArgument("directory", Argument.MANDATORY | Argument.NONEXISTENT, help_dir);
+    private final FileArgument argDir;
 
     public MkdirCommand() {
         super(help_super);
+        argDir = new FileArgument("directory", Argument.MANDATORY | Argument.NONEXISTENT, help_dir);
         registerArguments(argDir);
     }
 

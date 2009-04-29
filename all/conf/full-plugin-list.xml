@@ -24,8 +24,8 @@
   <plugin id="org.jnode.apps.httpd"/>
 
   <plugin id="org.apache.tools.ant-launcher"/>
-  <plugin id="org.apache.tools.ant"/>  
-  <plugin id="org.jnode.shell.command.ant"/>
+  <plugin id="org.apache.tools.ant"/>
+  <plugin id="org.jnode.command.dev.ant"/>
   <plugin id="ejc"/>
     
 

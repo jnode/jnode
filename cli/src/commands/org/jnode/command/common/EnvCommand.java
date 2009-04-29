@@ -49,7 +49,7 @@ public class EnvCommand extends AbstractCommand {
 
     public EnvCommand() {
         super(help_super);
-        envArg = new FlagArgument("env", Argument.OPTIONAL | Argument.SINGLE, help_env);
+        envArg   = new FlagArgument("env", Argument.OPTIONAL | Argument.SINGLE, help_env);
         shellArg = new FlagArgument("shell", Argument.OPTIONAL | Argument.SINGLE, help_shell);
         registerArguments(envArg, shellArg);
     }

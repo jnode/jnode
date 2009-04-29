@@ -49,8 +49,8 @@ public class WLanCtlCommand extends AbstractCommand {
     public WLanCtlCommand() {
         super(help_super);
         argSetEssid = new FlagArgument("setEssid", Argument.OPTIONAL, help_set);
-        argDevice = new DeviceArgument("device", Argument.MANDATORY, help_dev, WirelessNetDeviceAPI.class);
-        argValue = new StringArgument("value", Argument.OPTIONAL, help_value);
+        argDevice   = new DeviceArgument("device", Argument.MANDATORY, help_dev, WirelessNetDeviceAPI.class);
+        argValue    = new StringArgument("value", Argument.OPTIONAL, help_value);
         registerArguments(argSetEssid, argDevice, argValue);
     }
 

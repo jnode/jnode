@@ -5,7 +5,7 @@
   <property name="my-build.dir"   value="${basedir}/build"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
   <property name="my-src.dir"     value="${basedir}/src"/>
-  <property name="my.jar"         value="${jnode-coreutils.jar}"/>
+  <property name="my.jar"         value="${jnode-cli.jar}"/>
   <property name="my-report.dir"  value="${my-build.dir}/report"/>
   
 <!-- Subproject specific classpath -->
@@ -14,7 +14,6 @@
     <pathelement location="${jnode-fs.jar}"/>
     <pathelement location="${jnode-shell.jar}"/>
     <pathelement location="${jnode-net.jar}"/>
-    <pathelement location="${jnode-gui.jar}"/>
     <path refid="cp"/>
   </path>
   

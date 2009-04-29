@@ -92,16 +92,16 @@ public class TailCommand extends AbstractCommand {
     
     public TailCommand() {
         super("Print the tail end of a list of files, or stdin.");
-        Files = new FileArgument("files", Argument.OPTIONAL | Argument.MULTIPLE, help_files);
-        Bytes = new StringArgument("bytes", Argument.EXISTING | Argument.OPTIONAL, help_bytes);
-        Lines = new StringArgument("lines", Argument.EXISTING | Argument.OPTIONAL, help_lines);
-        Follow = new FlagArgument("follow", Argument.OPTIONAL, help_follow);
-        FollowR = new FlagArgument("followr", Argument.OPTIONAL, help_follow_retry);
+        Files        = new FileArgument("files", Argument.OPTIONAL | Argument.MULTIPLE, help_files);
+        Bytes        = new StringArgument("bytes", Argument.EXISTING | Argument.OPTIONAL, help_bytes);
+        Lines        = new StringArgument("lines", Argument.EXISTING | Argument.OPTIONAL, help_lines);
+        Follow       = new FlagArgument("follow", Argument.OPTIONAL, help_follow);
+        FollowR      = new FlagArgument("followr", Argument.OPTIONAL, help_follow_retry);
         MaxUnchanged = new IntegerArgument("unchanged", Argument.OPTIONAL, help_unchanged);
-        Sleep = new IntegerArgument("sleep", Argument.OPTIONAL, help_sleep);
-        Retry = new FlagArgument("retry", Argument.OPTIONAL, help_retry);
-        Quiet = new FlagArgument("quiet", Argument.OPTIONAL, help_quiet);
-        Verbose = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
+        Sleep        = new IntegerArgument("sleep", Argument.OPTIONAL, help_sleep);
+        Retry        = new FlagArgument("retry", Argument.OPTIONAL, help_retry);
+        Quiet        = new FlagArgument("quiet", Argument.OPTIONAL, help_quiet);
+        Verbose      = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
         registerArguments(Files, Bytes, Lines, Follow, Retry, FollowR, MaxUnchanged, Sleep, Quiet, Verbose);
     }
     

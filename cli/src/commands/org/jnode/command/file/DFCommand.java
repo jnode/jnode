@@ -55,11 +55,11 @@ public class DFCommand extends AbstractCommand {
     private static final String str_unknown = "unknown";
     private static final String err_get_info = "\tError getting disk usage information for %s on %s : %s%n";
     
-    private final DeviceArgument argDevice 
-        = new DeviceArgument("device", Argument.OPTIONAL | Argument.EXISTING, help_device);
+    private final DeviceArgument argDevice;
 
     public DFCommand() {
         super(help_super);
+        argDevice = new DeviceArgument("device", Argument.OPTIONAL | Argument.EXISTING, help_device);
         registerArguments(argDevice);
     }
 

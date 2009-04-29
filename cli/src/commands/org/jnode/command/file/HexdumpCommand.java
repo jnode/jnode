@@ -46,11 +46,13 @@ public class HexdumpCommand extends AbstractCommand {
     private static final String fmt_cant_open = "Cannot open %s: %s%n";
     private static final String fmt_cant_open_url = "Cannot access URL %s: %s%n";
     
-    private final FileArgument argFile = new FileArgument("file", Argument.OPTIONAL | Argument.EXISTING, help_file);
-    private final URLArgument argURL = new URLArgument("url", Argument.OPTIONAL | Argument.EXISTING, help_url);
+    private final FileArgument argFile;
+    private final URLArgument argURL;
 
     public HexdumpCommand() {
         super(help_super);
+        argFile = new FileArgument("file", Argument.OPTIONAL | Argument.EXISTING, help_file);
+        argURL  = new URLArgument("url", Argument.OPTIONAL | Argument.EXISTING, help_url);
         registerArguments(argFile, argURL);
     }
 

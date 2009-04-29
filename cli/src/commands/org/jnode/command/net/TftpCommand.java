@@ -50,10 +50,10 @@ public class TftpCommand extends AbstractCommand {
 
     public TftpCommand() {
         super(help_super);
-        argPut = new FlagArgument("put", Argument.OPTIONAL, help_put);
-        argGet = new FlagArgument("get", Argument.OPTIONAL, help_get);
+        argPut    = new FlagArgument("put", Argument.OPTIONAL, help_put);
+        argGet    = new FlagArgument("get", Argument.OPTIONAL, help_get);
         argServer = new HostNameArgument("host", Argument.OPTIONAL, help_host);
-        argFile = new FileArgument("filename", Argument.OPTIONAL, help_file);
+        argFile   = new FileArgument("filename", Argument.OPTIONAL, help_file);
         registerArguments(argGet, argPut, argFile, argServer);
     }
 

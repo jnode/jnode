@@ -70,19 +70,24 @@ public class FindCommand extends AbstractCommand {
     private static final String help_dir = "directory to start searching from";
     private static final String help_super = "Find files and directories";
     
-    private final StringArgument nameArg = new StringArgument("name", Argument.OPTIONAL, help_name);
-    private final StringArgument inameArg = new StringArgument("iname", Argument.OPTIONAL, help_iname);
-    private final LongArgument maxdepthArg = new LongArgument("maxdepth", Argument.OPTIONAL, help_max_depth);
-    private final LongArgument mindepthArg = new LongArgument("mindepth", Argument.OPTIONAL, help_min_depth);
-    private final StringArgument typeArg = new StringArgument("type", Argument.OPTIONAL, help_type);
-    private final FileArgument dirArg 
-        = new FileArgument("directory", Argument.OPTIONAL | Argument.MULTIPLE, help_dir);
+    private final StringArgument nameArg;
+    private final StringArgument inameArg;
+    private final LongArgument maxdepthArg;
+    private final LongArgument mindepthArg;
+    private final StringArgument typeArg;
+    private final FileArgument dirArg;
     
     private PrintWriter out;
     private PrintWriter err;
 
     public FindCommand() {
         super(help_super);
+        nameArg     = new StringArgument("name", Argument.OPTIONAL, help_name);
+        inameArg    = new StringArgument("iname", Argument.OPTIONAL, help_iname);
+        maxdepthArg = new LongArgument("maxdepth", Argument.OPTIONAL, help_max_depth);
+        mindepthArg = new LongArgument("mindepth", Argument.OPTIONAL, help_min_depth);
+        typeArg     = new StringArgument("type", Argument.OPTIONAL, help_type);
+        dirArg      = new FileArgument("directory", Argument.OPTIONAL | Argument.MULTIPLE, help_dir);
         registerArguments(dirArg, mindepthArg, maxdepthArg, inameArg, nameArg, typeArg);
     }
 

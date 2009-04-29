@@ -20,10 +20,6 @@
 
 package org.jnode.command.archive;
 
-import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.FlagArgument;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,10 +29,11 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.IOException;
-
 import java.util.ArrayList;
-
 import org.apache.tools.zip.ZipFile;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
 
 /**
  * This is a base class that holds some convenience methods for implementing archive commands.

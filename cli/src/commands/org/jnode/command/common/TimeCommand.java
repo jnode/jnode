@@ -53,7 +53,7 @@ public class TimeCommand extends AbstractCommand {
     public TimeCommand() {
         super(help_super);
         Alias = new AliasArgument("alias", Argument.MANDATORY, help_alias);
-        Args = new StringArgument("args", Argument.MULTIPLE, help_args);
+        Args  = new StringArgument("args", Argument.MULTIPLE, help_args);
         registerArguments(Alias, Args);
     }
 
