@@ -31,7 +31,6 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.classpath.ext.security"/>
     <plugin id="org.classpath.tools"/>
 
-    <plugin id="org.apache.tools.archive" />
     <plugin id="org.apache.jakarta.commons.net"/>
     <plugin id="org.xbill.dns"/>
 
@@ -49,6 +48,12 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.awt.font"/>
     <plugin id="org.jnode.awt.font.truetype"/>
     <plugin id="org.jnode.awt.swingpeers"/>
+    
+    <plugin id="org.apache.tools.archive" />
+    <plugin id="org.jnode.command.archive"/>
+    <plugin id="org.jnode.command.file"/>
+    <plugin id="org.jnode.command.util"/>
+    
     <plugin id="org.jnode.debug"/>
     <plugin id="org.jnode.debugger"/>
 
@@ -116,7 +121,6 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.driver.video.vesa"/>
 
     <plugin id="org.jnode.fs.command"/>
-    <plugin id="org.jnode.fs.command.archive" />
     <plugin id="org.jnode.fs.ext2"/>
     <plugin id="org.jnode.fs.ext2.command"/>
     <plugin id="org.jnode.fs.hfsplus"/>

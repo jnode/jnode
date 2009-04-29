@@ -38,6 +38,7 @@
     <property name="jnode-textui.jar" value="${root.dir}/textui/build/classes"/>
     <property name="jnode-net.jar" value="${root.dir}/net/build/classes"/>
     <property name="jnode-shell.jar" value="${root.dir}/shell/build/classes"/>
+  	<property name="jnode-coreutils.jar" value="${root.dir}/coreutils/build/classes"/>
     <property name="jnode-fonts.jar" value="${build.dir}/descriptors/jnode-fonts.jar"/>
   	<property name="jnode-images.jar" value="${build.dir}/descriptors/jnode-images.jar"/>
 
@@ -143,6 +144,7 @@
         <pathelement location="${jnode-shell.jar}"/>
         <pathelement location="${jnode-net.jar}"/>
         <pathelement location="${jnode-gui.jar}"/>
+        <pathelement location="${jnode-coreutils.jar}"/>
         <pathelement location="${thinlet.jar}"/>
         <pathelement location="${jnode-textui.jar}"/>
 	    <pathelement location="${bcel-5.1.jar}"/>
@@ -344,6 +346,7 @@
             <libalias name="jnode-textui.jar" alias="${jnode-textui.jar}"/>
             <libalias name="jnode-net.jar" alias="${jnode-net.jar}"/>
             <libalias name="jnode-shell.jar" alias="${jnode-shell.jar}"/>
+            <libalias name="jnode-coreutils.jar" alias="${jnode-coreutils.jar}"/>
 
         	<libalias name="jnode-mmtk-genrc.jar" alias="${jnode-mmtk-genrc.jar}"/>
         	<libalias name="jnode-mmtk-ms.jar" alias="${jnode-mmtk-ms.jar}"/>

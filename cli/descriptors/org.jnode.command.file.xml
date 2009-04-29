@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.command.file"
+        name="JNode file commands"
+        version="@VERSION@"
+        provider-name="@PROVIDER@"
+        license-name="lgpl">
+
+  <requires>
+    <import plugin="org.jnode.shell.syntax"/>
+    <import plugin="org.jnode.command.util"/>
+  </requires>
+  
+  <runtime>
+    <library name="jnode-coreutils.jar">
+      <export name="org.jnode.command.file.*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.shell.aliases">
+    <alias name="cd"      class="org.jnode.command.file.CdCommand" internal="yes"/>
+    <alias name="cp"      class="org.jnode.command.file.CpCommand"/>
+    <alias name="del"     class="org.jnode.command.file.DeleteCommand"/>
+    <alias name="df"      class="org.jnode.command.file.DFCommand"/>
+    <alias name="dir"     class="org.jnode.command.file.DirCommand"/>
+    <alias name="find"    class="org.jnode.command.file.FindCommand"/>  
+    <alias name="hexdump" class="org.jnode.command.file.HexdumpCommand"/>
+    <alias name="ls"      class="org.jnode.command.file.DirCommand"/>
+    <alias name="md5sum"  class="org.jnode.command.file.Md5SumCommand"/>
+    <alias name="mkdir"   class="org.jnode.command.file.MkdirCommand"/>
+    <alias name="pwd"     class="org.jnode.command.file.PwdCommand"/>
+    <alias name="rm"      class="org.jnode.command.file.DeleteCommand"/>
+    <alias name="touch"   class="org.jnode.command.file.TouchCommand"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="cd">
+      <empty description="change the current directory to the 'user.home' directory"/>
+      <argument argLabel="directory" description="change the current directory to 'directory'"/>
+    </syntax>
+    <syntax alias="cp">
+      <sequence description="copy files or directories">
+        <optionSet>
+          <option argLabel="force"       shortName="f" longName="force"/>
+          <option argLabel="update"      shortName="u" longName="update"/>
+          <option argLabel="interactive" shortName="i" longName="interactive"/>
+          <option argLabel="recursive"   shortName="r" longName="recursive"/>
+          <option argLabel="verbose"     shortName="v" longName="verbose"/>
+        </optionSet>
+        <repeat minCount="1">
+          <argument argLabel="source"/>
+        </repeat>
+        <argument argLabel="target"/>
+      </sequence>
+    </syntax>
+    <syntax alias="del">
+      <sequence description="delete files and directories">
+        <optionSet>
+          <option argLabel="recursive"   shortName="r" longName="recursive"/>
+          <option argLabel="force"       shortName="f" longName="force" />
+          <option argLabel="interactive" shortName="i" longName="interactive" />
+          <option argLabel="verbose"     shortName="v" longName="verbose" />
+        </optionSet>
+        <repeat minCount="1">
+          <argument argLabel="paths"/>
+        </repeat>
+      </sequence>
+    </syntax>
+    <syntax alias="df">
+      <empty description="display disk usage for all filesystems"/>
+      <argument argLabel="device" description="display disk usage for the filesystem on a device"/>
+    </syntax>
+    <syntax alias="dir">
+      <empty description="list the current directory"/>
+      <argument argLabel="path" description="list a file or directory"/>
+    </syntax>
+    <syntax alias="find">
+      <sequence description="find files or directories">
+        <repeat minCount="0">
+          <argument argLabel="directory" description="directory to start searching from"/>
+        </repeat>
+        <optionSet>
+          <option argLabel="type"     shortName="t" longName="type"/>
+          <option argLabel="maxdepth" shortName="D" longName="maxdepth"/>
+          <option argLabel="mindepth" shortName="d" longName="mindepth"/>
+          <option argLabel="name"     shortName="n" longName="name"/>
+          <option argLabel="iname"    shortName="N" longName="iname"/>
+        </optionSet>
+      </sequence>
+    </syntax>
+    <syntax alias="hexdump">
+      <empty description="print a hex dump of standard input"/>
+      <argument argLabel="file" description="print a hex dump of a file"/>
+      <option argLabel="url" shortName="u" longName="url" description="print a hex dump of a URL"/>
+    </syntax>
+    <syntax alias="ls">
+      <empty description="list the current directory"/>
+      <repeat>
+        <argument argLabel="path" description="list files or directories"/>
+      </repeat>
+    </syntax>
+    <syntax alias="md5sum">
+      <empty description="Calculates the MD5 digest for standard input"/>
+      <option argLabel="checkfile" shortName="c" longName="check"/>
+      <sequence description="Calculates the MD5 digests for files">
+        <optional eager="true">
+          <option argLabel="recursive" shortName="r" longName="recursive"/>
+        </optional>
+        <repeat minCount="1"><argument argLabel="paths"/></repeat>
+      </sequence>
+    </syntax>
+    <syntax alias="mkdir">
+      <argument argLabel="directory" description="create a new directory"/>
+    </syntax>
+    <syntax alias="pwd">
+      <empty description="show the pathname for the current directory"/>
+    </syntax>
+    <syntax alias="rm">
+      <sequence description="delete files and directories">
+        <optionSet>
+          <option argLabel="recursive"   shortName="r" longName="recursive"/>
+          <option argLabel="force"       shortName="f" longName="force" />
+          <option argLabel="interactive" shortName="i" longName="interactive" />
+          <option argLabel="verbose"     shortName="v" longName="verbose" />
+        </optionSet>
+        <repeat minCount="1">
+          <argument argLabel="paths"/>
+        </repeat>
+      </sequence>
+    </syntax>
+    <syntax alias="touch">
+      <argument argLabel="file" description="touch the given file"/>
+    </syntax>
+  </extension>
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write,delete"/>
+    <permission class="java.io.RuntimePermission" name="readFileDescriptor"/>
+    <permission class="java.io.RuntimePermission" name="writeFileDescriptor"/>
+    <permission class="java.util.PropertyPermission" name="user.dir" actions="read,write"/>
+  </extension>
+</plugin>
