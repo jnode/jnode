@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.apache.tools.archive"
+        name="Ant archive tools"
+        version="1.7.1"
+        provider-name="Apache Ant"
+        provider-url="http://ant.apache.org"
+        license-name="apache2.0">
+
+  <runtime>
+    <library name="ant.jar">
+      <export name="org.apache.tools.tar.*" />
+      <export name="org.apache.tools.zip.*" />
+      <export name="org.apache.tools.bzip2.*" />
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
+    <permission class="java.lang.RuntimePermission" name="readFileDescriptor"/>
+    <permission class="java.lang.RuntimePermission" name="writeFileDescriptor"/>
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+  </extension>
+</plugin>

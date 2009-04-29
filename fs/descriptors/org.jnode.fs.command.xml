@@ -21,100 +21,13 @@
   </runtime>
 
   <extension point="org.jnode.shell.aliases">
-    <alias name="cd"  class="org.jnode.fs.command.CdCommand" internal="yes"/>
-    <alias name="cp" class="org.jnode.fs.command.CpCommand"/>
-    <alias name="del" class="org.jnode.fs.command.DeleteCommand"/>
-    <alias name="df" class="org.jnode.fs.command.DFCommand"/>
-    <alias name="dir" class="org.jnode.fs.command.DirCommand"/>
     <alias name="eject" class="org.jnode.fs.command.EjectCommand"/>
-    <alias name="find" class="org.jnode.fs.command.FindCommand"/>  
-    <alias name="hexdump" class="org.jnode.fs.command.HexdumpCommand"/>
-    <alias name="ls" class="org.jnode.fs.command.DirCommand"/>
-    <alias name="md5sum" class="org.jnode.fs.command.Md5SumCommand"/>
-    <alias name="mkdir" class="org.jnode.fs.command.MkdirCommand"/>
     <alias name="mount" class="org.jnode.fs.command.MountCommand"/>
-    <alias name="mv" class="org.jnode.fs.command.MoveCommand"/>
-    <alias name="pwd" class="org.jnode.fs.command.PwdCommand"/>
-    <alias name="rm" class="org.jnode.fs.command.DeleteCommand"/>
-    <alias name="touch" class="org.jnode.fs.command.TouchCommand"/>
   </extension>
 
   <extension point="org.jnode.shell.syntaxes">
-    <syntax alias="cd">
-      <empty description="change the current directory to the 'user.home' directory"/>
-      <argument argLabel="directory" description="change the current directory to 'directory'"/>
-    </syntax>
-    <syntax alias="cp">
-      <sequence description="copy files or directories">
-        <optionSet>
-          <option argLabel="force" shortName="f" longName="force"/>
-          <option argLabel="update" shortName="u" longName="update"/>
-          <option argLabel="interactive" shortName="i" longName="interactive"/>
-          <option argLabel="recursive" shortName="r" longName="recursive"/>
-          <option argLabel="verbose" shortName="v" longName="verbose"/>
-        </optionSet>
-        <repeat minCount="1"><argument argLabel="source"/></repeat>
-        <argument argLabel="target"/>
-      </sequence>
-    </syntax>
-    <syntax alias="del">
-      <sequence description="delete files and directories">
-        <optionSet>
-          <option argLabel="recursive" shortName="r" longName="recursive"/>
-          <option argLabel="force" shortName="f" longName="force" />
-          <option argLabel="interactive" shortName="i" longName="interactive" />
-          <option argLabel="verbose" shortName="v" longName="verbose" />
-        </optionSet>
-        <repeat minCount="1"><argument argLabel="paths"/></repeat>
-      </sequence>
-    </syntax>
-    <syntax alias="df">
-      <empty description="display disk usage for all filesystems"/>
-      <argument argLabel="device" description="display disk usage for the filesystem on a device"/>
-    </syntax>
-    <syntax alias="dir">
-      <empty description="list the current directory"/>
-      <argument argLabel="path" description="list a file or directory"/>
-    </syntax>
     <syntax alias="eject">
       <argument argLabel="device" description="eject a device with a removable medium"/>
-    </syntax>
-    <syntax alias="find">
-      <sequence description="find files or directories">
-        <repeat minCount="0">
-          <argument argLabel="directory" description="directory to start searching from"/>
-        </repeat>
-        <optionSet>
-          <option argLabel="type" longName="type" shortName="t" description="filter results to show only files of given type. valid types are 'd' for directory and 'f' for file"/>
-          <option argLabel="maxdepth" longName="maxdepth" shortName="D" description="descent at most to given level of directories"/>
-          <option argLabel="mindepth" longName="mindepth" shortName="d" description="ignore files and directories at levels less than given level"/>
-          <option argLabel="name" longName="name" shortName="n" description="filter results to show only files that match given pattern"/>
-          <option argLabel="iname" longName="iname" shortName="N" description="same like 'n', but case insensitive"/>
-        </optionSet>
-      </sequence>
-    </syntax>
-    <syntax alias="hexdump">
-      <empty description="print a hex dump of standard input"/>
-      <argument argLabel="file" description="print a hex dump of a file"/>
-      <option argLabel="url" shortName="u" longName="url" description="print a hex dump of a URL"/>
-    </syntax>
-    <syntax alias="ls">
-      <empty description="list the current directory"/>
-      <repeat><argument argLabel="path" description="list files or directories"/></repeat>
-    </syntax>
-    <syntax alias="md5sum">
-      <option description="Checks MD5 digests recorded in a file"
-              argLabel="checkfile" shortName="c" longName="check"/>
-      <sequence description="Calculates the MD5 digests for files">
-        <optional eager="true">
-          <option argLabel="recursive" shortName="r" longName="recursive"/>
-        </optional>
-        <repeat minCount="1"><argument argLabel="paths"/></repeat>
-      </sequence>
-      <empty description="Calculates the MD5 digest for standard input"/>
-    </syntax>
-    <syntax alias="mkdir">
-      <argument argLabel="directory" description="create a new directory"/>
     </syntax>
     <syntax alias="mount">
       <empty description="list all mounted filesystems"/>
@@ -123,23 +36,6 @@
         <argument argLabel="directory" description="the mountpoint"/>
         <argument argLabel="fsPath" description="the file system's root directory"/>
       </sequence>
-    </syntax>
-    <syntax alias="pwd">
-      <empty description="show the pathname for the current directory"/>
-    </syntax>
-    <syntax alias="rm">
-      <sequence description="delete files and directories">
-        <optionSet>
-          <option argLabel="recursive" shortName="r" longName="recursive"/>
-          <option argLabel="force" shortName="f" longName="force" />
-          <option argLabel="interactive" shortName="i" longName="interactive" />
-          <option argLabel="verbose" shortName="v" longName="verbose" />
-        </optionSet>
-        <repeat minCount="1"><argument argLabel="paths"/></repeat>
-      </sequence>
-    </syntax>
-    <syntax alias="touch">
-      <argument argLabel="file" description="touch the given file"/>
     </syntax>
   </extension>
 

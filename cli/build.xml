@@ -1,0 +1,42 @@
+<project name="JNode-CoreUtils" default="all" basedir=".">
+
+  <typedef file="${basedir}/../all/lib/jnode.xml"/>
+  
+  <property name="my-build.dir"   value="${basedir}/build"/>
+  <property name="my-classes.dir" value="${my-build.dir}/classes"/>
+  <property name="my-src.dir"     value="${basedir}/src"/>
+  <property name="my.jar"         value="${jnode-coreutils.jar}"/>
+  <property name="my-report.dir"  value="${my-build.dir}/report"/>
+  
+<!-- Subproject specific classpath -->
+  <path id="my-cp">
+    <pathelement location="${jnode-core.jar}"/>
+    <pathelement location="${jnode-fs.jar}"/>
+    <pathelement location="${jnode-shell.jar}"/>
+    <pathelement location="${jnode-net.jar}"/>
+    <pathelement location="${jnode-gui.jar}"/>
+    <path refid="cp"/>
+  </path>
+  
+<!-- Initialize subproject directories -->
+  <target name="prepare">
+    <mkdir dir="${my-classes.dir}"/>
+    <jnode.copy-descriptors/>
+  </target>
+  
+<!-- Compile subproject -->
+  <target name="compile" depends="prepare">
+    <jnode.compile>
+      <src path="${my-src.dir}/commands"/>
+      <classpath refid="my-cp"/>
+    </jnode.compile>
+  </target>
+  
+  <target name="assemble" depends="compile"/>
+  
+  <target name="all" depends="assemble"/>
+  
+  <target name="clean">
+    <jnode.clean/>
+  </target>
+</project>

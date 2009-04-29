@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin-list name="shell">
     <manifest>
-        <attribute key="Main-Class" value="org.jnode.shell.CommandShell"/>
+      <attribute key="Main-Class" value="org.jnode.shell.CommandShell"/>
+      <attribute key="Main-Class-Arg" value="boot"/>
     </manifest>
 
     <plugin id="org.jnode.driver"/>
