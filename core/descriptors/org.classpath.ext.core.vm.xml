@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<fragment id="org.classpath.ext.core.vm"
+  name="Classpath AWT classes"
+  version="@VERSION@"
+  plugin-id="rt"
+  plugin-version="@VERSION@"
+  provider-name="Classpath"
+  provider-url="http://classpath.org"
+  license-name="classpath">
+
+  <runtime>
+    <library name="jnode-core.jar">
+        <export name="java.awt.*"/>
+        <export name="java.awt.event.*"/>
+        <export name="java.awt.image.*"/>
+        <export name="sun.awt.*"/>
+        <export name="sun.awt.image.*"/>
+        <export name="sun.font.*"/>
+        <export name="sun.java2d.*"/>
+        <export name="sun.java2d.loops.*"/>
+        <export name="sun.java2d.pipe.*"/>
+        <export name="sun.rmi.server.*"/>
+        <export name="org.jnode.imageio.jpeg.*"/>
+    </library>
+  </runtime>
+</fragment>

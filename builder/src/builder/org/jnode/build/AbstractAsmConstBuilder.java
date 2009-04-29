@@ -46,7 +46,7 @@ import org.jnode.vm.classmgr.VmType;
 public abstract class AbstractAsmConstBuilder {
 
     private File destFile;
-    private URL classesURL;
+    private String classesURL;
     private ArrayList<ClassName> classes = new ArrayList<ClassName>();
 
     /**
@@ -76,8 +76,12 @@ public abstract class AbstractAsmConstBuilder {
         throws BuildException, ClassNotFoundException, IllegalAccessException, IOException, InstantiationException {
 
         final VmArchitecture arch = getArchitecture();
-        final int slotSize = arch.getReferenceSize();
-        final VmSystemClassLoader cl = new VmSystemClassLoader(classesURL, arch);
+        String[] urls = classesURL.split(",");
+        URL[] urla = new URL[urls.length];
+        for (int i = 0; i < urls.length; i++)
+            urla[i] = new URL(urls[i].trim());
+
+        final VmSystemClassLoader cl = new VmSystemClassLoader(urla, arch);
         final Vm vm = new Vm("?", arch, cl.getSharedStatics(), false, cl, null);
         vm.toString(); // Just to avoid compiler warnings
         VmType.initializeForBootImage(cl);
@@ -90,8 +94,8 @@ public abstract class AbstractAsmConstBuilder {
         out.println();
 
         for (ClassName cn : classes) {
-            final URL classUrl = cn.getURL(classesURL);
-            lastModified = Math.max(lastModified, classUrl.openConnection().getLastModified());
+            lastModified = Math.max(lastModified, cl.findResource(cn.getClassFileName()).
+                openConnection().getLastModified());
             out.println("; Constants for " + cn.getClassName());
 
             if (cn.isStatic()) {
@@ -221,6 +225,10 @@ public abstract class AbstractAsmConstBuilder {
         public URL getURL(URL root) throws MalformedURLException {
             return new URL(root.toExternalForm() + "/" + className.replace('.', '/') + ".class");
         }
+
+        public String getClassFileName() {
+            return "/" + className.replace('.', '/') + ".class";
+        }
     }
 
     /**
@@ -228,7 +236,7 @@ public abstract class AbstractAsmConstBuilder {
      *
      * @return URL
      */
-    public URL getClassesURL() {
+    public String getClassesURL() {
         return classesURL;
     }
 
@@ -237,7 +245,7 @@ public abstract class AbstractAsmConstBuilder {
      *
      * @param classesURL The classesURL to set
      */
-    public void setClassesURL(URL classesURL) {
+    public void setClassesURL(String classesURL) {
         this.classesURL = classesURL;
     }
 

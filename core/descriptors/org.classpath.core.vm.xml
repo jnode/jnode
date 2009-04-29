@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="rt.vm"
+  name="Classpath AWT classes"
+  version="@VERSION@"
+  system="true"
+  plugin-version="@VERSION@"
+  provider-name="Classpath"
+  provider-url="http://classpath.org"
+  license-name="classpath">
+
+  <runtime>
+    <library name="jnode-core.jar">
+        <export name="gnu.classpath.*"/>
+        <export name="gnu.classpath.jdwp.*"/>
+        <export name="gnu.classpath.jdwp.transport.*"/>
+        <export name="gnu.java.security.action.*"/>
+        <export name="gnu.java.security.util.*"/>
+        <export name="java.io.*"/>
+        <export name="java.lang.*"/>
+        <export name="java.lang.ref.*"/>
+        <export name="java.lang.reflect.*"/>
+        <export name="java.net.*"/>
+        <export name="java.nio.*"/>
+        <export name="java.nio.channels.*"/>
+        <export name="java.security.*"/>
+        <export name="java.sql.*"/>
+        <export name="java.util.*"/>
+        <export name="java.util.concurrent.atomic.*"/>
+        <export name="java.util.jar.*"/>
+        <export name="java.util.logging.*"/>
+        <export name="java.util.prefs.*"/>
+        <export name="javax.imageio.spi.*"/>
+        <export name="sun.reflect.*"/>
+        <export name="sun.misc.*"/>
+        <export name="sun.security.provider.*"/>
+
+        <export name="javax.isolate.*"/>
+    </library>
+  </runtime>
+</plugin>

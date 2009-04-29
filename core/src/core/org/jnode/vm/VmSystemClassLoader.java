@@ -63,7 +63,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     private VmType[] bootClasses;
 
-    private transient URL classesURL;
+    private transient URL[] classesURL;
 
     private static transient boolean verbose = false;
 
@@ -103,6 +103,16 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @param arch
      */
     public VmSystemClassLoader(URL classesURL, VmArchitecture arch) {
+        this(new URL[]{classesURL}, arch, null);
+    }
+
+    /**
+     * Constructor for VmClassLoader.
+     *
+     * @param classesURL
+     * @param arch
+     */
+    public VmSystemClassLoader(URL[] classesURL, VmArchitecture arch) {
         this(classesURL, arch, null);
     }
 
@@ -113,7 +123,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @param arch
      * @param resolver
      */
-    public VmSystemClassLoader(URL classesURL, VmArchitecture arch,
+    public VmSystemClassLoader(URL[] classesURL, VmArchitecture arch,
                                ObjectResolver resolver) {
         this.classesURL = classesURL;
         this.classInfos = new TreeMap<String, ClassInfo>();
@@ -501,7 +511,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         }
     }
 
-    protected URL findResource(String name) {
+    public URL findResource(String name) {
         if (verbose) {
             System.out.println("VmSystemClassLoader.findResource(" + name + ")");
         }
@@ -513,7 +523,16 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
                 System.out.println("Loading resource " + name + " from " + classesURL);
             }
             try {
-                return new URL(classesURL, name);
+                for (URL u : classesURL) {
+                    URL url = new URL(u, name);
+                    try {
+                        url.openStream().close();
+                        return url;
+                    } catch (IOException e) {
+                        //continue
+                    }
+                }
+                return null;
             } catch (MalformedURLException e) {
                 e.printStackTrace();
                 return null;
@@ -567,8 +586,15 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             if (verbose) {
                 System.out.println("Loading resource " + name + " from " + classesURL);
             }
-            URL url = new URL(classesURL, name);
-            return url.openStream();
+            for (URL u : classesURL) {
+                URL url = new URL(u, name);
+                try {
+                    return url.openStream();
+                } catch (IOException e) {
+                    //continue
+                }
+            }
+            return null;
         } else if (systemRtJar != null) {
             if (verbose) {
                 System.out.println("Loading resource " + name + " from systemRtJar");

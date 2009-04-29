@@ -15,7 +15,7 @@
   </requires>
     
   <runtime>
-    <library name="jnode-core.jar">
+    <library name="classlib.jar">
       <export name="javax.annotation.processing.*"/>
       <export name="javax.lang.model.*"/>
       <export name="javax.lang.model.element.*"/>
