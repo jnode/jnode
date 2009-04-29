@@ -108,6 +108,7 @@
     <property name="jnode-x86_64-lite.iso" value="${cdroms.dir}/jnode-x86_64-lite.iso"/>
 
     <path id="cp">
+        <pathelement location="${classlib.jar}"/>
         <pathelement location="${mmtk.jar}"/>
         <pathelement location="${ant.jar}"/>
         <pathelement location="${junit.jar}"/>
@@ -230,18 +231,6 @@
           </then>
         </if>
         <property name="classlib.stamp" value="${root.dir}/all/build/classlib.stamp" />
-        <if>
-            <or>
-              <not>
-                <available file="${classlib.stamp}" />
-              </not>
-              <uptodate srcfile="${classlib.stamp}" targetfile="${classlib.jar}"/>
-            </or>
-            <then>
-              <unjar src="${classlib.jar}" dest="${jnode-core.jar}"/>
-              <touch file="${classlib.stamp}"/>  
-            </then>
-        </if>
     </target>
 
     <!-- Call the assemble target of all subprojects -->
@@ -255,6 +244,96 @@
     <target name="assemble-plugins" depends="assemble-projects,openjdk-annotate">
         <!-- Now assemble all plugins -->
         <taskdef name="plugin" classname="org.jnode.build.PluginTask" classpathref="cp-jnode"/>
+        <if>
+            <or>
+              <not>
+                <available file="${classlib.stamp}" />
+              </not>
+              <uptodate srcfile="${classlib.stamp}" targetfile="${classlib.jar}"/>
+            </or>
+            <then>
+              <!-- Now assemble all plugins -->
+                <plugin todir="${plugins.dir}" tmpdir="${build.dir}/tmp/plugins" pluginDir="${descriptors.dir}">
+                    <packager userApplicationsDir="${user.applications.dir}" pathRefId="cp"/>
+
+                    <libalias name="jnode-core.jar" alias="${jnode-core.jar}"/>
+                    <libalias name="jnode-distr.jar" alias="${jnode-distr.jar}"/>
+                    <libalias name="jnode-fs.jar" alias="${jnode-fs.jar}"/>
+                    <libalias name="jnode-gui.jar" alias="${jnode-gui.jar}"/>
+                    <libalias name="jnode-textui.jar" alias="${jnode-textui.jar}"/>
+                    <libalias name="jnode-net.jar" alias="${jnode-net.jar}"/>
+                    <libalias name="jnode-shell.jar" alias="${jnode-shell.jar}"/>
+
+                    <libalias name="jnode-mmtk-genrc.jar" alias="${jnode-mmtk-genrc.jar}"/>
+                    <libalias name="jnode-mmtk-ms.jar" alias="${jnode-mmtk-ms.jar}"/>
+                    <libalias name="jnode-mmtk-nogc.jar" alias="${jnode-mmtk-nogc.jar}"/>
+
+                    <libalias name="mmtk.jar" alias="${mmtk.jar}"/>
+
+                    <libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}"/>
+                    <libalias name="dnsjava-1.6.6.jar" alias="${dnsjava.jar}"/>
+                    <libalias name="jsch-0.1.24.jar" alias="${jsch.jar}"/>
+                    <libalias name="log4j.jar" alias="${log4j.jar}"/>
+                    <libalias name="beanshell.jar" alias="${beanshell.jar}"/>
+                    <libalias name="nanoxml-java.jar" alias="${nanoxml-java.jar}"/>
+                    <libalias name="js.jar" alias="${js.jar}"/>
+                    <libalias name="thinlet.jar" alias="${thinlet.jar}"/>
+
+                    <libalias name="junit.jar" alias="${junit.jar}"/>
+                    <libalias name="jmock-1.0.1.jar" alias="${jmock.jar}"/>
+                    <libalias name="jmock-cglib-1.0.1.jar" alias="${jmock-cglib.jar}"/>
+                    <libalias name="asm.jar" alias="${asm.jar}"/>
+                    <libalias name="asm-attrs.jar" alias="${asm-attrs.jar}"/>
+                    <libalias name="asm-util.jar" alias="${asm-util.jar}"/>
+                    <libalias name="cglib.jar" alias="${cglib.jar}"/>
+                    <libalias name="mauve.jar" alias="${mauve.jar}"/>
+
+                    <libalias name="ant.jar" alias="${ant.jar}"/>
+                    <libalias name="ant-launcher.jar" alias="${ant-launcher.jar}"/>
+                    <libalias name="edtftpj.jar" alias="${edtftpj.jar}"/>
+                    <libalias name="jcifs.jar" alias="${jcifs.jar}"/>
+                    <libalias name="ejc.jar" alias="${ejc.jar}"/>
+                    <libalias name="oncrpc.jar" alias="${oncrpc.jar}"/>
+                    <libalias name="telnetd.jar" alias="${telnetd.jar}"/>
+                    <libalias name="commons-logging.jar" alias="${commons-logging.jar}"/>
+                    <libalias name="jawk.jar" alias="${jawk.jar}"/>
+                    <libalias name="jetty.jar" alias="${jetty.jar}"/>
+                    <libalias name="jetty-util.jar" alias="${jetty-util.jar}"/>
+                    <libalias name="jsp.jar" alias="${jsp.jar}"/>
+                    <libalias name="jsp-api.jar" alias="${jsp-api.jar}"/>
+                    <libalias name="servlet.jar" alias="${servlet.jar}"/>
+                    <libalias name="derby.jar" alias="${derby.jar}"/>
+                    <libalias name="derbynet.jar" alias="${derbynet.jar}"/>
+                    <libalias name="derbytools.jar" alias="${derbytools.jar}"/>
+                    <libalias name="classlib.jar" alias="${classlib.jar}"/>
+
+                    <descriptors dir="${descriptors.dir}/">
+                        <include name="org.classpath.core.xml"/>
+                        <include name="org.classpath.ext.awt.xml"/>
+                        <include name="org.classpath.ext.corba.xml"/>
+                        <include name="org.classpath.ext.core.xml"/>
+                        <include name="org.classpath.ext.imageio.xml"/>
+                        <include name="org.classpath.ext.jdwp.xml"/>
+                        <include name="org.classpath.ext.management.xml"/>
+                        <include name="org.classpath.ext.print.xml"/>
+                        <include name="org.classpath.ext.security.xml"/>
+                        <include name="org.classpath.ext.sql.xml"/>
+                        <include name="org.classpath.ext.xml"/>
+                        <include name="org.classpath.ext.xml.ws.tools.xml"/>
+                        <include name="org.classpath.ext.xml.ws.xml"/>
+                        <include name="org.classpath.ext.xml.xml"/>
+                        <include name="org.classpath.tools.xml"/>
+                        <include name="com.sun.tools.javac.xml"/>
+                        <include name="com.sun.tools.jdi.xml"/>
+                        <include name="javax.ext.tools.xml"/>
+                        <include name="sun.tools.xml"/>
+                    </descriptors>
+                </plugin>
+
+                <touch file="${classlib.stamp}"/>
+            </then>
+        </if>
+
         <plugin todir="${plugins.dir}" tmpdir="${build.dir}/tmp/plugins" pluginDir="${descriptors.dir}">
         	<packager userApplicationsDir="${user.applications.dir}" pathRefId="cp"/>
         	
@@ -311,6 +390,26 @@
             <descriptors dir="${descriptors.dir}/">
                 <include name="*.xml"/>
                 <exclude name="*plugin-list.xml"/>
+                <exclude name="com.sun.tools.javac.xml"/>
+                <exclude name="com.sun.tools.jdi.xml"/>
+                <exclude name="javax.ext.tools.xml"/>
+                <exclude name="sun.tools.xml"/>
+                <exclude name="org.classpath.core.xml"/>
+                <exclude name="org.classpath.core.xml"/>
+                <exclude name="org.classpath.ext.awt.xml"/>
+                <exclude name="org.classpath.ext.corba.xml"/>
+                <exclude name="org.classpath.ext.core.xml"/>
+                <exclude name="org.classpath.ext.imageio.xml"/>
+                <exclude name="org.classpath.ext.jdwp.xml"/>
+                <exclude name="org.classpath.ext.management.xml"/>
+                <exclude name="org.classpath.ext.print.xml"/>
+                <exclude name="org.classpath.ext.security.xml"/>
+                <exclude name="org.classpath.ext.sql.xml"/>
+                <exclude name="org.classpath.ext.xml"/>
+                <exclude name="org.classpath.ext.xml.ws.tools.xml"/>
+                <exclude name="org.classpath.ext.xml.ws.xml"/>
+                <exclude name="org.classpath.ext.xml.xml"/>
+                <exclude name="org.classpath.tools.xml"/>
             </descriptors>
         </plugin>
     </target>

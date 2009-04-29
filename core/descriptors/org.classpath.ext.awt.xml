@@ -11,7 +11,7 @@
   license-name="classpath">
 
   <runtime>
-    <library name="jnode-core.jar">
+    <library name="classlib.jar">
         <export name="gnu.java.awt.peer.headless.*"/>
         <export name="gnu.java.awt.peer.swing.*"/>
         <export name="gnu.java.awt.font.*"/>

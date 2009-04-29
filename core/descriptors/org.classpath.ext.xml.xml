@@ -11,7 +11,7 @@
   license-name="classpath">
 
   <runtime>
-    <library name="jnode-core.jar">
+    <library name="classlib.jar">
       <export name="com.sun.org.apache.bcel.internal.*"/>
       <export name="com.sun.org.apache.bcel.internal.classfile.*"/>
       <export name="com.sun.org.apache.bcel.internal.generic.*"/>

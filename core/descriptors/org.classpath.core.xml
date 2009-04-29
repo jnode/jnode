@@ -10,7 +10,7 @@
   license-name="classpath">
 
   <runtime>
-    <library name="jnode-core.jar">
+    <library name="classlib.jar">
 	  <export name="com.sun.beans.*"/>
 	  <export name="com.sun.beans.finder.*"/>
 	  <export name="com.sun.java.util.jar.pack.*"/>
@@ -121,8 +121,6 @@
       <export name="java.util.concurrent.atomic.*"/>
       <export name="java.util.concurrent.locks.*"/>  
 
-      <export name="javax.isolate.*"/>
-      
 	  <export name="javax.naming.*"/>
       <export name="javax.naming.spi.*"/>
 
@@ -160,6 +158,7 @@
       <export name="org.xml.sax.*"/>
       
       <export name="org.jnode.java.io.*"/>
+      <export name="org.jnode.annotation.*"/>
 
       <export name="org.w3c.dom.*"/>
       <export name="org.w3c.dom.bootstrap.*"/>

@@ -22,6 +22,7 @@ package org.jnode.test.core;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.net.URL;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.classmgr.TIBLayout;
@@ -42,8 +43,8 @@ public class IMTCompilerTest {
         final String dir = System.getProperty("classes.dir", ".");
 
         final VmX86Architecture arch = new VmX86Architecture32();
-        final VmSystemClassLoader cl = new VmSystemClassLoader(new File(dir)
-            .toURL(), arch, new CompilerTest.DummyResolver());
+        final VmSystemClassLoader cl = new VmSystemClassLoader(new URL[]{new File(dir)
+            .toURL()}, arch, new CompilerTest.DummyResolver());
         final IMTCompiler cmp = arch.getIMTCompiler();
         cmp.initialize(cl);
         VmType.initializeForBootImage(cl);

@@ -95,6 +95,7 @@
       <jnode.compile destdir="${my-classes-plan.dir}/@{package}/">
         <src path="${my-gen-plan.dir}/@{package}/"/>
       	<classpath>
+     		<pathelement location="${classlib.jar}"/>
      		<pathelement location="${jnode-code.jar}"/>
      		<pathelement location="${mmtk.jar}"/>
       	</classpath>
