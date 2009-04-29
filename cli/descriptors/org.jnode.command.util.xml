@@ -6,7 +6,11 @@
         version="@VERSION@"
         provider-name="@PROVIDER@"
         license-name="lgpl">
-
+  
+  <requires>
+    <import plugin="org.jnode.shell"/>
+  </requires>
+  
   <runtime>
     <library name="jnode-cli.jar">
       <export name="org.jnode.command.util.*" />

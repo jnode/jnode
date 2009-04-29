@@ -147,6 +147,7 @@ public abstract class AbstractDirectoryWalker {
             while (!cancelled && !stack.isEmpty()) {
                 handle(stack.pop());
             }
+            lastAction(cancelled);
         }
     }
     
@@ -253,7 +254,7 @@ public abstract class AbstractDirectoryWalker {
     /**
      * This method is called, when access to a file was denied.<br>
      * Default implementation will rise a <code>IOException</code> instead of
-     * <code>SecurityException</code>. Maybe overridden by extending classes to
+     * <code>SecurityException</code>. May be overridden by extending classes to
      * do something else.
      * 
      * @param file <code>File</code>-object, to which access was restricted.
@@ -265,13 +266,22 @@ public abstract class AbstractDirectoryWalker {
 
     /**
      * This method is called, when walking is about to start.<br>
-     * By default, it does nothing. Maybe overridden by extending classes to do
+     * By default, it does nothing. May be overridden by extending classes to do
      * something else.
      * 
      * @param file <code>File</code>-object, that represents starting dir.
      * @throws IOException if IO error occurs.
      */
     protected void handleStartingDir(final File file) throws IOException {
+        // do nothing by default
+    }
+    
+    /**
+     * This method is called, when walking has finished. <br>
+     * By default, it does nothing. May be overridden by extending classes to do something else.
+     * @param wasCancelled true, if directory walking was aborted.
+     */
+    protected void lastAction(boolean wasCancelled){
         // do nothing by default
     }
 

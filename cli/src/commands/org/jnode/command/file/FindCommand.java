@@ -94,7 +94,8 @@ public class FindCommand extends AbstractCommand {
     public static void main(String[] args) throws IOException {
         new FindCommand().execute();
     }
-
+    
+    @Override
     public void execute() throws IOException {
         out = getOutput().getPrintWriter();
         err = getError().getPrintWriter();
