@@ -28,9 +28,10 @@ import java.util.Properties;
 /**
  * This is the implementation of the IOContext API that is be used when
  * 'proclet' mode is not enabled.  It also provides static methods for
- * getting and setting the 'global' versions of the Stream state, and
- * the System properties and environment.  (The 'global' state is used
- * in 'proclet' mode when the current thread is not part of a 'proclet'.)
+ * getting and setting the 'global' versions of the Stream state,
+ * the System properties and the System environment.  The 'global' state 
+ * is used and (in the case of the properties and 'env' map, updated) in 
+ * 'proclet' mode when the current thread is not part of a 'proclet'.
  * 
  * @author Levente S\u00e1ntha
  * @author crawley@jnode.org

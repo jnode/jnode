@@ -32,7 +32,15 @@ import org.jnode.vm.VmSystem;
 /**
  * The ProcletIOContext is an IOContext implementation that uses Proxy streams to 
  * direct System.in/out/err traffic to different places depending on the current
- * proclet.  
+ * proclet.  The System properties and 'env' are also 'procletized' in this 
+ * implementation.
+ * <p>
+ * A JNode isolate is switched to 'proclet mode" by calling 
+ * {@link VmSystem#switchToExternalIOContext(IOContext)}.
+ * In theory, calling {@link VmSystem#resetIOContext()} will return the isolate
+ * to "normal mode".  However, doing this abruptly cause any remaining 
+ * proclets' procletized state to abruptly revert to the isolate-global version 
+ * of that state.
  * 
  * @author Levente S\u00e1ntha
  * @author crawley@jnode.org
@@ -75,19 +83,39 @@ public class ProcletIOContext implements IOContext {
     }
     
     public Map<String, String> getEnv() {
-        return Proclet.currentProcletContext().getEnvironment();
+        Proclet proclet = Proclet.currentProcletContext();
+        if (proclet != null) {
+            return proclet.getEnvironment();
+        } else {
+            return VmIOContext.getGlobalEnv();
+        }
     }
 
     public Properties getProperties() {
-        return Proclet.currentProcletContext().getProperties();
+        Proclet proclet = Proclet.currentProcletContext();
+        if (proclet != null) {
+            return proclet.getProperties();
+        } else {
+            return VmIOContext.getGlobalProperties();
+        }
     }
 
     public void setEnv(Map<String, String> env) {
-        Proclet.currentProcletContext().setEnvironment(env);
+        Proclet proclet = Proclet.currentProcletContext();
+        if (proclet != null) {
+            proclet.setEnvironment(env);
+        } else {
+            VmIOContext.setGlobalEnv(env);
+        }
     }
 
     public void setProperties(Properties props) {
-        Proclet.currentProcletContext().setProperties(props);
+        Proclet proclet = Proclet.currentProcletContext();
+        if (proclet != null) {
+            proclet.setProperties(props);
+        } else {
+            VmIOContext.setGlobalProperties(props);
+        }
     }
 
     private int getCurrentPid() {
