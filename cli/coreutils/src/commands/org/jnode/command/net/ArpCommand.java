@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.net.command;
+package org.jnode.command.net;
 
 import java.io.PrintWriter;
 
@@ -37,12 +37,16 @@ import org.jnode.shell.syntax.FlagArgument;
  */
 public class ArpCommand extends AbstractCommand {
 
-    private final FlagArgument FLAG_CLEAR = 
-        new FlagArgument("clear", Argument.OPTIONAL, "if set, clear the ARP cache");
+    private static final String help_clear = "if set, clear the ARP cache";
+    private static final String help_super = "print or clear the ARP cache";
+    private static final String str_cleared = "Cleared the ARP cache";
+    
+    private final FlagArgument argClear;
 
     public ArpCommand() {
-        super("print or clear the ARP cache");
-        registerArguments(FLAG_CLEAR);
+        super(help_super);
+        argClear = new FlagArgument("clear", Argument.OPTIONAL, help_super);
+        registerArguments(argClear);
     }
 
     /**
@@ -56,9 +60,9 @@ public class ArpCommand extends AbstractCommand {
         ARPNetworkLayer arp = (ARPNetworkLayer) 
                 NetUtils.getNLM().getNetworkLayer(EthernetConstants.ETH_P_ARP);
         PrintWriter out = getOutput().getPrintWriter();
-        if (FLAG_CLEAR.isSet()) {
+        if (argClear.isSet()) {
             arp.getCache().clear();
-            out.println("Cleared the ARP cache");
+            out.println(str_cleared);
         } else {
             for (ARPCacheEntry entry : arp.getCache().entries()) {
                 out.println(entry);

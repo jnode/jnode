@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.net.command;
+package org.jnode.command.net;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -34,42 +34,49 @@ import org.jnode.shell.syntax.URLArgument;
 public class WgetCommand extends AbstractCommand {
     private static final int BUFFER_SIZE = 8192;
     
-    private final FlagArgument ARG_DEBUG =
-        new FlagArgument("debug", Argument.OPTIONAL, "if set, output debug information");
-    private final URLArgument ARG_SOURCE = 
-        new URLArgument("url", Argument.MANDATORY + Argument.MULTIPLE, "the source URL(s)");
+    private static final String help_debug = "if set, output debug information";
+    private static final String help_url = "the source URL(s)";
+    private static final String help_super = "Fetch the contents of one or more URLs.";
+    private static final String fmt_get_file = "Getting file %s from url %s%n";
+    private static final String err_get_file = "Cannot get %s: %s%n";
+    private static final String err_no_file = "Could not figure out a local file name for URL %s%n";
+    
+    private final FlagArgument argDebug;
+    private final URLArgument argUrl;
 
     private PrintWriter out;
     private PrintWriter err;
     
     public WgetCommand() {
-        super("Fetch the contents of one or more URLs.");
-        registerArguments(ARG_SOURCE, ARG_DEBUG);
+        super(help_super);
+        argDebug = new FlagArgument("debug", Argument.OPTIONAL, help_debug);
+        argUrl = new URLArgument("url", Argument.MANDATORY + Argument.MULTIPLE, help_url);
+        registerArguments(argUrl, argDebug);
     }
 
     public static void main(String[] args) throws Exception {
         new WgetCommand().execute(args);
     }
-
+    
     @Override
     public void execute() throws Exception {
         this.out = getOutput().getPrintWriter();
         this.err = getError().getPrintWriter();
-        boolean debug = ARG_DEBUG.isSet();
+        boolean debug = argDebug.isSet();
         int errorCount = 0;
-        for (URL url : ARG_SOURCE.getValues()) {
+        for (URL url : argUrl.getValues()) {
             String filename = getLocalFileName(url);
             if (filename == null) {
                 errorCount++;
             } else {
                 try {
-                    out.println("Getting file " + filename + " from url " + url.toString());
+                    out.format(fmt_get_file, filename, url.toString());
                     get(url, filename);
                 } catch (IOException ex) {
                     if (debug) {
                         ex.printStackTrace(err);
                     }
-                    err.println("Cannot get " + filename + ": " + ex.getMessage());
+                    err.format(err_get_file, filename, ex.getLocalizedMessage());
                     errorCount++;
                 }
             }
@@ -91,7 +98,7 @@ public class WgetCommand extends AbstractCommand {
         if (lastSlashIndex >= 0 && lastSlashIndex < address.length() - 1) {
             return address.substring(lastSlashIndex + 1);
         } else {
-            err.println("Could not figure out a local file name for URL " + url);
+            err.format(err_no_file, url.toString());
             return null;
         }
     }

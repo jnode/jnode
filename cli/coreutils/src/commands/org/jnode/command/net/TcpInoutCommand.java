@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.net.command;
+package org.jnode.command.net;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,22 +50,25 @@ public class TcpInoutCommand extends AbstractCommand {
     // implementations of TELNET, RSH and SSH protocols (client and
     // server-side).
 
-    private final HostNameArgument ARG_HOST = new HostNameArgument(
-            "host", Argument.OPTIONAL, "the hostname of the server to contact");
-
-    private final PortNumberArgument ARG_PORT = new PortNumberArgument(
-            "port", Argument.OPTIONAL, "the port the server is listening to");
-
-    private final PortNumberArgument ARG_LOCAL_PORT = new PortNumberArgument(
-            "localPort", Argument.OPTIONAL, "the local port we should listen to");
+    private static final String help_host = "the hostname of the server to contact";
+    private static final String help_port = "the port the server is listening to";
+    private static final String help_lport = "the local port we should listen to";
+    private static final String help_super = "Set up an interactive TCP connection to a remote machine";
+    
+    private final HostNameArgument argHost;
+    private final PortNumberArgument argPort;
+    private final PortNumberArgument argLocalPort;
 
     private Socket socket;
     private CopyThread toThread;
     private CopyThread fromThread;
 
     public TcpInoutCommand() {
-        super("Set up an interactive TCP connection to a remote machine");
-        registerArguments(ARG_HOST, ARG_LOCAL_PORT, ARG_PORT);
+        super(help_super);
+        argHost = new HostNameArgument("host", Argument.OPTIONAL, help_host);
+        argPort = new PortNumberArgument("port", Argument.OPTIONAL, help_port);
+        argLocalPort = new PortNumberArgument("localPort", Argument.OPTIONAL, help_lport);
+        registerArguments(argHost, argLocalPort, argPort);
     }
 
     /**
@@ -77,13 +80,13 @@ public class TcpInoutCommand extends AbstractCommand {
 
     public void execute() throws IOException {
         Socket socket;
-        if (ARG_LOCAL_PORT.isSet()) {
-            int port = ARG_LOCAL_PORT.getValue();
+        if (argLocalPort.isSet()) {
+            int port = argLocalPort.getValue();
             ServerSocket ss = ServerSocketFactory.getDefault().createServerSocket(port);
             socket = ss.accept();
         } else {
-            InetAddress host = ARG_HOST.getAsInetAddress();
-            int port = ARG_PORT.getValue();
+            InetAddress host = argHost.getAsInetAddress();
+            int port = argPort.getValue();
             socket = SocketFactory.getDefault().createSocket(host, port);
         }
         InputStream in = getInput().getInputStream();

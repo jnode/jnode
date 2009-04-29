@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.net.command;
+package org.jnode.command.net;
 
 import static org.jnode.net.ethernet.EthernetConstants.ETH_P_IP;
 
@@ -45,24 +45,29 @@ import org.jnode.shell.syntax.FlagArgument;
  * @author epr
  */
 public class RouteCommand extends AbstractCommand {
-    private final FlagArgument FLAG_ADD =
-            new FlagArgument("add", Argument.OPTIONAL, "if set, add a route");
-
-    private final FlagArgument FLAG_DEL =
-            new FlagArgument("del", Argument.OPTIONAL, "if set, remove a route");
-
-    private final IPv4AddressArgument ARG_TARGET =
-            new IPv4AddressArgument("target", Argument.OPTIONAL, "the target network");
-
-    private final IPv4HostArgument ARG_GATEWAY =
-            new IPv4HostArgument("gateway", Argument.OPTIONAL, "the gateway name or IP address");
-
-    private final DeviceArgument ARG_DEVICE =
-            new DeviceArgument("device", Argument.OPTIONAL, "the device to connect to the foreign network");
+    
+    private static final String help_add = "if set, add a route";
+    private static final String help_del = "if set, remove a route";
+    private static final String help_target = "the target network";
+    private static final String help_gateway = "the gateway name or IP address";
+    private static final String help_device = "the device to connect to the foreign network";
+    private static final String help_super = "Manage the IPv4 network routing table";
+    private static final String str_table = "Routing table:";
+    
+    private final FlagArgument argAdd;
+    private final FlagArgument argDel;
+    private final IPv4AddressArgument argTarget;
+    private final IPv4HostArgument argGateway;
+    private final DeviceArgument argDevice;
 
     public RouteCommand() {
-        super("Manage the IPv4 network routing table");
-        registerArguments(FLAG_ADD, FLAG_DEL, ARG_DEVICE, ARG_GATEWAY, ARG_TARGET);
+        super(help_super);
+        argAdd     = new FlagArgument("add", Argument.OPTIONAL, help_add);
+        argDel     = new FlagArgument("del", Argument.OPTIONAL, help_del);
+        argTarget  = new IPv4AddressArgument("target", Argument.OPTIONAL, help_target);
+        argGateway = new IPv4HostArgument("gateway", Argument.OPTIONAL, help_gateway);
+        argDevice  = new DeviceArgument("device", Argument.OPTIONAL, help_device);
+        registerArguments(argAdd, argDel, argDevice, argGateway, argTarget);
     }
 
     public static void main(String[] args) throws Exception {
@@ -72,18 +77,18 @@ public class RouteCommand extends AbstractCommand {
     public void execute() throws NoSuchProtocolException, NetworkException, NameNotFoundException {
         final IPv4NetworkLayer ipNL =
                 (IPv4NetworkLayer) NetUtils.getNLM().getNetworkLayer(ETH_P_IP);
-        final IPv4Address target = ARG_TARGET.getValue();
-        final IPv4Address gateway = ARG_GATEWAY.getValue();
-        final Device device = ARG_DEVICE.getValue();
+        final IPv4Address target = argTarget.getValue();
+        final IPv4Address gateway = argGateway.getValue();
+        final Device device = argDevice.getValue();
         final IPv4ConfigurationService cfg = InitialNaming.lookup(IPv4ConfigurationService.NAME);
 
-        if (FLAG_ADD.isSet()) {
+        if (argAdd.isSet()) {
             cfg.addRoute(target, gateway, device, true);
-        } else if (FLAG_DEL.isSet()) {
+        } else if (argDel.isSet()) {
             cfg.deleteRoute(target, gateway, device);
         } else {
             PrintWriter out = getOutput().getPrintWriter();
-            out.println("Routing table");
+            out.println(str_table);
             out.println(ipNL.getRoutingTable());
         }
     }

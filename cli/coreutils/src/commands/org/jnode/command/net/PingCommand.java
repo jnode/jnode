@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.net.command;
+package org.jnode.command.net;
 
 import java.io.PrintWriter;
 import java.net.SocketException;
@@ -46,6 +46,16 @@ import org.jnode.shell.syntax.HostNameArgument;
  * @author JPG
  */
 public class PingCommand extends AbstractCommand implements ICMPListener {
+    
+    private static final String help_host = "the target host";
+    private static final String help_super = "Ping the specified host";
+    private static final String fmt_unknown_host = "Unknown host: %s";
+    private static final String fmt_ping = "Ping %s attempt %d";
+    private static final String fmt_reply = "Reply from %s: %d bytes of data ttl=%d seq=%d tim=%dms%n";
+    private static final String fmt_stats = "-> Packet statistics%n%s%n";
+    private static final String fmt_get_stats = "%d packets transmitted, %d packets received%nround-trip min/avg/max" +
+                                                " = %d/%d/%dms";
+    
     // FIXME Some of the following could be command parameters ...
     private final Statistics stat = new Statistics();
     private boolean wait = true;
@@ -58,23 +68,23 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
     private long timeout = 5000;
     private int ttl = 255;
 
-    private final HostNameArgument ARG_HOST =
-            new HostNameArgument("host", Argument.MANDATORY, "the target host");
+    private final HostNameArgument argHost;
 
     public PingCommand() {
-        super("Ping the specified host");
-        registerArguments(ARG_HOST);
+        super(help_super);
+        argHost = new HostNameArgument("host", Argument.MANDATORY, help_host);
+        registerArguments(argHost);
     }
 
     public static void main(String[] args) throws Exception {
         new PingCommand().execute(args);
     }
-
+    
     public void execute() throws SocketException, InterruptedException {
         try {
-            this.dst = new IPv4Address(ARG_HOST.getAsInetAddress());
+            this.dst = new IPv4Address(argHost.getAsInetAddress());
         } catch (UnknownHostException ex) {
-            getError().getPrintWriter().println("Unknown host: " + ex.getMessage());
+            getError().getPrintWriter().format(fmt_unknown_host, ex.getLocalizedMessage());
             exit(1);
         }
         final PrintWriter out = getOutput().getPrintWriter();
@@ -92,7 +102,7 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
             int id_count = 0;
             int seq_count = 0;
             while (this.count != 0) {
-                out.println("Ping " + dst + " attempt " + seq_count);
+                out.format(fmt_ping, dst, seq_count);
 
                 if (!this.flood) {
                     this.wait = true;
@@ -117,11 +127,8 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
                     Thread.sleep(500);
                     synchronized (this) {
                         if (response) {
-                            out.print("Reply from " + dst.toString() + ": ");
-                            out.print(hdr1.getDataLength() - 8 + "bytes of data ");
-                            out.print("ttl=" + hdr1.getTtl() + " ");
-                            out.print("seq=" + hdr2.getSeqNumber() + " ");
-                            out.println("time=" + (roundt) + "ms");
+                            out.format(fmt_reply, 
+                                dst.toString(), hdr1.getDataLength(), hdr1.getTtl(), hdr2.getSeqNumber(), roundt);
                             response = false;
                         }
                     }
@@ -136,11 +143,10 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
         } finally {
             icmpProtocol.removeListener(this);
         }
-
-        out.println("-> Packet statistics");
-        out.println(this.stat.getStatistics());
+        
+        out.format(fmt_stats, this.stat.getStatistics());
     }
-
+    
     private long match(int id, int seq, Request r) {
         if (r != null && id == r.getId()) {
             return r.getTimestamp();
@@ -269,8 +275,7 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
         String getStatistics() {
             int packets = received + lost;
             float avg = sum / packets;
-            return (packets + " packets transmitted, " + received + " packets received\n" +
-                    "round-trip min/avg/max = " + min + "/" + avg + "/" + max + " ms");
+            return String.format(fmt_get_stats, packets, received, min, avg, max);
         }
     }
 }

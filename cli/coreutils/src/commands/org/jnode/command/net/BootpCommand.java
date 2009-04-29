@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.net.command;
+package org.jnode.command.net;
 
 import javax.naming.NameNotFoundException;
 
@@ -36,12 +36,16 @@ import org.jnode.shell.syntax.DeviceArgument;
  */
 public class BootpCommand extends AbstractCommand {
 
-    private final DeviceArgument ARG_DEVICE = 
-        new DeviceArgument("device", Argument.MANDATORY, "", NetDeviceAPI.class);
+    private static final String help_device = "";
+    private static final String help_super = "Configure a network interface using BOOTP";
+    private static final String fmt_config = "Trying to configure %s...%n";
+    
+    private final DeviceArgument argDevice;
 
     public BootpCommand() {
-        super("Configure a network interface using BOOTP");
-        registerArguments(ARG_DEVICE);
+        super(help_super);
+        argDevice = new DeviceArgument("device", Argument.MANDATORY, help_device, NetDeviceAPI.class);
+        registerArguments(argDevice);
     }
 
     public static void main(String[] args) throws Exception {
@@ -49,8 +53,8 @@ public class BootpCommand extends AbstractCommand {
     }
 
     public void execute() throws NameNotFoundException, NetworkException {
-        final Device dev = ARG_DEVICE.getValue();
-        getOutput().getPrintWriter().println("Trying to configure " + dev.getId() + "...");
+        final Device dev = argDevice.getValue();
+        getOutput().getPrintWriter().format(fmt_config, dev.getId());
         final IPv4ConfigurationService cfg = InitialNaming.lookup(IPv4ConfigurationService.NAME);
         cfg.configureDeviceBootp(dev, true);
     }

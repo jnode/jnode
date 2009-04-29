@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.net.command;
+package org.jnode.command.net;
 
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -46,12 +46,18 @@ import org.jnode.shell.syntax.DeviceArgument;
  */
 public class DhcpCommand extends AbstractCommand {
 
-    private final DeviceArgument ARG_DEVICE = new DeviceArgument(
-            "device", Argument.MANDATORY, "the network interface device to be configured", NetDeviceAPI.class);
+    private static final String help_device  = "the network interface device to be configured";
+    private static final String help_super   = "Configure a network interface using DHCP";
+    private static final String err_loopback = "The loopback network device is not bound to IP address 127.0.0.1%n" +
+                                               "Run 'ifconfig loopback 127.0.0.1 255.255.255.255' to fix this.%n";
+    private static final String fmt_config   = "Configuring network device %s...%n";
+    
+    private final DeviceArgument argDevice;
 
     public DhcpCommand() {
-        super("Configure a network interface using DHCP");
-        registerArguments(ARG_DEVICE);
+        super(help_super);
+        argDevice = new DeviceArgument("device", Argument.MANDATORY, help_device, NetDeviceAPI.class);
+        registerArguments(argDevice);
     }
 
     public static void main(String[] args) throws Exception {
@@ -60,7 +66,7 @@ public class DhcpCommand extends AbstractCommand {
 
     public void execute() throws DeviceNotFoundException, NameNotFoundException, ApiNotFoundException, 
         UnknownHostException, NetworkException {
-        final Device dev = ARG_DEVICE.getValue();
+        final Device dev = argDevice.getValue();
 
         // The DHCP network configuration process will attempt to configure the DNS.  This will only work if
         // the IP address 127.0.0.1 is bound to the loopback network interface.  And if there isn't, JNode's
@@ -72,13 +78,12 @@ public class DhcpCommand extends AbstractCommand {
         ProtocolAddressInfo info = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
         if (info == null || !info.contains(InetAddress.getByAddress(new byte[]{127, 0, 0, 1}))) {
             PrintWriter err = getError().getPrintWriter();
-            err.println("The loopback network device is not bound to IP address 127.0.0.1");
-            err.println("Run 'ifconfig loopback 127.0.0.1 255.255.255.255' to fix this.");
+            err.format(err_loopback);
             exit(1);
         }
 
         // Now it should be safe to do the DHCP configuration.
-        getOutput().getPrintWriter().println("Configuring network device " + dev.getId() + "...");
+        getOutput().getPrintWriter().format(fmt_config, dev.getId());
         final IPv4ConfigurationService cfg = InitialNaming.lookup(IPv4ConfigurationService.NAME);
         cfg.configureDeviceDhcp(dev, true);
     }

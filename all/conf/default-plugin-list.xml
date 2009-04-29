@@ -52,6 +52,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.apache.tools.archive" />
     <plugin id="org.jnode.command.archive"/>
     <plugin id="org.jnode.command.file"/>
+    <plugin id="org.jnode.command.net"/>
     <plugin id="org.jnode.command.util"/>
     
     <plugin id="org.jnode.debug"/>
@@ -152,7 +153,6 @@ The default list of (non-system) plugins to be included in the init-jar.
 
     <plugin id="org.jnode.net"/>
     <plugin id="org.jnode.net.arp"/>
-    <plugin id="org.jnode.net.command"/>
     <plugin id="org.jnode.net.ipv4"/>
     <plugin id="org.jnode.net.ipv4.config"/>
     <plugin id="org.jnode.net.ipv4.core"/>

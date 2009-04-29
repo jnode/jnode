@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.net.command;
+package org.jnode.command.net;
 
 import java.io.PrintWriter;
 
@@ -47,47 +47,52 @@ import org.jnode.shell.syntax.DeviceArgument;
 public class IfconfigCommand extends AbstractCommand {
     // FIXME should support IPv6 and other address families.
 
-    private final DeviceArgument ARG_DEVICE = 
-        new DeviceArgument("device", Argument.OPTIONAL, "the device", NetDeviceAPI.class);
-
-    private final IPv4AddressArgument ARG_IP_ADDRESS = 
-        new IPv4AddressArgument("ipAddress", Argument.OPTIONAL, "the IPv4 address to bind the device to");
-
-    private final IPv4AddressArgument ARG_SUBNET_MASK =
-        new IPv4AddressArgument("subnetMask", Argument.OPTIONAL, "the IPv4 subnet mask for the device");
+    private static final String help_device = "the device";
+    private static final String help_ip     = "the IPv4 address to bind the device to";
+    private static final String help_subnet  = "the IPv4 subnet mask for the device";
+    private static final String help_super  = "List or manage network interface bindings";
+    private static final String fmt_devices = "%s: MAC-Address %s MTU %s%n    %s";
+    private static final String fmt_ip      = "IP address(es) for %s %s";
+    private static final String fmt_set_ip  = "IP Address for %s set to %s";
+    
+    private final DeviceArgument argDevice;
+    private final IPv4AddressArgument argIPAddress;
+    private final IPv4AddressArgument argSubnetMask;
 
 
     public IfconfigCommand() {
-        super("List or manage network interface bindings");
-        registerArguments(ARG_DEVICE, ARG_IP_ADDRESS, ARG_SUBNET_MASK);
+        super(help_super);
+        argDevice     = new DeviceArgument("device", Argument.OPTIONAL, help_device, NetDeviceAPI.class);
+        argIPAddress  = new IPv4AddressArgument("ipAddress", Argument.OPTIONAL, help_ip);
+        argSubnetMask = new IPv4AddressArgument("subnetMask", Argument.OPTIONAL, help_subnet);
+        registerArguments(argDevice, argIPAddress, argSubnetMask);
     }
 
     public static void main(String[] args) throws Exception {
         new IfconfigCommand().execute(args);
     }
-
+    
     public void execute() throws NameNotFoundException, ApiNotFoundException, NetworkException {
         PrintWriter out = getOutput().getPrintWriter();
-        if (!ARG_DEVICE.isSet()) {
+        if (!argDevice.isSet()) {
             // Print MAC address, MTU and IP address(es) for all network devices.
             final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
             for (Device dev : dm.getDevicesByAPI(NetDeviceAPI.class)) {
                 final NetDeviceAPI api = dev.getAPI(NetDeviceAPI.class);
-                out.println(dev.getId() + ": MAC-Address " + api.getAddress() + " MTU " + api.getMTU());
-                out.println("    " + api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
+                String info = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP).toString();
+                out.format(fmt_devices, dev.getId(), api.getAddress(), api.getMTU(), info);
             }
         } else {
-            final Device dev = ARG_DEVICE.getValue();
+            final Device dev = argDevice.getValue();
             final NetDeviceAPI api = dev.getAPI(NetDeviceAPI.class);
 
-            if (!ARG_IP_ADDRESS.isSet()) {
+            if (!argIPAddress.isSet()) {
                 // Print IP address(es) for device
-                out.println("IP address(es) for " + dev.getId() + 
-                        " " + api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
+                out.format(fmt_ip, dev.getId(), api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
             } else {
                 // Set IP address for device
-                final IPv4Address ip = ARG_IP_ADDRESS.getValue();
-                final IPv4Address mask = ARG_SUBNET_MASK.getValue();
+                final IPv4Address ip = argIPAddress.getValue();
+                final IPv4Address mask = argSubnetMask.getValue();
                 final IPv4ConfigurationService cfg = InitialNaming.lookup(IPv4ConfigurationService.NAME);
                 cfg.configureDeviceStatic(dev, ip, mask, true);
 
@@ -95,8 +100,7 @@ public class IfconfigCommand extends AbstractCommand {
                 // IPv4 ConfigurationServiceImpl calls processor.apply with the 
                 // waitUntilReady parameter == false.  (The comment in the code
                 // talks about avoiding deadlocks.)
-                out.println("IP address for " + dev.getId() + " set to " + 
-                        api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
+                out.format(fmt_set_ip, dev.getId(), api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
             }
         }
     }
