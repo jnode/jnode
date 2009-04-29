@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.command.dev"
+        name="JNode developer commands"
+        version="@VERSION@"
+        provider-name="@PROVIDER@"
+        license-name="lgpl">
+
+  <requires>
+    <import plugin="org.jnode.debug"/>
+    <import plugin="org.classpath.ext.jdwp"/>
+    <import plugin="org.jnode.shell.syntax"/>
+  </requires>
+  
+  <runtime>
+    <library name="jnode-coreutils.jar">
+      <export name="org.jnode.command.dev.*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.shell.aliases">
+    <alias name="compile" class="org.jnode.command.dev.CompileCommand"/>
+    <alias name="debug"   class="org.jnode.command.dev.DebugCommand"/>
+    <alias name="disasm"  class="org.jnode.command.dev.DisassembleCommand"/>
+    <alias name="netout"  class="org.jnode.command.dev.RemoteOutputCommand"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="compile" description="Compile a class to native code">
+      <sequence>
+        <optionSet>
+          <option argLabel="test"  longName="test"/>
+          <option argLabel="level" longName="level"/>
+        </optionSet>
+        <argument argLabel="className"/>
+      </sequence>
+    </syntax>
+    <syntax alias="disasm" description="Disassemble a native code class">
+      <sequence>
+        <optionSet>
+          <option argLabel="test"  longName="test"/>
+          <option argLabel="level" longName="level"/>
+        </optionSet>
+        <argument argLabel="className"/>
+        <optional>
+          <argument argLabel="methodName"/>
+        </optional>
+      </sequence>
+    </syntax>
+    <syntax alias="debug">
+      <optional description="Run a JDWP listener to enable remote debugging">
+        <option argLabel="port" shortName="p"/>
+      </optional>
+    </syntax>
+    <syntax alias="remoteout">
+      <optionSet description="Redirect output and logging to a remote receiver">
+        <option argLabel="host" shortName="h" longName="host"/>
+        <option argLabel="port" shortName="p" longName="port"/>
+        <option argLabel="udp"  shortName="u" longName="udp"/>
+      </optionSet>
+    </syntax>
+  </extension>
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.io.FilePermission"       name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
+    <permission class="java.lang.RuntimePermission"  name="modifyThreadGroup"/>
+    <permission class="java.lang.RuntimePermission"  name="setIO"/>
+    <permission class="java.lang.RuntimePermission"  name="exitVM"/>
+    <permission class="java.net.SocketPermission"    name="*:1-" actions="resolve,listen,connect"/>
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+  </extension>
+</plugin>

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.command.system"
+        name="JNode system commands"
+        version="@VERSION@"
+        provider-name="@PROVIDER@"
+        license-name="lgpl">
+
+  <requires>
+    <import plugin="org.jnode.shell.syntax"/>
+  </requires>
+  
+  <runtime>
+    <library name="jnode-coreutils.jar">
+      <export name="org.jnode.command.system.*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.shell.aliases">
+    <alias name="alias"     class="org.jnode.shell.command.AliasCommand"/>
+    <alias name="bindkeys"  class="org.jnode.shell.command.BindKeysCommand"/>
+    <alias name="class"     class="org.jnode.shell.command.ClassCommand"/>
+    <alias name="classpath" class="org.jnode.shell.command.ClasspathCommand" internal="yes"/>
+    <alias name="gc"        class="org.jnode.shell.command.GcCommand"/>
+    <alias name="isolate"   class="org.jnode.shell.command.IsolateCommand"/>
+    <alias name="java"      class="org.jnode.shell.command.JavaCommand"/>
+    <alias name="kill"      class="org.jnode.shell.command.KillCommand"/>
+    <alias name="loadkeys"  class="org.jnode.shell.command.LoadkeysCommand"/>
+    <alias name="locale"    class="org.jnode.shell.command.LocaleCommand"/>
+    <alias name="memory"    class="org.jnode.shell.command.MemoryCommand"/>
+    <alias name="namespace" class="org.jnode.shell.command.NamespaceCommand"/>
+    <alias name="onheap"    class="org.jnode.shell.command.OnHeapCommand"/>
+    <alias name="page"      class="org.jnode.shell.command.PageCommand"/>
+    <alias name="printenv"  class="org.jnode.shell.command.PrintEnvCommand"/>
+    <alias name="propset"   class="org.jnode.shell.command.SetCommand" internal="yes"/>
+    <alias name="run"       class="org.jnode.shell.command.RunCommand"/>
+    <alias name="syntax"    class="org.jnode.shell.command.SyntaxCommand"/>
+    <alias name="terminate" class="org.jnode.shell.command.TerminateCommand"/>
+    <alias name="thread"    class="org.jnode.shell.command.ThreadCommand"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="alias">
+      <empty description="List all aliases"/>
+      <option argLabel="remove" shortName="r" description="Remove an alias"/>
+      <sequence description="Create or update an alias">
+        <argument argLabel="alias"/>
+        <argument argLabel="className"/>
+      </sequence>
+    </syntax>
+    <syntax alias="bindkeys">
+      <empty description="Show the key bindings"/>
+      <option argLabel="reset" longName="reset" description="Reset the key bindings to the default settings"/>
+      <sequence description="Remove key bindings">
+        <option argLabel="remove" shortName="r" longName="remove"/>
+        <argument argLabel="action"/>
+        <repeat minCount="0">
+          <alternatives>
+            <argument argLabel="vkSpec"/>
+            <argument argLabel="character"/>
+          </alternatives>
+        </repeat>
+      </sequence>
+      <sequence description="Add key bindings">
+        <option argLabel="add" shortName="a" longName="add"/>
+        <argument argLabel="action"/>
+        <repeat minCount="1">
+          <alternatives>
+            <argument argLabel="vkSpec"/>
+            <argument argLabel="character"/>
+          </alternatives>
+        </repeat>
+      </sequence>
+    </syntax>
+    <syntax alias="class" description="Show details of a Java class">
+      <argument argLabel="className"/>
+    </syntax>
+    <syntax alias="classpath">
+      <empty description="Print the current classpath"/>
+      <option argLabel="addUrl"  longName="add" description="add a URL to the classpath"/>
+      <option argLabel="clear"   longName="clear" description="clear the classpath"/>
+      <option argLabel="refresh" longName="refresh" description="refresh the classpath"/>
+    </syntax>
+    <syntax alias="gc">
+      <empty description="Run the garbage collector"/>
+      <sequence description="Set heap debug flags">
+        <option argLabel="set" longName="set"/>
+        <repeat minCount="1">
+          <argument argLabel="debugFlag"/>
+        </repeat>
+      </sequence>
+      <sequence description="Clear heap debug flags">
+        <option argLabel="clear" longName="clear"/>
+        <repeat minCount="1">
+          <argument argLabel="debugFlag"/>
+        </repeat>
+      </sequence>
+      <option argLabel="show" longName="show" description="Show heap debug flags"/>
+    </syntax>
+    <syntax alias="isolate">
+      <empty description="Show basic information about all isolates in the system"/>
+    </syntax>
+    <syntax alias="java" description="Run a Java class via its 'main' method">
+      <sequence>
+        <argument argLabel="className"/>
+        <repeat>
+          <argument argLabel="arg"/>
+        </repeat>
+      </sequence>
+    </syntax>
+    <syntax alias="kill" description="Kill a thread">
+      <sequence>
+        <repeat maxCount="1">
+          <option argLabel="debug" longName="debug"/>
+        </repeat>
+        <argument argLabel="threadId"/>
+      </sequence>
+    </syntax>
+    <syntax alias="loadkeys">
+      <empty description="Print the current keyboard layout"/>
+      <sequence description="Change the current keyboard layout">
+        <option argLabel="set" shortName="s" longName="set"/>
+        <alternatives>
+          <argument argLabel="layout"/>
+          <sequence>
+            <option argLabel="triple" shortName="t" longName="triple"/>
+            <argument argLabel="country"/>
+            <optional>
+              <argument argLabel="language"/>
+              <optional>
+                <argument argLabel="variant"/>
+              </optional>
+            </optional>
+          </sequence>
+        </alternatives>
+      </sequence>
+      <sequence description="Register a keyboard layout">
+        <option argLabel="add" shortName="a" longName="add"/>
+        <alternatives>
+          <argument argLabel="layout"/>
+          <sequence>
+            <option shortName="t" longName="triple" argLabel="triple"/>
+            <argument argLabel="country"/>
+            <optional>
+              <argument argLabel="language"/>
+              <optional>
+                <argument argLabel="variant"/>
+              </optional>
+            </optional>
+          </sequence>
+        </alternatives>
+        <argument argLabel="class"/>
+      </sequence>
+      <sequence description="Unregister a keyboard layout">
+        <option argLabel="remove" shortName="r" longName="remove"/>
+        <alternatives>
+          <argument argLabel="layout"/>
+          <sequence>
+            <option argLabel="triple" shortName="t" longName="triple"/>
+            <argument argLabel="country"/>
+            <optional>
+              <argument argLabel="language"/>
+              <optional>
+                <argument argLabel="variant"/>
+              </optional>
+            </optional>
+          </sequence>
+        </alternatives>
+      </sequence>
+    </syntax>
+    <syntax alias="locale">
+      <empty description="Print the current default Locale name"/>
+      <option argLabel="list" longName="list" shortName="l" description="List the names of the available Locales"/>
+      <sequence description="Change the default Locale">
+        <argument argLabel="language"/>
+        <optional>
+          <argument argLabel="country"/>
+          <optional>
+            <argument argLabel="variant"/>
+          </optional>
+        </optional>
+      </sequence>
+    </syntax>
+    <syntax alias="memory" description="Show JNode memory usage"/>
+    <syntax alias="namespace" description="Print the contents of the system namespace"/>
+    <syntax alias="onheap" description="Print heap object count and size statistics">
+      <optionSet>
+        <option argLabel="minCount"     longName="minCount"/>
+        <option argLabel="minTotalSize" longName="minTotalSize"/>
+      </optionSet>
+    </syntax> 
+    <syntax alias="page">
+      <empty description="Filter standard input a page (screen) at a time"/>
+      <argument argLabel="file" description="Output the file a page (screen) at a time"/>
+    </syntax>
+    <syntax alias="propset">
+      <sequence description="Set a shell property">
+        <option argLabel="shell" shortName="s" longName="shell"/>
+        <argument argLabel="skey"/>
+        <argument argLabel="value"/>
+      </sequence>
+      <sequence>
+      	<argument description="Remove a shell property" argLabel="skey"/>
+        <option argLabel="shell" shortName="s" longName="shell"/>
+      </sequence>
+      <sequence description="Set a system property">
+        <argument argLabel="key"/>
+        <argument argLabel="value"/>
+      </sequence>
+      <argument description="Remove a system property" argLabel="key"/>
+    </syntax>
+    <syntax alias="run" description="Run a command file">
+      <argument argLabel="file"/>
+    </syntax>
+    <syntax alias="syntax">
+      <empty description="List aliases which have syntaxes"/>
+      <option argLabel="dumpAll" longName="dump-all" description="Dump all syntaxes"/>
+      <sequence description="Dump the syntax for a given alias">
+        <option argLabel="dump" shortName="d" longName="dump"/>
+        <argument argLabel="alias"/>
+      </sequence>
+      <sequence description="Load a new syntax for a given alias">
+        <option argLabel="file" shortName="l" longName="load"/>
+        <argument argLabel="alias"/>
+      </sequence>
+      <sequence description="Remove the syntax for a given alias">
+        <option argLabel="remove" shortName="r" longName="remove"/>
+        <argument argLabel="alias"/>
+      </sequence>
+    </syntax>
+    <syntax alias="terminate" description="Terminate an isolate">
+      <argument argLabel="id" description="isolate identifier"/>
+    </syntax>
+    <syntax alias="thread">
+      <optional description="Display all extant JNode Threads">
+        <option argLabel="groupDump" shortName="g" longName="groupDump"/>
+      </optional>
+      <argument argLabel="threadName" description="Display the named Thread"/>
+    </syntax>
+  </extension>
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+    <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
+    <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
+    <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
+    <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
+    <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
+    <permission class="java.lang.reflect.ReflectPermission" name="suppressAccessChecks"/>
+  </extension>
+  
+</plugin>
