@@ -20,14 +20,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.server;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+
+import org.jtestserver.client.utils.ConfigurationUtils;
 
 public class Config {
 
     public static Config read() throws IOException {
         Properties properties = new Properties();
-        //properties.load(Config.class.getResourceAsStream("config.properties"));
+        
+        //TODO get server's config
+        //properties.load(new FileInputStream(ConfigurationUtils.getConfigurationFile()));
+        
         return new Config(properties);
     }
     
