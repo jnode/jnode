@@ -20,8 +20,6 @@
  
 package org.jnode.shell.proclet;
 
-import gnu.classpath.SystemProperties;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -43,8 +41,6 @@ public abstract class AbstractProxyPrintStream extends PrintStream implements
      * limitations of the afore-mentioned class's specification ...
      */
     private static PrintStream nullStream;
-    private static final char[] line_separator = SystemProperties.getProperty(
-            "line.separator", "\n").toCharArray();
 
     private boolean error_occurred = false;
 
@@ -81,7 +77,7 @@ public abstract class AbstractProxyPrintStream extends PrintStream implements
         PrintStream eo = effectiveOutput();
         writeChars(eo, str, 0, str.length());
         if (println) {
-            writeChars(eo, line_separator, 0, line_separator.length);
+            eo.println();
         }
         flush();
     }
@@ -91,7 +87,7 @@ public abstract class AbstractProxyPrintStream extends PrintStream implements
         PrintStream eo = effectiveOutput();
         writeChars(eo, chars, pos, len);
         if (println) {
-            writeChars(eo, line_separator, 0, line_separator.length);
+            eo.println();
         }
         flush();
     }
@@ -145,7 +141,7 @@ public abstract class AbstractProxyPrintStream extends PrintStream implements
     }
 
     public void println() {
-        print(line_separator, 0, line_separator.length, false);
+        effectiveOutput().println();
     }
 
     public void println(boolean bool) {
