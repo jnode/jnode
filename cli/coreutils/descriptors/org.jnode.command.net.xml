@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.net.command"
-    name="JNode Network Shell Commands"
+<plugin id="org.jnode.command.net"
+    name="JNode net commands"
     version="@VERSION@"
-    license-name="lgpl"
-    provider-name="JNode.org">
+    provider-name="@PROVIDER@"
+    license-name="lgpl">
 
     <requires>
         <import plugin="org.jnode.net"/>
@@ -18,26 +18,28 @@
 
     <runtime>
         <library name="jnode-net.jar">
-            <export name="org.jnode.net.command.*"/>
             <export name="org.jnode.net.syntax.*"/>
+        </library>
+        <library name="jnode-coreutils.jar">
+            <export name="org.jnode.command.net.*"/>
         </library>
     </runtime>
 
     <extension point="org.jnode.shell.aliases">
-        <alias name="arp" class="org.jnode.net.command.ArpCommand"/>
-        <alias name="bootp" class="org.jnode.net.command.BootpCommand"/>
-        <alias name="dhcp" class="org.jnode.net.command.DhcpCommand"/>
-        <alias name="ifconfig" class="org.jnode.net.command.IfconfigCommand"/>
-        <alias name="netstat" class="org.jnode.net.command.NetstatCommand"/>
-        <alias name="ping" class="org.jnode.net.command.PingCommand"/>
-        <alias name="route" class="org.jnode.net.command.RouteCommand"/>
-        <alias name="resolver" class="org.jnode.net.command.ResolverCommand"/>
-        <alias name="resolve" class="org.jnode.net.command.ResolveCommand"/>
-        <alias name="tftp" class="org.jnode.net.command.TftpCommand"/>
-        <alias name="wlanctl" class="org.jnode.net.command.WLanCtlCommand"/>
-        <alias name="tcpinout" class="org.jnode.net.command.TcpInoutCommand"/>
-        <alias name="rpcinfo" class="org.jnode.net.command.RpcInfoCommand"/>
-		<alias name="wget" class="org.jnode.net.command.WgetCommand"/>
+        <alias name="arp" class="org.jnode.command.net.ArpCommand"/>
+        <alias name="bootp" class="org.jnode.command.net.BootpCommand"/>
+        <alias name="dhcp" class="org.jnode.command.net.DhcpCommand"/>
+        <alias name="ifconfig" class="org.jnode.command.net.IfconfigCommand"/>
+        <alias name="netstat" class="org.jnode.command.net.NetstatCommand"/>
+        <alias name="ping" class="org.jnode.command.net.PingCommand"/>
+        <alias name="route" class="org.jnode.command.net.RouteCommand"/>
+        <alias name="resolver" class="org.jnode.command.net.ResolverCommand"/>
+        <alias name="resolve" class="org.jnode.command.net.ResolveCommand"/>
+        <alias name="tftp" class="org.jnode.command.net.TftpCommand"/>
+        <alias name="wlanctl" class="org.jnode.command.net.WLanCtlCommand"/>
+        <alias name="tcpinout" class="org.jnode.command.net.TcpInoutCommand"/>
+        <alias name="rpcinfo" class="org.jnode.command.net.RpcInfoCommand"/>
+		<alias name="wget" class="org.jnode.command.net.WgetCommand"/>
     </extension>
     
     <extension point="org.jnode.shell.syntaxes">

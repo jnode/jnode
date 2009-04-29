@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.net.command;
+package org.jnode.command.net;
 
 import java.io.PrintWriter;
 import java.util.Collection;
@@ -37,19 +37,25 @@ import org.jnode.shell.syntax.FlagArgument;
  * @author hagar-wize
  */
 public class ResolverCommand extends AbstractCommand {
+
+    private static final String help_add = "If set, add a DNS server";
+    private static final String help_del = "If set, remove a DNS server";
+    private static final String help_server = "the DNS server's hostname or IP address";
+    private static final String help_super = "Manage JNode's DNS resolver";
+    private static final String str_no_servers = "No DNS servers found.";
+    private static final String str_servers = "DNS servers:";
+    
     // FIXME this should not be restricted to IPv4 addresses.
-    private final FlagArgument FLAG_ADD =
-            new FlagArgument("add", Argument.OPTIONAL, "if set, add a DNS server");
-
-    private final FlagArgument FLAG_DEL =
-            new FlagArgument("del", Argument.OPTIONAL, "if set, remove a DNS server");
-
-    private final IPv4AddressArgument ARG_DNS_SERVER =
-            new IPv4AddressArgument("server", Argument.OPTIONAL, "the DNS server's hostname or IP address");
+    private final FlagArgument argAdd;
+    private final FlagArgument argDel;
+    private final IPv4AddressArgument argDnsServer;
 
     public ResolverCommand() {
-        super("Manage JNode's DNS resolver");
-        registerArguments(FLAG_ADD, FLAG_DEL, ARG_DNS_SERVER);
+        super(help_super);
+        argAdd = new FlagArgument("add", Argument.OPTIONAL, help_add);
+        argDel = new FlagArgument("del", Argument.OPTIONAL, help_del);
+        argDnsServer = new IPv4AddressArgument("server", Argument.OPTIONAL, help_server);
+        registerArguments(argAdd, argDel, argDnsServer);
     }
 
     public static void main(String[] args) throws Exception {
@@ -57,21 +63,21 @@ public class ResolverCommand extends AbstractCommand {
     }
 
     public void execute() throws NetworkException {
-        IPv4Address server = ARG_DNS_SERVER.getValue();
+        IPv4Address server = argDnsServer.getValue();
         PrintWriter out = getOutput().getPrintWriter();
-        if (FLAG_ADD.isSet()) {
+        if (argAdd.isSet()) {
             // Add a DNS server
             ResolverImpl.addDnsServer(server);
-        } else if (FLAG_DEL.isSet()) {
+        } else if (argDel.isSet()) {
             // Remove a DNS server
             ResolverImpl.removeDnsServer(server);
         } else {
             // List the DNS servers that the resolver uses
             Collection<String> resolvers = ResolverImpl.getDnsServers();
             if (resolvers.size() == 0) {
-                out.println("No DNS servers found.");
+                out.println(str_no_servers);
             } else {
-                out.println("DNS servers");
+                out.println(str_servers);
                 for (String dnsServer : resolvers) {
                     out.println(dnsServer);
                 }

@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.net.command;
+package org.jnode.command.net;
 
 import java.io.File;
 
@@ -36,22 +36,25 @@ import org.jnode.shell.syntax.HostNameArgument;
  * @author crawley
  */
 public class TftpCommand extends AbstractCommand {
-
-    private final FlagArgument FLAG_PUT =
-            new FlagArgument("put", Argument.OPTIONAL, "if set, transfer a file to the TFTP server");
-
-    private final FlagArgument FLAG_GET =
-            new FlagArgument("get", Argument.OPTIONAL, "if set, fetch a file from the TFTP server");
-
-    private final HostNameArgument ARG_SERVER =
-            new HostNameArgument("host", Argument.OPTIONAL, "the hostname of the TFTP server");
-
-    private final FileArgument ARG_FILENAME =
-            new FileArgument("filename", Argument.OPTIONAL, "the file to transfer");
+    
+    private static final String help_put = "if set, transfer a file to the TFTP server";
+    private static final String help_get = "if set, fetch a file from the TFTP server";
+    private static final String help_host = "the hostname of the TFTP server";
+    private static final String help_file = "the file to transfer";
+    private static final String help_super = "Do a TFTP get or put, or run an interactive TFTP client";
+    
+    private final FlagArgument argPut;
+    private final FlagArgument argGet;
+    private final HostNameArgument argServer;
+    private final FileArgument argFile;
 
     public TftpCommand() {
-        super("Do a TFTP get or put, or run an interactive TFTP client");
-        registerArguments(FLAG_GET, FLAG_PUT, ARG_FILENAME, ARG_SERVER);
+        super(help_super);
+        argPut = new FlagArgument("put", Argument.OPTIONAL, help_put);
+        argGet = new FlagArgument("get", Argument.OPTIONAL, help_get);
+        argServer = new HostNameArgument("host", Argument.OPTIONAL, help_host);
+        argFile = new FileArgument("filename", Argument.OPTIONAL, help_file);
+        registerArguments(argGet, argPut, argFile, argServer);
     }
 
     public static void main(String[] args) throws Exception {
@@ -60,9 +63,9 @@ public class TftpCommand extends AbstractCommand {
 
     public void execute() throws Exception {
         TFTPClient client = new TFTPClient(getOutput().getPrintWriter());
-        String host = ARG_SERVER.getValue();
-        File file = ARG_FILENAME.getValue();
-        if (FLAG_PUT.isSet()) {
+        String host = argServer.getValue();
+        File file = argFile.getValue();
+        if (argPut.isSet()) {
             if (client.executeCommand(new String[] {TFTPClient.CONNECT_CMD, host})) {
                 if (!client.executeCommand(new String[] {TFTPClient.PUT_CMD, file.toString()})) {
                     exit(1);
@@ -70,7 +73,7 @@ public class TftpCommand extends AbstractCommand {
             } else {
                 exit(2);
             }
-        } else if (FLAG_GET.isSet()) {
+        } else if (argGet.isSet()) {
             if (client.executeCommand(new String[] {TFTPClient.CONNECT_CMD, host})) {
                 if (!client.executeCommand(new String[] {TFTPClient.GET_CMD, file.toString()})) {
                     exit(1);

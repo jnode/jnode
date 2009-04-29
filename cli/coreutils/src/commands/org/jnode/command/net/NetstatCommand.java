@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.net.command;
+package org.jnode.command.net;
 
 import java.io.PrintWriter;
 
@@ -36,8 +36,12 @@ import org.jnode.util.Statistics;
  */
 public class NetstatCommand extends AbstractCommand {
 
+    private static final String help_super = "Print statistics for all network devices";
+    private static final String fmt_stat = "%s: ID %s";
+    private static final String str_none = "none";
+    
     public NetstatCommand() {
-        super("Print statistics for all network devices");
+        super(help_super);
     }
 
     public static void main(String[] args) throws Exception {
@@ -54,26 +58,27 @@ public class NetstatCommand extends AbstractCommand {
             showStats(getOutput().getPrintWriter(), nl, 80);
         }
     }
-
+    
     private void showStats(PrintWriter out, NetworkLayer nl, int maxWidth) throws NetworkException {
-        out.println(nl.getName() + ": ID " + nl.getProtocolID());
+        out.format(fmt_stat, nl.getName(), nl.getProtocolID());
         final String prefix = "    ";
         out.print(prefix);
         showStats(out, nl.getStatistics(), maxWidth - prefix.length(), prefix);
         for (TransportLayer tl : nl.getTransportLayers()) {
-            out.println(prefix + tl.getName() + ": ID " + tl.getProtocolID());
+            out.print(prefix);
+            out.format(fmt_stat, tl.getName(), tl.getProtocolID());
             final String prefix2 = prefix + prefix;
             out.print(prefix2);
             showStats(out, tl.getStatistics(), maxWidth - prefix2.length(), prefix2);
         }
         out.println();
     }
-
+    
     private void showStats(PrintWriter out, Statistics stat, int maxWidth, String prefix)
         throws NetworkException {
         final Statistic[] list = stat.getStatistics();
         if (list.length == 0) {
-            out.print("none");
+            out.print(str_none);
         } else {
             int width = 0;
             for (int i = 0; i < list.length; i++) {

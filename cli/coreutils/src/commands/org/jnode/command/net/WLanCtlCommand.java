@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.net.command;
+package org.jnode.command.net;
 
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -36,34 +36,37 @@ import org.jnode.shell.syntax.StringArgument;
  */
 public class WLanCtlCommand extends AbstractCommand {
 
-    private final FlagArgument FLAG_SET_ESSID = new FlagArgument(
-            "setEssid", Argument.OPTIONAL, "if set, set the ESSID");
-
-    private final DeviceArgument ARG_DEVICE = new DeviceArgument(
-            "device", Argument.MANDATORY, "the device to be operated on", WirelessNetDeviceAPI.class);
-
-    private final StringArgument ARG_VALUE = new StringArgument(
-            "value", Argument.OPTIONAL, "the value to use in the operation");
-
+    private static final String help_set = "if set, set the ESSID";
+    private static final String help_dev = "the device to be operated on";
+    private static final String help_value = "the value to use in the operations";
+    private static final String help_super = "Manage a WLan device";
+    private static final String fmt_set = "Setting ESSID on %s to %s%n";
+    
+    private final FlagArgument argSetEssid;
+    private final DeviceArgument argDevice;
+    private final StringArgument argValue;
 
     public WLanCtlCommand() {
-        super("Manage a WLan device");
-        registerArguments(FLAG_SET_ESSID, ARG_DEVICE, ARG_VALUE);
+        super(help_super);
+        argSetEssid = new FlagArgument("setEssid", Argument.OPTIONAL, help_set);
+        argDevice = new DeviceArgument("device", Argument.MANDATORY, help_dev, WirelessNetDeviceAPI.class);
+        argValue = new StringArgument("value", Argument.OPTIONAL, help_value);
+        registerArguments(argSetEssid, argDevice, argValue);
     }
 
     public static void main(String[] args) throws Exception {
         new WLanCtlCommand().execute(args);
     }
-
+    
     public void execute() throws ApiNotFoundException, NetworkException {
-        final Device dev = ARG_DEVICE.getValue();
+        final Device dev = argDevice.getValue();
         final WirelessNetDeviceAPI api;
         api = dev.getAPI(WirelessNetDeviceAPI.class);
 
         // Perform the selected operation
-        if (FLAG_SET_ESSID.isSet()) {
-            final String essid = ARG_VALUE.getValue();
-            getOutput().getPrintWriter().println("Setting ESSID on " + dev.getId() + " to " + essid);
+        if (argSetEssid.isSet()) {
+            final String essid = argValue.getValue();
+            getOutput().getPrintWriter().format(fmt_set, dev.getId(), essid);
             api.setESSID(essid);
         }
     }
