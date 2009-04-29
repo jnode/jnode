@@ -67,8 +67,8 @@ public class RemoteOutputCommand extends AbstractCommand {
     public RemoteOutputCommand() {
         super(help_super);
         argAddress = new HostNameArgument("host", Argument.MANDATORY, help_addr);
-        argPort = new IntegerArgument("port", Argument.OPTIONAL, help_port);
-        argUdp = new FlagArgument("udp", Argument.OPTIONAL, help_udp);
+        argPort    = new IntegerArgument("port", Argument.OPTIONAL, help_port);
+        argUdp     = new FlagArgument("udp", Argument.OPTIONAL, help_udp);
         registerArguments(argAddress, argPort, argUdp);
     }
     

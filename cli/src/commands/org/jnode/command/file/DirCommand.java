@@ -47,11 +47,11 @@ public class DirCommand extends AbstractCommand {
     private static final String help_super = "List files or directories";
     private static final String fmt_no_path = "No such path: %s%n";
     
-    private final FileArgument argPath 
-        = new FileArgument("path", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING, help_path);
+    private final FileArgument argPath;
     
     public DirCommand() {
         super(help_super);
+        argPath = new FileArgument("path", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING, help_path);
         registerArguments(argPath);
     }
 

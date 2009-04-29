@@ -52,8 +52,8 @@ public class ResolverCommand extends AbstractCommand {
 
     public ResolverCommand() {
         super(help_super);
-        argAdd = new FlagArgument("add", Argument.OPTIONAL, help_add);
-        argDel = new FlagArgument("del", Argument.OPTIONAL, help_del);
+        argAdd       = new FlagArgument("add", Argument.OPTIONAL, help_add);
+        argDel       = new FlagArgument("del", Argument.OPTIONAL, help_del);
         argDnsServer = new IPv4AddressArgument("server", Argument.OPTIONAL, help_server);
         registerArguments(argAdd, argDel, argDnsServer);
     }

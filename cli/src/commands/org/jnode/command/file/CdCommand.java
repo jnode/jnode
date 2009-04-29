@@ -42,11 +42,11 @@ public class CdCommand extends AbstractCommand {
     private static final String err_home = "user.home is not set";
     private static final String err_dir_invalid = "%s is not a valid directory%n";
     
-    private final FileArgument argDir = new FileArgument(
-            "directory", Argument.OPTIONAL | Argument.EXISTING, help_dir);
+    private final FileArgument argDir;
 
     public CdCommand() {
         super(help_super);
+        argDir = new FileArgument("directory", Argument.OPTIONAL | Argument.EXISTING, help_dir);
         registerArguments(argDir);
     }
 

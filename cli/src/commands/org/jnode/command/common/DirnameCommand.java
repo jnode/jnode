@@ -34,10 +34,11 @@ public class DirnameCommand extends AbstractCommand {
     private static final String help_name = "Strip the non-directory suffix from this file name";
     private static final String help_super = "Strip non-directory suffix from the file name";
     
-    private final StringArgument argName = new StringArgument("name", Argument.MANDATORY, help_name);
+    private final StringArgument argName;
     
     public DirnameCommand() {
         super(help_super);
+        argName = new StringArgument("name", Argument.MANDATORY, help_name);
         registerArguments(argName);
     }
     

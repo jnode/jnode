@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.shell.command;
+package org.jnode.command.system;
 
 import java.io.PrintWriter;
 
@@ -45,7 +45,7 @@ public class OnHeapCommand extends AbstractCommand {
     public OnHeapCommand() {
         super(help_super);
         argMinInstanceCount = new IntegerArgument("minCount", Argument.OPTIONAL, 1, Integer.MAX_VALUE, help_inst);
-        argMinTotalSize = new LongArgument("minTotalSize", Argument.OPTIONAL, 1L, Long.MAX_VALUE, help_size);
+        argMinTotalSize     = new LongArgument("minTotalSize", Argument.OPTIONAL, 1L, Long.MAX_VALUE, help_size);
         registerArguments(argMinInstanceCount, argMinTotalSize);
     }
 

@@ -8,8 +8,12 @@
         license-name="lgpl">
 
   <runtime>
-    <library name="jnode-coreutils.jar">
+    <library name="jnode-cli.jar">
       <export name="org.jnode.command.util.*" />
     </library>
   </runtime>
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
+  </extension>
 </plugin>

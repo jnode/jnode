@@ -65,8 +65,8 @@ public class TcpInoutCommand extends AbstractCommand {
 
     public TcpInoutCommand() {
         super(help_super);
-        argHost = new HostNameArgument("host", Argument.OPTIONAL, help_host);
-        argPort = new PortNumberArgument("port", Argument.OPTIONAL, help_port);
+        argHost      = new HostNameArgument("host", Argument.OPTIONAL, help_host);
+        argPort      = new PortNumberArgument("port", Argument.OPTIONAL, help_port);
         argLocalPort = new PortNumberArgument("localPort", Argument.OPTIONAL, help_lport);
         registerArguments(argHost, argLocalPort, argPort);
     }

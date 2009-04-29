@@ -8,38 +8,40 @@
     license-name="lgpl">
 
     <requires>
-        <import plugin="org.jnode.net"/>
-        <import plugin="org.jnode.net.arp"/>
-        <import plugin="org.jnode.net.ipv4"/>
-        <import plugin="org.jnode.net.ipv4.config"/>
-        <import plugin="org.jnode.shell.help"/>
-        <import plugin="org.acplt.oncrpc"/>
+      <import plugin="org.acplt.oncrpc"/>
+      <import plugin="org.jnode.driver"/>
+      <import plugin="org.jnode.net"/>
+      <import plugin="org.jnode.net.arp"/>
+      <import plugin="org.jnode.net.ipv4"/>
+      <import plugin="org.jnode.net.ipv4.config"/>
+      <import plugin="org.jnode.shell.help"/>
+      <import plugin="org.jnode.util"/>
     </requires>
 
     <runtime>
-        <library name="jnode-net.jar">
-            <export name="org.jnode.net.syntax.*"/>
-        </library>
-        <library name="jnode-coreutils.jar">
-            <export name="org.jnode.command.net.*"/>
-        </library>
+      <library name="jnode-net.jar">
+        <export name="org.jnode.net.syntax.*"/>
+      </library>
+      <library name="jnode-cli.jar">
+        <export name="org.jnode.command.net.*"/>
+      </library>
     </runtime>
 
     <extension point="org.jnode.shell.aliases">
-        <alias name="arp" class="org.jnode.command.net.ArpCommand"/>
-        <alias name="bootp" class="org.jnode.command.net.BootpCommand"/>
-        <alias name="dhcp" class="org.jnode.command.net.DhcpCommand"/>
-        <alias name="ifconfig" class="org.jnode.command.net.IfconfigCommand"/>
-        <alias name="netstat" class="org.jnode.command.net.NetstatCommand"/>
-        <alias name="ping" class="org.jnode.command.net.PingCommand"/>
-        <alias name="route" class="org.jnode.command.net.RouteCommand"/>
-        <alias name="resolver" class="org.jnode.command.net.ResolverCommand"/>
-        <alias name="resolve" class="org.jnode.command.net.ResolveCommand"/>
-        <alias name="tftp" class="org.jnode.command.net.TftpCommand"/>
-        <alias name="wlanctl" class="org.jnode.command.net.WLanCtlCommand"/>
-        <alias name="tcpinout" class="org.jnode.command.net.TcpInoutCommand"/>
-        <alias name="rpcinfo" class="org.jnode.command.net.RpcInfoCommand"/>
-		<alias name="wget" class="org.jnode.command.net.WgetCommand"/>
+      <alias name="arp"      class="org.jnode.command.net.ArpCommand"/>
+      <alias name="bootp"    class="org.jnode.command.net.BootpCommand"/>
+      <alias name="dhcp"     class="org.jnode.command.net.DhcpCommand"/>
+      <alias name="ifconfig" class="org.jnode.command.net.IfconfigCommand"/>
+      <alias name="netstat"  class="org.jnode.command.net.NetstatCommand"/>
+      <alias name="ping"     class="org.jnode.command.net.PingCommand"/>
+      <alias name="route"    class="org.jnode.command.net.RouteCommand"/>
+      <alias name="resolver" class="org.jnode.command.net.ResolverCommand"/>
+      <alias name="resolve"  class="org.jnode.command.net.ResolveCommand"/>
+      <alias name="tftp"     class="org.jnode.command.net.TftpCommand"/>
+      <alias name="wlanctl"  class="org.jnode.command.net.WLanCtlCommand"/>
+      <alias name="tcpinout" class="org.jnode.command.net.TcpInoutCommand"/>
+      <alias name="rpcinfo"  class="org.jnode.command.net.RpcInfoCommand"/>
+      <alias name="wget"     class="org.jnode.command.net.WgetCommand"/>
     </extension>
     
     <extension point="org.jnode.shell.syntaxes">
@@ -59,7 +61,9 @@
         <sequence description="Bind a given device to an IPv4 address">
           <argument argLabel="device"/>
           <argument argLabel="ipAddress"/>
-          <optional><argument argLabel="subnetMask"/></optional>
+          <optional>
+            <argument argLabel="subnetMask"/>
+          </optional>
         </sequence>
       </syntax>
       <syntax alias="netstat">
@@ -88,7 +92,9 @@
           </alternatives>
           <argument argLabel="target"/>
           <argument argLabel="device"/>
-          <optional><argument argLabel="gateway"/></optional>
+          <optional>
+            <argument argLabel="gateway"/>
+          </optional>
         </sequence>
       </syntax>
       <syntax alias="rpcinfo">
@@ -102,7 +108,9 @@
         </sequence>
       </syntax>
       <syntax alias="tftp">
-        <optional description="Run an interactive TFTP client"><argument argLabel="host"/></optional>
+        <optional description="Run an interactive TFTP client">
+          <argument argLabel="host"/>
+        </optional>
         <sequence description="Do a non-interactive TFTP 'get' or 'put'">
           <alternatives>
             <option argLabel="get" longName="get"/>
@@ -121,24 +129,28 @@
       </syntax>
 	  <syntax alias="wget">
 	    <sequence description="Fetch the contents of one or more URLs">
-          <optional><option argLabel="debug" shortName="d" longName="debug"/></optional>
-          <repeat minCount="1"><argument argLabel="url"/></repeat>
+          <optional>
+            <option argLabel="debug" shortName="d" longName="debug"/>
+          </optional>
+          <repeat minCount="1">
+            <argument argLabel="url"/>
+          </repeat>
         </sequence>
       </syntax>
     </extension>
   
     <extension point="org.jnode.security.permissions">
-		<permission class="java.net.SocketPermission" name="*" actions="connect,resolve"/>
-		<permission class="java.net.SocketPermission" name="*:1024-" actions="listen,accept"/>
-        <permission class="java.net.SocketPermission" name="*:53" actions="resolve,listen,connect"/>
-        <permission class="java.net.SocketPermission" name="*:80" actions="resolve,listen,connect"/>
-        <permission class="java.net.SocketPermission" name="*:8080" actions="resolve,listen,connect"/>
-        <permission class="java.util.PropertyPermission" name="dns.server" actions="read"/>
-        <permission class="java.util.PropertyPermission" name="dns.search" actions="read"/>
-        <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
-        <permission class="org.jnode.net.NetPermission" name="bootpClient"/>
-        <permission class="org.jnode.net.NetPermission" name="dhcpClient"/>
-        <permission class="org.jnode.net.NetPermission" name="wget"/>
-        <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
+	  <permission class="java.net.SocketPermission"    name="*" actions="connect,resolve"/>
+	  <permission class="java.net.SocketPermission"    name="*:1024-" actions="listen,accept"/>
+      <permission class="java.net.SocketPermission"    name="*:53" actions="resolve,listen,connect"/>
+      <permission class="java.net.SocketPermission"    name="*:80" actions="resolve,listen,connect"/>
+      <permission class="java.net.SocketPermission"    name="*:8080" actions="resolve,listen,connect"/>
+      <permission class="java.util.PropertyPermission" name="dns.server" actions="read"/>
+      <permission class="java.util.PropertyPermission" name="dns.search" actions="read"/>
+      <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
+      <permission class="org.jnode.net.NetPermission"  name="bootpClient"/>
+      <permission class="org.jnode.net.NetPermission"  name="dhcpClient"/>
+      <permission class="org.jnode.net.NetPermission"  name="wget"/>
+      <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
     </extension>
 </plugin>

@@ -8,12 +8,14 @@
         license-name="lgpl">
 
   <requires>
+    <import plugin="org.jnode.driver.console"/>
+    <import plugin="org.jnode.shell"/>
     <import plugin="org.jnode.shell.help"/>
     <import plugin="org.jnode.shell.syntax"/>
   </requires>
   
   <runtime>
-    <library name="jnode-coreutils.jar">
+    <library name="jnode-cli.jar">
       <export name="org.jnode.command.common.*"/>
     </library>
   </runtime>
@@ -32,6 +34,7 @@
     <alias name="man"      class="org.jnode.command.common.HelpCommand"/>
     <alias name="sleep"    class="org.jnode.command.common.SleepCommand"/>
     <alias name="test"     class="org.jnode.command.common.UnixTestCommand"/>
+    <!-- is not getting FilePermission read -->
     <alias name="time"     class="org.jnode.command.common.TimeCommand"/>
     <alias name="true"     class="org.jnode.command.common.TrueCommand"/>
     <alias name="uptime"   class="org.jnode.command.common.UptimeCommand"/>
@@ -98,6 +101,7 @@
   </extension>
   
   <extension point="org.jnode.security.permissions">
-    <permission class="java.util.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read"/>
+    <permission class="java.io.FilePermission"       name="&lt;&lt;ALL FILES&gt;&gt;" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
   </extension>
 </plugin>

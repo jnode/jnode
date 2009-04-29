@@ -85,14 +85,13 @@ public class CpCommand extends AbstractCommand {
     static final byte MODE_FORCE = 2;
     static final byte MODE_UPDATE = 3;
 
-    private final FileArgument argSource = 
-        new FileArgument("source", Argument.MANDATORY | Argument.MULTIPLE | Argument.EXISTING, help_source);
-    private final FileArgument argTarget = new FileArgument("target", Argument.MANDATORY, help_target);
-    private final FlagArgument argForce = new FlagArgument("force", Argument.OPTIONAL, help_force);
-    private final FlagArgument argInteractive = new FlagArgument("interactive", Argument.OPTIONAL, help_interactive);
-    private final FlagArgument argUpdate = new FlagArgument("update", Argument.OPTIONAL, help_update);
-    private final FlagArgument argRecursive = new FlagArgument("recursive", Argument.OPTIONAL, help_recurse);
-    private final FlagArgument argVerbose = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
+    private final FileArgument argSource;
+    private final FileArgument argTarget;
+    private final FlagArgument argForce;
+    private final FlagArgument argInteractive;
+    private final FlagArgument argUpdate;
+    private final FlagArgument argRecursive;
+    private final FlagArgument argVerbose;
 
     private byte mode = MODE_NORMAL;
     private boolean recursive = false;
@@ -106,8 +105,14 @@ public class CpCommand extends AbstractCommand {
 
     public CpCommand() {
         super(help_super);
-        registerArguments(argSource, argTarget, argForce, argInteractive, argRecursive,
-                argUpdate, argVerbose);
+        argSource = new FileArgument("source", Argument.MANDATORY | Argument.MULTIPLE | Argument.EXISTING, help_source);
+        argTarget      = new FileArgument("target", Argument.MANDATORY, help_target);
+        argForce       = new FlagArgument("force", Argument.OPTIONAL, help_force);
+        argInteractive = new FlagArgument("interactive", Argument.OPTIONAL, help_interactive);
+        argUpdate      = new FlagArgument("update", Argument.OPTIONAL, help_update);
+        argRecursive   = new FlagArgument("recursive", Argument.OPTIONAL, help_recurse);
+        argVerbose     = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
+        registerArguments(argSource, argTarget, argForce, argInteractive, argRecursive, argUpdate, argVerbose);
     }
     
     public static void main(String[] args) throws Exception {

@@ -42,10 +42,11 @@ public class TouchCommand extends AbstractCommand {
     private static final String str_created = "File created";
     private static final String err_file = "Cannot create file";
     
-    private final FileArgument argFile = new FileArgument("file", Argument.MANDATORY, help_file);
+    private final FileArgument argFile;
 
     public TouchCommand() {
         super(help_super);
+        argFile = new FileArgument("file", Argument.MANDATORY, help_file);
         registerArguments(argFile);
     }
 

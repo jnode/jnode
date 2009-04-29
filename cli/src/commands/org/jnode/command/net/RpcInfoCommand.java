@@ -61,11 +61,11 @@ public class RpcInfoCommand extends AbstractCommand {
     private static final String err_connect = "Cannot connect to host %s%n";
     private static final String fmt_unknown = "unknown service (%d)";
 
-    private final HostNameArgument argHost =
-        new HostNameArgument("host", Argument.MANDATORY, help_host);
+    private final HostNameArgument argHost;
 
     public RpcInfoCommand() {
         super(help_super);
+        argHost = new HostNameArgument("host", Argument.MANDATORY, help_host);
         registerArguments(argHost);
     }
 

@@ -36,11 +36,13 @@ public class BasenameCommand extends AbstractCommand {
     private static final String help_suffix = "Strip this argSuffix from the fileargName";
     private static final String help_super = "Strip directory and argSuffix from filesargNames";
     
-    private final StringArgument argName = new StringArgument("name", Argument.MANDATORY, help_name);
-    private final StringArgument argSuffix = new StringArgument("suffix", Argument.OPTIONAL, help_suffix);
+    private final StringArgument argName;
+    private final StringArgument argSuffix;
     
     public BasenameCommand() {
         super(help_super);
+        argName   = new StringArgument("name", Argument.MANDATORY, help_name);
+        argSuffix = new StringArgument("suffix", Argument.OPTIONAL, help_suffix);
         registerArguments(argName, argSuffix);
     }
     
