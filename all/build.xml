@@ -629,6 +629,9 @@ clean             Remove all intermediate build results.
     <target name="javadoc" description="generate documentation of all java source files">
         <jnode.javadoc destdir="${build.dir}/javadoc/full">
             <sourcepath>
+                <pathelement location="${root.dir}/builder/src/builder"/>
+                <pathelement location="${root.dir}/builder/src/configure"/>
+                <pathelement location="${root.dir}/cli/src/commands"/>
                 <pathelement location="${root.dir}/core/src/classlib"/>
                 <pathelement location="${root.dir}/core/src/classpath/ext"/>
                 <pathelement location="${root.dir}/core/src/classpath/vm"/>
@@ -767,6 +770,7 @@ clean             Remove all intermediate build results.
 
         <header update="on" headerFile="${root.dir}/all/template/header.txt">
             <fileset dir="${root.dir}/builder/src/builder" includes="**/*.java"/>
+            <fileset dir="${root.dir}/cli/src/commands" includes="**/*.java"/>
             <fileset dir="${root.dir}/core/src/classpath/ext" includes="**/*.java"/>
             <fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java"
                     excludes="gnu/classpath/jdwp/VMFrame.java,
@@ -1060,6 +1064,7 @@ clean             Remove all intermediate build results.
         <checkstyle config="jnode_checks.xml">
             <fileset dir="../builder/src/builder" includes="**/*.java"/>
             <fileset dir="../builder/src/configure" includes="**/*.java"/>
+            <fileset dir="../cli/src/commands" includes="**/*.java"/>
             <fileset dir="../core/src/core" includes="**/*.java"/>
             <fileset dir="../core/src/driver" includes="**/*.java"/>
             <fileset dir="../core/src/test" includes="**/*.java"/>
