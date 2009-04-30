@@ -43,21 +43,28 @@
     <alias name="tail"    class="org.jnode.command.file.TailCommand"/>
     <alias name="touch"   class="org.jnode.command.file.TouchCommand"/>
     <alias name="wc"      class="org.jnode.command.file.WcCommand"/>
-    <!-- can't find org.jnode.command.file.WcCommand -->
   </extension>
   
   <extension point="org.jnode.shell.syntaxes">
     <syntax alias="cat">
       <empty description="copy standard input to standard output"/>
+      <sequence description="concatenate files to standard output">
+        <optionSet>
+          <option argLabel="num-nonblank" shortName="b" longName="number-nonblank"/>
+          <option argLabel="num"          shortName="n" longName="number"/>
+          <option argLabel="squeeze"      shortName="s" longName="sqeeze-blank"/>
+          <option argLabel="show-ends"    shortName="E" longName="show-ends"/>
+        </optionSet>
+        <repeat minCount="1">
+          <argument argLabel="file"/>
+        </repeat>
+      </sequence>
       <sequence description="fetch and concatenate urls to standard output">
         <option argLabel="urls" shortName="u" longName="urls"/>
         <repeat minCount="1">
           <argument argLabel="url"/>
         </repeat>
       </sequence>
-      <repeat minCount="1" description="concatenate files to standard output">
-        <argument argLabel="file"/>
-      </repeat>
     </syntax>
     <syntax alias="cd">
       <empty description="change the current directory to the 'user.home' directory"/>
@@ -105,7 +112,7 @@
           <argument argLabel="directory" description="directory to start printing sizes recursively"/>
         </repeat>
         <optionSet>
-          <option argLabel="sum"          shortName="s" longName="summarize"/>
+          <option argLabel="sum"            shortName="s" longName="summarize"/>
           <option argLabel="all"            shortName="a" longName="all"/>
           <option argLabel="human-readable" shortName="h" longName="human-readable"/>
         </optionSet>

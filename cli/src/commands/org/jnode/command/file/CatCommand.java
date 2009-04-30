@@ -20,15 +20,18 @@
  
 package org.jnode.command.file;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.net.URL;
 
+import org.jnode.command.util.IOUtils;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
@@ -53,115 +56,240 @@ public class CatCommand extends AbstractCommand {
     private static final String help_file = "the files to be concatenated";
     private static final String help_url = "the urls to be concatenated";
     private static final String help_urls = "If set, arguments will be urls";
+    private static final String help_num_nb = "If set, number nonempty output lines";
+    private static final String help_num = "If set, number all output lines";
+    private static final String help_ends = "If set, print a $ at the end of each lines";
+    private static final String help_squeeze = "If set, supress printing of sequential blank lines";
     private static final String help_super = "Concatenate the contents of files, urls or standard input";
     private static final String err_url = "Cannot fetch %s: %s%n";
-    private static final String err_file = "Cannot open %s: %s%n";
+    private static final String err_file = "Cannot open %sn";
     
     private final FileArgument argFile;
+    private final FlagArgument argNumNB;
+    private final FlagArgument argNumAll;
+    private final FlagArgument argEnds;
+    private final FlagArgument argSqueeze;
+    
     private final URLArgument argUrl;
     private final FlagArgument argUrls;
 
     private PrintWriter err;
+    private PrintWriter out;
+    private Reader in;
+    private InputStream stdin;
+    private OutputStream stdout;
+    private File[] files;
+    private String end;
+    private int rc = 0;
+    private boolean squeeze;
+    private boolean numAll;
+    private boolean numNB;
+    private boolean useStreams;
     
     public CatCommand() {
         super(help_super);
-        argFile = new FileArgument("file", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING, help_file);
-        argUrl  = new URLArgument("url", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING, help_url);
+        int fileFlags = Argument.MULTIPLE | Argument.EXISTING | FileArgument.HYPHEN_IS_SPECIAL;
+        argFile    = new FileArgument("file", fileFlags, help_file);
+        argNumNB   = new FlagArgument("num-nonblank", 0, help_num_nb);
+        argNumAll  = new FlagArgument("num", 0, help_num);
+        argEnds    = new FlagArgument("show-ends", 0, help_ends);
+        argSqueeze = new FlagArgument("squeeze", 0, help_squeeze);
+        registerArguments(argFile, argNumNB, argNumAll, argEnds, argSqueeze);
+        
+        argUrl  = new URLArgument("url", Argument.MULTIPLE | Argument.EXISTING, help_url);
         argUrls = new FlagArgument("urls", Argument.OPTIONAL, help_urls);
-        registerArguments(argFile, argUrl, argUrls);
+        registerArguments(argUrl, argUrls);
     }
-
+    
     private static final int BUFFER_SIZE = 8192;
-
-
+    
     public static void main(String[] args) throws Exception {
         new CatCommand().execute(args);
     }
     
     public void execute() throws IOException {
-        this.err         = getError().getPrintWriter();
-        OutputStream out = getOutput().getOutputStream();
-        File[] files     = argFile.getValues();
-        URL[] urls       = argUrl.getValues();
+        in     = getInput().getReader();
+        stdin  = getInput().getInputStream();
+        out    = getOutput().getPrintWriter();
+        stdout = getOutput().getOutputStream();
+        err    = getError().getPrintWriter();
         
-        boolean ok = true;
+        parseOptions();
+        
+        if (files != null && files.length > 0) {
+            handleFiles();
+            out.flush();
+            exit(rc);
+        }
+        
+        // FIXME remove this url code once wget is more complete
+        URL[] urls = argUrl.getValues();
         if (urls != null && urls.length > 0) {
+            byte[] buffer = new byte[BUFFER_SIZE];
             for (URL url : urls) {
                 InputStream is = null;
                 try {
                     is = url.openStream();
                 } catch (IOException ex) {
                     err.format(err_url, url, ex.getLocalizedMessage());
-                    ok = false;
+                    rc = 1;
                 }
                 if (is != null) {
                     try {
-                        process(is, out);
+                        IOUtils.copyStream(is, stdout, buffer);
                     } finally {
-                        try { 
-                            is.close();
-                        } catch (IOException ex) { 
-                            /* ignore */
-                        }
+                        IOUtils.close(is);
                     }
                 }
             }
-        } else if (files != null && files.length > 0) {
-            for (File file : files) {
-                InputStream is = null;
-                try {
-                    is = openFile(file);
-                    if (is == null) {
-                        ok = false;
-                    } else {
-                        process(is, out);
-                    }
-                } finally {
-                    if (is != null) {
-                        try { 
-                            is.close();
-                        } catch (IOException ex) {
-                            /* ignore */
-                        }
-                    }
-                }
-            }
-        } else {
-            process(getInput().getInputStream(), out);
+            out.flush();
+            exit(rc);
         }
-        out.flush();
-        if (!ok) { 
-            exit(1); 
-        }
+        
+        // should not reach this
+        throw new IllegalStateException("Nothing to process");
     }
-
+    
+    private boolean handleFiles() {
+        InputStream in = null;
+        BufferedReader reader = null;
+        byte[] buffer = new byte[BUFFER_SIZE];
+        boolean ok = true;
+        
+        for (File file : files) {
+            try {
+                if (useStreams) {
+                    if ((in = openFileStream(file)) != null) {
+                        IOUtils.copyStream(in, stdout, buffer);
+                    } else {
+                        rc = 1;
+                    }
+                } else {
+                    if ((reader = openFileReader(file)) != null) {
+                        processReader(reader);
+                    } else {
+                        rc = 1;
+                    }
+                }
+            } catch (IOException e) {
+                rc = 1;
+            } finally {
+                IOUtils.close(in, reader);
+            }
+        }
+        
+        return ok;
+    }
+    
     /**
-     * Copy all of stream 'in' to stream 'out'
-     * @param in
-     * @param out
-     * @throws IOException
+     * Process the input through a BufferedReader.
+     *
+     * Instead of doing a straight stream->stream copy, we process line by line
+     * in order to do some per-line editing before we send to stdout.
      */
-    private void process(InputStream in, OutputStream out) throws IOException {
-        int len;
-        final byte[] buf = new byte[BUFFER_SIZE];
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
+    private void processReader(BufferedReader reader) throws IOException {
+        String line;
+        boolean haveBlank = false;
+        int lineCount = 0;
+        
+        while ((line = reader.readLine()) != null) {
+            if (line.length() == 0) {
+                if (!haveBlank) {
+                    haveBlank = true;
+                } else if (squeeze) {
+                    continue;
+                }
+            } else {
+                haveBlank = false;
+            }
+            
+            if (numAll) {
+                println(line, ++lineCount);
+            } else if (numNB) {
+                println(line, (haveBlank ? -1 : ++lineCount));
+            } else {
+                println(line, 0);
+            }
         }
     }
     
     /**
-     * Attempt to open a file, writing an error message on failure.
+     * Attempt to open a file, writing an error message on failure. If the file
+     * is '-', return stdin.
+     *
      * @param fname the filename of the file to be opened
      * @return An open stream, or <code>null</code>.
-     * @throws FileNotFoundException 
      */
-    private InputStream openFile(File file) throws FileNotFoundException {
-        try {
-            return new FileInputStream(file);
-        } catch (IOException ex) {
-            err.format(err_file, file, ex.getLocalizedMessage());
-            return null;
+    private InputStream openFileStream(File file) {
+        InputStream ret = null;
+        
+        if (file.getName().equals("-")) {
+            ret = stdin;
+        } else {
+            ret = IOUtils.openInputStream(file, true, BUFFER_SIZE);
+            if (ret == null) {
+                err.format(err_file, file);
+            }
+        }
+        
+        return ret;
+    }
+    
+    private BufferedReader openFileReader(File file) {
+        BufferedReader ret = null;
+        
+        if (file.getName().equals("-")) {
+            ret = new BufferedReader(in, BUFFER_SIZE);
+        } else {
+            try {
+                ret = new BufferedReader(new FileReader(file), BUFFER_SIZE);
+            } catch (FileNotFoundException e) {
+                err.format(err_file, file);
+            }
+        }
+        
+        return ret;
+    }
+    
+    private void parseOptions() {
+        files = argFile.getValues();
+        
+        if (files == null || files.length == 0) {
+            files = new File[] {new File("-")};
+        }
+        
+        useStreams = true;
+        
+        if (argNumNB.isSet()) {
+            numNB = true;
+            useStreams = false;
+        } else if (argNumAll.isSet()) {
+            numAll = true;
+            useStreams = false;
+        }
+        
+        if (argEnds.isSet()) {
+            end = "$";
+            useStreams = false;
+        } else {
+            end = "";
+        }
+        
+        if (argSqueeze.isSet()) {
+            squeeze = true;
+            useStreams = false;
         }
     }
-
+    
+    private void println(String s, int line) {
+        if (numNB || numAll) {
+            if (line == -1) {
+                out.format("       %s%s%n", s, end);
+            } else {
+                out.format("%6d %s%s%n", line, s, end);
+            }
+        } else {
+            out.format("%s%s%n", s, end);
+        }
+    }
 }
