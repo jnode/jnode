@@ -4,7 +4,7 @@
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/driver"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
 	<classpathentry kind="src" path="/core"/>
-	<classpathentry kind="lib" path="lib/oncrpc.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/oncrpc.jar"/>
 	<classpathentry kind="src" path="/shell"/>
 	<classpathentry kind="lib" path="lib/jsch-0.1.24.jar"/>
 	<classpathentry kind="lib" path="lib/dnsjava-1.6.6.jar" sourcepath="lib/dnsjava-1.6.6-src.zip"/>
