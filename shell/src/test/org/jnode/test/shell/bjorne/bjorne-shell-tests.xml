@@ -1,7 +1,7 @@
 <testSet title="Bjorne interpreter tests">
     <plugin id="org.jnode.shell.bjorne" class="org.jnode.test.shell.bjorne.BjornePseudoPlugin"/>
-    <plugin id="org.jnode.shell.command.posix"/>
-    <plugin id="org.jnode.fs.command"/>
+    <plugin id="org.jnode.command.common"/>
+    <plugin id="org.jnode.command.file"/>
     <testSpec title="simple" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 echo HI

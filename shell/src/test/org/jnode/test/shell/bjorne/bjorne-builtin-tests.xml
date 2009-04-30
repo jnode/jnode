@@ -1,6 +1,6 @@
 <testSet title="Bjorne interpreter tests">
     <plugin id="org.jnode.shell.bjorne" class="org.jnode.test.shell.bjorne.BjornePseudoPlugin"/>
-    <plugin id="org.jnode.shell.command.posix"/>
+    <plugin id="org.jnode.command.common"/>
     <testSpec title="exit 0" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 exit 0
