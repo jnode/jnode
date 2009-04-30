@@ -122,6 +122,7 @@ class PluginRepository {
         selected.clear();
         pluginMap.clear();
 
+        addProject(Main.readProject("cli", this));
         addProject(Main.readProject("core", this));
         addProject(Main.readProject("gui", this));
         addProject(Main.readProject("fs", this));
