@@ -55,13 +55,21 @@ import org.jnode.shell.syntax.XMLSyntaxSpecAdapter;
  * @author crawley@jnode.org
  */
 public class Emu {
-    private static final String[] ALL_PROJECTS = new String[]{
-        "core", "distr", "fs", "gui", "net", "shell", "sound", "textui"
+	// FIXME configuring a hard-coded list of projects is a bad idea.
+	private static final String[] ALL_PROJECTS = new String[]{
+        "cli", "core", "distr", "fs", "gui", "net", "shell", "sound", "textui"
     };
 
     // FIXME configuring a hard-coded list of command plugins is a bad idea.
     private static final String[] DEFAULT_PLUGIN_IDS = new String[] {
-        "org.jnode.shell.command",
+        "org.jnode.command.archive",
+        "org.jnode.command.common",
+        "org.jnode.command.dev.ant",
+        "org.jnode.command.dev",
+        "org.jnode.command.file",
+        "org.jnode.command.net",
+        "org.jnode.command.system",
+        "org.jnode.command.util",
         "org.jnode.shell.command.driver.console",
         "org.jnode.apps.editor",
         "org.jnode.apps.edit",
