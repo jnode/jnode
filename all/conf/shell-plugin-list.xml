@@ -13,11 +13,8 @@
     <plugin id="org.jnode.fs.ramfs"/>
     <plugin id="org.jnode.fs.ramfs.def"/>
 
-    <plugin id="org.apache.tools.archive"/>
-    <plugin id="org.jnode.command.archive"/>
     <plugin id="org.jnode.command.common"/>
-    <plugin id="org.jnode.command.file"/>
-    <plugin id="org.jnode.command.util"/>
+    <plugin id="org.jnode.command.system"/>
     
     <plugin id="org.jnode.driver.character"/>
     <plugin id="org.jnode.driver.console"/>
