@@ -41,7 +41,7 @@ import org.jnode.shell.syntax.URLArgument;
 /**
  * Read files or network resources and write the concatenation to standard output.  If
  * no filenames or URIs are provided, copy standard input to standard output.  Data is
- * copied byte-wise.
+ * copied byte-wise unless flags are used that add additional formatting to the lines.
  * <p>
  * If any file or URL cannot be opened, it is skipped and we (eventually) set a non-zero
  * return code.  If we get an IOException reading or writing data, we allow it to propagate.
@@ -50,6 +50,7 @@ import org.jnode.shell.syntax.URLArgument;
  * @author Andreas H\u00e4nel
  * @author crawley@jnode.org
  * @author Fabien DUMINY (fduminy@jnode.org)
+ * @author chris boertien
  */
 public class CatCommand extends AbstractCommand {
 
@@ -81,6 +82,7 @@ public class CatCommand extends AbstractCommand {
     private File[] files;
     private String end;
     private int rc = 0;
+    private int lineCount;
     private boolean squeeze;
     private boolean numAll;
     private boolean numNB;
@@ -190,7 +192,6 @@ public class CatCommand extends AbstractCommand {
     private void processReader(BufferedReader reader) throws IOException {
         String line;
         boolean haveBlank = false;
-        int lineCount = 0;
         
         while ((line = reader.readLine()) != null) {
             if (line.length() == 0) {
@@ -217,8 +218,8 @@ public class CatCommand extends AbstractCommand {
      * Attempt to open a file, writing an error message on failure. If the file
      * is '-', return stdin.
      *
-     * @param fname the filename of the file to be opened
-     * @return An open stream, or <code>null</code>.
+     * @param file the file to open the stream on
+     * @return the reader, or null
      */
     private InputStream openFileStream(File file) {
         InputStream ret = null;
@@ -235,15 +236,21 @@ public class CatCommand extends AbstractCommand {
         return ret;
     }
     
+    /**
+     * Attempt to open a file reader, writing an error message on failure. If the file
+     * is '-', return stdin.
+     *
+     * @param file the file to open the reader on
+     * @return the reader, or null
+     */
     private BufferedReader openFileReader(File file) {
         BufferedReader ret = null;
         
         if (file.getName().equals("-")) {
             ret = new BufferedReader(in, BUFFER_SIZE);
         } else {
-            try {
-                ret = new BufferedReader(new FileReader(file), BUFFER_SIZE);
-            } catch (FileNotFoundException e) {
+            ret = IOUtils.openBufferedReader(file, BUFFER_SIZE);
+            if (ret == null) {
                 err.format(err_file, file);
             }
         }
