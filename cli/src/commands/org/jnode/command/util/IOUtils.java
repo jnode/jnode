@@ -27,8 +27,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.Flushable;
 import java.io.InputStream;
+import java.io.LineNumberReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -215,6 +217,66 @@ public final class IOUtils {
         } catch (SecurityException e2) {
             return null;
         }
+    }
+    
+    /**
+     * Opens a Reader on a file.
+     * 
+     * This method will not throw a FileNotFoundException like the FileReader
+     * constructor would.
+     *
+     * @param file the file to open the reader on
+     * @return the reader, or null if the file could not be opened
+     * @throws NullPointerException if file is null
+     */
+    public static Reader openReader(File file) {
+        checkNull(file);
+        
+        try {
+            return new FileReader(file);
+        } catch (FileNotFoundException e) {
+            // fall through
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Opens a BufferedReader on a file.
+     * 
+     * This method will not throw a FileNotFoundException like the FileReader
+     * constructor would.
+     *
+     * @param file the file to open the reader on
+     * @param bufferSize the buffer size to use for this reader
+     * @return the reader, or null if the file could not be opened
+     * @throws NullPointerException if file is null
+     */
+    public static BufferedReader openBufferedReader(File file, int bufferSize) {
+        Reader reader = openReader(file);
+        if (reader != null) {
+            return new BufferedReader(reader, bufferSize);
+        }
+        return null;
+    }
+    
+    /**
+     * Opens a LineNumberReader on a file.
+     *
+     * This method will not throw a FileNotFoundException like the FileReader
+     * constructor would.
+     *
+     * @param file the file to open the reader on
+     * @param bufferSize the buffer size to use for this reader
+     * @return the reader, or null if the file could not be opened
+     * @throws NullPointerException if file is null
+     */
+    public static LineNumberReader openLineReader(File file, int bufferSize) {
+        Reader reader = openReader(file);
+        if (reader != null) {
+            return new LineNumberReader(reader, bufferSize);
+        }
+        return null;
     }
     
     /**
