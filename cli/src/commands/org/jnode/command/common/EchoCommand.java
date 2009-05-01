@@ -62,6 +62,5 @@ public class EchoCommand extends AbstractCommand {
             out.print(words[i]);
         }
         out.println();
-        System.getenv();
     }
 }
