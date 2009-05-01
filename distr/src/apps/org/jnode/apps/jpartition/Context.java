@@ -25,11 +25,36 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
+/**
+ * Represents the context with the shell : input and output streams
+ * and the error reporter (error stream might eventually be used by some
+ * {@link ErrorReporter} implementations).
+ *  
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class Context {
+    /**
+     * Reader for the input stream.
+     */
     private final BufferedReader in;
+    
+    /**
+     * Output stream.
+     */
     private final PrintStream out;
+    
+    /**
+     * Error reporter.
+     */
     private final ErrorReporter errorReporter;
 
+    /**
+     * Constructor.
+     * @param in Input stream.
+     * @param out Output stream.
+     * @param errorReporter Error reporter.
+     */
     public Context(InputStream in, PrintStream out, ErrorReporter errorReporter) {
         InputStreamReader r = new InputStreamReader(in);
         this.in = new BufferedReader(r);
@@ -38,14 +63,26 @@ public class Context {
         this.errorReporter = errorReporter;
     }
 
+    /**
+     * Get the reader for the input stream. 
+     * @return Reader for the input stream.
+     */
     public final PrintStream getOut() {
         return out;
     }
 
+    /**
+     * Get the output stream.
+     * @return Output stream.
+     */
     public final BufferedReader getIn() {
         return in;
     }
 
+    /**
+     * Get the error reporter.
+     * @return Error reporter.
+     */
     public final ErrorReporter getErrorReporter() {
         return errorReporter;
     }

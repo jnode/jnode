@@ -22,15 +22,36 @@ package org.jnode.apps.jpartition;
 
 import org.jnode.apps.jpartition.model.UserFacade;
 
+/**
+ * Main class of JPartition application.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class JPartition {
+    /**
+     * The view factory used to create the user interface.
+     */
     private final ViewFactory viewFactory;
+    
+    /**
+     * True if we are trying to install jnode, false in other cases.
+     */
     private final boolean install;
 
+    /**
+     * Constructor for a new instance of JPartition application.
+     * @param viewFactory The view factory used to create the user interface.
+     * @param install True if we are trying to install jnode, false in other cases.
+     */
     public JPartition(ViewFactory viewFactory, boolean install) {
         this.viewFactory = viewFactory;
         this.install = install;
     }
 
+    /**
+     * Actually show the user interface from parameters given at construction time.
+     * @throws Exception
+     */
     public final void launch() throws Exception {
         ErrorReporter errorReporter = viewFactory.createErrorReporter();
         UserFacade.getInstance().setErrorReporter(errorReporter);

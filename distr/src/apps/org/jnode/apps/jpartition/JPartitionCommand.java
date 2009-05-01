@@ -29,6 +29,11 @@ import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 
+/**
+ * Command to launch JPartition from JNode's shell.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class JPartitionCommand extends AbstractCommand {
     private final FlagArgument FLAG_SWING =
             new FlagArgument("swing", Argument.OPTIONAL, "if set, use the Swing (graphic) UI");
@@ -39,15 +44,26 @@ public class JPartitionCommand extends AbstractCommand {
     private final FlagArgument ARG_INSTALL =
             new FlagArgument("install", Argument.OPTIONAL, "if set, format the partition(s)");
 
+    /**
+     * Constructor.
+     */
     public JPartitionCommand() {
         super("interactive disk partitioning tool");
         registerArguments(FLAG_CONSOLE, FLAG_SWING, ARG_INSTALL);
     }
 
+    /**
+     * Main method to run JPartition outside of JNode.
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         new JPartitionCommand().execute(args);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void execute() throws Exception {
         boolean install = ARG_INSTALL.isSet();
 
@@ -60,6 +76,9 @@ public class JPartitionCommand extends AbstractCommand {
         doExecute(install, in, out, err, consoleView, swingView);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void doExecute(boolean install, InputStream in, PrintStream out, PrintStream err, boolean consoleView, boolean swingView) throws Exception { 
         ViewFactory viewFactory =
                 consoleView ? new ConsoleViewFactory(in, out, err)
