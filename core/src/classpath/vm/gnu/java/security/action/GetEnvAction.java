@@ -22,7 +22,6 @@ package gnu.java.security.action;
 
 import java.security.PrivilegedAction;
 import java.util.Map;
-import java.util.Properties;
 
 
 /**
