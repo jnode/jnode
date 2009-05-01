@@ -51,7 +51,7 @@ public class IfconfigCommand extends AbstractCommand {
     private static final String help_ip     = "the IPv4 address to bind the device to";
     private static final String help_subnet  = "the IPv4 subnet mask for the device";
     private static final String help_super  = "List or manage network interface bindings";
-    private static final String fmt_devices = "%s: MAC-Address %s MTU %s%n    %s";
+    private static final String fmt_devices = "%s: MAC-Address %s MTU %s%n    %s%n";
     private static final String fmt_ip      = "IP address(es) for %s %s";
     private static final String fmt_set_ip  = "IP Address for %s set to %s";
     
@@ -79,8 +79,8 @@ public class IfconfigCommand extends AbstractCommand {
             final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
             for (Device dev : dm.getDevicesByAPI(NetDeviceAPI.class)) {
                 final NetDeviceAPI api = dev.getAPI(NetDeviceAPI.class);
-                String info = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP).toString();
-                out.format(fmt_devices, dev.getId(), api.getAddress(), api.getMTU(), info);
+                out.format(fmt_devices, dev.getId(), api.getAddress(), api.getMTU(),
+                           api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
             }
         } else {
             final Device dev = argDevice.getValue();
