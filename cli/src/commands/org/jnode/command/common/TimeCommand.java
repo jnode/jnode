@@ -20,14 +20,10 @@
 package org.jnode.command.common;
 
 import java.io.PrintWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellUtils;
-import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.syntax.AliasArgument;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.StringArgument;
@@ -63,7 +59,6 @@ public class TimeCommand extends AbstractCommand {
 
     public void execute() throws Exception {
         PrintWriter out = getOutput().getPrintWriter();
-        PrintWriter err = getError().getPrintWriter();
 
         StringBuilder sb = new StringBuilder(Alias.getValue());
         for (String arg : Args.getValues()) {
