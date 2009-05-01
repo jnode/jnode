@@ -462,8 +462,6 @@ public final class IOUtils {
             input = reader.readLine();
         } catch (IOException e) {
             return null;
-        } finally {
-            out.println();
         }
         
         return input;
