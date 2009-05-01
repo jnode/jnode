@@ -50,11 +50,11 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
     private static final String help_host = "the target host";
     private static final String help_super = "Ping the specified host";
     private static final String fmt_unknown_host = "Unknown host: %s";
-    private static final String fmt_ping = "Ping %s attempt %d";
-    private static final String fmt_reply = "Reply from %s: %d bytes of data ttl=%d seq=%d tim=%dms%n";
+    private static final String fmt_ping = "Ping %s attempt %d ";
+    private static final String fmt_reply = "Reply from %s: %d bytes of data ttl=%d seq=%d time=%dms%n";
     private static final String fmt_stats = "-> Packet statistics%n%s%n";
     private static final String fmt_get_stats = "%d packets transmitted, %d packets received%nround-trip min/avg/max" +
-                                                " = %d/%d/%dms";
+                                                " = %.3f/%.3f/%.3fms";
     
     // FIXME Some of the following could be command parameters ...
     private final Statistics stat = new Statistics();
