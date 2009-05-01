@@ -27,13 +27,13 @@ import java.io.IOException;
 
 import javax.naming.NameNotFoundException;
 
+import org.jnode.command.util.IOUtils;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
-
 /**
  * Delete a file or a empty directory
  *
@@ -42,6 +42,8 @@ import org.jnode.shell.syntax.FlagArgument;
  * @author Levente S\u00e1ntha
  * @author Martin Husted Hartvig (hagar at jnode.org)
  * @author crawley@jnode.org
+ * @author chris boertien
+ * @see {@link http://www.opengroup.org/onlinepubs/009695399/utilities/rm.html}
  */
 public class DeleteCommand extends AbstractCommand {
     
@@ -50,30 +52,38 @@ public class DeleteCommand extends AbstractCommand {
     private static final String help_force = "ignore non-existant files, never prompt";
     private static final String help_interact = "prompt before every delete";
     private static final String help_verbose = "give information on what is happening";
+    private static final String help_onefs = "If recursively deleting, do not recurse into directories that reside" +
+                                             "on a different file system";                               
     private static final String help_super = "Delete files or directories";
-    private static final String fmt_not_exist = "'%s' does not exist%n";
-    private static final String fmt_is_dir = "Cannot remove '%s': Is a directory%n";
-    private static final String fmt_ask_overwrite = "Remove regular file '%s'?";
-    private static final String fmt_ask_descend = "Descend into directory '%s'?";
-    private static final String fmt_ask_remove = "Remove directory '%s'?";
+    private static final String str_not_exist = "File or Directory does not exist";
+    private static final String str_is_dir = "Is a directory";
+    private static final String str_is_dot = "Directory is '.' or '..'";
+    private static final String str_is_mount = "Directory is a mount point";
+    private static final String str_not_empty = "Directory is not empty";
+    private static final String fmt_skip = "Skipping '%s' %s%n";
     private static final String fmt_removed_file = "Removed '%s'";
     private static final String fmt_removed_dir = "Removed directory '%s'";
     private static final String fmt_not_removed = "'%s' was not removed";
+    private static final String fmt_ask_remove_file = "Remove regular file '%s'? [yes/no] ";
+    private static final String fmt_ask_descend = "Descend into directory '%s'? [yes/no]";
+    private static final String fmt_ask_remove_dir = "Remove directory '%s'? [yes/no]";
 
     private final FileArgument argPaths;
     private final FlagArgument flagRecurse;
     private final FlagArgument flagForce;
     private final FlagArgument flagInteract;
     private final FlagArgument flagVerbose;
+    private final FlagArgument flagOneFS;
     
     private FileSystemService fss;
+    private PrintWriter err;
+    private PrintWriter out;
+    private Reader in;
     private boolean recursive;
     private boolean force;
     private boolean interactive;
     private boolean verbose;
-    private PrintWriter err;
-    private PrintWriter out;
-    private Reader in;
+    private boolean onefs;
 
     public DeleteCommand() {
         super(help_super);
@@ -82,7 +92,8 @@ public class DeleteCommand extends AbstractCommand {
         flagForce    = new FlagArgument("force", Argument.OPTIONAL, help_force);
         flagInteract = new FlagArgument("interactive", Argument.OPTIONAL, help_interact);
         flagVerbose  = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
-        registerArguments(argPaths, flagRecurse, flagForce, flagInteract, flagVerbose);
+        flagOneFS    = new FlagArgument("onefs", 0, help_onefs);
+        registerArguments(argPaths, flagRecurse, flagForce, flagInteract, flagVerbose, flagOneFS);
     }
 
     public static void main(String[] args) throws Exception {
@@ -97,6 +108,7 @@ public class DeleteCommand extends AbstractCommand {
         force        = flagForce.isSet();
         interactive  = flagInteract.isSet();
         verbose      = flagVerbose.isSet();
+        onefs        = flagOneFS.isSet();
         File[] paths = argPaths.getValues();
         
         err = getError().getPrintWriter();
@@ -113,72 +125,134 @@ public class DeleteCommand extends AbstractCommand {
     }
     
     private boolean deleteFile(File file) {
+        // We have to be careful about how we handle race conditions, especially
+        // considering the depth-first nature of recursive file deletion. If this
+        // method gets called on a file, and the file does not exist, then we assume
+        // some other process has beat us to it. The command line only allows existing
+        // files to be input.
+        
+        boolean deleteOk;
+        boolean prompt;
+        
         if (!file.exists()) {
-            if (!force) {
-                err.format(fmt_not_exist, file);
-            }
-            return false;
-        }
-        if (file.isDirectory() && !recursive) {
-            err.format(fmt_is_dir, file);
-            return false;
-        }
-        if (file.isFile() && interactive && !prompt_yn(String.format(fmt_ask_overwrite, file))) {
-            return false;
+            // someone beat us to the delete() call, return gracefully.
+            return skip(str_not_exist, file) || true;
         }
         
-        boolean deleteOk = true;
-
-        // FIXME the following doesn't handle mounted filesystems correctly (I think).
-        // Recursive delete should not recurse >>into<< a mounted filesystem, but should
-        // give an error message and then refuse to delete the parent directory because
-        // it cannot be emptied.
-        if (file.isDirectory() && !fss.isMount(file.getAbsolutePath())) {
-            if (interactive && !prompt_yn(String.format(fmt_ask_descend, file))) {
-                return false;
+        // A note about 'interactive' mode. It is _not_ an error
+        // if stdin is not a tty. It is possible to send responses
+        // via a pipe. This is why we only check for a tty stdin
+        // if interactive was not set.
+        prompt = (!force && (interactive || (!isWriteable(file) && getInput().isTTY())));
+        
+        if (file.isDirectory()) {
+            // This is written to match the POSIX behavior in rm Description Section 2
+            if (!recursive) {
+                return skip(str_is_dir, file);
             }
+            if (file.getName().equals("..") || file.getName().equals(".")) {
+                return skip(str_is_dot, file);
+            }
+            if (prompt) {
+                if (!prompt(String.format(fmt_ask_descend, file))) {
+                    return skip("", file);
+                }
+            }
+            // According to the POSIX spec, there is no provision for recursive deletion
+            // that spans into another file system. The GNU rm utility provides the ability
+            // to stop recursive deleting from entering another file system. If that flag
+            // is not set, then we will continue to delete files within that file system
+            // but the deleting of the directory that is the mount will probably fail because
+            // it is in use.
+            if (!checkMount(file)) {
+                return skip(str_is_mount, file);
+            }
+            deleteOk = true;
             for (File f : file.listFiles()) {
-                final String name = f.getName();
-
+                String name = f.getName();
                 if (!name.equals(".") && !name.equals("..")) {
                     deleteOk &= deleteFile(f);
                 }
             }
-            if (deleteOk && interactive && !prompt_yn(String.format(fmt_ask_remove, file))) {
+            if (!deleteOk) {
+                return skip(str_not_empty, file);
+            }
+            if (prompt) {
+                if (!prompt(String.format(fmt_ask_remove_dir, file))) {
+                    return skip("", file);
+                }
+            }
+            return rmdir(file);
+        } else {
+            if (prompt) {
+                if (!prompt(String.format(fmt_ask_remove_file, file))) {
+                    return skip("", file);
+                }
+            }
+            return unlink(file);
+        }
+    }
+    
+    private boolean prompt(String s) {
+        return IOUtils.promptYesOrNo(in, out, s);
+    }
+    
+    private boolean checkMount(File file) {
+        // This is wrong, as the directory might have been given on the
+        // command line, which means regardless of the value of onefs, we will continue.
+        // The proper way would be to check that this directory resides on the same file
+        // system as the directory given on the command line.
+        if (onefs) {
+            try {
+                if (fss.isMount(file.getCanonicalPath())) {
+                    return false;
+                }
+            } catch (IOException e) {
                 return false;
             }
         }
-        
-        if (deleteOk) {
-            // FIXME ... this is going to attempt to delete "directories" that are 
-            // mounted filesystems.  Is this right?  What will it do?
-            // FIXME ... this does not report the reason that the delete failed.
-            // How should we do that?
-            if (verbose) {
-                if (file.isFile()) out.format(fmt_removed_file, file);
-                if (file.isDirectory()) out.format(fmt_removed_dir, file);
-            }
-            deleteOk = file.delete();
-            if (!deleteOk) {
-                err.format(fmt_not_removed, file);
-            }
-        }
-        return deleteOk;
+        return true;
     }
     
-    private boolean prompt_yn(String s) {
-        int choice;
-        for (;;) {
-            out.print(s + "  [y/n]");
-            try {
-                choice = in.read();
-            } catch (IOException _) {
-                choice = 0;
-            }
-            out.println();
-            if (choice == 'y' || choice == 'n') break;
+    private boolean isWriteable(File file) {
+        try {
+            return file.canWrite();
+        } catch (SecurityException e) {
+            return false;
         }
-        
-        return choice == 'y';
+    }
+    
+    private boolean rmdir(File file) {
+        if (!file.delete()) {
+            return error(fmt_not_removed, file);
+        }
+        if (verbose) {
+            out.format(fmt_removed_dir, file);
+        }
+        return true;
+    }
+    
+    private boolean unlink(File file) {
+        if (!file.delete()) {
+            return error(fmt_not_removed, file);
+        }
+        if (verbose) {
+            out.format(fmt_removed_file, file);
+        }
+        return true;
+    }
+    
+    private boolean skip(String msg, File file) {
+        if (!force) {
+            err.format(fmt_skip, file, msg);
+        }
+        return false;
+    }
+    
+    private boolean error(String msg, Object... args) {
+        if (verbose) {
+            err.format(msg, args);
+        }
+        return false;
     }
 }
