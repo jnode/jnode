@@ -100,8 +100,31 @@
       </sequence>
     </syntax>
     <syntax alias="df">
-      <empty description="display disk usage for all filesystems"/>
-      <argument argLabel="device" description="display disk usage for the filesystem on a device"/>
+      <sequence description="display disk usage for file systems">
+        <optionSet>
+          <option argLabel="human-read-bin" shortName="h" longName="human-readable"/>
+          <option argLabel="human-read-dec" shortName="H" longName="si"/>
+          <option argLabel="show-all"       shortName="a" longName="all"/>
+          <option argLabel="block-size"     shortName="B" longName="block-size"/>
+          <option argLabel="block-size-1k"  shortName="k"/>
+          <!--
+          <option argLabel="posix"           shortName="P" longName="portability"/>
+          <option argLabel="inodes"          shortName="i" longName="inodes"/>
+          <option argLabel="local"           shortName="l" longName="local"/>
+          <option argLabel="sync"            longName="sync"/>
+          <option argLabel="no-sync"         longName="no-sync"/>
+          <option argLabel="fs-type"         shortName="t" longName="type"/>
+          <option argLabel="print-type"      shortName="T" longName="print-type"/>
+          <option argLabel="ex-type"         shortName="x" longName="exclude-type"/>
+          -->
+        </optionSet>
+        <optional>
+          <alternatives>
+            <argument argLabel="path"/>
+            <argument argLabel="device"/>
+          </alternatives>
+        </optional>
+      </sequence>
     </syntax>
     <syntax alias="dir">
       <empty description="list the current directory"/>
@@ -231,7 +254,9 @@
         <optional eager="true">
           <option argLabel="recursive" shortName="r" longName="recursive"/>
         </optional>
-        <repeat minCount="1"><argument argLabel="paths"/></repeat>
+        <repeat minCount="1">
+          <argument argLabel="paths"/>
+        </repeat>
       </sequence>
     </syntax>
     <syntax alias="mkdir">
@@ -297,5 +322,14 @@
     <permission class="java.io.RuntimePermission"    name="writeFileDescriptor"/>
     <permission class="java.util.PropertyPermission" name="user.dir" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="user.home" actions="read,write"/>
+    <permission class="java.lang.RuntimePermission"  name="getenv.*" actions="read"/>
+    <!--
+    <permission class="java.lang.RuntimePermission"  name="getenv.POSIXLY_CORRECT" actions="read"/>
+    <permission class="java.lang.RuntimePermission" name="getenv.DF_BLOCK_SIZE" actions="read"/>
+    <permission class="java.lang.RuntimePermission" name="genenv.DU_BLOCK_SIZE" actions="read"/>
+    <permission class="java.lang.RuntimePermission" name="getenv.LS_BLOCK_SIZE" actions="read"/>
+    <permission class="java.lang.RuntimePermission" name="getenv.BLOCK_SIZE" actions="read"/>
+    <permission class="java.lang.RuntimePermission" name="getenv.BLOCKSIZE" actions="read"/>
+    -->
   </extension>
 </plugin>
