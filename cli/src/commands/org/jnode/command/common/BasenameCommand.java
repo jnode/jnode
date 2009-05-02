@@ -32,9 +32,9 @@ import org.jnode.shell.syntax.StringArgument;
  */
 public class BasenameCommand extends AbstractCommand {
 
-    private static final String help_name = "Strip this fileargName of its directory and optionally argSuffix components.";
-    private static final String help_suffix = "Strip this argSuffix from the fileargName";
-    private static final String help_super = "Strip directory and argSuffix from filesargNames";
+    private static final String help_name = "Strip this file name of its directory and optionally suffix components.";
+    private static final String help_suffix = "Strip this suffix from the file name";
+    private static final String help_super = "Strip directory and suffix from files names";
     
     private final StringArgument argName;
     private final StringArgument argSuffix;

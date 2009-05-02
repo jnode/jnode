@@ -52,8 +52,8 @@ public class IfconfigCommand extends AbstractCommand {
     private static final String help_subnet  = "the IPv4 subnet mask for the device";
     private static final String help_super  = "List or manage network interface bindings";
     private static final String fmt_devices = "%s: MAC-Address %s MTU %s%n    %s%n";
-    private static final String fmt_ip      = "IP address(es) for %s %s";
-    private static final String fmt_set_ip  = "IP Address for %s set to %s";
+    private static final String fmt_ip      = "IP address(es) for %s %s%n";
+    private static final String fmt_set_ip  = "IP Address for %s set to %s%n";
     
     private final DeviceArgument argDevice;
     private final IPv4AddressArgument argIPAddress;

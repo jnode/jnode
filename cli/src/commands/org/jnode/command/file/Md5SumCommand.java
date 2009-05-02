@@ -78,9 +78,9 @@ public class Md5SumCommand extends AbstractCommand {
     
     public Md5SumCommand() {
         super(help_super);
-        argPaths      = new FileArgument("paths", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING, help_paths);
+        argPaths      = new FileArgument("paths", Argument.MULTIPLE | Argument.EXISTING, help_paths);
         flagRecursive = new FlagArgument("recursive", Argument.OPTIONAL, help_recurse);
-        argCheckfile  = new FileArgument("checkfile", Argument.OPTIONAL | Argument.SINGLE | Argument.EXISTING, help_check);
+        argCheckfile  = new FileArgument("checkfile", Argument.SINGLE | Argument.EXISTING, help_check);
         registerArguments(argPaths, flagRecursive, argCheckfile);
     }
 
