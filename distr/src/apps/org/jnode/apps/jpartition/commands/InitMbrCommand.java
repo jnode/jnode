@@ -25,12 +25,24 @@ import org.jnode.apps.jpartition.commands.framework.CommandException;
 import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.partitions.command.PartitionHelper;
 
+/**
+ * Command used to initialize the MBR (Main Boot Record) of a device.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class InitMbrCommand extends BaseDeviceCommand {
 
+    /**
+     * Constructor.
+     * @param device The device to use.
+     */
     public InitMbrCommand(IDEDevice device) {
         super("init MBR", device);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void doExecute(Context context) throws CommandException {
         PartitionHelper helper;

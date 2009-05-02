@@ -26,26 +26,54 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.Context;
-import org.jnode.apps.jpartition.ErrorReporter;
 
+/**
+ * Command processor which handle a stack of commands to execute.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class CommandProcessor {
     private static final Logger log = Logger.getLogger(CommandProcessor.class);
 
+    /**
+     * The context to use.
+     */
     private final Context context;
 
+    /**
+     * The stack of commands.
+     */
     private Stack<Command> commands = new Stack<Command>();
+    
+    /**
+     * The listeners of this command processor.
+     */
     private List<CommandProcessorListener> listeners = new ArrayList<CommandProcessorListener>();
 
+    /**
+     * Are we actually executing the commands in our stack ? 
+     */
     private boolean running = false;
 
+    /**
+     * Cosntructor.
+     * @param context The context to use.
+     */
     public CommandProcessor(Context context) {
         this.context = context;
     }
 
+    /**
+     * Get the pending commands.
+     * @return The pending commands.
+     */
     public List<Command> getPendingCommands() {
         return new ArrayList<Command>(commands);
     }
 
+    /**
+     * Main loop processing all commands in the stack.
+     */
     public synchronized void process() {
         try {
             if (!running) {
@@ -93,6 +121,10 @@ public class CommandProcessor {
         return quit;
     }
 
+    /**
+     * Add a command to the stack of pending commands. 
+     * @param command The command to add.
+     */
     public void addCommand(Command command) {
         if (command.getStatus() != CommandStatus.NOT_RUNNING) {
             throw new IllegalArgumentException("command must be in status NOT_RUNNING");
@@ -121,16 +153,29 @@ public class CommandProcessor {
         }
     }
 
+    /**
+     * Callback method used to notify the command processor that a command 
+     * has started to execute.
+     * @param command The command that has started.
+     */
     public void commandStarted(Command command) {
         for (CommandProcessorListener l : listeners) {
             l.commandStarted(this, command);
         }
     }
 
+    /**
+     * Add a listener of command processor events.
+     * @param listener The listener to add.
+     */
     public void addListener(CommandProcessorListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Remove a listener of command processor events.
+     * @param listener The listener to remove.
+     */
     public void removeListener(CommandProcessorListener listener) {
         listeners.remove(listener);
     }

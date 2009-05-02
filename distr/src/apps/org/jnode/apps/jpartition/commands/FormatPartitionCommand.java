@@ -26,20 +26,37 @@ import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.Formatter;
 
+/**
+ * Command to format a partition with a filesystem.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class FormatPartitionCommand extends BasePartitionCommand {
     private final Formatter<? extends FileSystem<?>> formatter;
 
+    /**
+     * Constructor.
+     * @param device The device to use.
+     * @partitionNumber Number (zero based) of the device's partition.
+     * @param formatter The formatter to use for creating the filesystem.
+     */
     public FormatPartitionCommand(IDEDevice device, int partitionNumber,
             Formatter<? extends FileSystem<?>> formatter) {
         super("format partition", device, partitionNumber);
         this.formatter = formatter;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected final void doExecute(Context context) throws CommandException {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "format partition " + partitionNumber + " on device " + device.getId() + " with " +
