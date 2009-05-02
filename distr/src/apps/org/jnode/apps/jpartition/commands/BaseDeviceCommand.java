@@ -21,9 +21,9 @@
 package org.jnode.apps.jpartition.commands;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
+import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.commands.framework.BaseCommand;
 import org.jnode.apps.jpartition.commands.framework.CommandException;
 import org.jnode.driver.ApiNotFoundException;
@@ -43,10 +43,9 @@ public abstract class BaseDeviceCommand extends BaseCommand {
         this.device = device;
     }
 
-    protected final PartitionHelper createPartitionHelper() throws CommandException {
+    protected final PartitionHelper createPartitionHelper(Context context) throws CommandException {
         try {
-            //FIXME replace System.out by output stream from (Console)ViewFactory 
-            return new PartitionHelper(device, new PrintWriter(new OutputStreamWriter(System.out)));
+            return new PartitionHelper(device, new PrintWriter(context.getOut()));
         } catch (DeviceNotFoundException e) {
             throw new CommandException(e);
         } catch (ApiNotFoundException e) {
@@ -56,7 +55,7 @@ public abstract class BaseDeviceCommand extends BaseCommand {
         }
     }
 
-    protected abstract void doExecute() throws CommandException;
+    protected abstract void doExecute(Context context) throws CommandException;
 
     @Override
     public String toString() {

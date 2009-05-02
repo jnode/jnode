@@ -20,6 +20,9 @@
  
 package org.jnode.apps.jpartition;
 
+import java.io.InputStream;
+import java.io.PrintStream;
+
 import org.jnode.apps.jpartition.model.UserFacade;
 
 /**
@@ -39,13 +42,33 @@ public class JPartition {
     private final boolean install;
 
     /**
+     * The input stream to use.
+     */
+    private final InputStream in;
+    
+    /**
+     * The output stream to use.
+     */
+    private final PrintStream out;
+
+    /**
+     * The error stream to use.
+     */
+    private final PrintStream err;
+    
+    /**
      * Constructor for a new instance of JPartition application.
      * @param viewFactory The view factory used to create the user interface.
+     * @param in Input stream.
+     * @param out Output stream.
      * @param install True if we are trying to install jnode, false in other cases.
      */
-    public JPartition(ViewFactory viewFactory, boolean install) {
+    public JPartition(ViewFactory viewFactory, InputStream in, PrintStream out, PrintStream err, boolean install) {
         this.viewFactory = viewFactory;
         this.install = install;
+        this.in = in;
+        this.out = out;
+        this.err = err;        
     }
 
     /**
@@ -53,13 +76,15 @@ public class JPartition {
      * @throws Exception
      */
     public final void launch() throws Exception {
-        ErrorReporter errorReporter = viewFactory.createErrorReporter();
-        UserFacade.getInstance().setErrorReporter(errorReporter);
+        ErrorReporter errorReporter = viewFactory.createErrorReporter(err);
+        Context context = new Context(in, out, errorReporter);        
+        UserFacade.getInstance().setContext(context);
 
+        
         // CommandProcessor
-        Object cmdProcessorView = viewFactory.createCommandProcessorView();
+        Object cmdProcessorView = viewFactory.createCommandProcessorView(context);
 
         // Device
-        viewFactory.createDeviceView(errorReporter, cmdProcessorView, install);
+        viewFactory.createDeviceView(context, cmdProcessorView, install);
     }
 }

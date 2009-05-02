@@ -25,20 +25,21 @@ import java.util.List;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.ErrorReporter;
 
 public class CommandProcessor {
     private static final Logger log = Logger.getLogger(CommandProcessor.class);
 
-    private final ErrorReporter errorReporter;
+    private final Context context;
 
     private Stack<Command> commands = new Stack<Command>();
     private List<CommandProcessorListener> listeners = new ArrayList<CommandProcessorListener>();
 
     private boolean running = false;
 
-    public CommandProcessor(ErrorReporter errorReporter) {
-        this.errorReporter = errorReporter;
+    public CommandProcessor(Context context) {
+        this.context = context;
     }
 
     public List<Command> getPendingCommands() {
@@ -58,7 +59,7 @@ public class CommandProcessor {
                 running = false;
             }
         } catch (Throwable t) {
-            errorReporter.reportError(log, this, t);
+            context.getErrorReporter().reportError(log, this, t);
         }
     }
 
@@ -132,5 +133,12 @@ public class CommandProcessor {
 
     public void removeListener(CommandProcessorListener listener) {
         listeners.remove(listener);
+    }
+
+    /**
+     * @return
+     */
+    public Context getContext() {
+        return context;
     }
 }

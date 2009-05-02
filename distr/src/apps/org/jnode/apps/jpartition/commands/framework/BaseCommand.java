@@ -21,6 +21,7 @@
 package org.jnode.apps.jpartition.commands.framework;
 
 import org.apache.log4j.Logger;
+import org.jnode.apps.jpartition.Context;
 
 /** 
  * Abstract implementation of the {@link Command} interface.
@@ -47,7 +48,7 @@ public abstract class BaseCommand implements Command {
             status = CommandStatus.RUNNING;
             processor.commandStarted(this);
 
-            doExecute();
+            doExecute(processor.getContext());
             status = CommandStatus.SUCCESS;
         } catch (CommandException e) {
             log.error("command failed", e);
@@ -67,7 +68,12 @@ public abstract class BaseCommand implements Command {
         return status;
     }
 
-    protected abstract void doExecute() throws CommandException;
+    /**
+     * Actually execute the command with the given context.
+     * @param context The context to use.
+     * @throws CommandException
+     */
+    protected abstract void doExecute(Context context) throws CommandException;
 
     /**
      * Get a printable representation of the command.

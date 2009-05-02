@@ -20,6 +20,8 @@
  
 package org.jnode.apps.jpartition;
 
+import java.io.PrintStream;
+
 /**
  * Factory used to build a user interface (text mode, graphical mode ...) for JPartition.
  *   
@@ -30,24 +32,27 @@ public interface ViewFactory {
     /**
      * Creates a view for the devices which might or might not (implementor's choice)
      * display available devices, their partitions... 
-     * @param errorReporter The error reporter to use (normally created by this factory).
+     * @param context The {@link Context} to use.
      * @param cmdProcessorView The command processor view to use (normally created by this factory).
      * @param install True if we are trying to install jnode, false in other cases.
      * @return The device view.
      * @throws Exception
      */
-    Object createDeviceView(ErrorReporter errorReporter, Object cmdProcessorView, boolean install)
+    Object createDeviceView(Context context, Object cmdProcessorView, boolean install)
         throws Exception;
 
     /**
      * Creates a command processor view.
+     * @param context The {@link Context} to use.
      * @return A new command processor view.
      */
-    Object createCommandProcessorView();
+    Object createCommandProcessorView(Context context);
 
     /**
      * Creates an error reporter.
+     * @param err The error stream to use.
      * @return A new error reporter.
      */
-    ErrorReporter createErrorReporter();
+    ErrorReporter createErrorReporter(PrintStream err);
+    
 }

@@ -20,22 +20,31 @@
  
 package org.jnode.apps.jpartition.swingview;
 
+import java.io.PrintStream;
+
 import javax.swing.JComponent;
 
+import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.ViewFactory;
 
 public class SwingViewFactory implements ViewFactory {
-    public Object createDeviceView(ErrorReporter errorReporter, Object cmdProcessorView,
+    public Object createDeviceView(Context context, Object cmdProcessorView,
             boolean install) throws Exception {
-        return new MainView(errorReporter, (JComponent) cmdProcessorView);
+        return new MainView(context, (JComponent) cmdProcessorView);
     }
 
-    public Object createCommandProcessorView() {
+    /**
+     * {@inheritDoc}
+     */
+    public Object createCommandProcessorView(Context context) {
         return new CommandProcessorView();
     }
 
-    public ErrorReporter createErrorReporter() {
+    /**
+     * {@inheritDoc}
+     */
+    public ErrorReporter createErrorReporter(PrintStream err) {
         return new SwingErrorReporter();
     }
 }

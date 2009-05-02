@@ -27,7 +27,7 @@ import java.awt.event.ComponentListener;
 import javax.swing.Action;
 import javax.swing.JLabel;
 
-import org.jnode.apps.jpartition.ErrorReporter;
+import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.model.Device;
 import org.jnode.apps.jpartition.model.Partition;
 import org.jnode.apps.jpartition.model.UserFacade;
@@ -36,8 +36,8 @@ import org.jnode.util.NumberUtils;
 public class DeviceView extends DiskAreaView<Device> {
     private static final long serialVersionUID = 4961328945650444476L;
 
-    public DeviceView(ErrorReporter errorReporter) {
-        super(errorReporter);
+    public DeviceView(Context context) {
+        super(context);
         setLayout(null);
         update();
 
@@ -73,7 +73,7 @@ public class DeviceView extends DiskAreaView<Device> {
             final int space = 1;
             double x = 0;
             for (Partition partition : bounded.getPartitions()) {
-                PartitionView p = new PartitionView(errorReporter, this, partition);
+                PartitionView p = new PartitionView(context, this, partition);
 
                 double size = pixelsPerByte * partition.getSize();
                 p.setBounds((int) x + space, 0 + space, (int) size - 2 * space, getHeight() - 2 *

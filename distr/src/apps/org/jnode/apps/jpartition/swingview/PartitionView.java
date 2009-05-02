@@ -28,7 +28,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 
-import org.jnode.apps.jpartition.ErrorReporter;
+import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.model.Partition;
 import org.jnode.apps.jpartition.model.UserFacade;
 import org.jnode.apps.jpartition.swingview.actions.AddPartitionAction;
@@ -41,8 +41,8 @@ public class PartitionView extends DiskAreaView<Partition> {
 
     private PartitionState state = new IdleState();
 
-    public PartitionView(ErrorReporter errorReporter, DeviceView deviceView, Partition partition) {
-        super(errorReporter);
+    public PartitionView(Context context, DeviceView deviceView, Partition partition) {
+        super(context);
         this.deviceView = deviceView;
         this.bounded = partition;
         update();
@@ -119,10 +119,10 @@ public class PartitionView extends DiskAreaView<Partition> {
         Action[] actions;
         if (bounded.isUsed()) {
             actions =
-                    new Action[] {new FormatPartitionAction(errorReporter, this),
-                        new RemovePartitionAction(errorReporter, this), };
+                    new Action[] {new FormatPartitionAction(context.getErrorReporter(), this),
+                        new RemovePartitionAction(context.getErrorReporter(), this), };
         } else {
-            actions = new Action[] {new AddPartitionAction(errorReporter, this), };
+            actions = new Action[] {new AddPartitionAction(context.getErrorReporter(), this), };
         }
         return actions;
     }

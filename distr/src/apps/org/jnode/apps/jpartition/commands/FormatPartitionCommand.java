@@ -20,6 +20,7 @@
  
 package org.jnode.apps.jpartition.commands;
 
+import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.commands.framework.CommandException;
 import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.fs.FileSystem;
@@ -35,7 +36,7 @@ public class FormatPartitionCommand extends BasePartitionCommand {
     }
 
     @Override
-    protected final void doExecute() throws CommandException {
+    protected final void doExecute(Context context) throws CommandException {
         // TODO Auto-generated method stub
     }
 

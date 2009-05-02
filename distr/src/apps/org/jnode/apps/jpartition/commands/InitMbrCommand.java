@@ -20,9 +20,7 @@
  
 package org.jnode.apps.jpartition.commands;
 
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-
+import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.commands.framework.CommandException;
 import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.partitions.command.PartitionHelper;
@@ -34,11 +32,10 @@ public class InitMbrCommand extends BaseDeviceCommand {
     }
 
     @Override
-    protected void doExecute() throws CommandException {
+    protected void doExecute(Context context) throws CommandException {
         PartitionHelper helper;
-        try {
-            //FIXME replace System.out by output stream from (Console)ViewFactory 
-            helper = new PartitionHelper(device, new PrintWriter(new OutputStreamWriter(System.out)));
+        try { 
+            helper = createPartitionHelper(context);
             helper.initMbr();
         } catch (Throwable t) {
             throw new CommandException(t);

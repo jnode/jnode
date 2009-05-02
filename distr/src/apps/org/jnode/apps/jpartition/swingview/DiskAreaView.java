@@ -22,6 +22,7 @@ package org.jnode.apps.jpartition.swingview;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -32,10 +33,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.border.Border;
 
-import org.jnode.apps.jpartition.ErrorReporter;
+import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.model.Bounded;
-
-import java.awt.Rectangle;
 
 public abstract class DiskAreaView<T extends Bounded> extends JComponent {
     private static final long serialVersionUID = -506634580666065291L;
@@ -43,13 +42,13 @@ public abstract class DiskAreaView<T extends Bounded> extends JComponent {
     private final int DEFAULT_PIXELS_PER_BYTE = 1;
 
     protected final int borderWidth = 5;
-    protected final ErrorReporter errorReporter;
+    protected final Context context;
 
     protected T bounded;
     protected double pixelsPerByte = DEFAULT_PIXELS_PER_BYTE;
 
-    public DiskAreaView(ErrorReporter errorReporter) {
-        this.errorReporter = errorReporter;
+    public DiskAreaView(Context context) {
+        this.context = context;
         setLayout(null);
         setOpaque(true);
 

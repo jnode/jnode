@@ -30,7 +30,7 @@ import java.util.Map;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.jnode.apps.jpartition.ErrorReporter;
+import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.commands.CreatePartitionCommand;
 import org.jnode.apps.jpartition.commands.FormatPartitionCommand;
 import org.jnode.apps.jpartition.commands.RemovePartitionCommand;
@@ -62,7 +62,8 @@ public class UserFacade {
     private final Map<String, Formatter<? extends FileSystem<?>>> formatters =
             new HashMap<String, Formatter<? extends FileSystem<?>>>();
     private Formatter<? extends FileSystem<?>> selectedFormatter;
-    private ErrorReporter errorReporter;
+    
+    private Context context;
 
     private CommandProcessor cmdProcessor;
 
@@ -78,9 +79,9 @@ public class UserFacade {
         addFormatter(new Ext2FileSystemFormatter(BlockSize._4Kb));
     }
 
-    public void setErrorReporter(ErrorReporter errorReporter) {
-        this.errorReporter = errorReporter;
-        cmdProcessor = new CommandProcessor(errorReporter);
+    public void setContext(Context context) {
+        this.context = context;
+        cmdProcessor = new CommandProcessor(context);
     }
 
     public void selectFormatter(String name) {
@@ -122,8 +123,8 @@ public class UserFacade {
             }
 
             public void errorHappened(OSFacadeException e) {
-                if (errorReporter != null) {
-                    errorReporter.reportError(LOG, UserFacade.this, e);
+                if (context.getErrorReporter() != null) {
+                    context.getErrorReporter().reportError(LOG, UserFacade.this, e);
                 }
             }
         };
@@ -226,8 +227,8 @@ public class UserFacade {
             // not called by user => need to notify
             selectDevice(selectedDev, true);
         } catch (OSFacadeException e) {
-            if (errorReporter != null) {
-                errorReporter.reportError(LOG, this, e);
+            if (context.getErrorReporter() != null) {
+                context.getErrorReporter().reportError(LOG, this, e);
             }
         }
     }

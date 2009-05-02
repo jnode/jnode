@@ -81,14 +81,14 @@ public class JPartitionCommand extends AbstractCommand {
      */
     public void doExecute(boolean install, InputStream in, PrintStream out, PrintStream err, boolean consoleView, boolean swingView) throws Exception { 
         ViewFactory viewFactory =
-                consoleView ? new ConsoleViewFactory(in, out, err)
+                consoleView ? new ConsoleViewFactory()
                         : swingView ? new SwingViewFactory() : null;
         if (viewFactory == null) {
             err.println("No UI selected");
             exit(1);
         }
-    
-        JPartition jpartition = new JPartition(viewFactory, install);
+ 
+        JPartition jpartition = new JPartition(viewFactory, in, out, err, install);
         jpartition.launch();
     } 
 }
