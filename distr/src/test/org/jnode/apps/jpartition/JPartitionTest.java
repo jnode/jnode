@@ -20,7 +20,9 @@
  
 package org.jnode.apps.jpartition;
 
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 
 import junit.framework.TestSuite;
@@ -30,8 +32,6 @@ import org.jnode.apps.jpartition.model.TestEmptyDevice;
 import org.jnode.apps.jpartition.model.TestNonEmptyDevice;
 import org.jnode.apps.jpartition.model.TestOSFacade;
 import org.jnode.apps.jpartition.model.TestRemovePartitionFromDevice;
-import org.jnode.apps.jpartition.swingview.FileDeviceView;
-import org.jnode.apps.jpartition.utils.device.AbstractIDEDevice;
 import org.jnode.apps.jpartition.utils.device.DeviceUtils;
 import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.fs.jfat.command.JGrub;
@@ -62,9 +62,12 @@ public class JPartitionTest extends TestSuite {
      * @throws Throwable
      */
     public static void main(String[] args) throws Throwable {
+        InputStream in = System.in;
+        PrintStream out = System.out;
+        PrintStream err = System.err;
         
-        final ViewFactory vf = new ConsoleViewFactory(System.in, System.out, System.err);
-        final ErrorReporter errorReporter = vf.createErrorReporter();
+        final ViewFactory vf = new ConsoleViewFactory();
+        final ErrorReporter errorReporter = vf.createErrorReporter(err);
 /*        
         final Thread t = new Thread() {
             public void run() {
@@ -83,6 +86,6 @@ public class JPartitionTest extends TestSuite {
         
 //        jgrub.install();
         
-        new JPartitionCommand().doExecute(true, System.in, System.out, System.err, true, false);
+        new JPartitionCommand().doExecute(true, in, out, err, true, false);
     }
 }

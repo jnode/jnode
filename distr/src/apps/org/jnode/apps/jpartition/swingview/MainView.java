@@ -31,7 +31,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.jnode.apps.jpartition.ErrorReporter;
+import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.model.Device;
 import org.jnode.apps.jpartition.model.UserFacade;
 import org.jnode.apps.jpartition.model.UserListener;
@@ -42,14 +42,14 @@ public class MainView extends JFrame {
     private final DefaultComboBoxModel devices;
     private final DeviceView deviceView;
 
-    public MainView(ErrorReporter errorReporter, JComponent cmdProcessorView) throws Exception {
+    public MainView(Context context, JComponent cmdProcessorView) throws Exception {
         setTitle("JPartition");
         setLayout(new BorderLayout());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         add(cmdProcessorView, BorderLayout.SOUTH);
 
-        deviceView = new DeviceView(errorReporter);
+        deviceView = new DeviceView(context);
         add(deviceView, BorderLayout.CENTER);
 
         devices = new DefaultComboBoxModel(UserFacade.getInstance().getDeviceNames());

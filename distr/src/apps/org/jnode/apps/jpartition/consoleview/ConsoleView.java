@@ -43,14 +43,14 @@ class ConsoleView extends Component {
     private final boolean install;
     private Partition selectedPartition;
 
-    ConsoleView(InputStream in, PrintStream out, ErrorReporter errorReporter, boolean install) {
-        super(new Context(in, out, errorReporter));
+    ConsoleView(Context context, boolean install) {
+        super(context);
         this.install = install;
 
         try {
             start();
         } catch (Throwable e) {
-            errorReporter.reportError(log, this, e);
+            context.getErrorReporter().reportError(log, this, e);
         }
 
         println();

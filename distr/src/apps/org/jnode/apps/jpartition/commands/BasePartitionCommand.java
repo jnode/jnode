@@ -20,6 +20,7 @@
  
 package org.jnode.apps.jpartition.commands;
 
+import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.commands.framework.CommandException;
 import org.jnode.driver.bus.ide.IDEDevice;
 
@@ -31,7 +32,7 @@ public abstract class BasePartitionCommand extends BaseDeviceCommand {
         this.partitionNumber = partitionNumber;
     }
 
-    protected abstract void doExecute() throws CommandException;
+    protected abstract void doExecute(Context context) throws CommandException;
 
     @Override
     public String toString() {
