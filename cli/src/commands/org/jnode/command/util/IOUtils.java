@@ -471,7 +471,7 @@ public final class IOUtils {
      * Check for null objects in a list of objects.
      */
     private static void checkNull(Object... objs) {
-        for(Object obj : objs) {
+        for (Object obj : objs) {
             if (obj == null) throw new NullPointerException(ex_null_param);
         }
     }

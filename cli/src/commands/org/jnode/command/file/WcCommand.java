@@ -31,7 +31,6 @@ import java.util.List;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
 

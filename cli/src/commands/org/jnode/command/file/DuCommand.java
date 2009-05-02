@@ -101,7 +101,7 @@ public class DuCommand extends AbstractCommand {
         protected void lastAction(boolean wasCancelled) {
             Map<File, Long> summarisedMap = summariseIt(map);
             for (Entry<File, Long> e : summarisedMap.entrySet()) {
-                if(humanReadable)
+                if (humanReadable)
                     out.println(NumberUtils.toBinaryByte(e.getValue()) + "\t" + e.getKey());
                 else
                     out.println(e.getValue() + "\t" + e.getKey());
@@ -120,7 +120,7 @@ public class DuCommand extends AbstractCommand {
             Map<File, Long> summarisedMap = summariseIt(map);
             for (Entry<File, Long> e : summarisedMap.entrySet()) {
                 if (e.getKey().isDirectory()) {
-                    if(humanReadable)
+                    if (humanReadable)
                         out.println(NumberUtils.toBinaryByte(e.getValue()) + "\t" + e.getKey());
                     else
                         out.println(e.getValue() + "\t" + e.getKey());
@@ -139,7 +139,7 @@ public class DuCommand extends AbstractCommand {
         protected void lastAction(boolean wasCancelled) {
             TreeMap<File, Long> summarisedMap = summariseIt(map);
             Entry<File, Long> e = summarisedMap.firstEntry();
-            if(humanReadable)
+            if (humanReadable)
                 out.println(NumberUtils.toBinaryByte(e.getValue()) + "\t" + e.getKey());
             else
                 out.println(e.getValue() + "\t" + e.getKey());
@@ -167,7 +167,7 @@ public class DuCommand extends AbstractCommand {
         allArg           = new FlagArgument("all", Argument.OPTIONAL, HELP_ALL);
         dirArg           = new FileArgument("directory", Argument.OPTIONAL | Argument.MULTIPLE, HELP_DIR);
         humanReadableArg = new FlagArgument("human-readable", Argument.OPTIONAL, HELP_HUMAN_READABLE);
-        registerArguments(totalArg, allArg, humanReadableArg, dirArg );
+        registerArguments(totalArg, allArg, humanReadableArg, dirArg);
     }
 
     public static void main(String[] args) throws IOException {

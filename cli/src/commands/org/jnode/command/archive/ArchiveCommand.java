@@ -29,7 +29,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.IOException;
-import java.util.ArrayList;
 import org.apache.tools.zip.ZipFile;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
