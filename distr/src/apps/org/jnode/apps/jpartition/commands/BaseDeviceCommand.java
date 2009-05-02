@@ -31,9 +31,22 @@ import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.partitions.command.PartitionHelper;
 
+/**
+ * Abstract command that is working on a device.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public abstract class BaseDeviceCommand extends BaseCommand {
+    /**
+     * The device to use.
+     */
     protected final IDEDevice device;
 
+    /**
+     * Constructor.
+     * @param name The name of the command.
+     * @param device The device to use.
+     */
     public BaseDeviceCommand(String name, IDEDevice device) {
         super(name);
         if (device == null) {
@@ -57,6 +70,9 @@ public abstract class BaseDeviceCommand extends BaseCommand {
 
     protected abstract void doExecute(Context context) throws CommandException;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return super.toString() + " - " + device.getId();

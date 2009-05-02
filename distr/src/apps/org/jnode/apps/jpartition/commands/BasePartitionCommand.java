@@ -24,9 +24,23 @@ import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.commands.framework.CommandException;
 import org.jnode.driver.bus.ide.IDEDevice;
 
+/**
+ * Abstract command that is working on a partition.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public abstract class BasePartitionCommand extends BaseDeviceCommand {
+    /**
+     * Number (zero based) of the device's partition.
+     */
     protected final int partitionNumber;
 
+    /**
+     * Constructor.
+     * @param name The name of the command.
+     * @param device The device to use.
+     * @partitionNumber Number (zero based) of the device's partition.
+     */
     public BasePartitionCommand(String name, IDEDevice device, int partitionNumber) {
         super(name, device);
         this.partitionNumber = partitionNumber;
@@ -34,6 +48,9 @@ public abstract class BasePartitionCommand extends BaseDeviceCommand {
 
     protected abstract void doExecute(Context context) throws CommandException;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return super.toString() + " - partition " + partitionNumber;

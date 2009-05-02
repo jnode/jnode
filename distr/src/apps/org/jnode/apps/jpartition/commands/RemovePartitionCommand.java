@@ -24,17 +24,33 @@ import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.commands.framework.CommandException;
 import org.jnode.driver.bus.ide.IDEDevice;
 
+/**
+ * Command used to remove a partition from a device.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class RemovePartitionCommand extends BasePartitionCommand {
 
+    /**
+     * Constructor.
+     * @param device The device to use.
+     * @partitionNumber Number (zero based) of the device's partition.
+     */
     public RemovePartitionCommand(IDEDevice device, int partitionNumber) {
         super("remove partition", device, partitionNumber);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected final void doExecute(Context context) throws CommandException {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "remove partition " + partitionNumber + " on device" + device.getId();

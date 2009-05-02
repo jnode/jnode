@@ -24,16 +24,38 @@ import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.commands.framework.CommandException;
 import org.jnode.driver.bus.ide.IDEDevice;
 
+/**
+ * Command to create a partition.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class CreatePartitionCommand extends BasePartitionCommand {
+    /**
+     * The start sector of the partition to create.
+     */
     private final long start;
+    
+    /**
+     * The number of sectors of the partition to create.
+     */
     private final long size;
 
+    /**
+     * Constructor.
+     * @param device The device to use.
+     * @partitionNumber Number (zero based) of the device's partition.
+     * @param start The start sector of the partition to create.
+     * @param size The number of sectors of the partition to create.
+     */
     public CreatePartitionCommand(IDEDevice device, int partitionNumber, long start, long size) {
         super("create partition", device, partitionNumber);
         this.start = start;
         this.size = size;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected final void doExecute(Context context) throws CommandException {
         // PartitionHelper helper = createPartitionHelper();
@@ -45,6 +67,9 @@ public class CreatePartitionCommand extends BasePartitionCommand {
         // }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "create partition [" + start + ", " + (start + size - 1) + "] on device " +
