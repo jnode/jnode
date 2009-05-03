@@ -35,6 +35,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  * Convenience IO methods.
@@ -402,6 +404,7 @@ public final class IOUtils {
      * @throws NullPointerException if in, out or str are null
      */
     public static boolean promptYesOrNo(Reader in, PrintWriter out, String prompt, boolean defaultChoice) {
+        checkNull(in, out, prompt);
         String input;
         
         // put a cap on the loops so it doesn't become an infinite loop
@@ -465,6 +468,62 @@ public final class IOUtils {
         }
         
         return input;
+    }
+    
+    public static List<String> readLines(Reader reader) {
+        return readLines(new BufferedReader(reader, BUFFER_SIZE), -1);
+    }
+    
+    public static List<String> readLines(BufferedReader reader) {
+        return readLines(reader, -1);
+    }
+    
+    /**
+     * Read all of the lines from a Reader.
+     *
+     * Calling this is the same as readLines(new BufferedReader(reader), max)
+     *
+     * @param reader the source to read from
+     * @param max the max number of lines to read, if this is -1 Integer.MAX_VALUE is used
+     * @returns a list of strings, possibly empty, or null if there was an exception.
+     * @throws NullPointerException if reader is null
+     */
+    public static List<String> readLines(Reader reader, int max) {
+        return readLines(new BufferedReader(reader, BUFFER_SIZE), max);
+    }
+     
+    /**
+     * Read all of the lines from a Reader.
+     *
+     * If there are no lines to read, an empty List will be returned.
+     *
+     * If there was an exception while reading, null will be returned.
+     *
+     * @param reader the source to read from
+     * @param max the max number of lines to read, if this is -1 Integer.MAX_VALUE is used
+     * @returns a list of strings, possibly empty, or null if there was an exception.
+     * @throws NullPointerException if reader is null
+     */
+    public static List<String> readLines(BufferedReader reader, int max) {
+        List<String> ret = new LinkedList<String>();
+        String line;
+        int count = 0;
+        
+        try {
+            if (max > 0) {
+                while ((count++ < max) && (line = reader.readLine()) != null) {
+                    ret.add(line);
+                }
+            } else {
+                while ((line = reader.readLine()) != null) {
+                    ret.add(line);
+                }
+            }
+        } catch (IOException e) {
+            return null;
+        }
+        
+        return ret;
     }
     
     /**
