@@ -1,0 +1,5 @@
+<testSet title="All common command tests">
+    <include setName="posix-command-tests.xml"/>
+    <include setName="basename-command-tests.xml"/>
+    <include setName="dirname-command-tests.xml"/>
+</testSet>

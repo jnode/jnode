@@ -1,0 +1,24 @@
+<project name="JNode-Shell-Tests" default="all" basedir=".">
+
+	<import file="${basedir}/../all/build.xml"/>
+	
+	<target name="help" description="output target descriptions">
+		<echo>
+The main targets (tests) for this build are as follows:
+all   	Runs all tests for this project
+help    Output these messages
+		</echo>
+	</target>
+	
+	<target name="all">
+		<java classpathref="cp-test" classname="org.jnode.test.shell.harness.TestHarness">
+			<arg value="-E"/>
+			<arg value="-s"/>
+			<arg value="${root.dir}"/>
+			<arg value="${basedir}/src/test/org/jnode/test/command/all-tests.xml"/>
+		</java>
+	</target>
+
+</project>
+
+
