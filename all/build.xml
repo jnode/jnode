@@ -596,6 +596,12 @@ clean             Remove all intermediate build results.
         <jnode.antall target="clean"/>
         <delete dir="${build.dir}" quiet="on"/>
     </target>
+	
+	<path id="cp-javadoc">
+        <path refid="cp"/>
+		<pathelement location="${bcel-5.1.jar}"/>
+		<pathelement location="${nanoxml-java.jar}"/>
+	</path>
 
     <!-- Generate only the basic api javadoc files -->
     <target name="javadoc-small" description="generate documentation of the basic JNode APIs">
@@ -615,7 +621,7 @@ clean             Remove all intermediate build results.
             <package name="org.jnode.naming"/>
             <package name="org.jnode.plugin"/>
             <package name="org.jnode.system"/>
-            <bootclasspath refid="cp"/>
+            <bootclasspath refid="cp-javadoc"/>
         </jnode.javadoc>
     </target>
 
@@ -636,7 +642,7 @@ clean             Remove all intermediate build results.
             <package name="org.mmtk.*"/>
             <package name="org.jnode.vm.memmgr.mmtk.*"/>
             <package name="org.vmmagic.*"/>
-            <classpath refid="cp"/>
+            <classpath refid="cp-javadoc"/>
         </jnode.javadoc>
     </target>
 
@@ -669,12 +675,11 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/net/src/net"/>
                 <pathelement location="${root.dir}/net/src/driver"/>
                 <pathelement location="${root.dir}/shell/src/shell"/>
-                <pathelement location="${root.dir}/all/lib/classlib-src.jar"/>
             </sourcepath>
             <package name="org.jnode.*"/>
             <package name="org.mmtk.*"/>
             <package name="org.vmmagic.*"/>
-            <bootclasspath refid="cp"/>
+            <bootclasspath refid="cp-javadoc"/>
         </jnode.javadoc>
     </target>
 
