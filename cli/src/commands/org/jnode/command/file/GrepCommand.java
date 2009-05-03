@@ -48,6 +48,14 @@ import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.IntegerArgument;
 import org.jnode.shell.syntax.StringArgument;
 
+import java.io.Closeable;
+import java.io.Flushable;
+import java.io.Writer;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 /**
  * TODO check performance of prefixing, probably needs some buffering.
  * TODO implement outputting context lines (requires buffering output lines)
@@ -60,7 +68,7 @@ import org.jnode.shell.syntax.StringArgument;
 public class GrepCommand extends AbstractCommand {
 
     private static final Logger log = Logger.getLogger(GrepCommand.class);
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final int BUFFER_SIZE = 8192;
     
     private static final String help_matcher_fixed = "Patterns are fixed strings, seperated by new lines. Any of " +
@@ -156,6 +164,183 @@ public class GrepCommand extends AbstractCommand {
     private static final String help_files = "The files to match against. If there are no files, or if any file is " +
                                              "'-' then match stdandard input.";
     private static final String err_ex_walker = "Exception while walking.";
+    
+    private class ContextLineWriter implements Closeable, Flushable {
+        
+        protected LineNumberReader reader;
+        
+        private PrintWriter writer;
+        private Deque<String> contextStack;
+        private int linesUntilFlush;
+        private int linesForFlush;
+        private int contextBefore;
+        private int contextAfter;
+        private boolean haveLine;
+        private boolean firstFlush;
+        
+        public ContextLineWriter(Writer writer, int before, int after) {
+            if (writer instanceof PrintWriter) {
+                this.writer = (PrintWriter) writer;
+            } else {
+                this.writer = new PrintWriter(writer);
+            }
+            
+            firstFlush      = true;
+            contextBefore   = before;
+            contextAfter    = after;
+            linesForFlush   = before + after + 1;
+            contextStack    = new ArrayDeque<String>();
+        }
+        
+        public ContextLineWriter(OutputStream out, int before, int after) {
+            this(new PrintWriter(out), before, after);
+        }
+        
+        @Override
+        public void close() {
+            if (reader != null) {
+                finish();
+            }
+            IOUtils.close(true, writer);
+            writer = null;
+        }
+        
+        @Override
+        public void flush() {
+            doFlush();
+            while(contextStack.size() > 0) {
+                writer.println(contextStack.removeFirst());
+            }
+            haveLine = false;
+            writer.flush();
+        }
+        
+        public void setIn(InputStream in) throws IOException {
+            setIn(new InputStreamReader(in));
+        }
+        
+        public LineNumberReader setIn(Reader reader) throws IOException {
+            if (isClosed()) {
+                throw new IOException("Stream closed");
+            }
+            if (this.reader != null) {
+                finish();
+            }
+            
+            this.reader = new LineNumberReader(reader, BUFFER_SIZE) {
+                @Override
+                public String readLine() throws IOException {
+                    String line = super.readLine();
+                    if (line != null) {
+                        if (!haveLine) {
+                            if (contextStack.size() > 0) {
+                                contextStack.addLast(doContextLine(contextStack.removeLast()));
+                            }
+                            if (contextStack.size() > contextBefore) {
+                                if (contextStack.size() > (contextBefore + 1)) {
+                                    log.debug("Too many 'before' lines on stack!");
+                                }
+                                contextStack.removeFirst();
+                            }
+                        } else {
+                            if (linesUntilFlush < (linesForFlush)) {
+                                contextStack.addLast(doContextLine(contextStack.removeLast()));
+                            }
+                            if (linesUntilFlush == 0) {
+                                String[] saveLines = new String[contextBefore];
+                                for (int i = 0; i < contextBefore; i++) {
+                                    saveLines[i] = contextStack.removeLast();
+                                }
+                                contextStack.removeLast();
+                                flush();
+                                for (int i = 0; i < contextBefore; i++) {
+                                    contextStack.addLast(saveLines[i]);
+                                }
+                            } else {
+                                linesUntilFlush--;
+                            }
+                        }
+                        contextStack.addLast(line);
+                    } else {
+                        if (!haveLine) {
+                            contextStack.clear();
+                        } else {
+                            int excessLines = contextAfter - (linesForFlush - linesUntilFlush);
+                            if (excessLines > 0) {
+                                for (int i = 0; i < excessLines; i++) {
+                                    contextStack.removeLast();
+                                }
+                            }
+                        }
+                        finish();
+                    }
+                    return line;
+                }
+            };
+            
+            return this.reader;
+        }
+        
+        public void addLine(String s) throws IOException {
+            if (isClosed()) {
+                throw new IOException("Stream closed");
+            }
+            contextStack.addLast(s);
+            writeLast();
+        }
+        
+        public void rewriteLast(String s) throws IOException {
+            if (isClosed()) {
+                throw new IOException("Stream closed");
+            }
+            contextStack.removeLast();
+            contextStack.addLast(s);
+            writeLast();
+        }
+        
+        public void writeLast() throws IOException {
+            if (isClosed()) {
+                throw new IOException("Stream closed");
+            }
+            if (!haveLine) {
+                haveLine = true;
+            }
+            linesUntilFlush = linesForFlush;
+        }
+        
+        private void finish() {
+            if (reader == null) return;
+            if (haveLine) {
+                flush();
+            }
+            doFinish();
+            IOUtils.close(reader);
+            reader = null;
+        }
+        
+        private boolean isClosed() {
+            return writer == null;
+        }
+        
+        private boolean haveLine() {
+            return haveLine;
+        }
+        
+        protected void doFlush() {
+            if (!firstFlush) {
+                contextStack.addFirst("-----");
+            }
+            firstFlush = false;
+        }
+        
+        protected void doFinish() {
+            // no-op
+        }
+        
+        protected String doContextLine(String s) {
+            return prefixLine(s, currentFile, currentLine, currentByte, '-');
+        }
+    }
 
     private final StringArgument Patterns;
     private final FileArgument PatternFiles;
@@ -222,6 +407,7 @@ public class GrepCommand extends AbstractCommand {
     
     private PrintWriter err;
     private PrintWriter out;
+    private ContextLineWriter contextOut;
     private Reader in;
     private InputStream stdin;
     private OutputStream stdout;
@@ -229,6 +415,7 @@ public class GrepCommand extends AbstractCommand {
     private List<Pattern> patterns;
     private String prefixLabel;
     private Matcher match;
+    private String currentFile;
     private int matcher;
     private int prefix;
     private int maxCount = Integer.MAX_VALUE;
@@ -236,6 +423,8 @@ public class GrepCommand extends AbstractCommand {
     private int contextAfter;
     private int patternFlags;
     private int rc = 1;
+    private int currentLine;
+    private int currentByte;
     private boolean inverse;
     private boolean matchCase;
     private boolean matchWord;
@@ -272,7 +461,7 @@ public class GrepCommand extends AbstractCommand {
         Debug        = new FlagArgument("debug", 0, help_debug);
         registerArguments(IgnoreCase, Invert, MatchWord, MatchLine, MaxCount, Quiet, Suppress, Debug);
         
-        ShowCount    = new FlagArgument("show-count", 0, help_count);
+        ShowCount       = new FlagArgument("show-count", 0, help_count);
         ShowFileNoMatch = new FlagArgument("show-files-nomatch", 0, help_file_nomatch);
         ShowFileMatch   = new FlagArgument("show-files-match", 0, help_file_match);
         ShowOnlyMatch   = new FlagArgument("show-only-match", 0, help_only_matching);
@@ -330,8 +519,8 @@ public class GrepCommand extends AbstractCommand {
      */
     public void execute() throws Exception {
         err    = getError().getPrintWriter();
-        out    = getOutput().getPrintWriter();
         in     = getInput().getReader();
+        out    = getOutput().getPrintWriter();
         stdout = getOutput().getOutputStream();
         stdin  = getInput().getInputStream();
         
@@ -340,7 +529,12 @@ public class GrepCommand extends AbstractCommand {
         
         try {
             parseOptions();
-            debugOptions();
+            if ((contextBefore > 0) || (contextAfter > 0)) {
+                debug("Using ContextLineWriter");
+                debug("Before=" + contextBefore);
+                debug("After=" + contextAfter);
+                contextOut = new ContextLineWriter(out, contextBefore, contextAfter);
+            }
             
             for (File file : files) {
                 debug("Processing file: " + file);
@@ -348,11 +542,20 @@ public class GrepCommand extends AbstractCommand {
                 name   = file.getPath();
                 try {
                     if (name.equals("-")) {
-                        reader = new LineNumberReader(in, BUFFER_SIZE);
+                        if (contextOut != null) {
+                            reader = contextOut.setIn(in);
+                        } else {
+                            reader = new LineNumberReader(in, BUFFER_SIZE);
+                        }
                         name = prefixLabel;
                     } else {
-                        reader = IOUtils.openLineReader(file, BUFFER_SIZE);
+                        if (contextOut != null) {
+                            reader = contextOut.setIn(IOUtils.openReader(file));
+                        } else {
+                            reader = IOUtils.openLineReader(file, BUFFER_SIZE);
+                        }
                     }
+                    currentFile = name;
                     if (exitOnFirstMatch) {
                         debug(" exitOnFirstMatch");
                         if (matchUntilOne(reader)) {
@@ -377,11 +580,11 @@ public class GrepCommand extends AbstractCommand {
                     }
                     if (showCount) {
                         debug(" showCount");
-                        printFileCount(name, matchCount(reader));
+                        printFileCount(matchCount(reader));
                         continue;
                     }
                     debug(" normal");
-                    matchNormal(reader, name);
+                    matchNormal(reader);
                 } catch (IOException e) {
                     error("IOException greping file : " + file);
                     e.printStackTrace();
@@ -451,20 +654,20 @@ public class GrepCommand extends AbstractCommand {
     /**
      * Prints matching or non-matching lines to stdout with a possible prefix.
      */
-    private void matchNormal(LineNumberReader reader, String name) throws IOException {
+    private void matchNormal(LineNumberReader reader) throws IOException {
         String line;
         MatchResult result;
-        int byteCount = 0;
         int matches = 0;
         
         while ((matches < maxCount) && ((line = reader.readLine()) != null)) {
             result = match(line);
+            currentLine = reader.getLineNumber();
             if ((match(line) != null) ^ inverse) {
-                printMatch(line, name, reader.getLineNumber(), byteCount);
+                printMatch(line, currentFile, currentLine, currentByte);
                 rc = 0;
                 matches++;
             }
-            byteCount += line.length() + 1;
+            currentByte += line.length() + 1;
         }
     }
     
@@ -481,58 +684,74 @@ public class GrepCommand extends AbstractCommand {
         return null;
     }
     
+    private String prefixLine(String line, String name, int lineCount, int byteCount, char fieldSep) {
+        if (prefix == PREFIX_NOFILE) {
+            return line;
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        
+        if ((prefix & PREFIX_TAB) != 0) {
+            if ((prefix & PREFIX_FILE) != 0) {
+                sb.append(name);
+                if ((prefix & (PREFIX_LINE | PREFIX_BYTE)) == 0) {
+                    sb.append("\t");
+                }
+                sb.append(fieldSep);
+            }
+            if ((prefix & PREFIX_LINE) != 0) {
+                sb.append(padNumber(lineCount, 4));
+                if ((prefix & PREFIX_BYTE) == 0) {
+                    sb.append("\t");
+                }
+                sb.append(fieldSep);
+            }
+            if ((prefix & PREFIX_BYTE) != 0) {
+                sb.append(padNumber(byteCount, 9));
+                sb.append("\t");
+                sb.append(fieldSep);
+            }
+        } else {
+            if ((prefix & PREFIX_FILE) != 0) {
+                sb.append(name);
+                sb.append(fieldSep);
+            }
+            if ((prefix & PREFIX_LINE) != 0) {
+                sb.append(lineCount);
+                sb.append(fieldSep);
+            }
+            if ((prefix & PREFIX_BYTE) != 0) {
+                sb.append(byteCount);
+                sb.append(fieldSep);
+            }
+        }
+        return sb.append(line).toString();
+    }
+    
     /**
      * Outputs a matched string, in the given file, at the given line and the given byte offset. Outputs
      * to stdout the match string, along with any set prefix options.
      */
-    private void printMatch(String line, String name, int lineCount, int byteCount) {
-        String sLine;
-        String sByte;
+    private void printMatch(String line, String name, int lineCount, int byteCount) throws IOException {
         if (quiet) return;
-        if (prefix != PREFIX_NOFILE) {
-            if ((prefix & PREFIX_TAB) != 0) {
-                if ((prefix & PREFIX_FILE) != 0) {
-                    out.print(name);
-                    if ((prefix & (PREFIX_LINE | PREFIX_BYTE)) == 0) {
-                        out.print("\t");
-                    }
-                    out.print(":");
-                }
-                if ((prefix & PREFIX_LINE) != 0) {
-                    out.print(padNumber(lineCount, 4));
-                    if ((prefix & PREFIX_BYTE) == 0) {
-                        out.print("\t");
-                    }
-                    out.print(":");
-                }
-                if ((prefix & PREFIX_BYTE) != 0) {
-                    out.print(padNumber(byteCount, 9));
-                    out.print("\t:");
-                }
+        String newLine = prefixLine(line, name, lineCount, byteCount, ':');
+        if (contextOut != null) {
+            if (newLine == line) {
+                contextOut.writeLast();
             } else {
-                if ((prefix & PREFIX_FILE) != 0) {
-                    out.print(name);
-                    out.print(":");
-                }
-                if ((prefix & PREFIX_LINE) != 0) {
-                    out.print(lineCount);
-                    out.print(":");
-                }
-                if ((prefix & PREFIX_BYTE) != 0) {
-                    out.print(byteCount);
-                    out.print(":");
-                }
+                contextOut.rewriteLast(newLine);
             }
+        } else {
+            out.println(newLine);
         }
-        out.println(line);
     }
     
     /**
      * Outputs the name and count seperated by a colon or null byte
      */
-    private void printFileCount(String name, int count) {
+    private void printFileCount(int count) {
         if (quiet) return;
-        out.print(name);
+        out.print(currentFile);
         out.print(":");
         out.println(count);
     }
@@ -705,6 +924,14 @@ public class GrepCommand extends AbstractCommand {
         
         if ((prefix & (PREFIX_FILE | PREFIX_NOFILE)) == (PREFIX_FILE | PREFIX_NOFILE)) {
             throw new AssertionError("PREFIX_NOFILE && PREFIX_FILE");
+        }
+        
+        if (ContextBoth.isSet()) {
+            contextAfter = contextBefore = ContextBoth.getValue();
+        } else if (ContextBefore.isSet()) {
+            contextBefore = ContextBefore.getValue();
+        } else if (ContextAfter.isSet()) {
+            contextAfter = ContextAfter.getValue();
         }
     }
     
