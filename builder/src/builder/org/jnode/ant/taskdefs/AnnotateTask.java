@@ -100,7 +100,7 @@ public class AnnotateTask extends FileSetTask {
     /**
      * Define the time at which build started.
      *
-     * @param annotationFile
+     * @param buildStartTime
      */
     public final void setBuildStartTime(String buildStartTime) {
         this.buildStartTime = buildStartTime;
@@ -109,7 +109,7 @@ public class AnnotateTask extends FileSetTask {
     /**
      * Define the pattern with which buildStartTime is defined.
      *
-     * @param annotationFile
+     * @param pattern
      */
     public final void setPattern(String pattern) {
         this.pattern = pattern;
@@ -247,6 +247,7 @@ public class AnnotateTask extends FileSetTask {
      * properly added
      *
      * @param file
+     * @param message
      * @throws IOException
      */
     private void traceClass(File file, String message) throws IOException {
@@ -273,7 +274,7 @@ public class AnnotateTask extends FileSetTask {
      * @param inputClass
      * @param tmpFile
      * @param annotations
-     * @return
+     * @return {@code true} if the class file was modified
      * @throws BuildException
      */
     private boolean addAnnotation(File classFile, InputStream inputClass, File tmpFile, String annotations)

@@ -175,7 +175,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     /**
      * Create the kernel-sources element.
      *
-     * @return
+     * @return the element created
      */
     public AsmSourceInfo createNanokernelsources() {
         return asmSourceInfo;
@@ -198,6 +198,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * Compile the methods in the given class to native code.
      *
      * @param os
+     * @param arch
      * @throws ClassNotFoundException
      */
     private final void compileClasses(NativeStream os, VmArchitecture arch)
@@ -263,6 +264,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * image.
      *
      * @param blockedObjects
+     * @param piRegistry
      * @return The loaded resource names
      * @throws BuildException
      */
@@ -308,7 +310,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * Copy the jnode.jar file into a byte array that is added to the java
      * image.
      *
-     * @param blockedObjects
+     * @param piRegistry
      * @return The loaded resource names
      * @throws BuildException
      */
@@ -597,8 +599,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             emitStaticInitializerCalls(os, bootClasses, clInitCaller);
 
             // This is the end of the image
-            X86BinaryAssembler.ObjectInfo dummyObjectAtEnd = os
-                .startObject(loadClass(VmMethodCode.class));
+            X86BinaryAssembler.ObjectInfo dummyObjectAtEnd = 
+                os.startObject(loadClass(VmMethodCode.class));
             pageAlign(os);
             dummyObjectAtEnd.markEnd();
             os.setObjectRef(imageEnd);
@@ -907,7 +909,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * Should the given type be compiled with the best compiler.
      *
      * @param vmClass
-     * @return
+     * @return {@code true} if it should, {@code false} if not.
      */
     protected boolean isCompileHighOptLevel(VmType<?> vmClass) {
         if (vmClass.isArray()) {
@@ -1217,7 +1219,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * Print any unresolved labels to the out stream and generate a list file
      * for all public labels.
      *
-     * @param os
      * @param bootClasses
      * @throws BuildException
      * @throws UnresolvedObjectRefException

@@ -116,7 +116,7 @@ public class PluginDocumentationTask extends AbstractPluginTask {
     /**
      * Get a list of all included descriptor files.
      *
-     * @return
+     * @return the descriptor files.
      */
     protected File[] getDescriptorFiles() {
         final List<File> files = new ArrayList<File>();

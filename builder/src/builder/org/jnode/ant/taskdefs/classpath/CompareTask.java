@@ -586,20 +586,19 @@ public class CompareTask extends Task {
         this.destDir = destDir;
     }
 
-
     /**
-     * Returns the type.
+     * Returns the type of the comparison.
      *
-     * @return
+     * @return the type of the comparison.
      */
     public String getType() {
         return type;
     }
 
     /**
-     * The type of the comparesion.
+     * Sets the type of the comparison.
      *
-     * @param type of the comparesion
+     * @param type of the comparison.
      */
     public void setType(String type) {
         this.type = type;

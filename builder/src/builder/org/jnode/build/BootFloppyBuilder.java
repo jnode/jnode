@@ -179,9 +179,9 @@ public class BootFloppyBuilder extends Task {
     }
 
     /**
-     * Gets the last modification date of all parameters.
+     * Gets the latest modification date for all of the parameter fileSets.
      *
-     * @return
+     * @return the latest modification date.
      */
     protected long getLastModified() {
         long lm = 0l;
@@ -321,9 +321,9 @@ public class BootFloppyBuilder extends Task {
     }
 
     /**
-     * Add a fileset to this task.
+     * Create and add a fileset to this task.
      *
-     * @return
+     * @return the fileset created
      */
     public FileSet createFileset() {
         final FileSet fs = new FileSet();

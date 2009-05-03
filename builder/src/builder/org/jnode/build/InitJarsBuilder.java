@@ -47,9 +47,9 @@ public class InitJarsBuilder extends Task {
     private PluginListInsertor insertor;
     
     /**
-     * Add a fileset to this task.
+     * Create and add a fileset to this task.
      *
-     * @return
+     * @return the fileset created
      */
     public FileSet createFileset() {
         final FileSet fs = new FileSet();
