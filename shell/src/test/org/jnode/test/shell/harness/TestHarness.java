@@ -123,7 +123,11 @@ public class TestHarness {
         for (int i = firstArg; i < args.length; i++) {
             String arg = args[i];
             try {
-                specs = loadTestSetSpecification(arg, useResources ? "/" : ".");
+            	File specFile = new File(arg);
+            	if (useResources && !specFile.isAbsolute()) {
+            		specFile = new File("/", arg);
+            	}
+                specs = loadTestSetSpecification(specFile);
                 if (specs != null) {
                     execute(specs);
                 }
@@ -159,24 +163,23 @@ public class TestHarness {
         }
     }
 
-    public TestSetSpecification loadTestSetSpecification(String specName, String base) throws Exception {
+    public TestSetSpecification loadTestSetSpecification(File specFile) throws Exception {
         TestSpecificationParser parser = new TestSpecificationParser();
         InputStream is = null;
-        File file = new File(base, specName);
         try {
             if (useResources) {
-                String resourceName = file.getPath();
+                String resourceName = specFile.getPath();
                 is = this.getClass().getResourceAsStream(resourceName);
                 if (is == null) {
                     report("Cannot find resource for '" + resourceName + "'");
                     return null;
                 }
             } else {
-                is = new FileInputStream(file);
+                is = new FileInputStream(specFile);
             }
-            return parser.parse(this, is, file.getParent());
+            return parser.parse(this, is, specFile.getParent());
         } catch (Exception ex) {
-            diagnose(ex, specName);
+            diagnose(ex, specFile.getPath());
             return null;
         } finally {
             if (is != null) {
