@@ -123,10 +123,10 @@ public class TestHarness {
         for (int i = firstArg; i < args.length; i++) {
             String arg = args[i];
             try {
-            	File specFile = new File(arg);
-            	if (useResources && !specFile.isAbsolute()) {
-            		specFile = new File("/", arg);
-            	}
+                File specFile = new File(arg);
+                if (useResources && !specFile.isAbsolute()) {
+                    specFile = new File("/", arg);
+                }
                 specs = loadTestSetSpecification(specFile);
                 if (specs != null) {
                     execute(specs);
