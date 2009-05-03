@@ -84,7 +84,7 @@ public class PackagerTask extends Task {
     
     /**
      * Is that task enabled ?
-     * @return
+     * @return Returns {@code true} if this task is enabled, otherwise {@code false}.
      */
     protected final boolean isEnabled() {
         return (userApplicationsDir != null);
@@ -92,7 +92,7 @@ public class PackagerTask extends Task {
     
     /**
      * Get properties file used to configure the packager tool.
-     * @return
+     * @return the property file.
      */
     protected final File getPropertiesFile() {
         return isEnabled() ? new File(userApplicationsDir, PROPERTIES_FILE) : null;
@@ -100,7 +100,7 @@ public class PackagerTask extends Task {
     
     /**
      * Get the properties and if necessary read it from the file.
-     * @return
+     * @return the task's Properties object.
      */
     protected final synchronized Properties getProperties() {
         if (properties == null) {
@@ -112,7 +112,7 @@ public class PackagerTask extends Task {
 
     /**
      * Read the properties file used to configure the packager tool.
-     * @return
+     * @return a Properties object loaded from the file.
      */
     private final Properties readProperties() {
         try {
@@ -132,11 +132,13 @@ public class PackagerTask extends Task {
     }
     
     /**
-     * Read the properties from the given {@link InputStream}.
+     * Read the properties from the given {@link InputStream} into a new
+     * Properties object.  A Properties object may be supplied to provide
+     * defaults for the created Properties object.
      * 
      * @param input
-     * @param defaultProps
-     * @return
+     * @param defaultProps the default Properties object, or {@code null}.
+     * @return a Properties object loaded from the stream.
      */
     private static final Properties readProperties(InputStream input, Properties defaultProps) {
         Properties properties = (defaultProps == null) ? new Properties() : new Properties(defaultProps);

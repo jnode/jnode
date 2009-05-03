@@ -211,9 +211,7 @@ public class BCELDependencyChecker extends AbstractPluginTask {
 
 
     /**
-     * @param sb
-     * @param depends
-     * @param descriptors
+     * @param jarFiles
      * @param descriptor
      * @throws BuildException
      */

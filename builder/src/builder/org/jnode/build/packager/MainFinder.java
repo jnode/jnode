@@ -51,7 +51,7 @@ public class MainFinder {
      * then scans the jars/resources for main classes.  
      * 
      * @param userJar
-     * @return
+     * @return the names of the main classes.
      * @throws FileNotFoundException
      * @throws IOException
      */

@@ -46,7 +46,7 @@ public final class AsmSourceInfo {
     /**
      * Return a list of all configured include directories.
      *
-     * @return
+     * @return the list of all configured include directories.
      */
     public final List<File> includeDirs() {
         return Collections.unmodifiableList(includeDirs);
@@ -71,9 +71,9 @@ public final class AsmSourceInfo {
     }
 
     /**
-     * Create an includeDir sub element.
+     * Create an includeDir subelement.
      *
-     * @return
+     * @return the subelement created.
      */
     public IncludeDir createIncludeDir() {
         return new IncludeDir();
