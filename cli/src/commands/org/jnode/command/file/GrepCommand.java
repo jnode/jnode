@@ -20,8 +20,9 @@
  
 package org.jnode.command.file;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileFilter;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -33,12 +34,13 @@ import java.util.regex.Matcher;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.jnode.command.util.AbstractDirectoryWalker;
+import org.jnode.command.util.AbstractDirectoryWalker.PathnamePatternFilter;
+import org.jnode.command.util.IOUtils;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
@@ -57,7 +59,9 @@ import org.jnode.shell.syntax.StringArgument;
  */
 public class GrepCommand extends AbstractCommand {
 
+    private static final Logger log = Logger.getLogger(GrepCommand.class);
     private static final boolean DEBUG = false;
+    private static final int BUFFER_SIZE = 8192;
     
     private static final String help_matcher_fixed = "Patterns are fixed strings, seperated by new lines. Any of " +
                                                      "which is to be matched.";
@@ -151,6 +155,7 @@ public class GrepCommand extends AbstractCommand {
     private static final String help_pattern_files = "File with patterns to match, one per line.";
     private static final String help_files = "The files to match against. If there are no files, or if any file is " +
                                              "'-' then match stdandard input.";
+    private static final String err_ex_walker = "Exception while walking.";
 
     private final StringArgument Patterns;
     private final FileArgument PatternFiles;
@@ -214,8 +219,6 @@ public class GrepCommand extends AbstractCommand {
     private static final int PREFIX_FL     = PREFIX_FILE | PREFIX_LINE;
     private static final int PREFIX_FB     = PREFIX_FILE | PREFIX_BYTE;
     private static final int PREFIX_LB     = PREFIX_LINE | PREFIX_BYTE;
-    
-    private static final Pattern multiGlob = Pattern.compile("[*]");
     
     private PrintWriter err;
     private PrintWriter out;
@@ -309,7 +312,8 @@ public class GrepCommand extends AbstractCommand {
             FileArgument("files", Argument.MULTIPLE | Argument.EXISTING | FileArgument.HYPHEN_IS_SPECIAL, help_files);
         registerArguments(Patterns, PatternFiles, Files, NullTerm);
         
-        match = multiGlob.matcher(" ");
+        // Default matcher
+        match = Pattern.compile(".*").matcher("");
     }
 
     /**
@@ -344,10 +348,10 @@ public class GrepCommand extends AbstractCommand {
                 name   = file.getPath();
                 try {
                     if (name.equals("-")) {
-                        reader = new LineNumberReader(in);
+                        reader = new LineNumberReader(in, BUFFER_SIZE);
                         name = prefixLabel;
                     } else {
-                        reader = new LineNumberReader(new FileReader(file));
+                        reader = IOUtils.openLineReader(file, BUFFER_SIZE);
                     }
                     if (exitOnFirstMatch) {
                         debug(" exitOnFirstMatch");
@@ -382,13 +386,7 @@ public class GrepCommand extends AbstractCommand {
                     error("IOException greping file : " + file);
                     e.printStackTrace();
                 } finally {
-                    if (reader != null) {
-                        try {
-                            reader.close();
-                        } catch (IOException _) {
-                            // ignore
-                        }
-                    }
+                    IOUtils.close(reader);
                 }
             }
         } catch (Exception e) {
@@ -487,7 +485,6 @@ public class GrepCommand extends AbstractCommand {
      * Outputs a matched string, in the given file, at the given line and the given byte offset. Outputs
      * to stdout the match string, along with any set prefix options.
      */
-    // TODO PREFIX_TAB
     private void printMatch(String line, String name, int lineCount, int byteCount) {
         String sLine;
         String sByte;
@@ -623,19 +620,6 @@ public class GrepCommand extends AbstractCommand {
         return Pattern.compile(sb.toString(), flags);
     }
     
-    private Pattern glob2Pattern(String glob) {
-        debug("glob-1 > " + glob);
-        String s = glob;
-        glob = multiGlob.matcher(glob).replaceAll(".*");
-        glob = glob.replace('?', '.');
-        debug("glob-2 > " + glob);
-        try {
-            return Pattern.compile(glob);
-        } catch (PatternSyntaxException e) {
-            throw new InternalError("Invalid glob pattern {" + s + "," + glob + "}");
-        }
-    }
-    
     /*********************************************************/
     /************** Command Line Parsing *********************/
     /*********************************************************/
@@ -720,12 +704,12 @@ public class GrepCommand extends AbstractCommand {
         }
         
         if ((prefix & (PREFIX_FILE | PREFIX_NOFILE)) == (PREFIX_FILE | PREFIX_NOFILE)) {
-            throw new InternalError("PREFIX_NOFILE && PREFIX_FILE");
+            throw new AssertionError("PREFIX_NOFILE && PREFIX_FILE");
         }
     }
     
     private void parsePatterns() {
-        LineNumberReader reader;
+        BufferedReader reader;
         String line;
         patterns = new ArrayList<Pattern>();
         
@@ -734,30 +718,49 @@ public class GrepCommand extends AbstractCommand {
                 patterns.add(rewritePattern(s));
             } catch (PatternSyntaxException e) {
                 error("Invalid Pattern : " + s);
+                exit(2);
             }
         }
         
         for (File file : PatternFiles.getValues()) {
             reader = null;
             try {
-                reader = new LineNumberReader(new FileReader(file));
+                reader = IOUtils.openBufferedReader(file, BUFFER_SIZE);
                 while ((line = reader.readLine()) != null) {
                     try {
                         patterns.add(rewritePattern(line));
                     } catch (PatternSyntaxException e) {
                         error("Invalid Pattern : " + line);
+                        exit(2);
                     }
                 }
             } catch (IOException e) {
                 debug("IOException while parsing pattern file : " + file);
+                error("Error reading file: " + file);
+                exit(2);
             } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException _) {
-                        // ignore
-                    }
-                }
+                IOUtils.close(reader);
+            }
+        }
+    }
+    
+    private class Walker extends AbstractDirectoryWalker {
+        @Override
+        public void handleFile(File file) {
+            files.add(file);
+        }
+        @Override
+        public void handleDir(File dir) {
+            // no-op
+        }
+        @Override
+        public void handleRestrictedFile(File file) {
+            // no-op
+        }
+        
+        private void doFile(File file) {
+            if (notFiltered(file)) {
+                files.add(file);
             }
         }
     }
@@ -765,115 +768,75 @@ public class GrepCommand extends AbstractCommand {
     private void parseFiles() {
         String line;
         String name;
-        LineNumberReader reader;
+        BufferedReader reader;
         
         files = new ArrayList<File>();
+        
         if (!Files.isSet()) {
             files.add(new File("-"));
             return;
         }
-        List<Pattern> excludes    = new ArrayList<Pattern>();
-        List<Pattern> includes    = new ArrayList<Pattern>();
-        List<String> excludeDirs  = new ArrayList<String>();
+        
+        Walker walker = new Walker();
         
         for (String s : Include.getValues()) {
-            includes.add(glob2Pattern(s));
-        }
-        
-        for (String s : ExcludeDir.getValues()) {
-            excludeDirs.add(s);
+            walker.addFilter(new PathnamePatternFilter(s, false));
         }
         
         for (String s : Exclude.getValues()) {
-            excludes.add(glob2Pattern(s));
+            walker.addFilter(new PathnamePatternFilter(s, true));
         }
         
         for (File file : ExcludeFile.getValues()) {
-            reader = null;
+            reader = IOUtils.openBufferedReader(file, BUFFER_SIZE);
+            List<String> lines = null;
             try {
-                reader = new LineNumberReader(new FileReader(file));
-                while ((line = reader.readLine()) != null) {
-                    excludes.add(glob2Pattern(line));
-                }
-            } catch (IOException _) {
-                debug("IOException while parsing exclude file: " + file);
+                lines = IOUtils.readLines(reader);
             } finally {
-                try {
-                    if (reader != null) {
-                        reader.close();
-                    }
-                } catch (IOException _) {
-                    // ignore
+                IOUtils.close(reader);
+            }
+            if (lines != null) {
+                for (String s : lines) {
+                    walker.addFilter(new PathnamePatternFilter(s, true));
                 }
             }
         }
         
-        Deque<File> stack = new ArrayDeque<File>();
+        List<String> excludeDirs  = new ArrayList<String>();
+        
+        for (final String s : ExcludeDir.getValues()) {
+            walker.addDirectoryFilter(new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return !(file.isDirectory() && file.getName().equals(s));
+                }
+            });
+        }
+        
+        List<File> dirs = new ArrayList<File>();
+        
         for (File file : Files.getValues()) {
-            name = file.getName();
-            if (name.equals("-")) {
-                files.add(file);
-                continue;
-            }
             if (file.isDirectory()) {
-                if (!excludeDir(name, excludeDirs) && recurse) {
-                    stack.push(file);
+                if (recurse) {
+                    dirs.add(file);
                 }
-            } else if (includeFile(name, includes) && !excludeFile(name, excludes)) {
-                files.add(file);
+            } else if (file.isFile()) {
+                walker.doFile(file);
+            } else {
+                // skip special files
             }
         }
         
-        while (stack.size() > 0) {
-            File dir = stack.pop();
-            if (!dir.isDirectory()) {
-                err.println("Stack has non-directory: " + dir);
-                continue;
+        try {
+            if (dirs.size() > 0) {
+                walker.walk(dirs);
             }
-            for (File file : dir.listFiles()) {
-                name = file.getName();
-                if (file.isDirectory()) {
-                    if (!excludeDir(name, excludeDirs)) {
-                        stack.push(file);
-                    }
-                } else if (includeFile(name, includes) && !excludeFile(name, excludes)) {
-                    files.add(file);
-                }
-            }
-        }   
-    }
-    
-    private boolean excludeFile(String name, List<Pattern> excludes) {
-        if (excludes.size() == 0) return false;
-        for (Pattern exclude : excludes) {
-            if (exclude.matcher(name).matches()) {
-                debug("Exclude: " + name);
-                return true;
-            }
+        } catch (IOException e) {
+            // technically, the walker shouldn't let this propogate unless something
+            // is really wrong.
+            error(err_ex_walker);
+            exit(2);
         }
-        return false;
-    }
-    
-    private boolean excludeDir(String name, List<String> excludeDirs) {
-        if (excludeDirs.size() == 0) return false;
-        for (String exclude : excludeDirs) {
-            if (name.equals(exclude)) {
-                debug("ExcludeDir: " + name);
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    private boolean includeFile(String name, List<Pattern> includes) {
-        if (includes.size() == 0) return true;
-        for (Pattern include : includes) {
-            if (include.matcher(name).matches()) {
-                debug("Include: " + name);
-                return true;
-            }
-        }
-        return false;
     }
     
     private void error(String s) {
@@ -881,7 +844,7 @@ public class GrepCommand extends AbstractCommand {
     }
     
     private void debug(String s) {
-        if (debug) err.println(s);
+        if (debug) log.debug(s);
     }
     
     private void debugOptions() {
