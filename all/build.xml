@@ -1,5 +1,8 @@
 <project name="JNode" default="help" basedir=".">
-    <!-- if task is used from this -->
+
+    <property name="root.dir" value="${basedir}/.."/>
+	
+	<!-- if task is used from this -->
     <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 	<!-- before including jnode.xml, we must set this property -->
     <condition property="memoryMaximumSize" value="1512m" else="768m">
@@ -8,7 +11,7 @@
     <echo message="Setting memoryMaximumSize to ${memoryMaximumSize}"/>
 	
     <!-- Include antlib -->
-    <typedef file="${basedir}/lib/jnode.xml"/>
+    <typedef file="${root.dir}/all/lib/jnode.xml"/>
 
     <!-- JNode version -->
     <property name="jnode-ver" value="0.2.9-dev"/>
@@ -18,7 +21,6 @@
     <property name="java.source" value="1.6"/>
     <property name="java.encoding" value="US-ASCII"/>
 
-    <property name="root.dir" value="${basedir}/.."/>
     <property name="build.dir" value="${basedir}/build"/>
     <property name="reports.dir" value="${build.dir}/reports"/>
     <property name="cdroms.dir" value="${build.dir}/cdroms"/>
@@ -99,10 +101,10 @@
     <property name="xmlParserAPIs.jar" value="${root.dir}/builder/pmd/lib/xmlParserAPIs-2.6.2.jar"/>
 
     <!-- lists of plugins to use while booting -->
-    <property name="default-plugin-list" value="${basedir}/conf/default-plugin-list.xml"/>
-    <property name="full-plugin-list" value="${basedir}/conf/full-plugin-list.xml"/>
-    <property name="install-plugin-list" value="${basedir}/conf/install-plugin-list.xml"/>
-    <property name="system-plugin-list" value="${basedir}/conf/system-plugin-list.xml"/>
+    <property name="default-plugin-list" value="${root.dir}/all/conf/default-plugin-list.xml"/>
+    <property name="full-plugin-list" value="${root.dir}/all/conf/full-plugin-list.xml"/>
+    <property name="install-plugin-list" value="${root.dir}/all/conf/install-plugin-list.xml"/>
+    <property name="system-plugin-list" value="${root.dir}/all/conf/system-plugin-list.xml"/>
     <property name="sources.dist.tar.gz" value="${build.dir}/jnodesources-${jnode-ver}.tar.gz"/>
     <property name="jnode-x86.iso" value="${cdroms.dir}/jnode-x86.iso"/>
     <property name="jnode-x86-lite.iso" value="${cdroms.dir}/jnode-x86-lite.iso"/>
@@ -120,7 +122,7 @@
     	<pathelement location="${asm-util.jar}"/>
         <pathelement location="${cglib.jar}"/>
         <pathelement location="${log4j.jar}"/>
-        <pathelement location="${basedir}/conf"/>
+        <pathelement location="${root.dir}/all/conf"/>
         <pathelement location="${beanshell.jar}"/>
         <pathelement location="${js.jar}"/>
         <pathelement location="${oncrpc.jar}"/>
@@ -148,6 +150,19 @@
         <pathelement location="${thinlet.jar}"/>
         <pathelement location="${jnode-textui.jar}"/>
 	    <pathelement location="${bcel-5.1.jar}"/>
+        <path refid="cp"/>
+    </path>
+	
+	<path id="cp-test">
+        <pathelement location="${root.dir}/core/build/classes"/>
+        <pathelement location="${root.dir}/distr/build/classes"/>
+        <pathelement location="${root.dir}/fs/build/classes"/>
+        <pathelement location="${root.dir}/shell/build/classes"/>
+        <pathelement location="${root.dir}/net/build/classes"/>
+        <pathelement location="${root.dir}/gui/build/classes"/>
+        <pathelement location="${root.dir}/cli/build/classes"/>
+        <pathelement location="${root.dir}/textui/build/classes"/>
+        <pathelement location="${root.dir}/shell/lib/nanoxml-2.2.3.jar"/>
         <path refid="cp"/>
     </path>
 
@@ -423,10 +438,10 @@
         <taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode"/>
         <initjars destdir="${initjars.dir}"
             pluginDir="${plugins.dir}"
-            systemPluginList="${basedir}/conf/system-plugin-list.xml">
+            systemPluginList="${root.dir}/all/conf/system-plugin-list.xml">
             <insert userApplicationsDir="${user.applications.dir}"/>
                     	
-            <fileset dir="${basedir}/conf">
+            <fileset dir="${root.dir}/all/conf">
                 <exclude name="system-plugin-list.xml"/>
                 <include name="*plugin-list.xml"/>
             </fileset>
@@ -439,7 +454,7 @@
         <taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode"/>
         <initjars destdir="${initjars.dir}"
             pluginDir="${plugins.dir}"
-            systemPluginList="${basedir}/conf/system-plugin-list.xml">
+            systemPluginList="${root.dir}/all/conf/system-plugin-list.xml">
             <fileset dir="${custom.plugin-list.dir}">
                 <include name="*plugin-list.xml"/>
             </fileset>
