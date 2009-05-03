@@ -21,6 +21,10 @@
   <target name="prepare">
     <mkdir dir="${my-classes.dir}"/>
     <jnode.copy-descriptors/>
+    <copy todir="${my-classes.dir}">
+        <fileset dir="${my-src.dir}/commands" excludes="**/*.java,**/package.html"/>
+        <fileset dir="${my-src.dir}/test" excludes="**/*.java,**/package.html"/>
+    </copy>
   </target>
   
 <!-- Compile subproject -->
