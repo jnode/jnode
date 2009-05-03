@@ -225,7 +225,7 @@ public class CatCommand extends AbstractCommand {
         if (file.getName().equals("-")) {
             ret = stdin;
         } else {
-            ret = IOUtils.openInputStream(file, true, BUFFER_SIZE);
+            ret = IOUtils.openInputStream(file);
             if (ret == null) {
                 err.format(err_file, file);
             }
