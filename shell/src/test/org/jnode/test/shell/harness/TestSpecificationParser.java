@@ -75,7 +75,11 @@ public class TestSpecificationParser {
                     } else if (name.equals("include")) {
                         String specName = extractAttribute(argChild, "setName");
                         // (indirectly recursive)
-                        TestSetSpecification included = harness.loadTestSetSpecification(specName, base);
+                        File includedFile = new File(specName);
+                        if (!includedFile.isAbsolute()) {
+                        	includedFile = new File(base, specName);
+                        }
+                        TestSetSpecification included = harness.loadTestSetSpecification(includedFile);
                         if (included != null) {
                             res.addTestSetSpecification(included);
                         }
