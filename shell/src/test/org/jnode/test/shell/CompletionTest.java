@@ -109,9 +109,9 @@ public class CompletionTest extends TestCase {
             ShellUtils.registerCommandInterpreter(RedirectingInterpreter.FACTORY);
 
             AliasManager am = this.getAliasManager();
-            am.add("gc", "org.jnode.shell.command.GcCommand");
-            am.add("cpuid", "org.jnode.shell.command.system.CpuIDCommand");
-            am.add("set", "org.jnode.shell.command.SetCommand");
+            am.add("gc", "org.jnode.command.system.GcCommand");
+            am.add("cpuid", "org.jnode.command.system.CpuIDCommand");
+            am.add("set", "org.jnode.command.system.SetCommand");
             am.add("dir", "org.jnode.test.shell.MyDirCommand");
             am.add("duh", "org.jnode.test.shell.MyDuhCommand");
             am.add("cat", "org.jnode.test.shell.MyCatCommand");
@@ -141,7 +141,7 @@ public class CompletionTest extends TestCase {
         checkCompletions(cs, "set a", new String[]{}, -1);
         checkCompletions(cs, "set u", new String[]{
             "user.country ", "user.dir ", "user.home ",
-            "user.language ", "user.name ", "user.timezone "}, 4);
+            "user.language ", "user.name ", "user.timezone ", "user.zoneinfo.dir "}, 4);
         checkCompletions(cs, "set a ", new String[]{}, -1);
         checkCompletions(cs, "set a b", new String[]{}, 6);
         checkCompletions(cs, "set a b ", new String[]{}, -1);
