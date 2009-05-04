@@ -198,7 +198,15 @@ public class BjorneInterpreter implements CommandInterpreter {
         bindShell(shell);
         BjorneTokenizer tokens = new BjorneTokenizer(partial);
         final CommandNode tree = new BjorneParser(tokens, "> ").parse();
-        if (tree instanceof BjorneCompletable) {
+        if (tree == null) {
+            return new Completable() {
+                @Override
+                public void complete(CompletionInfo completions, CommandShell shell) throws CompletionException {
+                    CommandLine cline = new CommandLine(null, null);
+                    cline.complete(completions, shell);
+                }
+            };
+        } else if (tree instanceof BjorneCompletable) {
             return new Completable() {
                 @Override
                 public void complete(CompletionInfo completions,
