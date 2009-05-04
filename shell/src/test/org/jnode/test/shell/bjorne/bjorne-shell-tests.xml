@@ -842,5 +842,16 @@ Hi mum again
         <file name="4" input="false">set
 </file>
     </testSpec>
-    
+    <testSpec title="and_if multiline" command="test" runMode="AS_SCRIPT" rc="1">
+        <script>#!bjorne
+                false &amp;&amp;
+                true
+        </script>
+    </testSpec>
+    <testSpec title="or_if multiline" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                true ||
+                false
+        </script>
+    </testSpec>
 </testSet>
