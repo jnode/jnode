@@ -103,9 +103,9 @@ public class DefaultSyntaxCompletionTest extends TestCase {
             ShellUtils.registerCommandInterpreter(RedirectingInterpreter.FACTORY);
 
             AliasManager am = this.getAliasManager();
-            am.add("gc", "org.jnode.shell.command.GcCommand");
-            am.add("cpuid", "org.jnode.shell.command.system.CpuIDCommand");
-            am.add("set", "org.jnode.shell.command.SetCommand");
+            am.add("gc", "org.jnode.command.system..GcCommand");
+            am.add("cpuid", "org.jnode.command.system.CpuIDCommand");
+            am.add("set", "org.jnode.command.system.SetCommand");
             am.add("duh", "org.jnode.test.shell.MyDuhCommand");
             am.add("alias", "org.jnode.test.shell.MyAliasCommand");
             am.add("compile", "org.jnode.test.shell.MyCompileCommand");
@@ -119,8 +119,8 @@ public class DefaultSyntaxCompletionTest extends TestCase {
 
         final String[] propertyCompletions = getExpectedPropertyNameCompletions();
 
-        checkCompletions(cs, "set ", new String[]{"--key ", "--value "}, -1);
-        checkCompletions(cs, "set -", new String[]{"--key ", "--value "}, 4);
+        checkCompletions(cs, "set ", new String[]{"--key ", "--shell ", "--skey ", "--value "}, -1);
+        checkCompletions(cs, "set -", new String[]{"--key ", "--shell ", "--skey ", "--value "}, 4);
         checkCompletions(cs, "set --v", new String[]{"--value "}, 4);
         checkCompletions(cs, "set --key", new String[]{"--key "}, 4);
         checkCompletions(cs, "set --key ", propertyCompletions, -1);
@@ -128,7 +128,7 @@ public class DefaultSyntaxCompletionTest extends TestCase {
 
         checkCompletions(cs, "set --key u", new String[]{
             "user.country ", "user.dir ", "user.home ",
-            "user.language ", "user.name ", "user.timezone "}, 10);
+            "user.language ", "user.name ", "user.timezone ", "user.zoneinfo.dir "}, 10);
 
         checkCompletions(cs, "cpuid ", new String[]{}, -1);
 
