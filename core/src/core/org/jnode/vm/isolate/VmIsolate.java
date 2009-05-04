@@ -945,6 +945,18 @@ public final class VmIsolate {
             VmSystem.setOut(thread.getStdout());
             VmSystem.setErr(thread.getStderr());
             VmSystem.setIn(thread.getStdin());
+            
+            // Set the isolate's properties to a copy of the initial properties passed
+            // when the isolate was created.  (This needs to be done really early
+            // via the IOContext switch to avoid NPEs when the native compiler,
+            // class loader, security manager, etc call System.getProperty() too
+            // soon.)
+            Properties myProps = new Properties();
+            for (Object key : initProperties.keySet()) {
+                myProps.setProperty(
+                        (String) key, (String) initProperties.getProperty((String) key));
+            }
+            VmSystem.getIOContext().setProperties(myProps);
 
             // Set context classloader
             final ClassLoader loader = thread.getPluginManager().getRegistry()
@@ -960,17 +972,6 @@ public final class VmIsolate {
             //start executor
             //executorThread = new Thread(new TaskExecutor(), "isolate-executor");
             //executorThread.start();
-
-            //inherit properties
-            AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                public Object run() {
-                    Properties sys_porps = SystemProperties.getProperties();
-                    for (String prop : initProperties.stringPropertyNames()) {
-                        sys_porps.setProperty(prop, initProperties.getProperty(prop));
-                    }
-                    return null;
-                }
-            });
 
             // Find main method
             final Method mainMethod = cls.getMethod("main",
