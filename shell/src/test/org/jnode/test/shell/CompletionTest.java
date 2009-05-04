@@ -141,7 +141,7 @@ public class CompletionTest extends TestCase {
         checkCompletions(cs, "set a", new String[]{}, -1);
         checkCompletions(cs, "set u", new String[]{
             "user.country ", "user.dir ", "user.home ",
-            "user.language ", "user.name ", "user.timezone ", "user.zoneinfo.dir "}, 4);
+            "user.language ", "user.name ", "user.timezone "}, 4);
         checkCompletions(cs, "set a ", new String[]{}, -1);
         checkCompletions(cs, "set a b", new String[]{}, 6);
         checkCompletions(cs, "set a b ", new String[]{}, -1);

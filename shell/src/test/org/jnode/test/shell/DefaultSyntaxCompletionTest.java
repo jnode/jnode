@@ -128,7 +128,7 @@ public class DefaultSyntaxCompletionTest extends TestCase {
 
         checkCompletions(cs, "set --key u", new String[]{
             "user.country ", "user.dir ", "user.home ",
-            "user.language ", "user.name ", "user.timezone ", "user.zoneinfo.dir "}, 10);
+            "user.language ", "user.name ", "user.timezone "}, 10);
 
         checkCompletions(cs, "cpuid ", new String[]{}, -1);
 
