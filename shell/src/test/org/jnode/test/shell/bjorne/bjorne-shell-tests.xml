@@ -17,6 +17,24 @@ mother
         <output>hello mother
 </output>
     </testSpec>
+    <testSpec title="&amp;&amp;" command="test" runMode="AS_SCRIPT" rc="1">
+        <script>#!bjorne
+        true &amp;&amp; echo hi
+        false &amp;&amp; echo bye
+        </script>
+        <output>hi
+</output>
+    </testSpec>
+    <testSpec title="&amp;&amp; multiline" command="test" runMode="AS_SCRIPT" rc="1">
+        <script>#!bjorne
+        true &amp;&amp; 
+        echo hi
+        false &amp;&amp; 
+        echo bye
+        </script>
+        <output>hi
+</output>
+    </testSpec>
     <testSpec title="$?" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 true
@@ -747,6 +765,14 @@ Hi mum again
 Hi mum again
 Hi mum
 Hi mum again
+</output>
+    </testSpec>
+    <testSpec title="pipeline multiline" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+        echo Hi |
+        cat
+        </script>
+        <output>Hi
 </output>
     </testSpec>
     <testSpec title="subshell" command="test" runMode="AS_SCRIPT" rc="0">
