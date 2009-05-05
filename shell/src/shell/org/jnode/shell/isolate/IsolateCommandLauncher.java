@@ -20,15 +20,28 @@
  
 package org.jnode.shell.isolate;
 
+import java.util.Map;
+
 import javax.isolate.Isolate;
 import javax.isolate.Link;
 
 import org.jnode.shell.CommandRunner;
+import org.jnode.vm.Unsafe;
 import org.jnode.vm.isolate.ObjectLinkMessage;
 
+/**
+ * This is the class that the isolate invoker uses to launch the user's
+ * command in the new isolate.  
+ * 
+ * @author crawley@jnode.org
+ */
 public class IsolateCommandLauncher {
 
     /**
+     * The entry point that used to run the 'application' when the isolate is
+     * started.  The actual command is then passed to us in a Link message
+     * in the form of a CommandRunner object.
+     * 
      * @param args
      */
     public static void main(String[] args) {
@@ -37,8 +50,19 @@ public class IsolateCommandLauncher {
         try {
             ObjectLinkMessage message = (ObjectLinkMessage) cl.receive();
             cr = (CommandRunner) message.extract();
+            Map<String, String> env = cr.getEnv();
+            int envSize = (env == null) ? 0 : env.size();
+            byte[][] binEnv = new byte[envSize * 2][];
+            if (envSize > 0) {
+                int i = 0; 
+                for (Map.Entry<String, String> entry : env.entrySet()) {
+                    binEnv[i++] = entry.getKey().getBytes();
+                    binEnv[i++] = entry.getValue().getBytes();
+                }
+            }
+            NativeProcessEnvironment.setIsolateInitialEnv(binEnv);
         } catch (Exception e) {
-            e.printStackTrace();
+            Unsafe.debugStackTrace(e.getMessage(), e);
             return;
         }
         cr.run();

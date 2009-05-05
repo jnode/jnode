@@ -50,6 +50,8 @@ import org.jnode.vm.isolate.ObjectLinkMessage;
 
 /**
  * This class implements the CommandThread API for running commands in a new isolates.
+ * It takes care of assembling the Stream bindings for the new isolate, creating it
+ * and passing it the CommandRunner that holds the command class and arguments.
  * 
  * @author crawley@jnode.org
  */

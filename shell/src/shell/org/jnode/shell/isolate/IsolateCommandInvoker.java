@@ -21,12 +21,18 @@
 package org.jnode.shell.isolate;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
 
 import org.jnode.shell.AsyncCommandInvoker;
+import org.jnode.shell.CommandInfo;
+import org.jnode.shell.CommandInvoker;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandRunner;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.CommandThread;
 import org.jnode.shell.CommandThreadImpl;
+import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellInvocationException;
 import org.jnode.shell.SimpleCommandInvoker;
 
@@ -35,7 +41,7 @@ import org.jnode.shell.SimpleCommandInvoker;
  * 
  * @author crawley@jnode.org
  */
-public class IsolateCommandInvoker extends AsyncCommandInvoker {
+public class IsolateCommandInvoker extends AsyncCommandInvoker implements CommandInvoker {
 
     public static final Factory FACTORY = new Factory() {
         public SimpleCommandInvoker create(CommandShell shell) {
@@ -54,6 +60,20 @@ public class IsolateCommandInvoker extends AsyncCommandInvoker {
     @Override
     public String getName() {
         return "isolate";
+    }
+
+    public int invoke(CommandLine cmdLine, CommandInfo cmdInfo,
+            Properties sysProps, Map<String, String> env) 
+        throws ShellException {
+        CommandRunner cr = setup(cmdLine, cmdInfo, sysProps, env);
+        return runIt(cmdLine, cmdInfo, cr);
+    }
+
+    public CommandThread invokeAsynchronous(CommandLine cmdLine, CommandInfo cmdInfo,
+            Properties sysProps, Map<String, String> env)
+        throws ShellException {
+        CommandRunner cr = setup(cmdLine, cmdInfo, sysProps, env);
+        return forkIt(cmdLine, cmdInfo, cr);
     }
 
     @Override
