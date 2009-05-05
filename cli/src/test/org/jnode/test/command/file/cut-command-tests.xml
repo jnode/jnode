@@ -1,0 +1,133 @@
+<testSet title="POSIX cut command tests">
+    <plugin id="org.jnode.command.file"/>
+    <testSpec title="cut byte-range 1" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-b</arg>
+        <arg>3-7</arg>
+        <input>1234567890
+</input>
+        <output>34567
+</output>
+    </testSpec>
+    <testSpec title="cut byte-range 2" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-b</arg>
+        <arg>-7</arg>
+        <input>1234567890
+</input>
+        <output>1234567
+</output>
+    </testSpec>
+    <testSpec title="cut byte-range 3" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-b</arg>
+        <arg>3-</arg>
+        <input>1234567890
+</input>
+        <output>34567890
+</output>
+    </testSpec>
+    <testSpec title="cut char-range 1" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-c</arg>
+        <arg>3-7</arg>
+        <input>1234567890
+</input>
+        <output>34567
+</output>
+    </testSpec>
+    <testSpec title="cut char-range 2" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-c</arg>
+        <arg>-7</arg>
+        <input>1234567890
+</input>
+        <output>1234567
+</output>
+    </testSpec>
+    <testSpec title="cut char-range 3" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-c</arg>
+        <arg>3-</arg>
+        <input>1234567890
+</input>
+        <output>34567890
+</output>
+    </testSpec>
+    <!-- The next 3 tests have <TAB>s in the input/output, make sure an editor does not
+         expand them to spaces! -->
+    <testSpec title="cut field-range default 1" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-f</arg>
+        <arg>3-7</arg>
+       <input>1	2	3	4	5	6	7	8	9	0
+</input>
+		<output>3	4	5	6	7
+</output>
+	</testSpec>
+	<testSpec title="cut field-range default 2" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-f</arg>
+        <arg>3-</arg>
+       <input>1	2	3	4	5	6	7	8	9	0
+</input>
+		<output>3	4	5	6	7	8	9	0
+</output>
+	</testSpec>
+	<testSpec title="cut field-range default 3" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-f</arg>
+        <arg>-7</arg>
+       <input>1	2	3	4	5	6	7	8	9	0
+</input>
+		<output>1	2	3	4	5	6	7
+</output>
+	</testSpec>
+	<testSpec title="cut field-range alt-delim 1" command="cut" runMode="AS_ALIAS" rc="0">
+	    <arg>-d</arg>
+	    <arg>;</arg>
+	    <arg>-f</arg>
+	    <arg>3-7</arg>
+	    <input>1;2;3;4;5;6;7;8;9;0
+</input>
+        <output>3;4;5;6;7
+</output>
+    </testSpec>
+    <testSpec title="cut field-range alt-delim 2" command="cut" runMode="AS_ALIAS" rc="0">
+	    <arg>-d</arg>
+	    <arg>;</arg>
+	    <arg>-f</arg>
+	    <arg>3-</arg>
+	    <input>1;2;3;4;5;6;7;8;9;0
+</input>
+        <output>3;4;5;6;7;8;9;0
+</output>
+    </testSpec>
+    <testSpec title="cut field-range alt-delim 3" command="cut" runMode="AS_ALIAS" rc="0">
+	    <arg>-d</arg>
+	    <arg>;</arg>
+	    <arg>-f</arg>
+	    <arg>-7</arg>
+	    <input>1;2;3;4;5;6;7;8;9;0
+</input>
+        <output>1;2;3;4;5;6;7
+</output>
+    </testSpec>
+    <testSpec title="cut field-range out-delim" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-d</arg>
+        <arg>;</arg>
+        <arg>-f</arg>
+        <arg>3-7</arg>
+        <arg>--output-delimiter</arg>
+        <arg>:</arg>
+        <input>1;2;3;4;5;6;7;8;9;0
+</input>
+        <output>3:4:5:6:7
+</output>
+    </testSpec>
+    <testSpec title="cut suppress" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-d</arg>
+        <arg>;</arg>
+        <arg>-f</arg>
+        <arg>3-7</arg>
+        <arg>-s</arg>
+        <input>1;2;3;4;5;6;7;8;9;0
+1:2:3:4:5:6:7:8:9:0
+1;2;3;4;5;6;7;8;9;0
+</input>
+        <output>3;4;5;6;7
+3;4;5;6;7
+</output>
+    </testSpec>
+</testSet>

@@ -1,0 +1,83 @@
+<testSet title="argument tests">
+    <plugin id="org.jnode.command.file"/>
+    <testSpec title="num-list concat 1" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-b</arg>
+        <arg>3,5,7</arg>
+        <input>1234567890
+</input>
+        <output>357
+</output>
+    </testSpec>
+    <testSpec title="num-list concat 2" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-b</arg>
+        <arg>-3,7-</arg>
+        <input>1234567890
+</input>
+        <output>1237890
+</output>
+    </testSpec>
+    <testSpec title="num-list concat 3" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-b</arg>
+        <arg>3,4-6,7</arg>
+        <input>1234567890
+</input>
+        <output>34567
+</output>
+    </testSpec>
+    <testSpec title="num-list concat 4" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-b</arg>
+        <arg>1-2,3,5,6-7,9-10</arg>
+        <input>1234567890
+</input>
+        <output>12356790
+</output>
+    </testSpec>
+    <testSpec title="num-list concat 5" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-b</arg>
+        <arg>-3,-2</arg>
+        <input>1234567890
+</input>
+        <output>123
+</output>
+    </testSpec>
+    <testSpec title="num-list concat 6" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-b</arg>
+        <arg>9-,5-,7-8,6</arg>
+        <input>1234567890
+</input>
+        <output>567890
+</output>
+    </testSpec>
+    <testSpec title="num-list sort 1" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-b</arg>
+        <arg>7,1,5,9,3</arg>
+        <input>1234567890
+</input>
+        <output>13579
+</output>
+    </testSpec>
+        <arg>-b</arg>
+    <testSpec title="num-list sort 2" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>6-7,5,9-10,2,3,1</arg>
+        <input>1234567890
+</input>
+        <output>12356790
+</output>
+    </testSpec>
+    <testSpec title="num-list sort 3" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-b</arg>
+        <arg>7-,-3</arg>
+        <input>1234567890
+</input>
+        <output>1237890
+</output>
+    </testSpec>
+    <testSpec title="num-list sort 4" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-b</arg>
+        <arg>5,-4,6-</arg>
+        <input>1234567890
+</input>
+        <output>1234567890
+</output>
+    </testSpec>
+</testSet>

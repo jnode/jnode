@@ -5,20 +5,50 @@
 	<target name="help" description="output target descriptions">
 		<echo>
 The main targets (tests) for this build are as follows:
-all   	Runs all tests for the 'cli' project
-help    Output these messages
+all             Runs all tests for the 'cli' project
+all-junit       Runs all JUnit tests for the 'cli' project
+blackbox-common Runs all blackbox tests in the 'common' package of the 'cli' project
+blackbox-file   Runs all blackbox tests in the 'file' package of the 'cli' project
+all-blackbox    Runs all blackbox tests for the 'cli' project
+help            Output these messages
 		</echo>
 	</target>
 	
-	<target name="all">
-		<java classpathref="cp-test" classname="org.jnode.test.shell.harness.TestHarness">
+	<target name="all-junit">
+	    <junit showoutput="on" printsummary="on" fork="on">
+			<classpath refid="cp-test"/>
+			<test name="org.jnode.test.cli.CLITestSuite"/>
+		</junit>
+	</target>
+	
+	<target name="blackbox-common">
+	    <java classpathref="cp-test" classname="org.jnode.test.shell.harness.TestHarness">
+	        <arg value="-E"/>
+	        <arg value="-s"/>
+	        <arg value="${root.dir}"/>
+	        <arg value="${basedir}/src/test/org/jnode/test/command/common/all-common-tests.xml"/>
+	    </java>
+	</target>
+	
+	<target name="blackbox-file">
+	    <java classpathref="cp-test" classname="org.jnode.test.shell.harness.TestHarness">
+	        <arg value="-E"/>
+	        <arg value="-s"/>
+	        <arg value="${root.dir}"/>
+	        <arg value="${basedir}/src/test/org/jnode/test/command/file/all-file-tests.xml"/>
+	    </java>
+	</target>
+	
+	<target name="all-blackbox">
+	    <java classpathref="cp-test" classname="org.jnode.test.shell.harness.TestHarness">
 			<arg value="-E"/>
 			<arg value="-s"/>
 			<arg value="${root.dir}"/>
 			<arg value="${basedir}/src/test/org/jnode/test/command/all-tests.xml"/>
 		</java>
 	</target>
-
+	
+	<target name="all" depends="all-junit,all-blackbox"/>
 </project>
 
 
