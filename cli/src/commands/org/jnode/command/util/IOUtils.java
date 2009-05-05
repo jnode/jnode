@@ -100,6 +100,27 @@ public final class IOUtils {
     }
     
     /**
+     * Call the flush method of a list of Flushable objects.
+     *
+     * This method will not throw a NullPointerException if any of the objects are null.
+     *
+     * This method will trap the IOException from flush.
+     *
+     * @param objs one or more Flushable objects
+     */
+    public static void flush(Flushable... objs) {
+        for (Flushable obj : objs) {
+            if (obj != null) {
+                try {
+                    obj.flush();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
+        }
+    }
+    
+    /**
      * Copies data from an Inputstream to an OutputStream.
      *
      * This method allocates a 4096 byte buffer each time it is called.
@@ -241,6 +262,20 @@ public final class IOUtils {
         }
         
         return null;
+    }
+    
+    /**
+     * Opens a BufferedReader on a file.
+     *
+     * This method will not throw a FileNotFoundException like the FileReader
+     * constructor would.
+     *
+     * @param file the file to open the reader on
+     * @return the reader, or null if the file could not be opened
+     * @throws NullPointerException if file is null
+     */
+    public static BufferedReader openBufferedReader(File file) {
+        return openBufferedReader(file, BUFFER_SIZE);
     }
     
     /**
@@ -505,6 +540,7 @@ public final class IOUtils {
      * @throws NullPointerException if reader is null
      */
     public static List<String> readLines(BufferedReader reader, int max) {
+        checkNull(reader);
         List<String> ret = new LinkedList<String>();
         String line;
         int count = 0;

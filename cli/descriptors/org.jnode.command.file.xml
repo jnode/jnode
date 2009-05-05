@@ -8,6 +8,7 @@
         license-name="lgpl">
 
   <requires>
+    <import plugin="org.jnode.command.argument"/>
     <import plugin="org.jnode.command.util"/>
     <import plugin="org.jnode.driver"/>
     <import plugin="org.jnode.fs"/>
@@ -26,6 +27,7 @@
     <alias name="cat"     class="org.jnode.command.file.CatCommand"/>
     <alias name="cd"      class="org.jnode.command.file.CdCommand" internal="yes"/>
     <alias name="cp"      class="org.jnode.command.file.CpCommand"/>
+    <alias name="cut"     class="org.jnode.command.file.CutCommand"/>
     <alias name="del"     class="org.jnode.command.file.DeleteCommand"/>
     <alias name="df"      class="org.jnode.command.file.DFCommand"/>
     <alias name="dir"     class="org.jnode.command.file.DirCommand"/>
@@ -83,6 +85,22 @@
           <argument argLabel="source"/>
         </repeat>
         <argument argLabel="target"/>
+      </sequence>
+    </syntax>
+    <syntax alias="cut">
+      <sequence description="select parts of lines">
+        <optionSet>
+          <option argLabel="byte-range"  shortName="b" longName="bytes" />
+          <option argLabel="char-range"  shortName="c" longName="characters"/>
+          <option argLabel="field-range" shortName="f" longName="fields"/>
+          <option argLabel="in-delim"    shortName="d" longName="delimiter"/>
+          <option argLabel="suppress"    shortName="s" longName="only-delimited"/>
+          <option argLabel="complement"  longName="complement"/>
+          <option argLabel="out-delim"   longName="output-delimiter"/>
+        </optionSet>
+        <repeat>
+          <argument argLabel="files"/>
+        </repeat>
       </sequence>
     </syntax>
     <syntax alias="del">
