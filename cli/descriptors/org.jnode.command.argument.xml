@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.command.argument"
+        name="JNode command arguments"
+        version="@VERSION@"
+        provider-name="@PROVIDER@"
+        license-name="lgpl">
+  
+  <requires>
+    <import plugin="org.jnode.shell.syntax"/>
+    <import plugin="org.jnode.command.util"/>
+  </requires>
+  
+  <runtime>
+    <library name="jnode-cli.jar">
+      <export name="org.jnode.command.argument.*"/>
+    </library>
+  </runtime>
+</plugin>
