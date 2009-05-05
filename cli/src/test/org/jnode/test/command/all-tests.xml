@@ -1,4 +1,5 @@
 <testSet title="All command tests">
+    <include setName="argument/all-argument-tests.xml"/>
     <include setName="common/all-common-tests.xml"/>
     <include setName="file/all-file-tests.xml"/>
 </testSet>
