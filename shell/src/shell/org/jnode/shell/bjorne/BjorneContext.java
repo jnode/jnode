@@ -58,9 +58,9 @@ import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ShellSyntaxException;
 import org.jnode.shell.io.CommandIO;
+import org.jnode.shell.io.CommandIOHolder;
 import org.jnode.shell.io.CommandInput;
 import org.jnode.shell.io.CommandOutput;
-import org.jnode.shell.io.CommandIOHolder;
 
 /**
  * This class holds the shell variable and stream state for a bjorne shell

@@ -45,7 +45,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.jnode.driver.console.CompletionInfo;
-import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandInterpreter;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
@@ -351,8 +350,7 @@ public class BjorneInterpreter implements CommandInterpreter {
         } else {
             cmdLine.setStreams(streams);
             try {
-                CommandInfo cmdInfo = cmdLine.parseCommandLine(shell);
-                return shell.invoke(cmdLine, cmdInfo, sysProps, env);
+                return shell.invoke(cmdLine, sysProps, env);
             } catch (CommandSyntaxException ex) {
                 throw new ShellException("Command arguments don't match syntax", ex);
             }

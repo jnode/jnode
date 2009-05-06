@@ -21,7 +21,6 @@
 package org.jnode.shell.bjorne;
 
 import org.jnode.driver.console.CompletionInfo;
-import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.CommandThread;
@@ -130,8 +129,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
         throws ShellException {
         CommandLine command = context.buildCommandLine(getWords());
         command.setStreams(context.getIOs());
-        CommandInfo cmdInfo = command.parseCommandLine(shell);
-        return shell.invokeAsynchronous(command, cmdInfo);
+        return shell.invokeAsynchronous(command);
     }
 
     @Override

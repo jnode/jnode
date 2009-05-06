@@ -74,11 +74,12 @@ public class DefaultCommandInvoker implements SimpleCommandInvoker {
     public String getName() {
         return "default";
     }
-
+    
     /**
      * Invoke the command. 
      */
-    public int invoke(CommandLine cmdLine, CommandInfo cmdInfo) {
+    public int invoke(CommandLine cmdLine) throws ShellException {
+        CommandInfo cmdInfo = cmdLine.parseCommandLine(shell);
         String cmdName = cmdLine.getCommandName();
         if (cmdName == null) {
             return 0;
@@ -148,11 +149,11 @@ public class DefaultCommandInvoker implements SimpleCommandInvoker {
         }
         return 1;
     }
-
+    
     /**
      * This method is not supported for the DefaultCommandInvoker.
      */
-    public CommandThread invokeAsynchronous(CommandLine commandLine, CommandInfo cmdInfo) {
+    public CommandThread invokeAsynchronous(CommandLine commandLine) throws ShellException {
         throw new UnsupportedOperationException();
     }
 

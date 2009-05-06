@@ -101,8 +101,7 @@ public class DefaultInterpreter implements CommandInterpreter {
             return 0;
         }
         try {
-            CommandInfo cmdInfo = cmd.parseCommandLine(shell);
-            return shell.invoke(cmd, cmdInfo, null, null);
+            return shell.invoke(cmd, null, null);
         } catch (CommandSyntaxException ex) {
             throw new ShellException("Command arguments don't match syntax", ex);
         }
