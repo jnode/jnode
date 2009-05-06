@@ -66,19 +66,19 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker implements Comman
     public String getName() {
         return "proclet";
     }
-
-    public int invoke(CommandLine cmdLine, CommandInfo cmdInfo,
-            Properties sysProps, Map<String, String> env) 
+    
+    public int invoke(CommandLine commandLine, Properties sysProps, Map<String, String> env)
         throws ShellException {
-        CommandRunner cr = setup(cmdLine, cmdInfo, sysProps, env);
-        return runIt(cmdLine, cmdInfo, cr);
+        CommandInfo cmdInfo = commandLine.parseCommandLine(shell);
+        CommandRunner cr = setup(commandLine, cmdInfo, sysProps, env);
+        return runIt(commandLine, cmdInfo, cr);
     }
 
-    public CommandThread invokeAsynchronous(CommandLine cmdLine, CommandInfo cmdInfo,
-            Properties sysProps, Map<String, String> env)
-        throws ShellException {
-        CommandRunner cr = setup(cmdLine, cmdInfo, sysProps, env);
-        return forkIt(cmdLine, cmdInfo, cr);
+    public CommandThread invokeAsynchronous(CommandLine commandLine, Properties sysProps,
+            Map<String, String> env) throws ShellException {
+        CommandInfo cmdInfo = commandLine.parseCommandLine(shell);
+        CommandRunner cr = setup(commandLine, cmdInfo, sysProps, env);
+        return forkIt(commandLine, cmdInfo, cr);
     }
     
     protected CommandThreadImpl createThread(CommandRunner cr) {

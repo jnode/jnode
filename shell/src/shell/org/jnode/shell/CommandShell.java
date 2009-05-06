@@ -638,13 +638,12 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @return the command's return code
      * @throws ShellException
      */
-    public int invoke(CommandLine cmdLine, CommandInfo cmdInfo, 
-            Properties sysProps, Map<String, String> env) 
+    public int invoke(CommandLine cmdLine, Properties sysProps, Map<String, String> env) 
         throws ShellException {
         if (this.invoker instanceof CommandInvoker) {
-            return ((CommandInvoker) this.invoker).invoke(cmdLine, cmdInfo, sysProps, env);
+            return ((CommandInvoker) this.invoker).invoke(cmdLine, sysProps, env);
         } else {
-            return this.invoker.invoke(cmdLine, cmdInfo);
+            return this.invoker.invoke(cmdLine);
         }
     }
 
@@ -657,9 +656,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @return the command's return code
      * @throws ShellException
      */
-    public CommandThread invokeAsynchronous(CommandLine cmdLine, CommandInfo cmdInfo)
+    public CommandThread invokeAsynchronous(CommandLine cmdLine)
         throws ShellException {
-        return this.invoker.invokeAsynchronous(cmdLine, cmdInfo);
+        return this.invoker.invokeAsynchronous(cmdLine);
     }
 
     public CommandInfo getCommandInfo(String cmd) throws ShellException {

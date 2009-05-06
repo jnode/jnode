@@ -36,7 +36,6 @@ public interface CommandInvoker extends SimpleCommandInvoker {
      * 
      * @param commandLine this provides the command name (alias), the command
      *        arguments and (where relevant) the command's i/o stream context.
-     * @param cmdInfo a CommandInfo descriptor for the command to be run.
      * @param sysProps a Properties object containing the command's system
      *        properties.  If this parameter is {@code null}, a copy of the 
      *        system properties for the calling context should be used.
@@ -47,8 +46,7 @@ public interface CommandInvoker extends SimpleCommandInvoker {
      *         non-zero indicating command failure.
      * @throws ShellException if there was some problem launching the command.
      */
-    int invoke(CommandLine commandLine, CommandInfo cmdInfo,
-            Properties sysProps, Map<String, String> env) 
+    int invoke(CommandLine commandLine, Properties sysProps, Map<String, String> env) 
         throws ShellException;
 
     /**
@@ -57,7 +55,6 @@ public interface CommandInvoker extends SimpleCommandInvoker {
      * 
      * @param commandLine this provides the command name (alias), the command
      *        arguments and (where relevant) the command's i/o stream context.
-     * @param cmdInfo a CommandInfo descriptor for the command to be run.
      * @param sysProps a Properties object containing the command's system
      *        properties.  If this parameter is {@code null}, a copy of the 
      *        system properties for the calling context should be used.
@@ -69,8 +66,8 @@ public interface CommandInvoker extends SimpleCommandInvoker {
      *         execute.
      * @throws ShellException if there was some problem launching the command.
      */
-    CommandThread invokeAsynchronous(CommandLine commandLine, CommandInfo cmdInfo,
+    CommandThread invokeAsynchronous(CommandLine commandLine, 
             Properties sysProps, Map<String, String> env) 
         throws ShellException;
-
+    
 }

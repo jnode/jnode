@@ -51,7 +51,7 @@ import org.jnode.shell.io.CommandIO;
 public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
         KeyboardListener {
 
-    CommandShell commandShell;
+    protected final CommandShell shell;
 
     static final Class<?>[] MAIN_ARG_TYPES = new Class[] {String[].class};
 
@@ -70,27 +70,28 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
     CommandThread threadProcess = null;
     String cmdName;
 
-    public AsyncCommandInvoker(CommandShell commandShell) {
-        this.commandShell = commandShell;
+    public AsyncCommandInvoker(CommandShell shell) {
+        this.shell = shell;
         
         // listen for ctrl-c
-        if (commandShell.getConsole() != null) {
-            commandShell.getConsole().addKeyboardListener(this);
+        if (shell.getConsole() != null) {
+            shell.getConsole().addKeyboardListener(this);
         }
         // FIXME ... we need to figure out when / how to detach the listener.
         // At the moment they probably stay attached for ever.  That is not
         // great if lots of invokers are created.
     }
 
-    public int invoke(CommandLine cmdLine, CommandInfo cmdInfo) throws ShellException {
-        CommandRunner cr = setup(cmdLine, cmdInfo);
-        return runIt(cmdLine, cmdInfo, cr);
+    public int invoke(CommandLine commandLine) throws ShellException {
+        CommandInfo cmdInfo = commandLine.parseCommandLine(shell);
+        CommandRunner cr = setup(commandLine, cmdInfo);
+        return runIt(commandLine, cmdInfo, cr);
     }
 
-    public CommandThread invokeAsynchronous(CommandLine cmdLine, CommandInfo cmdInfo)
-        throws ShellException {
-        CommandRunner cr = setup(cmdLine, cmdInfo);
-        return forkIt(cmdLine, cmdInfo, cr);
+    public CommandThread invokeAsynchronous(CommandLine commandLine) throws ShellException {
+        CommandInfo cmdInfo = commandLine.parseCommandLine(shell);
+        CommandRunner cr = setup(commandLine, cmdInfo);
+        return forkIt(commandLine, cmdInfo, cr);
     }
 
     protected CommandRunner setup(CommandLine cmdLine, CommandInfo cmdInfo)
@@ -109,7 +110,7 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
             ios[Command.STD_OUT] != CommandLine.DEFAULT_STDOUT ||
             ios[Command.STD_ERR] != CommandLine.DEFAULT_STDERR;
         try {
-            commandShell.resolveStreams(ios);
+            shell.resolveStreams(ios);
         } catch (ClassCastException ex) {
             throw new ShellFailureException("streams array broken", ex);
         }
@@ -264,6 +265,6 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
 
     @Override
     public boolean isDebugEnabled() {
-        return commandShell.isDebugEnabled();
+        return shell.isDebugEnabled();
     }
 }
