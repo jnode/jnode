@@ -565,6 +565,10 @@ public class CommandLine implements Completable, Iterable<String> {
      * This locates the command's class and a suitable command line syntax, then
      * parses against the Syntax, binding the command arguments to Argument objects
      * in an ArgumentBundle object obtained from the Command object.
+     * <p>
+     * Note that the async invokers don't use this method.  Instead, they obtain the
+     * CommandInfo in the parent thread, then create the command instance and do 
+     * the argument parsing in the child thread / proclet / isolate.
      *
      * @param shell the context for resolving command aliases and locating syntaxes
      * @return a CompandInfo which includes the command instance to which the arguments have been bound
@@ -576,28 +580,9 @@ public class CommandLine implements Completable, Iterable<String> {
         if (cmd.equals("")) {
             throw new ShellFailureException("no command name");
         }
-        try {
-            // Get command's argument bundle and syntax
-            CommandInfo cmdInfo = shell.getCommandInfo(cmd);
-            Command command = cmdInfo.createCommandInstance();
-
-            // Get the command's argument bundle, or the default one.
-            ArgumentBundle bundle = (command == null) ? null :
-                command.getArgumentBundle();
-            if (bundle != null) {
-                // Get a syntax for the alias, or a default one.
-                SyntaxBundle syntaxes = shell.getSyntaxManager().getSyntaxBundle(cmd);
-
-                // Do a full parse to bind the command line argument tokens to corresponding
-                // command arguments
-                bundle.parse(this, syntaxes);
-            }
-            return cmdInfo;
-        } catch (InstantiationException ex) {
-            throw new ShellException("Command class cannot be instantiated", ex);
-        } catch (IllegalAccessException ex) {
-            throw new ShellException("Command class cannot be instantiated", ex);
-        }
+        CommandInfo cmdInfo = shell.getCommandInfo(cmd);
+        cmdInfo.parseCommandLine(this);
+        return cmdInfo;
     }
 
     public void complete(CompletionInfo completion, CommandShell shell) throws CompletionException {

@@ -23,6 +23,8 @@ package org.jnode.shell;
 import gnu.java.security.action.InvokeAction;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -46,44 +48,39 @@ import org.jnode.vm.VmExit;
  * @author crawley@jnode.org
  */
 public class CommandRunner implements CommandRunnable {
+
+    static final Class<?>[] MAIN_ARG_TYPES = new Class[] {String[].class};
+
+    static final Class<?>[] EXECUTE_ARG_TYPES = new Class[] {
+        CommandLine.class, InputStream.class, PrintStream.class,
+        PrintStream.class
+    };
+
+    static final String MAIN_METHOD = "main";
+
+    static final String EXECUTE_METHOD = "execute";
     
     private final SimpleCommandInvoker invoker;
     private final CommandIO[] ios;
-    final Class<?> targetClass;
-    final Method method;
-    final Object[] args;
-    final CommandInfo cmdInfo;
     final CommandLine commandLine;
     final PrintWriter shellErr;
     final Properties sysProps;
     final Map<String, String> env;
+    final boolean redirected;
+    final CommandInfo cmdInfo;
+    
+    Class<?> targetClass;
+    Method method;
+    Object[] args;
     private int rc;
     
 
-    public CommandRunner(SimpleCommandInvoker invoker,
-            CommandInfo cmdInfo, Class<?> targetClass, Method method, Object[] args,
-            CommandIO[] ios, Properties sysProps, Map<String, String> env) {
+    public CommandRunner(SimpleCommandInvoker invoker, CommandLine commandLine, CommandInfo cmdInfo, CommandIO[] ios,
+            Properties sysProps, Map<String, String> env, boolean redirected) {
         this.invoker = invoker;
-        this.targetClass = targetClass;
-        this.method = method;
-        this.cmdInfo = cmdInfo;
-        this.commandLine = null;
-        this.args = args;
-        this.ios = ios;
-        this.shellErr = ios[Command.SHELL_ERR].getPrintWriter();
-        this.env = env;
-        this.sysProps = sysProps;
-    }
-
-    public CommandRunner(SimpleCommandInvoker invoker, 
-            CommandInfo cmdInfo, CommandLine commandLine, CommandIO[] ios,
-            Properties sysProps, Map<String, String> env) {
-        this.invoker = invoker;
-        this.targetClass = null;
-        this.method = null;
-        this.args = null;
-        this.cmdInfo = cmdInfo;
+        this.redirected = redirected;
         this.commandLine = commandLine;
+        this.cmdInfo = cmdInfo;
         this.ios = ios;
         this.shellErr = ios[Command.SHELL_ERR].getPrintWriter();
         this.env = env;
@@ -92,44 +89,8 @@ public class CommandRunner implements CommandRunnable {
 
     public void run() {
         try {
-            try {
-                if (method != null) {
-                    try {
-                        // This saves the Command instance that has the command line state
-                        // associated in a thread-local so that the Abstract.execute(String[])
-                        // method can get hold of it.  This is the magic that allows a command
-                        // that implements 'main' as "new MyCommand().execute(args)" to get the
-                        // parsed command line arguments, etc.
-                        AbstractCommand.saveCurrentCommand(cmdInfo.getCommandInstance());
-                        
-                        // Call the command's entry point method reflectively
-                        Object obj = Modifier.isStatic(method.getModifiers()) ? null
-                                : targetClass.newInstance();
-                        AccessController.doPrivileged(new InvokeAction(method, obj,
-                                args));
-                    } finally {
-                        // This clears the current command to prevent possible leakage of
-                        // commands arguments, etc to the next command.
-                        AbstractCommand.retrieveCurrentCommand();
-                    }
-                } else {
-                    // For a command that implements the Command API, call the 'new'
-                    // execute method.  If it is not 'execute()' is not overridden by the
-                    // command class, the default implementation from AbstractCommand will
-                    // bounce us to the older execute(CommandLine, InputStream, PrintStream,
-                    // PrintStream) method.
-                    Command cmd = cmdInfo.createCommandInstance();
-                    cmd.initialize(commandLine, getIOs());
-                    cmd.execute();
-                }
-            } catch (PrivilegedActionException ex) {
-                Exception ex2 = ex.getException();
-                if (ex2 instanceof InvocationTargetException) {
-                    throw ex2.getCause();
-                } else {
-                    throw ex2;
-                }
-            } 
+            prepare();
+            execute();
         } catch (SyntaxErrorException ex) {
             try {
                 HelpFactory.getHelpFactory().getHelp(commandLine.getCommandName(), cmdInfo).usage(shellErr);
@@ -146,6 +107,80 @@ public class CommandRunner implements CommandRunnable {
         } catch (Throwable ex) {
             shellErr.println("Fatal error in command");
             stackTrace(ex);
+        }
+    }
+
+    private void prepare() throws ShellException {
+        Command command;
+        try {
+            command = cmdInfo.createCommandInstance();
+        } catch (Exception ex) {
+            throw new ShellInvocationException("Problem while creating command instance", ex);
+        }
+        if (command == null) {
+            try {
+                method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
+                int modifiers = method.getModifiers();
+                if ((modifiers & Modifier.STATIC) == 0 || (modifiers & Modifier.PUBLIC) == 0) {
+                    new ShellInvocationException("The 'main' method for " + 
+                            cmdInfo.getCommandClass() + " is not public static");
+                }
+                if (redirected) {
+                    throw new ShellInvocationException(
+                            "The 'main' method for " + cmdInfo.getCommandClass() +
+                            " does not allow redirection or pipelining");
+                }
+                // We've checked the method access, and we must ignore the class access.
+                method.setAccessible(true);
+                targetClass = cmdInfo.getCommandClass();
+                args = new Object[] {commandLine.getArguments()};
+            } catch (NoSuchMethodException e) {
+                throw new ShellInvocationException(
+                        "No entry point method found for " + cmdInfo.getCommandClass());
+            }
+        } else {
+            cmdInfo.parseCommandLine(commandLine);
+        }
+    }
+
+    private void execute() throws Throwable {
+        try {
+            if (method != null) {
+                try {
+                    // This saves the Command instance that has the command line state
+                    // associated in a thread-local so that the Abstract.execute(String[])
+                    // method can get hold of it.  This is the magic that allows a command
+                    // that implements 'main' as "new MyCommand().execute(args)" to get the
+                    // parsed command line arguments, etc.
+                    AbstractCommand.saveCurrentCommand(cmdInfo.getCommandInstance());
+
+                    // Call the command's entry point method reflectively
+                    Object obj = Modifier.isStatic(method.getModifiers()) ? null
+                            : targetClass.newInstance();
+                    AccessController.doPrivileged(new InvokeAction(method, obj,
+                            args));
+                } finally {
+                    // This clears the current command to prevent possible leakage of
+                    // commands arguments, etc to the next command.
+                    AbstractCommand.retrieveCurrentCommand();
+                }
+            } else {
+                // For a command that implements the Command API, call the 'new'
+                // execute method.  If it is not 'execute()' is not overridden by the
+                // command class, the default implementation from AbstractCommand will
+                // bounce us to the older execute(CommandLine, InputStream, PrintStream,
+                // PrintStream) method.
+                Command cmd = cmdInfo.createCommandInstance();
+                cmd.initialize(commandLine, getIOs());
+                cmd.execute();
+            }
+        } catch (PrivilegedActionException ex) {
+            Exception ex2 = ex.getException();
+            if (ex2 instanceof InvocationTargetException) {
+                throw ex2.getCause();
+            } else {
+                throw ex2;
+            }
         }
     }
 

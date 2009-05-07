@@ -21,10 +21,6 @@
 package org.jnode.shell;
 
 import java.awt.event.KeyEvent;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Map;
@@ -53,17 +49,6 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
 
     protected final CommandShell shell;
 
-    static final Class<?>[] MAIN_ARG_TYPES = new Class[] {String[].class};
-
-    static final Class<?>[] EXECUTE_ARG_TYPES = new Class[] {
-        CommandLine.class, InputStream.class, PrintStream.class,
-        PrintStream.class
-    };
-
-    static final String MAIN_METHOD = "main";
-
-    static final String EXECUTE_METHOD = "execute";
-
     boolean blocking;
 
     Thread blockingThread;
@@ -83,28 +68,22 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
     }
 
     public int invoke(CommandLine commandLine) throws ShellException {
-        CommandInfo cmdInfo = commandLine.parseCommandLine(shell);
-        CommandRunner cr = setup(commandLine, cmdInfo);
-        return runIt(commandLine, cmdInfo, cr);
+        CommandRunner cr = setup(commandLine);
+        return runIt(commandLine, cr);
     }
 
     public CommandThread invokeAsynchronous(CommandLine commandLine) throws ShellException {
-        CommandInfo cmdInfo = commandLine.parseCommandLine(shell);
-        CommandRunner cr = setup(commandLine, cmdInfo);
-        return forkIt(commandLine, cmdInfo, cr);
+        CommandRunner cr = setup(commandLine);
+        return forkIt(commandLine, cr);
     }
 
-    protected CommandRunner setup(CommandLine cmdLine, CommandInfo cmdInfo)
+    protected CommandRunner setup(CommandLine cmdLine)
         throws ShellException {
-        return setup(cmdLine, cmdInfo, null, null);
+        return setup(cmdLine, null, null);
     }
 
-    protected CommandRunner setup(CommandLine cmdLine, CommandInfo cmdInfo,
-            Properties sysProps, Map<String, String> env)
+    protected CommandRunner setup(CommandLine cmdLine, Properties sysProps, Map<String, String> env)
         throws ShellException {
-        Method method;
-        CommandRunner cr = null;
-
         CommandIO[] ios = cmdLine.getStreams();
         boolean redirected = ios[Command.STD_IN] != CommandLine.DEFAULT_STDIN ||
             ios[Command.STD_OUT] != CommandLine.DEFAULT_STDOUT ||
@@ -114,45 +93,12 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
         } catch (ClassCastException ex) {
             throw new ShellFailureException("streams array broken", ex);
         }
-        Command command;
-        try {
-            command = cmdInfo.createCommandInstance();
-        } catch (Exception ex) {
-            throw new ShellInvocationException("Problem while creating command instance", ex);
-        }
-        if (command != null) {
-            cr = new CommandRunner(this, cmdInfo, cmdLine, ios, sysProps, env);
-        } else {
-            try {
-                method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
-                int modifiers = method.getModifiers();
-                if ((modifiers & Modifier.STATIC) == 0 || (modifiers & Modifier.PUBLIC) == 0) {
-                    new ShellInvocationException("The 'main' method for " + 
-                            cmdInfo.getCommandClass() + " is not public static");
-                }
-                if (redirected) {
-                    throw new ShellInvocationException(
-                            "The 'main' method for " + cmdInfo.getCommandClass() +
-                            " does not allow redirection or pipelining");
-                }
-                // We've checked the method access, and we must ignore the class access.
-                method.setAccessible(true);
-                cr = new CommandRunner(
-                        this, cmdInfo, cmdInfo.getCommandClass(), method,
-                        new Object[] {cmdLine.getArguments()}, ios, sysProps, env);
-            } catch (NoSuchMethodException e) {
-                // continue;
-            }
-            if (cr == null) {
-                throw new ShellInvocationException(
-                        "No entry point method found for " + cmdInfo.getCommandClass());
-            }
-        }
-        return cr;
+        CommandInfo cmdInfo = shell.getCommandInfo(cmdLine.getCommandName());
+        return new CommandRunner(this, cmdLine, cmdInfo, ios, sysProps, env, redirected);
     }
 
-    protected int runIt(CommandLine cmdLine, CommandInfo cmdInfo, CommandRunner cr)
-        throws ShellInvocationException {
+    protected int runIt(CommandLine cmdLine, CommandRunner cr) throws ShellInvocationException {
+        CommandInfo cmdInfo = cr.getCommandInfo();
         try {
             if (cmdInfo.isInternal()) {
                 cr.run();
@@ -172,8 +118,7 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
             }
             return cr.getRC();
         } catch (Exception ex) {
-            throw new ShellInvocationException("Uncaught Exception in command",
-                    ex);
+            throw new ShellInvocationException("Uncaught Exception in command", ex);
         } catch (Error ex) {
             throw new ShellInvocationException("Fatal Error in command", ex);
         } finally {
@@ -182,8 +127,8 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
         }
     }
 
-    protected CommandThread forkIt(CommandLine cmdLine, CommandInfo cmdInfo,
-            CommandRunner cr) throws ShellInvocationException {
+    protected CommandThread forkIt(CommandLine cmdLine, CommandRunner cr) throws ShellInvocationException {
+        CommandInfo cmdInfo = cr.getCommandInfo();
         if (cmdInfo.isInternal()) {
             throw new ShellFailureException("unexpected internal command");
         }
