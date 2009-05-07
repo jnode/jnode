@@ -71,6 +71,7 @@ import org.jnode.shell.isolate.IsolateCommandInvoker;
 import org.jnode.shell.proclet.ProcletCommandInvoker;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.CommandSyntaxException;
+import org.jnode.shell.syntax.SyntaxBundle;
 import org.jnode.shell.syntax.SyntaxManager;
 import org.jnode.shell.syntax.CommandSyntaxException.Context;
 import org.jnode.util.ReaderInputStream;
@@ -662,16 +663,17 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     public CommandInfo getCommandInfo(String cmd) throws ShellException {
+        SyntaxBundle syntaxBundle = getSyntaxManager().getSyntaxBundle(cmd);
         try {
             Class<?> cls = aliasMgr.getAliasClass(cmd);
-            return new CommandInfo(cls, aliasMgr.isInternal(cmd));
+            return new CommandInfo(cls, cmd, syntaxBundle, aliasMgr.isInternal(cmd));
         } catch (ClassNotFoundException ex) {
             throw new ShellException("Cannot the load command class for alias '" + cmd + "'", ex);
         } catch (NoSuchAliasException ex) {
             try {
                 final ClassLoader cl = 
                     Thread.currentThread().getContextClassLoader();
-                return new CommandInfo(cl.loadClass(cmd), false);
+                return new CommandInfo(cl.loadClass(cmd), cmd, syntaxBundle, false);
             } catch (ClassNotFoundException ex2) {
                 throw new ShellException(
                         "Cannot find an alias or load a command class for '" + cmd + "'", ex);

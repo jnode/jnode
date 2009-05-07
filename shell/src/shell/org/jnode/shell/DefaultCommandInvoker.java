@@ -163,8 +163,8 @@ public class DefaultCommandInvoker implements SimpleCommandInvoker {
         }
     }
 
-    @Override
     public boolean isDebugEnabled() {
         return shell.isDebugEnabled();
     }
+
 }

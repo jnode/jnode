@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.jnode.shell.AsyncCommandInvoker;
-import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandInvoker;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandRunner;
@@ -63,16 +62,14 @@ public class IsolateCommandInvoker extends AsyncCommandInvoker implements Comman
     
     public int invoke(CommandLine commandLine, Properties sysProps, Map<String, String> env)
         throws ShellException {
-        CommandInfo cmdInfo = commandLine.parseCommandLine(shell);
-        CommandRunner cr = setup(commandLine, cmdInfo, sysProps, env);
-        return runIt(commandLine, cmdInfo, cr);
+        CommandRunner cr = setup(commandLine, sysProps, env);
+        return runIt(commandLine, cr);
     }
 
     public CommandThread invokeAsynchronous(CommandLine commandLine, Properties sysProps,
             Map<String, String> env) throws ShellException {
-        CommandInfo cmdInfo = commandLine.parseCommandLine(shell);
-        CommandRunner cr = setup(commandLine, cmdInfo, sysProps, env);
-        return forkIt(commandLine, cmdInfo, cr);
+        CommandRunner cr = setup(commandLine, sysProps, env);
+        return forkIt(commandLine, cr);
     }
 
     @Override
