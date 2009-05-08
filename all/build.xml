@@ -218,6 +218,66 @@
         <mkdir dir="${descriptors.dir}"/>
         <mkdir dir="${plugins.dir}"/>
         <mkdir dir="${initjars.dir}"/>
+        <property file="${root.dir}/all/lib/ftp.properties"/>
+        <!-- check for classlib update -->
+        <if>
+            <or>
+                <not>
+                    <uptodate srcfile="${root.dir}/all/lib/ftp.properties" targetfile="${root.dir}/all/lib/classlib.pack.gz"/>
+                </not>
+                <not>
+                    <uptodate srcfile="${root.dir}/all/lib/ftp.properties" targetfile="${root.dir}/all/lib/classlib-src.jar.bz2"/>
+                </not>
+            </or>
+            <then>
+                <!-- check if classlib update should be done locally or from the FTP server -->
+                <if>
+                    <isset property="jnode.local.classlib"/>
+                    <then>
+                        <fail message="classlib is out of date, run copy or quickdeploy in classlib project">
+                            <condition>
+                                <or>
+                                    <not>
+                                        <uptodate srcfile="${root.dir}/all/lib/ftp.properties"
+                                            targetfile="${root.dir}/all/lib/classlib.jar"/>
+                                    </not>
+                                    <not>
+                                        <uptodate srcfile="${root.dir}/all/lib/ftp.properties"
+                                            targetfile="${root.dir}/all/lib/classlib-src.jar"/>
+                                    </not>
+                                </or>
+                            </condition>
+                        </fail>
+                    </then>
+                    <else>
+                        <!-- classlib update from the FTP server -->
+                        <delete file="${root.dir}/all/lib/classlib.pack.gz"/>
+                        <delete file="${root.dir}/all/lib/classlib-src.jar.bz2"/>
+                        <get src="${classlib.url}/classlib.pack.gz" dest="${root.dir}/all/lib/classlib.pack.gz"/>
+                        <get src="${classlib.url}/classlib-src.jar.bz2" dest="${root.dir}/all/lib/classlib-src.jar.bz2"/>
+                        <!-- verify checksum for downloaded files -->
+                        <if>
+                            <not>
+                                <checksum algorithm="MD5" file="${root.dir}/all/lib/classlib.pack.gz" property="${classlib.md5}"/>
+                            </not>
+                            <then>
+                                <delete file="${root.dir}/all/lib/classlib.pack.gz"/>
+                                <fail message="checksum failed for classlib.pack.gz"/>
+                            </then>
+                        </if>
+                        <if>
+                            <not>
+                                <checksum algorithm="MD5" file="${root.dir}/all/lib/classlib-src.jar.bz2" property="${classlib-src.md5}"/>
+                            </not>
+                            <then>
+                                <delete file="${root.dir}/all/lib/classlib-src.jar.bz2"/>
+                                <fail message="checksum failed for classlib-src.jar.bz2"/>
+                            </then>
+                        </if>
+                    </else>
+                </if>
+          </then>
+        </if>
         <if>
           <or>
               <not>
