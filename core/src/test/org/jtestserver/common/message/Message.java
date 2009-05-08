@@ -20,25 +20,28 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package org.jtestserver.common.message;
 
 
-import org.jtestserver.common.protocol.Protocol;
+import org.jtestserver.common.protocol.Client;
 import org.jtestserver.common.protocol.ProtocolException;
 import org.jtestserver.common.protocol.TimeoutException;
 
 public abstract class Message {
     
-    public static Object send(Protocol protocol, MessageDescriptor desc, Object... params)
+    public static Object send(Client<?, ?> client, MessageDescriptor desc, Object... params)
         throws ProtocolException, TimeoutException {
+        
+        boolean needReply = (desc.getResultClass() != null);
         OutputMessage output = OutputMessage.createOutputMessage(desc, params);
-        output.sendWith(protocol);
+        String answer = client.send(output.toMessage(), needReply);
 
         Object result = null;
-        if (desc.getResultClass() != null) {
-            InputMessage input = InputMessage.create(protocol);
+        if (needReply) {
+            InputMessage input = InputMessage.create(answer);
             result = input.parse(desc.getResultClass());
         }
         return result;
     }
-    
-    static final String SEPARATOR = ";";
+
+    static final char SEPARATOR = ';';
+    static final char ESCAPE_CHARACTER = '\\';
     static final String NULL = "NULL";
 }

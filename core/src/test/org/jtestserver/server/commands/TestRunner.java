@@ -21,6 +21,6 @@ package org.jtestserver.server.commands;
 
 import org.jtestserver.server.TestFailureException;
 
-public interface TestRunner {
-    void runTest(String test) throws TestFailureException;
+public interface TestRunner<T> {
+    T runTest(String test) throws TestFailureException;
 }

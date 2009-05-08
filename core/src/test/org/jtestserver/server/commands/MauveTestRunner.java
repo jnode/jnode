@@ -20,20 +20,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.server.commands;
 
-import gnu.testlet.SingleTestHarness;
-import gnu.testlet.TestHarness;
-import gnu.testlet.Testlet;
+import gnu.testlet.runner.CheckResult;
+import gnu.testlet.runner.Mauve;
+import gnu.testlet.runner.RunResult;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Locale;
 
 import org.jtestserver.common.Status;
 import org.jtestserver.server.Config;
 import org.jtestserver.server.TestFailureException;
 
-public class MauveTestRunner implements TestRunner {
+public class MauveTestRunner implements TestRunner<RunResult> {
     private static final MauveTestRunner INSTANCE = new MauveTestRunner();
     
     public static final MauveTestRunner getInstance() {
@@ -41,7 +38,7 @@ public class MauveTestRunner implements TestRunner {
     }
     
     private Status status = Status.READY;
-    private RunnerThread thread = new RunnerThread();
+//    private RunnerThread thread = new RunnerThread();
     private Config config;
     
     private MauveTestRunner() {        
@@ -52,80 +49,34 @@ public class MauveTestRunner implements TestRunner {
     }
     
     @Override
-    public void runTest(String test) throws TestFailureException {
-        try {
-            Class<?> k = Thread.currentThread().getContextClassLoader().loadClass(
-                    test);
-            
-            thread.runTest(k);
-        } catch (ClassNotFoundException e) {
-            throw new TestFailureException(e);
-        }
+    public RunResult runTest(String test) throws TestFailureException {
+        status = status.RUNNING;
+        JTSMauve m = new JTSMauve();
+        RunResult result = m.runTest(test);
+        status = Status.READY;
+        
+        return result;
     }
 
     public Status getStatus() {
         return status;
     }
 
-    public void shutdown() {
-        thread.requestShutdown();
-    }
-
-    private class RunnerThread extends Thread {
-        private final Logger LOGGER = Logger.getLogger(RunnerThread.class.getName());
-                
-        private boolean shutdownRequested = false;
-        
-        private ArrayBlockingQueue<Class<?>> tests;
-        
-        public void runTest(Class<?> testClass) {
-            if (!isAlive()) {
-                tests = new ArrayBlockingQueue<Class<?>>(config.getMauveQueueSize());
-                start();
-            }
+    private class JTSMauve extends Mauve {
+        public RunResult runTest(String testName) {
+            // save the default locale, some tests change the default and we want
+            // to restore it before generating the HTML report...
+            Locale savedLocale = Locale.getDefault();
             
-            if (!shutdownRequested) {
-                try {
-                    tests.put(testClass);
-                } catch (InterruptedException e) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, "unexpected interruption", e);
-                }
-            }
-        }
-        
-        public void requestShutdown() {
-            shutdownRequested = true;
-        }
-        
-        @Override
-        public void run() {
-            while (!shutdownRequested) {
-                Class<?> testClass = null;
-                status = Status.READY;
-                
-                try {
-                    do {
-                        testClass = tests.poll(1, TimeUnit.SECONDS);
-                    } while ((testClass == null) && !shutdownRequested);
-                } catch (InterruptedException e) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, "unexpected interruption", e);
-                }
+            result = new RunResult("Mauve Test Run");
+            currentCheck = new CheckResult(0, false);
 
-                if (!shutdownRequested) {
-                    status = Status.RUNNING;
-                    try {
-                        Testlet t = (Testlet) testClass.newInstance();
-                        TestHarness h = new SingleTestHarness(t, false);
-                        t.test(h);
-                        status = Status.READY;
-                    } catch (Throwable t) {
-                        LOGGER.log(Level.SEVERE, "error in run", t);            
-                        status = Status.ERROR;
-                    } finally {
-                        testClass = null;
-                    }
-                }
-            }
+            executeLine("", testName);
+            
+            // tests are complete so restore the default locale
+            Locale.setDefault(savedLocale);
+            
+            return getResult();
         }
     }
 }

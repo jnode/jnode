@@ -20,10 +20,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.client;
 
+import gnu.testlet.runner.ClassResult;
+import gnu.testlet.runner.HTMLGenerator;
+import gnu.testlet.runner.PackageResult;
+import gnu.testlet.runner.RunResult;
+import gnu.testlet.runner.TestResult;
+import gnu.testlet.runner.XMLReportWriter;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,20 +40,21 @@ import org.jtestserver.client.process.ServerProcess;
 import org.jtestserver.client.utils.ConfigurationUtils;
 import org.jtestserver.client.utils.TestListRW;
 import org.jtestserver.client.utils.WatchDog;
-import org.jtestserver.common.Status;
+import org.jtestserver.common.protocol.Client;
 import org.jtestserver.common.protocol.Protocol;
 import org.jtestserver.common.protocol.ProtocolException;
 import org.jtestserver.common.protocol.TimeoutException;
-import org.jtestserver.common.protocol.UDPProtocol;
+import org.jtestserver.common.protocol.udp.UDPProtocol;
 
 public class TestDriver {
     private static final Logger LOGGER = Logger.getLogger(TestDriver.class.getName());
     
     public static void main(String[] args) {
         ConfigurationUtils.init();
+        TestDriver testDriver = null;
         
         try {
-            TestDriver testDriver = createUDPTestDriver();
+            testDriver = createUDPTestDriver();
             
             if ((args.length > 0) && "kill".equals(args[0])) {
                 testDriver.killRunningServers();
@@ -54,20 +63,38 @@ public class TestDriver {
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "protocol error", e);
+            
+            if (testDriver != null) {
+                try {
+                    testDriver.killRunningServers();
+                } catch (ProtocolException e1) {
+                    LOGGER.log(Level.SEVERE, "protocol error", e1);
+                }
+            }
         } catch (ProtocolException e) {
             LOGGER.log(Level.SEVERE, "I/O error", e);
+            
+            if (testDriver != null) {
+                try {
+                    testDriver.killRunningServers();
+                } catch (ProtocolException e1) {
+                    LOGGER.log(Level.SEVERE, "protocol error", e1);
+                }
+            }
         }
     }
     
     private static TestDriver createUDPTestDriver() throws ProtocolException, IOException {         
         Config config = new ConfigReader().read(ConfigurationUtils.getConfigurationFile());
         InetAddress serverAddress = InetAddress.getByName(config.getServerName());
-        int serverPort = config.getServerPort();
-        UDPProtocol protocol = UDPProtocol.createClient(serverAddress, serverPort);
-        protocol.setTimeout(config.getClientTimeout());
+        int serverPort = config.getServerPort();        
+        Protocol<?> protocol = new UDPProtocol(); //TODO create protocol from a config parameter
+        
+        Client<?, ?> client = protocol.createClient(serverAddress, serverPort);
+        client.setTimeout(config.getClientTimeout());
         
         ServerProcess process = config.getVMConfig().createServerProcess();
-        return new TestDriver(config, protocol, process);
+        return new TestDriver(config, client, process);
     }
     
     private final TestClient client;
@@ -77,9 +104,9 @@ public class TestDriver {
     private final TestListRW testListRW;
     private final WatchDog watchDog;
     
-    private TestDriver(Config config, Protocol protocol, ServerProcess process) {
+    private TestDriver(Config config, Client<?, ?> client, ServerProcess process) {
         this.config = config;
-        client = new DefaultTestClient(protocol);
+        this.client = new DefaultTestClient(client);
         this.process = process;
         testListRW = new TestListRW(config);
         watchDog = new WatchDog(process, config) {
@@ -128,36 +155,49 @@ public class TestDriver {
     }
     
     public void start() throws IOException, ProtocolException {
-        killRunningServers();
+        //killRunningServers();
         
         process.start();
         watchDog.startWatching();
  
-        final File workingFile = new File(config.getWorkDir(), "working-tests.txt");
-        final File crashingFile = new File(config.getWorkDir(), "crashing-tests.txt");
+        Run latestRun = Run.getLatest(config);
+        Run newRun = Run.create(config);
         
         List<String> workingList = new ArrayList<String>();
         List<String> crashingList = new ArrayList<String>();
         
         LOGGER.info("running list of working tests");
-        runTests(workingFile, true, workingList, crashingList);
+        File workingTests = (latestRun == null) ? null : latestRun.getWorkingTests();
+        RunResult workingResult = runTests(workingTests, true, workingList, crashingList, newRun.getTimestampString());
         
         LOGGER.info("running list of crashing tests");
-        runTests(crashingFile, false, workingList, crashingList);
+        File crashingTests = (latestRun == null) ? null : latestRun.getCrashingTests();
+        RunResult crashingResult = runTests(crashingTests, false, workingList, crashingList, 
+                newRun.getTimestampString());
         
-        LOGGER.info("writing crashing & working tests lists");        
-        testListRW.writeList(workingFile, workingList);
-        testListRW.writeList(crashingFile, crashingList);
+        LOGGER.info("writing crashing & working tests lists");
+        testListRW.writeList(newRun.getWorkingTests(), workingList);
+        testListRW.writeList(newRun.getCrashingTests(), crashingList);
+        
+        writeReports(workingResult, "working", newRun.getWorkingTests().getParentFile());
+        writeReports(crashingResult, "crashing", newRun.getCrashingTests().getParentFile());
         
         watchDog.stopWatching();
         killRunningServers();
     }
     
-    private void runTests(File listFile, boolean useCompleteListAsDefault,
-            List<String> workingList, List<String> crashingList)
+    private void writeReports(RunResult result, String name, File dir) throws IOException {
+        XMLReportWriter rw = new XMLReportWriter(false);
+        rw.write(result, new File(dir, name + "-report.xml"));
+        
+        HTMLGenerator.createReport(result, dir);
+    }
+    
+    private RunResult runTests(File listFile, boolean useCompleteListAsDefault,
+            List<String> workingList, List<String> crashingList, String timestamp)
         throws ProtocolException, IOException {
         final List<String> list;
-        if (listFile.exists() && !config.isForceUseMauveList()) {
+        if ((listFile != null) && listFile.exists() && !config.isForceUseMauveList()) {
             list = testListRW.readList(listFile);
         } else {
             if (useCompleteListAsDefault || config.isForceUseMauveList()) {
@@ -169,14 +209,15 @@ public class TestDriver {
             }
         }
 
+        RunResult result = new RunResult(timestamp);
         for (String test : list) {
             boolean working = false;
             LOGGER.info("launching test " + test);
 
             try {
-                Status status = client.runMauveTest(test);
-                LOGGER.info(((status == null) ? "null" : status.toString()) + ": " + test);
-
+                RunResult delta = client.runMauveTest(test);
+                mergeResults(result, delta);
+                
                 working = true;
             } catch (TimeoutException e) {
                 LOGGER.log(Level.SEVERE, "a timeout happened", e);
@@ -185,6 +226,35 @@ public class TestDriver {
                     workingList.add(test);
                 } else {
                     crashingList.add(test);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    private void mergeResults(RunResult targetResult, RunResult result) {
+        for (Iterator<?> itPackage = result.getPackageIterator(); itPackage.hasNext(); ) {
+            PackageResult pkg = (PackageResult) itPackage.next();
+            
+            PackageResult pr = targetResult.getPackageResult(pkg.getName());
+            if (pr == null) {
+                pr = pkg;
+                targetResult.add(pkg);
+            } else {            
+                for (Iterator<?> itClass = pkg.getClassIterator(); itClass.hasNext(); ) {
+                    ClassResult cls = (ClassResult) itClass.next();
+                    
+                    ClassResult cr = pr.getClassResult(cls.getName());
+                    if (cr == null) {
+                        cr = cls;
+                        pr.add(cls);
+                    } else {                                    
+                        for (Iterator<?> itTest = cls.getTestIterator(); itTest.hasNext(); ) {
+                            TestResult test = (TestResult) itTest.next();
+                            cr.add(test);
+                        }
+                    }
                 }
             }
         }

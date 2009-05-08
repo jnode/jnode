@@ -1,7 +1,7 @@
 /*
 JTestServer is a client/server framework for testing any JVM implementation.
  
-Copyright (C) 2008  Fabien DUMINY (fduminy@jnode.org)
+Copyright (C) 2009  Fabien DUMINY (fduminy@jnode.org)
 
 JTestServer is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -17,24 +17,28 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-package org.jtestserver.tests;
+package org.jtestserver.common.protocol;
 
-import java.io.File;
+import java.net.SocketAddress;
 
-import org.jtestserver.client.utils.ConfigurationUtils;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-
-@RunWith(Suite.class)
-@SuiteClasses({TestProtocol.class, TestUDPProtocol.class, TestInputMessage.class,
-    TestOutputMessage.class, TestVMware.class, TestKVM.class, TestJVM.class,
-    TestMauveTestRunner.class })
-public class AllTests {
-    
-    static {
-        ConfigurationUtils.init();
+/**
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
+public class ReceivedMessage {
+    private final String message;
+    private final SocketAddress remoteAddress;
+    public ReceivedMessage(String message, SocketAddress remoteAddress) {
+        super();
+        this.message = message;
+        this.remoteAddress = remoteAddress;
+    }
+    public String getMessage() {
+        return message;
+    }
+    public SocketAddress getRemoteAddress() {
+        return remoteAddress;
     }
     
-    static final File CONFIG_DIRECTORY = ConfigurationUtils.getConfigurationFile();
+    
 }

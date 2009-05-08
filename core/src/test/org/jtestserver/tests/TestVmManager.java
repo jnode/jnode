@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.jtestserver.client.process.VmManager;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,6 +34,15 @@ public abstract class TestVmManager {
     protected String vmName;
 
     protected VmManager vmManager;
+    
+    @After
+    public void tearDown() {
+        try {
+            vmManager.stop(vmName);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
     
     @Test    
     public void testGetRunningVMs() throws IOException {

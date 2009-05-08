@@ -21,10 +21,11 @@ package org.jtestserver.tests;
 
 import org.jtestserver.common.protocol.ProtocolException;
 import org.jtestserver.common.protocol.TimeoutException;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
-//@Ignore TODO this give a compile error with jnode's ant script 
+@Ignore 
 public class TestUDPProtocol {
     private static final int DISABLE_TIMEOUT_VALUE = 0;
     

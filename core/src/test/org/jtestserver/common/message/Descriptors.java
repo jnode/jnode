@@ -23,7 +23,7 @@ import org.jtestserver.common.Status;
 
 public interface Descriptors {
     public static final MessageDescriptor RUN_MAUVE_TEST = 
-        new MessageDescriptor(Status.class, "RUN_MAUVE_TEST", String.class);
+        new MessageDescriptor(String.class, "RUN_MAUVE_TEST", String.class);
     
     public static final MessageDescriptor SHUTDOWN = 
         new MessageDescriptor(null, "SHUTDOWN");

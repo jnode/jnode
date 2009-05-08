@@ -19,12 +19,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.client;
 
+import gnu.testlet.runner.RunResult;
+
 import org.jtestserver.common.Status;
 import org.jtestserver.common.protocol.ProtocolException;
 import org.jtestserver.common.protocol.TimeoutException;
 
 public interface TestClient {
-    Status runMauveTest(String test) throws ProtocolException, TimeoutException;
+    RunResult runMauveTest(String test) throws ProtocolException, TimeoutException;
     Status getStatus() throws ProtocolException, TimeoutException;
     void shutdown() throws ProtocolException, TimeoutException;
     void close() throws ProtocolException;    

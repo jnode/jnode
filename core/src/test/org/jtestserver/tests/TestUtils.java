@@ -24,8 +24,10 @@ import static org.junit.Assert.assertEquals;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.jtestserver.common.protocol.Protocol;
+import org.jtestserver.common.protocol.Client;
+import org.jtestserver.common.protocol.MessageProcessor;
 import org.jtestserver.common.protocol.ProtocolException;
+import org.jtestserver.common.protocol.Server;
 import org.jtestserver.common.protocol.TimeoutException;
 
 class TestUtils {
@@ -42,24 +44,137 @@ class TestUtils {
         }
     }
 
-    static void sendReceive(Protocol client, String message, Protocol server) 
-        throws ProtocolException, TimeoutException {
-        sendReceive(client, message, server, 0); // by default, no server delay (0)
+    static void sendReceive(Client<?, ?> client, String message, Server<?, ?> server, String response) 
+        throws Throwable {
+        sendReceive(client, message, server, 0, response); // by default, no server delay (0)
     }
 
-    static void sendReceive(Protocol client, String message, Protocol server, int serverDelay)
-        throws ProtocolException, TimeoutException {
-        client.send(message);
+    static synchronized void sendReceive(Client<?, ?> client, String message, Server<?, ?> server,
+            int serverDelay, String response)
+        throws Throwable {
+        
+        boolean needResponse  = (response != MessageProcessor.NO_RESPONSE);
+        
+        ServerThread serverThread = new ServerThread(server, serverDelay, response);
+        serverThread.start();
+        
+        ClientThread clientThread = new ClientThread(client, message, needResponse);
+        clientThread.start();
 
-        if (serverDelay > 0) {
+        while (clientThread.isAlive() || serverThread.isAlive()) {
+            Thread.sleep(1000);
+        }
+        
+//        if (serverThread.hasError()) {
+//            server.close();
+//        }
+//        if (clientThread.hasError()) {
+//            client.close();
+//        }
+        
+        assertEquals(message, serverThread.getMessage());
+        assertEquals(response, clientThread.getResponse());
+    }
+    
+    private static class ServerThread extends Thread implements MessageProcessor {
+        private final Server<?, ?> server;
+        private final int serverDelay;
+        private final String response;
+        
+        private String message = null;
+        private Throwable t = null;
+        
+        public ServerThread(Server<?, ?> server, int serverDelay, String response) {
+            super("ServerThread");
+            this.server = server;
+            this.serverDelay = serverDelay;
+            this.response = response;
+        }
+        
+        /* (non-Javadoc)
+         * @see java.lang.Thread#run()
+         */
+        @Override
+        public void run() {      
+//            if (serverDelay > 0) {
+//                try {
+//                    Thread.sleep(serverDelay);
+//                } catch (InterruptedException e) {
+//                    // ignore
+//                }
+//            }
+            
             try {
-                Thread.sleep(serverDelay);
-            } catch (InterruptedException e) {
-                // ignore
+                server.receive(this);
+            } catch (Throwable t) {
+                this.t = t;
             }
         }
         
-        String receivedMessage = server.receive();
-        assertEquals(message, receivedMessage);
+        public boolean hasError() {
+            return (t != null);
+        }
+        
+        /* (non-Javadoc)
+         * @see org.jtestserver.common.protocol.MessageProcessor#process(java.lang.String)
+         */
+        @Override
+        public String process(String message) {
+            this.message = message;
+            return response; // might be MessageProcessor.NO_REPLY
+        }
+        
+        public String getMessage() throws Throwable {
+            if (t != null) {
+                throw t;
+            }
+            return message;
+        }
+    }
+    
+    private static class ClientThread extends Thread {
+        private final Client<?, ?> client;
+        private final boolean needResponse;
+        private final String message;
+        
+        private boolean responseReceived = false;
+        private String response = null;
+        private Throwable t = null;
+        
+        public ClientThread(Client<?, ?> client, String message, boolean needResponse) {
+            super("ClientThread");
+            this.client = client;
+            this.needResponse = needResponse;
+            this.message = message;
+        }
+        
+        public boolean hasError() {
+            return (t != null);
+        }
+
+        /* (non-Javadoc)
+         * @see java.lang.Thread#run()
+         */
+        @Override
+        public void run() {      
+            try {
+                responseReceived = false;
+                
+                response = client.send(message, needResponse);
+                responseReceived = true;
+            } catch (Throwable  t) {
+                this.t = t;
+            }
+        }
+        
+        public String getResponse() throws Throwable {
+            if (t != null) {
+                throw t;
+            }
+            if (needResponse && !responseReceived) {
+                throw new RuntimeException("response not received");
+            }
+            return response;
+        }
     }
 }

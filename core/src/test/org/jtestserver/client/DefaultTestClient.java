@@ -19,38 +19,69 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.client;
 
+import gnu.testlet.runner.RunResult;
+import gnu.testlet.runner.XMLReportParser;
+
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.sourceforge.nanoxml.XMLParseException;
 
 import org.jtestserver.common.Status;
 import org.jtestserver.common.message.Descriptors;
 import org.jtestserver.common.message.Message;
-import org.jtestserver.common.protocol.Protocol;
+import org.jtestserver.common.protocol.Client;
 import org.jtestserver.common.protocol.ProtocolException;
 import org.jtestserver.common.protocol.TimeoutException;
 
 public class DefaultTestClient implements TestClient {
     private static final Logger LOGGER = Logger.getLogger(DefaultTestClient.class.getName());
         
-    private final Protocol protocol;
+    private final Client<?, ?> client;
 
-    public DefaultTestClient(Protocol protocol) {
-        this.protocol = protocol;
+    public DefaultTestClient(Client<?, ?> client) {
+        this.client = client;
     }
 
     @Override
-    public Status runMauveTest(String test) throws ProtocolException, TimeoutException {
-        return (Status) Message.send(protocol, Descriptors.RUN_MAUVE_TEST, test);
+    public RunResult runMauveTest(String test) throws ProtocolException, TimeoutException {
+        String report = (String) Message.send(client, Descriptors.RUN_MAUVE_TEST, test);
+        LOGGER.log(Level.INFO, "parsing xml report for " + test);
+        return parseMauveReport(report);
+    }
+    
+    protected RunResult parseMauveReport(String report) throws ProtocolException {
+        XMLReportParser parser = new XMLReportParser();
+        StringReader sr = new StringReader(report);
+        try {
+            LOGGER.log(Level.INFO, "xml report: " + report);
+            
+            //TODO a supprimer
+            if (!report.startsWith("<")) {
+                LOGGER.log(Level.SEVERE, "invalid xml answer");
+                return new RunResult("ERROR");
+            }
+            // fin to do
+            
+            System.out.println("length=" + report.length() + " report=" + report);
+            return parser.parse(sr);
+        } catch (XMLParseException e) {
+            throw new ProtocolException("invalid XML answer", e);
+        } catch (IOException e) {
+            throw new ProtocolException("I/O error", e);
+        }
     }
     
     @Override
     public Status getStatus() throws ProtocolException, TimeoutException {
-        return (Status) Message.send(protocol, Descriptors.GET_STATUS);
+        return (Status) Message.send(client, Descriptors.GET_STATUS);
     }
     
     @Override
     public void shutdown() throws ProtocolException, TimeoutException {
-        Message.send(protocol, Descriptors.SHUTDOWN);
+        Message.send(client, Descriptors.SHUTDOWN);
     }
     
     @Override
@@ -60,6 +91,6 @@ public class DefaultTestClient implements TestClient {
         } catch (TimeoutException e) {
             LOGGER.log(Level.SEVERE, "error in close", e);            
         }
-        protocol.close();
+        client.close();
     }
 }

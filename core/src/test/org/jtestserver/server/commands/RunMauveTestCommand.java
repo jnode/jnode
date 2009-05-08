@@ -21,16 +21,20 @@ package org.jtestserver.server.commands;
 
 
 
+import gnu.testlet.runner.RunResult;
+import gnu.testlet.runner.XMLReportWriter;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jtestserver.common.Status;
 import org.jtestserver.common.message.Descriptors;
 import org.jtestserver.common.protocol.ProtocolException;
 import org.jtestserver.common.protocol.TimeoutException;
 import org.jtestserver.server.TestFailureException;
 
-public class RunMauveTestCommand extends AbstractTestServerCommand<Status> {
+public class RunMauveTestCommand extends AbstractTestServerCommand<String> {
     private static final Logger LOGGER = Logger.getLogger(RunMauveTestCommand.class.getName());
     
     public RunMauveTestCommand() {
@@ -38,20 +42,24 @@ public class RunMauveTestCommand extends AbstractTestServerCommand<Status> {
     }
 
     @Override
-    protected Status execute(Object[] params) throws ProtocolException, TimeoutException {
-        Status result = Status.READY;
+    protected String execute(Object[] params) throws ProtocolException, TimeoutException {
+        String result = "";
         String test = (String) params[0];
         LOGGER.finer("running test " + test);
         
-        TestRunner runner = MauveTestRunner.getInstance();
+        MauveTestRunner runner = MauveTestRunner.getInstance();
         try {
-            runner.runTest(test);
+            RunResult runResult = runner.runTest(test);
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            pw.write("<?xml version=\"1.0\" encoding=\"UTF-16\"?>");
+            new XMLReportWriter(true).write(runResult, pw);
+            result = sw.getBuffer().toString();
+            LOGGER.log(Level.FINEST, "result=" + result);
         } catch (TestFailureException e) {
             LOGGER.log(Level.SEVERE, "error in execute", e);            
-            result = Status.ERROR;
         } catch (Throwable t) {
             LOGGER.log(Level.SEVERE, "error in execute", t);            
-            result = Status.ERROR;
         }
         
         return result;

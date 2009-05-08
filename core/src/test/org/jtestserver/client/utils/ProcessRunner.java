@@ -207,9 +207,11 @@ public class ProcessRunner {
                 errors.add(Boolean.TRUE);
             }            
         }, cmdLine.toArray());
+        
+        LOGGER.log(Level.INFO, "command line: " + cmdLine.toString());
 
         // wait a bit to see if an error happen
-        // but don't wait the end of the KVM process 
+        // but don't wait the end of the process 
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {

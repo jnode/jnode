@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.jtestserver.client.process.VmManager;
 import org.jtestserver.client.process.kvm.CommandLineBuilder;
+import org.jtestserver.client.utils.ConfigurationUtils;
 import org.jtestserver.client.utils.ProcessRunner;
 import org.jtestserver.client.utils.SystemUtils;
 import org.jtestserver.client.utils.SystemUtils.ProcessStatus;
@@ -97,7 +98,14 @@ public class JVM implements VmManager {
         if (config.getBootClasspath() != null) {
             cmdLine.append("-Xbootclasspath").append(config.getBootClasspath());
         }
+
+        if (config.getOptions() != null) {
+            cmdLine.append(config.getOptions());
+        }
         
+        cmdLine.append("-D" + ConfigurationUtils.LOGGING_CONFIG_FILE + '=' 
+                + ConfigurationUtils.getLoggingConfigFile());
+
         cmdLine.append("-cp").append(config.getClasspath());
         cmdLine.append(config.getMainClass());
 

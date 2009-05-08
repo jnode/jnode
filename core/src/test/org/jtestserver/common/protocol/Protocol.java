@@ -19,12 +19,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.common.protocol;
 
+import java.net.InetAddress;
+import java.net.SocketAddress;
 
-public interface Protocol {
-    public void send(String command) throws ProtocolException, TimeoutException;
+
+public abstract class Protocol<S> {
+    public abstract Client<S, ? extends Protocol<S>> createClient(InetAddress serverIp, int serverPort) 
+        throws ProtocolException;
     
-    public String receive() throws ProtocolException, TimeoutException;
-
-    public void close() throws ProtocolException;
-
+    public abstract Server<S, ? extends Protocol<S>> createServer(int localPort) throws ProtocolException;
+    
+    protected abstract void sendMessage(S socket, String message, SocketAddress remoteAddress) 
+        throws ProtocolException, TimeoutException;
+    protected abstract ReceivedMessage receiveMessage(S socket) throws ProtocolException, TimeoutException;
 }
