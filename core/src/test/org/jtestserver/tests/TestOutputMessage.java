@@ -19,9 +19,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.tests;
 
+import org.junit.Ignore;
 
 
-//@Ignore TODO this give a compile error with jnode's ant script 
+
+@Ignore 
 public class TestOutputMessage {
 
 }

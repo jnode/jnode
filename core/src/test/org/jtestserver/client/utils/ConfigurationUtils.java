@@ -15,6 +15,8 @@ import java.util.logging.LogManager;
  *
  */
 public class ConfigurationUtils {
+    public static final String LOGGING_CONFIG_FILE = "java.util.logging.config.file";
+    
     private static final String HOME_DIRECTORY_PROPERTY = "jtestserver.home";
     private static final String DEFAULT_HOME_DIRECTORY_NAME = "home";
     
@@ -62,9 +64,7 @@ public class ConfigurationUtils {
             HOME = searchHomeDirectory();
             
             // init logging
-            File loggingConfigFile = new File(getConfigurationDirectory(), "logging.config.properties");
-            
-            System.setProperty("java.util.logging.config.file", loggingConfigFile.getAbsolutePath());
+            System.setProperty(LOGGING_CONFIG_FILE, getLoggingConfigFile());
             try {
                 LogManager.getLogManager().readConfiguration();
             } catch (SecurityException e1) {
@@ -73,6 +73,15 @@ public class ConfigurationUtils {
                 e1.printStackTrace();
             }
         }
+    }
+    
+    /**
+     * Get the java.util.logging configuration file.
+     * @return The java.util.logging configuration file.
+     */
+    public static String getLoggingConfigFile() {
+        File f = new File(getConfigurationDirectory(), "logging.config.properties");
+        return f.getAbsolutePath();
     }
     
     /**

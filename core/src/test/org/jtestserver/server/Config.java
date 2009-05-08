@@ -20,11 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.server;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
-
-import org.jtestserver.client.utils.ConfigurationUtils;
 
 public class Config {
 
@@ -41,7 +38,10 @@ public class Config {
     }
 
     public int getMauveQueueSize() {
-        // TODO Auto-generated method stub
-        return 100000;
+        return 100000; //TODO externalize config
+    }
+    
+    public int getPort() {
+        return 10000; //TODO externalize config
     }
 }

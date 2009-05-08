@@ -23,21 +23,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.net.ssl.SSLEngineResult.Status;
-
-import org.jtestserver.common.protocol.Protocol;
-import org.jtestserver.common.protocol.ProtocolException;
-import org.jtestserver.common.protocol.TimeoutException;
+import org.jtestserver.common.Status;
 
 public class InputMessage extends Message {
-    private final StringTokenizer message;
+    private static final String SEPARATOR_STR = new String(new char[]{SEPARATOR});
+    
+    private final String message;
+    private int currentPosition = 0;
 
-    public static InputMessage create(Protocol protocol) throws ProtocolException, TimeoutException {
-        return new InputMessage(protocol.receive());
+    public static InputMessage create(String answer) {
+        return new InputMessage(answer);
     }
     
     private InputMessage(String message) {
-        this.message = new StringTokenizer(message, SEPARATOR, false);
+        this.message = message;
     }
 
     public final Object[] parseParameters(MessageDescriptor desc) {
@@ -71,8 +70,38 @@ public class InputMessage extends Message {
         return result;
     }        
 
-    public String getString() {
-        String str = message.nextToken();
+    public String getString() { 
+        // unescape SEPARATOR and ESCAPE_CHARACTER characters
+        StringBuilder sb = new StringBuilder();
+        for (; currentPosition < message.length(); currentPosition++) {
+            char c = message.charAt(currentPosition);
+            
+            boolean unescaped = false;
+            if (c == ESCAPE_CHARACTER) {
+                if (currentPosition < (message.length() - 1)) {
+                    char c2 = message.charAt(currentPosition + 1);
+                    if ((c2 == ESCAPE_CHARACTER) || (c2 == SEPARATOR)) {
+                        // special character, that need to be unescaped
+                        sb.append(c2);
+                        currentPosition++;
+                        unescaped = true;
+                    }
+                }
+            }
+            
+            if (!unescaped) {
+                if (c == SEPARATOR) {
+                    // found the "real" separator => end of the field 
+                    currentPosition++;
+                    break;
+                } else {
+                    // normal character
+                    sb.append(c);
+                }
+            }
+        }
+        
+        String str = sb.toString();
         if (NULL.equals(str)) {
             throw new NullValueException();
         }

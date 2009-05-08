@@ -20,9 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package org.jtestserver.common.message;
 
 import org.jtestserver.common.Status;
-import org.jtestserver.common.protocol.Protocol;
-import org.jtestserver.common.protocol.ProtocolException;
-import org.jtestserver.common.protocol.TimeoutException;
 
 public class OutputMessage extends Message {
     private final StringBuilder message;
@@ -55,8 +52,8 @@ public class OutputMessage extends Message {
         message = new StringBuilder();
     }
 
-    public void sendWith(Protocol protocol) throws ProtocolException, TimeoutException {
-        protocol.send(message.toString());
+    public String toMessage() {
+        return message.toString();
     }
 
     private OutputMessage append(CharSequence chars) {
@@ -64,7 +61,17 @@ public class OutputMessage extends Message {
             message.append(SEPARATOR);
         }
         
-        message.append(chars);
+        // add characters one by one in order to escape
+        // SEPARATOR and ESCAPE_CHARACTER characters, if any.
+        for (int i = 0; i < chars.length(); i++) {
+            char c = chars.charAt(i);
+            
+            if ((c == SEPARATOR) || (c == ESCAPE_CHARACTER)) {
+                message.append(ESCAPE_CHARACTER);                
+            }
+            
+            message.append(c);
+        }
         
         return this;
     }

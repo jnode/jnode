@@ -27,10 +27,11 @@ import java.util.logging.Logger;
 
 import org.jtestserver.common.message.InputMessage;
 import org.jtestserver.common.message.OutputMessage;
-import org.jtestserver.common.protocol.Protocol;
+import org.jtestserver.common.protocol.MessageProcessor;
 import org.jtestserver.common.protocol.ProtocolException;
+import org.jtestserver.common.protocol.Server;
 import org.jtestserver.common.protocol.TimeoutException;
-import org.jtestserver.common.protocol.UDPProtocol;
+import org.jtestserver.common.protocol.udp.UDPProtocol;
 import org.jtestserver.server.commands.GetStatusCommand;
 import org.jtestserver.server.commands.MauveTestRunner;
 import org.jtestserver.server.commands.RunMauveTestCommand;
@@ -41,32 +42,33 @@ public class TestServer {
         
     public static void main(String[] args) {
         try {
-            UDPProtocol protocol = UDPProtocol.createServer();
-            //protocol.setTimeout(10000);
-            
-            TestServer server = new TestServer(protocol);
+            TestServer server = new TestServer();
             server.start();
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "unable to read config", e);
+            System.exit(1);
         } catch (ProtocolException e) {
             LOGGER.log(Level.SEVERE, "unable to create server", e);
+            System.exit(2);
         }
     }
     
     private boolean shutdownRequested = false;
-    private final Protocol protocol;
+    private final Server<?, ?> server;
     private final Map<String, TestServerCommand> nameToCommand;
     private final Config config;
     
-    public TestServer(Protocol protocol) throws IOException {
-        this.protocol = protocol;
+    public TestServer() throws IOException, ProtocolException {
         nameToCommand = new HashMap<String, TestServerCommand>();
         
         addCommand(new RunMauveTestCommand());
         addCommand(new ShutdownCommand(this));
         addCommand(new GetStatusCommand());
         
-        this.config = Config.read();
+        config = Config.read();
+        server = new UDPProtocol().createServer(config.getPort());
+        //protocol.setTimeout(10000);
+        
         MauveTestRunner.getInstance().setConfig(config);
     }
     
@@ -79,25 +81,36 @@ public class TestServer {
         
         while (!shutdownRequested) {
             try {
-                InputMessage input = InputMessage.create(protocol);
-                String commandName = input.getString();
-                TestServerCommand command = nameToCommand.get(commandName);
-                
-                OutputMessage output = null;
-                if (command == null) {
-                    //TODO
-                } else {
-                    try {
-                        output = command.execute(input);
-                    } catch (Throwable t) {
-                        LOGGER.log(Level.SEVERE, "error in command", t);
+                server.receive(new MessageProcessor() {
+                    /* (non-Javadoc)
+                     * @see org.jtestserver.common.protocol.MessageProcessor#process(java.lang.String)
+                     */
+                    @Override
+                    public String process(String message) {
+                        InputMessage input = InputMessage.create(message);
+                        String commandName = input.getString();
+                        TestServerCommand command = nameToCommand.get(commandName);
+                        
+                        OutputMessage output = null;
+                        if (command == null) {
+                            //TODO
+                        } else {
+                            try {
+                                output = command.execute(input);
+                            } catch (Throwable t) {
+                                LOGGER.log(Level.SEVERE, "error in command", t);
+                            }
+                        }
+                        
+                        // if the command returns a result
+                        String result = null;
+                        if (output != null) {
+                            result = output.toMessage();
+                        }
+                        
+                        return result;
                     }
-                }
-                
-                // if the command returns a result
-                if (output != null) {
-                    output.sendWith(protocol);
-                }
+                });
                 
             } catch (ProtocolException pe) {
                 LOGGER.log(Level.SEVERE, "protocol error", pe);
@@ -112,12 +125,7 @@ public class TestServer {
     }
     
     private void shutdown() {
-        try {
-            protocol.close();
-        } catch (ProtocolException e) {
-            LOGGER.log(Level.SEVERE, "error in shutdown", e);
-        }
-        MauveTestRunner.getInstance().shutdown();
+        server.close();
         LOGGER.info("Server has shutdown");
     }
     

@@ -19,6 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.client.utils;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
@@ -36,7 +38,13 @@ public class LoggingFormatter extends Formatter {
     public String format(LogRecord record) {
         StringBuilder sb = new StringBuilder(record.getLevel().getName()).append(": ");
         sb.append(record.getSourceClassName()).append('#').append(record.getSourceMethodName());
-        sb.append(": ").append(record.getMessage()).append('\n');
+        sb.append(": ").append(record.getMessage());
+        if (record.getThrown() != null) {
+            StringWriter sw = new StringWriter();
+            record.getThrown().printStackTrace(new PrintWriter(sw));
+            sb.append('\n').append(sw.getBuffer());
+        }
+        sb.append('\n');        
         return sb.toString();
     }
 }
