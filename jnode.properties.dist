@@ -108,3 +108,11 @@ jnode.user.home=/jnode/home
 # Custom build tools
 # -----------------------------------------------
 # jnode.enable.mkisofs=true
+
+# -----------------------------------------------
+# If enabled, the build system will not try to
+# download the classlib binaries from the net.
+# Instead the quickdeploy ANT target should be run
+# in classlib6 to get the binaries.
+# -----------------------------------------------
+#jnode.local.classlib=true
