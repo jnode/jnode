@@ -22,10 +22,9 @@ package org.jnode.command.argument;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import org.jnode.command.util.NumberRange;
-import org.jnode.driver.console.CompletionInfo;
+//import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
 import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.Argument;
@@ -95,7 +94,7 @@ public class NumberListArgument extends Argument<NumberRange> {
                 i++;
             }
         }
-        for (int i = 0; i < (ranges.length - 1); i++ ) {
+        for (int i = 0; i < (ranges.length - 1); i++) {
             values.add(ranges[i]);
         }
         return ranges[ranges.length - 1];
@@ -125,7 +124,7 @@ public class NumberListArgument extends Argument<NumberRange> {
     private NumberRange[] parseList(String text) throws CommandSyntaxException {
         int delimPos = text.indexOf(listDelim);
         if (delimPos == -1) {
-            return new NumberRange[] { parseRange(text) };
+            return new NumberRange[] {parseRange(text)};
         } else {
             String[] rangesText = text.split(listDelim);
             NumberRange[] ranges = new NumberRange[rangesText.length];

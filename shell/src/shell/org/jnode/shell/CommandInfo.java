@@ -21,7 +21,6 @@
 package org.jnode.shell;
 
 import org.jnode.shell.syntax.ArgumentBundle;
-import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
