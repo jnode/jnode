@@ -117,6 +117,10 @@ public class CommandRunner implements CommandRunnable {
         } catch (Exception ex) {
             throw new ShellInvocationException("Problem while creating command instance", ex);
         }
+        // make this happen before setting up the main() method call for
+        // bare commands. For commands without a bare command definition
+        // this will return silently having done nothing.
+        cmdInfo.parseCommandLine(commandLine);
         if (command == null) {
             try {
                 method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
@@ -138,8 +142,6 @@ public class CommandRunner implements CommandRunnable {
                 throw new ShellInvocationException(
                         "No entry point method found for " + cmdInfo.getCommandClass());
             }
-        } else {
-            cmdInfo.parseCommandLine(commandLine);
         }
     }
 

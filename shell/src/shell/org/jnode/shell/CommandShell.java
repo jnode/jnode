@@ -666,9 +666,15 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         SyntaxBundle syntaxBundle = getSyntaxManager().getSyntaxBundle(cmd);
         try {
             Class<?> cls = aliasMgr.getAliasClass(cmd);
-            return new CommandInfo(cls, cmd, syntaxBundle, aliasMgr.isInternal(cmd));
+            if (Command.class.isAssignableFrom(cls)) {
+                return new CommandInfo(cls, cmd, syntaxBundle, aliasMgr.isInternal(cmd));
+            } else {
+                // check if this alias has a bare command definition
+                ArgumentBundle argBundle = getSyntaxManager().getArgumentBundle(cmd);
+                return new CommandInfo(cls, cmd, syntaxBundle, argBundle);
+            }
         } catch (ClassNotFoundException ex) {
-            throw new ShellException("Cannot the load command class for alias '" + cmd + "'", ex);
+            throw new ShellException("Cannot load the command class for alias '" + cmd + "'", ex);
         } catch (NoSuchAliasException ex) {
             try {
                 final ClassLoader cl = 
@@ -682,15 +688,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
     
     protected ArgumentBundle getCommandArgumentBundle(CommandInfo commandInfo) {
-        if (Command.class.isAssignableFrom(commandInfo.getCommandClass())) {
-            try {
-                Command cmd = (Command) (commandInfo.getCommandClass().newInstance());
-                return cmd.getArgumentBundle();
-            } catch (Exception ex) {
-                // drop through
-            }
-        }
-        return null;
+        return commandInfo.getArgumentBundle();
     }
 
     boolean isDebugEnabled() {
