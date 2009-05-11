@@ -21,6 +21,7 @@
 package org.jnode.shell.syntax;
 
 import java.util.Collection;
+import org.jnode.shell.syntax.ArgumentSpecLoader.ArgumentSpec;
 
 /**
  * A SyntaxManager manages the association between a command "alias" and 
@@ -45,7 +46,7 @@ public interface SyntaxManager {
     public abstract void add(SyntaxBundle bundle);
 
     /**
-     * Remove the syntaxBundle for an alias
+     * Remove the syntaxBundle and argumentBundle(if one exists) for an alias
      * 
      * @param alias The alias
      */
@@ -58,6 +59,22 @@ public interface SyntaxManager {
      * @return The syntax for the given alias, or <code>null</code>
      */
     public abstract SyntaxBundle getSyntaxBundle(String alias);
+    
+    /**
+     * Add an argument bundle for a bare command.
+     *
+     * @param bundle an argument bundle holding the arguments of a bare command
+     * @param alias the alias to bind the arguments to
+     */
+    public abstract void add(String alias, ArgumentSpec[] args);
+    
+    /**
+     * Gets the argument bundle for a given alias if one exists.
+     *
+     * @param alias an alias that corresponds to a particular bundle
+     * @return The arguments for the given alias, or <code>null</code>
+     */
+    public abstract ArgumentBundle getArgumentBundle(String alias);
     
     /**
      * Get the current set of keys known to the SyntaxManager.

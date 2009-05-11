@@ -32,10 +32,6 @@ import java.util.List;
 public class SyntaxSpecLoader {
 
     public SyntaxBundle loadSyntax(SyntaxSpecAdapter element) {
-        final String name = element.getName();
-        if (!"syntax".equals(name)) {
-            throw new SyntaxFailureException("element name is not 'syntax'");
-        }
         final String alias = element.getAttribute("alias");
         if (alias == null) {
             throw new SyntaxFailureException("syntax element has no 'alias' attribute");

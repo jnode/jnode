@@ -31,6 +31,7 @@ import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.ExtensionPointListener;
+import org.jnode.shell.syntax.ArgumentSpecLoader.ArgumentSpec;
 
 /**
  * This syntax manager loads syntaxes specified using plugin extensions.
@@ -38,11 +39,14 @@ import org.jnode.plugin.ExtensionPointListener;
  * @author crawley@jnode.org
  */
 public class DefaultSyntaxManager implements SyntaxManager, ExtensionPointListener {
-
+    
     private final DefaultSyntaxManager parent;
 
     private final HashMap<String, SyntaxBundle> syntaxes = 
         new HashMap<String, SyntaxBundle>();
+    
+    private final HashMap<String, ArgumentSpec[]> arguments =
+        new HashMap<String, ArgumentSpec[]>();
 
     private final ExtensionPoint syntaxEP;
 
@@ -72,12 +76,22 @@ public class DefaultSyntaxManager implements SyntaxManager, ExtensionPointListen
             syntaxes.put(bundle.getAlias(), bundle);
         }
     }
+    
+    public void add(String alias, ArgumentSpec[] args) {
+        if (parent == null) {
+            throw new UnsupportedOperationException(
+                    "Cannot modify the system syntax manager");
+        } else if (args != null) {
+            arguments.put(alias, args);
+        }
+    }
 
     public SyntaxBundle remove(String alias) {
         if (parent == null) {
             throw new UnsupportedOperationException(
                     "Cannot modify the system syntax manager");
         } else {
+            arguments.remove(alias);
             return syntaxes.remove(alias);
         }
     }
@@ -91,6 +105,29 @@ public class DefaultSyntaxManager implements SyntaxManager, ExtensionPointListen
         } else {
             return null;
         }
+    }
+    
+    public ArgumentBundle getArgumentBundle(String alias) {
+        ArgumentSpec[] args = arguments.get(alias);
+        if (args != null) {
+            return makeArgumentBundle(args);
+        } else if (parent != null) {
+            return parent.getArgumentBundle(alias);
+        } else {
+            return null;
+        }
+    }
+    
+    private ArgumentBundle makeArgumentBundle(ArgumentSpec[] specs) {
+        Argument<?>[] args = new Argument<?>[specs.length];
+        for (int i = 0; i < specs.length; i++) {
+            try {
+                args[i] = specs[i].instantiate();
+            } catch (Exception e) {
+                return null;
+            }
+        }
+        return new ArgumentBundle(args);
     }
     
     public Collection<String> getKeys() {
@@ -114,14 +151,25 @@ public class DefaultSyntaxManager implements SyntaxManager, ExtensionPointListen
         System.out.println("Refreshing syntax list");
         if (syntaxEP != null) {
             syntaxes.clear();
+            arguments.clear();
+            SyntaxSpecLoader syntaxLoader = new SyntaxSpecLoader();
+            ArgumentSpecLoader argumentLoader = new ArgumentSpecLoader();
             for (Extension ext : syntaxEP.getExtensions()) {
-                SyntaxSpecLoader loader = new SyntaxSpecLoader();
                 for (ConfigurationElement element : ext.getConfigurationElements()) {
                     SyntaxSpecAdapter adaptedElement = new PluginSyntaxSpecAdapter(element);
                     try {
-                        SyntaxBundle bundle = loader.loadSyntax(adaptedElement);
-                        if (bundle != null) {
-                            syntaxes.put(bundle.getAlias(), bundle);
+                        if (element.getName().equals("syntax")) {
+                            SyntaxBundle bundle = syntaxLoader.loadSyntax(adaptedElement);
+                            if (bundle != null) {
+                                syntaxes.put(bundle.getAlias(), bundle);
+                            }
+                        } else if (element.getName().equals("argument-bundle")) {
+                            ArgumentSpec[] specs = argumentLoader.loadArguments(adaptedElement);
+                            if (specs != null) {
+                                arguments.put(element.getAttribute("alias"), specs);
+                            }
+                        } else {
+                            throw new SyntaxFailureException("Element name is not 'syntax' or 'argument-bundle'");
                         }
                     } catch (Exception ex) {
                         log.log(Priority.WARN, "problem in syntax", ex);
