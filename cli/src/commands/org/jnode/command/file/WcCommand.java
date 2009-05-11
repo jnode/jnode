@@ -280,12 +280,12 @@ public class WcCommand extends AbstractCommand {
             /**
              * Instantiates a new byte count input stream.
              * 
-             * @param inputStream
+             * @param in
              *            the input stream
              */
-            private ByteCountInputStream(InputStream inputStream) {
+            private ByteCountInputStream(InputStream in) {
                 super();
-                inputStream = inputStream;
+                inputStream = in;
             }
 
             /**
@@ -397,10 +397,10 @@ public class WcCommand extends AbstractCommand {
          * @throws IOException
          *             Signals that an I/O exception has occurred.
          */
-        private WcStream processStream(String fileName, InputStream inputStream) throws IOException {
+        private WcStream processStream(String name, InputStream inputStream) throws IOException {
             ByteCountInputStream bic = new ByteCountInputStream(inputStream);
             InputStreamReader reader = null;
-            fileName = fileName;
+            fileName = name;
 
             reader = new InputStreamReader(bic);
             boolean wasR = false;
