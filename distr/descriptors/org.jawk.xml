@@ -27,34 +27,64 @@
   </extension>
   
   <extension point="org.jnode.shell.syntaxes">
+    <argument-bundle alias="awk">
+        <typedefs>
+            <typedef name="StringArgument" value="org.jnode.shell.syntax.StringArgument"/>
+            <typedef name="FileArgument"   value="org.jnode.shell.syntax.FileArgument"/>
+            <typedef name="FlagArgument"   value="org.jnode.shell.syntax.FlagArgument"/>
+        </typedefs>
+        <argument label="vars" type="StringArgument">
+            <param type="flags" value="MULTIPLE"/>
+        </argument>
+        <argument label="script" type="FileArgument">
+            <param type="flags" value="EXISTING"/>
+        </argument>
+        <argument label="files" type="FileArgument">
+            <param type="flags" value="MULTIPLE,EXISTING"/>
+        </argument>
+        <argument label="compile-dir" type="FileArgument">
+            <param type="flags" value="EXISTING"/>
+        </argument>
+        <argument label="interm-file"  type="FileArgument">
+            <param type="flags" value="NONEXISTENT"/>
+        </argument>
+        <argument label="field-sep"    type="StringArgument"/>
+        <argument label="program"      type="StringArgument"/>
+        <argument label="interm-out"   type="FlagArgument"/>
+        <argument label="compile"      type="FlagArgument"/>
+        <argument label="compile-exec" type="FlagArgument"/>
+        <argument label="dump-interm"  type="FlagArgument"/>
+        <argument label="dump-ast"     type="FlagArgument"/>
+        <argument label="xfuncs"       type="FlagArgument"/>
+        <argument label="xtypes"       type="FlagArgument"/>
+        <argument label="sort-arrays"  type="FlagArgument"/>
+        <argument label="no-fmt-trap"  type="FlagArgument"/>
+    </argument-bundle>
     <syntax alias="awk">
-      <sequence>
-          <optionSet>
-            <option argLabel="vars" shortName="v"/>
-            <option argLabel="field-sep" shortName="F"/>
-            <option argLabel="script" shortName="f"/>
-            <option argLabel="interm-out" shortName="c"/>
-            <option argLabel="interm-file" shortName="o"/>
-            <option argLabel="compile" shortName="z"/>
-            <option argLabel="compile-exec" shortName="Z"/>
-            <option argLabel="compile-dir" shortName="d"/>
-            <option argLabel="dump-interm" shortName="s"/>
-            <option argLabel="dump-ast" shortName="S"/>
-            <option argLabel="xfuncs" shortName="x"/>
-            <option argLabel="xtypes" shortName="y"/>
-            <option argLabel="sort-arrays" shortName="t"/>
-            <option argLabel="no-fmt-trap" shortName="r"/>
-          </optionSet>
-          <optional>
-            <argument argLabel="program"/>
-          </optional>
-          <repeat>
+        <sequence>
+            <optionSet>
+                <option argLabel="vars"         shortName="v"/>
+                <option argLabel="field-sep"    shortName="F"/>
+                <option argLabel="interm-out"   shortName="c"/>
+                <option argLabel="interm-file"  shortName="o"/>
+                <option argLabel="compile"      shortName="z"/>
+                <option argLabel="compile-exec" shortName="Z"/>
+                <option argLabel="compile-dir"  shortName="d"/>
+                <option argLabel="dump-interm"  shortName="s"/>
+                <option argLabel="dump-ast"     shortName="S"/>
+                <option argLabel="xfuncs"       shortName="x"/>
+                <option argLabel="xtypes"       shortName="y"/>
+                <option argLabel="sort-arrays"  shortName="t"/>
+                <option argLabel="no-fmt-trap"  shortName="r"/>
+            </optionSet>
             <alternatives>
-              <argument argLabel="files"/>
-              <argument argLabel="vars"/>
+                <option argLabel="script"       shortName="f"/>
+                <argument argLabel="program"/>
             </alternatives>
-          </repeat>
-      </sequence>
+            <repeat>
+                <argument argLabel="files"/>
+            </repeat>
+        </sequence>
     </syntax>
   </extension>
   
@@ -66,5 +96,6 @@
     <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
     <permission class="java.lang.RuntimePermission" name="getenv.*"/>
     <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
+    <permission class="java.lang.RuntimePermission" name="exitVM"/>
   </extension>
 </plugin>
