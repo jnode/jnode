@@ -32,10 +32,11 @@ import org.jnode.shell.syntax.SyntaxBundle;
  * @author crawley@jnode.org
  */
 public final class CommandInfo {
-
+    
     private final Class<?> clazz;
     private final String commandName;
     private final SyntaxBundle syntaxBundle;
+    private final ArgumentBundle argBundle;
     private final boolean internal;
 
     private Command instance;
@@ -45,6 +46,26 @@ public final class CommandInfo {
         this.internal = internal;
         this.commandName = commandName;
         this.syntaxBundle = syntaxBundle;
+        this.argBundle = null;
+    }
+    
+    /**
+     * Creates a CommandInfo object for a bare command.
+     *
+     * If the bare command has a defined {@code ArgumentBundle} then
+     * it will be used when parsing the command line.
+     *
+     * @param clazz the designated {@code Class} for executing the command
+     * @param commandName the name, or alias, for the command
+     * @param syntaxBundle the syntax definition to parse the command line against
+     * @param argBundle the optional {@code ArgumentBundle} to parse the command line against
+     */    
+    public CommandInfo(Class<?> clazz, String commandName, SyntaxBundle syntaxBundle, ArgumentBundle argBundle) {
+        this.clazz = clazz;
+        this.internal = false;
+        this.commandName = commandName;
+        this.syntaxBundle = syntaxBundle;
+        this.argBundle = argBundle;
     }
 
     public final Class<?> getCommandClass() {
@@ -53,6 +74,19 @@ public final class CommandInfo {
 
     public final boolean isInternal() {
         return internal;
+    }
+    
+    public final ArgumentBundle getArgumentBundle() {
+        if (argBundle == null) {
+            if (Command.class.isAssignableFrom(clazz)) {
+                try {
+                    return ((Command) clazz.newInstance()).getArgumentBundle();
+                } catch (Exception e) {
+                    // fall through
+                }
+            }
+        }
+        return argBundle;
     }
 
     /**
@@ -90,17 +124,24 @@ public final class CommandInfo {
      * parses against the Syntax, binding the command arguments to Argument objects
      * in an ArgumentBundle object obtained from the Command object.
      *
-     * @param shell the context for resolving command aliases and locating syntaxes
+     * If this CommandInfo object was created from a bare command, then the argBundle
+     * will have been previously supplied to parse against.
+     *
+     * @param cmdLine the command line containing the tokens to parse against the argument bundle.
      * @throws CommandSyntaxException if the chosen syntax doesn't match the command
      *                                line arguments.
      * @throws ShellException for problems instantiating the command class.
      */
     public void parseCommandLine(CommandLine cmdLine) throws ShellException {
         try {
-            Command command = createCommandInstance();
-
-            // Get the command's argument bundle, or the default one.
-            ArgumentBundle bundle = (command == null) ? null : command.getArgumentBundle();
+            ArgumentBundle bundle = argBundle;
+            if (bundle == null) {
+                Command cmd = createCommandInstance();
+                if (cmd != null) {
+                    bundle = cmd.getArgumentBundle();
+                }
+            }
+            
             if (bundle != null) {
                 // Do a full parse to bind the command line argument tokens to corresponding
                 // command arguments

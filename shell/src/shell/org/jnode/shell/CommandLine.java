@@ -594,7 +594,7 @@ public class CommandLine implements Completable, Iterable<String> {
             } catch (ShellException ex) {
                 throw new CompletionException(ex.getMessage(), ex);
             }
-
+            
             Command command;
             try {
                 command = cmdClass.createCommandInstance();
@@ -603,7 +603,9 @@ public class CommandLine implements Completable, Iterable<String> {
             }
 
             // Get the command's argument bundle and syntax
-            ArgumentBundle bundle = (command == null) ? null : command.getArgumentBundle();
+            ArgumentBundle bundle = (command == null)
+                ? cmdClass.getArgumentBundle()
+                : command.getArgumentBundle();
             SyntaxBundle syntaxes = shell.getSyntaxManager().getSyntaxBundle(cmd);
 
             if (bundle == null) {
