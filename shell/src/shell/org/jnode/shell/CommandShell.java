@@ -87,6 +87,7 @@ import org.jnode.vm.VmSystem;
  * @author epr
  * @author Fabien DUMINY
  * @author crawley@jnode.org
+ * @author chris boertien
  */
 public class CommandShell implements Runnable, Shell, ConsoleListener {
 
@@ -661,7 +662,25 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         throws ShellException {
         return this.invoker.invokeAsynchronous(cmdLine);
     }
-
+    
+    /**
+     * Gets a {@link CommandInfo} object representing the given command/alias.
+     *
+     * If the given command is a known alias, and the {@code Class} for the alias
+     * is a type of {@link Command} then a {@code CommandInfo} object for a JNode
+     * command will be returned. If the {@code Class} is a non-JNode command and
+     * a bare command definition for the alias exists, then a {@code CommandInfo}
+     * object will be created that contains an {@link org.jnode.shell.syntax.ArgumentBundle ArgumentBundle}
+     * will be created.
+     *
+     * If the given command is not an alias, then it will be assumed to be a
+     * class name, and an attempt will be made to load the a {@code Class} for
+     * that name, and create a {@code CommandInfo} object for it.
+     *
+     * @param cmd an alias or class name
+     * @return a {@code CommandInfo} object representing the given command
+     * @throws ShellException, if the class could not be found
+     */
     public CommandInfo getCommandInfo(String cmd) throws ShellException {
         SyntaxBundle syntaxBundle = getSyntaxManager().getSyntaxBundle(cmd);
         try {
