@@ -52,13 +52,10 @@ import java.io.Closeable;
 import java.io.Flushable;
 import java.io.Writer;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
 /**
- * TODO check performance of prefixing, probably needs some buffering.
- * TODO implement outputting context lines (requires buffering output lines)
  * TODO implement Fixed/Basic/Ext matchers
  * TODO implement --color (if/when possible)
  * @author peda

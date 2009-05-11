@@ -96,7 +96,7 @@ public class CutCommand extends AbstractCommand {
         registerArguments(argSuppress, argComplement);
     }
     
-    public void execute() {
+    public void execute() throws IOException {
         err = getError().getPrintWriter();
         out = new BufferedWriter(getOutput().getPrintWriter());
         parseOptions();
@@ -123,8 +123,6 @@ public class CutCommand extends AbstractCommand {
                 } else if (mode == Mode.FIELD) {
                     cutFields(lines);
                 }
-            } catch (IOException e) {
-                
             } finally {
                 IOUtils.flush(out);
             }

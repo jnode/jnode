@@ -2,3 +2,4 @@
     <include setName="wc-command-tests.xml"/>
     <include setName="cut-command-tests.xml"/>
 </testSet>
+
