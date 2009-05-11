@@ -109,7 +109,17 @@ public class CommandRunner implements CommandRunnable {
             stackTrace(ex);
         }
     }
-
+    
+    /**
+     * Prepare the command for execution.
+     *
+     * If the command is not a type of Command then the main method will
+     * be prepared for invoking with arguments supplied from the command
+     * line.
+     *
+     * This will fail to complete if the command line parsing fails, or if
+     * the main method for the class could not be found.
+     */
     private void prepare() throws ShellException {
         Command command;
         try {
@@ -144,7 +154,14 @@ public class CommandRunner implements CommandRunnable {
             }
         }
     }
-
+    
+    /**
+     * Executes the command.
+     *
+     * For a JNode command, this will initialie and execute the command. For
+     * other commands the main method will be invoked via reflection with the
+     * set of arguments supplied on the command line.
+     */
     private void execute() throws Throwable {
         try {
             if (method != null) {
@@ -199,7 +216,7 @@ public class CommandRunner implements CommandRunnable {
             ex.printStackTrace(shellErr);
         }
     }
-
+    
     public Method getMethod() {
         return method;
     }

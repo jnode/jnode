@@ -27,9 +27,18 @@ import org.jnode.shell.syntax.SyntaxBundle;
 /**
  * A CommandInfo object is a descriptor used by the CommandShell and CommandInvokers
  * to hold information about a command that is being prepared for execution.
+ *
+ * There are two basic types of command's that can be described. The first type is
+ * a JNode command that implements {@link Command} by extending {@link AbstractCommand}.
+ * The other type is generally refered to as a 'classic Java' command, and refers to
+ * command that is executed via its {@code main} method. This type of command may have
+ * an associated bare command definition in its descriptor. If such a descriptor was
+ * supplied, an instance of this class will contain the {@link org.jnode.shell.syntax.ArgumentBundle}
+ * for the command.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author crawley@jnode.org
+ * @author chris boertien
  */
 public final class CommandInfo {
     
@@ -40,7 +49,15 @@ public final class CommandInfo {
     private final boolean internal;
 
     private Command instance;
-
+    
+    /**
+     * Creates a CommandInfo object for a JNode command.
+     *
+     * @param clazz the designated {@code Class} for executing the command
+     * @param commandName the name, or alias, for the command
+     * @param syntaxBundle the syntax definition to parse the command line against
+     * @param argBundle the optional {@code ArgumentBundle} to parse the command line against
+     */
     public CommandInfo(Class<?> clazz, String commandName, SyntaxBundle syntaxBundle, boolean internal) {
         this.clazz = clazz;
         this.internal = internal;
@@ -59,7 +76,7 @@ public final class CommandInfo {
      * @param commandName the name, or alias, for the command
      * @param syntaxBundle the syntax definition to parse the command line against
      * @param argBundle the optional {@code ArgumentBundle} to parse the command line against
-     */    
+     */
     public CommandInfo(Class<?> clazz, String commandName, SyntaxBundle syntaxBundle, ArgumentBundle argBundle) {
         this.clazz = clazz;
         this.internal = false;
@@ -67,15 +84,37 @@ public final class CommandInfo {
         this.syntaxBundle = syntaxBundle;
         this.argBundle = argBundle;
     }
-
+    
+    /**
+     * Gets the {@code Class} for the command.
+     *
+     * @return the {@code Class} for the command
+     */
     public final Class<?> getCommandClass() {
         return clazz;
     }
-
+    
+    /**
+     * Checks wether this command is considered internal or not.
+     *
+     * @return true if this is an internal command
+     * @see org.jnode.shell.alias.AliasManager#isInternal
+     */
     public final boolean isInternal() {
         return internal;
     }
     
+    /**
+     * Retrieves the argument bundle for the command.
+     *
+     * If this instance was instantiated with an {@link ArgumentBundle}, then
+     * that bundle will be returned. If not, and the target class is a type of
+     * {@link Command} then the {@code Command}s {@code ArgumentBundle} will
+     * be returned. Otherwise this method will return null.
+     *
+     * @return an {@code ArgumentBundle} for the command, or null if none can be found
+     * @see #CommandInfo(Class,String,SyntaxBundle,ArgumentBundle)
+     */
     public final ArgumentBundle getArgumentBundle() {
         if (argBundle == null) {
             if (Command.class.isAssignableFrom(clazz)) {
@@ -107,6 +146,7 @@ public final class CommandInfo {
 
     /**
      * Get the Command instance for this CommandInfo, without instantiating one.
+     *
      * @return The Command instance to be used for binding argument and executing 
      * the command, or <code>null</code>.
      */
@@ -114,6 +154,11 @@ public final class CommandInfo {
         return instance;
     }
     
+    /**
+     * Gets the name/alias for this command.
+     *
+     * @return the command's alias
+     */
     public String getCommandName() {
         return commandName;
     }
