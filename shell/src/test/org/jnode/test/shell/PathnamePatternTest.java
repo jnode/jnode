@@ -112,6 +112,9 @@ public class PathnamePatternTest extends TestCase {
 
         assertEquals("PathnamePattern{source='\"/a/*\"',absolute=true,patterns=['a','^\\*$']}", 
                 PathnamePattern.compilePathPattern("\"/a/*\"", DF).toRegexString());
+        
+        assertEquals("PathnamePattern{source='{print \\$1}',absolute=false,patterns=['^\\{print \\$1\\}$']}", 
+                PathnamePattern.compilePathPattern("{print \\$1}", DF).toRegexString());
     }
     
     public void testExpand() {

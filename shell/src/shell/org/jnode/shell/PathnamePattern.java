@@ -549,6 +549,8 @@ public class PathnamePattern {
             case '*':
             case '?':
             case '$':
+            case '{':
+            case '}':
             case '^':
             case '\\':
                 return "\\" + ch;
