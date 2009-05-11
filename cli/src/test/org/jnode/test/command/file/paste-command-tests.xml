@@ -1,0 +1,131 @@
+<testSet title="POSIX paste command tests">
+    <plugin id="org.jnode.command.file"/>
+    <plugin id="org.jnode.shell.bjorne" class="org.jnode.test.shell.bjorne.BjornePseudoPlugin"/>
+    <testSpec title="serial stdin default-delim" command="paste" runMode="AS_ALIAS" rc="0">
+        <arg>-s</arg>
+        <input>1
+2
+3
+4
+</input>
+        <output>1	2	3	4
+</output>
+    </testSpec>
+    <testSpec title="title serial stdin single-delim" command="paste" runMode="AS_ALIAS" rc="0">
+        <arg>-s</arg>
+        <arg>-d</arg>
+        <arg>;</arg>
+        <input>1
+2
+3
+4
+</input>
+        <output>1;2;3;4
+</output>
+    </testSpec>
+    <testSpec title="serial stdin multi-delim 1" command="paste" runMode="AS_ALIAS" rc="0">
+        <arg>-s</arg>
+        <arg>-d</arg>
+        <arg>;:,</arg>
+        <input>1
+2
+3
+4
+</input>
+        <output>1;2:3,4
+</output>
+    </testSpec>
+    <testSpec title="serial stdin multi-delim 2" command="paste" runMode="AS_ALIAS" rc="0">
+        <arg>-s</arg>
+        <arg>-d</arg>
+        <arg>;:</arg>
+        <input>1
+2
+3
+4
+</input>
+        <output>1;2:3;4
+</output>
+    </testSpec>
+    <testSpec title="parallel stdin default-delim" command="paste" runMode="AS_ALIAS" rc="0">
+        <input>1
+2
+3
+4
+</input>
+        <output>1
+2
+3
+4
+</output>
+    </testSpec>
+    <testSpec title="parallel stdin-multi single-delim" command="paste" runMode="AS_ALIAS" rc="0">
+        <arg>-d</arg>
+        <arg>;</arg>
+        <arg>-</arg>
+        <arg>-</arg>
+        <input>1
+2
+3
+4
+</input>
+        <output>1;2
+3;4
+</output>
+    </testSpec>
+    <testSpec title="parallel stdin-multi multi-delim" command="paste" runMode="AS_ALIAS" rc="0">
+        <arg>-d</arg>
+        <arg>;:,</arg>
+        <arg>-</arg>
+        <arg>-</arg>
+        <arg>-</arg>
+        <arg>-</arg>
+        <input>1
+2
+3
+4
+</input>
+        <output>1;2:3,4
+</output>
+    </testSpec>
+    <testSpec title="parallel file-dup sync" command="run" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                paste -d ";" @TEMP_DIR@/a @TEMP_DIR@/a
+        </script>
+        <file name="a" input="true">1
+2
+3
+4
+</file>
+        <output>1;2
+3;4
+</output>
+    </testSpec>
+    <testSpec title="parallel file-dup async" command="run" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                paste -d ";" @TEMP_DIR@/a @TEMP_DIR@/a @TEMP_DIR@/a
+        </script>
+        <file name="a" input="true">1
+2
+3
+4
+</file>
+        <output>1;2;3
+4
+</output>
+    </testSpec>
+    <testSpec title="parallel file-dup async multi-delim" command="run" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                paste -d ";:" @TEMP_DIR@/a @TEMP_DIR@/a @TEMP_DIR@/a
+        </script>
+        <file name="a" input="true">1
+2
+3
+4
+5
+</file>
+        <output>1;2:3
+4;5
+</output>
+    </testSpec>
+</testSet>
