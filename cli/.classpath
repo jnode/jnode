@@ -2,10 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src/commands"/>
 	<classpathentry kind="src" path="src/test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/shell"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/fs"/>
+	<classpathentry kind="lib" path="/all/lib/classlib.jar" sourcepath="/all/lib/classlib-src.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
