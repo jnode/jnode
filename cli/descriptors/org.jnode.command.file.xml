@@ -38,8 +38,8 @@
     <alias name="hexdump" class="org.jnode.command.file.HexdumpCommand"/>
     <alias name="ls"      class="org.jnode.command.file.DirCommand"/>
     <alias name="md5sum"  class="org.jnode.command.file.Md5SumCommand"/>
-    <!-- NoSuchAlgorithmException: md5 Message Digest not available -->
     <alias name="mkdir"   class="org.jnode.command.file.MkdirCommand"/>
+    <alias name="paste"   class="org.jnode.command.file.PasteCommand"/>
     <alias name="pwd"     class="org.jnode.command.file.PwdCommand"/>
     <alias name="rm"      class="org.jnode.command.file.DeleteCommand"/>
     <alias name="tail"    class="org.jnode.command.file.TailCommand"/>
@@ -279,6 +279,18 @@
     </syntax>
     <syntax alias="mkdir">
       <argument argLabel="directory" description="create a new directory"/>
+    </syntax>
+    <syntax alias="paste">
+      <empty />
+      <sequence>
+        <optionSet>
+          <option argLabel="serial" shortName="s" longName="serial"/>
+          <option argLabel="delims" shortName="d" longName="delimiters"/>
+        </optionSet>
+        <repeat>
+          <argument argLabel="files"/>
+        </repeat>
+      </sequence>
     </syntax>
     <syntax alias="pwd">
       <empty description="show the pathname for the current directory"/>

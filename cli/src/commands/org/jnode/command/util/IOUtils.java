@@ -298,6 +298,30 @@ public final class IOUtils {
     }
     
     /**
+     * Wraps a {@code Reader} with a {@code BufferedReader}.
+     *
+     * @param reader the reader to wrap
+     * @return a {@code BufferedReader}
+     * @throws NullPointerException if reader is null
+     */
+    public static BufferedReader openBufferedReader(Reader reader) {
+        return openBufferedReader(reader, BUFFER_SIZE);
+    }
+    
+    /**
+     * Wraps a {@code Reader} with a {@code BufferedReader}.
+     *
+     * @param reader the reader to wrap
+     * @param bufferSize the size of buffer to use
+     * @return a {@code BufferedReader}
+     * @throws NullPointerException if reader is null
+     */
+    public static BufferedReader openBufferedReader(Reader reader, int bufferSize) {
+        checkNull(reader);
+        return new BufferedReader(reader, bufferSize);
+    }
+    
+    /**
      * Opens a LineNumberReader on a file.
      *
      * This method will not throw a FileNotFoundException like the FileReader

@@ -56,8 +56,8 @@
         <output>13579
 </output>
     </testSpec>
-        <arg>-b</arg>
     <testSpec title="num-list sort 2" command="cut" runMode="AS_ALIAS" rc="0">
+        <arg>-b</arg>
         <arg>6-7,5,9-10,2,3,1</arg>
         <input>1234567890
 </input>
