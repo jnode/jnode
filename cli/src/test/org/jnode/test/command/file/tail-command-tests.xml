@@ -1,0 +1,208 @@
+<testSet title="POSIX head command tests">
+    <testSpec title="default 1" command="tail" runMode="AS_ALIAS" rc="0">
+        <input>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</input>
+        <output>2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</output>
+    </testSpec>
+    <testSpec title="default 2" command="tail" runMode="AS_ALIAS" rc="0">
+        <input>1
+2
+3
+4
+5
+</input>
+        <output>1
+2
+3
+4
+5
+</output>
+    </testSpec>
+    <testSpec title="set-lines-neg 1" command="tail" runMode="AS_ALIAS" rc="0">
+        <arg>-n</arg>
+        <arg>3</arg>
+        <input>1
+2
+3
+4
+5
+</input>
+        <output>3
+4
+5
+</output>
+    </testSpec>
+    <testSpec title="set-lines-neg 1" command="tail" runMode="AS_ALIAS" rc="0">
+        <arg>-n</arg>
+        <arg>-3</arg>
+        <input>1
+2
+3
+4
+5
+</input>
+        <output>3
+4
+5
+</output>
+    </testSpec>
+    <testSpec title="set-lines-pos 1" command="tail" runMode="AS_ALIAS" rc="0">
+        <arg>-n</arg>
+        <arg>+2</arg>
+        <input>1
+2
+3
+4
+5
+</input>
+        <output>2
+3
+4
+5
+</output>
+    </testSpec>
+    <testSpec title="test-bytes-pos 1" command="tail" runMode="AS_ALIAS" rc="0">
+        <arg>-c</arg>
+        <arg>+3</arg>
+        <input>1
+2
+3
+4
+5
+</input>
+        <output>3
+4
+5
+</output>
+    </testSpec>
+    <!-- bugged
+    <testSpec title="test-bytes-neg 1" command="tail" runMode="AS_ALIAS" rc="0">
+        <arg>-c</arg>
+        <arg>-3</arg>
+        <input>1
+2
+3
+4
+5
+</input>
+        <output>
+5
+</output>
+    </testSpec>
+    -->
+    <testSpec title="test-bytes-neg 1" command="tail" runMode="AS_ALIAS" rc="0">
+        <arg>-c</arg>
+        <arg>-3</arg>
+        <arg>/tmp/jnodeTestDir/a</arg>
+        <file name="a" input="true">1
+2
+3
+4
+5
+</file>
+        <output>
+5
+</output>
+    </testSpec>
+    <testSpec title="headers-optional 1" command="tail" runMode="AS_ALIAS" rc="0">
+        <arg>-n</arg>
+        <arg>2</arg>
+        <arg>/tmp/jnodeTestDir/a</arg>
+        <arg>/tmp/jnodeTestDir/b</arg>
+        <file name="a" input="true">1
+2
+3
+4
+5
+</file>
+        <file name="b" input="true">1
+2
+3
+4
+5
+</file>
+        <output>==&gt; /tmp/jnodeTestDir/a &lt;==
+4
+5
+
+==&gt; /tmp/jnodeTestDir/b &lt;==
+4
+5
+</output>
+    </testSpec>
+    <testSpec title="headers-never 1" command="tail" runMode="AS_ALIAS" rc="0">
+        <arg>-n</arg>
+        <arg>2</arg>
+        <arg>-q</arg>
+        <arg>/tmp/jnodeTestDir/a</arg>
+        <arg>/tmp/jnodeTestDir/b</arg>
+        <file name="a" input="true">1
+2
+3
+4
+5
+</file>
+        <file name="b" input="true">1
+2
+3
+4
+5
+</file>
+        <output>4
+5
+4
+5
+</output>
+    </testSpec>
+    <testSpec title="headers-always file 1" command="tail" runMode="AS_ALIAS" rc="0">
+        <arg>-n</arg>
+        <arg>2</arg>
+        <arg>-v</arg>
+        <arg>/tmp/jnodeTestDir/a</arg>
+        <file name="a" input="true">1
+2
+3
+4
+5
+</file>
+        <output>==&gt; /tmp/jnodeTestDir/a &lt;==
+4
+5
+</output>
+    </testSpec>
+    <testSpec title="headers-always stdin 1" command="tail" runMode="AS_ALIAS" rc="0">
+        <arg>-n</arg>
+        <arg>2</arg>
+        <arg>-v</arg>
+        <input>1
+2
+3
+4
+5
+</input>
+        <output>==&gt; standard input &lt;==
+4
+5
+</output>
+    </testSpec>
+</testSet>

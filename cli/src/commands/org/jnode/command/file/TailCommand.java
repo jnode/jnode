@@ -89,6 +89,7 @@ public class TailCommand extends AbstractCommand {
     private boolean reverse;
     private boolean follow;
     private boolean retry;
+    private boolean first = true;
     
     public TailCommand() {
         super("Print the tail end of a list of files, or stdin.");
@@ -131,7 +132,7 @@ public class TailCommand extends AbstractCommand {
         
         try {
             for (File file : files) {
-                printHeader(file.getName());
+                printHeader(file.getPath());
                 if (!file.getName().equals("-")) {
                     if (useLines) {
                         printFileLines(file);
@@ -209,7 +210,7 @@ public class TailCommand extends AbstractCommand {
         String line;
         if (reverse) {
             int n = count;
-            while (--n >= 0 && (line = reader.readLine()) != null) {
+            while (--n > 0 && reader.readLine() != null) {
                 // no-op
             }
             while ((line = reader.readLine()) != null) {
@@ -221,7 +222,7 @@ public class TailCommand extends AbstractCommand {
                 lines.add(line);
             }
             
-            int n = lines.size() - count;
+            int n = Math.max(0, lines.size() - count);
             for (; n < lines.size(); n++) {
                 out.println(lines.get(n));
             }
@@ -236,13 +237,12 @@ public class TailCommand extends AbstractCommand {
         int bufsize = 8 * 1024;
         
         if (reverse) {
-            n = count;
+            in.skip(count + 1);
         } else if (size != -1) {
-            n = size - count;
+            in.skip(Math.max(0, size - count));
         } else {
             throw new UnsupportedOperationException("Cannot do -count byte reads on stdin yet");
         }
-        in.skip(n);
         
         buffer = new byte[bufsize];
         while ((len = in.read(buffer)) > 0) {
@@ -253,7 +253,10 @@ public class TailCommand extends AbstractCommand {
     private void printHeader(String name) {
         PrintWriter out = getOutput().getPrintWriter();
         if (headers) {
-            out.println();
+            if (!first) {
+                out.println();
+            }
+            first = false;
             if (name.equals("-")) {
                 out.println("==> standard input <==");
             } else {
@@ -297,7 +300,7 @@ public class TailCommand extends AbstractCommand {
     }
 
     private int parseInt(String s) {
-        if (s.charAt(0) == '+') {
+        if (s.charAt(0) == '+' || s.charAt(0) == '-') {
             s = s.substring(1);
         }
         try {
