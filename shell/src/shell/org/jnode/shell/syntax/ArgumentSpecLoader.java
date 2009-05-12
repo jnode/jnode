@@ -207,7 +207,7 @@ public class ArgumentSpecLoader {
         }
     }
     
-    static class ArgumentSpec<T extends Argument<?>> {
+    public static class ArgumentSpec<T extends Argument<?>> {
         private Constructor<T> ctor;
         private Object[] params;
         
