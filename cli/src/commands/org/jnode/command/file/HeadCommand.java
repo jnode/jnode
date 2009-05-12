@@ -64,6 +64,7 @@ public class HeadCommand extends AbstractCommand {
     private boolean headers;
     private boolean useLines;
     private boolean reverse;
+    private boolean first = true;
     
     public HeadCommand() {
         super("Print the head of a list of files, or stdin");
@@ -92,7 +93,7 @@ public class HeadCommand extends AbstractCommand {
         
         try {
             for (File file : files) {
-                printHeader(file.getName());
+                printHeader(file.getPath());
                 if (file.getName().equals("-")) {
                     if (useLines) {
                         printStdinLines();
@@ -214,7 +215,10 @@ public class HeadCommand extends AbstractCommand {
     private void printHeader(String name) {
         PrintWriter out = getOutput().getPrintWriter();
         if (headers) {
-            out.println();
+            if (!first) {
+                out.println();
+            }
+            first = false;
             if (name.equals("-")) {
                 out.println("==> standard input <==");
             } else {

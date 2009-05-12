@@ -1,5 +1,6 @@
 <testSet title="All file command tests">
     <include setName="cut-command-tests.xml"/>
+    <include setName="head-command-tests.xml"/>
     <include setName="paste-command-tests.xml"/>
     <include setName="wc-command-tests.xml"/>
 </testSet>
