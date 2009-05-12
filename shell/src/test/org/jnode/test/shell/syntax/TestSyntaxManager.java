@@ -23,6 +23,8 @@ package org.jnode.test.shell.syntax;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.jnode.shell.syntax.ArgumentBundle;
+import org.jnode.shell.syntax.ArgumentSpecLoader.ArgumentSpec;
 import org.jnode.shell.syntax.SyntaxBundle;
 import org.jnode.shell.syntax.SyntaxManager;
 
@@ -36,13 +38,21 @@ public class TestSyntaxManager implements SyntaxManager {
     public void add(SyntaxBundle bundle) {
         syntaxes.put(bundle.getAlias(), bundle);
     }
-
+    
+    public void add(String alias, ArgumentSpec[] args) {
+        return;
+    }
+    
     public SyntaxBundle remove(String alias) {
         return syntaxes.remove(alias);
     }
 
     public SyntaxBundle getSyntaxBundle(String alias) {
         return syntaxes.get(alias);
+    }
+    
+    public ArgumentBundle getArgumentBundle(String alias) {
+        return null;
     }
 
     public SyntaxManager createSyntaxManager() {
