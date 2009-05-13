@@ -1,0 +1,7 @@
+<testSet title="grep command tests">
+    <include setName="grep-context-tests.xml"/>
+    <!-- TODO
+    <include setName="grep-prefix-tests.xml"/>
+    <include setName="grep-match-tests.xml"/>
+    -->
+</testSet>

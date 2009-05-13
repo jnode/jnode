@@ -1,0 +1,379 @@
+<testSet title="grep context line tests">
+    <plugin id="org.jnode.command.file"/>
+    <!-- 
+         Context lines are not part of the POSIX standard. They are an extension
+         and therefore we don't need to meet a 'standard'. Though we do try to
+         make the behavior compatible with gnu grep, as it also has this extension.
+    -->
+    
+    <!-- context tests -->
+    <testSpec title="context-before 1" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-B</arg>
+        <arg>2</arg>
+        <arg>foo</arg>
+        <input>0
+1
+2
+foo
+</input>
+        <output>1
+2
+foo
+</output>
+    </testSpec>
+    <testSpec title="context-before 2" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-B</arg>
+        <arg>2</arg>
+        <arg>foo</arg>
+        <input>0
+1
+2
+foo
+1
+2
+foo
+</input>
+        <output>1
+2
+foo
+1
+2
+foo
+</output>
+    </testSpec>
+    <testSpec title="context-before 3" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-B</arg>
+        <arg>2</arg>
+        <arg>foo</arg>
+        <input>1
+2
+foo
+0
+1
+2
+foo
+</input>
+        <output>1
+2
+foo
+-----
+1
+2
+foo
+</output>
+    </testSpec>
+    <testSpec title="context-before 4" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-B</arg>
+        <arg>2</arg>
+        <arg>foo</arg>
+        <input>0
+1
+2
+foo
+2
+foo
+1
+2
+foo
+0
+0
+1
+2
+foo
+0
+1
+2
+foo
+2
+foo
+foo
+1
+2
+foo
+</input>
+        <output>1
+2
+foo
+2
+foo
+1
+2
+foo
+-----
+1
+2
+foo
+-----
+1
+2
+foo
+2
+foo
+foo
+1
+2
+foo
+</output>
+    </testSpec>
+    <testSpec title="context-before 5" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-B</arg>
+        <arg>2</arg>
+        <arg>foo</arg>
+        <input>1
+2
+foo
+0
+</input>
+        <output>1
+2
+foo
+</output>
+    </testSpec>
+    <testSpec title="context-after 1" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-A</arg>
+        <arg>1</arg>
+        <arg>foo</arg>
+        <input>0
+foo
+1
+</input>
+        <output>foo
+1
+</output>
+    </testSpec>
+    <testSpec title="context-after 2" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-A</arg>
+        <arg>1</arg>
+        <arg>foo</arg>
+        <input>foo
+1
+0
+</input>
+        <output>foo
+1
+</output>
+    </testSpec>
+    <testSpec title="context-after 3" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-A</arg>
+        <arg>1</arg>
+        <arg>foo</arg>
+        <input>0
+foo
+1
+0
+0
+</input>
+        <output>foo
+1
+</output>
+    </testSpec>
+    <testSpec title="context-after 4" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-A</arg>
+        <arg>2</arg>
+        <arg>foo</arg>
+        <input>0
+foo
+2
+1
+foo
+2
+foo
+2
+1
+0
+foo
+2
+1
+0
+0
+foo
+2
+</input>
+        <output>foo
+2
+1
+foo
+2
+foo
+2
+1
+-----
+foo
+2
+1
+-----
+foo
+2
+</output>
+    </testSpec>
+    <testSpec title="context-both 1" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-C</arg>
+        <arg>1</arg>
+        <arg>foo</arg>
+        <input>1
+foo
+1
+</input>
+        <output>1
+foo
+1
+</output>
+    </testSpec>
+    <testSpec title="context-both 2" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-C</arg>
+        <arg>1</arg>
+        <arg>foo</arg>
+        <input>0
+1
+foo
+1
+0
+</input>
+        <output>1
+foo
+1
+</output>
+    </testSpec>
+    <testSpec title="context-both 3" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-C</arg>
+        <arg>1</arg>
+        <arg>foo</arg>
+        <input>0
+1
+foo
+1
+foo
+foo
+1
+1
+foo
+1
+0
+1
+foo
+1
+</input>
+        <output>1
+foo
+1
+foo
+foo
+1
+1
+foo
+1
+-----
+1
+foo
+1
+</output>
+    </testSpec>
+    <testSpec title="context-both 4" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-C</arg>
+        <arg>2</arg>
+        <arg>foo</arg>
+        <input>0
+1
+2
+foo
+2
+1
+0
+0
+1
+2
+foo
+2
+foo
+2
+1
+1
+2
+foo
+2
+1
+0
+0
+1
+2
+foo
+2
+1
+0
+1
+2
+foo
+2
+1
+0
+</input>
+        <output>1
+2
+foo
+2
+1
+-----
+1
+2
+foo
+2
+foo
+2
+1
+1
+2
+foo
+2
+1
+-----
+1
+2
+foo
+2
+1
+-----
+1
+2
+foo
+2
+1
+</output>
+    </testSpec>
+    
+    <!-- context prefix tests -->
+    
+    <testSpec title="context-prefix 1" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-C</arg>
+        <arg>1</arg>
+        <arg>-H</arg>
+        <arg>foo</arg>
+        <input>0
+1
+foo
+1
+0
+</input>
+        <output>stdin-1
+stdin:foo
+stdin-1
+</output>
+    </testSpec>
+    
+    <!-- context error tests -->
+    <!--
+        If the -o option is specified, than context line printing should be
+        disabled.
+    -->
+    <testSpec title="context-error 1" command="grep" runMode="AS_ALIAS" rc="0">
+        <arg>-C</arg>
+        <arg>1</arg>
+        <arg>-o</arg>
+        <arg>foo</arg>
+        <input>1
+foo
+1
+</input>
+        <output>foo
+</output>
+    </testSpec>
+</testSet>

@@ -23,7 +23,7 @@
   </requires>
   
   <extension point="org.jnode.shell.aliases">
-    <alias name="awk" class="org.jawk.JawkCommand"/>
+    <alias name="awk" class="org.jawk.JawkMain"/>
   </extension>
   
   <extension point="org.jnode.shell.syntaxes">

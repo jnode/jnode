@@ -1,0 +1,141 @@
+<testSet title="cat command tests">
+    <plugin id="org.jnode.command.file"/>
+    <plugin id="org.jnode.shell.bjorne" class="org.jnode.test.shell.bjorne.BjornePseudoPlugin"/>
+    <testSpec title="stdin->stdout" command="cat" runMode="AS_ALIAS" rc="0">
+        <input>1234
+</input>
+        <output>1234
+</output>
+    </testSpec>
+    <testSpec title="single-file" command="run" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                cat @TEMP_DIR@/a
+        </script>
+        <file name="a" input="true">1234
+</file>
+        <output>1234
+</output>
+    </testSpec>
+    <testSpec title="multi-file 1" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                cat @TEMP_DIR@/a @TEMP_DIR@/b
+        </script>
+        <file name="a" input="true">1234
+</file>
+        <file name="b" input="true">5678
+</file>
+        <output>1234
+5678
+</output>
+    </testSpec>
+    <testSpec title="multi-file 2" command="run" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                cat @TEMP_DIR@/b @TEMP_DIR@/a
+        </script>
+        <file name="a" input="true">1234
+</file>
+        <file name="b" input="true">5678
+</file>
+        <output>5678
+1234
+</output>
+    </testSpec>
+    <testSpec title="file+stdin" command="cat" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo "----" | cat @TEMP_DIR@/a - @TEMP_DIR@/b
+        </script>
+        <file name="a" input="true">1234
+</file>
+        <file name="b" input="true">5678
+</file>
+        <output>1234
+----
+5678
+</output>
+    </testSpec>
+    <!-- Non POSIX tests -->
+    
+    <testSpec title="show-all-lines" command="cat" runMode="AS_ALIAS" rc="0">
+        <arg>-n</arg>
+        <input>a
+b
+c
+d
+</input>
+        <output>     1 a
+     2 b
+     3 c
+     4 d
+</output>
+    </testSpec>
+    <testSpec title="show-all-lines squash" command="cat" runMode="AS_ALIAS" rc="0">
+        <arg>-ns</arg>
+        <input>a
+b
+
+
+c
+d
+</input>
+        <output>     1 a
+     2 b
+     3 
+     4 c
+     5 d
+</output>
+    </testSpec>
+    <testSpec title="show-nonblank-lines" command="cat" runMode="AS_ALIAS" rc="0">
+        <arg>-b</arg>
+        <input>a
+b
+
+c
+
+d
+</input>
+        <output>     1 a
+     2 b
+       
+     3 c
+       
+     4 d
+</output>
+    </testSpec>
+    <testSpec title="show-nonblank-lines squash" command="cat" runMode="AS_ALIAS" rc="0">
+        <arg>-bs</arg>
+        <input>a
+
+
+b
+
+
+c
+
+
+d
+</input>
+        <output>     1 a
+       
+     2 b
+       
+     3 c
+       
+     4 d
+</output>
+    </testSpec>
+    <testSpec title="show-ends" command="cat" runMode="AS_ALIAS" rc="0">
+        <arg>-E</arg>
+        <input>1234
+   
+  
+ 
+
+</input>
+        <output>1234$
+   $
+  $
+ $
+$
+</output>
+    </testSpec>
+</testSet>
