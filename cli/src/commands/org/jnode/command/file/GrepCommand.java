@@ -65,7 +65,7 @@ import java.util.Deque;
 public class GrepCommand extends AbstractCommand {
 
     private static final Logger log = Logger.getLogger(GrepCommand.class);
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final int BUFFER_SIZE = 8192;
     
     private static final String help_matcher_fixed = "Patterns are fixed strings, seperated by new lines. Any of " +
@@ -234,9 +234,6 @@ public class GrepCommand extends AbstractCommand {
                                 contextStack.addLast(doContextLine(contextStack.removeLast()));
                             }
                             if (contextStack.size() > contextBefore) {
-                                if (contextStack.size() > (contextBefore + 1)) {
-                                    log.debug("Too many 'before' lines on stack!");
-                                }
                                 contextStack.removeFirst();
                             }
                         } else {
@@ -250,7 +247,7 @@ public class GrepCommand extends AbstractCommand {
                                 }
                                 contextStack.removeLast();
                                 flush();
-                                for (int i = 0; i < contextBefore; i++) {
+                                for (int i = contextBefore - 1; i >= 0; i--) {
                                     contextStack.addLast(saveLines[i]);
                                 }
                             } else {
@@ -259,16 +256,6 @@ public class GrepCommand extends AbstractCommand {
                         }
                         contextStack.addLast(line);
                     } else {
-                        if (!haveLine) {
-                            contextStack.clear();
-                        } else {
-                            int excessLines = contextAfter - (linesForFlush - linesUntilFlush);
-                            if (excessLines > 0) {
-                                for (int i = 0; i < excessLines; i++) {
-                                    contextStack.removeLast();
-                                }
-                            }
-                        }
                         finish();
                     }
                     return line;
@@ -307,7 +294,13 @@ public class GrepCommand extends AbstractCommand {
         
         private void finish() {
             if (reader == null) return;
-            if (haveLine) {
+            if (!haveLine) {
+                contextStack.clear();
+            } else {
+                int excessLines = (linesForFlush - linesUntilFlush) - contextAfter;
+                for (int i = 0; i < excessLines; i++) {
+                    contextStack.removeLast();
+                }
                 flush();
             }
             doFinish();
@@ -527,14 +520,10 @@ public class GrepCommand extends AbstractCommand {
         try {
             parseOptions();
             if ((contextBefore > 0) || (contextAfter > 0)) {
-                debug("Using ContextLineWriter");
-                debug("Before=" + contextBefore);
-                debug("After=" + contextAfter);
                 contextOut = new ContextLineWriter(out, contextBefore, contextAfter);
             }
             
             for (File file : files) {
-                debug("Processing file: " + file);
                 reader = null;
                 name   = file.getPath();
                 try {
@@ -554,7 +543,6 @@ public class GrepCommand extends AbstractCommand {
                     }
                     currentFile = name;
                     if (exitOnFirstMatch) {
-                        debug(" exitOnFirstMatch");
                         if (matchUntilOne(reader)) {
                             rc = 0;
                             break;
@@ -562,29 +550,24 @@ public class GrepCommand extends AbstractCommand {
                         continue;
                     }
                     if (showFileMatch) {
-                        debug(" showFileMatch");
                         if (matchUntilOne(reader)) {
                             printFile(name);
                         }
                         continue;
                     }
                     if (showFileNoMatch) {
-                        debug(" showFileNoMatch");
                         if (!matchUntilOne(reader)) {
                             printFile(name);
                         }
                         continue;
                     }
                     if (showCount) {
-                        debug(" showCount");
                         printFileCount(matchCount(reader));
                         continue;
                     }
-                    debug(" normal");
                     matchNormal(reader);
                 } catch (IOException e) {
                     error("IOException greping file : " + file);
-                    e.printStackTrace();
                 } finally {
                     IOUtils.close(reader);
                 }
@@ -919,16 +902,15 @@ public class GrepCommand extends AbstractCommand {
             }
         }
         
-        if ((prefix & (PREFIX_FILE | PREFIX_NOFILE)) == (PREFIX_FILE | PREFIX_NOFILE)) {
-            throw new AssertionError("PREFIX_NOFILE && PREFIX_FILE");
-        }
-        
         if (ContextBoth.isSet()) {
             contextAfter = contextBefore = ContextBoth.getValue();
         } else if (ContextBefore.isSet()) {
             contextBefore = ContextBefore.getValue();
         } else if (ContextAfter.isSet()) {
             contextAfter = ContextAfter.getValue();
+        }
+        if ((contextAfter > 0 || contextBefore > 0) && showOnlyMatch) {
+            contextAfter = contextBefore = 0;
         }
     }
     

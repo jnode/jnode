@@ -57,7 +57,7 @@
           <option argLabel="squeeze"      shortName="s" longName="sqeeze-blank"/>
           <option argLabel="show-ends"    shortName="E" longName="show-ends"/>
         </optionSet>
-        <repeat minCount="1">
+        <repeat>
           <argument argLabel="file"/>
         </repeat>
       </sequence>
