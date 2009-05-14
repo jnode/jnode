@@ -58,14 +58,6 @@ public class DefaultTestClient implements TestClient {
         try {
             LOGGER.log(Level.INFO, "xml report: " + report);
             
-            //TODO a supprimer
-            if (!report.startsWith("<")) {
-                LOGGER.log(Level.SEVERE, "invalid xml answer");
-                return new RunResult("ERROR");
-            }
-            // fin to do
-            
-            System.out.println("length=" + report.length() + " report=" + report);
             return parser.parse(sr);
         } catch (XMLParseException e) {
             throw new ProtocolException("invalid XML answer", e);
