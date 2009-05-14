@@ -25,7 +25,13 @@ import gnu.testlet.runner.HTMLGenerator;
 import gnu.testlet.runner.PackageResult;
 import gnu.testlet.runner.RunResult;
 import gnu.testlet.runner.TestResult;
+import gnu.testlet.runner.XMLReportParser;
 import gnu.testlet.runner.XMLReportWriter;
+import gnu.testlet.runner.compare.ComparisonWriter;
+import gnu.testlet.runner.compare.HTMLComparisonWriter;
+import gnu.testlet.runner.compare.ReportComparator;
+import gnu.testlet.runner.compare.RunComparison;
+import gnu.testlet.runner.compare.TextComparisonWriter;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +41,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.sourceforge.nanoxml.XMLParseException;
 
 import org.jtestserver.client.process.ServerProcess;
 import org.jtestserver.client.utils.ConfigurationUtils;
@@ -168,29 +176,46 @@ public class TestDriver {
         
         LOGGER.info("running list of working tests");
         File workingTests = (latestRun == null) ? null : latestRun.getWorkingTests();
-        RunResult workingResult = runTests(workingTests, true, workingList, crashingList, newRun.getTimestampString());
+        RunResult runResult = runTests(workingTests, true, workingList, crashingList, newRun.getTimestampString());
         
         LOGGER.info("running list of crashing tests");
         File crashingTests = (latestRun == null) ? null : latestRun.getCrashingTests();
-        RunResult crashingResult = runTests(crashingTests, false, workingList, crashingList, 
+        RunResult rr = runTests(crashingTests, false, workingList, crashingList, 
                 newRun.getTimestampString());
+        mergeResults(runResult, rr);
         
         LOGGER.info("writing crashing & working tests lists");
         testListRW.writeList(newRun.getWorkingTests(), workingList);
         testListRW.writeList(newRun.getCrashingTests(), crashingList);
         
-        writeReports(workingResult, "working", newRun.getWorkingTests().getParentFile());
-        writeReports(crashingResult, "crashing", newRun.getCrashingTests().getParentFile());
+        writeReports(runResult, newRun.getReportXml());
+        
+        compareRuns(latestRun, newRun, runResult);
         
         watchDog.stopWatching();
         killRunningServers();
     }
     
-    private void writeReports(RunResult result, String name, File dir) throws IOException {
-        XMLReportWriter rw = new XMLReportWriter(false);
-        rw.write(result, new File(dir, name + "-report.xml"));
+    private void compareRuns(Run latestRun, Run newRun, RunResult newRunResult) throws XMLParseException, IOException {
+        RunResult latestRunResult = new XMLReportParser().parse(latestRun.getReportXml());
         
-        HTMLGenerator.createReport(result, dir);
+        ReportComparator comparator = new ReportComparator(latestRunResult, newRunResult);
+        RunComparison comparison = comparator.compare();
+        
+        // write comparison in html format
+        ComparisonWriter writer = new HTMLComparisonWriter();
+        writer.write(comparison, new File(newRun.getReportXml().getParentFile(), "comparison.html"));
+        
+        // write comparison in text format
+        writer = new TextComparisonWriter();
+        writer.write(comparison, new File(newRun.getReportXml().getParentFile(), "comparison.txt"));
+    }
+    
+    private void writeReports(RunResult result, File reportXml) throws IOException {
+        XMLReportWriter rw = new XMLReportWriter(false);
+        rw.write(result, reportXml);
+        
+        HTMLGenerator.createReport(result, reportXml.getParentFile());
     }
     
     private RunResult runTests(File listFile, boolean useCompleteListAsDefault,
@@ -210,7 +235,12 @@ public class TestDriver {
         }
 
         RunResult result = new RunResult(timestamp);
+        int i = 0;
         for (String test : list) {
+            if (i++ > 100) { // TODO for debug only, remove that
+                break;
+            }
+            
             boolean working = false;
             LOGGER.info("launching test " + test);
 
