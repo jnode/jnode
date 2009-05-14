@@ -39,7 +39,7 @@ import org.jtestserver.common.protocol.TimeoutException;
 public class UDPProtocol extends Protocol<DatagramSocket> {
     private static final Logger LOGGER = Logger.getLogger(UDPProtocol.class.getName());
         
-    private static final int MAX_SIZE = 65000;
+    private static final int MAX_SIZE = Integer.MAX_VALUE; // 1024 * 1024;
 
     //private static final int CHAR_SIZE = 2; // size of a char in bytes
     private static final int INT_SIZE = 4; // size of an int in bytes
@@ -66,19 +66,20 @@ public class UDPProtocol extends Protocol<DatagramSocket> {
     protected void sendMessage(DatagramSocket socket, String message, SocketAddress remoteAddress) 
         throws ProtocolException, TimeoutException {
         try {
+            final byte[] bytes = message.getBytes(); 
+            
             // send size of data
-            ByteBuffer byteBuffer = ByteBuffer.allocate(INT_SIZE).putInt(message.length());
+            ByteBuffer byteBuffer = ByteBuffer.allocate(INT_SIZE).putInt(bytes.length);
             byte[] data = byteBuffer.array();
             remoteAddress = (remoteAddress == null) ? socket.getRemoteSocketAddress() : remoteAddress;
             DatagramPacket packet = new DatagramPacket(data, data.length, remoteAddress);
                         
             socket.send(packet);
             
-            LOGGER.log(Level.INFO, "nb bytes sent : " + message.length());
+            LOGGER.log(Level.INFO, "nb bytes sent : " + bytes.length);
             
             // send data
-            data = message.getBytes();
-            packet = new DatagramPacket(data, data.length, remoteAddress);
+            packet = new DatagramPacket(bytes, bytes.length, remoteAddress);
             socket.send(packet);
             
 //            ByteBuffer bb = ByteBuffer.allocate(command.length() * CHAR_SIZE + INT_SIZE);
