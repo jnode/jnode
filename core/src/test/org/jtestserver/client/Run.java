@@ -108,4 +108,11 @@ public class Run {
     public File getCrashingTests() {
         return new File(rootWorkDir, "crashing-tests.txt");
     }
+
+    /**
+     * @return
+     */
+    public File getReportXml() {
+        return new File(rootWorkDir, "report.xml");
+    }
 }
