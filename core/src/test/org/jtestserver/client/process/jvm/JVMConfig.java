@@ -48,13 +48,16 @@ public class JVMConfig implements VMConfig {
         bootClasspath = ConfigUtils.getClasspath(properties, "jvm.bootclasspath", false);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ServerProcess createServerProcess() {
         return new JVMServerProcess(this);
     }
 
-    /* (non-Javadoc)
-     * @see org.jtestserver.client.process.VMConfig#getVmName()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public String getVmName() {
