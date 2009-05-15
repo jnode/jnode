@@ -71,17 +71,9 @@ public class TestDriver {
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "protocol error", e);
-            
-            if (testDriver != null) {
-                try {
-                    testDriver.killRunningServers();
-                } catch (ProtocolException e1) {
-                    LOGGER.log(Level.SEVERE, "protocol error", e1);
-                }
-            }
         } catch (ProtocolException e) {
             LOGGER.log(Level.SEVERE, "I/O error", e);
-            
+        } finally {
             if (testDriver != null) {
                 try {
                     testDriver.killRunningServers();
@@ -123,10 +115,8 @@ public class TestDriver {
             protected void processDead() {
                 LOGGER.warning("process is dead. restarting it.");
                 try {
-                    TestDriver.this.start();
+                    TestDriver.this.process.start();
                 } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, "error while restarting", e);
-                } catch (ProtocolException e) {
                     LOGGER.log(Level.SEVERE, "error while restarting", e);
                 }
             }
@@ -263,26 +253,24 @@ public class TestDriver {
         return result;
     }
     
-    private void mergeResults(RunResult targetResult, RunResult result) {
-        for (Iterator<?> itPackage = result.getPackageIterator(); itPackage.hasNext(); ) {
-            PackageResult pkg = (PackageResult) itPackage.next();
+    private void mergeResults(RunResult target, RunResult source) {
+        for (Iterator<?> itSourcePackage = source.getPackageIterator(); itSourcePackage.hasNext(); ) {
+            PackageResult sourcePackage = (PackageResult) itSourcePackage.next();
             
-            PackageResult pr = targetResult.getPackageResult(pkg.getName());
-            if (pr == null) {
-                pr = pkg;
-                targetResult.add(pkg);
+            PackageResult targetPackage = target.getPackageResult(sourcePackage.getName());
+            if (targetPackage == null) {
+                target.add(sourcePackage);
             } else {            
-                for (Iterator<?> itClass = pkg.getClassIterator(); itClass.hasNext(); ) {
-                    ClassResult cls = (ClassResult) itClass.next();
+                for (Iterator<?> itSourceClass = sourcePackage.getClassIterator(); itSourceClass.hasNext(); ) {
+                    ClassResult sourceClass = (ClassResult) itSourceClass.next();
                     
-                    ClassResult cr = pr.getClassResult(cls.getName());
-                    if (cr == null) {
-                        cr = cls;
-                        pr.add(cls);
+                    ClassResult targetClass = targetPackage.getClassResult(sourceClass.getName());
+                    if (targetClass == null) {
+                        targetPackage.add(sourceClass);
                     } else {                                    
-                        for (Iterator<?> itTest = cls.getTestIterator(); itTest.hasNext(); ) {
-                            TestResult test = (TestResult) itTest.next();
-                            cr.add(test);
+                        for (Iterator<?> itSourceTest = sourceClass.getTestIterator(); itSourceTest.hasNext(); ) {
+                            TestResult sourceTest = (TestResult) itSourceTest.next();
+                            targetClass.add(sourceTest);
                         }
                     }
                 }
