@@ -75,11 +75,7 @@ public class TestDriver {
             LOGGER.log(Level.SEVERE, "I/O error", e);
         } finally {
             if (testDriver != null) {
-                try {
-                    testDriver.killRunningServers();
-                } catch (ProtocolException e1) {
-                    LOGGER.log(Level.SEVERE, "protocol error", e1);
-                }
+                testDriver.killRunningServers();
             }
         }
     }
@@ -123,25 +119,34 @@ public class TestDriver {
         };
     }
     
-    public void killRunningServers() throws ProtocolException {
+    public void killRunningServers() {
         LOGGER.info("killing running servers");
         
+        boolean killed = false;
         try {
             // kill server that might still be running
             client.shutdown();
-        } catch (Throwable t) {
-            LOGGER.log(Level.SEVERE, "unexpected error", t);
+        } catch (ProtocolException pe) {
+            // assume that exception means the server has been killed
+            killed = true;
+        } catch (TimeoutException e) {
+            // assume that exception means the server has been killed
+            killed = true;
         }
         
-        boolean killed = false;
         while (!killed) {
             try {
                 client.getStatus();
+            } catch (ProtocolException pe) {
+                // assume that exception means the server has been killed
+                killed = true;
             } catch (TimeoutException e) {
-                LOGGER.log(Level.SEVERE, "a timeout happened", e);
+                // assume that exception means the server has been killed
                 killed = true;
             }
         }
+        
+        LOGGER.info("all servers are killed");
 
         // stop the watch dog before actually stop the process
         watchDog.stopWatching();
@@ -187,18 +192,22 @@ public class TestDriver {
     }
     
     private void compareRuns(Run latestRun, Run newRun, RunResult newRunResult) throws XMLParseException, IOException {
-        RunResult latestRunResult = new XMLReportParser().parse(latestRun.getReportXml());
-        
-        ReportComparator comparator = new ReportComparator(latestRunResult, newRunResult);
-        RunComparison comparison = comparator.compare();
-        
-        // write comparison in html format
-        ComparisonWriter writer = new HTMLComparisonWriter();
-        writer.write(comparison, new File(newRun.getReportXml().getParentFile(), "comparison.html"));
-        
-        // write comparison in text format
-        writer = new TextComparisonWriter();
-        writer.write(comparison, new File(newRun.getReportXml().getParentFile(), "comparison.txt"));
+        if (latestRun != null) {
+            // there was a previous run, let do the comparison !
+            
+            RunResult latestRunResult = new XMLReportParser().parse(latestRun.getReportXml());
+            
+            ReportComparator comparator = new ReportComparator(latestRunResult, newRunResult);
+            RunComparison comparison = comparator.compare();
+            
+            // write comparison in html format
+            ComparisonWriter writer = new HTMLComparisonWriter();
+            writer.write(comparison, new File(newRun.getReportXml().getParentFile(), "comparison.html"));
+            
+            // write comparison in text format
+            writer = new TextComparisonWriter();
+            writer.write(comparison, new File(newRun.getReportXml().getParentFile(), "comparison.txt"));
+        }
     }
     
     private void writeReports(RunResult result, File reportXml) throws IOException {
