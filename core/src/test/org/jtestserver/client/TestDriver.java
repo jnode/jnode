@@ -279,7 +279,20 @@ public class TestDriver {
                     } else {                                    
                         for (Iterator<?> itSourceTest = sourceClass.getTestIterator(); itSourceTest.hasNext(); ) {
                             TestResult sourceTest = (TestResult) itSourceTest.next();
-                            targetClass.add(sourceTest);
+                            
+                            boolean hasTest = false;
+                            for (Iterator<?> it = targetClass.getTestIterator(); it.hasNext(); ) {
+                                TestResult tr = (TestResult) it.next();
+                                if (tr.getName().equals(sourceTest.getName())) {
+                                    hasTest = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (!hasTest) {
+                                targetClass.add(sourceTest);
+                            }
+                            
                         }
                     }
                 }
