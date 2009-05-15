@@ -50,9 +50,9 @@ public class JVM implements VmManager {
         this.startCommandLine = createStartCommandLine().toString();
         this.config.setVmName(startCommandLine);
     }
-    
-    /* (non-Javadoc)
-     * @see org.jtestserver.client.process.VmManager#getRunningVMs()
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public List<String> getRunningVMs() throws IOException {
@@ -66,8 +66,8 @@ public class JVM implements VmManager {
         return runningVMs;
     }
 
-    /* (non-Javadoc)
-     * @see org.jtestserver.client.process.VmManager#start(java.lang.String)
+    /**
+     * {@inheritDoc}
      */
     @Override
     public boolean start(String vm) throws IOException {
@@ -76,8 +76,8 @@ public class JVM implements VmManager {
         return runner.execute(createStartCommandLine());
     }
 
-    /* (non-Javadoc)
-     * @see org.jtestserver.client.process.VmManager#stop(java.lang.String)
+    /**
+     * {@inheritDoc}
      */
     @Override
     public boolean stop(String vm) throws IOException {
