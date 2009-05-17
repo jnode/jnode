@@ -103,7 +103,7 @@ public class TestServer {
                         }
                         
                         // if the command returns a result
-                        String result = null;
+                        String result = MessageProcessor.NO_RESPONSE;
                         if (output != null) {
                             result = output.toMessage();
                         }
