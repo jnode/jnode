@@ -64,16 +64,16 @@ public class MauveTestRunner implements TestRunner<RunResult> {
 
     private class JTSMauve extends Mauve {
         public RunResult runTest(String testName) {
-            // save the default locale, some tests change the default and we want
-            // to restore it before generating the HTML report...
+            // save the default locale, some tests change the default
             Locale savedLocale = Locale.getDefault();
             
             result = new RunResult("Mauve Test Run");
+            addSystemProperties(result);
             currentCheck = new CheckResult(0, false);
 
             executeLine("", testName);
             
-            // tests are complete so restore the default locale
+            // restore the default locale
             Locale.setDefault(savedLocale);
             
             return getResult();

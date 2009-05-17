@@ -172,6 +172,7 @@ public class TestDriver {
         LOGGER.info("running list of working tests");
         File workingTests = (latestRun == null) ? null : latestRun.getWorkingTests();
         RunResult runResult = runTests(workingTests, true, workingList, crashingList, newRun.getTimestampString());
+        runResult.setSystemProperty("jtestserver.process", process.getClass().getName());
         
         LOGGER.info("running list of crashing tests");
         File crashingTests = (latestRun == null) ? null : latestRun.getCrashingTests();
@@ -234,17 +235,19 @@ public class TestDriver {
         }
 
         RunResult result = new RunResult(timestamp);
-        int i = 0;
+        boolean firstTest = true;
+        int i = 0; // TODO for debug only, remove that
         for (String test : list) {
             if (i++ > 100) { // TODO for debug only, remove that
                 break;
             }
             
             boolean working = false;
+            RunResult delta = null;
             LOGGER.info("launching test " + test);
-
+            
             try {
-                RunResult delta = client.runMauveTest(test);
+                delta = client.runMauveTest(test);
                 mergeResults(result, delta);
                 
                 working = true;
@@ -255,6 +258,14 @@ public class TestDriver {
                     workingList.add(test);
                 } else {
                     crashingList.add(test);
+                }
+                
+                if (firstTest && (delta != null)) {
+                    for (String name : delta.getSystemPropertyNames()) {
+                        result.setSystemProperty(name, delta.getSystemProperty(name));
+                    }
+                    
+                    firstTest = false;
                 }
             }
         }
