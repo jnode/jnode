@@ -31,7 +31,17 @@ import org.jnode.shell.help.CompletionException;
  */
 public interface Completable {
 
-    void complete(CompletionInfo completion, CommandShell shell)
+    /**
+     * Add valid completions to the supplied 'completions' object.  Each
+     * completion should be a complete (acceptable) token or a prefix for 
+     * one or more acceptable tokens.  The method should not add too many
+     * completions.
+     * 
+     * @param completions
+     * @param shell
+     * @throws CompletionException
+     */
+    void complete(CompletionInfo completions, CommandShell shell)
         throws CompletionException;
 
 }
