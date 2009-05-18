@@ -42,6 +42,7 @@
     <alias name="paste"   class="org.jnode.command.file.PasteCommand"/>
     <alias name="pwd"     class="org.jnode.command.file.PwdCommand"/>
     <alias name="rm"      class="org.jnode.command.file.DeleteCommand"/>
+    <alias name="sort"    class="org.jnode.command.file.SortCommand"/>
     <alias name="tail"    class="org.jnode.command.file.TailCommand"/>
     <alias name="touch"   class="org.jnode.command.file.TouchCommand"/>
     <alias name="wc"      class="org.jnode.command.file.WcCommand"/>
@@ -307,6 +308,29 @@
           <argument argLabel="paths"/>
         </repeat>
       </sequence>
+    </syntax>
+    <syntax alias="sort">
+        <sequence>
+            <optionSet>
+                <option argLabel="field"     shortName="k"/>
+                <option argLabel="output"    shortName="o"/>
+                <option argLabel="field-sep" shortName="t"/>
+                <option argLabel="check"     shortName="c"/>
+                <option argLabel="merge"     shortName="m"/>
+                <option argLabel="unique"    shortName="u"/>
+                <option argLabel="reverse"   shortName="r"/>
+                <option argLabel="cmp-print" shortName="i"/>
+                <option argLabel="cmp-alpha" shortName="d"/>
+                <option argLabel="cmp-icase" shortName="i"/>
+                <option argLabel="no-blanks" shortName="b"/>
+                <option argLabel="numeric"   shortName="n"/>
+                <!-- debugging options -->
+                <option argLabel="sort" longName="sort"/>
+            </optionSet>
+            <repeat>
+                <argument argLabel="files"/>
+            </repeat>
+        </sequence>
     </syntax>
     <syntax alias="tail">
       <sequence>

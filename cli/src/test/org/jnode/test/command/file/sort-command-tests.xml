@@ -1,0 +1,131 @@
+<testSet title="sort command tests">
+    <!--
+        First some tests for the default paramaters
+    -->
+    <testSpec title="whole-line 1" command="sort" runMode="AS_ALIAS" rc="0">
+        <input>d
+c
+b
+a
+</input>
+        <output>a
+b
+c
+d
+</output>
+    </testSpec>
+    <testSpec title="single-field full default-sep" command="sort" runMode="AS_ALIAS" rc="0">
+        <arg>-k</arg>
+        <arg>2,2</arg>
+        <input>1 d
+3 b
+2 c
+4 a
+</input>
+        <output>4 a
+3 b
+2 c
+1 d
+</output>
+    </testSpec>
+    
+    <!--
+        The next few tests are aimed at the various combinations of key-field selection
+    -->
+    <testSpec title="single-field full custom-sep" command="sort" runMode="AS_ALIAS" rc="0">
+        <arg>-t</arg>
+        <arg>;</arg>
+        <arg>-k</arg>
+        <arg>2,2</arg>
+        <input>c;j;2
+k;h;4
+i;q;1
+p;f;3
+</input>
+        <output>p;f;3
+k;h;4
+c;j;2
+i;q;1
+</output>
+    </testSpec>
+    <testSpec title="single-field partial custom-sep 1" command="sort" runMode="AS_ALIAS" rc="0">
+        <arg>-t</arg>
+        <arg>;</arg>
+        <arg>-k</arg>
+        <arg>2.2,2.2</arg>
+        <input>k;jc;4
+o;ad;9
+i;la;2
+w;xb;5
+</input>
+        <output>i;la;2
+w;xb;5
+k;jc;4
+o;ad;9
+</output>
+    </testSpec>
+    <testSpec title="single-field partial custom-sep 2" command="sort" runMode="AS_ALIAS" rc="0">
+        <arg>-t</arg>
+        <arg>;</arg>
+        <arg>-k</arg>
+        <arg>1.1,1.2</arg>
+        <input>awq;1
+ajk;4
+aon;2
+alm;3
+</input>
+        <output>ajk;4
+alm;3
+aon;2
+awq;1
+</output>
+    </testSpec>
+    <testSpec title="multi-field full custom-sep 1" command="sort" runMode="AS_ALIAS" rc="0">
+        <arg>-t</arg>
+        <arg>;</arg>
+        <arg>-k</arg>
+        <arg>2,3</arg>
+        <input>3;a;b
+2;b;a
+4;a;a
+1;b;b
+</input>
+        <output>4;a;a
+3;a;b
+2;b;a
+1;b;b
+</output>
+    </testSpec>
+    <testSpec title="multi-field full custom-sep 2" command="sort" runMode="AS_ALIAS" rc="0">
+        <arg>-t</arg>
+        <arg>;</arg>
+        <arg>-k</arg>
+        <arg>2,3</arg>
+        <input>2;;ba
+4;aa;
+1;b;b
+3;a;b
+</input>
+        <output>4;aa;
+3;a;b
+2;;ba
+1;b;b
+</output>
+    </testSpec>
+    <testSpec title="multi-field partial 1" command="sort" runMode="AS_ALIAS" rc="0">
+        <arg>-t</arg>
+        <arg>;</arg>
+        <arg>-k</arg>
+        <arg>2.2,3.2</arg>
+        <input>2;yab;aay
+3;xaa;abx
+4;zaa;aaz
+1;wba;aaw
+</input>
+        <output>4;zaa;aaz
+3;xaa;abx
+2;yab;aay
+1;wba;aaw
+</output>
+    </testSpec>
+</testSet>
