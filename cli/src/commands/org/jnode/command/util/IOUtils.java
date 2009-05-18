@@ -529,6 +529,18 @@ public final class IOUtils {
         return input;
     }
     
+    public static List<String> readLines(File file) {
+        BufferedReader reader = openBufferedReader(file);
+        if (reader == null) {
+            return null;
+        }
+        try {
+            return readLines(reader);
+        } finally {
+            close(reader);
+        }
+    }
+    
     public static List<String> readLines(Reader reader) {
         return readLines(new BufferedReader(reader, BUFFER_SIZE), -1);
     }
