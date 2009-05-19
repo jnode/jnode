@@ -40,60 +40,86 @@ import static org.jnode.shell.bjorne.BjorneToken.RULE_7a_CONTEXT;
 import static org.jnode.shell.bjorne.BjorneToken.RULE_7b_CONTEXT;
 import static org.jnode.shell.bjorne.BjorneToken.RULE_8_CONTEXT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_AMP;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_AMP_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_AND_IF;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_AND_IF_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_ASSIGNMENT;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_BANG;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_BAR;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_ASSIGNMENT_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_BANG_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_BAR_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_CASE;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_CLOBBER;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_DGREAT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_CASE_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_CLOBBER_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_DGREAT_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_DLESS;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_DLESSDASH;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_DO;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_DONE;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_DSEMI;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_DLESSDASH_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_DLESS_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_DONE_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_DO_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_DSEMI_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_ELIF;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_ELSE;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_ELIF_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_ELSE_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_END_OF_LINE;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_END_OF_LINE_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_END_OF_STREAM;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_ESAC;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_FI;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_END_OF_STREAM_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_ESAC_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_FI_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_FOR;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_GREAT;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_GREATAND;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_FOR_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_GREATAND_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_GREAT_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_IF;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_IN;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_IO_NUMBER;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_IF_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_IN_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_IO_NUMBER_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LBRACE;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_LESS;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSAND;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_LBRACE_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSAND_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSGREAT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSGREAT_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_LESS_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LPAREN;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_NAME;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_OR_IF;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_RBRACE;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_RPAREN;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_LPAREN_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_NAME_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_OR_IF_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_RBRACE_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_RPAREN_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_SEMI;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_THEN;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_SEMI_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_THEN_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_UNTIL;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_UNTIL_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_WHILE;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_WHILE_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_WORD;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_WORD_BIT;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.jnode.shell.IncompleteCommandException;
-import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ShellSyntaxException;
 
+/**
+ * The BjorneBarser is a simple recursive descent parser/tree builder for the "posix shell"
+ * language with the "twist" that it can capture completion information.  This done by
+ * causing all token 'expectations' to be expressed as 'expectedSets', and capturing the
+ * expected sets that apply when the end-of-stream token and the one before it are parsed.
+ * 
+ * @author crawley@jnode.org
+ */
 public class BjorneParser {
     private final BjorneTokenizer tokens;
+    private BjorneCompleter completer;
     
     private final String continuationPrompt;
     
-    private final List<RedirectionNode> hereRedirections = 
-        new ArrayList<RedirectionNode>();
+    private final List<RedirectionNode> hereRedirections = new ArrayList<RedirectionNode>();
+    private boolean allowLineBreaks;
 
     public BjorneParser(BjorneTokenizer tokens, String continuationPrompt) {
         this.tokens = tokens;
@@ -101,6 +127,8 @@ public class BjorneParser {
     }
 
     /**
+     * Parse a 'complete_command'.
+     * <p>
      * Parse 'complete_command ::= list separator | list'
      * 
      * @return the CommandNode representing the complete command.
@@ -109,13 +137,30 @@ public class BjorneParser {
     public CommandNode parse() throws ShellSyntaxException {
         hereRedirections.clear();
         List<CommandNode> commands = new LinkedList<CommandNode>();
-        while (tokens.peek().getTokenType() != TOK_END_OF_STREAM) {
+        while (peek().getTokenType() != TOK_END_OF_STREAM) {
             CommandNode command = parseList();
             commands.add(command);
-            processLineBreaks();
+            allowLineBreaks();
         }
         captureHereDocuments();
         return listToNode(commands);
+    }
+    
+    /**
+     * Parse a 'complete_command' capturing completions.parseAndOr
+     * 
+     * @param completer holder object for capturing completion information.
+     * @return the CommandNode representing the complete command.
+     * @throws ShellSyntaxException
+     */
+    public CommandNode parse(BjorneCompleter completer) throws ShellSyntaxException {
+        this.completer = completer;
+        try {
+            return parse();
+        } finally {
+            // Make sure this is nulled ...     
+            this.completer = null;
+        }
     }
 
     /**
@@ -127,23 +172,25 @@ public class BjorneParser {
     private CommandNode parseList() throws ShellSyntaxException {
         List<CommandNode> commands = new LinkedList<CommandNode>();
         CommandNode command = parseAndOr();
-    LOOP: 
         while (command != null) {
             commands.add(command);
-            switch (tokens.peek().getTokenType()) {
+            BjorneToken token = expectPeek(
+                    TOK_SEMI_BIT | TOK_AMP_BIT | TOK_END_OF_LINE_BIT | TOK_END_OF_STREAM_BIT);
+            switch (token.getTokenType()) {
                 case TOK_SEMI:
+                    next();
+                    command = parseOptAndOr();
                     break;
                 case TOK_AMP:
                     command.setFlag(FLAG_ASYNC);
+                    next();
+                    command = parseOptAndOr();
                     break;
                 case TOK_END_OF_LINE:
                 case TOK_END_OF_STREAM:
-                    break LOOP;
-                default:
-                    throw new ShellSyntaxException("unexpected token: " + tokens.peek());
+                    command = null;
+                    break;
             }
-            tokens.next();
-            command = parseOptAndOr();
         }
         return listToNode(commands);
     }
@@ -158,53 +205,29 @@ public class BjorneParser {
     private CommandNode parseAndOr() throws ShellSyntaxException {
         List<CommandNode> commands = new LinkedList<CommandNode>();
         int flag = 0;
-    LOOP: 
-        while (true) {
-            CommandNode command = parsePipeline();
+        CommandNode command = parsePipeline();
+        commands.add(command);
+        BjorneToken token;
+        while ((token = optNext(TOK_AND_IF_BIT | TOK_OR_IF_BIT)) != null) {
+            flag = (token.getTokenType() == TOK_AND_IF) ? FLAG_AND_IF : FLAG_OR_IF;
+            skipLineBreaks();
+            command = parsePipeline();
             command.setFlag(flag);
-            BjorneToken token = tokens.peek();
-            int type = token.getTokenType();
-            switch (type) {
-                case TOK_AND_IF:
-                    flag = FLAG_AND_IF;
-                    break;
-                case TOK_OR_IF:
-                    flag = FLAG_OR_IF;
-                    break;
-                default:
-                    commands.add(command);
-                    break LOOP;
-            }
             commands.add(command);
-            tokens.next();
-            processLineBreaks();
         }
         return listToNode(commands);
     }
 
     private CommandNode parseOptAndOr() throws ShellSyntaxException {
-        processLineBreaks();
-        switch (tokens.peek(RULE_1_CONTEXT).getTokenType()) {
-            case TOK_LBRACE:
-            case TOK_LPAREN:
-            case TOK_WORD:
-            case TOK_IF:
-            case TOK_WHILE:
-            case TOK_UNTIL:
-            case TOK_CASE:
-            case TOK_FOR:
-            case TOK_IO_NUMBER:
-            case TOK_LESS:
-            case TOK_GREAT:
-            case TOK_DLESS:
-            case TOK_DGREAT:
-            case TOK_LESSAND:
-            case TOK_GREATAND:
-            case TOK_LESSGREAT:
-            case TOK_CLOBBER:
-                return parseAndOr();
-            default:
-                return null;
+        allowLineBreaks();
+        if (optPeek(TOK_LBRACE_BIT | TOK_LPAREN_BIT | TOK_WORD_BIT | TOK_IF_BIT | 
+                TOK_WHILE_BIT | TOK_UNTIL_BIT | TOK_CASE_BIT | TOK_FOR_BIT | 
+                TOK_IO_NUMBER_BIT | TOK_LESS_BIT | TOK_GREAT_BIT | TOK_DLESS_BIT | 
+                TOK_DGREAT_BIT | TOK_LESSAND_BIT | TOK_GREATAND_BIT | TOK_LESSGREAT |
+                TOK_CLOBBER_BIT, RULE_1_CONTEXT) != null) {
+            return parseAndOr();
+        } else {
+            return null;
         }
     }
 
@@ -214,10 +237,8 @@ public class BjorneParser {
      * @return the CommandNode representing the pipeline.
      */
     private CommandNode parsePipeline() throws ShellSyntaxException {
-        boolean bang = (tokens.peek().getTokenType() == TOK_BANG);
-        if (bang) {
-            tokens.next();
-        }
+        peekEager();
+        boolean bang = optNext(TOK_BANG_BIT) != null;
         CommandNode pipeSeq = parsePipeSequence();
         if (bang) {
             pipeSeq.setFlag(FLAG_BANG);
@@ -233,9 +254,8 @@ public class BjorneParser {
     private CommandNode parsePipeSequence() throws ShellSyntaxException {
         List<CommandNode> commands = new LinkedList<CommandNode>();
         commands.add(parseCommand());
-        while (tokens.peek().getTokenType() == TOK_BAR) {
-            tokens.next();
-            processLineBreaks();
+        while (optNext(TOK_BAR_BIT) != null) {
+            skipLineBreaks();
             commands.add(parseCommand());
         }
         boolean pipe = commands.size() > 1;
@@ -254,21 +274,12 @@ public class BjorneParser {
      * @throws ShellSyntaxException
      */
     private CommandNode parseCommand() throws ShellSyntaxException {
-        switch (tokens.peek(RULE_7a_CONTEXT).getTokenType()) {
-            case TOK_IF:
-            case TOK_WHILE:
-            case TOK_UNTIL:
-            case TOK_FOR:
-            case TOK_CASE:
-            case TOK_LBRACE:
-            case TOK_LPAREN:
-                return parseCompoundCommand();
-            default:
-                CommandNode tmp = parseFunctionDefinition();
-                if (tmp != null) {
-                    return tmp;
-                }
-                return parseSimpleCommand();
+        if (optPeek(TOK_IF_BIT | TOK_WHILE_BIT | TOK_UNTIL_BIT | TOK_FOR_BIT | 
+                TOK_CASE_BIT | TOK_LBRACE_BIT | TOK_LPAREN_BIT, RULE_7a_CONTEXT) != null) {
+            return parseCompoundCommand();
+        } else {
+            CommandNode tmp = parseFunctionDefinition();
+            return (tmp != null) ? tmp : parseSimpleCommand();
         }
     }
 
@@ -280,74 +291,61 @@ public class BjorneParser {
 
         // Deal with cmd_prefix'es before the command name; i.e. assignments and
         // redirections
-        BjorneToken token = null;
-        boolean found = false;
-        for (int i = 0; !found; i++) {
-            token = tokens.peek(i == 0 ? RULE_7a_CONTEXT : RULE_7b_CONTEXT);
-            switch (token.getTokenType()) {
-                case TOK_ASSIGNMENT:
-                    assignments.add(token);
-                    tokens.next();
-                    break;
-                case TOK_IO_NUMBER:
-                case TOK_LESS:
-                case TOK_GREAT:
-                case TOK_DLESS:
-                case TOK_DGREAT:
-                case TOK_LESSAND:
-                case TOK_GREATAND:
-                case TOK_LESSGREAT:
-                case TOK_CLOBBER:
-                    redirects.add(parseRedirect());
-                    break;
-                default:
-                    found = true;
-                    break;
+        BjorneToken token;
+        for (int i = 0; ; i++) {
+            token = optPeek(TOK_ASSIGNMENT_BIT | TOK_IO_NUMBER_BIT | TOK_LESS_BIT |
+                    TOK_GREAT_BIT | TOK_DLESS_BIT | TOK_DGREAT_BIT | TOK_LESSAND_BIT | 
+                    TOK_GREATAND_BIT | TOK_LESSGREAT_BIT | TOK_CLOBBER_BIT, 
+                    i == 0 ? RULE_7a_CONTEXT : RULE_7b_CONTEXT);
+            if (token == null) {
+                break;
+            }
+            if (token.getTokenType() == TOK_ASSIGNMENT) {
+                assignments.add(token);
+                next();
+            } else {
+                redirects.add(parseRedirect());
             }
         }
-        if (token.getTokenType() == TOK_WORD) {
-            // This is the command name. Record then consume it.
-            words.add(token);
-            tokens.next();
+        token = optNext(TOK_WORD_BIT);
+        try {
+            if (token != null) {
+                // This is the command name.
+                words.add(token);
 
-            // Deal with any command arguments and embedded / trailing
-            // redirections.
-        LOOP: 
-            while (true) {
-                token = tokens.peek();
-                switch (token.getTokenType()) {
-                    case TOK_IO_NUMBER:
-                    case TOK_LESS:
-                    case TOK_GREAT:
-                    case TOK_DLESS:
-                    case TOK_DGREAT:
-                    case TOK_LESSAND:
-                    case TOK_GREATAND:
-                    case TOK_LESSGREAT:
-                    case TOK_CLOBBER:
-                        redirects.add(parseRedirect());
-                        break;
-                    case TOK_WORD:
+                // Deal with any command arguments and embedded / trailing
+                // redirections.
+                while ((token = optPeek(TOK_WORD_BIT | TOK_IO_NUMBER_BIT | TOK_LESS_BIT |
+                        TOK_GREAT_BIT | TOK_DLESS_BIT | TOK_DGREAT_BIT | TOK_LESSAND_BIT | 
+                        TOK_GREATAND_BIT | TOK_LESSGREAT_BIT | TOK_CLOBBER_BIT)) != null) {
+                    if (token.getTokenType() == TOK_WORD) {
                         words.add(token);
-                        tokens.next();
-                        break;
-                    default:
-                        break LOOP;
+                        next();
+                    } else {
+                        redirects.add(parseRedirect());
+                    }
                 }
-            }
-            if (words.size() > 0) {
                 String commandWord = words.get(0).getText();
                 builtin = BjorneInterpreter.isBuiltin(commandWord);
                 // FIXME ... built-in commands should use the Syntax mechanisms so
                 // that completion, help, etc will work as expected.
+            } else {
+                // An empty command is legal, as are assignments and redirections
+                // w/o a command.
             }
-        } else {
-            // An empty command is legal, as are assignments and redirections
-            // w/o a command.
+        } catch (ShellSyntaxException ex) {
+            if (completer != null) {
+                completer.setCommand(new SimpleCommandNode(CMD_COMMAND, 
+                        words.toArray(new BjorneToken[words.size()]), builtin));
+            }
+            throw ex;
         }
         SimpleCommandNode res = 
             new SimpleCommandNode(CMD_COMMAND, 
                     words.toArray(new BjorneToken[words.size()]), builtin);
+        if (completer != null) {
+            completer.setCommand(res);
+        }
         if (!redirects.isEmpty()) {
             res.setRedirects(redirects.toArray(new RedirectionNode[redirects.size()]));
         }
@@ -358,21 +356,18 @@ public class BjorneParser {
     }
 
     private FunctionDefinitionNode parseFunctionDefinition() throws ShellSyntaxException {
-        BjorneToken fname = tokens.peek(RULE_8_CONTEXT);
-        if (fname.getTokenType() != TOK_NAME) {
+        BjorneToken fname = optNext(TOK_NAME_BIT, RULE_8_CONTEXT);
+        if (fname == null) {
             return null;
         }
-        tokens.next();
-        if (tokens.peek().getTokenType() != TOK_LPAREN) {
+        if (optPeek(TOK_LPAREN_BIT) == null) {
             tokens.backup();
             return null;
+        } else {
+            next();
         }
-        tokens.next();
-        int tt = tokens.next().getTokenType();
-        if (tt != TOK_RPAREN) {
-            syntaxError("expected matching ')' in function_definition", tt);
-        }
-        processLineBreaks();
+        expectNext(TOK_RPAREN_BIT);
+        skipLineBreaks();
         return new FunctionDefinitionNode(fname, parseFunctionBody());
     }
 
@@ -393,8 +388,10 @@ public class BjorneParser {
      * @throws ShellSyntaxException
      */
     private CommandNode parseCompoundCommand() throws ShellSyntaxException {
-        CommandNode command;
-        switch (tokens.peek(RULE_1_CONTEXT).getTokenType()) {
+        CommandNode command = null;
+        BjorneToken token = expectPeek(TOK_IF_BIT | TOK_WHILE_BIT | TOK_UNTIL_BIT | TOK_FOR_BIT | 
+                TOK_CASE_BIT | TOK_LBRACE_BIT | TOK_LPAREN_BIT, RULE_1_CONTEXT);
+        switch (token.getTokenType()) {
             case TOK_IF:
                 command = parseIfCommand();
                 break;
@@ -416,75 +413,38 @@ public class BjorneParser {
             case TOK_LPAREN:
                 command = parseSubshell();
                 break;
-            default:
-                throw new ShellFailureException("bad token");
         }
         command.setRedirects(parseOptRedirects());
         return command;
     }
 
     private RedirectionNode parseRedirect() throws ShellSyntaxException {
-        BjorneToken token = tokens.next();
-        BjorneToken io = null;
+        BjorneToken io = optNext(TOK_IO_NUMBER_BIT);
         BjorneToken arg = null;
-        if (token.getTokenType() == TOK_IO_NUMBER) {
-            io = token;
-            token = tokens.next();
-        }
+        BjorneToken token = expectNext(TOK_LESS_BIT | TOK_GREAT_BIT | TOK_DGREAT_BIT | 
+                TOK_LESSAND_BIT | TOK_GREATAND_BIT | TOK_LESSGREAT_BIT | TOK_CLOBBER_BIT | 
+                TOK_DLESS_BIT | TOK_DLESSDASH_BIT);
         int tt = token.getTokenType();
-        switch (tt) {
-            case TOK_LESS:
-            case TOK_GREAT:
-            case TOK_DGREAT:
-            case TOK_LESSAND:
-            case TOK_GREATAND:
-            case TOK_LESSGREAT:
-            case TOK_CLOBBER:
-                arg = tokens.next();
-                int tt2 = arg.getTokenType();
-                if (tt2 != TOK_WORD) {
-                    syntaxError("expected a filename after " + token, tt2);
-                }
-                // (The corresponding token type and redirection type values are the
-                // same ...)
-                return new RedirectionNode(tt, io, arg);
-            case TOK_DLESS:
-            case TOK_DLESSDASH:
-                arg = tokens.next();
-                int tt3 = arg.getTokenType();
-                if (tt3 != TOK_WORD) {
-                    syntaxError("expected a here-end marker " + token, tt3);
-                }
-                RedirectionNode res = new RedirectionNode(tt, io, arg);
-                // (The HERE document will be captured when we reach the next 
-                // real (i.e. not '\' escaped) line break ... see processLineBreaks())
-                hereRedirections.add(res);
-                return res;
-            default:
-                throw new ShellSyntaxException("expected a redirection token");
+        if (tt == TOK_DLESS || tt == TOK_DLESSDASH) {
+            arg = expectNext(TOK_WORD_BIT);
+            RedirectionNode res = new RedirectionNode(tt, io, arg);
+            // (HERE document capture will start when we reach the next 
+            // real (i.e. not '\' escaped) line break ... see processLineBreaks())
+            hereRedirections.add(res);
+            return res;
+        } else {
+            arg = expectNext(TOK_WORD_BIT);
+            // (Corresponding token type and redirection type values are the same)
+            return new RedirectionNode(tt, io, arg);
         }
     }
 
     private RedirectionNode[] parseOptRedirects() throws ShellSyntaxException {
         List<RedirectionNode> redirects = new LinkedList<RedirectionNode>();
-    LOOP:
-        while (true) {
-            switch (tokens.peek().getTokenType()) {
-                case TOK_IO_NUMBER:
-                case TOK_LESS:
-                case TOK_GREAT:
-                case TOK_DLESS:
-                case TOK_DLESSDASH:
-                case TOK_DGREAT:
-                case TOK_LESSAND:
-                case TOK_GREATAND:
-                case TOK_LESSGREAT:
-                case TOK_CLOBBER:
-                    redirects.add(parseRedirect());
-                    break;
-                default:
-                    break LOOP;
-            }
+        while (optPeek(TOK_LESS_BIT | TOK_GREAT_BIT | TOK_DGREAT_BIT | 
+                TOK_LESSAND_BIT | TOK_GREATAND_BIT | TOK_LESSGREAT_BIT | TOK_CLOBBER_BIT | 
+                TOK_DLESS_BIT | TOK_DLESSDASH_BIT | TOK_IO_NUMBER_BIT) != null) {
+            redirects.add(parseRedirect());
         }
         if (redirects.isEmpty()) {
             return null;
@@ -493,243 +453,343 @@ public class BjorneParser {
     }
 
     private CommandNode parseSubshell() throws ShellSyntaxException {
-        tokens.next();
+        next();
         CommandNode compoundList = parseCompoundList();
-        int tt = tokens.next().getTokenType();
-        if (tt != TOK_RPAREN) {
-            syntaxError("expected ')'", tt);
-        }
+        expectNext(TOK_RPAREN_BIT);
         compoundList.setNodeType(CMD_SUBSHELL);
         return compoundList;
     }
 
     private CommandNode parseCompoundList() throws ShellSyntaxException {
         List<CommandNode> commands = new LinkedList<CommandNode>();
-        processLineBreaks();
+        skipLineBreaks();
         CommandNode command = parseAndOr();
-    LOOP: 
         while (command != null) {
             commands.add(command);
-            switch (tokens.peek().getTokenType()) {
-                case TOK_SEMI:
-                    tokens.next();
-                    break;
-                case TOK_END_OF_LINE:
-                    break;
-                case TOK_AMP:
-                    command.setFlag(FLAG_ASYNC);
-                    tokens.next();
-                    break;
-                default:
-                    break LOOP;
+            BjorneToken token = optNext(TOK_SEMI_BIT | TOK_AMP_BIT | TOK_END_OF_LINE_BIT);
+            if (token == null) {
+                break;
+            } else if (token.getTokenType() == TOK_AMP) {
+                command.setFlag(FLAG_ASYNC);
             }
-            processLineBreaks();
+            skipLineBreaks();
             command = parseOptAndOr();
         }
         return listToNode(commands);
     }
 
     private CommandNode parseBraceGroup() throws ShellSyntaxException {
-        tokens.next();
+        next();
         CommandNode compoundList = parseCompoundList();
-        int tt = tokens.peek().getTokenType();
-        if (tt != TOK_RBRACE) {
-            syntaxError("expected '}'", tt);
-        }
+        expectPeek(TOK_RBRACE_BIT);
         compoundList.setNodeType(CMD_BRACE_GROUP);
         return compoundList;
     }
 
     private CaseCommandNode parseCaseCommand() throws ShellSyntaxException {
-        tokens.next();
-        BjorneToken word = tokens.next();
+        next();
+        BjorneToken word = expectNext(TOK_WORD_BIT);
         List<CaseItemNode> caseItems = new LinkedList<CaseItemNode>();
-        processLineBreaks();
-        int tt = tokens.next(RULE_6_CONTEXT).getTokenType();
-        if (tt != TOK_IN) {
-            syntaxError("expected 'in' in case_clause", tt);
-        }
-        processLineBreaks();
-        BjorneToken token = tokens.peek(RULE_1_CONTEXT);
-        while (token.getTokenType() != TOK_ESAC) {
+        skipLineBreaks();
+        expectNext(TOK_IN_BIT, RULE_6_CONTEXT);
+        skipLineBreaks();
+        while (optNext(TOK_ESAC_BIT, RULE_1_CONTEXT) == null) {
             caseItems.add(parseCaseItem());
-            processLineBreaks();
-            token = tokens.peek(RULE_1_CONTEXT);
-            tt = token.getTokenType();
-            if (tt == TOK_DSEMI) {
-                tokens.next();
-                processLineBreaks();
-                token = tokens.peek(RULE_1_CONTEXT);
-            } else if (tt != TOK_ESAC) {
-                syntaxError("expected ';;' or 'esac' after case_item", tt);
+            skipLineBreaks();
+            if (optNext(TOK_DSEMI_BIT, RULE_1_CONTEXT) != null) {
+                skipLineBreaks();
             }
         }
-        tokens.next();
-        return new CaseCommandNode(word, caseItems
-                .toArray(new CaseItemNode[caseItems.size()]));
+        return new CaseCommandNode(word, caseItems.toArray(new CaseItemNode[caseItems.size()]));
     }
 
     private CaseItemNode parseCaseItem() throws ShellSyntaxException {
         // Note: we've already ascertained that the first token of the case_item
-        // will not
-        // be an 'esac', so there's no point applying rule 4
-        BjorneToken token = tokens.peek();
-        if (token.getTokenType() == TOK_LPAREN) {
-            token = tokens.next();
-        }
+        // will not be an 'esac', so there's no point applying rule 4
+        optNext(TOK_LPAREN_BIT);
         BjorneToken[] pattern = parsePattern();
-        int tt = tokens.next().getTokenType();
-        if (tt != TOK_RPAREN) {
-            syntaxError("expected ')' after pattern in case_item", tt);
-        }
+        expectNext(TOK_RPAREN_BIT);
         CommandNode body = null;
-        processLineBreaks();
-        token = tokens.peek(RULE_1_CONTEXT);
-        if (token.getTokenType() != TOK_DSEMI
-                && token.getTokenType() != TOK_ESAC) {
+        skipLineBreaks();
+        if (optPeek(TOK_DSEMI_BIT | TOK_ESAC_BIT, RULE_1_CONTEXT) == null) {
             body = parseCompoundList();
-            processLineBreaks();
+            skipLineBreaks();
         }
-
         return new CaseItemNode(pattern, body);
     }
 
     private BjorneToken[] parsePattern() throws ShellSyntaxException {
         List<BjorneToken> pattern = new LinkedList<BjorneToken>();
         while (true) {
-            BjorneToken token = tokens.next();
-            int tt = token.getTokenType();
-            if (tt != TOK_WORD) {
-                syntaxError("expected WORD in pattern", tt);
-            }
+            BjorneToken token = expectNext(TOK_WORD_BIT);
             pattern.add(token);
-            if (tokens.peek().getTokenType() != TOK_BAR) {
+            if (optNext(TOK_BAR_BIT) == null) {
                 break;
             }
-            tokens.next();
         }
         return pattern.toArray(new BjorneToken[pattern.size()]);
     }
 
     private ForCommandNode parseForCommand() throws ShellSyntaxException {
-        tokens.next();
-        BjorneToken var = tokens.next(RULE_5_CONTEXT);
-        int tt = var.getTokenType();
-        if (tt != TOK_NAME) {
-            syntaxError("expected a NAME following 'for'", tt);
-        }
-        processLineBreaks();
+        next();
+        BjorneToken var = expectNext(TOK_NAME_BIT, RULE_5_CONTEXT);
+        skipLineBreaks();
         List<BjorneToken> words = new LinkedList<BjorneToken>();
-        if (tokens.peek(RULE_6_CONTEXT).getTokenType() == TOK_IN) {
-            tokens.next();
-            BjorneToken word = tokens.peek();
-            while (word.getTokenType() == TOK_WORD) {
+        if (optNext(TOK_IN_BIT, RULE_6_CONTEXT) != null) {
+            BjorneToken word = expectNext(TOK_WORD_BIT);
+            do {
                 words.add(word);
-                tokens.next();
-                word = tokens.peek();
-            }
-            if (words.isEmpty()) {
-                syntaxError("expected a wordlist following 'in'", word.getTokenType());
-            }
-            tt = tokens.peek().getTokenType();
-            switch (tt) {
-                case TOK_SEMI:
-                    tokens.next();
-                    processLineBreaks();
-                    break;
-                case TOK_END_OF_LINE:
-                    processLineBreaks();
-                    break;
-                default:
-                    syntaxError("expected a ';' following wordlist", tt);
-            }
+                word = optNext(TOK_WORD_BIT);
+            } while (word != null);
+            expectNext(TOK_SEMI_BIT | TOK_END_OF_LINE_BIT);
         }
         return new ForCommandNode(var,
                 words.toArray(new BjorneToken[words.size()]), parseDoGroup());
     }
 
     private CommandNode parseDoGroup() throws ShellSyntaxException {
-        processLineBreaks();
-        int tt = tokens.next(RULE_1_CONTEXT).getTokenType();
-        if (tt != TOK_DO) {
-            syntaxError("expected the 'do' of a do_group", tt);
-        }
+        skipLineBreaks();
+        expectNext(TOK_DO_BIT, RULE_1_CONTEXT);
         CommandNode body = parseCompoundList();
-        processLineBreaks();
-        tt = tokens.next(RULE_1_CONTEXT).getTokenType();
-        if (tt != TOK_DONE) {
-            syntaxError("expected a command or 'done'", tt);
-        }
+        skipLineBreaks();
+        expectNext(TOK_DONE_BIT, RULE_1_CONTEXT);
         return body;
     }
 
     private LoopCommandNode parseUntilCommand() throws ShellSyntaxException {
-        tokens.next();
+        next();
         CommandNode cond = parseCompoundList();
         CommandNode body = parseDoGroup();
         return new LoopCommandNode(CMD_UNTIL, cond, body);
     }
 
     private LoopCommandNode parseWhileCommand() throws ShellSyntaxException {
-        tokens.next();
+        next();
         CommandNode cond = parseCompoundList();
         CommandNode body = parseDoGroup();
         return new LoopCommandNode(CMD_WHILE, cond, body);
     }
 
     private IfCommandNode parseIfCommand() throws ShellSyntaxException {
-        tokens.next();
+        next();
         CommandNode cond = parseCompoundList();
-        processLineBreaks();
-        int tt = tokens.next(RULE_1_CONTEXT).getTokenType();
-        if (tt != TOK_THEN) {
-            syntaxError("expected a 'then' in if_clause", tt);
-        }
+        skipLineBreaks();
+        expectNext(TOK_THEN_BIT, RULE_1_CONTEXT);
         CommandNode thenPart = parseCompoundList();
         CommandNode elsePart = parseOptElsePart();
-        processLineBreaks();
-        tt = tokens.next(RULE_1_CONTEXT).getTokenType();
-        if (tt != TOK_FI) {
-            syntaxError("expected an 'elif', 'else' or 'fi'", tt);
-        }
+        skipLineBreaks();
+        expectNext(TOK_FI_BIT, RULE_1_CONTEXT);
         return new IfCommandNode(CMD_IF, cond, thenPart, elsePart);
     }
 
     private CommandNode parseOptElsePart() throws ShellSyntaxException {
-        processLineBreaks();
-        switch (tokens.next(RULE_1_CONTEXT).getTokenType()) {
-            case TOK_ELIF:
-                CommandNode cond = parseCompoundList();
-                processLineBreaks();
-                int tt = tokens.next(RULE_1_CONTEXT).getTokenType();
-                if (tt != TOK_THEN) {
-                    syntaxError("expected a 'then' in else_part", tt);
-                }
-                return new IfCommandNode(CMD_ELIF, cond, parseCompoundList(),
-                        parseOptElsePart());
-            case TOK_ELSE:
-                return parseCompoundList();
-            default:
-                tokens.backup();
-                return null;
-        }
+        skipLineBreaks();
+        BjorneToken token = optNext(TOK_ELIF_BIT | TOK_ELSE_BIT, RULE_1_CONTEXT);
+        if (token == null) {
+            return null;
+        } else if (token.getTokenType() == TOK_ELIF) {
+            CommandNode cond = parseCompoundList();
+            skipLineBreaks();
+            expectNext(TOK_THEN_BIT, RULE_1_CONTEXT);
+            return new IfCommandNode(CMD_ELIF, cond, parseCompoundList(), parseOptElsePart());
+        } else {
+            return parseCompoundList();
+        } 
     }
     
-    private void syntaxError(String msg, int tt) throws ShellSyntaxException {
-        if (tt == TOK_END_OF_STREAM) {
-            throw new IncompleteCommandException(msg, continuationPrompt);
+    private BjorneToken optNext(long expectedSet, int context) throws ShellSyntaxException {
+        if (allowLineBreaks) {
+            doLineBreaks(false);
+        }
+        BjorneToken token = tokens.next(context);
+        if (expect(token, expectedSet, false)) {
+            return token;
         } else {
-            System.err.println("tt is " + tt);
-            throw new ShellSyntaxException(msg);
+            tokens.backup();
+            return null;
         }
     }
 
-    private void processLineBreaks() throws IncompleteCommandException {
-        if (tokens.peek().getTokenType() == TOK_END_OF_LINE) {
+    private BjorneToken optNext(long expectedSet) throws ShellSyntaxException {
+        BjorneToken token = next();
+        if (expect(token, expectedSet, false)) {
+            return token;
+        } else {
+            tokens.backup();
+            return null;
+        }
+    }
+
+    private BjorneToken optPeek(long expectedSet, int context) throws ShellSyntaxException {
+        if (allowLineBreaks) {
+            doLineBreaks(false);
+        }
+        BjorneToken token = tokens.peek(context);
+        return expect(token, expectedSet, false) ? token : null;
+    }
+
+    private BjorneToken optPeek(long expectedSet) throws ShellSyntaxException {
+        if (allowLineBreaks) {
+            doLineBreaks(false);
+        }
+        BjorneToken token = tokens.peek();
+        return expect(token, expectedSet, false) ? token : null;
+    }
+
+    private BjorneToken expectNext(long expectedSet, int context) throws ShellSyntaxException {
+        if (allowLineBreaks) {
+            doLineBreaks(true);
+        }
+        BjorneToken token = tokens.next(context);
+        expect(token, expectedSet, true);
+        return token;
+    }
+
+    private BjorneToken expectNext(long expectedSet) throws ShellSyntaxException {
+        if (allowLineBreaks) {
+            doLineBreaks(true);
+        }
+        BjorneToken token = tokens.next();
+        expect(token, expectedSet, true);
+        return token;
+    }
+
+    private BjorneToken expectPeek(long expectedSet, int context) throws ShellSyntaxException {
+        if (allowLineBreaks) {
+            doLineBreaks(true);
+        }
+        BjorneToken token =  tokens.peek(context);
+        expect(token, expectedSet, true);
+        return token;
+    }
+
+    private BjorneToken expectPeek(long expectedSet) throws ShellSyntaxException {
+        BjorneToken token = peekEager();
+        expect(token, expectedSet, true);
+        return token;
+    }
+    
+    private BjorneToken next() throws IncompleteCommandException {
+        if (allowLineBreaks) {
+            doLineBreaks(false);
+        }
+        return tokens.next();
+    }
+    
+    private BjorneToken peek() throws IncompleteCommandException {
+        if (allowLineBreaks) {
+            doLineBreaks(false);
+        }
+        return tokens.peek();
+    }
+    
+    private BjorneToken peekEager() throws IncompleteCommandException {
+        if (allowLineBreaks) {
+            doLineBreaks(true);
+        }
+        return tokens.peek();
+    }
+
+    private boolean expect(BjorneToken token, long expectedSet, boolean mandatory) 
+        throws ShellSyntaxException {
+        captureCompletions(token, expectedSet);
+        int tt = token.getTokenType();
+        if (((1L << tt) & expectedSet) == 0L) {
+            if (mandatory) {
+                if (tt == TOK_END_OF_STREAM) {
+                    throw new IncompleteCommandException(
+                            "EOF reached while looking for " + formatExpectedSet(expectedSet), 
+                            continuationPrompt);
+                } else {
+                    throw new ShellSyntaxException(
+                            "expected " + formatExpectedSet(expectedSet) + " but got " + token);
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    private void captureCompletions(BjorneToken token, long expectedSet) {
+        if (completer != null) {
+            // Capture tokens and expectedSets for later use in determining what
+            // completions to allow.
+            int tt = token.getTokenType();
+            if (tt == TOK_END_OF_STREAM) {
+                if (completer.getEndToken() == null) {
+                    completer.setEndToken(token);
+                    completer.setEndExpectedSet(expectedSet);
+                } else {
+                    completer.addToEndExpectedSet(expectedSet);
+                }
+            } else {
+                BjorneToken pt = completer.getPenultimateToken();
+                if (pt == null || pt.start < token.start) {
+                    completer.setPenultimateToken(token);
+                    completer.setPenultimateExpectedSet(expectedSet);
+                } else {
+                    completer.addToPenultimateExpectedSet(expectedSet);
+                }
+            }
+        }
+    }
+
+    private String formatExpectedSet(long expectedSet) {
+        StringBuilder sb = new StringBuilder(40);
+        long mask = 1L;
+        for (int i = 0; i < 64 && expectedSet != 0L; i++) {
+            if ((expectedSet & mask) != 0) {
+                if (sb.length() > 0) {
+                    if (expectedSet != 0L) {
+                        sb.append(", ");
+                    } else {
+                        sb.append(" or ");
+                    }
+                }
+                sb.append(BjorneToken.toString(i));
+                expectedSet &= ~mask;
+            }
+            mask <<= 1;
+        }
+        return sb.toString();
+    }
+
+    private void skipLineBreaks() throws IncompleteCommandException {
+        this.allowLineBreaks = true;
+        doLineBreaks(true);
+    }
+
+    private void allowLineBreaks() throws IncompleteCommandException {
+        this.allowLineBreaks = true;
+    }
+
+    private void doLineBreaks(boolean needMore) throws IncompleteCommandException {
+        // NB: use tokens.peek() / next() rather than the wrappers here!!
+        this.allowLineBreaks = false;
+        BjorneToken token = tokens.peek();
+        captureCompletions(token, TOK_END_OF_LINE_BIT);
+        int tt = token.getTokenType();
+        if (needMore && tt == TOK_END_OF_STREAM) {
+            throw new IncompleteCommandException(
+                    "EOF reached while looking for optional linebreak(s)", 
+                    continuationPrompt);
+        } else if (tt == TOK_END_OF_LINE) {
             tokens.next();
             captureHereDocuments();
-            while (tokens.peek().getTokenType() == TOK_END_OF_LINE) {
-                tokens.next();
+            while (true) {
+                token = tokens.peek();
+                tt = token.getTokenType();
+                if (tt == TOK_END_OF_LINE) {
+                    tokens.next();
+                } else if (needMore && tt == TOK_END_OF_STREAM) {
+                    throw new IncompleteCommandException(
+                            "EOF reached while looking for optional linebreak(s)", 
+                            continuationPrompt);
+                } else {
+                    break;
+                }
             }
         }
     }
