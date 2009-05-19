@@ -44,7 +44,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandInterpreter;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
@@ -53,7 +52,6 @@ import org.jnode.shell.IncompleteCommandException;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ShellSyntaxException;
-import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandOutput;
 import org.jnode.shell.syntax.CommandSyntaxException;
@@ -196,27 +194,13 @@ public class BjorneInterpreter implements CommandInterpreter {
     public Completable parsePartial(CommandShell shell, String partial) throws ShellSyntaxException {
         bindShell(shell);
         BjorneTokenizer tokens = new BjorneTokenizer(partial);
-        final CommandNode tree = new BjorneParser(tokens, "> ").parse();
-        if (tree == null) {
-            return new Completable() {
-                @Override
-                public void complete(CompletionInfo completions, CommandShell shell) throws CompletionException {
-                    CommandLine cline = new CommandLine(null, null);
-                    cline.complete(completions, shell);
-                }
-            };
-        } else if (tree instanceof BjorneCompletable) {
-            return new Completable() {
-                @Override
-                public void complete(CompletionInfo completions,
-                        CommandShell shell) throws CompletionException {
-                    ((BjorneCompletable) tree).complete(completions, context, shell);
-                }
-                
-            };
-        } else {
-            return null;
+        BjorneCompleter completions = new BjorneCompleter(context);
+        try {
+            new BjorneParser(tokens, "> ").parse(completions);
+        } catch (ShellSyntaxException ex) {
+            // squelch both syntax and incomplete command exceptions.
         }
+        return completions;
     }
     
     @Override

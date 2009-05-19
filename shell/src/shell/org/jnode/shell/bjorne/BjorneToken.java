@@ -24,86 +24,125 @@ import org.jnode.shell.CommandLine;
 
 public class BjorneToken extends CommandLine.Token {
 
-    public static final int TOK_END_OF_STREAM = -1;
+    public static final int TOK_END_OF_STREAM = 1;
+    public static final long TOK_END_OF_STREAM_BIT = (1 << TOK_END_OF_STREAM);
 
-    public static final int TOK_END_OF_LINE = -2;
+    public static final int TOK_END_OF_LINE = 2;
+    public static final long TOK_END_OF_LINE_BIT = (1 << TOK_END_OF_LINE);
 
     // See The Open Group Base Specifications Issue 6
     // IEEE Std 1003.1, 2004 Edition
     // Chapter 2 Section 2.10.2
-    public static final int TOK_SEMI = ';';
+    public static final int TOK_SEMI = 3; // ;
+    public static final long TOK_SEMI_BIT = (1L << TOK_SEMI);
 
-    public static final int TOK_AMP = '&';
+    public static final int TOK_AMP = 4; // &
+    public static final long TOK_AMP_BIT = (1L << TOK_AMP);
 
-    public static final int TOK_BAR = '|';
+    public static final int TOK_BAR = 5; // |
+    public static final long TOK_BAR_BIT = (1L << TOK_BAR);
 
-    public static final int TOK_LESS = '<';
+    public static final int TOK_LESS = 6; // <
+    public static final long TOK_LESS_BIT = (1L << TOK_LESS);
 
-    public static final int TOK_GREAT = '>';
+    public static final int TOK_GREAT = 7; // >
+    public static final long TOK_GREAT_BIT = (1L << TOK_GREAT);
 
-    public static final int TOK_LPAREN = '(';
+    public static final int TOK_LPAREN = 8; // (
+    public static final long TOK_LPAREN_BIT = (1L << TOK_LPAREN);
 
-    public static final int TOK_RPAREN = ')';
+    public static final int TOK_RPAREN = 9; // )
+    public static final long TOK_RPAREN_BIT = (1L << TOK_RPAREN);
 
-    public static final int TOK_LBRACE = '{'; // reserved word
+    public static final int TOK_LBRACE = 10; // { reserved word
+    public static final long TOK_LBRACE_BIT = (1L << TOK_LBRACE);
 
-    public static final int TOK_RBRACE = '}'; // reserved word
+    public static final int TOK_RBRACE = 11; // } reserved word
+    public static final long TOK_RBRACE_BIT = (1L << TOK_RBRACE);
 
-    public static final int TOK_BANG = '!'; // reserved word
+    public static final int TOK_BANG = 12; // ! reserved word
+    public static final long TOK_BANG_BIT = (1L << TOK_BANG);
 
-    public static final int TOK_AND_IF = 128; // &&
+    public static final int TOK_AND_IF = 13; // &&
+    public static final long TOK_AND_IF_BIT = (1L << TOK_AND_IF);
 
-    public static final int TOK_OR_IF = 129; // ||
+    public static final int TOK_OR_IF = 14; // ||
+    public static final long TOK_OR_IF_BIT = (1L << TOK_OR_IF);
 
-    public static final int TOK_DSEMI = 130; // ;;
+    public static final int TOK_DSEMI = 15; // ;;
+    public static final long TOK_DSEMI_BIT = (1L << TOK_DSEMI);
 
-    public static final int TOK_DLESS = 131; // <<
+    public static final int TOK_DLESS = 16; // <<
+    public static final long TOK_DLESS_BIT = (1L << TOK_DLESS);
 
-    public static final int TOK_DGREAT = 132; // >>
+    public static final int TOK_DGREAT = 17; // >>
+    public static final long TOK_DGREAT_BIT = (1L << TOK_DGREAT);
 
-    public static final int TOK_LESSAND = 133; // <&
+    public static final int TOK_LESSAND = 18; // <&
+    public static final long TOK_LESSAND_BIT = (1L << TOK_LESSAND);
 
-    public static final int TOK_GREATAND = 134; // >&
+    public static final int TOK_GREATAND = 19; // >&
+    public static final long TOK_GREATAND_BIT = (1L << TOK_GREATAND);
 
-    public static final int TOK_LESSGREAT = 135; // <>
+    public static final int TOK_LESSGREAT = 20; // <>
+    public static final long TOK_LESSGREAT_BIT = (1L << TOK_LESSGREAT);
 
-    public static final int TOK_DLESSDASH = 136; // <<-
+    public static final int TOK_DLESSDASH = 21; // <<-
+    public static final long TOK_DLESSDASH_BIT = (1L << TOK_DLESSDASH);
 
-    public static final int TOK_CLOBBER = 137; // >|
+    public static final int TOK_CLOBBER = 22; // >|
+    public static final long TOK_CLOBBER_BIT = (1L << TOK_CLOBBER);
 
-    public static final int TOK_WORD = 138;
+    public static final int TOK_WORD = 23;
+    public static final long TOK_WORD_BIT = (1L << TOK_WORD);
 
-    public static final int TOK_NAME = 139;
+    public static final int TOK_NAME = 24;
+    public static final long TOK_NAME_BIT = (1L << TOK_NAME);
 
-    public static final int TOK_ASSIGNMENT = 140;
+    public static final int TOK_ASSIGNMENT = 25;
+    public static final long TOK_ASSIGNMENT_BIT = (1L << TOK_ASSIGNMENT);
 
-    public static final int TOK_IO_NUMBER = 141;
+    public static final int TOK_IO_NUMBER = 26;
+    public static final long TOK_IO_NUMBER_BIT = (1L << TOK_IO_NUMBER);
 
-    public static final int TOK_IF = 142;
+    public static final int TOK_IF = 27;
+    public static final long TOK_IF_BIT = (1L << TOK_IF);
 
-    public static final int TOK_THEN = 143;
+    public static final int TOK_THEN = 28;
+    public static final long TOK_THEN_BIT = (1L << TOK_THEN);
 
-    public static final int TOK_ELSE = 144;
+    public static final int TOK_ELSE = 29;
+    public static final long TOK_ELSE_BIT = (1L << TOK_ELSE);
 
-    public static final int TOK_ELIF = 145;
+    public static final int TOK_ELIF = 30;
+    public static final long TOK_ELIF_BIT = (1L << TOK_ELIF);
 
-    public static final int TOK_FI = 146;
+    public static final int TOK_FI = 31;
+    public static final long TOK_FI_BIT = (1L << TOK_FI);
 
-    public static final int TOK_DO = 147;
+    public static final int TOK_DO = 32;
+    public static final long TOK_DO_BIT = (1L << TOK_DO);
 
-    public static final int TOK_DONE = 148;
+    public static final int TOK_DONE = 33;
+    public static final long TOK_DONE_BIT = (1L << TOK_DONE);
 
-    public static final int TOK_CASE = 149;
+    public static final int TOK_CASE = 34;
+    public static final long TOK_CASE_BIT = (1L << TOK_CASE);
 
-    public static final int TOK_ESAC = 150;
+    public static final int TOK_ESAC = 35;
+    public static final long TOK_ESAC_BIT = (1L << TOK_ESAC);
 
-    public static final int TOK_WHILE = 151;
+    public static final int TOK_WHILE = 36;
+    public static final long TOK_WHILE_BIT = (1L << TOK_WHILE);
 
-    public static final int TOK_UNTIL = 152;
+    public static final int TOK_UNTIL = 37;
+    public static final long TOK_UNTIL_BIT = (1L << TOK_UNTIL);
 
-    public static final int TOK_FOR = 153;
+    public static final int TOK_FOR = 38;
+    public static final long TOK_FOR_BIT = (1L << TOK_FOR);
 
-    public static final int TOK_IN = 154;
+    public static final int TOK_IN = 39;
+    public static final long TOK_IN_BIT = (1L << TOK_IN);
 
     public static final int BASE_CONTEXT = 0;
 
@@ -265,17 +304,34 @@ public class BjorneToken extends CommandLine.Token {
                 return "ASSIGNMENT{" + text + "}";
             case TOK_IO_NUMBER:
                 return "IO_NUMBER{" + text + "}";
+            default:
+                String str = toString(tokenType);
+                return str == null ? "?UNKNOWN?" : str;
+        }
+    }
+
+    public static String toString(int tt) {
+        switch (tt) {
             case TOK_SEMI:
+                return ";";
             case TOK_AMP:
+                return "&";
             case TOK_BAR:
+                return "|";
             case TOK_LESS:
+                return "<";
             case TOK_GREAT:
+                return ">";
             case TOK_LPAREN:
+                return "(";
             case TOK_RPAREN:
+                return ")";
             case TOK_LBRACE:
+                return "{";
             case TOK_RBRACE:
+                return "}";
             case TOK_BANG:
-                return "" + ((char) tokenType);
+                return "!";
             case TOK_AND_IF:
                 return "&&";
             case TOK_OR_IF:
@@ -323,11 +379,19 @@ public class BjorneToken extends CommandLine.Token {
             case TOK_IN:
                 return "in";
             case TOK_END_OF_LINE:
-                return "?EOL?";
+                return "end of line";
             case TOK_END_OF_STREAM:
-                return "?EOS?";
+                return "end of file";
+            case TOK_WORD:
+                return "<word>";
+            case TOK_NAME:
+                return "<name>";
+            case TOK_ASSIGNMENT:
+                return "<assignment>";
+            case TOK_IO_NUMBER:
+                return "<io number>";
             default:
-                return "?UNKNOWN?";
+                return "unknown (" + tt + ")";
         }
     }
 }
