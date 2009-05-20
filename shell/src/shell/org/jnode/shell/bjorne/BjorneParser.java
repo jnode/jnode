@@ -333,18 +333,24 @@ public class BjorneParser {
                 // An empty command is legal, as are assignments and redirections
                 // w/o a command.
             }
-        } catch (ShellSyntaxException ex) {
+        } catch (IncompleteCommandException ex) {
             if (completer != null) {
                 completer.setCommand(new SimpleCommandNode(CMD_COMMAND, 
                         words.toArray(new BjorneToken[words.size()]), builtin));
             }
             throw ex;
+        } catch (ShellSyntaxException ex) {
+            if (completer != null) {
+                completer.setCommand(words.size() == 0 ? null : 
+                    new SimpleCommandNode(CMD_COMMAND, 
+                            words.toArray(new BjorneToken[words.size()]), builtin));
+            }
+            throw ex;
         }
-        SimpleCommandNode res = 
-            new SimpleCommandNode(CMD_COMMAND, 
-                    words.toArray(new BjorneToken[words.size()]), builtin);
+        SimpleCommandNode res = new SimpleCommandNode(CMD_COMMAND, 
+                words.toArray(new BjorneToken[words.size()]), builtin);
         if (completer != null) {
-            completer.setCommand(res);
+            completer.setCommand(words.size() == 0 ? null : res);
         }
         if (!redirects.isEmpty()) {
             res.setRedirects(redirects.toArray(new RedirectionNode[redirects.size()]));

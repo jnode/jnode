@@ -2,6 +2,7 @@ package org.jnode.shell.bjorne;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.console.CompletionInfo;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.Completable;
 import org.jnode.shell.help.CompletionException;
@@ -32,12 +33,17 @@ public class BjorneCompleter implements Completable {
     @Override
     public void complete(CompletionInfo completion, CommandShell shell) throws CompletionException {
         Logger.getLogger(BjorneCompleter.class).debug(toString());
-        if (command != null) {
+        if (endToken == null) {
+            new CommandLine(null, null).complete(completion, shell);
+        } else if (command != null) {
             BjorneToken[] words = command.getWords();
             if (words.length > 0 && words[words.length - 1] == penultimateToken) {
                 command.complete(completion, context, shell);
+            } else if (words.length == 0) {
+                new CommandLine(null, null).complete(completion, shell);
             }
         }
+        
     }
 
     public void setEndToken(BjorneToken endToken) {
