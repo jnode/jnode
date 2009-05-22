@@ -295,7 +295,7 @@ public class BjorneParser {
         // Deal with cmd_prefix'es before the command name; i.e. assignments and
         // redirections
         BjorneToken token;
-        for (int i = 0; ; i++) {
+        for (int i = 0; /**/; i++) {
             token = optPeek(TOK_ASSIGNMENT_BIT | TOK_IO_NUMBER_BIT | TOK_LESS_BIT |
                     TOK_GREAT_BIT | TOK_DLESS_BIT | TOK_DGREAT_BIT | TOK_LESSAND_BIT | 
                     TOK_GREATAND_BIT | TOK_LESSGREAT_BIT | TOK_CLOBBER_BIT, 

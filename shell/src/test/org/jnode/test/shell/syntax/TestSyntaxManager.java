@@ -39,7 +39,7 @@ public class TestSyntaxManager implements SyntaxManager {
         syntaxes.put(bundle.getAlias(), bundle);
     }
     
-    public void add(String alias, ArgumentSpec[] args) {
+    public void add(String alias, ArgumentSpec<?>[] args) {
         return;
     }
     

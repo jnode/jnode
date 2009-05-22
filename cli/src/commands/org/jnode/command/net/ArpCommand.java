@@ -37,6 +37,7 @@ import org.jnode.shell.syntax.FlagArgument;
  */
 public class ArpCommand extends AbstractCommand {
 
+    @SuppressWarnings("unused")
     private static final String help_clear = "if set, clear the ARP cache";
     private static final String help_super = "print or clear the ARP cache";
     private static final String str_cleared = "Cleared the ARP cache";

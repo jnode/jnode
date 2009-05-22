@@ -20,8 +20,6 @@
 
 package org.jnode.command.archive;
 
-//import java.text.DateFormat;
-//import java.text.ParseException;
 import java.util.ArrayList;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -43,7 +41,9 @@ public class ZipCommand extends Zip {
     private static final String help_exclude     = "do not includes files matching a pattern";
     private static final String help_include     = "only includes files matching a pattern";
     
+    @SuppressWarnings("unused")
     private static final String fatal_bad_newer = "Invalid newer-than date: ";
+    @SuppressWarnings("unused")
     private static final String fatal_bad_older = "Invalid older-than date: ";
     
     private final FlagArgument FilesStdin;

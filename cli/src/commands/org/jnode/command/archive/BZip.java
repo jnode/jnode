@@ -40,7 +40,8 @@ import org.jnode.shell.syntax.FlagArgument;
  * @author chris boertien
  */
 public class BZip extends ArchiveCommand {
-
+    
+    @SuppressWarnings("unused")
     private static final boolean DEBUG = false;
     
     private static final String help_compress = "forces compression; regardless of invocation name";
@@ -189,6 +190,7 @@ public class BZip extends ArchiveCommand {
         }
     }
     
+    @SuppressWarnings("unused")
     private void test(File[] files) {
         // TODO
         // requires patch to apache ant to have CBZip2InputStream fail with an

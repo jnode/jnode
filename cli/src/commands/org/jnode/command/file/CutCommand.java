@@ -80,6 +80,7 @@ public class CutCommand extends AbstractCommand {
     private String inDelim;
     private String outDelim;
     private boolean suppress;
+    @SuppressWarnings("unused")
     private boolean complement;
     
     public CutCommand() {

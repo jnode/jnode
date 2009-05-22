@@ -83,13 +83,13 @@ public class DFCommand extends AbstractCommand {
     private final FlagArgument argBlock1k;
     private final IntegerArgument argBlock;
     
-    private StringBuilder line;
     private FileSystemService fss;
     private DeviceManager dm;
     private Map<String, String> mountPoints;
     private PrintWriter out;
     private int outputType;
     private int blockSize;
+    @SuppressWarnings("unused")
     private boolean all;
     
     public DFCommand() {
@@ -110,7 +110,6 @@ public class DFCommand extends AbstractCommand {
         dm          = InitialNaming.lookup(DeviceManager.NAME);
         mountPoints = fss.getDeviceMountPoints();
         out         = getOutput().getPrintWriter(true);
-        line        = new StringBuilder();
         
         Device device = null;
         

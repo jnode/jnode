@@ -58,6 +58,7 @@ public class TailCommand extends AbstractCommand {
                                              "from that line";
     private static final String help_unchanged = "with -f, reopen the file when the size has not change for <int> " +
                                                  "iterations to see if it has be unlinked or renamed Default is 5";
+    @SuppressWarnings("unused")
     private static final String help_pid = "with -f, terminate after process PID does (how?)";
     private static final String help_sleep = "with -f, sleep for <int> seconds between iterations. Default is 1";
     private static final String help_quiet = "never output headers giving file names";
@@ -82,12 +83,15 @@ public class TailCommand extends AbstractCommand {
     private PrintWriter err;
     
     private int count;
+    @SuppressWarnings("unused")
     private int sleep;
+    @SuppressWarnings("unused")
     private int unchanged;
     private boolean headers;
     private boolean useLines;
     private boolean reverse;
     private boolean follow;
+    @SuppressWarnings("unused")
     private boolean retry;
     private boolean first = true;
     
@@ -233,7 +237,6 @@ public class TailCommand extends AbstractCommand {
         OutputStream out = getOutput().getOutputStream();
         byte[] buffer;
         int len;
-        int n;
         int bufsize = 8 * 1024;
         
         if (reverse) {
