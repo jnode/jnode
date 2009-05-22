@@ -205,7 +205,7 @@ public class GrepCommand extends AbstractCommand {
         @Override
         public void flush() {
             doFlush();
-            while(contextStack.size() > 0) {
+            while (contextStack.size() > 0) {
                 writer.println(contextStack.removeFirst());
             }
             haveLine = false;
@@ -312,6 +312,7 @@ public class GrepCommand extends AbstractCommand {
             return writer == null;
         }
         
+        @SuppressWarnings("unused")
         private boolean haveLine() {
             return haveLine;
         }
@@ -390,17 +391,19 @@ public class GrepCommand extends AbstractCommand {
     private static final int PREFIX_NOFILE = 0x08;
     private static final int PREFIX_TAB    = 0x10;
     private static final int PREFIX_NULL   = 0x20;
+    @SuppressWarnings("unused")
     private static final int PREFIX_ALL    = PREFIX_FILE | PREFIX_LINE | PREFIX_BYTE;
+    @SuppressWarnings("unused")
     private static final int PREFIX_FL     = PREFIX_FILE | PREFIX_LINE;
+    @SuppressWarnings("unused")
     private static final int PREFIX_FB     = PREFIX_FILE | PREFIX_BYTE;
+    @SuppressWarnings("unused")
     private static final int PREFIX_LB     = PREFIX_LINE | PREFIX_BYTE;
     
     private PrintWriter err;
     private PrintWriter out;
     private ContextLineWriter contextOut;
     private Reader in;
-    private InputStream stdin;
-    private OutputStream stdout;
     private List<File> files;
     private List<Pattern> patterns;
     private String prefixLabel;
@@ -411,6 +414,7 @@ public class GrepCommand extends AbstractCommand {
     private int maxCount = Integer.MAX_VALUE;
     private int contextBefore;
     private int contextAfter;
+    @SuppressWarnings("unused")
     private int patternFlags;
     private int rc = 1;
     private int currentLine;
@@ -427,9 +431,13 @@ public class GrepCommand extends AbstractCommand {
     private boolean suppress;
     private boolean debug;
     private boolean recurse;
+    @SuppressWarnings("unused")
     private boolean dirAsFile;
+    @SuppressWarnings("unused")
     private boolean binaryAsText;
+    @SuppressWarnings("unused")
     private boolean binaryAsBinary;
+    @SuppressWarnings("unused")
     private boolean readDevice;
     private boolean exitOnFirstMatch;
     
@@ -508,11 +516,9 @@ public class GrepCommand extends AbstractCommand {
      * Primary entry point
      */
     public void execute() throws Exception {
-        err    = getError().getPrintWriter();
-        in     = getInput().getReader();
-        out    = getOutput().getPrintWriter();
-        stdout = getOutput().getOutputStream();
-        stdin  = getInput().getInputStream();
+        err = getError().getPrintWriter();
+        in = getInput().getReader();
+        out = getOutput().getPrintWriter();
         
         LineNumberReader reader;
         String name;
@@ -614,6 +620,7 @@ public class GrepCommand extends AbstractCommand {
     /**
      * Uses the MatchResult to only print the substring of the line that matched.
      */
+    @SuppressWarnings("unused")
     private void matchSubstring(LineNumberReader reader, String name) throws IOException {
         String line;
         MatchResult result;
@@ -636,11 +643,9 @@ public class GrepCommand extends AbstractCommand {
      */
     private void matchNormal(LineNumberReader reader) throws IOException {
         String line;
-        MatchResult result;
         int matches = 0;
         
         while ((matches < maxCount) && ((line = reader.readLine()) != null)) {
-            result = match(line);
             currentLine = reader.getLineNumber();
             if ((match(line) != null) ^ inverse) {
                 printMatch(line, currentFile, currentLine, currentByte);
@@ -972,8 +977,6 @@ public class GrepCommand extends AbstractCommand {
     }
     
     private void parseFiles() {
-        String line;
-        String name;
         BufferedReader reader;
         
         files = new ArrayList<File>();
@@ -1008,8 +1011,6 @@ public class GrepCommand extends AbstractCommand {
             }
         }
         
-        List<String> excludeDirs  = new ArrayList<String>();
-        
         for (final String s : ExcludeDir.getValues()) {
             walker.addDirectoryFilter(new FileFilter() {
                 @Override
@@ -1038,7 +1039,7 @@ public class GrepCommand extends AbstractCommand {
                 walker.walk(dirs);
             }
         } catch (IOException e) {
-            // technically, the walker shouldn't let this propogate unless something
+            // technically, the walker shouldn't let this propagate unless something
             // is really wrong.
             error(err_ex_walker);
             exit(2);
@@ -1053,6 +1054,7 @@ public class GrepCommand extends AbstractCommand {
         if (debug) log.debug(s);
     }
     
+    @SuppressWarnings("unused")
     private void debugOptions() {
         debug("Files : " + files.size());
         for (File file : files) {

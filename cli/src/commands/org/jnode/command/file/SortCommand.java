@@ -68,10 +68,15 @@ public class SortCommand extends AbstractCommand {
         private int field;
         private int offset;
         private boolean ignoreBlanks;
+        @SuppressWarnings("unused")
         private boolean sortNumeric;
+        @SuppressWarnings("unused")
         private boolean cmpPrint;
+        @SuppressWarnings("unused")
         private boolean cmpAlpha;
+        @SuppressWarnings("unused")
         private boolean cmpICase;
+        @SuppressWarnings("unused")
         private boolean reverse;
     }
     
@@ -85,6 +90,7 @@ public class SortCommand extends AbstractCommand {
         FieldRange[] ranges;
     }
     
+    @SuppressWarnings("unused")
     private static class Entry {
         Key key;
         String value;
@@ -251,7 +257,7 @@ public class SortCommand extends AbstractCommand {
             List<String> fields = new LinkedList<String>();
             int mark = 0;
             int i;
-            while((i = text.indexOf(sep, mark)) != -1) {
+            while ((i = text.indexOf(sep, mark)) != -1) {
                 fields.add(text.substring(mark, i));
                 mark = i + 1;
             }
@@ -305,7 +311,9 @@ public class SortCommand extends AbstractCommand {
     private final StringArgument argFieldSep = new StringArgument("field-sep", 0, help_field_sep);
     
     private final IntegerArgument argSort = new IntegerArgument("sort", 0, " ");
+    @SuppressWarnings("unused")
     private static final int SORT_ONE = 1;
+    @SuppressWarnings("unused")
     private static final int SORT_TWO = 2;
     private static final int SORT_LAST = 1;
     
@@ -316,15 +324,25 @@ public class SortCommand extends AbstractCommand {
     private FieldRange[] ranges;
     private String fieldSep;
     private int rc;
+    @SuppressWarnings("unused")
     private int sort;
+    @SuppressWarnings("unused")
     private boolean check;
+    @SuppressWarnings("unused")
     private boolean merge;
+    @SuppressWarnings("unused")
     private boolean unique;
+    @SuppressWarnings("unused")
     private boolean reverse;
+    @SuppressWarnings("unused")
     private boolean numeric;
+    @SuppressWarnings("unused")
     private boolean cmpPrint;
+    @SuppressWarnings("unused")
     private boolean cmpAlpha;
+    @SuppressWarnings("unused")
     private boolean cmpICase;
+    @SuppressWarnings("unused")
     private boolean noBlanks;
     
     public SortCommand() {
@@ -356,14 +374,14 @@ public class SortCommand extends AbstractCommand {
     
     private void sortOne() {
         // OPTIMIZE
-        // This is probably effecient enough for most use cases, but alot
+        // This is probably efficient enough for most use cases, but a lot
         // can be done to make this run faster, and not do so much buffering.
         // But it works for now...
         // Also of note, the -m (merge only) option is basically ignore, as
         // we're blindly sorting and merging all in one shot with Collections
-        // merge sort. Again, not effecient, but it works.
+        // merge sort. Again, not efficient, but it works.
         Comparator<String> cmp = new FieldComparator();
-        List<String> allLines = new LinkedList();
+        List<String> allLines = new LinkedList<String>();
         
         for (File file : files) {
             List<String> lines;
@@ -390,11 +408,12 @@ public class SortCommand extends AbstractCommand {
         }
     }
     
+    @SuppressWarnings("unused")
     private void sortTwo() {
         
     }
     
-    private void parseOptions(){
+    private void parseOptions() {
         if (argFile.isSet()) {
             files = Arrays.asList(argFile.getValues());
         } else {
@@ -427,6 +446,7 @@ public class SortCommand extends AbstractCommand {
         err.println(s);
     }
     
+    @SuppressWarnings("unused")
     private void debug(String s) {
         if (DEBUG) {
             error(s);

@@ -45,8 +45,8 @@ public class DefaultSyntaxManager implements SyntaxManager, ExtensionPointListen
     private final HashMap<String, SyntaxBundle> syntaxes = 
         new HashMap<String, SyntaxBundle>();
     
-    private final HashMap<String, ArgumentSpec[]> arguments =
-        new HashMap<String, ArgumentSpec[]>();
+    private final HashMap<String, ArgumentSpec<?>[]> arguments =
+        new HashMap<String, ArgumentSpec<?>[]>();
 
     private final ExtensionPoint syntaxEP;
 
@@ -77,7 +77,7 @@ public class DefaultSyntaxManager implements SyntaxManager, ExtensionPointListen
         }
     }
     
-    public void add(String alias, ArgumentSpec[] args) {
+    public void add(String alias, ArgumentSpec<?>[] args) {
         if (parent == null) {
             throw new UnsupportedOperationException(
                     "Cannot modify the system syntax manager");
@@ -108,7 +108,7 @@ public class DefaultSyntaxManager implements SyntaxManager, ExtensionPointListen
     }
     
     public ArgumentBundle getArgumentBundle(String alias) {
-        ArgumentSpec[] args = arguments.get(alias);
+        ArgumentSpec<?>[] args = arguments.get(alias);
         if (args != null) {
             return makeArgumentBundle(args);
         } else if (parent != null) {
@@ -118,7 +118,7 @@ public class DefaultSyntaxManager implements SyntaxManager, ExtensionPointListen
         }
     }
     
-    private ArgumentBundle makeArgumentBundle(ArgumentSpec[] specs) {
+    private ArgumentBundle makeArgumentBundle(ArgumentSpec<?>[] specs) {
         Argument<?>[] args = new Argument<?>[specs.length];
         for (int i = 0; i < specs.length; i++) {
             try {
@@ -164,7 +164,7 @@ public class DefaultSyntaxManager implements SyntaxManager, ExtensionPointListen
                                 syntaxes.put(bundle.getAlias(), bundle);
                             }
                         } else if (element.getName().equals("argument-bundle")) {
-                            ArgumentSpec[] specs = argumentLoader.loadArguments(adaptedElement);
+                            ArgumentSpec<?>[] specs = argumentLoader.loadArguments(adaptedElement);
                             if (specs != null) {
                                 arguments.put(element.getAttribute("alias"), specs);
                             }

@@ -21,7 +21,6 @@
 package org.jnode.command.argument;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.jnode.command.util.NumberRange;
 //import org.jnode.driver.console.CompletionInfo;
@@ -112,6 +111,7 @@ public class NumberListArgument extends Argument<NumberRange> {
     
     private static final boolean debug = false;
     
+    @SuppressWarnings("unused")
     private void error(String s) {
         if (debug) System.err.println(s);
     }

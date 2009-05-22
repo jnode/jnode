@@ -217,11 +217,13 @@ public class TarCommand extends ArchiveCommand {
     private static final String help_paths     = "files and directories to include in archive";
     private static final String help_recurse   = "recurse into directories";
     private static final String help_remove    = "remove files after adding them to the archive";
+    @SuppressWarnings("unused")
     private static final String help_stdout    = "extract files to stdout";
     private static final String help_suffix    = "append <suffix> to backup files (default ~)";
     private static final String help_totals    = "display total bytes written after creating the archive";
     private static final String help_unlink    = "when extracting, delete files if they exist. This is the default" +
                                                  "action and is used to override other options if they were set";
+    @SuppressWarnings("unused")
     private static final String help_verbose   = "list files processed";
     private static final String help_verify    = "verify the archive after writing it";
     private static final String help_xfile     = "exclude files matching patterns in <file>";
@@ -278,23 +280,30 @@ public class TarCommand extends ArchiveCommand {
     private final FileArgument Paths = new FileArgument("paths", Argument.OPTIONAL | Argument.MULTIPLE, help_paths);
     
     private File archive;
+    @SuppressWarnings("unused")
     private File excludeFile;
+    @SuppressWarnings("unused")
     private File fileList;
     private String suffix = "~";
+    @SuppressWarnings("unused")
     private String exclude = "";
     private int mode;
     private int compress;
     private int decompress;
     private boolean recurse;
+    @SuppressWarnings("unused")
     private boolean pipeInOut;
     private boolean backup;
     private boolean bzip;
     private boolean gzip;
+    @SuppressWarnings("unused")
     private boolean interact;
     private boolean verify;
+    @SuppressWarnings("unused")
     private boolean showTotals;
     private boolean keepOld;
     private boolean keepNew;
+    @SuppressWarnings("unused")
     private boolean unlink;
     
     public TarCommand() {
@@ -421,10 +430,8 @@ public class TarCommand extends ArchiveCommand {
      */
     private void concat(File[] archives) throws IOException {
         InputStream in;
-        OutputStream out;
         TarInputStream tin;
         TarOutputStream tout;
-        File tmpArchive;
         
         // Setup archive for appending
         tout = appendTarOutputStream();
@@ -462,7 +469,6 @@ public class TarCommand extends ArchiveCommand {
         OutputStream out;
         TarOutputStream tout = null;
         TarEntry entry;
-        File tmpArchive = null;
         
         if (mode == TAR_APPEND && archive.exists()) {
             tout = appendTarOutputStream();
@@ -498,7 +504,7 @@ public class TarCommand extends ArchiveCommand {
         InputStream in;
         TarInputStream tin;
         TarEntry entry;
-        TreeMap<String, Long> entries = new TreeMap();
+        TreeMap<String, Long> entries = new TreeMap<String, Long>();
         
         if ((in = openFileRead(archive)) == null) {
             fatal(" ", 1);
@@ -531,6 +537,7 @@ public class TarCommand extends ArchiveCommand {
     }
     
     // TODO
+    @SuppressWarnings("unused")
     private void delete(String[] names) throws IOException {
     }
     

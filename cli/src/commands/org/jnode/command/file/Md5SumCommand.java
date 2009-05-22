@@ -55,7 +55,9 @@ public class Md5SumCommand extends AbstractCommand {
     private static final String help_check = "check the MD5 digests for files listed in this file";
     private static final String help_super = "Calculate or check MD5 digests";
     private static final String fmt_err_open = "Cannot open %s: %s%n";
+    @SuppressWarnings("unused")
     private static final String str_ok = "Ok";
+    @SuppressWarnings("unused")
     private static final String str_fail = "Failed";
     private static final String fmt_io_ex = "%s : IO Exception - %s%n";
     private static final String fmt_fail_count = "%d file(s) failed%n";

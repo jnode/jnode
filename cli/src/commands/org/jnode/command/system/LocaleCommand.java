@@ -44,6 +44,7 @@ public class LocaleCommand extends AbstractCommand {
     private static final String help_lang = "the local's language";
     private static final String help_country = "the locale's country";
     private static final String help_variant = "the locale's variant";
+    @SuppressWarnings("unused")
     private static final String help_list = "if set, list the available Locales";
     private static final String help_super = "Print or change JNode's default Locale";
     private static final String err_no_locale = "No Locale is available for %s %s %s%n";

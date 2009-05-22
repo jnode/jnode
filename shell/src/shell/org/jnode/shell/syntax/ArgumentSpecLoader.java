@@ -81,7 +81,7 @@ public class ArgumentSpecLoader {
      * @return an array of {@code ArgumentSpec}s
      * @throws SyntaxFailureException if there was an error in the spec.
      */
-    public ArgumentSpec[] loadArguments(SyntaxSpecAdapter element) {
+    public ArgumentSpec<?>[] loadArguments(SyntaxSpecAdapter element) {
         String alias = element.getAttribute("alias");
         if (alias == null) {
             throw new SyntaxFailureException("'argument-bundle' element has no 'alias' attribute");
@@ -96,7 +96,7 @@ public class ArgumentSpecLoader {
                 doTypeDefs(element.getChild(0));
             }
             if (numArgs > 0) {
-                ArgumentSpec[] args = new ArgumentSpec[numArgs];
+                ArgumentSpec<?>[] args = new ArgumentSpec[numArgs];
                 for (int i = 0; i < numArgs; i++) {
                     args[i] = doLoad(element.getChild(i + start));
                 }
@@ -130,7 +130,7 @@ public class ArgumentSpecLoader {
     /**
      * Parses an argument.
      */
-    private ArgumentSpec doLoad(SyntaxSpecAdapter element) {
+    private ArgumentSpec<?> doLoad(SyntaxSpecAdapter element) {
         if (!element.getName().equals("argument")) {
             throw new SyntaxFailureException("Not a valid child of 'argument-bundle': " + element.getName());
         }

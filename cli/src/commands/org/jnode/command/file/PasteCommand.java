@@ -27,9 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jnode.command.argument.NumberListArgument;
 import org.jnode.command.util.IOUtils;
-import org.jnode.command.util.NumberRange;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
@@ -177,7 +175,7 @@ public class PasteCommand extends AbstractCommand {
         if (argFiles.isSet()) {
             files = Arrays.asList(argFiles.getValues());
         } else {
-            files = new ArrayList(1);
+            files = new ArrayList<File>(1);
             files.add(new File("-"));
         }
         

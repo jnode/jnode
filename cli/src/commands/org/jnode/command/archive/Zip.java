@@ -112,6 +112,7 @@ public class Zip extends ArchiveCommand {
     private static final int ZIP_UPDATE   = 0x80;
     private static final int ZIP_ALL      = 0x3F;
     private static final int ZIP_INSERT   = ZIP_ADD | ZIP_MOVE;
+    @SuppressWarnings("unused")
     private static final int ZIP_REQ_ARCH = ZIP_ALL & ~ZIP_INSERT;
     
     /* Populated in ZipCommand and UnzipCommand */
@@ -230,9 +231,7 @@ public class Zip extends ArchiveCommand {
         }
     }
     
-    @SuppressWarnings("unchecked")
     private void list() throws IOException {
-        Enumeration<ZipEntry> entries;
         int size = 0;
         int csize = 0;
         int count = 0;
@@ -604,12 +603,14 @@ public class Zip extends ArchiveCommand {
         error(String.format(fmt_warn_dup, str_zip_warn, str_name_repeat, A.getName()));
     }
     
+    @SuppressWarnings("unused")
     private void printName(String s) {
         if (outMode != 0) {
             out(s);
         }
     }
     
+    @SuppressWarnings("unused")
     private void debug(ZipEntry entry) {
         debug("Name: " + entry.getName());
         debug("Directory: " + entry.isDirectory());

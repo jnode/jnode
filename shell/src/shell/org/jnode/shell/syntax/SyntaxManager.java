@@ -66,7 +66,7 @@ public interface SyntaxManager {
      * @param bundle an argument bundle holding the arguments of a bare command
      * @param alias the alias to bind the arguments to
      */
-    public abstract void add(String alias, ArgumentSpec[] args);
+    public abstract void add(String alias, ArgumentSpec<?>[] args);
     
     /**
      * Gets the argument bundle for a given alias if one exists.

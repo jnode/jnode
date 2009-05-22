@@ -87,8 +87,6 @@ public class ArchiveCommand extends AbstractCommand {
     
     private byte[] buffer;
     
-    private ArchiveCommand() {}
-    
     protected ArchiveCommand(String s) {
         super(s);
     }

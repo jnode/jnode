@@ -54,6 +54,7 @@ public class RemoteOutputCommand extends AbstractCommand {
     private static final String help_port  = "remote port for the receiver";
     private static final String help_udp   = "if set, use udp, otherwise use tcp";
     private static final String help_super = "send data from System.out,System.err and the logger to a remote receiver";
+    @SuppressWarnings("unused")
     private static final String err_capture = "Cannot capture output from the current shell";
     private static final String err_connect = "Connection failed: %s%n";
     private static final String err_host = "Unknown host: %s%n";

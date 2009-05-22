@@ -64,9 +64,11 @@ public class PluginCommand extends AbstractCommand {
     private static final String fmt_load = "Loaded plugin %s version %s%n";
     private static final String fmt_reload = "Reloaded plugin %s version %s%n";
     private static final String fmt_unload = "Unloaded plugin %s%n";
+    @SuppressWarnings("unused")
     private static final String str_state = "state";
     private static final String str_active = "active";
     private static final String str_inactive = "inactive";
+    @SuppressWarnings("unused")
     private static final String str_version = "version";
     private static final String fmt_list = "%s; state %s; version %s";
     private static final String fmt_no_plugin = "Plugin %s not found%n";
