@@ -394,4 +394,29 @@ public class BjorneToken extends CommandLine.Token {
                 return "unknown (" + tt + ")";
         }
     }
+
+    public String unparse() {
+        return (text == null || text.length() == 0) ? toString() : text;
+    }
+    
+    public static String formatExpectedSet(long expectedSet) {
+        StringBuilder sb = new StringBuilder(40);
+        long mask = 1L;
+        for (int i = 0; i < 64 && expectedSet != 0L; i++) {
+            if ((expectedSet & mask) != 0) {
+                if (sb.length() > 0) {
+                    if (expectedSet != 0L) {
+                        sb.append(", ");
+                    } else {
+                        sb.append(" or ");
+                    }
+                }
+                sb.append(BjorneToken.toString(i));
+                expectedSet &= ~mask;
+            }
+            mask <<= 1;
+        }
+        return sb.toString();
+    }
+
 }

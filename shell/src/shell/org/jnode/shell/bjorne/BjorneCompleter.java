@@ -6,6 +6,7 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.Completable;
 import org.jnode.shell.help.CompletionException;
+import static org.jnode.shell.bjorne.BjorneToken.*;
 
 /**
  * This class is used by the Bjorne parser to capture completion information.
@@ -35,15 +36,41 @@ public class BjorneCompleter implements Completable {
         Logger.getLogger(BjorneCompleter.class).debug(toString());
         if (endToken == null) {
             new CommandLine(null, null).complete(completion, shell);
-        } else if (command != null) {
+            return;
+        }
+        if (command != null) {
             BjorneToken[] words = command.getWords();
             if (words.length > 0 && words[words.length - 1] == penultimateToken) {
-                command.complete(completion, context, shell);
+                boolean argumentAnticipated = penultimateToken.end < endToken.end;
+                command.complete(completion, context, shell, argumentAnticipated);
             } else if (words.length == 0) {
                 new CommandLine(null, null).complete(completion, shell);
             }
         }
-        
+        String partial;
+        long expectedSet;
+        if (penultimateToken == null || penultimateToken.end < endToken.end) {
+            partial = "";
+            expectedSet = endExpectedSet;
+            completion.setCompletionStart(endToken.start);
+        } else {
+            partial = penultimateToken.unparse();
+            expectedSet = penultimateExpectedSet;
+            completion.setCompletionStart(penultimateToken.start);
+        }
+        expectedSet &= ~(TOK_END_OF_LINE_BIT | TOK_END_OF_STREAM_BIT | TOK_WORD_BIT | 
+                TOK_NAME_BIT | TOK_ASSIGNMENT_BIT | TOK_IO_NUMBER_BIT);
+        for (int i = 0; i < 64; i++) {
+            if (((1L << i) & expectedSet) == 0) {
+                continue;
+            }
+            String candidate = BjorneToken.toString(i);
+            if (candidate.startsWith(partial)) {
+                Logger.getLogger(BjorneCompleter.class).debug(
+                        "candidate='" + candidate + "',partial='" + partial + "'");
+                completion.addCompletion(candidate);
+            }
+        }
     }
 
     public void setEndToken(BjorneToken endToken) {
@@ -97,9 +124,10 @@ public class BjorneCompleter implements Completable {
     @Override
     public String toString() {
         return "BjorneCompleter{endToken=" + toString(endToken) +
-            ",endExpectedSet=0x" + Long.toHexString(endExpectedSet) + 
-            ",penultimateToken=" + toString(penultimateToken) +
-            ",penultimateExpectedSet=0x" + Long.toHexString(penultimateExpectedSet) + ",command=" + command + "}";
+            ",endExpectedSet={" + BjorneToken.formatExpectedSet(endExpectedSet) +
+            "},penultimateToken=" + toString(penultimateToken) +
+            ",penultimateExpectedSet={" + BjorneToken.formatExpectedSet(penultimateExpectedSet) + 
+            "},command=" + command + "}";
     }
     
     private String toString(BjorneToken token) {

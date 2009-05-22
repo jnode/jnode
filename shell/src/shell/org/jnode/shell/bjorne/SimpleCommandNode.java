@@ -133,10 +133,12 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
     }
 
     @Override
-    public void complete(CompletionInfo completion, BjorneContext context, CommandShell shell)
+    public void complete(CompletionInfo completion, BjorneContext context, CommandShell shell,
+            boolean argumentAnticipated)
         throws CompletionException {
         try {
             CommandLine command = context.buildCommandLine(words);
+            command.setArgumentAnticipated(argumentAnticipated);
             command.complete(completion, shell);
         } catch (ShellException ex) {
             throw new CompletionException("Shell exception", ex);
