@@ -101,6 +101,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jnode.shell.IncompleteCommandException;
 import org.jnode.shell.ShellSyntaxException;
 
@@ -225,8 +226,10 @@ public class BjorneParser {
                 TOK_IO_NUMBER_BIT | TOK_LESS_BIT | TOK_GREAT_BIT | TOK_DLESS_BIT | 
                 TOK_DGREAT_BIT | TOK_LESSAND_BIT | TOK_GREATAND_BIT | TOK_LESSGREAT |
                 TOK_CLOBBER_BIT, RULE_1_CONTEXT) != null) {
+            Logger.getLogger(BjorneParser.class).debug("starting andOr");
             return parseAndOr();
         } else {
+            Logger.getLogger(BjorneParser.class).debug("no andOr");
             return null;
         }
     }
@@ -478,7 +481,9 @@ public class BjorneParser {
             } else if (token.getTokenType() == TOK_AMP) {
                 command.setFlag(FLAG_ASYNC);
             }
+            Logger.getLogger(BjorneParser.class).debug("after command separator");
             skipLineBreaks();
+            Logger.getLogger(BjorneParser.class).debug("after skip");
             command = parseOptAndOr();
         }
         return listToNode(commands);
@@ -496,7 +501,7 @@ public class BjorneParser {
         next();
         BjorneToken word = expectNext(TOK_WORD_BIT);
         List<CaseItemNode> caseItems = new LinkedList<CaseItemNode>();
-        skipLineBreaks();
+        allowLineBreaks();
         expectNext(TOK_IN_BIT, RULE_6_CONTEXT);
         skipLineBreaks();
         while (optNext(TOK_ESAC_BIT, RULE_1_CONTEXT) == null) {
@@ -554,10 +559,10 @@ public class BjorneParser {
     }
 
     private CommandNode parseDoGroup() throws ShellSyntaxException {
-        skipLineBreaks();
+        allowLineBreaks();
         expectNext(TOK_DO_BIT, RULE_1_CONTEXT);
         CommandNode body = parseCompoundList();
-        skipLineBreaks();
+        allowLineBreaks();
         expectNext(TOK_DONE_BIT, RULE_1_CONTEXT);
         return body;
     }
@@ -579,11 +584,13 @@ public class BjorneParser {
     private IfCommandNode parseIfCommand() throws ShellSyntaxException {
         next();
         CommandNode cond = parseCompoundList();
-        skipLineBreaks();
+        allowLineBreaks();
+        Logger.getLogger(BjorneParser.class).debug("expecting 'then'");
         expectNext(TOK_THEN_BIT, RULE_1_CONTEXT);
+        Logger.getLogger(BjorneParser.class).debug("expecting thenPart");
         CommandNode thenPart = parseCompoundList();
         CommandNode elsePart = parseOptElsePart();
-        skipLineBreaks();
+        allowLineBreaks();
         expectNext(TOK_FI_BIT, RULE_1_CONTEXT);
         return new IfCommandNode(CMD_IF, cond, thenPart, elsePart);
     }
@@ -595,7 +602,7 @@ public class BjorneParser {
             return null;
         } else if (token.getTokenType() == TOK_ELIF) {
             CommandNode cond = parseCompoundList();
-            skipLineBreaks();
+            allowLineBreaks();
             expectNext(TOK_THEN_BIT, RULE_1_CONTEXT);
             return new IfCommandNode(CMD_ELIF, cond, parseCompoundList(), parseOptElsePart());
         } else {
@@ -605,7 +612,7 @@ public class BjorneParser {
     
     private BjorneToken optNext(long expectedSet, int context) throws ShellSyntaxException {
         if (allowLineBreaks) {
-            doLineBreaks(false);
+            doLineBreaks(expectedSet, false);
         }
         BjorneToken token = tokens.next(context);
         if (expect(token, expectedSet, false)) {
@@ -617,6 +624,9 @@ public class BjorneParser {
     }
 
     private BjorneToken optNext(long expectedSet) throws ShellSyntaxException {
+        if (allowLineBreaks) {
+            doLineBreaks(expectedSet, false);
+        }
         BjorneToken token = next();
         if (expect(token, expectedSet, false)) {
             return token;
@@ -628,7 +638,7 @@ public class BjorneParser {
 
     private BjorneToken optPeek(long expectedSet, int context) throws ShellSyntaxException {
         if (allowLineBreaks) {
-            doLineBreaks(false);
+            doLineBreaks(expectedSet, false);
         }
         BjorneToken token = tokens.peek(context);
         return expect(token, expectedSet, false) ? token : null;
@@ -636,7 +646,7 @@ public class BjorneParser {
 
     private BjorneToken optPeek(long expectedSet) throws ShellSyntaxException {
         if (allowLineBreaks) {
-            doLineBreaks(false);
+            doLineBreaks(expectedSet, false);
         }
         BjorneToken token = tokens.peek();
         return expect(token, expectedSet, false) ? token : null;
@@ -644,7 +654,7 @@ public class BjorneParser {
 
     private BjorneToken expectNext(long expectedSet, int context) throws ShellSyntaxException {
         if (allowLineBreaks) {
-            doLineBreaks(true);
+            doLineBreaks(expectedSet, true);
         }
         BjorneToken token = tokens.next(context);
         expect(token, expectedSet, true);
@@ -653,7 +663,7 @@ public class BjorneParser {
 
     private BjorneToken expectNext(long expectedSet) throws ShellSyntaxException {
         if (allowLineBreaks) {
-            doLineBreaks(true);
+            doLineBreaks(expectedSet, true);
         }
         BjorneToken token = tokens.next();
         expect(token, expectedSet, true);
@@ -662,7 +672,7 @@ public class BjorneParser {
 
     private BjorneToken expectPeek(long expectedSet, int context) throws ShellSyntaxException {
         if (allowLineBreaks) {
-            doLineBreaks(true);
+            doLineBreaks(expectedSet, true);
         }
         BjorneToken token =  tokens.peek(context);
         expect(token, expectedSet, true);
@@ -677,21 +687,21 @@ public class BjorneParser {
     
     private BjorneToken next() throws IncompleteCommandException {
         if (allowLineBreaks) {
-            doLineBreaks(false);
+            doLineBreaks(0L, false);
         }
         return tokens.next();
     }
     
     private BjorneToken peek() throws IncompleteCommandException {
         if (allowLineBreaks) {
-            doLineBreaks(false);
+            doLineBreaks(0L, false);
         }
         return tokens.peek();
     }
     
     private BjorneToken peekEager() throws IncompleteCommandException {
         if (allowLineBreaks) {
-            doLineBreaks(true);
+            doLineBreaks(0L, true);
         }
         return tokens.peek();
     }
@@ -704,11 +714,11 @@ public class BjorneParser {
             if (mandatory) {
                 if (tt == TOK_END_OF_STREAM) {
                     throw new IncompleteCommandException(
-                            "EOF reached while looking for " + formatExpectedSet(expectedSet), 
+                            "EOF reached while looking for " + BjorneToken.formatExpectedSet(expectedSet), 
                             continuationPrompt);
                 } else {
                     throw new ShellSyntaxException(
-                            "expected " + formatExpectedSet(expectedSet) + " but got " + token);
+                            "expected " + BjorneToken.formatExpectedSet(expectedSet) + " but got " + token);
                 }
             } else {
                 return false;
@@ -722,65 +732,52 @@ public class BjorneParser {
         if (completer != null) {
             // Capture tokens and expectedSets for later use in determining what
             // completions to allow.
+            BjorneToken et = completer.getEndToken();
+            BjorneToken pt = completer.getPenultimateToken();
             int tt = token.getTokenType();
             if (tt == TOK_END_OF_STREAM) {
-                if (completer.getEndToken() == null) {
+                if (et == null) {
                     completer.setEndToken(token);
                     completer.setEndExpectedSet(expectedSet);
                 } else {
                     completer.addToEndExpectedSet(expectedSet);
                 }
             } else {
-                BjorneToken pt = completer.getPenultimateToken();
                 if (pt == null || pt.start < token.start) {
                     completer.setPenultimateToken(token);
-                    completer.setPenultimateExpectedSet(expectedSet);
+                    if (pt != null && pt.getTokenType() == TOK_END_OF_LINE) {
+                        completer.addToPenultimateExpectedSet(expectedSet);
+                    } else {
+                        completer.setPenultimateExpectedSet(expectedSet);
+                    }
                 } else {
                     completer.addToPenultimateExpectedSet(expectedSet);
                 }
             }
         }
     }
-
-    private String formatExpectedSet(long expectedSet) {
-        StringBuilder sb = new StringBuilder(40);
-        long mask = 1L;
-        for (int i = 0; i < 64 && expectedSet != 0L; i++) {
-            if ((expectedSet & mask) != 0) {
-                if (sb.length() > 0) {
-                    if (expectedSet != 0L) {
-                        sb.append(", ");
-                    } else {
-                        sb.append(" or ");
-                    }
-                }
-                sb.append(BjorneToken.toString(i));
-                expectedSet &= ~mask;
-            }
-            mask <<= 1;
-        }
-        return sb.toString();
-    }
-
+    
     private void skipLineBreaks() throws IncompleteCommandException {
         this.allowLineBreaks = true;
-        doLineBreaks(true);
+        doLineBreaks(0L, false);
     }
 
     private void allowLineBreaks() throws IncompleteCommandException {
         this.allowLineBreaks = true;
     }
 
-    private void doLineBreaks(boolean needMore) throws IncompleteCommandException {
+    private void doLineBreaks(long expectedSet, boolean needMore) throws IncompleteCommandException {
         // NB: use tokens.peek() / next() rather than the wrappers here!!
         this.allowLineBreaks = false;
         BjorneToken token = tokens.peek();
-        captureCompletions(token, TOK_END_OF_LINE_BIT);
         int tt = token.getTokenType();
-        if (needMore && tt == TOK_END_OF_STREAM) {
-            throw new IncompleteCommandException(
-                    "EOF reached while looking for optional linebreak(s)", 
-                    continuationPrompt);
+        if (tt == TOK_END_OF_STREAM) {
+            captureCompletions(token, expectedSet);
+            if (needMore) {
+                throw new IncompleteCommandException(
+                        "EOF reached while looking for optional linebreak(s)", 
+                        continuationPrompt);
+            } 
         } else if (tt == TOK_END_OF_LINE) {
             tokens.next();
             captureHereDocuments();
@@ -789,10 +786,13 @@ public class BjorneParser {
                 tt = token.getTokenType();
                 if (tt == TOK_END_OF_LINE) {
                     tokens.next();
-                } else if (needMore && tt == TOK_END_OF_STREAM) {
-                    throw new IncompleteCommandException(
-                            "EOF reached while looking for optional linebreak(s)", 
-                            continuationPrompt);
+                } else if (tt == TOK_END_OF_STREAM) {
+                    captureCompletions(token, expectedSet);
+                    if (needMore) {
+                        throw new IncompleteCommandException(
+                                "EOF reached while dealing with optional linebreak(s)", 
+                                continuationPrompt);
+                    }
                 } else {
                     break;
                 }
