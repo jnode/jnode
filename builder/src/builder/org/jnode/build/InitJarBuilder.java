@@ -293,7 +293,7 @@ public class InitJarBuilder extends AbstractPluginsTask {
             return this.pluginUrl;
         }
 
-        public boolean hasAllPrerequisitesInSet(Set ids) {
+        public boolean hasAllPrerequisitesInSet(Set<String> ids) {
             final PluginDescriptor descr = getDescriptor();
             final PluginPrerequisite[] prereqs = descr.getPrerequisites();
             for (int j = 0; j < prereqs.length; j++) {

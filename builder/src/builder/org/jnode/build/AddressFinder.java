@@ -116,7 +116,6 @@ public class AddressFinder {
             String line;
             long lastAddress = -1;
             String lastLabel = null;
-            String lastLine = null;
             while ((line = in.readLine()) != null) {
                 if (line.startsWith("$")) {
                     final int idx = line.indexOf('\t');
@@ -125,7 +124,6 @@ public class AddressFinder {
                     if (laddr <= address) {
                         lastAddress = laddr;
                         lastLabel = line.substring(idx + 1);
-                        lastLine = line;
                     } else {
                         break;
                     }

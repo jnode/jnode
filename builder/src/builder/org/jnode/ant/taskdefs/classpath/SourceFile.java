@@ -26,7 +26,7 @@ import java.io.File;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class SourceFile implements Comparable {
+final class SourceFile implements Comparable<Object> {
 
     private final File baseDir;
     private final String fileName;

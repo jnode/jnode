@@ -26,7 +26,7 @@ import java.io.File;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class PackageDirectory implements Comparable {
+public class PackageDirectory implements Comparable<Object> {
 
     private final File baseDir;
     private final String packageFileName;

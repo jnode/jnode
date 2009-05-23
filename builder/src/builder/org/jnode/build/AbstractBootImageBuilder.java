@@ -561,7 +561,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
             /* Set the bootclasses */
             log("prepare bootClassArray", Project.MSG_VERBOSE);
-            final VmType bootClasses[] = clsMgr.prepareAfterBootstrap();
+            final VmType<?> bootClasses[] = clsMgr.prepareAfterBootstrap();
             os.getObjectRef(bootClasses);
             emitObjects(os, arch, blockedObjects, false);
             // Twice, this is intended!
@@ -704,7 +704,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                         if (!(obj instanceof Label)) {
                             unresolvedFound++;
                             if (obj instanceof VmType) {
-                                final VmType<?> vmtObj = (VmType) obj;
+                                final VmType<?> vmtObj = (VmType<?>) obj;
                                 vmtObj.link();
                                 if (!vmtObj.isCompiled()) {
                                     compileClasses(os, arch);
@@ -787,7 +787,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     }
 
     protected abstract void emitStaticInitializerCalls(NativeStream os,
-                                                       VmType[] bootClasses, Object clInitCaller)
+                                                       VmType<?>[] bootClasses, Object clInitCaller)
         throws ClassNotFoundException;
 
     public final void execute() throws BuildException {
@@ -959,7 +959,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      */
     public final VmType<?> loadClass(Class<?> c) throws ClassNotFoundException {
         String name = c.getName();
-        VmType cls = clsMgr.findLoadedClass(name);
+        VmType<?> cls = clsMgr.findLoadedClass(name);
         if (cls != null) {
             return cls;
         } else if (c.isPrimitive()) {
@@ -997,7 +997,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @return The loaded class
      * @throws ClassNotFoundException
      */
-    public final VmType loadClass(String name)
+    public final VmType<?> loadClass(String name)
         throws ClassNotFoundException {
         return loadClass(name, true);
     }
@@ -1010,7 +1010,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @return The loaded class
      * @throws ClassNotFoundException
      */
-    public final VmType loadClass(String name, boolean resolve)
+    public final VmType<?> loadClass(String name, boolean resolve)
         throws ClassNotFoundException {
         /*
          * if (clsMgr == null) { clsMgr = new VmClassLoader(classesURL);
@@ -1089,7 +1089,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @throws BuildException
      * @throws UnresolvedObjectRefException
      */
-    protected final void printLabels(NativeStream os, VmType[] bootClasses,
+    protected final void printLabels(NativeStream os, VmType<?>[] bootClasses,
                                      VmSharedStatics statics) throws BuildException,
         UnresolvedObjectRefException {
         if (System.getProperty("bootimage.log") == null) {
@@ -1223,7 +1223,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @throws BuildException
      * @throws UnresolvedObjectRefException
      */
-    protected final void logLargeClasses(VmType[] bootClasses) {
+    protected final void logLargeClasses(VmType<?>[] bootClasses) {
         final Comparator<Long> reverseComp = Collections.reverseOrder();
         final TreeMap<Long, VmType<?>> sortedTypes = new TreeMap<Long, VmType<?>>(reverseComp);
         for (VmType<?> vmType : bootClasses) {
@@ -1244,7 +1244,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         int cnt = 1;
         log("Large classes:");
         for (Map.Entry<Long, VmType<?>> entry : sortedTypes.entrySet()) {
-            log("  " + entry.getValue().getName() + " " + NumberUtils.size(entry.getKey()));
+            log("  " + entry.getValue().getName() + " " + NumberUtils.toBinaryByte(entry.getKey()));
             if (++cnt > 10) {
                 return;
             }
@@ -1539,7 +1539,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             final String name = type.getName();
             final int cnt = type.getNoDeclaredFields();
             if ((cnt > 0) && !name.startsWith("java.")) {
-                final Class javaType = Class.forName(type.getName());
+                final Class<?> javaType = Class.forName(type.getName());
                 try {
                     final FieldInfo fieldInfo = emitter.getFieldInfo(javaType);
                     final Field[] jdkFields = fieldInfo.getJdkStaticFields();
@@ -1606,7 +1606,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 statics.setLong(idx, lval);
             } else {
                 final int ival;
-                final Class jfType = jf.getType();
+                final Class<?> jfType = jf.getType();
                 if (jfType == boolean.class) {
                     ival = ((Boolean) val).booleanValue() ? 1 : 0;
                 } else if (jfType == byte.class) {

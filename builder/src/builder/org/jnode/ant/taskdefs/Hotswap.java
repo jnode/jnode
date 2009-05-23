@@ -26,6 +26,8 @@ import com.sun.jdi.VirtualMachine;
 import com.sun.jdi.VirtualMachineManager;
 import com.sun.jdi.connect.AttachingConnector;
 import com.sun.jdi.connect.Connector;
+import com.sun.jdi.connect.Connector.Argument;
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -96,7 +98,7 @@ public class Hotswap extends MatchingTask {
     protected String host;
     protected String port;
     protected String name;
-    protected Vector filesets = new Vector();
+    protected Vector<FileSet> filesets = new Vector<FileSet>();
 
     private boolean useSocket = true;
 
@@ -215,7 +217,7 @@ public class Hotswap extends MatchingTask {
 
             // load classes and replace them on target VM
             for (int i = 0; i < filesets.size(); i++) {
-                FileSet fs = (FileSet) filesets.elementAt(i);
+                FileSet fs = filesets.elementAt(i);
                 try {
                     DirectoryScanner ds = fs.getDirectoryScanner(getProject());
                     String[] files = ds.getIncludedFiles();
@@ -348,11 +350,11 @@ class HotSwapHelper {
         boolean useSocket = (port != null);
 
         VirtualMachineManager manager = Bootstrap.virtualMachineManager();
-        List connectors = manager.attachingConnectors();
+        List<AttachingConnector> connectors = manager.attachingConnectors();
         AttachingConnector connector = null;
 //      System.err.println("Connectors available");
         for (int i = 0; i < connectors.size(); i++) {
-            AttachingConnector tmp = (AttachingConnector) connectors.get(i);
+            AttachingConnector tmp = connectors.get(i);
 //          System.err.println("conn "+i+"  name="+tmp.name()+" transport="+tmp.transport().name()+
 //          " description="+tmp.description());
             if (!useSocket && tmp.transport().name().equals("dt_shmem")) {
@@ -368,7 +370,7 @@ class HotSwapHelper {
             throw new IllegalStateException("Cannot find shared memory connector");
         }
 
-        Map args = connector.defaultArguments();
+        Map<String, Argument> args = connector.defaultArguments();
 //      Iterator iter = args.keySet().iterator();
 //      while (iter.hasNext()) {
 //          Object key = iter.next();
@@ -405,15 +407,15 @@ class HotSwapHelper {
         // load class(es)
         byte[] classBytes = loadClassFile(classFile);
         // redefine in JVM
-        List classes = vm.classesByName(className);
+        List<ReferenceType> classes = vm.classesByName(className);
 
         // if the class isn't loaded on the VM, can't do the replace.
         if (classes == null || classes.size() == 0)
             return;
 
         // for now, just grab the first ref.
-        ReferenceType refType = (ReferenceType) classes.get(0);
-        HashMap map = new HashMap();
+        ReferenceType refType = classes.get(0);
+        HashMap<ReferenceType, byte[]> map = new HashMap<ReferenceType, byte[]>();
         map.put(refType, classBytes);
         vm.redefineClasses(map);
 //      System.err.println("class replaced!");

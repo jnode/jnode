@@ -20,8 +20,10 @@
  
 package org.jnode.build;
 
-public class BuildException
-    extends org.apache.tools.ant.BuildException {
+public class BuildException extends org.apache.tools.ant.BuildException {
+    
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructor for BuildException.
      */
