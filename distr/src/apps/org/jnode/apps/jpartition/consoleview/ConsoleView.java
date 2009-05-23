@@ -21,13 +21,10 @@
 package org.jnode.apps.jpartition.consoleview;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.Context;
-import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.commands.framework.Command;
 import org.jnode.apps.jpartition.consoleview.components.Component;
 import org.jnode.apps.jpartition.consoleview.components.NumberField;

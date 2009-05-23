@@ -82,6 +82,7 @@ public class JPartitionTest extends TestSuite {
 */
         // DeviceUtils.createFakeDevice(new ErrorReporter());
         IDEDevice dev = DeviceUtils.createFileDevice(errorReporter);
+        @SuppressWarnings("unused")
         JGrub jgrub = new JGrub(new PrintWriter(new OutputStreamWriter(System.out)), dev);
         
 //        jgrub.install();

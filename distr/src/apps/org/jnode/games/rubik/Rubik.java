@@ -43,6 +43,9 @@ import javax.swing.SwingUtilities;
  *
  */
 public final class Rubik extends JComponent {
+    
+    private static final long serialVersionUID = 1L;
+    
     int i, j, k, n, o, p, q, lastX, lastY, dx, dy;
     int rectX[], rectY[];
     Color colList[], bgcolor;
@@ -183,7 +186,7 @@ public final class Rubik extends JComponent {
      * @return
      */
     public double vNorm(double v[], int ix) {
-        return m.sqrt(v[ix] * v[ix] + v[ix + 1] * v[ix + 1] + v[ix + 2] * v[ix + 2]);
+        return Math.sqrt(v[ix] * v[ix] + v[ix + 1] * v[ix + 1] + v[ix + 2] * v[ix + 2]);
     }
 
     /**
@@ -372,7 +375,7 @@ public final class Rubik extends JComponent {
             twisting = false;
             naturalState = true;
             for (i = 0; i < 20; i++)
-                colorTwist((int) (m.random() * 6), (int) (m.random() * 3 + 1));
+                colorTwist((int) (Math.random() * 6), (int) (Math.random() * 3 + 1));
             repaint();
         }
         return false;
@@ -422,7 +425,7 @@ public final class Rubik extends JComponent {
                 }
                 twisting = true;
                 phi = 0.02 * (currDragDir[0] * (x - lastX) + currDragDir[1] * (y - lastY)) /
-                    m.sqrt(currDragDir[0] * currDragDir[0] + currDragDir[1] * currDragDir[1]);
+                    Math.sqrt(currDragDir[0] * currDragDir[0] + currDragDir[1] * currDragDir[1]);
                 repaint();
                 return false;
             }
@@ -451,7 +454,7 @@ public final class Rubik extends JComponent {
         } else {
             // Twist, compute twisting angle phi
             phi = 0.02 * (currDragDir[0] * (x - lastX) + currDragDir[1] * (y - lastY)) /
-                m.sqrt(currDragDir[0] * currDragDir[0] + currDragDir[1] * currDragDir[1]);
+                Math.sqrt(currDragDir[0] * currDragDir[0] + currDragDir[1] * currDragDir[1]);
             repaint();
         }
         return false;
@@ -585,8 +588,8 @@ public final class Rubik extends JComponent {
         else {
             copyVec(eye, 0, Teye, 0); // In twisted state? Compute top observer
             copyVec(eX, 0, TeX, 0);
-            Cphi = m.cos(phi + phibase);
-            Sphi = -m.sin(phi + phibase);
+            Cphi = Math.cos(phi + phibase);
+            Sphi = -Math.sin(phi + phibase);
             // Twist around which axis?
             switch (twistSide) {
                 case 0: // z

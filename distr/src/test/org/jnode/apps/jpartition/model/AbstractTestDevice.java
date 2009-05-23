@@ -270,6 +270,7 @@ public abstract class AbstractTestDevice extends AbstractTest {
         for (Partition part : device.getPartitions()) {
             if (part.isUsed() == usedPartition) {
                 final long start = part.getStart();
+                @SuppressWarnings("unused")
                 final long end = part.getEnd();
                 final long size = part.getSize();
                 final boolean used = part.isUsed();

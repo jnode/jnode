@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
  * 
  */
 public class EntryArray {
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(EntryArray.class);
 
     private final int[] entries;

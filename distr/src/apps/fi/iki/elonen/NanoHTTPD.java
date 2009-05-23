@@ -97,7 +97,7 @@ public class NanoHTTPD {
     public Response serve(String uri, String method, Properties header, Properties parms) {
         System.out.println(method + " '" + uri + "' ");
 
-        Enumeration e = header.propertyNames();
+        Enumeration<?> e = header.propertyNames();
         while (e.hasMoreElements()) {
             String value = (String) e.nextElement();
             System.out.println("  HDR: '" + value + "' = '" +
@@ -266,6 +266,8 @@ public class NanoHTTPD {
      * and returns the response.
      */
     private class HTTPSession implements Runnable {
+        private Socket mySocket;
+        
         public HTTPSession(Socket s) {
             mySocket = s;
             Thread t = new Thread(this);
@@ -415,7 +417,7 @@ public class NanoHTTPD {
                     pw.print("Date: " + gmtFrmt.format(new Date()) + "\r\n");
 
                 if (header != null) {
-                    Enumeration e = header.keys();
+                    Enumeration<?> e = header.keys();
                     while (e.hasMoreElements()) {
                         String key = (String) e.nextElement();
                         String value = header.getProperty(key);
@@ -454,9 +456,6 @@ public class NanoHTTPD {
                 }
             }
         }
-
-        private Socket mySocket;
-        private BufferedReader myIn;
     }
 
 
@@ -619,7 +618,7 @@ public class NanoHTTPD {
     /**
      * Hashtable mapping (String)FILENAME_EXTENSION -> (String)MIME_TYPE.
      */
-    private static Hashtable theMimeTypes = new Hashtable();
+    private static Hashtable<String, String> theMimeTypes = new Hashtable<String, String>();
 
     static {
         StringTokenizer st = new StringTokenizer(

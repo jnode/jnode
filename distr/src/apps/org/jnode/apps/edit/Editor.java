@@ -75,18 +75,19 @@ public class Editor extends JFrame {
         panel.add(sp, BorderLayout.CENTER);
         directory = (String) AccessController.doPrivileged(new GetPropertyAction("user.dir"));
         if (file != null) {
-            Boolean exists = (Boolean) AccessController.doPrivileged(new PrivilegedAction() {
-                public Object run() {
+            Boolean exists = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                public Boolean run() {
                     return file.exists();
                 }
             });
 
-            if (exists)
+            if (exists) {
                 readFile(file);
-            else {
+            } else {
                 try {
                     file.createNewFile();
                 } catch (IOException e) {
+                    // FIXME ... this should no be squashed.
                     //empty
                 }
             }
@@ -178,7 +179,7 @@ public class Editor extends JFrame {
     }
 
     private void readFile(final File file) {
-        AccessController.doPrivileged(new PrivilegedAction() {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
                 try {
                     FileInputStream fis = new FileInputStream(file);
@@ -205,7 +206,7 @@ public class Editor extends JFrame {
     }
 
     private void writeFile(final File file) {
-        AccessController.doPrivileged(new PrivilegedAction() {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
                 try {
                     FileWriter fw = new FileWriter(file);

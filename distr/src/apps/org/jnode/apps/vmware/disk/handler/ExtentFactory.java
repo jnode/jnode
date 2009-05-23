@@ -34,6 +34,7 @@ import org.jnode.apps.vmware.disk.handler.sparse.SparseExtentFactory;
  * 
  */
 public abstract class ExtentFactory {
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(SparseExtentFactory.class);
 
     /**

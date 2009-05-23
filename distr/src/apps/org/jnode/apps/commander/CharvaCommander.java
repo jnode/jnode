@@ -322,6 +322,7 @@ public class CharvaCommander extends JFrame {
         f.delete();
     }
 
+    @SuppressWarnings("unused")
     private void notImplemented() {
         JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED!", null, JOptionPane.DEFAULT_OPTION);
         currentPane.requestFocus();

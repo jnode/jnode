@@ -38,7 +38,9 @@ import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.utils.device.DeviceUtils;
 import org.jnode.driver.bus.ide.IDEDevice;
 
+@SuppressWarnings("serial")
 public class FileDeviceView extends JFrame {
+    @SuppressWarnings("unused")
     private static final Logger log = Logger.getLogger(FileDeviceView.class);
 
     private final ErrorReporter errorReporter;

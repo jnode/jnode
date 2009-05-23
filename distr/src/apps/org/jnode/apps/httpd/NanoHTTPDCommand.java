@@ -46,7 +46,7 @@ public class NanoHTTPDCommand extends AbstractCommand {
             printWriter.close();
         }
 
-        NanoHTTPD nanoHTTPD = new NanoHTTPD(80) {
+        new NanoHTTPD(80) {
             public Response serve(String uri, String method, Properties header, Properties parms) {
                 return serveFile(uri, header, new File("/jnode"), true);
             }

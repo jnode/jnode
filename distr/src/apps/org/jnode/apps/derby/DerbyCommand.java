@@ -60,10 +60,12 @@ public class DerbyCommand extends AbstractCommand {
 
     public void execute()
         throws Exception {
+        @SuppressWarnings("unused")
         File home_dir = ARG_HOME.getValue();
         String command = FLAG_START.isSet() ? "start" : FLAG_STOP.isSet() ? "stop" : "?";
 
         // FIXME ... this needs to be passed to the server somehow.
+        @SuppressWarnings("unused")
         int port = ARG_PORT.isSet() ? ARG_PORT.getValue() : 1527;
 
         NetworkServerControlImpl server = new NetworkServerControlImpl();

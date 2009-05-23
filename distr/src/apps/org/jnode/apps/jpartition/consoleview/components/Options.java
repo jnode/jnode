@@ -22,7 +22,6 @@ package org.jnode.apps.jpartition.consoleview.components;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.jnode.apps.jpartition.Context;
@@ -40,7 +39,6 @@ public class Options extends Component {
         return show(question, Arrays.asList(options));
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T show(String question, List<T> options) throws IOException {
         return show(question, options, null);
     }

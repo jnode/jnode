@@ -37,6 +37,8 @@ import org.jnode.apps.jpartition.swingview.actions.RemovePartitionAction;
 import org.jnode.util.NumberUtils;
 
 public class PartitionView extends DiskAreaView<Partition> {
+    private static final long serialVersionUID = 1L;
+
     private final DeviceView deviceView;
 
     private PartitionState state = new IdleState();

@@ -30,6 +30,8 @@ import java.io.IOException;
  */
 public class UnsupportedFormatException extends IOException {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * 
      */

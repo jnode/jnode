@@ -88,8 +88,7 @@ public class TC extends JFrame {
                         if (o instanceof ObjectMethodPair) {
                             ObjectMethodPair omp = (ObjectMethodPair) o;
                             //TODO: support for methods that take arguments
-                            result = omp.getMethod().invoke(omp.getObject(),
-                                null);
+                            result = omp.getMethod().invoke(omp.getObject());
                         }
                     } catch (Exception ex) {
                         addResultItem(ex);
@@ -109,7 +108,7 @@ public class TC extends JFrame {
             resultPane = new ListPanel(75, 10) {
                 public void elementSelected(Object o) {
                     if (o != null) {
-                        final Vector newList = new Vector();
+                        final Vector<ListElement> newList = new Vector<ListElement>();
                         newList.addElement(new ListElement(o, getElementLabel(o)));
                         getRootObjectPanel().setList(newList);
                     }
@@ -124,10 +123,10 @@ public class TC extends JFrame {
     }
 
     protected void addResultItem(Object o) {
-//if(o!=null)System.out.println(o.toString());else System.out.println("NULL");
-        Vector resultList = getResultPane().getList();
-        if (resultList == null)
-            resultList = new Vector();
+        Vector<ListElement> resultList = getResultPane().getList();
+        if (resultList == null) {
+            resultList = new Vector<ListElement>();
+        }
         String label = (o == null) ? "null" : o.getClass().getName() + " [" + o.toString() + "]";
         resultList.addElement(new ListElement(o, label));
         getResultPane().setList(resultList);

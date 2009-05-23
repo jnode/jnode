@@ -60,9 +60,12 @@ public class SparseDiskFactory extends DiskFactory {
     protected File createMainFile(File directory, String name, long size) throws IOException {
         File mainFile = new File(directory, createDiskFileName(name, 0));
         RandomAccessFile raf = new RandomAccessFile(mainFile, "rw");
+        @SuppressWarnings("unused")
         FileChannel channel = raf.getChannel();
 
+        @SuppressWarnings("unused")
         Descriptor descriptor = buildDescriptor(mainFile, size);
+        @SuppressWarnings("unused")
         SparseExtentHeader header = new SparseExtentHeader();
 
         return mainFile;

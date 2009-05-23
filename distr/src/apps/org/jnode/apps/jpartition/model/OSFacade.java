@@ -43,6 +43,7 @@ import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 public class OSFacade {
     private static final Logger LOG = Logger.getLogger(OSFacade.class);
 
+    @SuppressWarnings("unused")
     private static Comparator<Partition> PARTITION_COMPARATOR = new Comparator<Partition>() {
         public int compare(Partition p1, Partition p2) {
             // we assume here that the partition doesn't intersect
@@ -197,6 +198,7 @@ public class OSFacade {
         return supported ? partitions : null;
     }
 
+    @SuppressWarnings("unused")
     private FileSystem<?> getFileSystem(org.jnode.driver.Device dev, PartitionTableEntry pte) {
         /*
          * DeviceManager devMan = InitialNaming.lookup(DeviceManager.NAME);
