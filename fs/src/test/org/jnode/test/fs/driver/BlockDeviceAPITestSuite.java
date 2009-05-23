@@ -22,6 +22,9 @@ package org.jnode.test.fs.driver;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.TestCase;
+
 import org.jnode.test.fs.driver.context.ByteArrayDeviceContext;
 import org.jnode.test.fs.driver.context.FileDeviceContext;
 import org.jnode.test.fs.driver.context.FloppyDriverContext;
@@ -79,13 +82,14 @@ public class BlockDeviceAPITestSuite extends AbstractTestSuite {
         return configs;
     }
 
-    protected BlockDeviceAPITestConfig addConfig(List<TestConfig> configs, Class contextClass) {
+    protected BlockDeviceAPITestConfig addConfig(List<TestConfig> configs, Class<?> contextClass) {
         BlockDeviceAPITestConfig cfg = new BlockDeviceAPITestConfig(contextClass);
         configs.add(cfg);
         return cfg;
     }
 
-    public Class[] getTestSuites() {
+    @SuppressWarnings("unchecked")
+    public Class<? extends TestCase>[] getTestSuites() {
         return new Class[]{BlockDeviceAPITest.class};
     }
 }

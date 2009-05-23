@@ -67,6 +67,7 @@ public class MockFloppyDeviceFactory extends AbstractMockDeviceFactory
     ////////////////////////////////////////////////////
 
     public FloppyDevice createDevice(FloppyControllerBus bus, int drive, FloppyDriveParameters dp) {
+        @SuppressWarnings("unused")
         MockInitializer initializer = new MockInitializer() {
             public void init(Mock mockFloppyDevice) {
 //                mockFloppyDevice.expects(testCase.atLeastOnce()).method("setDriver").withAnyArguments().will(
@@ -84,9 +85,9 @@ public class MockFloppyDeviceFactory extends AbstractMockDeviceFactory
 
         };
 
-        Class[] argCls = new Class[]{FloppyControllerBus.class, int.class, FloppyDriveParameters.class};
-        Object[] args = new Object[]{bus, new Integer(drive), dp};
-        //return (FloppyDevice) MockUtils.createMockObject(FloppyDevice.class, initializer, argCls, args);
+//        Class<?>[] argCls = new Class[]{FloppyControllerBus.class, int.class, FloppyDriveParameters.class};
+//        Object[] args = new Object[]{bus, new Integer(drive), dp};
+//        return (FloppyDevice) MockUtils.createMockObject(FloppyDevice.class, initializer, argCls, args);
         return new FloppyDevice(bus, drive, dp);
     }
 
@@ -131,7 +132,7 @@ public class MockFloppyDeviceFactory extends AbstractMockDeviceFactory
 
     public FloppyDriveParametersCommand createFloppyDriveParametersCommand(int drive, FloppyDriveParameters dp,
                                                                            FloppyParameters fp) {
-        Class[] argCls = new Class[]{int.class, FloppyDriveParameters.class, FloppyParameters.class};
+        Class<?>[] argCls = new Class[]{int.class, FloppyDriveParameters.class, FloppyParameters.class};
         Object[] args = new Object[]{new Integer(drive), dp, fp};
         MockInitializer initializer = new MockInitializer() {
             public void init(Mock mockCmd) {
@@ -146,7 +147,7 @@ public class MockFloppyDeviceFactory extends AbstractMockDeviceFactory
     }
 
     public FloppySeekCommand createFloppySeekCommand(int drive, int cylinder) {
-        Class[] argCls = new Class[]{int.class, int.class};
+        Class<?>[] argCls = new Class[]{int.class, int.class};
         Object[] args = new Object[]{new Integer(drive), new Integer(cylinder)};
         MockInitializer initializer = new MockInitializer() {
             public void init(Mock mockFloppyDevice) {
@@ -164,7 +165,7 @@ public class MockFloppyDeviceFactory extends AbstractMockDeviceFactory
     public FloppyReadSectorCommand createFloppyReadSectorCommand(int drive, Geometry geometry, CHS chs,
                                                                  int currentSectorSize, boolean b, int gap1Size,
                                                                  byte[] dest, int destOffset) {
-        Class[] argCls = new Class[]{int.class, Geometry.class, CHS.class, int.class, boolean.class, int.class,
+        Class<?>[] argCls = new Class[]{int.class, Geometry.class, CHS.class, int.class, boolean.class, int.class,
             byte[].class, int.class};
         Object[] args = new Object[]{new Integer(drive), geometry, chs, new Integer(currentSectorSize),
             Boolean.valueOf(b), new Integer(gap1Size), dest, new Integer(destOffset)};
@@ -183,7 +184,7 @@ public class MockFloppyDeviceFactory extends AbstractMockDeviceFactory
     public FloppyWriteSectorCommand createFloppyWriteSectorCommand(int drive, Geometry geometry, CHS chs,
                                                                    int currentSectorSize, boolean b, int gap1Size,
                                                                    byte[] src, int srcOffset) {
-        Class[] argCls = new Class[]{int.class, Geometry.class, CHS.class, int.class, boolean.class, int.class,
+        Class<?>[] argCls = new Class[]{int.class, Geometry.class, CHS.class, int.class, boolean.class, int.class,
             byte[].class, int.class};
         Object[] args = new Object[]{new Integer(drive), geometry, chs, new Integer(currentSectorSize),
             Boolean.valueOf(b), new Integer(gap1Size), src, new Integer(srcOffset)};
@@ -200,7 +201,7 @@ public class MockFloppyDeviceFactory extends AbstractMockDeviceFactory
     }
 
     public FloppyIdCommand createFloppyIdCommand(int drive) {
-        Class[] argCls = new Class[]{int.class};
+        Class<?>[] argCls = new Class[]{int.class};
         Object[] args = new Object[]{new Integer(drive)};
         MockInitializer initializer = new MockInitializer() {
             public void init(Mock mockCmd) {

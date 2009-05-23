@@ -31,18 +31,15 @@ import org.jnode.util.NumberUtils;
  * @author Fabien DUMINY
  */
 public class FileParam extends DeviceParam {
-    /**
-     *
-     *
-     */
+
+    private File file;
+    private long fileSize;
+    
     public FileParam(String fileName, String fileSize) {
         setFile(new File(fileName));
         setSize(fileSize);
     }
 
-    /**
-     *
-     */
     public Device createDevice() throws IOException {
         String mode = isInput() ? "r" : "rw";
         if (!isInput() && (fileSize > 0L) && (!file.exists() || (file.length() != fileSize)))
@@ -51,9 +48,6 @@ public class FileParam extends DeviceParam {
         return new FileDevice(file, mode);
     }
 
-    /**
-     *
-     */
     public long getDeviceSize() {
         return fileSize;
     }
@@ -72,21 +66,13 @@ public class FileParam extends DeviceParam {
         this.fileSize = NumberUtils.getSize(size);
     }
 
-    /**
-     *
-     */
     public void tearDown(Device device) {
         if (!isInput())
             file.delete();
     }
 
-    /**
-     *
-     */
     public String toString() {
-        return "File[" + file.getName() + ' ' + NumberUtils.size(fileSize) + "]";
+        return "File[" + file.getName() + ' ' + NumberUtils.toBinaryByte(fileSize) + "]";
     }
 
-    private File file;
-    private long fileSize;
 }

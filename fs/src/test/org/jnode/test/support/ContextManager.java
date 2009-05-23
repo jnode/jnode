@@ -131,7 +131,7 @@ public class ContextManager {
         return context;
     }
 
-    public void setContext(Class contextClass, TestConfig config, MockObjectTestCase testCase) throws Exception {
+    public void setContext(Class<?> contextClass, TestConfig config, MockObjectTestCase testCase) throws Exception {
         // first remove previous context
         clearContext();
 

@@ -89,6 +89,7 @@ public class IDEDiskDriver extends Driver
         final IDEDevice dev = (IDEDevice) getDevice();
         diskBus = new IDEDiskBus(dev);
         /* Register the IDEDevice API */
+        // FIXME - something is wrong with the typing here I think.  
         dev.registerAPI(PartitionableBlockDeviceAPI.class, new PartitionableBlockAlignmentSupport(this, SECTOR_SIZE));
         /* Get basic configuration */
         final IDEDriveDescriptor descr = dev.getDescriptor();

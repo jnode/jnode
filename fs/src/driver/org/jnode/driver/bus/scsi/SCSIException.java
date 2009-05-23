@@ -28,6 +28,8 @@ import java.io.IOException;
  */
 public class SCSIException extends IOException {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      *
      */

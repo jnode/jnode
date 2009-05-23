@@ -21,6 +21,8 @@
 package org.jnode.test.support;
 
 import java.util.List;
+
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.apache.log4j.Logger;
 
@@ -36,7 +38,7 @@ public abstract class AbstractTestSuite extends TestSuite {
      */
     public final void init() {
         List<TestConfig> configs = getConfigs();
-        Class[] testSuites = getTestSuites();
+        Class<? extends TestCase>[] testSuites = getTestSuites();
         log.info(configs.size() + " configs, " +
             testSuites.length + " TestSuites");
 
@@ -45,7 +47,7 @@ public abstract class AbstractTestSuite extends TestSuite {
         for (TestConfig cfg : configs) {
             cfgManager.addConfig(cfg);
 
-            for (Class cls : testSuites) {
+            for (Class<? extends TestCase> cls : testSuites) {
                 addTestSuite(cls);
             }
         }
@@ -59,7 +61,7 @@ public abstract class AbstractTestSuite extends TestSuite {
     /**
      * @return an array of TestSuite classes
      */
-    public abstract Class[] getTestSuites();
+    public abstract Class<? extends TestCase>[] getTestSuites();
 
     protected final Logger log = Logger.getLogger(getClass().getName());
 }

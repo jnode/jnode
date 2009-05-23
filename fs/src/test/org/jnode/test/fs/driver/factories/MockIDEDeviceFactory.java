@@ -65,7 +65,7 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory implements
             }
         };
 
-        Class[] argCls = new Class[]{Device.class, boolean.class};
+        Class<?>[] argCls = new Class[]{Device.class, boolean.class};
         Object[] args = new Object[]{parent, Boolean.valueOf(primary)};
 
         return (IDEBus) MockUtils.createMockObject(IDEBus.class, initializer,
@@ -118,7 +118,7 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory implements
             }
         };
 
-        Class[] argCls = new Class[]{byte[].class, int.class};
+        Class<?>[] argCls = new Class[]{byte[].class, int.class};
         Object[] args = new Object[]{new byte[IDEConstants.SECTOR_SIZE],
             new Integer(partNum)};
 
@@ -137,7 +137,6 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory implements
             return buffer.append("get partition entry");
         }
 
-        @SuppressWarnings("unchecked")
         public Object invoke(Invocation invocation) throws Throwable {
             int index = ((Integer) invocation.parameterValues.get(0))
                 .intValue();
@@ -165,7 +164,7 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory implements
             }
         };
 
-        Class[] argCls = new Class[]{byte[].class, Device.class};
+        Class<?>[] argCls = new Class[]{byte[].class, Device.class};
         Object[] args = new Object[]{bs, dev};
 
         return (IBMPartitionTable) MockUtils.createMockObject(

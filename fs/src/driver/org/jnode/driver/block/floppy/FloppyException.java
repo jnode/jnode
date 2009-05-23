@@ -25,6 +25,8 @@ package org.jnode.driver.block.floppy;
  */
 public class FloppyException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      *
      */

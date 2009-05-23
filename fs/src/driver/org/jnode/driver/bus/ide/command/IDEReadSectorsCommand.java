@@ -33,7 +33,6 @@ public class IDEReadSectorsCommand extends IDERWSectorsCommand {
     private final ByteBuffer buf;
 
     private int readSectors;
-    private static long total = 0;
 
     public IDEReadSectorsCommand(boolean primary, boolean master, long lbaStart, int sectors, ByteBuffer dest) {
         super(primary, master, lbaStart, sectors);
@@ -57,7 +56,7 @@ public class IDEReadSectorsCommand extends IDERWSectorsCommand {
             setError(io.getErrorReg());
         } else {
             if ((state & (ST_BUSY | ST_DEVICE_READY)) == ST_DEVICE_READY) {
-                final int offset = readSectors * SECTOR_SIZE;
+                // final int offset = readSectors * SECTOR_SIZE;
                 for (int i = 0; i < 256; i++) {
                     final int v = io.getDataReg();
                     buf.put((byte) (v & 0xFF));

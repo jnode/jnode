@@ -24,7 +24,7 @@ package org.jnode.test.support;
  * @author Fabien DUMINY
  */
 public interface TestConfig {
-    public Class getContextClass();
+    public Class<?> getContextClass();
 
     /**
      *

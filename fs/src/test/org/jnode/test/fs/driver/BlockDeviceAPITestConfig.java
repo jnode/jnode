@@ -41,7 +41,7 @@ public class BlockDeviceAPITestConfig implements TestConfig {
 
     private final List<Partition> partitions = new ArrayList<Partition>();
 
-    public BlockDeviceAPITestConfig(Class contextClass) {
+    public BlockDeviceAPITestConfig(Class<?> contextClass) {
         this.contextClass = contextClass;
     }
 
@@ -50,8 +50,7 @@ public class BlockDeviceAPITestConfig implements TestConfig {
     }
 
     public Partition[] getPartitions() {
-        return partitions
-            .toArray(new Partition[partitions.size()]);
+        return partitions.toArray(new Partition[partitions.size()]);
     }
 
     /**

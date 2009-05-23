@@ -388,10 +388,8 @@ public class DefaultIDEIO implements IDEIO {
                                   final ResourceOwner owner, final int low, final int length)
         throws ResourceNotFreeException, DriverException {
         try {
-            return (IOResource) AccessControllerUtils
-                .doPrivileged(new PrivilegedExceptionAction() {
-
-                    public Object run() throws ResourceNotFreeException {
+            return AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction<IOResource>() {
+                    public IOResource run() throws ResourceNotFreeException {
                         return rm.claimIOResource(owner, low, length);
                     }
                 });

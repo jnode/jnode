@@ -68,7 +68,7 @@ public class NTFSUnitTest extends TestCase {
         try {
             File file = new File(TEST_IMAGE_FILENAME_1);
             Device device = new FileDevice(file, "r");
-            FileSystem fileSystem = new NTFSFileSystemType().create(device, true);
+            FileSystem<?> fileSystem = new NTFSFileSystemType().create(device, true);
             FSDirectory root = fileSystem.getRootEntry().getDirectory();
 
             // Check the big file.  Every byte should be readable as zero, hopefully.
@@ -109,7 +109,7 @@ public class NTFSUnitTest extends TestCase {
         try {
             File file = new File(TEST_IMAGE_FILENAME_2);
             Device device = new FileDevice(file, "r");
-            FileSystem fileSystem = new NTFSFileSystemType().create(device, true);
+            FileSystem<?> fileSystem = new NTFSFileSystemType().create(device, true);
             FSDirectory root = fileSystem.getRootEntry().getDirectory();
 
             // The first file has 256 bytes of real data at the front, and the rest is sparse.

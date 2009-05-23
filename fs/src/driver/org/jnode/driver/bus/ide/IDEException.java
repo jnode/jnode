@@ -25,6 +25,8 @@ package org.jnode.driver.bus.ide;
  */
 public class IDEException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      *
      */
