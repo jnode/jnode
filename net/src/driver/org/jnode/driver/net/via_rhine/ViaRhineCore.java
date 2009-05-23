@@ -576,9 +576,7 @@ class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
 
     void probe() {
         int options = -1;
-        int did_version = 0;    /* Already printed version info. */
         int i;
-        int timeout;
         int FDXFlag;
         int byMIIvalue, LineSpeed, MIICRbak;
 
@@ -719,6 +717,7 @@ class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
         return io.inPortWord(ioBase + reg);
     }
 
+    @SuppressWarnings("unused")
     private int getReg32(int reg) {
         return io.inPortDword(ioBase + reg);
     }

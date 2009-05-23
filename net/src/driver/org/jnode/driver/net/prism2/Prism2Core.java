@@ -117,6 +117,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
     /**
      * Current link status
      */
+    @SuppressWarnings("unused")
     private LinkStatus linkStatus = NOTCONNECTED;
 
     /**
@@ -344,6 +345,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      * @return The 32-bit value.
      * @throws DriverException
      */
+    @SuppressWarnings("unused")
     private final int getConfig32(RecordID rid) throws DriverException {
         final byte[] arr = new byte[4];
         getConfig(rid, arr, 0, 4);
@@ -476,6 +478,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      * @param value
      * @throws DriverException
      */
+    @SuppressWarnings("unused")
     private final void setConfig32(RecordID rid, int value) throws DriverException {
         final byte[] arr = new byte[4];
         LittleEndian.setInt32(arr, 0, value);

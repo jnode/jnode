@@ -27,13 +27,14 @@ import org.jnode.system.ResourceManager;
  */
 abstract class ViaRhineRing<T extends ViaRhineDesc> {
     final int RING_SIZE;
-    ViaRhineDesc[] ring;
+    T[] ring;
     int ringAddr;
     int current;
 
+    @SuppressWarnings("unchecked")
     ViaRhineRing(ResourceManager rm, int size) {
         this.RING_SIZE = size;
-        ring = new ViaRhineDesc[RING_SIZE];
+        ring = (T[]) new ViaRhineDesc[RING_SIZE];
         for (int i = 0; i < RING_SIZE; i++) {
             ring[i] = createDescr(rm);
             if (i == 0)
@@ -46,7 +47,7 @@ abstract class ViaRhineRing<T extends ViaRhineDesc> {
         ring[RING_SIZE - 1].setNextDescAddr(ringAddr);
     }
 
-    abstract ViaRhineDesc createDescr(ResourceManager rm);
+    abstract T createDescr(ResourceManager rm);
 
     T currentDesc() {
         return (T) ring[current];

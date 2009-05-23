@@ -27,6 +27,8 @@ import java.net.SocketException;
  */
 public class NetworkException extends SocketException {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      *
      */

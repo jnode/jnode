@@ -101,9 +101,13 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
      */
     private EEPRO100Buffer buffers;
  
+    @SuppressWarnings("unused")
     private int phy[]; 
+    @SuppressWarnings("unused")
     private int eeReadCmd; 
+    @SuppressWarnings("unused")
     private int eeSize; 
+    @SuppressWarnings("unused")
     private int eeAddress;
 
     /**

@@ -48,6 +48,7 @@ public class NFS2OutputStream extends OutputStream {
     private NFS2Client nfsClient;
     private String mountDirectory;
     private byte[] fileHandle;
+    @SuppressWarnings("unused")
     private FileAttribute fileAttribute;
     private long fileOffset;
     private byte[] buffer;

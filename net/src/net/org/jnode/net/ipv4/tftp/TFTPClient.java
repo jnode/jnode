@@ -59,7 +59,6 @@ public class TFTPClient extends org.apache.commons.net.tftp.TFTPClient {
         this.out = out;
     }
 
-    @SuppressWarnings("deprecation")
     public void run(Reader in) throws IOException {
         // FIXME ... figure out to how to use JNode command argument parsing
         // (and completion) for our little TFTP interactive command syntax. 
