@@ -44,7 +44,7 @@ public class IDETest {
         final String name = (args.length > 0) ? args[0] : "hda";
 
         IDEDevice dev = (IDEDevice) dm.getDevice(name);
-        IDEDeviceAPI api = dev.getAPI(IDEDeviceAPI.class);
+        IDEDeviceAPI<?> api = dev.getAPI(IDEDeviceAPI.class);
         IDEDriveDescriptor descr = dev.getDescriptor();
 
         System.out.println("LBA support   : " + descr.supportsLBA());

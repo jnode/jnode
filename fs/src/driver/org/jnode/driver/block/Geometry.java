@@ -20,7 +20,6 @@
  
 package org.jnode.driver.block;
 
-import java.io.IOException;
 
 /**
  * @author epr
@@ -142,17 +141,5 @@ public class Geometry {
             }
         }
         return new CHS(c, h, s);
-    }
-
-    public static class GeometryException extends IOException {
-
-        public GeometryException(String message) {
-            super(message);
-        }
-
-        public GeometryException(String message, Throwable t) {
-            super(message);
-            initCause(t);
-        }
     }
 }

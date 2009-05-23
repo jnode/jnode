@@ -36,11 +36,11 @@ public class CGLibCoreMockExt extends AbstractDynamicMock {
 
     private Object proxy = null;
 
-    public CGLibCoreMockExt(Class mockedClass, String name) {
+    public CGLibCoreMockExt(Class<?> mockedClass, String name) {
         super(mockedClass, name);
     }
 
-    public CGLibCoreMockExt(Class mockedClass, String name,
+    public CGLibCoreMockExt(Class<?> mockedClass, String name,
                             InvocationDispatcher invocationDispatcher) {
         super(mockedClass, name, invocationDispatcher);
     }
@@ -49,7 +49,7 @@ public class CGLibCoreMockExt extends AbstractDynamicMock {
         return getMockedType().getClassLoader();
     }
 
-    protected Enhancer createEnhancer(Class mockedClass) {
+    protected Enhancer createEnhancer(Class<?> mockedClass) {
         Enhancer enhancer = new Enhancer();
         enhancer.setClassLoader(getClassLoader());
         enhancer.setSuperclass(mockedClass);
@@ -65,7 +65,7 @@ public class CGLibCoreMockExt extends AbstractDynamicMock {
         return createProxy(new Class[0], new Object[0]);
     }
 
-    public Object createProxy(Class[] argumentTypes, Object[] arguments) {
+    public Object createProxy(Class<?>[] argumentTypes, Object[] arguments) {
         checkProxyCreationIsSupported();
         proxy = createEnhancer(getMockedType())
             .create(argumentTypes, arguments);

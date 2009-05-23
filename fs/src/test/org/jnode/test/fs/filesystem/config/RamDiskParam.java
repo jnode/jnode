@@ -27,10 +27,7 @@ import org.jnode.util.NumberUtils;
  * @author Fabien DUMINY
  */
 public class RamDiskParam extends JNodeDeviceParam {
-    /**
-     *
-     *
-     */
+    
     public RamDiskParam() {
     }
 
@@ -41,18 +38,12 @@ public class RamDiskParam extends JNodeDeviceParam {
         ramdiskSize = NumberUtils.getSize(size);
     }
 
-    /**
-     *
-     */
     public long getSize() {
         return ramdiskSize;
     }
 
-    /**
-     *
-     */
     public String toString() {
-        return "Ramdisk[" + getDeviceName() + ' ' + NumberUtils.size(ramdiskSize) + "]";
+        return "Ramdisk[" + getDeviceName() + ' ' + NumberUtils.toDecimalByte(ramdiskSize) + "]";
     }
 
     private long ramdiskSize;

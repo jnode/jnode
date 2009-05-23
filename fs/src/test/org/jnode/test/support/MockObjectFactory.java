@@ -84,7 +84,7 @@ public class MockObjectFactory {
             }
         };
 
-        Class[] clsArgs = {int[].class, boolean.class};
+        Class<?>[] clsArgs = {int[].class, boolean.class};
         Object[] args = {data, atapi};
         IDEDriveDescriptor desc = (IDEDriveDescriptor)
             MockUtils.createMockObject(IDEDriveDescriptor.class,
@@ -110,7 +110,7 @@ public class MockObjectFactory {
     }
 
     public static Device createParentDevice() {
-        Class[] clsArgs = new Class[]{Bus.class, String.class};
+        Class<?>[] clsArgs = new Class[]{Bus.class, String.class};
         Object[] args = new Object[]{StubDeviceManager.INSTANCE.getSystemBus(), "MockDevice"};
         return (Device) MockUtils.createMockObject(Device.class, clsArgs, args);
     }

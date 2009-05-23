@@ -25,7 +25,7 @@ import java.nio.ByteBuffer;
 
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.Geometry;
-import org.jnode.driver.block.Geometry.GeometryException;
+import org.jnode.driver.block.GeometryException;
 import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTypes;

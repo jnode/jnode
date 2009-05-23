@@ -67,7 +67,7 @@ public abstract class AbstractFSTest extends TestCase {
     //public static final int FILE_SIZE_IN_WORDS = 256 * 1024; // 512 Ko = 256 K Words
     public static final int FILE_SIZE_IN_WORDS = 128; // 512 Ko = 128 K Words
 
-    private FileSystem fs;
+    private FileSystem<?> fs;
     protected FSTestConfig config;
     private Device device;
 
@@ -148,7 +148,7 @@ public abstract class AbstractFSTest extends TestCase {
     /**
      * @return Returns the fs.
      */
-    protected final FileSystem getFs() {
+    protected final FileSystem<?> getFs() {
         return fs;
     }
 

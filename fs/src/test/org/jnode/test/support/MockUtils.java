@@ -42,11 +42,11 @@ public class MockUtils {
         return name.cast(mock.proxy());
     }
 
-    public static Object createMockObject(Class name, Class[] clsArgs, Object[] args) {
+    public static Object createMockObject(Class<?> name, Class<?>[] clsArgs, Object[] args) {
         return createMockObject(name, null, clsArgs, args);
     }
 
-    public static Object createMockObject(Class name, MockInitializer initializer, Class[] clsArgs, Object[] args) {
+    public static Object createMockObject(Class<?> name, MockInitializer initializer, Class<?>[] clsArgs, Object[] args) {
         String shortName = getShortName(name);
         CGLibCoreMockExt cglibMock = new CGLibCoreMockExt(name, shortName);
         Mock mock = new Mock(cglibMock);

@@ -23,7 +23,6 @@ package org.jnode.driver.block.usb.storage.scsi;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
-import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
@@ -47,11 +46,6 @@ import org.jnode.util.TimeoutException;
 
 public class USBStorageSCSIDriver extends Driver
     implements FSBlockDeviceAPI, RemovableDeviceAPI, SCSIHostControllerAPI, USBPipeListener, USBStorageConstants {
-
-    /**
-     * My logger
-     */
-    private static final Logger log = Logger.getLogger(USBStorageSCSIDriver.class);
 
     /** */
     private final FSBlockAlignmentSupport blockAlignment;

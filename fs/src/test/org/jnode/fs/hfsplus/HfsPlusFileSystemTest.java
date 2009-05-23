@@ -62,9 +62,9 @@ public class HfsPlusFileSystemTest extends TestCase {
             HfsPlusFileSystem fs = new HfsPlusFileSystem(device, false, type);
             HFSPlusParams params = new HFSPlusParams();
             params.setVolumeName("testdrive");
-            params.setBlockSize(params.OPTIMAL_BLOCK_SIZE);
+            params.setBlockSize(HFSPlusParams.OPTIMAL_BLOCK_SIZE);
             params.setJournaled(false);
-            params.setJournalSize(params.DEFAULT_JOURNAL_SIZE);
+            params.setJournalSize(HFSPlusParams.DEFAULT_JOURNAL_SIZE);
             fs.create(params);
         } catch (Exception e) {
             e.printStackTrace();
@@ -79,6 +79,7 @@ public class HfsPlusFileSystemTest extends TestCase {
                     false);
             fs.read();
             fs.createRootEntry();
+            @SuppressWarnings("unused")
             FSDirectory root = fs.getRootEntry().getDirectory();
         } catch (FileNotFoundException e) {
             e.printStackTrace();

@@ -28,11 +28,11 @@ import org.jmock.cglib.MockObjectTestCase;
  */
 public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
     private TestConfig testConfig;
-    private Class configClazz;
+    private Class<?> configClazz;
 
     protected final Logger log;
 
-    public AbstractTest(Class configClazz) {
+    public AbstractTest(Class<?> configClazz) {
         super();
         init(configClazz, null);
         log = Logger.getLogger(getTestName());
@@ -41,13 +41,13 @@ public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
     /**
      *
      */
-    protected AbstractTest(Class configClazz, String name) {
+    protected AbstractTest(Class<?> configClazz, String name) {
         super();
         init(configClazz, name);
         log = Logger.getLogger(getTestName());
     }
 
-    protected void init(Class configClazz, String name) {
+    protected void init(Class<?> configClazz, String name) {
         setName(name);
         ContextManager.getInstance().init();
         this.configClazz = configClazz;
@@ -64,7 +64,7 @@ public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
             log.warn("NO CONFIGURATION");
             ContextManager.getInstance().clearContext();
         } else {
-            Class contextClass = tc.getContextClass();
+            Class<?> contextClass = tc.getContextClass();
             if (!Context.class.isAssignableFrom(contextClass))
                 throw new IllegalArgumentException(
                     "contextClass(" + contextClass.getName() + ") must implements Context");

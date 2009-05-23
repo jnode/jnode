@@ -54,7 +54,7 @@ public class FSTestConfig {
     /**
      * @return
      */
-    public Class<? extends FileSystem> getFsClass() {
+    public Class<? extends FileSystem<?>> getFsClass() {
         return fs.getType().getFsClass();
     }
 

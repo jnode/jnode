@@ -32,9 +32,8 @@ public class ConfigManager {
     private static final Logger log = Logger.getLogger(ConfigManager.class);
 
     private static ConfigManager instance;
-    private static boolean log4jInitialized = false;
 
-    private Map<Class, List<TestConfig>> configs;
+    private Map<Class<?>, List<TestConfig>> configs;
     private Map<TestKey, Iterator<TestConfig>> iterators;
 
     public static ConfigManager getInstance() {
@@ -55,7 +54,7 @@ public class ConfigManager {
         cfgs.add(config);
     }
 
-    public TestConfig getConfig(Class configClazz, Class clazz, String testName) {
+    public TestConfig getConfig(Class<?> configClazz, Class<?> clazz, String testName) {
         TestKey key = new TestKey(clazz, testName);
 
         synchronized (iterators) {
@@ -72,16 +71,16 @@ public class ConfigManager {
     }
 
     private ConfigManager() {
-        configs = new HashMap<Class, List<TestConfig>>();
+        configs = new HashMap<Class<?>, List<TestConfig>>();
         iterators = new HashMap<TestKey, Iterator<TestConfig>>();
         ContextManager.getInstance().init();
     }
 
     private static class TestKey {
-        private Class clazz;
+        private Class<?> clazz;
         private String testName;
 
-        public TestKey(Class clazz, String testName) {
+        public TestKey(Class<?> clazz, String testName) {
             this.clazz = clazz;
             this.testName = testName;
         }

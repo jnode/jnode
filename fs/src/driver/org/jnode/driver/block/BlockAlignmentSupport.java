@@ -22,7 +22,6 @@ package org.jnode.driver.block;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import org.apache.log4j.Logger;
 import org.jnode.util.ByteBufferUtils;
 
 /**
@@ -234,10 +233,6 @@ import org.jnode.util.ByteBufferUtils;
  *         gvt
  */
 public class BlockAlignmentSupport implements BlockDeviceAPI {
-    /**
-     * My logger
-     */
-    private static final Logger log = Logger.getLogger(BlockAlignmentSupport.class);
 
     private static final int EMPTY = 0;
     private static final int CONTAINED = 1;
@@ -246,7 +241,6 @@ public class BlockAlignmentSupport implements BlockDeviceAPI {
 
     private final BlockDeviceAPI parentApi;
     private int alignment;
-    private boolean dolog = false;
 
 
     /**
@@ -261,11 +255,6 @@ public class BlockAlignmentSupport implements BlockDeviceAPI {
         if (alignment <= 0) {
             throw new IllegalArgumentException("alignment <= 0");
         }
-    }
-
-
-    private void mylog(String msg) {
-        log.debug(msg);
     }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: Geometry.java 4975 2009-02-02 08:30:52Z lsantha $
  *
  * Copyright (C) 2003-2009 JNode.org
  *
@@ -17,36 +17,24 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-package org.jnode.test.fs;
+package org.jnode.driver.block;
 
-import junit.framework.TestCase;
-import org.jnode.driver.block.CHS;
-import org.jnode.driver.block.Geometry;
-import org.jnode.driver.block.GeometryException;
+import java.io.IOException;
 
 /**
+ * 
  * @author epr
  */
-public class GeometryTest extends TestCase {
+public class GeometryException extends IOException {
 
-    /**
-     * Constructor for GeometryTest.
-     *
-     * @param arg0
-     */
-    public GeometryTest(String arg0) {
-        super(arg0);
+    private static final long serialVersionUID = 1L;
+
+    public GeometryException(String message) {
+        super(message);
     }
 
-    public void testLogSec2CHS() throws GeometryException {
-        Geometry geom = new Geometry(64, 8, 40);
-        long max = geom.getTotalSectors();
-        for (long logSec = 0; logSec < max; logSec++) {
-            CHS chs = geom.getCHS(logSec);
-            //System.out.println("logSec=" + logSec + ", chs=" + chs);
-            assertEquals("logSec=" + logSec, logSec, geom.getLogicalSector(chs));
-        }
+    public GeometryException(String message, Throwable t) {
+        super(message);
+        initCause(t);
     }
-
 }
