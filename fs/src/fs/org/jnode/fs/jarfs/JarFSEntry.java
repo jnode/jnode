@@ -110,7 +110,7 @@ public final class JarFSEntry implements FSEntry {
         return true;
     }
 
-    public FileSystem getFileSystem() {
+    public FileSystem<?> getFileSystem() {
         return fs;
     }
 }

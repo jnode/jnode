@@ -112,6 +112,7 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
     public Iterator<? extends NFS2Entry> iterator() throws IOException {
         final NFS2Client nfsClient = getNFS2Client();
 
+        @SuppressWarnings("unused")
         FileAttribute fileAttribute;
         try {
             fileAttribute =

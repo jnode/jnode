@@ -33,7 +33,7 @@ import org.jnode.fs.FileSystem;
  */
 public abstract class AbstractFSObject implements FSObject {
 
-    private AbstractFileSystem fileSystem;
+    private AbstractFileSystem<?> fileSystem;
 
     private boolean valid;
     private boolean dirty;
@@ -47,7 +47,7 @@ public abstract class AbstractFSObject implements FSObject {
      * 
      * @param fs
      */
-    public AbstractFSObject(AbstractFileSystem fs) {
+    public AbstractFSObject(AbstractFileSystem<?> fs) {
         this.fileSystem = fs;
         this.valid = true;
         this.dirty = false;
@@ -111,7 +111,7 @@ public abstract class AbstractFSObject implements FSObject {
      * 
      * @return the FileSystem this object belongs to
      */
-    public final FileSystem getFileSystem() {
+    public final FileSystem<?> getFileSystem() {
         return fileSystem;
     }
 

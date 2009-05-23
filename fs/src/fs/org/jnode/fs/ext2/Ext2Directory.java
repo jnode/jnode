@@ -47,8 +47,7 @@ public class Ext2Directory extends AbstractFSDirectory {
     private final Logger log = Logger.getLogger(getClass());
 
     /**
-     * @param entry
-     *            the Ext2Entry representing this directory
+     * @param entry the Ext2Entry representing this directory
      */
     public Ext2Directory(Ext2Entry entry) throws IOException {
         super((Ext2FileSystem) entry.getFileSystem());
@@ -427,7 +426,7 @@ public class Ext2Directory extends AbstractFSDirectory {
             entries.add(entry);
         }
 
-        FSEntryTable table = new FSEntryTable((AbstractFileSystem) getFileSystem(), entries);
+        FSEntryTable table = new FSEntryTable((AbstractFileSystem<?>) getFileSystem(), entries);
 
         return table;
     }

@@ -33,7 +33,7 @@ import org.jnode.partitions.PartitionTableType;
  */
 public class IBMPartitionTableType implements PartitionTableType {
 
-    public PartitionTable create(byte[] firstSector, Device device) throws PartitionTableException {
+    public PartitionTable<?> create(byte[] firstSector, Device device) throws PartitionTableException {
         return new IBMPartitionTable(this, firstSector, device);
     }
 

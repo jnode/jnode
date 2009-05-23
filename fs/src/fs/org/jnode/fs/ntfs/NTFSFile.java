@@ -99,7 +99,7 @@ public class NTFSFile implements FSFile {
      * 
      * @see org.jnode.fs.FSObject#getFileSystem()
      */
-    public FileSystem getFileSystem() {
+    public FileSystem<?> getFileSystem() {
         // TODO Auto-generated method stub
         return null;
     }

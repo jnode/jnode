@@ -169,7 +169,7 @@ class LfnEntry implements FSEntry {
         return realEntry.isValid();
     }
 
-    public FileSystem getFileSystem() {
+    public FileSystem<?> getFileSystem() {
         return realEntry.getFileSystem();
     }
 

@@ -24,6 +24,8 @@ import java.io.IOException;
 
 public class FileSystemFullException extends IOException {
     
+    private static final long serialVersionUID = 1L;
+
     public FileSystemFullException(String message) {
         super(message);
     }

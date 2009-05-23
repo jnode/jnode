@@ -32,6 +32,7 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
 
     private final byte[] bs;
     private final int ofs;
+    @SuppressWarnings("unused")
     private final IBMPartitionTable parent;
 
     public IBMPartitionTableEntry(IBMPartitionTable parent, byte[] bs, int partNr) {

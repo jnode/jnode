@@ -32,12 +32,10 @@ import java.nio.charset.CharacterCodingException;
  * @author gvt
  */
 public class CodePageEncoder {
-    private final Charset cs;
     private final CharsetEncoder encoder;
     private boolean lossy;
 
     protected CodePageEncoder(Charset cs) {
-        this.cs = cs;
         this.encoder = cs.newEncoder();
         reset();
     }

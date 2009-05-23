@@ -171,7 +171,7 @@ public class NTFSEntry implements FSEntry {
     /**
      * @see org.jnode.fs.FSObject#getFileSystem()
      */
-    public FileSystem getFileSystem() {
+    public FileSystem<?> getFileSystem() {
         return fs;
     }
 

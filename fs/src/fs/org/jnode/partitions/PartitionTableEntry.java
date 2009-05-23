@@ -42,6 +42,6 @@ public interface PartitionTableEntry {
      * 
      * @return null of {{@link #hasChildPartitionTable()} is false.
      */
-    public PartitionTable getChildPartitionTable();
+    public PartitionTable<?> getChildPartitionTable();
 
 }

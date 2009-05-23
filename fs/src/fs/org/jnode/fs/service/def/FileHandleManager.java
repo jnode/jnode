@@ -98,6 +98,7 @@ final class FileHandleManager {
     class FileData {
 
         /** My logger */
+        @SuppressWarnings("unused")
         private final Logger fdLog = Logger.getLogger(getClass());
         /** The actual file */
         private final FSFile file;

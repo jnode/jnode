@@ -83,7 +83,7 @@ public abstract class AbstractFSEntry extends AbstractFSObject implements FSEntr
      * 
      * @param fs
      */
-    public AbstractFSEntry(AbstractFileSystem fs) {
+    public AbstractFSEntry(AbstractFileSystem<?> fs) {
         // parent and table are null for a root
         this(fs, null, null, "/", ROOT_ENTRY);
     }
@@ -97,7 +97,7 @@ public abstract class AbstractFSEntry extends AbstractFSObject implements FSEntr
      * @param name
      * @param type
      */
-    public AbstractFSEntry(AbstractFileSystem fs, FSEntryTable table, FSDirectory parent,
+    public AbstractFSEntry(AbstractFileSystem<?> fs, FSEntryTable table, FSDirectory parent,
             String name, int type) {
         super(fs);
         if ((type <= FIRST_ENTRY) || (type >= LAST_ENTRY))

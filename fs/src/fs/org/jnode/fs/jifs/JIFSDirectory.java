@@ -100,7 +100,7 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
         return false;
     }
 
-    public FileSystem getFileSystem() {
+    public FileSystem<?> getFileSystem() {
         // TODO
         return null;
     }

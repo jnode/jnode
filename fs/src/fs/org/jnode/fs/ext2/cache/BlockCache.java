@@ -31,6 +31,8 @@ import org.apache.log4j.Logger;
  * @author Andras Nagy
  */
 public final class BlockCache extends LinkedHashMap<Object, Block> {
+    private static final long serialVersionUID = 1L;
+
     // at most MAX_SIZE blocks fit in the cache
     static final int MAX_SIZE = 10;
 

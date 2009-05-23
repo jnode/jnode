@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.jnode.fs.FSFile;
-import org.jnode.net.nfs.nfs2.FileAttribute;
 import org.jnode.net.nfs.nfs2.NFS2Client;
 import org.jnode.net.nfs.nfs2.NFS2Exception;
 import org.jnode.net.nfs.nfs2.ReadFileResult;
@@ -125,8 +124,7 @@ public class NFS2File extends NFS2Object implements FSFile {
             while (src.remaining() > 0) {
                 count = Math.min(NFS2Client.MAX_DATA, src.remaining());
                 src.get(data, 0, count);
-                FileAttribute fileAttribute =
-                        client.writeFile(entry.getFileHandle(), (int) fileOffset, data, 0, count);
+                client.writeFile(entry.getFileHandle(), (int) fileOffset, data, 0, count);
                 fileOffset += count;
             }
         } catch (NFS2Exception e) {

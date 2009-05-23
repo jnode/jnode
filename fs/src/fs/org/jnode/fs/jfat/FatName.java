@@ -47,6 +47,7 @@ public class FatName {
         '"', '*', '+', ',', '/', ':', ';', '<', '=', '>', '?', '[', '\\', ']', '|'};
 
     private final FatDirectory parent;
+    @SuppressWarnings("unused")
     private final String name;
     private final CodePageEncoder encoder;
     private final CodePageDecoder decoder;

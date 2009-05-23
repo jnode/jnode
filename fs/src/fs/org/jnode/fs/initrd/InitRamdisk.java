@@ -72,7 +72,7 @@ public class InitRamdisk extends Plugin {
             log.info("Format initrd ramdisk");
 
             final FatFileSystemFormatter formatter = new FatFileSystemFormatter(FatType.FAT16);
-            final FileSystem fs = formatter.format(dev);
+            final FileSystem<?> fs = formatter.format(dev);
             try {
                 fs.getRootEntry().getDirectory().addDirectory("tmp");
             } catch (IOException ex) {

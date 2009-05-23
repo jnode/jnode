@@ -606,6 +606,7 @@ public class FatChain {
             return (size - offset);
         }
 
+        @SuppressWarnings("unused")
         private final long getPosition() {
             return position;
         }
@@ -727,6 +728,7 @@ public class FatChain {
          * ... peraphs an UnsupportedOperationException would be better here ...
          * but who knows? ;-)
          */
+        @SuppressWarnings("unused")
         private int previous() throws IOException {
             if (!hasPrevious())
                 throw new NoSuchElementException();
@@ -745,6 +747,7 @@ public class FatChain {
             return index;
         }
 
+        @SuppressWarnings("unused")
         private int previousIndex() {
             return (index - 1);
         }

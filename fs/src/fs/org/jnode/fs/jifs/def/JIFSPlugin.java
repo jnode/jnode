@@ -52,9 +52,11 @@ public class JIFSPlugin extends Plugin {
      * My logger
      */
     private static final Logger log = Logger.getLogger(JIFSPlugin.class);
+    
     /**
      * Manager of Extensions
      */
+    @SuppressWarnings("unused")
     private JIFSExtension jifsExtension;
 
     public JIFSPlugin(PluginDescriptor descriptor) {

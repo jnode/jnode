@@ -80,6 +80,10 @@ final class FileSystemTypeManager implements ExtensionPointListener {
      * @return a FileSystemType implementation or null if it doesn't exists.
      */
     public synchronized <T extends FileSystemType<?>> T getSystemType(Class<T> name) {
+        // FIXME ... there is a real type problem here.  There is nothing to stop the
+        // method returning a FileSystemType for the wrong kind of file system.  We
+        // should either figure out how to make this typesafe or change the signature
+        // to return FileSystemType<?>
         return (T) types.get(name);
     }
 

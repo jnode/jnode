@@ -27,6 +27,7 @@ import org.jnode.fs.FSAccessRights;
 
 public class NFS2AccessRights extends NFS2Object implements FSAccessRights {
 
+    @SuppressWarnings("unused")
     private NFS2Entry entry;
 
     public NFS2AccessRights(NFS2FileSystem fileSystem, NFS2Entry entry) {

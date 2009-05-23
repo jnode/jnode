@@ -103,7 +103,7 @@ public class NTFSDirectory implements FSDirectory {
     /**
      * 
      */
-    public FileSystem getFileSystem() {
+    public FileSystem<?> getFileSystem() {
         return fs;
     }
 
