@@ -38,7 +38,7 @@ public abstract class AbstractFSFile extends AbstractFSObject implements FSFile 
      * 
      * @param fs
      */
-    public AbstractFSFile(AbstractFileSystem fs) {
+    public AbstractFSFile(AbstractFileSystem<?> fs) {
         super(fs);
     }
 

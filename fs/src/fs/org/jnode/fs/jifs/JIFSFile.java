@@ -113,7 +113,7 @@ public class JIFSFile implements ExtFSEntry, FSFile {
         return isvalid;
     }
 
-    public FileSystem getFileSystem() {
+    public FileSystem<?> getFileSystem() {
         // TODO
         return null;
     }

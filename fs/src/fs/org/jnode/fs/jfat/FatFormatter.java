@@ -340,6 +340,7 @@ public class FatFormatter {
      * @param api
      * @throws IOException
      */
+    @SuppressWarnings("unused")
     private void setQuickDiskFree(int TotalSectors, BlockDeviceAPI api) throws IOException {
         // TODO:For Total Disk Formatting
     }

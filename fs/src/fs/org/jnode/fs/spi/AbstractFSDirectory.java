@@ -50,7 +50,7 @@ public abstract class AbstractFSDirectory extends AbstractFSObject implements FS
      * 
      * @param fs
      */
-    public AbstractFSDirectory(AbstractFileSystem fs) {
+    public AbstractFSDirectory(AbstractFileSystem<?> fs) {
         this(fs, false);
     }
 
@@ -60,7 +60,7 @@ public abstract class AbstractFSDirectory extends AbstractFSObject implements FS
      * @param fs
      * @param root true if it's a root directory
      */
-    public AbstractFSDirectory(AbstractFileSystem fs, boolean root) {
+    public AbstractFSDirectory(AbstractFileSystem<?> fs, boolean root) {
         super(fs);
         this.isRoot = root;
     }

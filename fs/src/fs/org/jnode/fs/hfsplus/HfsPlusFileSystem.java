@@ -23,7 +23,6 @@ package org.jnode.fs.hfsplus;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -170,7 +169,10 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
     }
 
     private void writeAllocationFile(int blockUsed) {
+        @SuppressWarnings("unused")
         int bytes = blockUsed >> 3;
+        @SuppressWarnings("unused")
         int bits = blockUsed & 0x0007;
+        // FIXME ... this should be completed
     }
 }

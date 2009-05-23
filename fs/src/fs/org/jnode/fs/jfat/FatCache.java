@@ -190,6 +190,7 @@ public class FatCache {
     }
 
     private class CacheMap extends LinkedHashMap<CacheKey, CacheElement> {
+        private static final long serialVersionUID = 1L;
         private final int cacheSize;
         private final CacheKey key = new CacheKey();
         private final Stack<CacheElement> free = new Stack<CacheElement>();

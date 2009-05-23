@@ -31,7 +31,6 @@ import org.jnode.fs.util.FSUtils;
 public class FSTreeBuilder {
     public static final char separator = '/';
 
-    @SuppressWarnings("unchecked")
     public static JarFSEntry build(JarFileSystem fs, JarFile jarFile, JarFSCache cache) {
         JarFSEntry root = new JarFSEntry(fs, null, null, jarFile.getName());
         Map<String, JarFSEntry> nameToJarFSEntry = new HashMap<String, JarFSEntry>();

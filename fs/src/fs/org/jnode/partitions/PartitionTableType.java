@@ -48,6 +48,6 @@ public interface PartitionTableType {
      * @param device
      * @param firstSector
      */
-    public PartitionTable create(byte[] firstSector, Device device) throws PartitionTableException;
+    public PartitionTable<?> create(byte[] firstSector, Device device) throws PartitionTableException;
 
 }

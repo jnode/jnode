@@ -92,7 +92,7 @@ public final class JarFSDirectory implements FSDirectory {
     /**
      * @see org.jnode.fs.FSObject#getFileSystem()
      */
-    public final FileSystem getFileSystem() {
+    public final FileSystem<?> getFileSystem() {
         return entry.getFileSystem();
     }
 

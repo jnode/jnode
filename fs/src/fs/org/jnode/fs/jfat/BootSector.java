@@ -34,6 +34,7 @@ import org.jnode.util.NumberUtils;
  * @author Tango
  */
 public class BootSector {
+    @SuppressWarnings("unused")
     private static final Logger log = Logger.getLogger(BootSector.class);
 
     private static final int IFAT12 = 12;
@@ -201,6 +202,7 @@ public class BootSector {
         }
     }
 
+    @SuppressWarnings("unused")
     private void encode() {
         setBytes(0, 3, BS_jmpBoot);
         setString(3, 8, BS_OEMName);

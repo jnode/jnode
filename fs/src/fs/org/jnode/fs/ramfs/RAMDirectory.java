@@ -192,7 +192,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
      * 
      * @see org.jnode.fs.FSObject#getFileSystem()
      */
-    public FileSystem getFileSystem() {
+    public FileSystem<?> getFileSystem() {
         return filesystem;
     }
 

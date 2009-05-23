@@ -31,7 +31,9 @@ public class MasterBootRecord {
     private static final int PARTITION_TABLE_END_OFFSET = PARTITION_TABLE_OFFSET + 64;
 
     private final ByteBuffer mbr;
+    @SuppressWarnings("unused")
     private boolean dirty;
+    @SuppressWarnings("unused")
     private final IBMPartitionTableEntry[] partitions;
 
     public MasterBootRecord() {

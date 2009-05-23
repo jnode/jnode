@@ -92,7 +92,7 @@ public class ISO9660File implements FSFile {
     /**
      * @see org.jnode.fs.FSObject#getFileSystem()
      */
-    public final FileSystem getFileSystem() {
+    public final FileSystem<?> getFileSystem() {
         return entry.getFileSystem();
     }
 }

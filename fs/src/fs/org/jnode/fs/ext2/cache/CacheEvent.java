@@ -29,6 +29,7 @@ import java.util.EventObject;
  * @author Andras Nagy
  */
 public class CacheEvent extends EventObject {
+    private static final long serialVersionUID = 1L;
     public static final int REMOVED = 0;
     private int eventType;
 

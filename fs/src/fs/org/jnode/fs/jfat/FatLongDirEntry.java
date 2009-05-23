@@ -233,6 +233,7 @@ public class FatLongDirEntry extends FatDirEntry {
         decodeOthers();
     }
 
+    @SuppressWarnings("unused")
     private void encode() throws IOException {
         encodeOrdinal();
         encodeComponent();

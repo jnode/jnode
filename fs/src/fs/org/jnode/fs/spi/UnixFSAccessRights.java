@@ -36,7 +36,7 @@ import com.sun.security.auth.UserPrincipal;
  * 
  */
 public class UnixFSAccessRights implements FSAccessRights {
-    private final FileSystem filesystem;
+    private final FileSystem<?> filesystem;
 
     private Principal owner;
     private Group group;
@@ -45,7 +45,7 @@ public class UnixFSAccessRights implements FSAccessRights {
     private final Rights groupRights = new Rights();
     private final Rights worldRights = new Rights();
 
-    public UnixFSAccessRights(FileSystem filesystem) {
+    public UnixFSAccessRights(FileSystem<?> filesystem) {
         if (filesystem == null) {
             throw new NullPointerException("filesystem can't be null");
         }
@@ -131,7 +131,7 @@ public class UnixFSAccessRights implements FSAccessRights {
         return true;
     }
 
-    public FileSystem getFileSystem() {
+    public FileSystem<?> getFileSystem() {
         return filesystem;
     }
 

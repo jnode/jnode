@@ -30,11 +30,9 @@ import java.nio.charset.CharacterCodingException;
  * @author gvt
  */
 public class CodePageDecoder {
-    private final Charset cs;
     private final CharsetDecoder decoder;
 
     protected CodePageDecoder(Charset cs) {
-        this.cs = cs;
         this.decoder = cs.newDecoder();
         reset();
     }

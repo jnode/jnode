@@ -49,6 +49,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
     private static final Logger log = Logger.getLogger(FileSystemAPIImpl.class);
 
     /** My filesystem manager */
+    @SuppressWarnings("unused")
     private final FileSystemManager fsm;
 
     /** The path to entry cache */

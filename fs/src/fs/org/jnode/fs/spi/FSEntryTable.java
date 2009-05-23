@@ -33,7 +33,7 @@ import org.jnode.fs.FSEntry;
 
 /**
  * A table containing all the entries of a directory. This class and its childs
- * have the responsability to identify an entry by its name (case sensitivity,
+ * have the responsibility to identify an entry by its name (case sensitivity,
  * long file name, ...). The class can limit the number of entries (for root
  * directories ...) if necessary.
  * 
@@ -63,7 +63,7 @@ public class FSEntryTable extends AbstractFSObject {
     private List<String> entryNames;
 
     /**
-     * Private constuctor for EMPTY_TABLE
+     * Private constructor for EMPTY_TABLE
      */
     private FSEntryTable() {
         entries = Collections.emptyMap();
@@ -76,7 +76,7 @@ public class FSEntryTable extends AbstractFSObject {
      * @param fs
      * @param entryList
      */
-    public FSEntryTable(AbstractFileSystem fs, List<FSEntry> entryList) {
+    public FSEntryTable(AbstractFileSystem<?> fs, List<FSEntry> entryList) {
         super(fs);
         // As a value may be null (a free entry)
         // we must use HashMap and not Hashtable
@@ -347,7 +347,7 @@ public class FSEntryTable extends AbstractFSObject {
      * 
      * @return a list of all FSEntries
      */
-    public List/* <FSEntry> */toList() {
+    public List<?>/* <FSEntry> */toList() {
         // false means not compacted (ie can contain some null entries)
         return toList(false);
     }

@@ -120,7 +120,7 @@ public final class ISO9660Directory implements FSDirectory {
     /**
      * @see org.jnode.fs.FSObject#getFileSystem()
      */
-    public final FileSystem getFileSystem() {
+    public final FileSystem<?> getFileSystem() {
         return entry.getFileSystem();
     }
 

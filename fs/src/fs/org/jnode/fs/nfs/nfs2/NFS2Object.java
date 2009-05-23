@@ -32,7 +32,7 @@ public class NFS2Object implements FSObject {
         this.fileSystem = fileSystem;
     }
 
-    public FileSystem getFileSystem() {
+    public FileSystem<?> getFileSystem() {
         return fileSystem;
     }
 

@@ -27,6 +27,9 @@ import java.io.IOException;
  *
  */
 public class UnallocatedBlockException extends IOException {
+    
+    private static final long serialVersionUID = 1L;
+
     public UnallocatedBlockException(String s) {
         super(s);
     }

@@ -48,6 +48,7 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
 
     private String name;
 
+    @SuppressWarnings("unused")
     private NFS2AccessRights accessRights;
     
 

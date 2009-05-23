@@ -30,6 +30,7 @@ public abstract class FatObject implements FSObject {
 
     /** The filesystem I'm a part of */
     private final FatFileSystem fs;
+    
     /** Is this object still valid? */
     private boolean valid;
 
@@ -59,7 +60,7 @@ public abstract class FatObject implements FSObject {
     /**
      * Gets the filesystem I'm a part of.
      */
-    public final FileSystem getFileSystem() {
+    public final FileSystem<?> getFileSystem() {
         return fs;
     }
 

@@ -290,6 +290,7 @@ public class FatShortDirEntry extends FatDirEntry {
         decodeLength();
     }
 
+    @SuppressWarnings("unused")
     private void encode() {
         encodeNameCase();
         encodeAttr();
