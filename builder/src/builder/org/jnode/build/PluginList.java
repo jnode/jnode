@@ -59,7 +59,7 @@ public final class PluginList {
         this.defaultDir = defaultDir;
         descrList = new ArrayList<URL>();
         pluginList = new ArrayList<URL>();
-        final XMLElement root = new XMLElement(new Hashtable(), true, false);
+        final XMLElement root = new XMLElement(new Hashtable<Object, Object>(), true, false);
         try {
             final FileReader r = new FileReader(file);
             try {
@@ -129,7 +129,7 @@ public final class PluginList {
     private void addPlugin(List<URL> descrList, List<URL> pluginList, String id, String version)
         throws MalformedURLException, PluginException {
         final File f = findPlugin(defaultDir, id, version);
-        final URL pluginUrl = f.toURL();
+        final URL pluginUrl = f.toURI().toURL();  // ensure proper escaping ...
         final URL descrUrl = new URL("jar:" + pluginUrl + "!/plugin.xml");
         
         if (pluginList.contains(pluginUrl)) {
@@ -283,7 +283,9 @@ public final class PluginList {
      */
     public final URL createPluginURL(String id, String version) {
         try {
-            return findPlugin(defaultDir, id, version).toURL();
+            // The toURI().toURL() pattern is to ensure that funky characters
+            // in the plugin pathname are properly escaped in the URL
+            return findPlugin(defaultDir, id, version).toURI().toURL();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }

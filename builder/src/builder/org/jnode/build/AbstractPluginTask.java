@@ -63,7 +63,7 @@ public abstract class AbstractPluginTask extends Task {
     protected PluginDescriptor readDescriptor(File descriptor) {
         final PluginDescriptor descr;
         try {
-            final XMLElement root = new XMLElement(new Hashtable(), true, false);
+            final XMLElement root = new XMLElement(new Hashtable<Object, Object>(), true, false);
             try {
                 final FileReader r = new FileReader(descriptor);
                 try {

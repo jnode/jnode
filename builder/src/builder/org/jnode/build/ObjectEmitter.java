@@ -126,7 +126,7 @@ public class ObjectEmitter {
         // If the object is a VmClass, force the loading of the
         // correspondig java.lang.Class
         if (cls.equals(VmType.class)) {
-            final VmType<?> vmCls = (VmType) obj;
+            final VmType<?> vmCls = (VmType<?>) obj;
             String name = vmCls.getName().replace('/', '.');
             if (!name.startsWith("java.lang")) {
                 vmCls.asClassDuringBootstrap();
@@ -141,7 +141,7 @@ public class ObjectEmitter {
         } else if (cls.equals(Long.class)) {
             emitLong((Long) obj);
         } else if (cls.equals(Class.class)) {
-            emitClass((Class) obj);
+            emitClass((Class<?>) obj);
         } else if (cls.isArray()) {
             emitArray(cls, obj, (VmArrayClass<?>) vmClass);
         } else {
@@ -280,8 +280,8 @@ public class ObjectEmitter {
         os.write64(l.longValue()); // long value
     }
 
-    private void emitArray(Class<?> cls, Object obj, VmArrayClass vmClass) {
-        final Class cmpType = cls.getComponentType();
+    private void emitArray(Class<?> cls, Object obj, VmArrayClass<?> vmClass) {
+        final Class<?> cmpType = cls.getComponentType();
         final int len = Array.getLength(obj);
         vmClass.incTotalLength(len);
         os.writeWord(len);
@@ -486,7 +486,7 @@ public class ObjectEmitter {
         final String cname = jdkType.getName();
         FieldInfo info = fieldInfos.get(cname);
         if (info == null) {
-            VmType jnodeType = null;
+            VmType<?> jnodeType = null;
             try {
                 jnodeType = loaderContext.loadClass(cname, true);
             } catch (ClassNotFoundException ex) {

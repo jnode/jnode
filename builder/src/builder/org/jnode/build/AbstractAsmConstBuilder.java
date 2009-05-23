@@ -120,7 +120,7 @@ public abstract class AbstractAsmConstBuilder {
             } else {
 
                 out.println("; VmClass: " + cn.getClassName());
-                VmType vmClass = cl.loadClass(cn.getClassName(), true);
+                VmType<?> vmClass = cl.loadClass(cn.getClassName(), true);
                 vmClass.link();
                 String cname = vmClass.getName().replace('/', '.');
                 int idx = cname.lastIndexOf('.');
@@ -142,7 +142,7 @@ public abstract class AbstractAsmConstBuilder {
                 }
                 // The size
                 if (vmClass instanceof VmNormalClass) {
-                    final VmNormalClass cls = (VmNormalClass) vmClass;
+                    final VmNormalClass<?> cls = (VmNormalClass<?>) vmClass;
                     out.println(cname + "_SIZE equ " + cls.getObjectSize());
                 }
                 //

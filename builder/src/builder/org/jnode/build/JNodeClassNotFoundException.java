@@ -23,6 +23,8 @@ package org.jnode.build;
 
 final class JNodeClassNotFoundException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * @param s
      */
