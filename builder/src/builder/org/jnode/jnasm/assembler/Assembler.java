@@ -56,8 +56,8 @@ public abstract class Assembler {
 
     public static Assembler newInstance(InputStream in) {
         try {
-            Class clazz = Class.forName(PARSER_CLASS);
-            Constructor cons = clazz.getConstructor(new Class[]{InputStream.class});
+            Class<?> clazz = Class.forName(PARSER_CLASS);
+            Constructor<?> cons = clazz.getConstructor(new Class[]{InputStream.class});
             return (Assembler) cons.newInstance(new Object[]{in});
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -66,8 +66,8 @@ public abstract class Assembler {
 
     public static Assembler newInstance(Reader reader) {
         try {
-            Class clazz = Class.forName("org.jnode.jnasm.assembler.gen.JNAsm");
-            Constructor cons = clazz.getConstructor(new Class[]{Reader.class});
+            Class<?> clazz = Class.forName("org.jnode.jnasm.assembler.gen.JNAsm");
+            Constructor<?> cons = clazz.getConstructor(new Class[]{Reader.class});
             return (Assembler) cons.newInstance(new Object[]{reader});
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -197,6 +197,8 @@ public abstract class Assembler {
     }
 
     public static class UndefinedConstantException extends RuntimeException {
+        
+        private static final long serialVersionUID = 1L;
         private String constant;
 
         public UndefinedConstantException(String constant) {

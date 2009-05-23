@@ -514,9 +514,6 @@ public class PluginDocumentationTask extends AbstractPluginTask {
             }
 
             if (descr.getRuntime() != null) {
-                final String lib = "Library";
-                final String exports = "Exports packages";
-
                 addSummaryTableHdr(out, "Libraries");
                 for (Library library : descr.getRuntime().getLibraries()) {
                     final String libName = library.getName();

@@ -194,7 +194,7 @@ class PluginListEditor {
         Set<Plugin> moved = repository.deselect(plugins);
 
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) rightPane.tree.getModel().getRoot();
-        Enumeration en = root.breadthFirstEnumeration();
+        Enumeration<?> en = root.breadthFirstEnumeration();
         while (en.hasMoreElements()) {
             DefaultMutableTreeNode nod = (DefaultMutableTreeNode) en.nextElement();
             if (moved.contains(nod.getUserObject())) {
@@ -237,7 +237,7 @@ class PluginListEditor {
         Set<Plugin> moved = repository.select(plugins);
 
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) leftPane.tree.getModel().getRoot();
-        Enumeration en = root.breadthFirstEnumeration();
+        Enumeration<?> en = root.breadthFirstEnumeration();
         while (en.hasMoreElements()) {
             DefaultMutableTreeNode nod = (DefaultMutableTreeNode) en.nextElement();
             if (moved.contains(nod.getUserObject())) {

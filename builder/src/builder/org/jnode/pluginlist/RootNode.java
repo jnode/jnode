@@ -6,6 +6,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  *
  */
 class RootNode extends DefaultMutableTreeNode implements Syncable {
+    private static final long serialVersionUID = 1L;
     public RootNode(PluginListModel model) {
         super(model);
         for (int i = 0; i < model.size(); i++)

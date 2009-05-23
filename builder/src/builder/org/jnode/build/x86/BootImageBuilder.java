@@ -249,7 +249,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
         try {
             int startLength = os.getLength();
 
-            VmType vmCodeClass = loadClass(VmMethodCode.class);
+            VmType<?> vmCodeClass = loadClass(VmMethodCode.class);
             final X86BinaryAssembler.ObjectInfo initObject = os
                 .startObject(vmCodeClass);
             final int offset = os.getLength() - startLength;
@@ -311,11 +311,11 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
         NativeStream.ObjectRef refJava;
 
         /* Link VmMethod_compile */
-        VmType vmMethodClass = loadClass(VmMethod.class);
+        VmType<?> vmMethodClass = loadClass(VmMethod.class);
         refJava = os.getObjectRef(vmMethodClass.getMethod("recompile", "()V"));
         os.getObjectRef(new Label("VmMethod_recompile")).link(refJava);
 
-        final VmType vmThreadClass = loadClass(VmThread.class);
+        final VmType<?> vmThreadClass = loadClass(VmThread.class);
 
         /* Link VmThread_systemException */
         refJava = os.getObjectRef(vmThreadClass.getMethod("systemException",
@@ -328,7 +328,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
         os.getObjectRef(vmThreadRunThread).link(refJava);
 
         /* Link VmProcessor_reschedule */
-        VmType vmProcClass = loadClass(VmProcessor.class);
+        VmType<?> vmProcClass = loadClass(VmProcessor.class);
         refJava = os.getObjectRef(vmProcClass.getMethod("reschedule", "()V"));
         os.getObjectRef(vmReschedule).link(refJava);
 
@@ -337,7 +337,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
         os.getObjectRef(vmCurProcessor).link(refJava);
 
         /* Set statics index of VmSystem_currentTimeMillis */
-        final VmType vmSystemClass = loadClass(VmSystem.class);
+        final VmType<?> vmSystemClass = loadClass(VmSystem.class);
         final int staticsIdx = ((VmStaticField) vmSystemClass
             .getField("currentTimeMillis")).getSharedStaticsIndex();
         final X86BinaryAssembler os86 = (X86BinaryAssembler) os;
@@ -370,7 +370,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
         os.getObjectRef(new Label("bootHeapEnd")).link(refJava);
 
         // Link VmX86Processor_applicationProcessorMain
-        final VmType x86ProcessorClass = loadClass(VmX86Processor.class);
+        final VmType<?> x86ProcessorClass = loadClass(VmX86Processor.class);
         refJava = os.getObjectRef(x86ProcessorClass.getMethod(
             "applicationProcessorMain", "()V"));
         os.getObjectRef(new Label("VmX86Processor_applicationProcessorMain"))
@@ -392,8 +392,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
      */
     protected void initCallMain(X86BinaryAssembler os) throws BuildException,
         ClassNotFoundException {
-        final VmType vmMethodClass = loadClass(VmMethod.class);
-        final VmType vmMainClass = loadClass(Main.class);
+        final VmType<?> vmMethodClass = loadClass(VmMethod.class);
+        final VmType<?> vmMainClass = loadClass(Main.class);
         final VmMethod mainMethod = vmMainClass.getMethod(
             Main.MAIN_METHOD_NAME, Main.MAIN_METHOD_SIGNATURE);
         final VmInstanceField nativeCodeField = (VmInstanceField) vmMethodClass
@@ -415,12 +415,12 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
      */
     protected void initVmThread(X86BinaryAssembler os) throws BuildException,
         ClassNotFoundException {
-        final VmType vmThreadClass = loadClass(VmThread.class);
+        final VmType<?> vmThreadClass = loadClass(VmThread.class);
         final VmInstanceField threadStackField = (VmInstanceField) vmThreadClass
             .getField("stack");
         final VmInstanceField threadStackEndField = (VmInstanceField) vmThreadClass
             .getField("stackEnd");
-        final VmType vmProcessorClass = loadClass(VmProcessor.class);
+        final VmType<?> vmProcessorClass = loadClass(VmProcessor.class);
         final VmInstanceField procStackEndField = (VmInstanceField) vmProcessorClass
             .getField("stackEnd");
         final VmThread initialThread = processor.getCurrentThread();
@@ -485,7 +485,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
     protected void initVm(X86BinaryAssembler os, Vm vm) throws BuildException,
         ClassNotFoundException {
         os.setObjectRef(new Label("$$Initialize Vm"));
-        VmType vmClass = loadClass(Vm.class);
+        VmType<?> vmClass = loadClass(Vm.class);
         VmStaticField vmField = (VmStaticField) vmClass.getField("instance");
 
         final GPR abx = os.isCode32() ? (GPR) X86Register.EBX : X86Register.RBX;
@@ -514,7 +514,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
     protected void initMain(X86BinaryAssembler os, PluginRegistry registry)
         throws BuildException, ClassNotFoundException {
         os.setObjectRef(new Label("$$Initialize Main"));
-        final VmType mainClass = loadClass(Main.class);
+        final VmType<?> mainClass = loadClass(Main.class);
         final VmStaticField registryField = (VmStaticField) mainClass
             .getField(Main.REGISTRY_FIELD_NAME);
 
@@ -534,7 +534,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
     }
 
     protected void emitStaticInitializerCalls(NativeStream nativeOs,
-                                              VmType[] bootClasses, Object clInitCaller)
+                                              VmType<?>[] bootClasses, Object clInitCaller)
         throws ClassNotFoundException {
 
         final X86BinaryAssembler os = (X86BinaryAssembler) nativeOs;
@@ -544,10 +544,10 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
         os.setObjectRef(clInitCaller);
 
         // Call VmClass.loadFromBootClassArray
-        final VmType vmClassClass = loadClass(VmType.class);
+        final VmType<?> vmClassClass = loadClass(VmType.class);
         final VmMethod lfbcaMethod = vmClassClass.getMethod(
             "loadFromBootClassArray", "([Lorg/jnode/vm/classmgr/VmType;)V");
-        final VmType vmMethodClass = loadClass(VmMethod.class);
+        final VmType<?> vmMethodClass = loadClass(VmMethod.class);
         final VmInstanceField nativeCodeField = (VmInstanceField) vmMethodClass
             .getField("nativeCode");
 
@@ -562,9 +562,9 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 
         // Now call all static initializers
         for (int i = 0; (i < bootClasses.length); i++) {
-            VmType vmClass = bootClasses[i];
+            VmType<?> vmClass = bootClasses[i];
             if ((vmClass instanceof VmClassType)
-                && (((VmClassType) vmClass).getInstanceCount() > 0)) {
+                && (((VmClassType<?>) vmClass).getInstanceCount() > 0)) {
                 VmMethod clInit = vmClass.getMethod("<clinit>", "()V");
                 if (clInit != null) {
                     // os.setObjectRef(clInitCaller + "$$" + vmClass.getName());
@@ -616,9 +616,13 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 
     private static final int MB_BSS_END_ADDR = 6 * 4;
 
+    @SuppressWarnings("unused")
     private static final int MODE_TYPE = 8 * 4;
+    @SuppressWarnings("unused")
     private static final int WIDTH = 9 * 4;
+    @SuppressWarnings("unused")
     private static final int HEIGHT = 10 * 4;
+    @SuppressWarnings("unused")
     private static final int DEPTH = 11 * 4;
 
     /**

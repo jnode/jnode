@@ -12,10 +12,13 @@ import java.awt.event.MouseEvent;
  *
  */
 class PluginTreePane extends JPanel {
+    
+    private static final long serialVersionUID = 1L;
     JTree tree;
 
     PluginTreePane(final PluginListModel model) {
         tree = new JTree(new RootNode(model)) {
+            private static final long serialVersionUID = 1L;
             @Override
             public String getToolTipText(MouseEvent event) {
                 TreePath path = tree.getClosestPathForLocation(event.getX(), event.getY());

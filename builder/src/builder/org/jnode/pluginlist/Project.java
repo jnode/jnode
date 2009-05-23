@@ -7,7 +7,7 @@ import java.util.Collections;
 /**
  *
  */
-class Project implements Comparable {
+class Project implements Comparable<Object> {
     private String name;
     private List<Plugin> pluginList = new ArrayList<Plugin>();
 

@@ -30,6 +30,7 @@ import org.jnode.assembler.NativeStream;
  */
 public class PseudoInstructions extends AssemblerModule {
     protected static final Map<String, Integer> INSTRUCTION_MAP;
+    @SuppressWarnings("unused")
     private static final String[] MNEMONICS;
     public static final int BITS_ISN = 0;
     public static final int DB_ISN = BITS_ISN + 1;

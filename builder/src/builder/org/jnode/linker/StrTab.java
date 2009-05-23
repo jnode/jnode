@@ -21,7 +21,7 @@
 package org.jnode.linker;
 
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author epr
@@ -31,11 +31,11 @@ public class StrTab {
     /**
      * (String, Index)*.
      */
-    private final HashMap str2addr = new HashMap();
+    private final HashMap<String, Integer> str2addr = new HashMap<String, Integer>();
     /**
      * (Index, String)*.
      */
-    private final HashMap addr2str = new HashMap();
+    private final HashMap<Integer, String> addr2str = new HashMap<Integer, String>();
     private int maxIndex;
 
     /**
@@ -110,10 +110,9 @@ public class StrTab {
      */
     public byte[] toByteArray() {
         final byte[] data = new byte[maxIndex];
-        for (Iterator i = addr2str.keySet().iterator(); i.hasNext();) {
-            final Integer index = (Integer) i.next();
-            final String str = (String) addr2str.get(index);
-            final int addr = index.intValue();
+        for (Map.Entry<Integer, String> entry : addr2str.entrySet()) {
+            final String str = entry.getValue();
+            final int addr = entry.getKey().intValue();
             for (int k = 0; k < str.length(); k++) {
                 data[addr + k] = (byte) str.charAt(k);
             }
