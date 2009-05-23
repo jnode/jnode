@@ -38,7 +38,7 @@ import java.util.Vector;
 abstract class ListPanel extends JPanel {
     //public static final char TOGGLE_SHOW_SUPER_FIELDS='p';    //show the fields of superclasses
 
-    Vector list;
+    Vector<ListElement> list;
     JList jlist;
     JScrollPane scrollPane;
     int rows, cols;
@@ -95,7 +95,7 @@ abstract class ListPanel extends JPanel {
     /**
      * @param list a Vector of ListElements
      */
-    public void setList(final Vector list) {
+    public void setList(final Vector<ListElement> list) {
         this.list = list;
 
         ((DefaultListModel) jlist.getModel()).removeAllElements();
@@ -110,7 +110,7 @@ abstract class ListPanel extends JPanel {
         return new Dimension(cols, rows);
     }
 
-    public Vector getList() {
+    public Vector<ListElement> getList() {
         return list;
     }
 

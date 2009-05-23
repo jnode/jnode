@@ -42,6 +42,9 @@ import javax.swing.SwingUtilities;
  * @author Levente S\u00e1ntha
  */
 public class Tetris extends JComponent implements KeyListener, MouseListener {
+    
+    private static final long serialVersionUID = 1L;
+
     private static final int[][][][] BLOCKS = {
         // * * *
         //   *

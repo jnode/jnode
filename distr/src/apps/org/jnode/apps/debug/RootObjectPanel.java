@@ -21,8 +21,6 @@
 package org.jnode.apps.debug;
 
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.Vector;
 import javax.naming.NameNotFoundException;
 import org.jnode.naming.InitialNaming;
@@ -47,8 +45,9 @@ public abstract class RootObjectPanel extends ListPanel {
                 //something is screwed: sometimes strange values are returned by getSelectedIndex()
                 Object o = list.elementAt(jlist.getSelectedIndex());
                 Object res = ((ListElement) o).getValue();
-                if (res instanceof Collection)
-                    fill((Collection) res);
+                if (res instanceof Collection) {
+                    fill((Collection<?>) res);
+                }
                 //if(res instanceof Naming)
                 //  fill(); //TODO: ...
 
@@ -58,14 +57,11 @@ public abstract class RootObjectPanel extends ListPanel {
     }
 
     protected void fill() {
-        Set allNames = InitialNaming.nameSet();
-        final Vector list = new Vector();
+        final Vector<ListElement> list = new Vector<ListElement>();
         try {
-            for (Iterator it = allNames.iterator(); it.hasNext();) {
-                Object key = it.next();
-                Object namedObject = InitialNaming.lookup((Class) key);
-                final ListElement element = new ListElement(namedObject, key.toString());
-                list.addElement(element);
+            for (Class<?> key : InitialNaming.nameSet()) {
+                Object namedObject = InitialNaming.lookup(key);
+                list.addElement(new ListElement(namedObject, key.toString()));
             }
         } catch (NameNotFoundException nnfe) {
             nnfe.printStackTrace();
@@ -73,10 +69,9 @@ public abstract class RootObjectPanel extends ListPanel {
         setList(list);
     }
 
-    protected void fill(Collection coll) {
-        final Vector list = new Vector();
-        for (Iterator it = coll.iterator(); it.hasNext();) {
-            Object o = it.next();
+    protected void fill(Collection<?> coll) {
+        final Vector<ListElement> list = new Vector<ListElement>();
+        for (Object o : coll) {
             final ListElement element = new ListElement(o, getElementLabel(o));
             list.addElement(element);
         }

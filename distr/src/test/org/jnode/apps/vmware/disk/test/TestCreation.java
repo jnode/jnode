@@ -31,6 +31,7 @@ import org.junit.Test;
  * 
  */
 public class TestCreation extends BaseTest {
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(TestCreation.class);
 
     /**

@@ -40,9 +40,9 @@ public abstract class PropertiesPanel extends ListPanel {
     public void fillPanel(Object rootObject) {
         this.rootObject = rootObject;
 
-        final Vector list = new Vector();
+        final Vector<ListElement> list = new Vector<ListElement>();
 
-        Class parent = rootObject.getClass();
+        Class<?> parent = rootObject.getClass();
         //add the fields
         while (parent != null) {
             Field[] fields = parent.getDeclaredFields();

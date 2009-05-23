@@ -85,7 +85,6 @@ public class CharvaBsh {
         private JTextArea editor;
         private JTextArea output;
         private Interpreter interpreter;
-        private static final int NUM_TRACE = 5;
 
         void showSaveDialog() {
             String s = JOptionPane

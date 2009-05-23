@@ -55,6 +55,8 @@ import javax.swing.SwingUtilities;
 public class BoxWorld extends JComponent implements WindowListener, KeyListener,
     MouseListener, MouseMotionListener, ActionListener, ItemListener {
 
+    private static final long serialVersionUID = 1L;
+
     // ***************** WORLD DATA ****************************
     private int[][] vecs = {
         {81, -766241563, -831219482, -696967897, -863854201, -896130840,
@@ -256,8 +258,10 @@ public class BoxWorld extends JComponent implements WindowListener, KeyListener,
     private int x, y, xo, yo;
 
     // popup menu
+    @SuppressWarnings("unused")
     private PopupMenu menu;
 
+    @SuppressWarnings("unused")
     private CheckboxMenuItem beep;
 
     // **************** APPLET METHODS *************************
