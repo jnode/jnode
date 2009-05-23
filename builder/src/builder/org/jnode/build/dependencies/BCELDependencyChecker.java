@@ -32,10 +32,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantClass;
 import org.apache.bcel.classfile.ConstantNameAndType;
@@ -61,12 +61,12 @@ import org.jnode.plugin.PluginPrerequisite;
  * @author Sebastian Lohmeier
  */
 public class BCELDependencyChecker extends AbstractPluginTask {
-    private List descriptorSets = new ArrayList(256);
-    private List pluginSets = new ArrayList(256);
+    private List<FileSet> descriptorSets = new ArrayList<FileSet>(256);
+    private List<FileSet> pluginSets = new ArrayList<FileSet>(256);
 
-    private List plugins;
-    private List fragments;
-    private Set systemPlugins;
+    private List<Plugin> plugins;
+    private List<Fragment> fragments;
+    private Set<Plugin> systemPlugins;
 
     public FileSet createDescriptors() {
         final FileSet fs = new FileSet();
@@ -93,7 +93,7 @@ public class BCELDependencyChecker extends AbstractPluginTask {
             throw new BuildException("At least 1 plugins element is required");
         }
 
-        Map containedClasses = new HashMap();
+        Map<String, Plugin> containedClasses = new HashMap<String, Plugin>();
         if (createPlugins(containedClasses)) {
             System.err.println("\nCan't proceed with more in-depth checks. Please fix above errors first.");
         } else {
@@ -102,35 +102,32 @@ public class BCELDependencyChecker extends AbstractPluginTask {
     }
 
     private Plugin findPlugin(String fullPluginId) {
-        Iterator iter = plugins.iterator();
-        while (iter.hasNext()) {
-            Plugin plugin = (Plugin) iter.next();
-            if (plugin.fullPluginId.equals(fullPluginId))
+        // TODO ... consider replacing this with a map.
+        for (Plugin plugin : plugins) {
+            if (plugin.fullPluginId.equals(fullPluginId)) {
                 return plugin;
+            }
         }
         return null;
     }
 
-    private Set findFragmentsOwnedByPlugin(Plugin plugin) {
+    private Set<Fragment> findFragmentsOwnedByPlugin(Plugin plugin) {
         String fullPluginId = plugin.getFullPluginId();
-        Set results = new HashSet();
-        Iterator iter = fragments.iterator();
-        while (iter.hasNext()) {
-            Fragment fragment = (Fragment) iter.next();
-            if (fragment.getFullPluginIdOfOwningPlugin().equals(fullPluginId))
+        Set<Fragment> results = new HashSet<Fragment>();
+        for (Fragment fragment : fragments) {
+            if (fragment.getFullPluginIdOfOwningPlugin().equals(fullPluginId)) {
                 results.add(fragment);
+            }
         }
         return results;
     }
 
-    private Collection findSystemPlugins() {
+    private Collection<Plugin> findSystemPlugins() {
         if (systemPlugins != null) {
             return systemPlugins;
         } else {
-            systemPlugins = new HashSet();
-            Iterator iter = plugins.iterator();
-            while (iter.hasNext()) {
-                Plugin plugin = (Plugin) iter.next();
+            systemPlugins = new HashSet<Plugin>();
+            for (Plugin plugin : plugins) {
                 if (plugin.isSystemPlugin()) {
                     systemPlugins.add(plugin);
                 }
@@ -143,10 +140,10 @@ public class BCELDependencyChecker extends AbstractPluginTask {
      * @param containedClasses
      * @param plugins
      */
-    private void analyzePlugins(Map containedClasses, List plugins) {
-        Iterator iter = plugins.iterator();
+    private void analyzePlugins(Map<String, Plugin> containedClasses, List<Plugin> plugins) {
+        Iterator<Plugin> iter = plugins.iterator();
         while (iter.hasNext()) {
-            analyzePlugin(containedClasses, (Plugin) iter.next());
+            analyzePlugin(containedClasses, iter.next());
         }
     }
 
@@ -154,41 +151,39 @@ public class BCELDependencyChecker extends AbstractPluginTask {
      * @param containedClasses
      * @param plugin
      */
-    private void analyzePlugin(Map containedClasses, Plugin plugin) {
+    private void analyzePlugin(Map<String, Plugin> containedClasses, Plugin plugin) {
         plugin.verifyDescriptor(containedClasses);
     }
 
     /**
-     * Creates the Plugin instances (e.g. reads and parses the XML descriptors
+     * Creates the Plugin instances, reading and parsing the XML descriptors
      * and the JAR files of all plugins.
      *
      * @param containedClasses
      * @return The list of plugins.
      */
-    private boolean createPlugins(Map containedClasses) {
+    private boolean createPlugins(Map<String, Plugin> containedClasses) {
         JarFiles jarFiles = new JarFiles(pluginSets);
-        plugins = new ArrayList();
-        fragments = new ArrayList();
-        File[] descFiles = getDescriptorFiles();
+        plugins = new ArrayList<Plugin>();
+        fragments = new ArrayList<Fragment>();
         boolean duplicateClasses = false;
-        for (int j = 0; j < descFiles.length; j++) { //maxPlugins; j++) {
-            Plugin plugin = processPlugin(descFiles[j], jarFiles);
+        for (File descFile : getDescriptorFiles()) {
+            Plugin plugin = processPlugin(descFile, jarFiles);
             if (plugin != null) {
                 plugins.add(plugin);
 
-                if (plugin instanceof Fragment)
-                    fragments.add(plugin);
+                if (plugin instanceof Fragment) {
+                    fragments.add((Fragment) plugin);
+                }
 
-                Iterator iter = plugin.containedClasses.iterator();
-                while (iter.hasNext()) {
-                    String containedClass = (String) iter.next();
+                for (String containedClass : plugin.containedClasses) {
                     if (!containedClasses.containsKey(containedClass)) {
                         containedClasses.put(containedClass, plugin);
                     } else {
                         System.err.println("WARNING: Class " + containedClass + " contained in both plugins:");
-                        System.err.println(((Plugin) containedClasses.get(containedClass)).getFullPluginId() + " and " +
+                        System.err.println(containedClasses.get(containedClass).getFullPluginId() + " and " +
                             plugin.getFullPluginId());
-                        duplicateClasses |= true;
+                        duplicateClasses = true;
                     }
                 }
             }
@@ -197,16 +192,14 @@ public class BCELDependencyChecker extends AbstractPluginTask {
     }
 
     protected File[] getDescriptorFiles() {
-        List files = new ArrayList();
-        for (Iterator i = descriptorSets.iterator(); i.hasNext();) {
-            final FileSet fs = (FileSet) i.next();
+        List<File> files = new ArrayList<File>();
+        for (FileSet fs : descriptorSets) {
             final DirectoryScanner ds = fs.getDirectoryScanner(getProject());
-            final String[] incFiles = ds.getIncludedFiles();
-            for (int j = 0; j < incFiles.length; j++) {
-                files.add(new File(ds.getBasedir(), incFiles[j]));
+            for (String incFile : ds.getIncludedFiles()) {
+                files.add(new File(ds.getBasedir(), incFile));
             }
         }
-        return (File[]) files.toArray(new File[files.size()]);
+        return files.toArray(new File[files.size()]);
     }
 
 
@@ -241,8 +234,8 @@ public class BCELDependencyChecker extends AbstractPluginTask {
         private final Pattern typePattern = Pattern.compile("\u004C[a-zA-Z_0-9/\u002E\u0024]*;");
         protected final String fullPluginId;
         protected final PluginDescriptor descr;
-        protected final Set containedClasses = new HashSet();
-        protected final Map usedClasses = new HashMap();
+        protected final Set<String> containedClasses = new HashSet<String>();
+        protected final Map<String, Set<String>> usedClasses = new HashMap<String, Set<String>>();
 
         private Plugin(JarFile jarFile, PluginDescriptor descr) {
             this.fullPluginId = createFullPluginId(descr.getId(), descr.getVersion());
@@ -263,7 +256,7 @@ public class BCELDependencyChecker extends AbstractPluginTask {
             return fullPluginId;
         }
 
-        protected void verifyDescriptor(Map containedClasses) {
+        protected void verifyDescriptor(Map<String, Plugin> containedClasses) {
             boolean errorFound = false;
             StringBuffer buffer = new StringBuffer("The plugin " + fullPluginId + "");
             buffer.append("\n------------------------------------------------------------------\n");
@@ -271,12 +264,11 @@ public class BCELDependencyChecker extends AbstractPluginTask {
             errorFound |= collectUnmatchedDependencies(buffer, containedClasses);
             errorFound |= exportsOrIsExtension(buffer);
 
-            Set allClasses = getAllUsedClasses();
+            Set<String> allClasses = getAllUsedClasses();
             errorFound |= assortClassesContainedInImportedPlugins(buffer, this, true, allClasses);
 
-            Iterator iter = findSystemPlugins().iterator();
-            while (iter.hasNext()) {
-                allClasses.removeAll(((Plugin) iter.next()).containedClasses);
+            for (Plugin plugin : findSystemPlugins()) {
+                allClasses.removeAll(plugin.containedClasses);
             }
 
             //errorFound |= isMissingImportDeclarations(buffer, allClasses);
@@ -301,19 +293,15 @@ public class BCELDependencyChecker extends AbstractPluginTask {
          * @param plugin
          * @param unmatchedDependencies
          */
-        private boolean collectUnmatchedDependencies(StringBuffer buffer, Map containedClasses) {
-            Map unmatchedDependencies = new HashMap();
-            Iterator iter1 = usedClasses.keySet().iterator();
-            while (iter1.hasNext()) {
-                String usingClass = (String) iter1.next();
-                Iterator iter2 = ((Set) usedClasses.get(usingClass)).iterator();
-                while (iter2.hasNext()) {
-                    String className = (String) iter2.next();
+        private boolean collectUnmatchedDependencies(StringBuffer buffer, Map<String, Plugin> containedClasses) {
+            Map<String, List<String>> unmatchedDependencies = new HashMap<String, List<String>>();
+            for (String usingClass : usedClasses.keySet()) {
+                for (String className : usedClasses.get(usingClass)) {
                     if (!containedClasses.containsKey(className)) {
                         if (unmatchedDependencies.containsKey(className)) {
-                            ((List) unmatchedDependencies.get(className)).add(usingClass);
+                            unmatchedDependencies.get(className).add(usingClass);
                         } else {
-                            List list = new ArrayList();
+                            List<String> list = new ArrayList<String>();
                             list.add(usingClass);
                             unmatchedDependencies.put(className, list);
                         }
@@ -333,55 +321,47 @@ public class BCELDependencyChecker extends AbstractPluginTask {
          * @param plugin
          * @param unmatchedDependencies
          */
-        private void dumpUnmatchedDependencies(StringBuffer buffer, Map unmatchedDependencies) {
+        private void dumpUnmatchedDependencies(StringBuffer buffer, Map<String, List<String>> unmatchedDependencies) {
             buffer.append(" * has unresolved dependencies:\n");
-            List keys = new ArrayList(unmatchedDependencies.keySet());
+            List<String> keys = new ArrayList<String>(unmatchedDependencies.keySet());
             Collections.sort(keys);
-            Iterator iter3 = keys.iterator();
-            while (iter3.hasNext()) {
-                String className = (String) iter3.next();
-                List usedClasses = (List) unmatchedDependencies.get(className);
+            for (String className : keys) {
+                List<String> usedClasses = unmatchedDependencies.get(className);
                 Collections.sort(usedClasses);
-                Iterator iter4 = usedClasses.iterator();
-                buffer.append("   " + className + "\n\tused by\t" + iter4.next() + "\n");
-                while (iter4.hasNext()) {
-                    buffer.append("   \t\t" + iter4.next() + "\n");
+                Iterator<String> iter = usedClasses.iterator();
+                buffer.append("   " + className + "\n\tused by\t" + iter.next() + "\n");
+                while (iter.hasNext()) {
+                    buffer.append("   \t\t" + iter.next() + "\n");
                 }
             }
         }
 
         private boolean assortClassesContainedInImportedPlugins(StringBuffer buffer, Plugin plugin,
-                                                                boolean isFirst, Set allClasses) {
+                                                                boolean isFirst, Set<String> allClasses) {
             boolean error = false;
-            Map usedPlugins = new HashMap();
+            Map<String, Plugin> usedPlugins = new HashMap<String, Plugin>();
 
             if (plugin instanceof Fragment) {
                 String idOfOwningPlugin = ((Fragment) plugin).getFullPluginIdOfOwningPlugin();
                 usedPlugins.put(idOfOwningPlugin, findPlugin(idOfOwningPlugin));
             }
 
-            Set ownedFragments = findFragmentsOwnedByPlugin(plugin);
-            Iterator iter = ownedFragments.iterator();
-            while (iter.hasNext()) {
-                Fragment fragment = (Fragment) iter.next();
+            for (Fragment fragment : findFragmentsOwnedByPlugin(plugin)) {
                 usedPlugins.put(fragment.getFullPluginId(), fragment);
             }
 
-            PluginPrerequisite[] prerequisites = plugin.descr.getPrerequisites();
-            for (int i = 0; i < prerequisites.length; i++) {
+            for (PluginPrerequisite prerequisite: plugin.descr.getPrerequisites()) {
                 String idOfUsedPlugin =
-                    createFullPluginId(prerequisites[i].getPluginId(), prerequisites[i].getPluginVersion());
+                    createFullPluginId(prerequisite.getPluginId(), prerequisite.getPluginVersion());
                 usedPlugins.put(idOfUsedPlugin, findPlugin(idOfUsedPlugin));
             }
 
-            Iterator iter1 = usedPlugins.keySet().iterator();
-            while (iter1.hasNext()) {
-                String idOfUsedPlugin = (String) iter1.next();
-                Plugin usedPlugin = (Plugin) usedPlugins.get(idOfUsedPlugin);
+            for (String idOfUsedPlugin : usedPlugins.keySet()) {
+                Plugin usedPlugin = usedPlugins.get(idOfUsedPlugin);
 
                 if (usedPlugin == null) {
                     buffer.append(" * references unknown plugin " + idOfUsedPlugin + "\n");
-                    error |= true;
+                    error = true;
                     continue;
                 }
 
@@ -391,7 +371,7 @@ public class BCELDependencyChecker extends AbstractPluginTask {
                         (usedPlugin.descr.getPrerequisites() == null
                             || usedPlugin.descr.getPrerequisites().length == 0)) {
                         buffer.append(" * references plugin " + idOfUsedPlugin + ", which is not actually required\n");
-                        error |= true;
+                        error = true;
                         // don't need to analyze recursively, since the plugin
                         // imports no other plugins
                     }
@@ -403,7 +383,8 @@ public class BCELDependencyChecker extends AbstractPluginTask {
             return error;
         }
 
-        private boolean isMissingImportDeclarations(StringBuffer buffer, Set allClasses) {
+        @SuppressWarnings("unused")
+        private boolean isMissingImportDeclarations(StringBuffer buffer, Set<String> allClasses) {
             if (!allClasses.isEmpty()) {
                 buffer.append(" * is missing import declarations covering the following classes: " + allClasses + "\n");
                 return true;
@@ -412,26 +393,26 @@ public class BCELDependencyChecker extends AbstractPluginTask {
             }
         }
 
-        private Set getAllUsedClasses() {
-            Set allClasses = new HashSet();
-            Iterator iter = usedClasses.values().iterator();
-            while (iter.hasNext()) {
-                allClasses.addAll((Set) iter.next());
+        private Set<String> getAllUsedClasses() {
+            HashSet<String> allClasses = new HashSet<String>();
+            for (Set<String> classNames : usedClasses.values()) {
+                allClasses.addAll(classNames);
             }
             return allClasses;
         }
 
         private void initContainedClasses(JarFile jarFile) {
-            Enumeration entries = jarFile.entries();
+            Enumeration<JarEntry> entries = jarFile.entries();
 
             while (entries.hasMoreElements()) {
-                ZipEntry entry = (ZipEntry) entries.nextElement();
+                JarEntry entry = entries.nextElement();
                 String entryName = entry.getName();
                 if (!entry.isDirectory() && entryName.endsWith(classSuffix)) {
                     String name = entryName.substring(0, entryName.length()
                         - classSuffix.length());
-                    if (name.indexOf(".") != -1)
+                    if (name.indexOf(".") != -1) {
                         System.err.println(name);
+                    }
                     name = name.replace('/', '.');
                     name = name.replace('\\', '.');
                     containedClasses.add(name);
@@ -441,10 +422,8 @@ public class BCELDependencyChecker extends AbstractPluginTask {
 
         private void initUsedClasses(JarFile jarFile) {
             SyntheticRepository repository = SyntheticRepository.getInstance(new ClassPath(jarFile.getName()));
-            Iterator iter = containedClasses.iterator();
-            while (iter.hasNext()) {
+            for (String className : containedClasses) {
                 try {
-                    String className = (String) iter.next();
                     analyzeClass(className, repository.loadClass(className));
                 } catch (ClassNotFoundException cnfe) {
                     cnfe.printStackTrace();
@@ -469,57 +448,54 @@ public class BCELDependencyChecker extends AbstractPluginTask {
         }
 
         private void analyzeFields(String usingClass, JavaClass javaClass) {
-            Field[] fields = javaClass.getFields();
-            for (int i = 0; i < fields.length; i++) {
-                addUsedClasses(usingClass, decodeSignature(fields[i].getType().getSignature()));
+            for (Field field : javaClass.getFields()) {
+                addUsedClasses(usingClass, decodeSignature(field.getType().getSignature()));
             }
         }
 
         private void analyzeMethods(String usingClass, JavaClass javaClass) {
-            Method[] methods = javaClass.getMethods();
-            for (int i = 0; i < methods.length; i++) {
-                Type[] arguments = methods[i].getArgumentTypes();
-                for (int j = 0; j < arguments.length; j++) {
-                    String typeName = decodeTypeName(arguments[j].getSignature());
-                    if (typeName != null)
+            for (Method method : javaClass.getMethods()) {
+                for (Type argument : method.getArgumentTypes()) {
+                    String typeName = decodeTypeName(argument.getSignature());
+                    if (typeName != null) {
                         addUsedClass(usingClass, typeName);
+                    }
                 }
-                addUsedClasses(usingClass, decodeSignature(methods[i].getReturnType().getSignature()));
+                addUsedClasses(usingClass, decodeSignature(method.getReturnType().getSignature()));
             }
         }
 
         private void analyzeConstantPool(String usingClass, JavaClass javaClass) {
             final ConstantPool constantPool = javaClass.getConstantPool();
-            Constant[] constants = constantPool.getConstantPool();
-            for (int i = 0; i < constants.length; i++) {
-                if (constants[i] instanceof ConstantClass) {
-                    String signature = ((ConstantClass) constants[i]).getBytes(constantPool);
-                    if (signature.startsWith("["))
-                        signature = decodeTypeName(signature);
-                    if (signature != null)
+            for (Constant constant : constantPool.getConstantPool()) {
+                if (constant instanceof ConstantClass) {
+                    String signature = ((ConstantClass) constant).getBytes(constantPool);
+                    if (signature != null) {
+                        if (signature.startsWith("[")) {
+                            signature = decodeTypeName(signature);
+                        }
                         addUsedClass(usingClass, signature);
-                } else if (constants[i] instanceof ConstantNameAndType) {
-                    Iterator iter =
-                        decodeSignature(((ConstantNameAndType) constants[i]).getSignature(constantPool)).iterator();
-                    while (iter.hasNext()) {
-                        String typeName = (String) iter.next();
-                        if (typeName != null)
+                    }
+                } else if (constant instanceof ConstantNameAndType) {
+                    for (String typeName : decodeSignature(
+                            ((ConstantNameAndType) constant).getSignature(constantPool))) {
+                        if (typeName != null) {
                             addUsedClass(usingClass, typeName);
+                        }
                     }
                 }
             }
         }
 
-        private void addUsedClasses(String usingClass, Collection classNames) {
-            Iterator iter = classNames.iterator();
-            while (iter.hasNext()) {
-                addUsedClass(usingClass, (String) iter.next());
+        private void addUsedClasses(String usingClass, Collection<String> classNames) {
+            for (String className : classNames) {
+                addUsedClass(usingClass, className);
             }
         }
 
         private void addUsedClasses(String usingClass, String[] classNames) {
-            for (int i = 0; i < classNames.length; i++) {
-                addUsedClass(usingClass, classNames[i]);
+            for (String className : classNames) {
+                addUsedClass(usingClass, className);
             }
         }
 
@@ -527,9 +503,9 @@ public class BCELDependencyChecker extends AbstractPluginTask {
             usedClass = usedClass.replace('/', '.');
             if (!containedClasses.contains(usedClass)) {
                 if (usedClasses.containsKey(usingClass)) {
-                    ((Set) usedClasses.get(usingClass)).add(usedClass);
+                    usedClasses.get(usingClass).add(usedClass);
                 } else {
-                    Set set = new HashSet();
+                    Set<String> set = new HashSet<String>();
                     set.add(usedClass);
                     usedClasses.put(usingClass, set);
                 }
@@ -550,12 +526,12 @@ public class BCELDependencyChecker extends AbstractPluginTask {
          * @return Returns a list of classnames referenced by the
          *         signature.
          */
-        private List decodeSignature(String signature) {
+        private List<String> decodeSignature(String signature) {
             return getObjectTypeNames(signature);
         }
 
-        private List getObjectTypeNames(String signature) {
-            List objectTypeNames = new ArrayList();
+        private List<String> getObjectTypeNames(String signature) {
+            List<String> objectTypeNames = new ArrayList<String>();
             Matcher matcher = typePattern.matcher(signature);
             while (matcher.find()) {
                 String objectTypeName = matcher.group();
@@ -575,8 +551,8 @@ public class BCELDependencyChecker extends AbstractPluginTask {
 
         private Fragment(JarFile jarFile, FragmentDescriptor descr) {
             super(jarFile, descr);
-            this.fullPluginIdOfOwningPlugin = createFullPluginId(((FragmentDescriptor) descr).getPluginId(),
-                ((FragmentDescriptor) descr).getPluginVersion());
+            this.fullPluginIdOfOwningPlugin = createFullPluginId(descr.getPluginId(),
+                descr.getPluginVersion());
         }
 
         private String getFullPluginIdOfOwningPlugin() {
@@ -593,11 +569,11 @@ public class BCELDependencyChecker extends AbstractPluginTask {
         /**
          * Maps plugin names to paths of jar files.
          */
-        private final Map jarFiles = new HashMap();
+        private final Map<String, String> jarFiles = new HashMap<String, String>();
 
-        private JarFiles(List pluginSets) {
-            for (Iterator i = pluginSets.iterator(); i.hasNext();) {
-                addFileSet((FileSet) i.next());
+        private JarFiles(List<FileSet> pluginSets) {
+            for (FileSet fs : pluginSets) {
+                addFileSet(fs);
             }
         }
 
@@ -606,8 +582,8 @@ public class BCELDependencyChecker extends AbstractPluginTask {
             final String[] files = ds.getIncludedFiles();
             String baseDir = ds.getBasedir().getAbsolutePath();
             //System.err.println("getAllJars() iterating ... basedir="+baseDir+" files.length="+files.length);
-            for (int j = 0; j < files.length; j++) {
-                jarFiles.put(files[j], baseDir + File.separatorChar + files[j]);
+            for (String file : files) {
+                jarFiles.put(file, baseDir + File.separatorChar + file);
             }
         }
 
@@ -616,11 +592,7 @@ public class BCELDependencyChecker extends AbstractPluginTask {
         }
 
         private JarFile getPluginJar(String fullPluginId) throws IOException {
-            return new JarFile((String) jarFiles.get(fullPluginId + ".jar"));
-        }
-
-        private int size() {
-            return jarFiles.size();
+            return new JarFile(jarFiles.get(fullPluginId + ".jar"));
         }
     }
 }
