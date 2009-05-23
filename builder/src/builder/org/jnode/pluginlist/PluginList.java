@@ -35,7 +35,7 @@ class PluginList {
 
     void read(Reader in) throws Exception {
 
-        final XMLElement root = new XMLElement(new Hashtable(), true, false);
+        final XMLElement root = new XMLElement(new Hashtable<Object, Object>(), true, false);
         root.parseFromReader(in);
         String rname = root.getName();
         if (rname.equals("plugin-list")) {

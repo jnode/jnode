@@ -83,15 +83,6 @@ public class ScriptParser {
     public static final Pattern NAME_PATTERN = Pattern.compile("[a-zA-Z0-9.\\-_]+");
     
     private static final Pattern LINE_SPLITTER_PATTERN = Pattern.compile("\r\n|\r(?!\n)|\n");
-    private static final String TAB_SPACES;
-    
-    static {
-        StringBuffer sb = new StringBuffer(Configure.TAB_WIDTH);
-        for (int i = 0; i < Configure.TAB_WIDTH; i++) {
-            sb.append(' ');
-        }
-        TAB_SPACES = sb.toString();
-    }
 
     public static class ParseContext {
         private final File file;

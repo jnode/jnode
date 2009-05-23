@@ -8,7 +8,7 @@ import java.util.ArrayList;
 /**
  *
  */
-class Plugin implements Comparable {
+class Plugin implements Comparable<Object> {
     private String id;
     private boolean system;
     private Set<Plugin> required = new HashSet<Plugin>();

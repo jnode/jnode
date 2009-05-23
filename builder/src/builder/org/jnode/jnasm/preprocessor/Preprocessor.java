@@ -43,9 +43,9 @@ import org.jnode.build.AsmSourceInfo;
 public abstract class Preprocessor {
     private static final String PARSER_CLASS = "org.jnode.jnasm.preprocessor.gen.JNAsmPP";
     private static FileResolver fileResolver;
-    protected static HashMap multiMacros = new HashMap();
-    protected static HashMap singleMacros = new HashMap();
-    protected static HashSet localLabels = new HashSet();
+    protected static HashMap<String, Macro> multiMacros = new HashMap<String, Macro>();
+    protected static HashMap<String, String> singleMacros = new HashMap<String, String>();
+    protected static HashSet<String> localLabels = new HashSet<String>();
     protected boolean substitute = true;
 
     public static void main(String[] argv) throws Exception {
@@ -72,8 +72,8 @@ public abstract class Preprocessor {
 
     public static Preprocessor newInstance(InputStream in) {
         try {
-            Class clazz = Class.forName(PARSER_CLASS);
-            Constructor cons = clazz.getConstructor(new Class[]{InputStream.class});
+            Class<?> clazz = Class.forName(PARSER_CLASS);
+            Constructor<?> cons = clazz.getConstructor(new Class[]{InputStream.class});
             Preprocessor preprocessor = (Preprocessor) cons.newInstance(new Object[]{in});
             return preprocessor;
         } catch (Exception e) {
@@ -83,8 +83,8 @@ public abstract class Preprocessor {
 
     public static Preprocessor newInstance(Reader reader) {
         try {
-            Class clazz = Class.forName(PARSER_CLASS);
-            Constructor cons = clazz.getConstructor(new Class[]{Reader.class});
+            Class<?> clazz = Class.forName(PARSER_CLASS);
+            Constructor<?> cons = clazz.getConstructor(new Class[]{Reader.class});
             Preprocessor preprocessor = (Preprocessor) cons.newInstance(new Object[]{reader});
             return preprocessor;
         } catch (Exception e) {
@@ -126,7 +126,7 @@ public abstract class Preprocessor {
     }
 
     public void setFileResolver(FileResolver fileResolver) {
-        this.fileResolver = fileResolver;
+        Preprocessor.fileResolver = fileResolver;
     }
 
     public void defineSymbol(String name, String definition) {

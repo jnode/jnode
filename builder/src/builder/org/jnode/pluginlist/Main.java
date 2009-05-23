@@ -149,7 +149,7 @@ public class Main {
 
     public static Plugin readPlugin(Reader in) throws Exception {
 
-        final XMLElement root = new XMLElement(new Hashtable(), true, false);
+        final XMLElement root = new XMLElement(new Hashtable<Object, Object>(), true, false);
         root.parseFromReader(in);
         String rname = root.getName();
         if (rname.equals("plugin") || rname.equals("fragment")) {

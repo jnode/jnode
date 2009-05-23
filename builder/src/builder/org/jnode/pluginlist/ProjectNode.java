@@ -6,6 +6,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  *
  */
 class ProjectNode extends DefaultMutableTreeNode implements Syncable {
+    private static final long serialVersionUID = 1L;
     public ProjectNode(Project project) {
         super(project);
         for (Plugin p : project.plugins())

@@ -105,10 +105,10 @@ public class Section {
 
     byte[] m_body;
 
-    Vector m_symtab;
+    Vector<Symbol> m_symtab;
 
     // char[] m_strtab;
-    Vector m_reltab;
+    Vector<Reloc> m_reltab;
 
     private StrTab strTab;
 
@@ -116,8 +116,8 @@ public class Section {
         this.elf = elf;
         this.sh_type = type;
         this.sh_flags = flags;
-        m_symtab = new Vector();
-        m_reltab = new Vector();
+        m_symtab = new Vector<Symbol>();
+        m_reltab = new Vector<Reloc>();
         strTab = new StrTab();
         if (name != null) {
             Section shstr = elf.getSHStrSection();
@@ -419,7 +419,7 @@ public class Section {
 
         ByteArrayInputStream in = new ByteArrayInputStream(m_body);
         long cnt = (sh_size == 0) ? 0 : (sh_size / sh_entsize);
-        m_symtab = new Vector();
+        m_symtab = new Vector<Symbol>();
         for (long i = 0; i < cnt; i++) {
             m_symtab.addElement(new Symbol(elf, in));
         }
@@ -447,7 +447,7 @@ public class Section {
 
         ByteArrayInputStream in = new ByteArrayInputStream(m_body);
         long cnt = (sh_size == 0) ? 0 : (sh_size / sh_entsize);
-        m_reltab = new Vector();
+        m_reltab = new Vector<Reloc>();
         for (long i = 0; i < cnt; i++) {
             m_reltab.addElement(new Reloc(elf, in));
         }
@@ -461,7 +461,7 @@ public class Section {
 
         final ByteArrayInputStream in = new ByteArrayInputStream(m_body);
         final long cnt = (sh_size == 0) ? 0 : (sh_size / sh_entsize);
-        m_reltab = new Vector();
+        m_reltab = new Vector<Reloc>();
         for (long i = 0; i < cnt; i++) {
             m_reltab.addElement(new Reloca(elf, in));
         }
