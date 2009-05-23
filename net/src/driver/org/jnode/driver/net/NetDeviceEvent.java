@@ -31,6 +31,8 @@ import org.jnode.driver.Device;
  */
 public abstract class NetDeviceEvent extends EventObject {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Identification of the event
      */

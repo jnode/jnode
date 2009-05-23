@@ -156,6 +156,7 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
          */
     }
 
+    @SuppressWarnings("unused")
     private void powerUpDevice() {
         setReg8(REG_CFG9346, CFG9346_WE);
         setReg8(REG_CONFIG1, 0);
@@ -232,6 +233,7 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
             log.debug("Ethernet card: Autoload incomplete");
     }
 
+    @SuppressWarnings("unused")
     private byte[] i2bsLoHi(int _i) {
         int shiftL = 24, shiftH = shiftL;
 
@@ -559,8 +561,10 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
                 final SocketBuffer skbuf = null; // rxRing.getPacket(pktLen);
 
                 try {
-                    if (skbuf.getSize() > 0)
+                    // FIXME ... this always throws an NPE since skbuf is null
+                    if (skbuf.getSize() > 0) {
                         driver.onReceive(skbuf);
+                    }
                 } catch (NetworkException e) {
                     e.printStackTrace(); // To change body of catch statement
                                             // use Options | File

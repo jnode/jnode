@@ -135,7 +135,7 @@ public class PlainUDPDatagramSocketImpl extends PlainDatagramSocketImpl {
         return udp.getTimeToLive0();
     }
 
-    private final Object SEND_LOCK = new Object();
+    // private final Object SEND_LOCK = new Object();
 
     @Override
     protected void send(DatagramPacket packet) throws IOException {

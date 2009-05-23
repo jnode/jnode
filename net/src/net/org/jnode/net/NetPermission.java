@@ -28,6 +28,8 @@ import java.security.BasicPermission;
  */
 public class NetPermission extends BasicPermission {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * @param name
      */
