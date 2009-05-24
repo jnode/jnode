@@ -37,7 +37,7 @@ public class DefaultComboBoxModel
 
     /** Constructs a DefaultComboBoxModel object initialized with a vector.
      */
-    public DefaultComboBoxModel(Vector items_) {
+    public DefaultComboBoxModel(Vector<?> items_) {
 	super();
 	for (int i=0; i<items_.size(); i++) {
 	    _list.add(items_.elementAt(i));
@@ -162,7 +162,7 @@ public class DefaultComboBoxModel
     //====================================================================
     // INSTANCE VARIABLES
 
-    private ArrayList _list = new ArrayList();
+    private ArrayList<Object> _list = new ArrayList<Object>();
 
     private Object _selectedItem;
 }

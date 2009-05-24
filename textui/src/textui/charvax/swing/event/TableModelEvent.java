@@ -24,9 +24,10 @@ import charvax.swing.table.TableModel;
 /**
  * This event is fired when the data in a table changes.
  */
-public class TableModelEvent
-    extends java.util.EventObject
+public class TableModelEvent extends java.util.EventObject
 {
+    private static final long serialVersionUID = 1L;
+    
     /** All row data has changed; listeners should discard all state
      * and re-query the TableModel.
      */

@@ -190,7 +190,7 @@ public abstract class Component
      * collected when there are no more strong references to it.
      */
     public void setParent(Container container_) {
-	_parent = new WeakReference(container_);
+	_parent = new WeakReference<Container>(container_);
 
 	// If this component's colors have not been set yet, inherit
 	// the parent container's colors.
@@ -219,7 +219,7 @@ public abstract class Component
      */
     public void addKeyListener(KeyListener kl_) {
 	if (_keyListeners == null)
-	    _keyListeners = new Vector();
+	    _keyListeners = new Vector<KeyListener>();
 	_keyListeners.add(kl_);
     }
 
@@ -228,7 +228,7 @@ public abstract class Component
      */
     public void addFocusListener(FocusListener fl_) {
 	if (_focusListeners == null)
-	    _focusListeners = new Vector();
+	    _focusListeners = new Vector<FocusListener>();
 	_focusListeners.add(fl_);
     }
 
@@ -270,7 +270,7 @@ public abstract class Component
      */
     public void processKeyEvent(KeyEvent ke_) {
 	if (_keyListeners != null) {
-	    for (Enumeration e = _keyListeners.elements(); 
+	    for (Enumeration<KeyListener> e = _keyListeners.elements(); 
 		    e.hasMoreElements(); ) {
 
 		KeyListener kl = (KeyListener) e.nextElement();
@@ -305,7 +305,7 @@ public abstract class Component
      */
     public void processFocusEvent(FocusEvent fe_) {
 	if (_focusListeners != null) {
-	    for (Enumeration e = _focusListeners.elements(); 
+	    for (Enumeration<FocusListener> e = _focusListeners.elements(); 
 		    e.hasMoreElements(); ) {
 
 		FocusListener fl = (FocusListener) e.nextElement();
@@ -400,7 +400,7 @@ public abstract class Component
 	Rectangle bounds = getBounds();
 	Window ancestor = getAncestorWindow();
 
-	Vector windowList = Toolkit.getDefaultToolkit().getWindowList();
+	Vector<Window> windowList = Toolkit.getDefaultToolkit().getWindowList();
 	boolean obscured = false;
 	synchronized (windowList) {
 
@@ -592,7 +592,7 @@ public abstract class Component
      * allow the parent to be garbage-collected when there are no more
      * strong references to it.
      */
-    protected WeakReference _parent = null;
+    protected WeakReference<Container> _parent = null;
 
     /**
      * This flag is true if this component can react to user input.
@@ -612,12 +612,12 @@ public abstract class Component
     /**
      * A list of KeyListeners registered for this component.
      */
-    protected Vector _keyListeners = null;
+    protected Vector<KeyListener> _keyListeners = null;
 
     /**
      * A list of FocusListeners registered for this component.
      */
-    protected Vector _focusListeners = null;
+    protected Vector<FocusListener> _focusListeners = null;
 
     /**
      * the X-alignment of this component

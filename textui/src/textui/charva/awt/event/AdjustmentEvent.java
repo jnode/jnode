@@ -24,9 +24,9 @@ import charva.awt.Component;
 /**
  * The adjustment event emitted by Adjustable objects (eg a scrollbar).
  */
-public class AdjustmentEvent
-    extends AWTEvent
+public class AdjustmentEvent extends AWTEvent
 {
+    private static final long serialVersionUID = 1L;
     /**
      * Create a new AdjustmentEvent.
      * @param source_ The component to which the event must be delivered.

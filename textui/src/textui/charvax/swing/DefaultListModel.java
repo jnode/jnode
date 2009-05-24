@@ -97,5 +97,5 @@ public class DefaultListModel
 
     // INSTANCE VARIABLES
 
-    private ArrayList _list = new ArrayList();
+    private ArrayList<Object> _list = new ArrayList<Object>();
 }

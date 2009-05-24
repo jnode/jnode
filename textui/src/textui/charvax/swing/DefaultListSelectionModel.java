@@ -123,11 +123,11 @@ public class DefaultListSelectionModel
      */
     public void addSelectionInterval(int index0, int index1) {
 
-	TreeSet range = getRange(index0, index1);
+	TreeSet<Integer> range = getRange(index0, index1);
 
 	/* Find the differences
 	 */
-	TreeSet newSelection = (TreeSet) _selection.clone();
+	TreeSet<Integer> newSelection = new TreeSet<Integer>(_selection);
 	newSelection.addAll(range);
 
 	handleSelectionChange(newSelection);
@@ -141,11 +141,11 @@ public class DefaultListSelectionModel
      */
     public void removeSelectionInterval(int index0, int index1) {
 
-	TreeSet range = getRange(index0, index1);
+	TreeSet<Integer> range = getRange(index0, index1);
 
 	/* Find the differences
 	 */
-	TreeSet newSelection = (TreeSet) _selection.clone();
+	TreeSet<Integer> newSelection = new TreeSet<Integer>(_selection);
 	newSelection.removeAll(range);
 
 	handleSelectionChange(newSelection);
@@ -158,7 +158,7 @@ public class DefaultListSelectionModel
      */
     public void setSelectionInterval(int index0, int index1) {
 
-	TreeSet newSelection = getRange(index0, index1);
+	TreeSet<Integer> newSelection = getRange(index0, index1);
 	handleSelectionChange(newSelection);
     }
 
@@ -196,7 +196,7 @@ public class DefaultListSelectionModel
 	ListSelectionEvent event = 
 	    new ListSelectionEvent(this, firstindex_, lastindex_, false);
 
-	Iterator iter = _listeners.iterator();
+	Iterator<ListSelectionListener> iter = _listeners.iterator();
 	while (iter.hasNext()) {
 	    ListSelectionListener l = (ListSelectionListener) iter.next();
 
@@ -207,7 +207,7 @@ public class DefaultListSelectionModel
     /** Returns a TreeSet that contains the indices between index0 and index1
      * inclusive.
      */
-    private TreeSet getRange(int index0, int index1) {
+    private TreeSet<Integer> getRange(int index0, int index1) {
 
 	int start = 0;
 	int end = 0;
@@ -218,19 +218,19 @@ public class DefaultListSelectionModel
 	    start = index1; end = index0;
 	}
 
-	TreeSet range = new TreeSet();
+	TreeSet<Integer> range = new TreeSet<Integer>();
 	for (int i=start; i<=end; i++) {
 	    range.add(new Integer(i));
 	}
 	return range;
     }
 
-    private void handleSelectionChange(TreeSet newSelection_) {
+    private void handleSelectionChange(TreeSet<Integer> newSelection_) {
 	/* Find the differences between the old selection and the new
 	 * selection.
 	 */
-	TreeSet copyOld = (TreeSet) _selection.clone();
-	TreeSet differences = (TreeSet) newSelection_.clone();
+	TreeSet<Integer> copyOld =  new TreeSet<Integer>(_selection);
+	TreeSet<Integer> differences = new TreeSet<Integer>(newSelection_);
 
 	differences.removeAll(_selection);
 	copyOld.removeAll(newSelection_);
@@ -253,11 +253,11 @@ public class DefaultListSelectionModel
 
     /** The list of listeners.
      */
-    protected ArrayList _listeners = new ArrayList();
+    protected ArrayList<ListSelectionListener> _listeners = new ArrayList<ListSelectionListener>();
 
     /** The set of selected indices.
      */
-    protected TreeSet _selection = new TreeSet();
+    protected TreeSet<Integer> _selection = new TreeSet<Integer>();
 
     private int _selectionMode = ListSelectionModel.SINGLE_SELECTION;
 }

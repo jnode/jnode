@@ -674,7 +674,7 @@ public abstract class AbstractToolkit
      * modifying it, because the window list is accessed by the
      * keyboard-reading thread as well as by the event-dispatching thread.
      */
-    Vector getWindowList() {
+    Vector<Window> getWindowList() {
         return _windowList;
     }
 
@@ -814,12 +814,12 @@ public abstract class AbstractToolkit
      * A list of visible Windows.  The first in the list is at the bottom, the
      * last is on top.
      */
-    private Vector _windowList = new Vector();
+    private Vector<Window> _windowList = new Vector<Window>();
 
     /**
      * A list of color-pairs.
      */
-    protected Vector _colorPairs = new Vector();
+    protected Vector<ColorPair> _colorPairs = new Vector<ColorPair>();
 
     protected EventQueue _evtQueue;
 

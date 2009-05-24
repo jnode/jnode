@@ -80,7 +80,7 @@ public class DefaultMutableTreeNode implements MutableTreeNode {
                 throw new IllegalStateException(
                         "TreeNode does not allow children");
 
-        if (_children == null) _children = new Vector();
+        if (_children == null) _children = new Vector<TreeNode>();
 
         _children.insertElementAt(child, index);
         child.setParent(this);
@@ -178,7 +178,7 @@ public class DefaultMutableTreeNode implements MutableTreeNode {
      * Modifying this node's child array invalidates any child enumerations
      * created before the modification.
      */
-    public Enumeration children() {
+    public Enumeration<TreeNode> children() {
         if (_children == null) return null;
 
         return _children.elements();
@@ -216,7 +216,7 @@ public class DefaultMutableTreeNode implements MutableTreeNode {
     public void removeAllChildren() {
         if (_children == null) return;
 
-        Enumeration e = _children.elements();
+        Enumeration<TreeNode> e = _children.elements();
         while (e.hasMoreElements()) {
             MutableTreeNode node = (MutableTreeNode) e.nextElement();
             node.setParent(null);
@@ -244,7 +244,7 @@ public class DefaultMutableTreeNode implements MutableTreeNode {
                         "TreeNode does not allow children");
 
         newChild.setParent(this);
-        if (_children == null) _children = new Vector();
+        if (_children == null) _children = new Vector<TreeNode>();
 
         _children.add(newChild);
     }
@@ -397,7 +397,7 @@ public class DefaultMutableTreeNode implements MutableTreeNode {
      * 
      * @return an enumeration for traversing the tree in preorder
      */
-    public Enumeration preorderEnumeration() {
+    public Enumeration<TreeNode> preorderEnumeration() {
         return null; // not implemented yet
     }
 
@@ -411,7 +411,7 @@ public class DefaultMutableTreeNode implements MutableTreeNode {
      * Modifying the tree by inserting, removing, or moving a node invalidates
      * any enumerations created before the modification.
      */
-    public Enumeration postorderEnumeration() {
+    public Enumeration<TreeNode> postorderEnumeration() {
         return null; // not implemented
     }
 
@@ -597,7 +597,7 @@ public class DefaultMutableTreeNode implements MutableTreeNode {
         if (node.isLeaf()) return start;
 
         int depth = start;
-        for (Enumeration e = node.children(); e.hasMoreElements();) {
+        for (Enumeration<TreeNode> e = node.children(); e.hasMoreElements();) {
             TreeNode child = (TreeNode) e.nextElement();
             int child_depth = this._depth(child, start);
             depth = (child_depth > depth) ? child_depth : depth;
@@ -609,7 +609,7 @@ public class DefaultMutableTreeNode implements MutableTreeNode {
     // INSTANCE VARIABLES
 
     /** Array of children, may be null if this node has no children. */
-    protected Vector _children;
+    protected Vector<TreeNode> _children;
 
     /**
      * This node's parent, or null if this node has no parent. Note that in

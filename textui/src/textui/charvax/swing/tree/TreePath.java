@@ -75,7 +75,7 @@ public class TreePath {
 
     /** Used by getParentPath().
      */
-    private TreePath(ArrayList list) {
+    private TreePath(ArrayList<Object> list) {
 	_list = list;
     }
 
@@ -110,7 +110,7 @@ public class TreePath {
      * except the last path component.
      */
     public TreePath getParentPath() {
-	ArrayList copy = (ArrayList) _list.clone();
+	ArrayList<Object> copy = new ArrayList<Object>(_list);
 	copy.remove(_list.size() - 1);
 	return new TreePath(copy);
     }
@@ -170,7 +170,7 @@ public class TreePath {
      * object plus child.
      */
     public TreePath pathByAddingChild(Object child) {
-	ArrayList other = (ArrayList) _list.clone();
+	ArrayList<Object> other = new ArrayList<Object>(_list);
 	other.add(child);
 	return new TreePath(other);
     }
@@ -187,5 +187,5 @@ public class TreePath {
     // INSTANCE VARIABLES
     /** An ArrayList representing the array of objects in the path
      */
-    private ArrayList _list = new ArrayList();
+    private ArrayList<Object> _list = new ArrayList<Object>();
 }

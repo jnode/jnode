@@ -24,9 +24,9 @@ package charva.awt.event;
  * This is the base class for all the CHARVA user-interface events.
  * It encapsulates information about the event.
  */
-public abstract class AWTEvent
-    extends java.util.EventObject
+public abstract class AWTEvent extends java.util.EventObject
 {
+    private static final long serialVersionUID = 1L;
     /**
      * Construct an event with the specified source and ID.
      * @param source_ The component that emitted this event.

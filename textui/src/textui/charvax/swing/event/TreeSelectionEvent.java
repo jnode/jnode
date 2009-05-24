@@ -27,6 +27,7 @@ import charvax.swing.tree.TreePath;
  * to find out the status of each potentially changed path.
  */
 public class TreeSelectionEvent extends java.util.EventObject {
+    private static final long serialVersionUID = 1L;
 
     /**
      * Represents a change in the selection of a TreeSelectionModel.

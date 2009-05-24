@@ -30,9 +30,9 @@ import charva.awt.Component;
  * returned. This is a useful but optional way of limiting the growth 
  * of the heap without causing noticeable delays.
  */
-public class GarbageCollectionEvent
-    extends AWTEvent
+public class GarbageCollectionEvent extends AWTEvent
 {
+    private static final long serialVersionUID = 1L;
     public GarbageCollectionEvent(Component source_) {
 	super(source_, AWTEvent.GARBAGE_COLLECTION);
     }

@@ -84,7 +84,7 @@ public class JList
     /**
      * Construct a JList containing the items in the specified Vector.
      */
-    public JList(Vector items_)
+    public JList(Vector<?> items_)
     {
 	setListData(items_);
     }
@@ -103,8 +103,8 @@ public class JList
 
     /** Constructs a ListModel from a Vector and then applies setModel to it.
      */
-    public void setListData(Vector listData_) {
-	Enumeration e = listData_.elements();
+    public void setListData(Vector<?> listData_) {
+	Enumeration<?> e = listData_.elements();
 	DefaultListModel model = new DefaultListModel();
 
 	while (e.hasMoreElements()) {
@@ -205,7 +205,7 @@ public class JList
      * sorted in increasing index order.
      */
     public int[] getSelectedIndices() {
-	ArrayList objects = new ArrayList();
+	ArrayList<Integer> objects = new ArrayList<Integer>();
 	if ( ! _selectionModel.isSelectionEmpty()) {
 	    int first = _selectionModel.getMinSelectionIndex();
 	    int last = _selectionModel.getMaxSelectionIndex();
@@ -217,7 +217,7 @@ public class JList
 
 	int[] values = new int[objects.size()];
 	for (int i=0; i<values.length; i++) {
-	    values[i] = ((Integer) objects.get(i)).intValue();
+	    values[i] = objects.get(i).intValue();
 	}
 	return values;
     }
@@ -241,7 +241,7 @@ public class JList
      * sorted in increasing index order.
      */
     public Object[] getSelectedValues() {
-	ArrayList objects = new ArrayList();
+	ArrayList<Object> objects = new ArrayList<Object>();
 	if ( ! _selectionModel.isSelectionEmpty()) {
 	    int first = _selectionModel.getMinSelectionIndex();
 	    int last = _selectionModel.getMaxSelectionIndex();
@@ -589,7 +589,7 @@ public class JList
      */
     public void addScrollListener(ScrollListener sl_) {
 	if (_scrollListeners == null)
-	    _scrollListeners = new Vector();
+	    _scrollListeners = new Vector<ScrollListener>();
 	_scrollListeners.add(sl_);
     }
 
@@ -606,7 +606,7 @@ public class JList
      */
     public void processScrollEvent(ScrollEvent e_) {
 	if (_scrollListeners != null) {
-	    for (Enumeration e = _scrollListeners.elements(); 
+	    for (Enumeration<ScrollListener> e = _scrollListeners.elements(); 
 		    e.hasMoreElements(); ) {
 
 		ScrollListener sl = (ScrollListener) e.nextElement();
@@ -647,6 +647,6 @@ public class JList
 
     /** A list of ScrollListeners registered for this JList.
      */
-    private Vector _scrollListeners = null;
+    private Vector<ScrollListener> _scrollListeners = null;
 
 }

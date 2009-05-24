@@ -76,7 +76,7 @@ public class Window extends Container implements Runnable {
      * Register a WindowListener object for this window.
      */
     public void addWindowListener(WindowListener listener_) {
-        if (_windowListeners == null) _windowListeners = new Vector();
+        if (_windowListeners == null) _windowListeners = new Vector<WindowListener>();
 
         _windowListeners.add(listener_);
     }
@@ -88,7 +88,7 @@ public class Window extends Container implements Runnable {
     protected void processWindowEvent(WindowEvent evt_) {
         if (_windowListeners == null) return;
 
-        Enumeration e = _windowListeners.elements();
+        Enumeration<WindowListener> e = _windowListeners.elements();
         while (e.hasMoreElements()) {
             WindowListener wl = (WindowListener) e.nextElement();
             switch (evt_.getID()) {
@@ -257,7 +257,7 @@ public class Window extends Container implements Runnable {
                 /*
                  * Now redraw all of the windows, from the bottom to the top.
                  */
-                Vector winlist = _term.getWindowList();
+                Vector<Window> winlist = _term.getWindowList();
                 Window window = null;
                 synchronized (winlist) {
                     for (int i = 0; i < winlist.size(); i++) {
@@ -323,7 +323,7 @@ public class Window extends Container implements Runnable {
          */
         if (!((Component) source).isTotallyObscured()) {
 
-            Vector windowlist = _term.getWindowList();
+            Vector<Window> windowlist = _term.getWindowList();
             synchronized (windowlist) {
 
                 /*
@@ -425,6 +425,7 @@ public class Window extends Container implements Runnable {
         super.debug(1);
     }
 
+    @SuppressWarnings("unused")
     private void startPlayback() {
 //        System.err.println("Playback disabled (awaiting security exception fix..)");
         return;
@@ -456,7 +457,7 @@ public class Window extends Container implements Runnable {
 
     private boolean _windowClosed = false;
 
-    private Vector _windowListeners = null;
+    private Vector<WindowListener> _windowListeners = null;
 
     private static boolean _dispatchThreadRunning = false;
 

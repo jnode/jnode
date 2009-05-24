@@ -56,7 +56,7 @@ public class ButtonGroup
      */
     public ButtonGroup()
     {
-	_buttons = new Vector();
+	_buttons = new Vector<AbstractButton>();
     }
 
     /** Adds the specified button to the group.
@@ -77,7 +77,7 @@ public class ButtonGroup
 
     /** Returns an Enumeration of all the buttons in this group.
      */
-    public Enumeration getElements()
+    public Enumeration<AbstractButton> getElements()
     {
 	return _buttons.elements();
     }
@@ -86,7 +86,7 @@ public class ButtonGroup
      */
     public AbstractButton getSelection()
     {
-	for (Enumeration e = _buttons.elements(); e.hasMoreElements();) {
+	for (Enumeration<AbstractButton> e = _buttons.elements(); e.hasMoreElements();) {
 
 	    AbstractButton b = (AbstractButton) e.nextElement();
 	    if (b.isSelected() == true)
@@ -130,7 +130,7 @@ public class ButtonGroup
 	/* There should have been only one button in the selected
 	 * state. All the other buttons should be in the deselected state.
 	 */
-	for (Enumeration e = _buttons.elements(); e.hasMoreElements(); ) {
+	for (Enumeration<AbstractButton> e = _buttons.elements(); e.hasMoreElements(); ) {
 
 	    AbstractButton b = (AbstractButton) e.nextElement();
 	    if (source != b || statechange != ItemEvent.SELECTED) {
@@ -145,5 +145,5 @@ public class ButtonGroup
     //====================================================================
     // INSTANCE VARIABLES
 
-    private Vector _buttons;
+    private Vector<AbstractButton> _buttons;
 }

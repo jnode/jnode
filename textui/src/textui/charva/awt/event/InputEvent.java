@@ -23,9 +23,9 @@ import charva.awt.Component;
 /**
  * This is the superclass of KeyEvent and MouseEvent.
  */
-public class InputEvent
-    extends AWTEvent
+public class InputEvent extends AWTEvent
 {
+    private static final long serialVersionUID = 1L;
     public InputEvent(Component source_, int id_) {
 	super(source_, id_);
     }

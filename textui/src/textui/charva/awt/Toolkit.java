@@ -33,7 +33,8 @@ public class Toolkit extends AbstractToolkit implements KeyboardListener,
 
     private int[] colorpairs = new int[256];
 
-    private LinkedList keyQueue = new LinkedList();
+    // This is a mixed queue of Integer and MouseEvent instances
+    private LinkedList<Object> keyQueue = new LinkedList<Object>();
 
     private final TextConsole console;
 

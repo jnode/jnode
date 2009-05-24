@@ -92,7 +92,7 @@ public class JTabbedPane
      */
     public void addTab(String title_, Object icon_, Component component_, String keylabel_) {
 
-	TabButton	tb = new TabButton(title_, component_, keylabel_);
+	TabButton tb = new TabButton(title_, component_, keylabel_);
 	_tabComponents.add(component_);
 	// arrange for our TabButton to be in the focus list...
 	_components.add(_tabs.size(), tb);
@@ -177,9 +177,9 @@ public class JTabbedPane
 	 */
 	int width = 0;
 	int height = 0;
-	Enumeration e = _tabComponents.elements();
+	Enumeration<Component> e = _tabComponents.elements();
 	while (e.hasMoreElements()) {
-	    Component c = (Component) e.nextElement();
+	    Component c = e.nextElement();
 	    Dimension size = c.minimumSize();
 	    if (size.width > width)
 		width = size.width;
@@ -191,9 +191,9 @@ public class JTabbedPane
 	 * that all of them will fit into.
 	 */
 	int tabwidth = 0;
-	e = _tabs.elements();
-	while (e.hasMoreElements()) {
-	    tabwidth += ((TabButton) e.nextElement()).getWidth();
+	Enumeration<TabButton> e2 = _tabs.elements();
+	while (e2.hasMoreElements()) {
+	    tabwidth += e2.nextElement().getWidth();
 	}
 	tabwidth += 2;
 	if (tabwidth > width)
@@ -227,7 +227,7 @@ public class JTabbedPane
 	/* Draw each of the tabs
 	 */
 	int hoffset = 1;
-	Enumeration e = _tabs.elements();
+	Enumeration<TabButton> e = _tabs.elements();
 	for (int i=0; e.hasMoreElements(); i++) {
 	    TabButton tb = (TabButton) e.nextElement();
 
@@ -329,7 +329,7 @@ public class JTabbedPane
 	    " size=" + _size + 
 	    " _selectedIndex=" + _selectedIndex +
 	    " tabtitles =");
-	Enumeration e = _tabs.elements();
+	Enumeration<TabButton> e = _tabs.elements();
 	while (e.hasMoreElements()) {
 	    String title = ((TabButton) e.nextElement()).getText();
 	    System.err.print(" " + title + " ");
@@ -341,8 +341,8 @@ public class JTabbedPane
     //====================================================================
     // INSTANCE VARIABLES
 
-    private Vector _tabComponents = new Vector();
-    private Vector _tabs = new Vector();
+    private Vector<Component> _tabComponents = new Vector<Component>();
+    private Vector<TabButton> _tabs = new Vector<TabButton>();
     private int _selectedIndex = -1;
     private ButtonGroup _buttongroup = new ButtonGroup();
 

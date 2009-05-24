@@ -23,9 +23,9 @@ import charva.awt.Component;
 /**
  * An event which encapsulates information about a mouse-click.
  */
-public class MouseEvent
-    extends InputEvent
+public class MouseEvent extends InputEvent
 {
+    private static final long serialVersionUID = 1L;
 
     public MouseEvent(Component source_, int modifiers_, 
 	    int x_, int y_, int clickcount_, int button_) {

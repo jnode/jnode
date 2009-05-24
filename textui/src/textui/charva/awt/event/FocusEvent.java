@@ -28,9 +28,9 @@ import charva.awt.Component;
  * registered to receive such events using the object's addFocusListener()
  * method.
  */
-public class FocusEvent
-    extends AWTEvent
+public class FocusEvent extends AWTEvent
 {
+    private static final long serialVersionUID = 1L;
     /**
      * Create a new FocusEvent.
      * @param id_ The event identifier. Must be FOCUS_LOST or FOCUS_GAINED.

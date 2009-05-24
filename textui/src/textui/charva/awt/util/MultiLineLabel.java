@@ -43,7 +43,7 @@ public class MultiLineLabel
     public Dimension minimumSize() {
 	int width=0, height=0;
 
-	Enumeration e = _labeltext.elements();
+	Enumeration<String> e = _labeltext.elements();
 	while (e.hasMoreElements()) {
 	    String s = (String) e.nextElement();
 	    if (s.length() > width)
@@ -62,7 +62,7 @@ public class MultiLineLabel
 
 
 	// we'll sort out justification and video-attributes etc later.
-	Enumeration e = _labeltext.elements();
+	Enumeration<String> e = _labeltext.elements();
 	for (int row=0; e.hasMoreElements(); row++) {
 	    String s = (String) e.nextElement();
 	    toolkit.setCursor(origin.addOffset(0, row));
@@ -93,7 +93,7 @@ public class MultiLineLabel
 
     public String[] getText() {
 	String[] strings = new String[_labeltext.size()];
-	Enumeration e = _labeltext.elements();
+	Enumeration<String> e = _labeltext.elements();
 	for (int i=0; e.hasMoreElements(); i++) {
 	    String s = (String) e.nextElement();
 	    strings[i] = s;
@@ -122,7 +122,7 @@ public class MultiLineLabel
 	    " size=" + getSize() + " label=" + (String) _labeltext.elementAt(0));
     }
 
-    private Vector _labeltext = new Vector();
+    private Vector<String> _labeltext = new Vector<String>();
 
     //private int _justification = LEFT;
 

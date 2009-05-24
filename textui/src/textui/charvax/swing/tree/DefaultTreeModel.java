@@ -121,7 +121,7 @@ public class DefaultTreeModel
      */
     protected boolean _asksAllowsChildren ;
 
-    protected ArrayList _listeners;
+    protected ArrayList<TreeModelListener> _listeners;
 
     protected TreeNode _root;
 }

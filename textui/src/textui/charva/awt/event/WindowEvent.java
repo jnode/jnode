@@ -29,9 +29,9 @@ import charva.awt.Window;
  * The event is passed to each WindowListener object that is registered to
  * receive such events using the window's addWindowListener method.
  */
-public class WindowEvent
-    extends AWTEvent
+public class WindowEvent extends AWTEvent
 {
+    private static final long serialVersionUID = 1L;
 
     public WindowEvent(Window source_, int id_) {
 	super(source_, id_);

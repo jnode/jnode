@@ -78,14 +78,14 @@ public class DefaultTableModel
 	if (_dataVector == null)
 	    return null;
 
-	Vector rowVector = (Vector) _dataVector.elementAt(rowIndex_);
+	Vector<Object> rowVector = (Vector<Object>) _dataVector.elementAt(rowIndex_);
 	return rowVector.elementAt(columnIndex_);
     }
 
     /** Sets the attribute value for the cell at position (row, column).
      */
     public void setValueAt(Object value_, int row_, int column_) {
-	Vector rowVector = (Vector) _dataVector.elementAt(row_);
+	Vector<Object> rowVector = (Vector<Object>) _dataVector.elementAt(row_);
 	rowVector.set(column_, value_);
 
 	/* Recalculate the column width for the affected column.
@@ -115,10 +115,10 @@ public class DefaultTableModel
     public void setDataVector(Object[][] data_, Object[] columnNames_) {
 
 	_rows = data_.length;
-	_dataVector = new Vector(_rows);
+	_dataVector = new Vector<Vector<Object>>(_rows);
 	for (int i=0; i<_rows; i++) {
 	    _columns = data_[i].length;
-	    Vector rowVector = new Vector(_columns);
+	    Vector<Object> rowVector = new Vector<Object>(_columns);
 	    _dataVector.add(rowVector);
 	    for (int j=0; j<_columns; j++)
 		rowVector.add(data_[i][j]);
@@ -126,8 +126,8 @@ public class DefaultTableModel
 
 	/* Set up the column-name  and column-width vectors
 	 */
-	_columnNames = new Vector(_columns);
-	_columnWidths = new Vector(_columns);
+	_columnNames = new Vector<Object>(_columns);
+	_columnWidths = new Vector<Integer>(_columns);
 	for (int i=0; i<_columns; i++) {
 	    _columnNames.add(columnNames_[i]);
 
@@ -145,14 +145,14 @@ public class DefaultTableModel
      * and columns.
      */
     public void setDataVector(int rows_, int columns_) {
-	_dataVector = new Vector(rows_);
+	_dataVector = new Vector<Vector<Object>>(rows_);
 	for (int i=0; i<rows_; i++) {
-	    Vector rowVector = new Vector(columns_);
+	    Vector<Object> rowVector = new Vector<Object>(columns_);
 	    rowVector.setSize(columns_);
 	    _dataVector.add(rowVector);
 	}
 
-	_columnWidths = new Vector(columns_);
+	_columnWidths = new Vector<Integer>(columns_);
 	for (int i=0; i<columns_; i++) {
 	    int width;
 	    if (_columnNames == null)
@@ -173,13 +173,13 @@ public class DefaultTableModel
     /** A vector of vectors of data values. Each vector in the _dataVector
      * represents a row of data.
      */
-    private Vector _dataVector = null;
+    private Vector<Vector<Object>> _dataVector = null;
 
     /* A vector of column names
      */
-    private Vector _columnNames = null;
+    private Vector<Object> _columnNames = null;
 
     /** A Vector of column widths
      */
-    private Vector _columnWidths = null;
+    private Vector<Integer> _columnWidths = null;
 }

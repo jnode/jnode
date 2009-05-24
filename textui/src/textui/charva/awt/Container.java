@@ -108,7 +108,7 @@ public abstract class Container
      * the point are relative to the origin of this container.
      */
     public Component getComponentAt(int x, int y) {
-	Enumeration e = _components.elements();
+	Enumeration<Component> e = _components.elements();
 	while (e.hasMoreElements()) {
 	    Component c = (Component) e.nextElement();
 	    if (c.contains(x, y)) {
@@ -217,7 +217,7 @@ public abstract class Container
 	if ( !isVisible())
 	    return;
 	
-	Enumeration e = _components.elements();
+	Enumeration<Component> e = _components.elements();
 	while (e.hasMoreElements()) {
 	    Component c = (Component) e.nextElement();
 	    if (c.isVisible())
@@ -234,7 +234,7 @@ public abstract class Container
     {
 	super.setForeground(color_);
 
-	Enumeration e = _components.elements();
+	Enumeration<Component> e = _components.elements();
 	while (e.hasMoreElements()) {
 	    Component c = (Component) e.nextElement();
 	    if (c.getForeground() == null)
@@ -251,7 +251,7 @@ public abstract class Container
     {
 	super.setBackground(color_);
 
-	Enumeration e = _components.elements();
+	Enumeration <Component>e = _components.elements();
 	while (e.hasMoreElements()) {
 	    Component c = (Component) e.nextElement();
 	    if (c.getBackground() == null)
@@ -297,7 +297,7 @@ public abstract class Container
 	    /* _currentFocus is not yet set. Try to set it to the first
 	     * FocusTraversable component contained in this container.
 	     */
-	    Enumeration e = _components.elements();
+	    Enumeration<Component> e = _components.elements();
 	    while (e.hasMoreElements()) {
 		Component c = (Component) e.nextElement();
 		if (c.isFocusTraversable()) {
@@ -464,7 +464,7 @@ public abstract class Container
 	if ( !super.isFocusTraversable())
 	    return false;
 
-	Enumeration e = _components.elements();
+	Enumeration<Component> e = _components.elements();
 	while (e.hasMoreElements()) {
 	    Component c = (Component) e.nextElement();
 	    if (c.isFocusTraversable())
@@ -478,7 +478,7 @@ public abstract class Container
     /* Default implementation of debug, gets overridden by subclasses.
      */
     public void debug(int level_) {
-	Enumeration e = _components.elements();
+	Enumeration<Component> e = _components.elements();
 	while (e.hasMoreElements()) {
 	    Component c = (Component) e.nextElement();
 	    c.debug(level_ + 1);
@@ -494,7 +494,7 @@ public abstract class Container
      */
     private void firstFocus() {
 
-	Enumeration e = _components.elements();
+	Enumeration<Component> e = _components.elements();
 	while (e.hasMoreElements()) {
 	    Component c = (Component) e.nextElement();
 	    if (c.isFocusTraversable()) {
@@ -568,7 +568,7 @@ public abstract class Container
     /**
      * The list of components contained within this Container.
      */
-    protected Vector _components = new Vector();
+    protected Vector<Component> _components = new Vector<Component>();
 
     /** The container's size
      */

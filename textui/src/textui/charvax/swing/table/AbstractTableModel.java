@@ -70,7 +70,7 @@ public abstract class AbstractTableModel
      * registered themselves as listeners for this TableModel.
      */
     public void fireTableChanged(TableModelEvent evt_) {
-	Enumeration e = _listeners.elements();
+	Enumeration<TableModelListener> e = _listeners.elements();
 	while (e.hasMoreElements()) {
 	    TableModelListener l = (TableModelListener) e.nextElement();
 	    l.tableChanged(evt_);
@@ -116,5 +116,5 @@ public abstract class AbstractTableModel
 
     //====================================================================
     // INSTANCE VARIABLES
-    private Vector _listeners = new Vector();
+    private Vector<TableModelListener> _listeners = new Vector<TableModelListener>();
 }

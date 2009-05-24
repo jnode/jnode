@@ -436,7 +436,7 @@ public class JTextArea
          */
         ScrollEvent scrollevent = null;
         int row = 0, col = 0;
-        outerloop:
+        // outerloop:
             for( int i = 0; i < super._document.length(); i++ ) {
 
                 /* At some point during the scan of the document, the
@@ -590,7 +590,7 @@ public class JTextArea
      */
     public void addScrollListener( ScrollListener sl_ ) {
         if( _scrollListeners == null ) {
-            _scrollListeners = new Vector();
+            _scrollListeners = new Vector<ScrollListener>();
         }
         _scrollListeners.add( sl_ );
     }
@@ -610,10 +610,10 @@ public class JTextArea
      */
     public void processScrollEvent( ScrollEvent e_ ) {
         if( _scrollListeners != null ) {
-            for( Enumeration e = _scrollListeners.elements();
+            for( Enumeration<ScrollListener> e = _scrollListeners.elements();
                  e.hasMoreElements(); ) {
 
-                ScrollListener sl = (ScrollListener)e.nextElement();
+                ScrollListener sl = e.nextElement();
                 sl.scroll( e_ );
             }
         }
@@ -748,6 +748,7 @@ public class JTextArea
     /* Private helper method used to redraw the component if its state
      * has changed.
      */
+    @SuppressWarnings("unused")
     private void refreshOrig() {
         /* If this JTextArea is contained in a JViewport, the PaintEvent
          * that we post must request a redraw of the JViewport, so that
@@ -855,7 +856,7 @@ public class JTextArea
     /**
      * A list of ScrollListeners registered for this JTextArea.
      */
-    private Vector _scrollListeners = null;
+    private Vector<ScrollListener> _scrollListeners = null;
 
     private static final int LINE_COUNT = 1;
     private static final int LINE_START_OFFSET = 2;

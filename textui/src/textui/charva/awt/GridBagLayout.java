@@ -47,9 +47,9 @@ public class GridBagLayout
 	 */
 	_rows = 0;
 	_columns = 0;
-	Enumeration e1 = _constraints.elements();
+	Enumeration<GridBagConstraints> e1 = _constraints.elements();
 	while (e1.hasMoreElements()) {
-	    GridBagConstraints gbc = (GridBagConstraints) e1.nextElement();
+	    GridBagConstraints gbc = e1.nextElement();
 	    if (gbc.gridx + gbc.gridwidth > _columns)
 		_columns = gbc.gridx + gbc.gridwidth;
 
@@ -72,11 +72,11 @@ public class GridBagLayout
 	int width_left[] = new int[_components.size()];
 	int height_left[] = new int[_components.size()];
 
-	e1 = _components.elements();
-	Enumeration e2 = _constraints.elements();
-	for (int i=0; e1.hasMoreElements(); i++) {
-	    Component c = (Component) e1.nextElement();
-	    GridBagConstraints gbc = (GridBagConstraints) e2.nextElement();
+	Enumeration<Component> e3 = _components.elements();
+	Enumeration<GridBagConstraints> e2 = _constraints.elements();
+	for (int i=0; e3.hasMoreElements(); i++) {
+	    Component c = e3.nextElement();
+	    GridBagConstraints gbc = e2.nextElement();
 
 	    /* Calculate the minimum width & height required for this 
 	     * component.
@@ -97,9 +97,9 @@ public class GridBagLayout
 	     * value determines the height of this row.
 	     */
 	    _calculatedRowHeights[row] = 0;
-	    Enumeration e = _constraints.elements();
+	    Enumeration<GridBagConstraints> e = _constraints.elements();
 	    for (int i=0; e.hasMoreElements(); i++) {
-		GridBagConstraints gbc = (GridBagConstraints) e.nextElement();
+		GridBagConstraints gbc = e.nextElement();
 
 		if (row == gbc.gridy + gbc.gridheight - 1) {
 		    /* This component's bottom edge is in the current row.
@@ -115,7 +115,7 @@ public class GridBagLayout
 	     */
 	    e = _constraints.elements();
 	    for (int i=0; e.hasMoreElements(); i++) {
-		GridBagConstraints gbc = (GridBagConstraints) e.nextElement();
+		GridBagConstraints gbc = e.nextElement();
 
 		if (row >= gbc.gridy &&
 			row < gbc.gridy + gbc.gridheight) {
@@ -133,9 +133,9 @@ public class GridBagLayout
 	     * value determines the width of this column.
 	     */
 	    _calculatedColumnWidths[column] = 0;
-	    Enumeration e = _constraints.elements();
+	    Enumeration<GridBagConstraints> e = _constraints.elements();
 	    for (int i=0; e.hasMoreElements(); i++) {
-		GridBagConstraints gbc = (GridBagConstraints) e.nextElement();
+		GridBagConstraints gbc = e.nextElement();
 
 		if (column == gbc.gridx + gbc.gridwidth - 1) {
 		    /* This component's right edge is in the current column.
@@ -151,7 +151,7 @@ public class GridBagLayout
 	     */
 	    e = _constraints.elements();
 	    for (int i=0; e.hasMoreElements(); i++) {
-		GridBagConstraints gbc = (GridBagConstraints) e.nextElement();
+		GridBagConstraints gbc = e.nextElement();
 
 		if (column >= gbc.gridx &&
 			column < gbc.gridx + gbc.gridwidth) {
@@ -165,7 +165,7 @@ public class GridBagLayout
 	 */
 	e2 = _constraints.elements();
 	while (e2.hasMoreElements()) {
-	    GridBagConstraints gbc = (GridBagConstraints) e2.nextElement();
+	    GridBagConstraints gbc = e2.nextElement();
 
 	    for (int i=gbc.gridx; i< gbc.gridx + gbc.gridwidth; i++) {
 		if (gbc.weightx > _calculatedColumnWeights[i])
@@ -209,12 +209,12 @@ public class GridBagLayout
 	int extraColumns = size.width - minsize.width;
 	int extraRows = size.height - minsize.height;
 
-	Enumeration e1 = _components.elements();
-	Enumeration e2 = _constraints.elements();
+	Enumeration<Component> e1 = _components.elements();
+	Enumeration<GridBagConstraints> e2 = _constraints.elements();
 	while (e1.hasMoreElements()) {
-	    Component c = (Component) e1.nextElement();
+	    Component c = e1.nextElement();
 
-	    GridBagConstraints gbc = (GridBagConstraints) e2.nextElement();
+	    GridBagConstraints gbc = e2.nextElement();
 
 	    /* Calculate the boundaries of the grid cell that this
 	     * component occupies.
@@ -406,13 +406,13 @@ public class GridBagLayout
     /**
      * As components are added, they are stored in this vector.
      */
-    private Vector _components = new Vector();
+    private Vector<Component> _components = new Vector<Component>();
 
     /**
      * As components are added, their constraint objects are stored in 
      * this vector.
      */
-    private Vector _constraints = new Vector();
+    private Vector<GridBagConstraints> _constraints = new Vector<GridBagConstraints>();
 
     /** The number of rows in the grid (calculated from all the added
      * components and their gridx, gridy, gridwidth and gridheight
