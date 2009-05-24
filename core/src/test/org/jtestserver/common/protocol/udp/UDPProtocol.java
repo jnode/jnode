@@ -27,7 +27,6 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
-import java.rmi.server.RemoteServer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
