@@ -56,6 +56,7 @@ import java.util.Vector;
 /**
  *
  */
+@SuppressWarnings("serial")
 public class Thinlet extends Container
 	implements Runnable, Serializable {
 
@@ -2688,9 +2689,9 @@ public class Thinlet extends Container
 				Rectangle bounds = getRectangle(mouseinside, "bounds");
 				try { // mouse wheel is supported since 1.4 thus it use reflection
 					if (wheelrotation == null) {
-						wheelrotation = e.getClass().getMethod("getWheelRotation", null);
+						wheelrotation = e.getClass().getMethod("getWheelRotation");
 					}
-					int rotation = ((Integer) wheelrotation.invoke(e, null)).intValue();
+					int rotation = ((Integer) wheelrotation.invoke(e)).intValue();
 
 					if (port.x + port.width < bounds.width) { // has vertical scrollbar
 						processScroll(mouseinside, (rotation > 0) ? "down" : "up"); //TODO scroll panels too
@@ -2725,11 +2726,13 @@ public class Thinlet extends Container
 						ke.consume();
 					} else if (MOUSE_WHEEL != 0) { // 1.4
 						if (!ke.isShiftDown()) {
-							transferFocus();
+						    transferFocus();
 						}
-						else { try {
-								getClass().getMethod("transferFocusBackward", null). invoke(this, null);
-						} catch (Exception exc) { /* never */ } }
+						else { 
+						    try {
+						        getClass().getMethod("transferFocusBackward"). invoke(this);
+						    } catch (Exception exc) { /* never */ }
+						}
 					}
 					repaint(focusowner);
 					closeup();
@@ -5260,16 +5263,17 @@ public class Thinlet extends Container
 	 * @param key the client property key
 	 * @param value the new client property value
 	 */
-	public void putProperty(Object component, Object key, Object value) {
-		Object table = get(component, ":bind");
+	@SuppressWarnings("unchecked")
+    public void putProperty(Object component, Object key, Object value) {
+		Hashtable<Object, Object> table = (Hashtable<Object, Object>) get(component, ":bind");
 		if (value != null) {
 			if (table == null) {
-				set(component, ":bind", table = new Hashtable());
+				set(component, ":bind", table = new Hashtable<Object, Object>());
 			}
-			((Hashtable) table).put(key, value);
+			table.put(key, value);
 		}
 		else if (table != null) {
-			((Hashtable) table).remove(key);
+			table.remove(key);
 		}
 	}
 
@@ -5282,7 +5286,7 @@ public class Thinlet extends Container
 	 */
 	public Object getProperty(Object component, Object key) {
 		Object table = get(component, ":bind");
-		return (table != null) ? ((Hashtable) table).get(key) : null;
+		return (table != null) ? ((Hashtable<?, ?>) table).get(key) : null;
 	}
 
 	// ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
@@ -5363,7 +5367,7 @@ public class Thinlet extends Container
 	 * @param name of the tag
 	 * @param attributelist a list of attributes including keys and value pairs
 	 */
-	protected void startElement(String name, Hashtable attributelist) {}
+	protected void startElement(String name, Hashtable<?,?> attributelist) {}
 
 	/**
 	 * The SAX-like parser calls this method, you have to overwrite it
@@ -5462,8 +5466,8 @@ public class Thinlet extends Container
 		try {
 			Object[] parentlist = null;
 			Object current = null;
-			Hashtable attributelist = null;
-			Vector methods = (validate && !dom) ? new Vector() : null;
+			Hashtable<String, String> attributelist = null;
+			Vector<Object> methods = (validate && !dom) ? new Vector<Object>() : null;
 			StringBuffer text = new StringBuffer();
 			for (int c = reader.read(); c != -1;) {
 				if (c == '<') {
@@ -5613,7 +5617,7 @@ public class Thinlet extends Container
 									if (dom) {
 										set(current, key.intern(), text.toString());
 									} else {
-										if (attributelist == null) { attributelist = new Hashtable(); }
+										if (attributelist == null) { attributelist = new Hashtable<String, String>(); }
 										attributelist.put(key, text.toString());
 									}
 								}
@@ -5621,7 +5625,9 @@ public class Thinlet extends Container
 								text.setLength(0);
 								c = reader.read();
 							}
-							else throw new IllegalArgumentException();
+							else {
+							    throw new IllegalArgumentException();
+							}
 						}
 					}
 				}
@@ -5647,7 +5653,7 @@ public class Thinlet extends Container
 	/**
 	 *
 	 */
-	private void finishParse(Vector methods, Object root, Object handler) {
+	private void finishParse(Vector<Object> methods, Object root, Object handler) {
 		if (methods != null) {
 			for (int i = 0; i < methods.size(); i += 3) {
 				Object component = methods.elementAt(i);
@@ -5734,7 +5740,7 @@ public class Thinlet extends Container
 	 *
 	 * @throws java.lang.IllegalArgumentException
 	 */
-	private void addAttribute(Object component, String key, String value, Vector lasts) {
+	private void addAttribute(Object component, String key, String value, Vector<Object> lasts) {
 		// replace value found in the bundle
 		if ((resourcebundle != null) && value.startsWith("i18n.")) {
 			value = resourcebundle.getString(value.substring(5));
@@ -6106,7 +6112,7 @@ public class Thinlet extends Container
 		String methodname = st.nextToken();
 		int n = st.countTokens();
 		Object[] data = new Object[2 + 3 * n];
-		Class[] parametertypes = (n > 0) ? new Class[n] : null;
+		Class<?>[] parametertypes = (n > 0) ? new Class[n] : null;
 		for (int i = 0; i < n; i++) {
 			String arg = st.nextToken();
 			if ("thinlet".equals(arg)) {

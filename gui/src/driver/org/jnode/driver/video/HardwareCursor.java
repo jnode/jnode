@@ -68,9 +68,9 @@ public class HardwareCursor {
     /**
      * Create an iterator over all images.
      * 
-     * @return An iterator of {@link HardwareCursor}instances.
+     * @return An iterator of {@link HardwareCursorImage} instances.
      */
-    public Iterator iterator() {
+    public Iterator<HardwareCursorImage> iterator() {
         return imageMap.values().iterator();
     }
 

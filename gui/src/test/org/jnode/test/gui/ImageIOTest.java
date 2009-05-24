@@ -30,6 +30,7 @@ import javax.swing.JFrame;
  * @author Levente S\u00e1ntha
  */
 public class ImageIOTest {
+    @SuppressWarnings("serial")
     public static void main(String[] argv) throws Exception {
         if (argv.length == 0) {
             System.out.println("org.jnode.test.gui.ImageIOTest <image file>");

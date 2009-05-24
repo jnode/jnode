@@ -45,6 +45,7 @@ public class GraphicsTest {
         }
     }
 
+    @SuppressWarnings("serial")
     static class TestComponent extends Component {
 
         public void paint(Graphics g) {

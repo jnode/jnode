@@ -155,6 +155,7 @@ public class VESACommand {
             int size = 0x7FFF; // 32 Kb
             int mode = ResourceManager.MEMMODE_NORMAL;
             int address = 0xA0000;
+            @SuppressWarnings("unused")
             MemoryResource resource =
                     manager.claimMemoryResource(owner, Address.fromInt(address), size, mode);
 
@@ -163,6 +164,8 @@ public class VESACommand {
             println("before call to vbe function");
             int codePtr = pmInfoBlock.getEntryPoint();
             println("codePtr=" + NumberUtils.hex(codePtr));
+            // FIXME ... if the javadoc for 'Unsafe.callVbeFunction' is credible, this is a 
+            // bad thing to do.
             int result =
                     Unsafe.callVbeFunction(Address.fromInt(codePtr), 0, Address.fromInt(address));
             println("codePtr=" + result);

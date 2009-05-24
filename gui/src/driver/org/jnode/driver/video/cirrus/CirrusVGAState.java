@@ -21,10 +21,13 @@ public class CirrusVGAState implements CirrusConstants {
 
     private int CR0, CR1, CR2, CR3, CR4, CR5, CR6, CR7, CR8, CR9;
 
+    @SuppressWarnings("unused")
     private int CRA, CRB, CRC, CRD, CRE, CRF, CR10, CR11, CR12;
 
+    @SuppressWarnings("unused")
     private int CR13, CR14, CR15, CR16, CR17, CR18, CR22, CR24;
 
+    @SuppressWarnings("unused")
     private int CR26, CR1B;
 
     public CirrusVGAState(CirrusMMIO vgaIO) {

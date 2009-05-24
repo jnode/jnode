@@ -48,6 +48,7 @@ public class TTFFileTest {
 
     static TTFFontData ttf;
 
+    @SuppressWarnings("serial")
     public static void main(String[] args) throws Exception {
 
         String fontName = "luxisr.ttf";

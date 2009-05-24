@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
  * 
  * @author Levente S\u00e1ntha
  */
+@SuppressWarnings("serial")
 public class ThinTest extends Thinlet {
     private static final String MARKUP =
             "<panel gap=\"4\" top=\"4\" left=\"4\">" + "<button text=\"Button Test\"/>"

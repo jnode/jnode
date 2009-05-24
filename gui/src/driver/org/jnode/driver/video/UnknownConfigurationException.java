@@ -24,6 +24,7 @@ package org.jnode.driver.video;
  * @author epr
  */
 public class UnknownConfigurationException extends FrameBufferException {
+    private static final long serialVersionUID = 1L;
 
     /**
      * 

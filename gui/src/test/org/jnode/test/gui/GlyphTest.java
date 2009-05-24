@@ -114,6 +114,7 @@ public class GlyphTest {
         }
     }
 
+    @SuppressWarnings("unused")
     private static Kernel createKernel(int width) {
         final float[] mtx = new float[width * width];
         final int center = width - 1 / 2;
@@ -136,6 +137,7 @@ public class GlyphTest {
         return new Kernel(width, width, mtx);
     }
 
+    @SuppressWarnings("unused")
     private static void printSum(Kernel kernel) {
         float v = 0.0f;
         float[] mtx = kernel.getKernelData(null);
@@ -145,6 +147,7 @@ public class GlyphTest {
         System.out.println("mtx " + v);
     }
 
+    @SuppressWarnings("unused")
     private static void fill(Shape shape, BufferedImage img) {
         final Graphics2D g = (Graphics2D) img.getGraphics();
         // g.draw(shape);
@@ -161,6 +164,7 @@ public class GlyphTest {
         }
     }
 
+    @SuppressWarnings("serial")
     public static class ImageViewer extends Component {
 
         private final BufferedImage[] images;
@@ -203,6 +207,7 @@ public class GlyphTest {
         }
     }
 
+    @SuppressWarnings("serial")
     public static class RasterViewer extends ImageViewer {
 
         /**
@@ -260,6 +265,7 @@ public class GlyphTest {
 
     }
 
+    @SuppressWarnings("serial")
     public static class MasterViewer extends ImageViewer {
 
         /**
@@ -283,6 +289,7 @@ public class GlyphTest {
         }
     }
 
+    @SuppressWarnings("serial")
     public static class ShapeViewer extends Component {
 
         private final Shape shape;

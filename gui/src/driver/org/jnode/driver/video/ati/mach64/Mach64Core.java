@@ -94,7 +94,7 @@ final class Mach64Core implements Mach64Constants {
 
             final int fbBase = (int) fbAddr.getMemoryBase() /* & 0xFF800000 */;
             final int memSize = fbAddr.getSize();
-            log.info("Memory size " + NumberUtils.size(memSize));
+            log.info("Memory size " + NumberUtils.toBinaryByte(memSize));
 
             // Map Device RAM
             this.deviceRam =

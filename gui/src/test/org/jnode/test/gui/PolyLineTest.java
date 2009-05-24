@@ -55,6 +55,7 @@ public class PolyLineTest {
         }
     }
 
+    @SuppressWarnings("serial")
     static class TestComponent extends Component {
 
         private final double[] linePoints;

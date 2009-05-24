@@ -48,6 +48,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Levente S\u00e1ntha
  */
+@SuppressWarnings("serial")
 public class Editor extends JFrame {
     private static Logger logger = Logger.getLogger(Editor.class);
     private JTextArea textArea;

@@ -46,6 +46,7 @@ import javax.swing.SwingUtilities;
 /**
  * @author Levente S\u00e1ntha
  */
+@SuppressWarnings("serial")
 public class RobotTest extends JPanel {
     private static BufferedImage image;
     private static Color crtColor = Color.BLACK;

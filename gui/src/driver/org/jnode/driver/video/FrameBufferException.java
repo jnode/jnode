@@ -24,6 +24,7 @@ package org.jnode.driver.video;
  * @author epr
  */
 public class FrameBufferException extends Exception {
+    private static final long serialVersionUID = 1L;
 
     /**
      * 
