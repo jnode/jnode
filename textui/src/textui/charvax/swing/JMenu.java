@@ -104,9 +104,9 @@ public class JMenu
     {
 	super.setForeground(color_);
 
-	Enumeration e = _menuItems.elements();
+	Enumeration<Component> e = _menuItems.elements();
 	while (e.hasMoreElements()) {
-	    Component c = (Component) e.nextElement();
+	    Component c = e.nextElement();
 	    if (c.getForeground() == null)
 	    	c.setForeground(color_);
 	}
@@ -121,9 +121,9 @@ public class JMenu
     {
 	super.setBackground(color_);
 
-	Enumeration e = _menuItems.elements();
+	Enumeration<Component> e = _menuItems.elements();
 	while (e.hasMoreElements()) {
-	    Component c = (Component) e.nextElement();
+	    Component c = e.nextElement();
 	    if (c.getBackground() == null)
 		c.setBackground(color_);
 	}
@@ -311,7 +311,7 @@ public class JMenu
      */
     void setParentMenu(Component parent_)
     {
-	_parentMenu = new WeakReference(parent_);
+	_parentMenu = new WeakReference<Component>(parent_);
 
 	// If the colors of this menu have not been set yet, inherit the
 	// colors of the parent.
@@ -329,12 +329,12 @@ public class JMenu
     //====================================================================
     // INSTANCE VARIABLES
 
-    private Vector _menuItems = new Vector();
+    private Vector<Component> _menuItems = new Vector<Component>();
 
     // Note that the reference to the parent is stored as a WeakReference
     // so that the parent can be garbage-collected when it no longer has
     // any strong references to it.
-    private WeakReference _parentMenu;
+    private WeakReference<Component> _parentMenu;
 
     private boolean _popupMenuVisible = false;
     //private final Point _popupMenuOrigin;

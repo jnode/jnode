@@ -37,7 +37,7 @@ public abstract class AbstractListModel
      */
     public void addListDataListener(ListDataListener l_) {
 	if (_listeners == null)
-	    _listeners = new ArrayList();
+	    _listeners = new ArrayList<ListDataListener>();
 
 	_listeners.add(l_);
     }
@@ -62,7 +62,7 @@ public abstract class AbstractListModel
 	ListDataEvent event = new ListDataEvent(this, 
 		ListDataEvent.CONTENTS_CHANGED, index0_, index1_);
 
-	for (Iterator iter = _listeners.iterator(); iter.hasNext(); ) {
+	for (Iterator<ListDataListener> iter = _listeners.iterator(); iter.hasNext(); ) {
 	    ListDataListener l = (ListDataListener) iter.next();
 	    l.contentsChanged(event);
 	}
@@ -78,7 +78,7 @@ public abstract class AbstractListModel
 	ListDataEvent event = new ListDataEvent(this, 
 		ListDataEvent.INTERVAL_REMOVED, index0_, index1_);
 
-	for (Iterator iter = _listeners.iterator(); iter.hasNext(); ) {
+	for (Iterator<ListDataListener> iter = _listeners.iterator(); iter.hasNext(); ) {
 	    ListDataListener l = (ListDataListener) iter.next();
 	    l.contentsChanged(event);
 	}
@@ -94,7 +94,7 @@ public abstract class AbstractListModel
 	ListDataEvent event = new ListDataEvent(this, 
 		ListDataEvent.INTERVAL_ADDED, index0_, index1_);
 
-	for (Iterator iter = _listeners.iterator(); iter.hasNext(); ) {
+	for (Iterator<ListDataListener> iter = _listeners.iterator(); iter.hasNext(); ) {
 	    ListDataListener l = (ListDataListener) iter.next();
 	    l.contentsChanged(event);
 	}
@@ -106,6 +106,6 @@ public abstract class AbstractListModel
     /**
      * A list of ListDataListeners registered for this object.
      */
-    protected ArrayList _listeners = null;
+    protected ArrayList<ListDataListener> _listeners = null;
 
 }

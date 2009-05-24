@@ -345,7 +345,7 @@ public class JTextField
      */
     public void postActionEvent(ActionEvent ae_) {
 	if (_actionListeners != null) {
-	    for (Enumeration e = _actionListeners.elements(); 
+	    for (Enumeration<ActionListener> e = _actionListeners.elements(); 
 		    e.hasMoreElements(); ) {
 
 		ActionListener al = (ActionListener) e.nextElement();
@@ -359,7 +359,7 @@ public class JTextField
      */
     public void addActionListener(ActionListener al_) {
 	if (_actionListeners == null)
-	    _actionListeners = new Vector();
+	    _actionListeners = new Vector<ActionListener>();
 	_actionListeners.add(al_);
     }
 
@@ -417,5 +417,5 @@ public class JTextField
     /**
      * A list of ActionListeners registered for this component.
      */
-    protected Vector _actionListeners = null;
+    protected Vector<ActionListener> _actionListeners = null;
 }

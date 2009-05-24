@@ -36,13 +36,12 @@ public class JPopupMenu
     /** Constructs a JPopupMenu that contains the specified items.
      * Each element in the Vector must be a JMenuItem or JSeparator.
      */
-    public JPopupMenu(Vector items_)
+    public JPopupMenu(Vector<Component> items_)
     {
 	super();
 
-	for (int i=0; i<items_.size(); i++) {
-	    Object o = items_.elementAt(i);
-	    add((Component) o);
+	for (Component item : items_) {
+	    add(item);
 	}
 
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

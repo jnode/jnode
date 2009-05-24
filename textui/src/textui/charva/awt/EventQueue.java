@@ -126,9 +126,9 @@ else
     //====================================================================
     // INSTANCE VARIABLES
 
-    private LinkedList _lowPriorityQueue = new LinkedList();
+    private LinkedList<AWTEvent> _lowPriorityQueue = new LinkedList<AWTEvent>();
 
-    private LinkedList _highPriorityQueue = new LinkedList();
+    private LinkedList<AWTEvent> _highPriorityQueue = new LinkedList<AWTEvent>();
 
     //====================================================================
     // STATIC VARIABLES

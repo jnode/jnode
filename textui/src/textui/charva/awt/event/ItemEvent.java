@@ -24,9 +24,9 @@ import charva.awt.Component;
 /**
  * An event which indicates that an item was selected or deselected.
  */
-public class ItemEvent
-    extends AWTEvent
+public class ItemEvent extends AWTEvent
 {
+    private static final long serialVersionUID = 1L;
     /**
      * Constructs an ItemEvent object.
      * @param source_ The object (such as a List) that originated the event.

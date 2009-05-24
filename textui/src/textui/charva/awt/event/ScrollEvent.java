@@ -28,9 +28,9 @@ import charva.awt.Scrollable;
  * such as a Table, when its state changes in such a way that it may
  * need to be scrolled (if it is contained within a ScrollPane).
  */
-public class ScrollEvent
-    extends AWTEvent
+public class ScrollEvent extends AWTEvent
 {
+    private static final long serialVersionUID = 1L;
     /**
      * Construct a ScrollEvent with the specified direction and limit
      * parameters.

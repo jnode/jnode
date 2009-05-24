@@ -323,7 +323,7 @@ public class JTable
      */
     public void addScrollListener(ScrollListener sl_) {
 	if (_scrollListeners == null)
-	    _scrollListeners = new Vector();
+	    _scrollListeners = new Vector<ScrollListener>();
 	_scrollListeners.add(sl_);
     }
 
@@ -340,7 +340,7 @@ public class JTable
      */
     public void processScrollEvent(ScrollEvent e_) {
 	if (_scrollListeners != null) {
-	    for (Enumeration e = _scrollListeners.elements(); 
+	    for (Enumeration<ScrollListener> e = _scrollListeners.elements(); 
 		    e.hasMoreElements(); ) {
 
 		ScrollListener sl = (ScrollListener) e.nextElement();
@@ -652,7 +652,7 @@ public class JTable
 
     /** A list of ScrollListeners registered for this JTable.
      */
-    private Vector _scrollListeners = null;
+    private Vector<ScrollListener> _scrollListeners = null;
 
     protected ListSelectionModel _rowSelectionModel = 
 	    new DefaultListSelectionModel();

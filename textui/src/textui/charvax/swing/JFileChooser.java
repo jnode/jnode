@@ -306,7 +306,7 @@ public class JFileChooser
 
     protected void fireFileChooserEvent()
     {
-	Enumeration e = _filelisteners.elements();
+	Enumeration<FileChooserListener> e = _filelisteners.elements();
 	while (e.hasMoreElements()) {
 	    FileChooserListener l = (FileChooserListener) e.nextElement();
 	    l.fileChanged(new FileChooserEvent(this));
@@ -326,7 +326,7 @@ public class JFileChooser
     protected boolean _cancelWasPressed = true;
     protected int _fileSelectionMode = FILES_ONLY;
     protected FileFilter _fileFilter = null;
-    protected Vector _filelisteners = new Vector();
+    protected Vector<FileChooserListener> _filelisteners = new Vector<FileChooserListener>();
 
     protected static final int _COLS = 50;
     protected static final int _ROWS = 20;
@@ -656,15 +656,13 @@ public class JFileChooser
 	     * the Comparator interface. This will be used by the TreeSet
 	     * to keep the filenames in lexicographical order.
 	     */
-	    Comparator fileSorter = new Comparator() {
-		public int compare(Object obj1, Object obj2) {
-		    String file1 = (String) obj1;
-		    String file2 = (String) obj2;
+	    Comparator<String> fileSorter = new Comparator<String>() {
+		public int compare(String file1, String file2) {
 		    return file1.compareTo(file2);
 		}
 	    };
 
-	    TreeSet dirs = new TreeSet(fileSorter);
+	    TreeSet<String> dirs = new TreeSet<String>(fileSorter);
 	    int numEntries = 0;
 	    for (int i=0; i<files.length; i++) {
 		if (files[i].isDirectory()) {
@@ -684,7 +682,7 @@ public class JFileChooser
 
 	    /* Copy the filenames from the TreeSet to the JList widget
 	     */
-	    Iterator iter = dirs.iterator();
+	    Iterator<String> iter = dirs.iterator();
 	    while (iter.hasNext()) {
 		listModel.addElement(iter.next());
 	    }
@@ -857,16 +855,16 @@ public class JFileChooser
 
     // end of inner class NewDirDialog
 
-    private interface FileChooserListener 
-	extends EventListener
+    private interface FileChooserListener extends EventListener
     {
 	public void fileChanged(FileChooserEvent e);
     }
 
-    private class FileChooserEvent
-	extends java.util.EventObject
+    private class FileChooserEvent extends java.util.EventObject
     {
-	public FileChooserEvent(Object source_)
+        private static final long serialVersionUID = 1L;
+
+    public FileChooserEvent(Object source_)
 	{
 	    super(source_);
 	}

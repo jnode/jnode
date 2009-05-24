@@ -25,6 +25,7 @@ package charvax.swing.event;
  * find out the status of each potentially changed row.
  */
 public class ListSelectionEvent extends java.util.EventObject {
+    private static final long serialVersionUID = 1L;
 
     /**
      * Construct a ListSelectionEvent.

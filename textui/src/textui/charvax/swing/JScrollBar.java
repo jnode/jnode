@@ -270,7 +270,7 @@ public class JScrollBar
      */
     public void addAdjustmentListener(AdjustmentListener listener_) {
 	if (_adjustmentListeners == null)
-	    _adjustmentListeners = new Vector();
+	    _adjustmentListeners = new Vector<AdjustmentListener>();
 	_adjustmentListeners.add(listener_);
     }
 
@@ -282,7 +282,7 @@ public class JScrollBar
 
     public void processAdjustmentEvent(AdjustmentEvent evt_) {
 	if (_adjustmentListeners != null) {
-	    for (Enumeration e = _adjustmentListeners.elements(); 
+	    for (Enumeration<AdjustmentListener> e = _adjustmentListeners.elements(); 
 		    e.hasMoreElements(); ) {
 
 		AdjustmentListener al = (AdjustmentListener) e.nextElement();
@@ -337,5 +337,5 @@ public class JScrollBar
     /**
      * A list of AdjustmentListeners registered for this component.
      */
-    protected Vector _adjustmentListeners = null;
+    protected Vector<AdjustmentListener> _adjustmentListeners = null;
 }

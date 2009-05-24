@@ -114,7 +114,7 @@ public class FlowLayout
 	int voffset = insets.top;
 
 	Component[] components = container_.getComponents();
-	Vector localvector = new Vector();
+	Vector<Component> localvector = new Vector<Component>();
 	for (int i=0; i<components.length; i++) {
 	    Component c = components[i];
 
@@ -160,7 +160,7 @@ public class FlowLayout
     /** private function to layout a single row of components.
      * @return The height of the laid-out row.
      */
-    private int layoutRow(Container container_, Vector components_, 
+    private int layoutRow(Container container_, Vector<Component> components_, 
 	int widthleft_, int heightleft_, int voffset_) {
 
 	int hoffset = 0;
@@ -179,7 +179,7 @@ public class FlowLayout
 		break;
 	}
 
-	Enumeration e = components_.elements();
+	Enumeration<Component> e = components_.elements();
 	while (e.hasMoreElements()) {
 	    Component c = (Component) e.nextElement();
 	    if (c.getSize().height > rowHeight)

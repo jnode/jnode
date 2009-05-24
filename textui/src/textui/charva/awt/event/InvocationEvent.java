@@ -24,9 +24,9 @@ package charva.awt.event;
  * An event which executes the <code>run()</code> method on a 
  * <code>Runnable</code> when dispatched by the AWT event dispatcher thread.
  */
-public class InvocationEvent
-    extends AWTEvent
+public class InvocationEvent extends AWTEvent
 {
+    private static final long serialVersionUID = 1L;
     /**
      * Constructs an InvocationEvent with the specified source which
      * will execute the Runnable's run() method when dispatched by

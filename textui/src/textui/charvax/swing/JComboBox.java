@@ -101,7 +101,7 @@ public class JComboBox
      * Vector. 
      * @param items_ the vector of items to display in the combobox
      */
-    public JComboBox(Vector items_)
+    public JComboBox(Vector<?> items_)
     {
 	DefaultComboBoxModel model = new DefaultComboBoxModel(items_);
 	setModel(model);
@@ -265,7 +265,7 @@ public class JComboBox
      */
     public void addItemListener(ItemListener il_) {
 	if (_itemListeners == null)
-	    _itemListeners = new Vector();
+	    _itemListeners = new Vector<ItemListener>();
 	_itemListeners.add(il_);
     }
 
@@ -281,7 +281,7 @@ public class JComboBox
      */
     protected void fireItemStateChanged(ItemEvent ie_) {
 	if (_itemListeners != null) {
-	    for (Enumeration e = _itemListeners.elements(); 
+	    for (Enumeration<ItemListener> e = _itemListeners.elements(); 
 		    e.hasMoreElements(); ) {
 
 		ItemListener il = (ItemListener) e.nextElement();
@@ -308,7 +308,7 @@ public class JComboBox
      */
     public void addActionListener(ActionListener al_) {
 	if (_actionListeners == null)
-	    _actionListeners = new Vector();
+	    _actionListeners = new Vector<ActionListener>();
 	_actionListeners.add(al_);
     }
 
@@ -317,7 +317,7 @@ public class JComboBox
      */
     protected void fireActionEvent(ActionEvent ae_) {
 	if (_actionListeners != null) {
-	    for (Enumeration e = _actionListeners.elements(); 
+	    for (Enumeration<ActionListener> e = _actionListeners.elements(); 
 		    e.hasMoreElements(); ) {
 
 		ActionListener al = (ActionListener) e.nextElement();
@@ -439,12 +439,12 @@ public class JComboBox
     /**
      * A list of ActionListeners registered for this component.
      */
-    protected Vector _actionListeners = null;
+    protected Vector<ActionListener> _actionListeners = null;
 
     /**
      * A list of ItemListeners registered for this component.
      */
-    protected Vector _itemListeners = null;
+    protected Vector<ItemListener> _itemListeners = null;
 
     /**
      * This is a non-static inner class that implements the popup 

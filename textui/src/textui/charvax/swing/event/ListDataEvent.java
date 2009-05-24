@@ -23,6 +23,7 @@ package charvax.swing.event;
  * An event that characterizes a change in a list.
  */
 public class ListDataEvent extends java.util.EventObject {
+    private static final long serialVersionUID = 1L;
 
     /**
      * Construct a ListDataEvent.

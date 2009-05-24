@@ -25,9 +25,10 @@ package charva.awt;
  * when it finds the requested capability but it is of the wrong
  * type).
  */
-public class TerminfoCapabilityException
-    extends Exception
+public class TerminfoCapabilityException extends Exception
 {
+    private static final long serialVersionUID = 1L;
+    
     public TerminfoCapabilityException()
     {
 	super();

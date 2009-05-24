@@ -185,7 +185,7 @@ public abstract class AbstractButton
      */
     public void addActionListener(ActionListener al_) {
 	if (_actionListeners == null)
-	    _actionListeners = new Vector();
+	    _actionListeners = new Vector<ActionListener>();
 	_actionListeners.add(al_);
     }
 
@@ -194,7 +194,7 @@ public abstract class AbstractButton
      */
     protected void fireActionPerformed(ActionEvent ae_) {
 	if (_actionListeners != null) {
-	    for (Enumeration e = _actionListeners.elements(); 
+	    for (Enumeration<ActionListener> e = _actionListeners.elements(); 
 		    e.hasMoreElements(); ) {
 
 		ActionListener al = (ActionListener) e.nextElement();
@@ -208,7 +208,7 @@ public abstract class AbstractButton
      */
     public void addItemListener(ItemListener il_) {
 	if (_itemListeners == null)
-	    _itemListeners = new Vector();
+	    _itemListeners = new Vector<ItemListener>();
 	_itemListeners.add(il_);
     }
 
@@ -250,7 +250,7 @@ public abstract class AbstractButton
      */
     protected void fireItemStateChanged(ItemEvent ie_) {
 	if (_itemListeners != null) {
-	    for (Enumeration e = _itemListeners.elements(); 
+	    for (Enumeration<ItemListener> e = _itemListeners.elements(); 
 		    e.hasMoreElements(); ) {
 
 		ItemListener il = (ItemListener) e.nextElement();
@@ -308,10 +308,10 @@ public abstract class AbstractButton
     /**
      * A list of ActionListeners registered for this component.
      */
-    protected Vector _actionListeners = null;
+    protected Vector<ActionListener> _actionListeners = null;
 
     /**
      * A list of ItemListeners registered for this component.
      */
-    protected Vector _itemListeners = null;
+    protected Vector<ItemListener> _itemListeners = null;
 }

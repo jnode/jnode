@@ -25,9 +25,9 @@ import charva.awt.Toolkit;
 /**
  * An event which indicates that a keystroke occurred in an object.
  */
-public class KeyEvent
-    extends InputEvent
+public class KeyEvent extends InputEvent
 {
+    private static final long serialVersionUID = 1L;
     private int _key;
 
     public KeyEvent(int key_, int id_, Component source_) {

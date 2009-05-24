@@ -26,9 +26,9 @@ import charva.awt.event.AWTEvent;
  * if possible. This speeds up redrawing.
  * The queue also handles GarbageCollectionEvents.
  */
-class SyncQueue
-    extends java.util.LinkedList
+class SyncQueue extends java.util.LinkedList<AWTEvent>
 {
+    private static final long serialVersionUID = 1L;
 
     private static SyncQueue _instance;
     private boolean stopped = false;
