@@ -60,12 +60,6 @@ public class Config {
     private final String[] excludingFilters;
     
     /**
-     * Should we force reading the mauve list on startup instead of getting it 
-     * from previous run (that save it in the work directory) ?
-     */
-    private final boolean forceUseMauveList;
-    
-    /**
      * Time between 2 checks of the WatchDog.
      */
     private final int watchDogPollInterval;
@@ -86,7 +80,6 @@ public class Config {
         serverPort = ConfigUtils.getInt(properties, "server.port", 10000);
         workDir = new File(ConfigurationUtils.getHomeDirectory(), "workdir");
         excludingFilters = ConfigUtils.getStringArray(properties, "excluding.filters");
-        forceUseMauveList = ConfigUtils.getBoolean(properties, "force.use.mauve.list", false);
         watchDogPollInterval = ConfigUtils.getInt(properties, "watchdog.poll.interval", 10000);
         this.vmConfig = vmConfig;
     }
@@ -107,10 +100,6 @@ public class Config {
         return workDir;
     }
     
-    public boolean isForceUseMauveList() {
-        return forceUseMauveList;
-    }
-
     public String[] getExcludingFilters() {
         return excludingFilters;
     }

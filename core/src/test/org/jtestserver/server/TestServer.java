@@ -66,7 +66,25 @@ public class TestServer {
         addCommand(new GetStatusCommand());
         
         config = Config.read();
-        server = new UDPProtocol().createServer(config.getPort());
+        Server<?, ?> s = null;
+        //TODO use config for min and max port
+        for (int port = config.getPort(); port < (config.getPort() + 10); port++) {
+            try {
+                LOGGER.finer("trying port " + port);
+                s = new UDPProtocol().createServer(port);
+                if (s != null) {
+                    LOGGER.finer("succeed !");
+                    break;
+                }
+            } catch (ProtocolException pe) {
+                LOGGER.warning("failed !");
+            }
+        }
+        server = s;
+        
+        if (server == null) {
+            throw new IOException("no available port found");
+        }
         //protocol.setTimeout(10000);
         
         MauveTestRunner.getInstance().setConfig(config);
@@ -77,6 +95,18 @@ public class TestServer {
     }
     
     public void start() {
+        
+        /*
+        String pid = "???";
+        try {
+            pid = SystemUtils.getInstance().getPid();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "ERROR", e);
+        } catch (InterruptedException e) {
+            LOGGER.log(Level.SEVERE, "ERROR", e);
+        }
+        LOGGER.info("server started (PID=" + pid + ')');
+        */
         LOGGER.info("server started");
         
         while (!shutdownRequested) {
