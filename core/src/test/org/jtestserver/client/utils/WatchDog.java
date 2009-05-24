@@ -91,7 +91,9 @@ public abstract class WatchDog extends Thread {
                     goSleep();
                 }
                 
-                processDead();
+                if (watch) {
+                    processDead();
+                }
             } else {
                 goSleep();
             }
