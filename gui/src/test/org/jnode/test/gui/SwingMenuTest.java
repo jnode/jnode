@@ -27,6 +27,7 @@ import javax.swing.JMenuItem;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@SuppressWarnings("serial")
 public class SwingMenuTest extends SwingTest {
 
     /**

@@ -123,6 +123,7 @@ public class CirrusDriver extends AbstractFrameBufferDriver implements CirrusCon
             throw new DriverException(ex);
         }
         super.startDevice();
+        @SuppressWarnings("unused")
         final Device dev = getDevice();
         //dev.registerAPI(DisplayDataChannelAPI.class, driver); 
         //       <-- should we register this one? We do read edid our own..

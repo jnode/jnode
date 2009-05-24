@@ -94,6 +94,7 @@ final class FpRegs implements RadeonConstants {
     final void calcForConfiguration(RadeonConfiguration config, PLLInfo pllInfo, RadeonVgaIO io,
             FBInfo fbinfo, CrtcRegs crtc) {
         final DisplayMode mode = config.getDisplayMode();
+        @SuppressWarnings("unused")
         final int bpp = config.getBitsPerPixel();
 
         final int panel_xres = fbinfo.getPanelXres();
@@ -153,6 +154,7 @@ final class FpRegs implements RadeonConstants {
         fp_v_sync_strt_wid = crtc.getCrtc_v_sync_strt_wid();
     }
 
+    @SuppressWarnings("unused")
     private static final int round_div(int num, int den) {
         return (num + (den / 2)) / den;
     }

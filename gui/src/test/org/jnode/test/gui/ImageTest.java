@@ -36,6 +36,7 @@ public class ImageTest {
 
     static final String IMAGE_PATH = "/org/zaval/lw/rs/img/tree.gif";
 
+    @SuppressWarnings("serial")
     static class TestComponent extends Component implements ImageObserver {
 
         private final Image img;

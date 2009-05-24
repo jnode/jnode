@@ -40,6 +40,7 @@ import javax.swing.JTextArea;
  */
 public class ConsoleTest {
 
+    @SuppressWarnings("serial")
     static class ConsoleFrame extends JFrame {
         private PrintStream savedOut;
         private JTextArea textArea;

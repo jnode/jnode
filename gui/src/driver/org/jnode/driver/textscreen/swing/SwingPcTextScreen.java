@@ -21,6 +21,7 @@
 package org.jnode.driver.textscreen.swing;
 
 import java.awt.AWTEvent;
+import java.awt.AWTKeyStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -97,6 +98,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
     }
 
     private class SwingPcScreen extends JComponent {
+        private static final long serialVersionUID = 1L;
         int margin = 5;
         int w;
         int h;
@@ -133,7 +135,8 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             });
             setFocusable(true);
             setBackground(Color.BLACK);
-            Set ftk = new HashSet(getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+            Set<AWTKeyStroke> ftk = new HashSet<AWTKeyStroke>(
+                    getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
             ftk.remove(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
             setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, ftk);
         }

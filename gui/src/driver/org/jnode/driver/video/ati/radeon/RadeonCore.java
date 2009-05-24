@@ -110,7 +110,7 @@ final class RadeonCore implements RadeonConstants {
                             ResourceManager.MEMMODE_NORMAL);
             this.vgaIO = new RadeonVgaIO(mmio);
             final int memSize = readMemorySize();
-            log.info("Memory size " + NumberUtils.size(memSize));
+            log.info("Memory size " + NumberUtils.toBinaryByte(memSize));
             this.accel = new RadeonAcceleration(vgaIO);
 
             // Map Device RAM
@@ -435,7 +435,7 @@ final class RadeonCore implements RadeonConstants {
             mem.release();
 
             log.info("Found ATI ROM at 0x" + NumberUtils.hex(romAddr.toInt()) + " size=" +
-                    NumberUtils.size(romSize));
+                    NumberUtils.toBinaryByte(romSize));
             return rm.claimMemoryResource(owner, romAddr, romSize, ResourceManager.MEMMODE_NORMAL);
         }
 

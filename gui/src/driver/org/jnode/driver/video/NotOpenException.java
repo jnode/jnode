@@ -21,6 +21,7 @@
 package org.jnode.driver.video;
 
 public class NotOpenException extends FrameBufferException {
+    private static final long serialVersionUID = 1L;
 
     /**
      * 

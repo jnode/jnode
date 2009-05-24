@@ -34,6 +34,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import org.jnode.awt.font.FontProvider;
 import org.jnode.awt.font.TextRenderer;
+import org.jnode.awt.font.bdf.BDFFont;
 import org.jnode.awt.font.bdf.BDFFontProvider;
 import org.jnode.driver.video.Surface;
 
@@ -99,13 +100,14 @@ public class Graphics2DSurface implements Surface {
     }
 
     public static void main(String[] argv) {
-        FontProvider fp = new BDFFontProvider();
-        Set<Font> obj = fp.getAllFonts();
+        FontProvider<BDFFont> fp = new BDFFontProvider();
+        Set<? extends Font> obj = fp.getAllFonts();
         System.out.println(obj);
         final TextRenderer tr = fp.getTextRenderer(obj.iterator().next());
         final AffineTransform tf = AffineTransform.getTranslateInstance(0, 0);
         JFrame f = new JFrame("BDF Test");
         f.add(new JComponent() {
+            private static final long serialVersionUID = 1L;
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);

@@ -46,6 +46,7 @@ import java.awt.geom.PathIterator;
 /**
  * @author epr
  */
+@SuppressWarnings("serial")
 public class AWTTest extends Frame {
 
     static class TestComponent extends Component {
@@ -263,6 +264,7 @@ public class AWTTest extends Frame {
     }
 
     public static void main(String[] args) throws InterruptedException {
+        @SuppressWarnings("unused")
         boolean useDoubleBuffer = (args.length > 0) && args[0].equals("buffer");
 
         try {

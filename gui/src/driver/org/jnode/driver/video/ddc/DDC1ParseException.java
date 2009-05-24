@@ -24,6 +24,7 @@ package org.jnode.driver.video.ddc;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class DDC1ParseException extends DDC1Exception {
+    private static final long serialVersionUID = 1L;
 
     /**
      * 

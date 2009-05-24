@@ -30,6 +30,7 @@ import javax.swing.JTextArea;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@SuppressWarnings("serial")
 public class SwingTest extends JFrame {
 
     private final JButton north;

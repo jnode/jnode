@@ -186,7 +186,7 @@ public class CurvesTest {
             Curves.calculateCubicCurveOpt2(x0, y0, x1, y1, x2, y2, x3, y3, temp);
     }
 
-
+    @SuppressWarnings("serial")
     private class MyPanel extends JPanel {
 
         GeneralPath gp1 = new GeneralPath();

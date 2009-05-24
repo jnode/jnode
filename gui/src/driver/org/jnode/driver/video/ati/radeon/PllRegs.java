@@ -246,6 +246,7 @@ final class PllRegs implements RadeonConstants {
             this.ppll_div_3 = (feedback_div | (bitvalue << 16));
             this.htotal_cntl = 0;
 
+            @SuppressWarnings("unused")
             final int vclk_freq = (ref_clk * feedback_div) / (ref_div * pll_output_freq);
             // System.out.println("vclk_freq=" + vclk_freq + ", fbdiv="
             // + feedback_div + ", postdiv=" + pll_output_freq
@@ -261,6 +262,7 @@ final class PllRegs implements RadeonConstants {
                 ", htotal_cntl:0x" + NumberUtils.hex(htotal_cntl);
     }
 
+    @SuppressWarnings("unused")
     private final void PLLWriteUpdate(RadeonVgaIO io) {
         PLLWaitForReadUpdateComplete(io);
         io.setPLLP(crtc2 ? P2PLL_REF_DIV : PPLL_REF_DIV, PPLL_ATOMIC_UPDATE_W,

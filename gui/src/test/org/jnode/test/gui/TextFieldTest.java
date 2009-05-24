@@ -30,6 +30,7 @@ import java.awt.event.WindowEvent;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@SuppressWarnings("serial")
 public class TextFieldTest extends Frame {
 
     public TextFieldTest() {

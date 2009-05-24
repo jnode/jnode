@@ -36,6 +36,7 @@ import org.jnode.system.MemoryResource;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class RadeonSurface extends AbstractSurface {
+    @SuppressWarnings("unused")
     private final RadeonAcceleration accel;
 
     private final BitmapGraphics bitmapGraphics;

@@ -26,6 +26,7 @@ import java.awt.MenuBar;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@SuppressWarnings("serial")
 public class AWTMenuTest extends AWTTest {
 
     /**

@@ -75,6 +75,7 @@ public class AWTDemo {
         public void init();
     }
 
+    @SuppressWarnings("serial")
     static class PrettyPanel extends Panel {
         Insets myInsets;
 
@@ -87,6 +88,7 @@ public class AWTDemo {
         }
     }
 
+    @SuppressWarnings("serial")
     abstract static class PrettyFrame extends Frame {
         public PrettyFrame() {
             ((BorderLayout) getLayout()).setHgap(5);
@@ -100,6 +102,7 @@ public class AWTDemo {
         }
     }
 
+    @SuppressWarnings("serial")
     abstract static class SubFrame extends PrettyFrame implements SubWindow {
         boolean initted = false;
 
@@ -110,6 +113,7 @@ public class AWTDemo {
         }
     }
 
+    @SuppressWarnings("serial")
     static class MainWindow extends PrettyFrame implements ActionListener {
         Button closeButton;
 
@@ -208,6 +212,7 @@ public class AWTDemo {
         }
     }
 
+    @SuppressWarnings("serial")
     static class ButtonsWindow extends SubFrame implements ActionListener {
         Button b[] = new Button[9];
 
@@ -259,6 +264,7 @@ public class AWTDemo {
         }
     }
 
+    @SuppressWarnings("serial")
     static class DialogWindow extends Dialog implements SubWindow {
         Label text;
 
@@ -336,6 +342,7 @@ public class AWTDemo {
         }
     }
 
+    @SuppressWarnings("serial")
     static class CursorsWindow extends SubFrame implements ItemListener {
         Choice cursorChoice;
 
@@ -397,6 +404,7 @@ public class AWTDemo {
         }
     }
 
+    @SuppressWarnings("serial")
     static class TextFieldWindow extends SubFrame implements ItemListener {
         Checkbox editable, visible, sensitive;
 
@@ -456,6 +464,7 @@ public class AWTDemo {
         }
     }
 
+    @SuppressWarnings("serial")
     static class FileWindow extends FileDialog implements SubWindow {
         boolean initted = false;
 
@@ -474,6 +483,7 @@ public class AWTDemo {
         }
     }
 
+    @SuppressWarnings("serial")
     static class LabelWindow extends SubFrame {
         public void init() {
             initted = true;
@@ -502,6 +512,7 @@ public class AWTDemo {
         }
     }
 
+    @SuppressWarnings("serial")
     static class ListWindow extends SubFrame {
         public void init() {
             initted = true;
@@ -530,6 +541,7 @@ public class AWTDemo {
         }
     }
 
+    @SuppressWarnings("serial")
     static class RadioWindow extends SubFrame {
         public void init() {
             initted = true;
@@ -579,6 +591,7 @@ public class AWTDemo {
         }
     }
 
+    @SuppressWarnings("serial")
     static class TestWindow extends SubFrame {
         static int xs = 5, ys = 5;
 
@@ -702,6 +715,7 @@ public class AWTDemo {
         }
     }
 
+    @SuppressWarnings("serial")
     static class RoundRectWindow extends SubFrame {
         public void init() {
             initted = true;

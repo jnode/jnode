@@ -32,6 +32,7 @@ public final class CirrusMMIO implements CirrusConstants, DisplayDataChannelAPI 
     /** My logger */
     private static final Logger log = Logger.getLogger(CirrusMMIO.class);
     
+    @SuppressWarnings("unused")
     private final MemoryResource mmio;
 
     private final IOResource ports;
