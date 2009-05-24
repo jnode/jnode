@@ -21,7 +21,6 @@ package org.jtestserver.common.message;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.jtestserver.common.Status;
 
