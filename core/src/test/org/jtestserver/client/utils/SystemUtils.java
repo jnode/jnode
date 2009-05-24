@@ -20,7 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.client.utils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +44,8 @@ public abstract class SystemUtils {
     }
     
     public abstract List<ProcessStatus> getProcessStatus(String command) throws IOException;
-    public abstract boolean killProcess(String pid) throws IOException;
+    public abstract boolean killProcess(String pid) throws IOException;    
+    public abstract String getPid() throws IOException, InterruptedException;
     
     public static class ProcessStatus {
         private final String identifier;
@@ -106,6 +109,35 @@ public abstract class SystemUtils {
             cmdLine.append("-9").append(pid);
             
             return runner.execute(cmdLine);
+        }
+
+        /**
+         * 
+         */
+        @Override
+        public String getPid() throws IOException, InterruptedException {
+            List<String> commands = new ArrayList<String>();
+            commands.add("/bin/bash");
+            commands.add("-c");
+            commands.add("echo $PPID");
+            ProcessBuilder pb = new ProcessBuilder(commands);
+
+            Process pr = pb.start();
+            pr.waitFor();
+            if (pr.exitValue() == 0) {
+                BufferedReader outReader = null;
+                try {
+                    outReader = new BufferedReader(new InputStreamReader(
+                            pr.getInputStream()));
+                    return outReader.readLine().trim();
+                } finally {
+                    if (outReader != null) {
+                        outReader.close();
+                    }
+                }
+            } else {
+                throw new IOException("Error while getting PID");
+            }
         }
     }
     

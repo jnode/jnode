@@ -45,13 +45,14 @@ import java.util.logging.Logger;
 import net.sourceforge.nanoxml.XMLParseException;
 
 import org.jtestserver.client.process.ServerProcess;
+import org.jtestserver.client.router.MultipleClientTestRouter;
+import org.jtestserver.client.router.TestRouter;
+import org.jtestserver.client.router.TestRouterResult;
 import org.jtestserver.client.utils.ConfigurationUtils;
 import org.jtestserver.client.utils.TestListRW;
-import org.jtestserver.client.utils.WatchDog;
 import org.jtestserver.common.protocol.Client;
 import org.jtestserver.common.protocol.Protocol;
 import org.jtestserver.common.protocol.ProtocolException;
-import org.jtestserver.common.protocol.TimeoutException;
 import org.jtestserver.common.protocol.udp.UDPProtocol;
 
 public class TestDriver {
@@ -64,19 +65,9 @@ public class TestDriver {
         try {
             testDriver = createUDPTestDriver();
             
-            if ((args.length > 0) && "kill".equals(args[0])) {
-                testDriver.killRunningServers();
-            } else {
-                testDriver.start();
-            }
-        } catch (IOException e) {
+            testDriver.start();
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "protocol error", e);
-        } catch (ProtocolException e) {
-            LOGGER.log(Level.SEVERE, "I/O error", e);
-        } finally {
-            if (testDriver != null) {
-                testDriver.killRunningServers();
-            }
         }
     }
     
@@ -93,107 +84,63 @@ public class TestDriver {
         return new TestDriver(config, client, process);
     }
     
-    private final TestClient client;
-    private final ServerProcess process;
     private final List<String> tests = new ArrayList<String>();
     private final Config config;
     private final TestListRW testListRW;
-    private final WatchDog watchDog;
+    private final TestRouter instance;
+    private final String processClassName;
     
     private TestDriver(Config config, Client<?, ?> client, ServerProcess process) {
         this.config = config;
-        this.client = new DefaultTestClient(client);
-        this.process = process;
         testListRW = new TestListRW(config);
-        watchDog = new WatchDog(process, config) {
-
-            @Override
-            protected void processDead() {
-                LOGGER.warning("process is dead. restarting it.");
-                try {
-                    TestDriver.this.process.start();
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, "error while restarting", e);
-                }
-            }
-        };
+        //instance = new SingleClientTestRouter(config, client, process);
+        instance = new MultipleClientTestRouter(config, client, process);
+        processClassName = process.getClass().getName();
     }
     
-    public void killRunningServers() {
-        LOGGER.info("killing running servers");
-        
-        boolean killed = false;
-        try {
-            // kill server that might still be running
-            client.shutdown();
-        } catch (ProtocolException pe) {
-            // assume that exception means the server has been killed
-            killed = true;
-        } catch (TimeoutException e) {
-            // assume that exception means the server has been killed
-            killed = true;
-        }
-        
-        while (!killed) {
-            try {
-                client.getStatus();
-            } catch (ProtocolException pe) {
-                // assume that exception means the server has been killed
-                killed = true;
-            } catch (TimeoutException e) {
-                // assume that exception means the server has been killed
-                killed = true;
-            }
-        }
-        
-        LOGGER.info("all servers are killed");
-
-        // stop the watch dog before actually stop the process
-        watchDog.stopWatching();
-        try {
-            process.stop();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "and error happened while stopping", e);
-        }
-    }
-    
-    public void start() throws IOException, ProtocolException {
-        //killRunningServers();
-        
-        process.start();
-        watchDog.startWatching();
+    public void start() throws Exception {
+        instance.start();
  
-        Run latestRun = Run.getLatest(config);
-        Run newRun = Run.create(config);
-        
-        List<String> workingList = new ArrayList<String>();
-        List<String> crashingList = new ArrayList<String>();
-        
-        LOGGER.info("running list of working tests");
-        File workingTests = (latestRun == null) ? null : latestRun.getWorkingTests();
-        RunResult runResult = runTests(workingTests, true, workingList, crashingList, newRun.getTimestampString());
-        runResult.setSystemProperty("jtestserver.process", process.getClass().getName());
-        
-        LOGGER.info("running list of crashing tests");
-        File crashingTests = (latestRun == null) ? null : latestRun.getCrashingTests();
-        RunResult rr = runTests(crashingTests, false, workingList, crashingList, 
-                newRun.getTimestampString());
-        mergeResults(runResult, rr);
-        
-        LOGGER.info("writing crashing & working tests lists");
-        testListRW.writeList(newRun.getWorkingTests(), workingList);
-        testListRW.writeList(newRun.getCrashingTests(), crashingList);
-        
-        writeReports(runResult, newRun.getReportXml());
-        
-        compareRuns(latestRun, newRun, runResult);
-        
-        watchDog.stopWatching();
-        killRunningServers();
+        try {
+            Run latestRun = Run.getLatest(config);
+            Run newRun = Run.create(config);
+            
+            List<String> workingList = new ArrayList<String>();
+            List<String> crashingList = new ArrayList<String>();
+            RunResult runResult;
+            
+            if (latestRun == null) {
+                LOGGER.info("running list of all tests");
+                runResult = runTests(null, true, workingList, crashingList, newRun.getTimestampString());
+                runResult.setSystemProperty("jtestserver.process", processClassName);
+
+            } else {
+                LOGGER.info("running list of working tests");
+                File workingTests = latestRun.getWorkingTests();
+                runResult = runTests(workingTests, true, workingList, crashingList, newRun.getTimestampString());
+                runResult.setSystemProperty("jtestserver.process", processClassName);
+                
+                LOGGER.info("running list of crashing tests");
+                File crashingTests = latestRun.getCrashingTests();
+                RunResult rr = runTests(crashingTests, false, workingList, crashingList, 
+                        newRun.getTimestampString());
+                mergeResults(runResult, rr);
+            }
+            
+            LOGGER.info("writing crashing & working tests lists");
+            testListRW.writeList(newRun.getWorkingTests(), workingList);
+            testListRW.writeList(newRun.getCrashingTests(), crashingList);
+            
+            writeReports(runResult, newRun.getReportXml());
+            
+            compareRuns(latestRun, newRun, runResult);
+        } finally {        
+            instance.stop();
+        }
     }
     
     private void compareRuns(Run latestRun, Run newRun, RunResult newRunResult) throws XMLParseException, IOException {
-        if (latestRun != null) {
+        if ((latestRun != null) && latestRun.getReportXml().exists()) {
             // there was a previous run, let do the comparison !
             
             RunResult latestRunResult = new XMLReportParser().parse(latestRun.getReportXml());
@@ -220,12 +167,12 @@ public class TestDriver {
     
     private RunResult runTests(File listFile, boolean useCompleteListAsDefault,
             List<String> workingList, List<String> crashingList, String timestamp)
-        throws ProtocolException, IOException {
+        throws Exception {
         final List<String> list;
-        if ((listFile != null) && listFile.exists() && !config.isForceUseMauveList()) {
+        if ((listFile != null) && listFile.exists()) {
             list = testListRW.readList(listFile);
         } else {
-            if (useCompleteListAsDefault || config.isForceUseMauveList()) {
+            if (useCompleteListAsDefault) {
                 // not yet a list of working/crashing tests => starts with the
                 // default one
                 list = testListRW.readCompleteList();
@@ -234,25 +181,32 @@ public class TestDriver {
             }
         }
 
-        RunResult result = new RunResult(timestamp);
-        boolean firstTest = true;
         int i = 0; // TODO for debug only, remove that
         for (String test : list) {
             if (i++ > 100) { // TODO for debug only, remove that
                 break;
             }
             
+            LOGGER.info("adding test " + test);            
+            instance.addTest(test);
+        }
+
+        RunResult result = new RunResult(timestamp);
+        boolean firstTest = true;
+        while (instance.hasPendingTests()) {
             boolean working = false;
             RunResult delta = null;
-            LOGGER.info("launching test " + test);
+            String test = null;
             
             try {
-                delta = client.runMauveTest(test);
+                LOGGER.info("getting a result");
+                TestRouterResult runnerResult = instance.getResult(); 
+                delta = runnerResult.getRunResult();
+                test = runnerResult.getTest();
+                LOGGER.info("got a result for " + test);
                 mergeResults(result, delta);
                 
                 working = true;
-            } catch (TimeoutException e) {
-                LOGGER.log(Level.SEVERE, "a timeout happened", e);
             } finally {
                 if (working) {
                     workingList.add(test);
