@@ -39,7 +39,7 @@ import sun.font.StandardGlyphVector;
 
 public class TTFFontPeer extends JNodeFontPeer<TTFontProvider, TTFFont> {
 
-    public TTFFontPeer(TTFontProvider provider, String name, Map attrs) {
+    public TTFFontPeer(TTFontProvider provider, String name, Map<?,?> attrs) {
         super(provider, name, attrs);
     }
 

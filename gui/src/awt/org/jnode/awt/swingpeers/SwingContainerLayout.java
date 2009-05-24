@@ -35,7 +35,7 @@ final class SwingContainerLayout implements LayoutManager {
     private final SwingContainerPeer<?, ?> containerPeer;
     private boolean layoutBusy = false;
 
-    public SwingContainerLayout(Container awtContainer, SwingContainerPeer containerPeer) {
+    public SwingContainerLayout(Container awtContainer, SwingContainerPeer<?, ?> containerPeer) {
         this.awtContainer = awtContainer;
         this.containerPeer = containerPeer;
     }

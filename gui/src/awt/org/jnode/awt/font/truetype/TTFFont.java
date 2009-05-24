@@ -28,6 +28,7 @@ import java.io.IOException;
  */
 public class TTFFont extends Font {
 
+    private static final long serialVersionUID = 1L;
     private final TTFFontData fontData;
 
     /**

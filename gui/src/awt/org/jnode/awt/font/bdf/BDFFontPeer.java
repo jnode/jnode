@@ -10,7 +10,6 @@ import java.text.CharacterIterator;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.jnode.awt.font.JNodeFontPeer;
 import org.jnode.awt.font.TGlyphVector;
 import org.jnode.font.bdf.BDFFontContainer;
@@ -27,14 +26,13 @@ import sun.font.FontLineMetrics;
  *
  */
 public class BDFFontPeer extends JNodeFontPeer<BDFFontProvider, BDFFont> {
-    private static final Logger log = Logger.getLogger(BDFFontPeer.class);    
 
     /**
      * this the char used to replace missing glyphs in BDFFont
      */
     private static final char MISSING_GLYPH_CODE = '\u0020';
     
-    public BDFFontPeer(BDFFontProvider provider, String name, Map attrs) {
+    public BDFFontPeer(BDFFontProvider provider, String name, Map<?, ?> attrs) {
         super(provider, name, attrs);
     }
 

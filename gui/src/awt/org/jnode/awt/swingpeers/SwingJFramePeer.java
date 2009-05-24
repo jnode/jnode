@@ -45,6 +45,7 @@ import javax.swing.RootPaneContainer;
  */
 abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBaseWindow<awtT, swingPeerT>>
     extends JFrame implements ISwingPeer<awtT> {
+    private static final long serialVersionUID = 1L;
 
     /**
      * The AWT component this is a peer for
@@ -165,11 +166,13 @@ abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBa
         }
     }
 
+    @SuppressWarnings("unused")
     private final class ContentPane extends JComponent {
+        private static final long serialVersionUID = 1L;
 
         private awtT target;
 
-        private SwingJBaseWindowPeer swingPeer;
+        private SwingJBaseWindowPeer<awtT, swingPeerT> swingPeer;
 
         public void initialize(awtT target, SwingJBaseWindowPeer<awtT, swingPeerT> swingPeer) {
             this.target = target;
@@ -200,6 +203,7 @@ abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBa
     }
 
     private final class RootPane extends JRootPane {
+        private static final long serialVersionUID = 1L;
 
         /**
          * @see javax.swing.JRootPane#createContentPane()
@@ -218,6 +222,7 @@ abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBa
 
 
 final class SwingJFrame extends SwingJBaseWindow<Frame, SwingJFrame> {
+    private static final long serialVersionUID = 1L;
 
     public SwingJFrame(Frame awtFrame) {
         super(awtFrame);

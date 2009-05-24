@@ -24,6 +24,7 @@ package org.jnode.driver.bus.i2c;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class I2cException extends Exception {
+    private static final long serialVersionUID = 1L;
 
     /**
      * 

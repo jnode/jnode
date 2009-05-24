@@ -41,7 +41,7 @@ public class JNodeBufferedImage extends BufferedImage {
      * @param properties
      */
     public JNodeBufferedImage(ColorModel colormodel, WritableRaster writableraster, boolean premultiplied,
-                              Hashtable properties) {
+                              Hashtable<?, ?> properties) {
         super(colormodel, writableraster, premultiplied, properties);
     }
 

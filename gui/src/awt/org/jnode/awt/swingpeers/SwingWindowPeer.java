@@ -43,6 +43,7 @@ final class SwingWindowPeer extends SwingBaseWindowPeer<Window, SwingWindow>
 }
 
 final class SwingWindow extends SwingBaseWindow<Window, SwingWindow> {
+    private static final long serialVersionUID = 1L;
 
     public SwingWindow(Window target) {
         super(target);

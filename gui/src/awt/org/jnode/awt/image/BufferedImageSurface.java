@@ -31,7 +31,6 @@ import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.awt.image.SinglePixelPackedSampleModel;
 import java.awt.image.WritableRaster;
-import org.apache.log4j.Logger;
 import org.jnode.awt.util.BitmapGraphics;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.util.AbstractSurface;
@@ -41,10 +40,6 @@ import org.jnode.driver.video.util.AbstractSurface;
  */
 public class BufferedImageSurface extends AbstractSurface {
 
-    /**
-     * My logger
-     */
-    private static final Logger log = Logger.getLogger(BufferedImageSurface.class);
     private final BufferedImage sImage;
     private final BitmapGraphics bitmapGraphics;
     private final ColorModel model;

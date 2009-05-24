@@ -87,7 +87,7 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContai
      * @return the font peer
      */
     @Override
-    public BDFFontPeer createFontPeer(String name, Map attrs) {
+    public BDFFontPeer createFontPeer(String name, Map<?, ?> attrs) {
         BDFFontPeer peer = null;
 
         List<BDFFontContainer> datas = getUserFontDatas();
@@ -181,7 +181,7 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContai
         return size;
     }
 
-    private boolean match(BDFFontContainer container, String name, Map attrs) {
+    private boolean match(BDFFontContainer container, String name, Map<?, ?> attrs) {
         // it's a temporary workaround taking first font found
         //FIXME : find the proper way for matching the font name
         //if (container.getFamily().equals(name) || container.getName().equals(name)) {

@@ -50,6 +50,7 @@ final class SwingButtonPeer extends SwingComponentPeer<Button, SwingButton> impl
 
 
 final class SwingButton extends JButton implements ISwingPeer<Button> {
+    private static final long serialVersionUID = 1L;
     private final Button awtComponent;
 
     /**

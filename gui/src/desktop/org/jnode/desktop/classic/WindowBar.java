@@ -54,6 +54,7 @@ import org.jnode.awt.swingpeers.SwingToolkit;
  * @author Levente S\u00e1ntha
  */
 public class WindowBar extends JPanel {
+    private static final long serialVersionUID = 1L;
     private static final Logger log = Logger.getLogger(WindowBar.class);
     private final Map<JInternalFrame, FrameWrapper> wrappers;
 
@@ -67,7 +68,7 @@ public class WindowBar extends JPanel {
     public void addFrame(final JInternalFrame frame) {
         log.debug("addFrame " + frame.getTitle());
         if (frame instanceof ISwingPeer) {
-            ISwingPeer isp = ((ISwingPeer) frame);
+            ISwingPeer<?> isp = ((ISwingPeer<?>) frame);
             Component comp = isp.getAWTComponent();
             if (!(comp instanceof Frame) || ((Frame) comp).isUndecorated()) {
                 comp.addComponentListener(new ComponentAdapter() {
@@ -130,6 +131,7 @@ public class WindowBar extends JPanel {
     }
 
     private class FrameWrapper extends JButton {
+        private static final long serialVersionUID = 1L;
         private final JInternalFrame frame;
 
         /**

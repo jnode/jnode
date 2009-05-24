@@ -142,6 +142,7 @@ final class SwingTextAreaPeer extends
 }
 
 final class SwingTextArea extends JTextArea implements ISwingPeer<TextArea> {
+    private static final long serialVersionUID = 1L;
     private final TextArea awtComponent;
 
     public SwingTextArea(TextArea awtComponent) {

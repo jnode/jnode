@@ -353,6 +353,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
     /**
      * Response on paint events.
      */
+    @SuppressWarnings("unused")
     private void processPaintEvent(PaintEvent event) {
         final Graphics g = getGraphics();
         if (g != null) {

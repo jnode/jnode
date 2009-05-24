@@ -81,7 +81,7 @@ public class TTFontProvider extends AbstractFontProvider<TTFFont, TTFFontData> {
      * @return the font peer created
      */
     @Override
-    public TTFFontPeer createFontPeer(String name, Map attrs) {
+    public TTFFontPeer createFontPeer(String name, Map<?, ?> attrs) {
         //TODO implement me
 //        TTFFontPeer peer = null;
 //

@@ -452,7 +452,7 @@ public final class SwingToolkit extends JNodeToolkit {
         }
         Component comp = desktopFrame.getComponentAt(x, y);
         if (comp instanceof SwingBaseWindow) {
-            SwingBaseWindow base = (SwingBaseWindow) comp;
+            SwingBaseWindow<?, ?> base = (SwingBaseWindow<?, ?>) comp;
             if (base.isShowing()) {
                 Window w = base.getAWTComponent();
                 if (w instanceof Frame) {
@@ -478,7 +478,7 @@ public final class SwingToolkit extends JNodeToolkit {
             }
         } else {
             comp = super.getTopComponentAt(x, y);
-            SwingBaseWindow window = (SwingBaseWindow) SwingUtilities.getAncestorOfClass(SwingBaseWindow.class, comp);
+            SwingBaseWindow<?, ?> window = (SwingBaseWindow<?, ?>) SwingUtilities.getAncestorOfClass(SwingBaseWindow.class, comp);
             if (window != null) {
                 Rectangle r = window.getBounds();
                 Insets ins = window.getSwingPeer().getInsets();
@@ -505,7 +505,7 @@ public final class SwingToolkit extends JNodeToolkit {
 
         WindowPeer p = (WindowPeer) w.getPeer();
         if (p instanceof SwingBaseWindowPeer) {
-            JInternalFrame f = (JInternalFrame) ((SwingBaseWindowPeer) p).peerComponent;
+            JInternalFrame f = (JInternalFrame) ((SwingBaseWindowPeer<?, ?>) p).peerComponent;
             if (f.isShowing() && !f.isSelected()) {
                 try {
                     f.setSelected(true);
@@ -539,7 +539,7 @@ public final class SwingToolkit extends JNodeToolkit {
     // /////////////////////////////////////////////////////////////////////////////////////
     // Private
 
-    final void onDisposeFrame(SwingBaseWindowPeer windowPeer) {
+    final void onDisposeFrame(SwingBaseWindowPeer<?, ?> windowPeer) {
         // Nothing to do
     }
 
@@ -553,7 +553,9 @@ public final class SwingToolkit extends JNodeToolkit {
 
         RepaintManager.setCurrentManager(repaintManager = new RepaintManager() {
             private WeakHashMap<Component, BufferedImage> bufferMap = new WeakHashMap<Component, BufferedImage>();
+            @SuppressWarnings("unused")
             private final Component DEFA_KEY = new Component() {
+                private static final long serialVersionUID = 1L;
             };
 
             @Override

@@ -276,7 +276,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
                         }
                     }
                 }
-                ((ISwingPeer<awtT>) peerComponent).processAWTEvent(event);
+                ((ISwingPeer<?>) peerComponent).processAWTEvent(event);
                 break;
             }
         }
@@ -390,6 +390,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
 
                     Object[] params = new Object[]{targetComponent, peerComponent,
                         Boolean.valueOf(temporary), Boolean.valueOf(focusedWindowChangeAllowed), Long.valueOf(time)};
+                    @SuppressWarnings("unused")
                     boolean ret =
                         ((Boolean) processSynchronousLightweightTransferMethod.invoke(null, params)).booleanValue();
                     //if(ret)

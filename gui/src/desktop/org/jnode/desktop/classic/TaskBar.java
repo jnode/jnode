@@ -65,8 +65,9 @@ import org.jnode.plugin.ExtensionPoint;
  * @author Levente S\u00e1ntha
  */
 public class TaskBar extends JPanel {
+    private static final long serialVersionUID = 1L;
     static final Logger log = Logger.getLogger(TaskBar.class);
-    private static final Class[] mainTypes = {String[].class};
+    private static final Class<?>[] mainTypes = {String[].class};
     JButton startButton;
     JPopupMenu startMenu;
     WindowBar windowBar;
@@ -202,7 +203,7 @@ public class TaskBar extends JPanel {
         public void actionPerformed(ActionEvent e) {
             if (lf == null) {
                 try {
-                    Class c = Thread.currentThread().getContextClassLoader().loadClass(lfName);
+                    Class<?> c = Thread.currentThread().getContextClassLoader().loadClass(lfName);
                     this.lf = (LookAndFeel) c.newInstance();
                 } catch (Exception ex) {
                     log.error("Error crating look & feel " + lfName, ex);
@@ -243,6 +244,7 @@ public class TaskBar extends JPanel {
     }
 
     class ChangeScreenResolution extends AbstractAction implements Runnable {
+        private static final long serialVersionUID = 1L;
         private final JNodeGraphicsConfiguration config;
 
         public ChangeScreenResolution(JNodeGraphicsConfiguration config) {
@@ -305,6 +307,7 @@ public class TaskBar extends JPanel {
     }
 
     static class Clock extends JLabel {
+        private static final long serialVersionUID = 1L;
         private Timer timer;
         private TimerTask task;
 

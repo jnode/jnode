@@ -112,7 +112,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     private JNodeFrameBufferDevice fbDevice;
     private JNodeGraphicsConfiguration config;
     private JNodeEventQueue _eventQueue;
-    private LRUCache<Map, ClasspathFontPeer> fontCache = new LRUCache<Map, ClasspathFontPeer>(50);
+    private LRUCache<Map<?, ?>, ClasspathFontPeer> fontCache = new LRUCache<Map<?, ?>, ClasspathFontPeer>(50);
     private Surface graphics;
     private boolean graphicsMode;
     private KeyboardHandler keyboardHandler;
@@ -121,6 +121,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     private final Dimension screenSize = new Dimension(640, 480);
     private Frame top;
     private Runnable exitAction;
+    @SuppressWarnings("unused")
     private Insets screenInsets;
 
     public JNodeToolkit() {
@@ -441,19 +442,9 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     }
 
     /**
-     * @see gnu.java.awt.ClasspathToolkit#getFont(java.lang.String,
-     *      java.util.Map)
-     */
-    public Font getFont(String name, Map attrs) {
-        // TODO Auto-generated method stub
-        return super.getFont(name, attrs);
-    }
-
-    /**
      * @return The fonts
      * @see java.awt.Toolkit#getFontList()
      */
-    @SuppressWarnings("deprecation")
     public String[] getFontList() {
         Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getAllFonts();
@@ -480,7 +471,6 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     /**
      * @see java.awt.Toolkit#getFontMetrics(java.awt.Font)
      */
-    @SuppressWarnings("deprecation")
     public FontMetrics getFontMetrics(Font font) {
         final FontManager fm = getFontManager();
         if (fm != null) {
@@ -816,6 +806,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
         }
     }
 
+    @SuppressWarnings("unused")
     private void drawStartupScreen() {
         AffineTransform tx = new AffineTransform();
         graphics.fill(new Rectangle(0, 0, config.getBounds().width, config.getBounds().height), null, tx, Color.BLACK,
@@ -995,6 +986,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     /**
      * @see java.awt.Toolkit#mapInputMethodHighlight(java.awt.im.InputMethodHighlight)
      */
+    @SuppressWarnings("unchecked")
     public Map mapInputMethodHighlight(InputMethodHighlight highlight) {
         // TODO Auto-generated method stub
         return null;
@@ -1118,6 +1110,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
         }
     }
 
+    @SuppressWarnings("serial")
     private class LRUCache<K, V> extends java.util.LinkedHashMap<K, V> {
         int max_entries;
 
@@ -1126,7 +1119,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
             max_entries = max;
         }
 
-        protected boolean removeEldestEntry(Map.Entry eldest) {
+        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
             return size() > max_entries;
         }
     }

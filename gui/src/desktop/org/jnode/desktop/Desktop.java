@@ -151,6 +151,7 @@ public class Desktop implements Runnable {
     }
 
     private class DesktopManagerImpl extends DefaultDesktopManager {
+        private static final long serialVersionUID = 1L;
 
         /**
          * @see javax.swing.DesktopManager#deiconifyFrame(javax.swing.JInternalFrame)

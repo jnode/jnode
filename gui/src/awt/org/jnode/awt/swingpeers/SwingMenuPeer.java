@@ -40,7 +40,7 @@ final class SwingMenuPeer extends SwingBaseMenuPeer<Menu, JMenu> implements Menu
         for (int i = 0; i < item_count; i++) {
             MenuItem menu_item = menu.getItem(i);
             menu_item.addNotify();
-            jComponent.add(((SwingMenuComponentPeer) menu_item.getPeer()).jComponent);
+            jComponent.add(((SwingMenuComponentPeer<?, ?>) menu_item.getPeer()).jComponent);
         }
     }
 
@@ -51,7 +51,7 @@ final class SwingMenuPeer extends SwingBaseMenuPeer<Menu, JMenu> implements Menu
             addSeparator();
         } else {
             item.addNotify();
-            jComponent.add(((SwingBaseMenuItemPeer) item.getPeer()).jComponent);
+            jComponent.add(((SwingBaseMenuItemPeer<?, ?>) item.getPeer()).jComponent);
         }
     }
 

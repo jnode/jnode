@@ -99,6 +99,7 @@ final class SwingChoicePeer extends SwingComponentPeer<Choice, SwingChoice> impl
 }
 
 final class SwingChoice extends JComboBox implements ISwingPeer<Choice> {
+    private static final long serialVersionUID = 1L;
     private final Choice awtComponent;
     private SwingChoicePeer peer;
 

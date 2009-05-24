@@ -72,6 +72,7 @@ final class SwingScrollbarPeer extends SwingComponentPeer<Scrollbar, SwingScroll
 }
 
 final class SwingScrollbar extends JScrollBar implements ISwingPeer<Scrollbar> {
+    private static final long serialVersionUID = 1L;
     private final Scrollbar awtComponent;
 
     public SwingScrollbar(Scrollbar awtComponent) {

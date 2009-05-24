@@ -29,6 +29,7 @@ import java.awt.peer.FramePeer;
 import java.beans.PropertyVetoException;
 
 final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
+    private static final long serialVersionUID = 1L;
 
     public SwingFrame(Frame awtFrame, String title) {
         super(awtFrame, title);

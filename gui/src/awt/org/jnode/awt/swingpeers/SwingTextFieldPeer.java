@@ -91,6 +91,7 @@ final class SwingTextFieldPeer extends
 }
 
 final class SwingTextField extends JTextField implements ISwingPeer<TextField> {
+    private static final long serialVersionUID = 1L;
     private final TextField awtComponent;
 
     public SwingTextField(TextField awtComponent) {

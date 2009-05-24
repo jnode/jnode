@@ -32,7 +32,7 @@ public abstract class AbstractImageConsumer implements ImageConsumer {
     private ColorModel model;
     private int width;
     private int height;
-    private Hashtable properties;
+    private Hashtable<?, ?> properties;
 
     public AbstractImageConsumer() {
     }
@@ -101,7 +101,7 @@ public abstract class AbstractImageConsumer implements ImageConsumer {
      * @param props
      * @see java.awt.image.ImageConsumer#setProperties(java.util.Hashtable)
      */
-    public void setProperties(Hashtable props) {
+    public void setProperties(Hashtable<?, ?> props) {
         this.properties = props;
     }
 
@@ -122,7 +122,7 @@ public abstract class AbstractImageConsumer implements ImageConsumer {
     /**
      * @return The properties
      */
-    public final Hashtable getProperties() {
+    public final Hashtable<?, ?> getProperties() {
         return this.properties;
     }
 

@@ -61,7 +61,7 @@ abstract class SwingContainerPeer<awtT extends Container, swingPeerT extends Con
      * @see java.awt.peer.ContainerPeer#beginValidate()
      */
     public void beginValidate() {
-        ((ISwingPeer<awtT>) peerComponent).validatePeerOnly();
+        ((ISwingPeer<?>) peerComponent).validatePeerOnly();
     }
 
     /**

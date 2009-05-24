@@ -60,6 +60,7 @@ final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
 }
 
 final class SwingDialog extends SwingBaseWindow<Dialog, SwingDialog> {
+    private static final long serialVersionUID = 1L;
 
     public SwingDialog(Dialog target, String title) {
         super(target, title);

@@ -89,5 +89,5 @@ public interface FontManager {
      */
     public Font createFont(int format, InputStream stream) throws FontFormatException, IOException;
 
-    public ClasspathFontPeer createFontPeer(String name, Map attrs);
+    public ClasspathFontPeer createFontPeer(String name, Map<?, ?> attrs);
 }

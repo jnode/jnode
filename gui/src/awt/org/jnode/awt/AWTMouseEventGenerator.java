@@ -25,10 +25,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.Window;
 import java.awt.event.MouseEvent;
-import javax.swing.SwingUtilities;
-import org.apache.log4j.Logger;
 import org.jnode.driver.input.PointerEvent;
 import org.jnode.driver.input.PointerListener;
 import org.jnode.driver.video.HardwareCursorAPI;
@@ -37,7 +34,6 @@ import org.jnode.driver.video.HardwareCursorAPI;
  * @author Levente S\u00e1ntha
  */
 public class AWTMouseEventGenerator implements PointerListener {
-    private static final Logger log = Logger.getLogger(AWTMouseEventGenerator.class);
 
     private static final int[] BUTTON_MASK = {
         PointerEvent.BUTTON_LEFT, PointerEvent.BUTTON_RIGHT, PointerEvent.BUTTON_MIDDLE
@@ -150,13 +146,13 @@ public class AWTMouseEventGenerator implements PointerListener {
      */
     private void postEvent(Component source, int id, long time, int clickCount, int button) {
         if (!source.isShowing()) return;
-        final Window w = SwingUtilities.getWindowAncestor(source);
-        Point pwo = null;
-        if (w != null && w.isShowing()) {
-            pwo = w.getLocationOnScreen();
-        } else {
-            pwo = new Point(-1, -1);
-        }
+//        final Window w = SwingUtilities.getWindowAncestor(source);
+//        Point pwo = null;
+//        if (w != null && w.isShowing()) {
+//            pwo = w.getLocationOnScreen();
+//        } else {
+//            pwo = new Point(-1, -1);
+//        }
 
         final Point p = source.getLocationOnScreen();
         final boolean popupTrigger = (button == MouseEvent.BUTTON2);

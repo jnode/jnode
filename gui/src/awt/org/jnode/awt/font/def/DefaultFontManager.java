@@ -203,7 +203,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
     }
 
     @Override
-    public JNodeFontPeer<?, ?> createFontPeer(String name, Map attrs) {
+    public JNodeFontPeer<?, ?> createFontPeer(String name, Map<?, ?> attrs) {
         for (FontProvider<?> prv : getProviders()) {
             JNodeFontPeer<?, ?> peer = prv.createFontPeer(name, attrs);
             if (peer != null) {

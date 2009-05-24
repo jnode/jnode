@@ -50,6 +50,7 @@ final class SwingPanelPeer extends SwingContainerPeer<Panel, SwingPanel>
 }
 
 final class SwingPanel extends JPanel implements ISwingPeer<Panel> {
+    private static final long serialVersionUID = 1L;
     private final Panel awtComponent;
 
     public SwingPanel(Panel awtComponent) {

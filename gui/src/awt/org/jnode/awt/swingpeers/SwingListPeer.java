@@ -44,6 +44,7 @@ final class SwingListPeer extends SwingComponentPeer<List, SwingList> implements
         SwingToolkit.add(list, peerComponent);
         SwingToolkit.copyAwtProperties(list, peerComponent);
         peerComponent.setModel(new AbstractListModel() {
+            private static final long serialVersionUID = 1L;
             public Object getElementAt(int idx) {
                 return list.getItem(idx);
             }
@@ -117,6 +118,7 @@ final class SwingListPeer extends SwingComponentPeer<List, SwingList> implements
 }
 
 final class SwingList extends JList implements ISwingPeer<List> {
+    private static final long serialVersionUID = 1L;
     private final List awtComponent;
 
     public SwingList(List awtComponent) {

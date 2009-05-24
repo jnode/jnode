@@ -23,6 +23,8 @@ package org.jnode.awt.font.truetype;
 import gnu.java.security.action.SetAccessibleAction;
 import java.lang.reflect.Constructor;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 import org.jnode.awt.font.truetype.tables.CMapTable;
 import org.jnode.awt.font.truetype.tables.GlyphTable;
 import org.jnode.awt.font.truetype.tables.HeadTable;
@@ -55,7 +57,7 @@ enum TableClass {
 
     private final String tag;
     private final Class<? extends TTFTable> clazz;
-    private static final Class[] CONS_TYPES = {TTFFontData.class, TTFInput.class};
+    private static final Class<?>[] CONS_TYPES = {TTFFontData.class, TTFInput.class};
 
     private TableClass(String tag, Class<? extends TTFTable> clazz) {
         this.tag = tag;
@@ -113,8 +115,8 @@ enum TableClass {
         });
 */
         try {
-            final Constructor c = clazz.getDeclaredConstructor(CONS_TYPES);
-            AccessController.doPrivileged(new SetAccessibleAction(c));
+            final Constructor<?> c = clazz.getDeclaredConstructor(CONS_TYPES);
+            AccessController.doPrivileged((PrivilegedAction<?>) new SetAccessibleAction(c));
             return (TTFTable) c.newInstance(new Object[]{font, in});
         } catch (Exception e1) {
             e1.printStackTrace();

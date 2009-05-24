@@ -93,6 +93,7 @@ public abstract class AbstractTextRenderer implements TextRenderer {
         try {
             final double ascent = fontMetrics.getAscent();
             final int fontSize = fontMetrics.getFont().getSize();
+            @SuppressWarnings("unused")
             final double scale = fontSize / ascent;
 
             final int textLength = text.length();
