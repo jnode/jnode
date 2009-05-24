@@ -26,9 +26,7 @@ import java.net.UnknownHostException;
 
 import org.jtestserver.common.protocol.Client;
 import org.jtestserver.common.protocol.MessageProcessor;
-import org.jtestserver.common.protocol.ProtocolException;
 import org.jtestserver.common.protocol.Server;
-import org.jtestserver.common.protocol.TimeoutException;
 
 class TestUtils {
     static final int PORT = 11000; // use a different port than default one
