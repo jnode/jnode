@@ -36,9 +36,6 @@ import sun.font.StandardGlyphVector;
 
 /**
  * @author vali
- *         <p/>
- *         To change the template for this generated type comment go to Window -
- *         Preferences - Java - Code Generation - Code and Comments
  */
 public abstract class JNodeFontPeer<FP extends FontProvider<F>, F extends Font> 
         extends ClasspathFontPeer implements FontPeer {
@@ -48,7 +45,7 @@ public abstract class JNodeFontPeer<FP extends FontProvider<F>, F extends Font>
      * @param name
      * @param attrs
      */
-    public JNodeFontPeer(FP provider, String name, Map attrs) {
+    public JNodeFontPeer(FP provider, String name, Map<?, ?> attrs) {
         super(name, attrs);
         this.provider = provider;
     }

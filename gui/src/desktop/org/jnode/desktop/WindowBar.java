@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class WindowBar extends JPanel {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(WindowBar.class);
 

@@ -23,7 +23,6 @@ package org.jnode.awt.java2d.loops;
 import java.awt.Composite;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
-import java.lang.ref.WeakReference;
 import sun.awt.image.BufImgSurfaceData;
 import sun.java2d.SurfaceData;
 import sun.java2d.loops.Blit;
@@ -72,13 +71,9 @@ public class JNodeMaskBlit extends MaskBlit {
     Blit convertdst;
     MaskBlit performop;
     Blit convertresult;
+    
 
-    WeakReference srcTmp;
-    WeakReference dstTmp;
-
-    public JNodeMaskBlit(SurfaceType srctype,
-                         CompositeType comptype,
-                         SurfaceType dsttype) {
+    public JNodeMaskBlit(SurfaceType srctype, CompositeType comptype, SurfaceType dsttype) {
         super(srctype, comptype, dsttype);
     }
 

@@ -43,6 +43,7 @@ import org.jnode.awt.JNodeAwtContext;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class DesktopFrame extends JFrame implements JNodeAwtContext {
+    private static final long serialVersionUID = 1L;
     private static final String DESKTOP_BACKGROUND = "desktop.background";
     private static final Color DESKTOP_BACKGROUND_COLOR = new Color(110, 190, 235);
     private final JDesktopPane desktop;
@@ -72,6 +73,7 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
         setFocusCycleRoot(true);
         setFocusTraversalPolicy(new DefaultFocusTraversalPolicy());
         desktop = new JDesktopPane() {
+            private static final long serialVersionUID = 1L;
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (backgroundImage != null) {
@@ -137,7 +139,7 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
         for (JInternalFrame f : desktop.getAllFrames()) {
             try {
                 if (f instanceof SwingBaseWindow) {
-                    ((SwingBaseWindow) f).target.dispose();
+                    ((SwingBaseWindow<?, ?>) f).target.dispose();
                 } else {
                     f.setClosed(true);
                 }

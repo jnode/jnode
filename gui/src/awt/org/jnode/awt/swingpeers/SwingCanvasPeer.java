@@ -40,6 +40,7 @@ final class SwingCanvasPeer extends SwingComponentPeer<Canvas, SwingCanvas> impl
 }
 
 final class SwingCanvas extends JComponent implements ISwingPeer<Canvas> {
+    private static final long serialVersionUID = 1L;
     private final Canvas awtComponent;
 
     public SwingCanvas(Canvas awtComponent) {

@@ -32,6 +32,7 @@ import org.jnode.awt.font.truetype.tables.HorizontalMetricsTable;
  */
 public class TTFFontMetrics extends FontMetrics {
 
+    private static final long serialVersionUID = 1L;
     private final TTFFontData fontData;
     private final double scale;
     private final int fontSize;

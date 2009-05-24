@@ -43,7 +43,7 @@ final class SwingPopupMenuPeer extends SwingBaseMenuPeer<PopupMenu, JPopupMenu>
         for (int i = 0; i < item_count; i++) {
             MenuItem menu_item = popupMenu.getItem(i);
             menu_item.addNotify();
-            jComponent.add(((SwingMenuComponentPeer) menu_item.getPeer()).jComponent);
+            jComponent.add(((SwingMenuComponentPeer<?, ?>) menu_item.getPeer()).jComponent);
         }
     }
 
@@ -57,13 +57,13 @@ final class SwingPopupMenuPeer extends SwingBaseMenuPeer<PopupMenu, JPopupMenu>
 
     @SuppressWarnings("deprecation")
     public void show(Component component, int x, int y) {
-        ((JPopupMenu) jComponent).show(((SwingComponentPeer) component.getPeer()).peerComponent, x, y);
+        ((JPopupMenu) jComponent).show(((SwingComponentPeer<?, ?>) component.getPeer()).peerComponent, x, y);
     }
 
     @SuppressWarnings("deprecation")
     public void addItem(MenuItem item) {
         item.addNotify();
-        jComponent.add(((SwingBaseMenuItemPeer) item.getPeer()).jComponent);
+        jComponent.add(((SwingBaseMenuItemPeer<?, ?>) item.getPeer()).jComponent);
     }
 
     public void delItem(int index) {

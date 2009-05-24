@@ -97,6 +97,7 @@ final class SwingScrollPanePeer extends
 }
 
 final class SwingScrollPane extends JScrollPane implements ISwingPeer<ScrollPane> {
+    private static final long serialVersionUID = 1L;
     private final ScrollPane awtComponent;
 
     public SwingScrollPane(ScrollPane awtComponent) {

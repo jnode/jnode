@@ -148,6 +148,7 @@ public class KeyboardHandler implements KeyboardListener {
     /**
      * The queue where to post the events
      */
+    @SuppressWarnings("unused")
     private final EventQueue eventQueue;
 
     /**

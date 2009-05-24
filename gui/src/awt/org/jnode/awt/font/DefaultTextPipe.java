@@ -44,7 +44,7 @@ import sun.java2d.SurfaceData;
 import sun.java2d.pipe.TextPipe;
 
 /**
- * Experiemntal text pipe implementation based on the current font support in JNode.
+ * Experimental text pipe implementation based on the current font support in JNode.
  *
  * @author Levente S\u00e1ntha
  */
@@ -99,7 +99,7 @@ public class DefaultTextPipe implements TextPipe {
                     org.jnode.vm.Unsafe.debug("DTP drawCompatibleRaster()\n");
                     BufferedImage bi = new BufferedImage(
                         new DirectColorModel(32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000),
-                        raster.createCompatibleWritableRaster(), false, new Hashtable());
+                        raster.createCompatibleWritableRaster(), false, new Hashtable<String, Object>());
                     g2d.copyImage(bi, dstX, dstY, srcX, srcY, width, height, bgColor, io);
                 }
 
@@ -108,7 +108,7 @@ public class DefaultTextPipe implements TextPipe {
                     org.jnode.vm.Unsafe.debug("DTP drawAlphaRaster\n");
                     BufferedImage bi = new BufferedImage(
                         new DirectColorModel(32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000),
-                        raster.createCompatibleWritableRaster(), false, new Hashtable());
+                        raster.createCompatibleWritableRaster(), false, new Hashtable<String, Object>());
                     g2d.copyImage(bi, dstX, dstY, srcX, srcY, width, height, color, io);
                 }
 

@@ -75,6 +75,7 @@ final class SwingCheckboxPeer extends SwingComponentPeer<Checkbox, SwingCheckBox
 }
 
 final class SwingCheckBox extends JCheckBox implements ISwingPeer<Checkbox> {
+    private static final long serialVersionUID = 1L;
     private final Checkbox awtComponent;
     private SwingCheckboxPeer peer;
 

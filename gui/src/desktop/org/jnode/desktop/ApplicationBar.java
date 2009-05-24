@@ -40,12 +40,13 @@ import org.jnode.plugin.ExtensionPoint;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class ApplicationBar extends JPanel {
+    private static final long serialVersionUID = 1L;
 
     static final Logger log = Logger.getLogger(ApplicationBar.class);
 
     private final ExtensionPoint ep;
 
-    private static final Class[] mainTypes = {String[].class};
+    private static final Class<?>[] mainTypes = {String[].class};
 
     public ApplicationBar(ExtensionPoint ep) {
         this.ep = ep;

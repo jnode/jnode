@@ -37,7 +37,7 @@ import org.jnode.driver.video.util.AbstractSurface;
  */
 public class JNodeSurfaceGraphics2D extends SurfaceGraphics2D {
 
-    private final JNodeGenericPeer component;
+    private final JNodeGenericPeer<?, ?> component;
     private final JNodeToolkit toolkit;
 
     /**

@@ -30,6 +30,7 @@ import org.jnode.plugin.ExtensionPoint;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class ControlBar extends JPanel {
+    private static final long serialVersionUID = 1L;
 
     private final ApplicationBar appsBar;
     private final WindowBar windowBar = new WindowBar();

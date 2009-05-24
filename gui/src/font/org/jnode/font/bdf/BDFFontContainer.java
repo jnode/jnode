@@ -128,11 +128,12 @@ public class BDFFontContainer {
 
     private String[] fontName;
 
-    private HashMap glyphMapper = new HashMap();
+    private HashMap<String, BDFGlyph> glyphMapper = new HashMap<String, BDFGlyph>();
 
     private BDFGlyph[] glyphs;
 
     // FIXME: actually start using this.
+    @SuppressWarnings("unused")
     private int metricsSet = 0;
 
     private String[] properties;
@@ -192,9 +193,9 @@ public class BDFFontContainer {
     }
 
     public BDFGlyph getGlyph(char ch) {
-        BDFGlyph g = (BDFGlyph)glyphMapper.get(String.valueOf(ch));
-        if(g==null) {
-            g = (BDFGlyph)glyphMapper.get(String.valueOf('\u0020'));
+        BDFGlyph g = (BDFGlyph) glyphMapper.get(String.valueOf(ch));
+        if (g == null) {
+            g = (BDFGlyph) glyphMapper.get(String.valueOf('\u0020'));
         }
         return g;
     }
@@ -216,14 +217,13 @@ public class BDFFontContainer {
     }
 
     String lookup(String s) {
-        String result = charMapper.getString(".undef");
-        if(s.length()==1) {
-            result = ""+(s.charAt(0));
-        } else if(charMapper.handleGetObject(s)!=null) {
-            result =charMapper.getString(s);
+        if (s.length() == 1) {
+            return "" + (s.charAt(0));
+        } else if (charMapper.handleGetObject(s) != null) {
+            return charMapper.getString(s);
+        } else {
+            return charMapper.getString(".undef");
         }
-
-        return result;
     }
 
     public void setBoundingBox(int x, int y, int width, int height) {

@@ -52,6 +52,8 @@ import sun.awt.SunToolkit;
 abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBaseWindow<awtT, swingPeerT>>
     extends JInternalFrame implements ISwingPeer<awtT> {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The AWT component this is a peer for
      */
@@ -306,6 +308,8 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
     }
 
     final class NullContentPane extends JComponent {
+        private static final long serialVersionUID = 1L;
+
         @Override
         public void update(Graphics g) {
             //org.jnode.vm.Unsafe.debug("NullContantPane.update()\n");
@@ -315,7 +319,7 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
         public void paint(Graphics g) {
             if ((target instanceof Frame && !(target instanceof JFrame)) ||
                 (target instanceof Dialog && !(target instanceof JDialog))) {
-                SwingBaseWindow sf = SwingBaseWindow.this;
+                SwingBaseWindow<?, ?> sf = SwingBaseWindow.this;
                 Window f = target;
 
                 Color bg = f.getBackground();
@@ -353,6 +357,8 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
     }
 
     final class NoContentRootPane extends JRootPane {
+        private static final long serialVersionUID = 1L;
+
         /**
          * @see javax.swing.JRootPane#createContentPane()
          */
@@ -361,11 +367,13 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
         }
     }
 
+    @SuppressWarnings("unused")
     private final class ContentPane extends JComponent {
+        private static final long serialVersionUID = 1L;
 
         private awtT target;
 
-        private SwingBaseWindowPeer swingPeer;
+        private SwingBaseWindowPeer<?, ?> swingPeer;
 
         public void initialize(awtT target, SwingBaseWindowPeer<awtT, swingPeerT> swingPeer) {
             this.target = target;
@@ -395,7 +403,10 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
         }
     }
 
+    @SuppressWarnings("unused")
     private final class RootPane extends JRootPane {
+
+        private static final long serialVersionUID = 1L;
 
         /**
          * @see javax.swing.JRootPane#createContentPane()

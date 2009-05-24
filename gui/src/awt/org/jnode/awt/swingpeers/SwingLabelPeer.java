@@ -76,6 +76,7 @@ final class SwingLabelPeer extends SwingComponentPeer<Label, SwingLabel>
 }
 
 final class SwingLabel extends JLabel implements ISwingPeer<Label> {
+    private static final long serialVersionUID = 1L;
     private final Label awtComponent;
 
     public SwingLabel(Label awtComponent) {

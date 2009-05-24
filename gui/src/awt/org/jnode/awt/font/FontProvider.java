@@ -100,7 +100,7 @@ public interface FontProvider<F extends Font> {
      * @param attrs
      * @return the font peer or {@code null}.
      */
-    public JNodeFontPeer<? extends FontProvider<F>, F> createFontPeer(String name, Map attrs);
+    public JNodeFontPeer<? extends FontProvider<F>, F> createFontPeer(String name, Map<?, ?> attrs);
 
     /**
      * Read and create a Font from the given InputStream

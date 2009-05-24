@@ -111,7 +111,7 @@ public abstract class AbstractGraphics extends Graphics2D {
      * @param hints
      * @see java.awt.Graphics2D#addRenderingHints(java.util.Map)
      */
-    public void addRenderingHints(Map hints) {
+    public void addRenderingHints(Map<?, ?> hints) {
         // TODO Auto-generated method stub
 
     }
@@ -365,7 +365,7 @@ public abstract class AbstractGraphics extends Graphics2D {
      * @param hints
      * @see java.awt.Graphics2D#setRenderingHints(java.util.Map)
      */
-    public void setRenderingHints(Map hints) {
+    public void setRenderingHints(Map<?, ?> hints) {
         // TODO Auto-generated method stub
 
     }
@@ -801,7 +801,6 @@ public abstract class AbstractGraphics extends Graphics2D {
      * @return The metrics
      * @see java.awt.Graphics#getFontMetrics(java.awt.Font)
      */
-    @SuppressWarnings("deprecation")
     public FontMetrics getFontMetrics(Font font) {
         return Toolkit.getDefaultToolkit().getFontMetrics(font);
     }

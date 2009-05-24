@@ -56,6 +56,7 @@ final class SwingLightweightContainerPeer extends
 }
 
 final class SwingLightweightContainer extends JComponent implements ISwingPeer<Container> {
+    private static final long serialVersionUID = 1L;
 
     private final Container awtComponent;
 
