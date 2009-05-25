@@ -44,7 +44,7 @@ import org.jnode.shell.help.def.DefaultHelpFactory;
 public class Cassowary {
     private static boolean initialized;
 
-    protected static void initEnv() throws NamingException {
+    public static void initEnv() throws NamingException {
         if (initialized) {
             return;
         }
