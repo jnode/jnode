@@ -792,6 +792,8 @@ public class BjorneParser {
                         throw new IncompleteCommandException(
                                 "EOF reached while dealing with optional linebreak(s)", 
                                 continuationPrompt);
+                    } else {
+                        break;
                     }
                 } else {
                     break;
