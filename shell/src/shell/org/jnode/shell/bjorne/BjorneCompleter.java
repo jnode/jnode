@@ -55,9 +55,12 @@ public class BjorneCompleter implements Completable {
             completion.setCompletionStart(endToken.start);
         } else {
             partial = penultimateToken.unparse();
-            expectedSet = penultimateExpectedSet;
+            expectedSet = penultimateExpectedSet | endExpectedSet;
             completion.setCompletionStart(penultimateToken.start);
         }
+        Logger.getLogger(BjorneCompleter.class).debug(
+                "Combined expected set = " + BjorneToken.formatExpectedSet(expectedSet));
+        Logger.getLogger(BjorneCompleter.class).debug("partial = '" + partial + "'");
         expectedSet &= ~(TOK_END_OF_LINE_BIT | TOK_END_OF_STREAM_BIT | TOK_WORD_BIT | 
                 TOK_NAME_BIT | TOK_ASSIGNMENT_BIT | TOK_IO_NUMBER_BIT);
         for (int i = 0; i < 64; i++) {

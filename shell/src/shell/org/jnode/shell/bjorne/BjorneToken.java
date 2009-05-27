@@ -396,7 +396,13 @@ public class BjorneToken extends CommandLine.Token {
     }
 
     public String unparse() {
-        return (text == null || text.length() == 0) ? toString() : text;
+        if (text != null && text.length() > 0) {
+            return text;
+        } else if (tokenType != TOK_END_OF_LINE && tokenType != TOK_END_OF_STREAM) {
+            return toString(tokenType);
+        } else {
+            return "";
+        }
     }
     
     public static String formatExpectedSet(long expectedSet) {
