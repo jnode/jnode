@@ -101,7 +101,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jnode.shell.IncompleteCommandException;
 import org.jnode.shell.ShellSyntaxException;
 
@@ -226,10 +225,8 @@ public class BjorneParser {
                 TOK_IO_NUMBER_BIT | TOK_LESS_BIT | TOK_GREAT_BIT | TOK_DLESS_BIT | 
                 TOK_DGREAT_BIT | TOK_LESSAND_BIT | TOK_GREATAND_BIT | TOK_LESSGREAT |
                 TOK_CLOBBER_BIT, RULE_1_CONTEXT) != null) {
-            Logger.getLogger(BjorneParser.class).debug("starting andOr");
             return parseAndOr();
         } else {
-            Logger.getLogger(BjorneParser.class).debug("no andOr");
             return null;
         }
     }

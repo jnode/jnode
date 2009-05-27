@@ -66,8 +66,6 @@ public class BjorneCompleter implements Completable {
             }
             String candidate = BjorneToken.toString(i);
             if (candidate.startsWith(partial)) {
-                Logger.getLogger(BjorneCompleter.class).debug(
-                        "candidate='" + candidate + "',partial='" + partial + "'");
                 completion.addCompletion(candidate);
             }
         }
