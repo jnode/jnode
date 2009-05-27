@@ -463,13 +463,13 @@ public class BjorneParser {
 
     private CommandNode parseSubshell() throws ShellSyntaxException {
         next();
-        CommandNode compoundList = parseCompoundList();
+        CommandNode compoundList = parseCompoundList(TOK_RPAREN_BIT);
         expectNext(TOK_RPAREN_BIT);
         compoundList.setNodeType(CMD_SUBSHELL);
         return compoundList;
     }
 
-    private CommandNode parseCompoundList() throws ShellSyntaxException {
+    private CommandNode parseCompoundList(long terminatorSet) throws ShellSyntaxException {
         List<CommandNode> commands = new LinkedList<CommandNode>();
         skipLineBreaks();
         CommandNode command = parseAndOr();
@@ -481,9 +481,10 @@ public class BjorneParser {
             } else if (token.getTokenType() == TOK_AMP) {
                 command.setFlag(FLAG_ASYNC);
             }
-            Logger.getLogger(BjorneParser.class).debug("after command separator");
             skipLineBreaks();
-            Logger.getLogger(BjorneParser.class).debug("after skip");
+            // (This helps the completer figure out alternative completions for a word
+            // in the command name position.)
+            token = optPeek(terminatorSet);
             command = parseOptAndOr();
         }
         return listToNode(commands);
@@ -491,7 +492,7 @@ public class BjorneParser {
 
     private CommandNode parseBraceGroup() throws ShellSyntaxException {
         next();
-        CommandNode compoundList = parseCompoundList();
+        CommandNode compoundList = parseCompoundList(TOK_RBRACE_BIT);
         expectPeek(TOK_RBRACE_BIT);
         compoundList.setNodeType(CMD_BRACE_GROUP);
         return compoundList;
@@ -523,7 +524,7 @@ public class BjorneParser {
         CommandNode body = null;
         skipLineBreaks();
         if (optPeek(TOK_DSEMI_BIT | TOK_ESAC_BIT, RULE_1_CONTEXT) == null) {
-            body = parseCompoundList();
+            body = parseCompoundList(0L);
             skipLineBreaks();
         }
         return new CaseItemNode(pattern, body);
@@ -561,7 +562,7 @@ public class BjorneParser {
     private CommandNode parseDoGroup() throws ShellSyntaxException {
         allowLineBreaks();
         expectNext(TOK_DO_BIT, RULE_1_CONTEXT);
-        CommandNode body = parseCompoundList();
+        CommandNode body = parseCompoundList(TOK_DONE_BIT);
         allowLineBreaks();
         expectNext(TOK_DONE_BIT, RULE_1_CONTEXT);
         return body;
@@ -569,26 +570,24 @@ public class BjorneParser {
 
     private LoopCommandNode parseUntilCommand() throws ShellSyntaxException {
         next();
-        CommandNode cond = parseCompoundList();
+        CommandNode cond = parseCompoundList(TOK_DO_BIT);
         CommandNode body = parseDoGroup();
         return new LoopCommandNode(CMD_UNTIL, cond, body);
     }
 
     private LoopCommandNode parseWhileCommand() throws ShellSyntaxException {
         next();
-        CommandNode cond = parseCompoundList();
+        CommandNode cond = parseCompoundList(TOK_DO_BIT);
         CommandNode body = parseDoGroup();
         return new LoopCommandNode(CMD_WHILE, cond, body);
     }
 
     private IfCommandNode parseIfCommand() throws ShellSyntaxException {
         next();
-        CommandNode cond = parseCompoundList();
+        CommandNode cond = parseCompoundList(TOK_THEN_BIT);
         allowLineBreaks();
-        Logger.getLogger(BjorneParser.class).debug("expecting 'then'");
         expectNext(TOK_THEN_BIT, RULE_1_CONTEXT);
-        Logger.getLogger(BjorneParser.class).debug("expecting thenPart");
-        CommandNode thenPart = parseCompoundList();
+        CommandNode thenPart = parseCompoundList(TOK_ELIF_BIT | TOK_ELSE_BIT | TOK_FI_BIT);
         CommandNode elsePart = parseOptElsePart();
         allowLineBreaks();
         expectNext(TOK_FI_BIT, RULE_1_CONTEXT);
@@ -601,12 +600,12 @@ public class BjorneParser {
         if (token == null) {
             return null;
         } else if (token.getTokenType() == TOK_ELIF) {
-            CommandNode cond = parseCompoundList();
+            CommandNode cond = parseCompoundList(TOK_THEN_BIT);
             allowLineBreaks();
             expectNext(TOK_THEN_BIT, RULE_1_CONTEXT);
-            return new IfCommandNode(CMD_ELIF, cond, parseCompoundList(), parseOptElsePart());
+            return new IfCommandNode(CMD_ELIF, cond, parseCompoundList(TOK_ELIF_BIT | TOK_ELSE_BIT | TOK_FI_BIT), parseOptElsePart());
         } else {
-            return parseCompoundList();
+            return parseCompoundList(TOK_FI_BIT);
         } 
     }
     
