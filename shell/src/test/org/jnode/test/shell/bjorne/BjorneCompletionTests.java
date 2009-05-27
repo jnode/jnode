@@ -28,7 +28,6 @@ import junit.framework.TestCase;
 
 import org.jnode.shell.CommandCompletions;
 import org.jnode.shell.Completable;
-import org.jnode.shell.ShellManager;
 import org.jnode.shell.ShellSyntaxException;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.alias.AliasManager;
@@ -44,6 +43,12 @@ import org.jnode.shell.syntax.SyntaxManager;
 import org.jnode.test.shell.Cassowary;
 import org.jnode.test.shell.syntax.TestShell;
 
+/**
+ * Tests for completion in the bjorne interpreter.  Some of the sample commands are 
+ * nonsensical ... but that's OK because we're only interested in completion behavior.
+ * 
+ * @author crawley@jnode.org
+ */
 public class BjorneCompletionTests extends TestCase {
     
     static TestShell shell;
@@ -55,7 +60,7 @@ public class BjorneCompletionTests extends TestCase {
             
             AliasManager am = shell.getAliasManager();
             am.add("gc", "org.jnode.command.system.GcCommand");
-            am.add("cpuid", "org.jnode.command.system.CpuIDCommand");
+            am.add("cpuid", "org.jnode.test.shell.MyCpuIDCommand");
             am.add("set", "org.jnode.command.system.SetCommand");
             am.add("dir", "org.jnode.test.shell.MyDirCommand");
             am.add("duh", "org.jnode.test.shell.MyDuhCommand");
@@ -80,11 +85,33 @@ public class BjorneCompletionTests extends TestCase {
         }
     }
     
-    
-    private static boolean DEBUG = true;
 
     public void testSimpleCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("echo hi", "TE");
+    }
+
+    public void testListCommand() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("echo hi ; echo", "TETT");
+    }
+
+    public void testAndCommand() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("echo hi && echo", "TETT");
+    }
+
+    public void testPipeCommand() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("echo hi | echo", "TETT");
+    }
+
+    public void testPipe2Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("echo hi |\necho", "TETT");
+    }
+
+    public void testIfCommand() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("if cpuid ; then echo hi ; fi", "TTTTTETT");
+    }
+
+    public void testIf2Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("if cpuid\nthen echo hi ; fi", "TTTTETT");
     }
 
     private void doCompletionTest(String input, String flags) 
@@ -95,7 +122,7 @@ public class BjorneCompletionTests extends TestCase {
             int inWord = 0;
             int wordStart = 0;
             for (int j = 0; j < i; j++) {
-                if (partial.charAt(j) == ' ') {
+                if (Character.isWhitespace(partial.charAt(j))) {
                     inWord++;
                     wordStart = j + 1;
                 }
