@@ -114,6 +114,18 @@ public class BjorneCompletionTests extends TestCase {
         doCompletionTest("if cpuid\nthen echo hi ; fi", "TTTTETT");
     }
 
+    public void testIf3Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("if cpuid ; then\necho hi ; fi", "TTTTTETT");
+    }
+
+    public void testIf4Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("if cpuid ; then\necho hi\nfi", "TTTTTET");
+    }
+
+    public void testWhileCommand() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("while cpuid ; do echo hi ; done", "TTTTTETT");
+    }
+
     private void doCompletionTest(String input, String flags) 
         throws ShellSyntaxException, CompletionException {
         BjorneInterpreter interpreter = new BjorneInterpreter();
@@ -152,7 +164,9 @@ public class BjorneCompletionTests extends TestCase {
                     // Maybe completions, maybe not
             }
             for (String completionWord : completionWords) {
-                assertTrue(completionWord.startsWith(lastWord));
+                if (!completionWord.startsWith(lastWord)) {
+                    fail("completion(s) don't start with '" + lastWord + "': " + diag(partial, completions));
+                }
             }
         }
     }

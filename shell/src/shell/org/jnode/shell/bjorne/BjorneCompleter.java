@@ -35,8 +35,12 @@ public class BjorneCompleter implements Completable {
     public void complete(CompletionInfo completion, CommandShell shell) throws CompletionException {
         Logger.getLogger(BjorneCompleter.class).debug(toString());
         if (endToken == null) {
-            new CommandLine(null, null).complete(completion, shell);
-            return;
+            if (penultimateToken == null) {
+                new CommandLine(null, null).complete(completion, shell);
+                return;
+            }
+            endToken = penultimateToken;
+            endExpectedSet = penultimateExpectedSet;
         }
         if (command != null) {
             BjorneToken[] words = command.getWords();
