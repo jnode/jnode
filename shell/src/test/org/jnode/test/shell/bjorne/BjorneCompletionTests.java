@@ -111,21 +111,129 @@ public class BjorneCompletionTests extends TestCase {
     }
 
     public void testIf2Command() throws ShellSyntaxException, CompletionException {
-        doCompletionTest("if cpuid\nthen echo hi ; fi", "TTTTETT");
+        doCompletionTest("if\ncpuid ; then echo hi ; fi", "TTTTTETT");
     }
 
     public void testIf3Command() throws ShellSyntaxException, CompletionException {
-        doCompletionTest("if cpuid ; then\necho hi ; fi", "TTTTTETT");
+        doCompletionTest("if cpuid\nthen echo hi ; fi", "TTTTETT");
     }
 
     public void testIf4Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("if cpuid ; then\necho hi ; fi", "TTTTTETT");
+    }
+
+    public void testIf5Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("if cpuid ; then\necho hi\nfi", "TTTTTET");
+    }
+
+    public void testIfElseCommand() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("if cpuid ; then echo hi ; else echo ho ; fi", "TTTTTETTTETT");
+    }
+
+    public void testIfElse2Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("if cpuid ; then echo hi ; else\necho ho ; fi", "TTTTTETTTETT");
+    }
+
+    public void testIfElse3Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("if cpuid ; then echo hi ; else echo ho\nfi", "TTTTTETTTET");
+    }
+
+    public void testIfElifCommand() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("if cpuid ; then echo hi ; elif cpuid ; then echo ho ; fi", "TTTTTETTTTTTETT");
+    }
+
+    public void testIfElif2Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("if cpuid ; then echo hi ; elif\ncpuid ; then echo ho ; fi", "TTTTTETTTTTTETT");
+    }
+
+    public void testIfElif3Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("if cpuid ; then echo hi ; elif cpuid\nthen echo ho ; fi", "TTTTTETTTTTETT");
+    }
+
+    public void testIfElif4Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("if cpuid ; then echo hi ; elif cpuid ; then\necho ho ; fi", "TTTTTETTTTTTETT");
     }
 
     public void testWhileCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("while cpuid ; do echo hi ; done", "TTTTTETT");
     }
 
+    public void testWhile2Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("while\ncpuid ; do echo hi ; done", "TTTTTETT");
+    }
+    
+    public void testWhile3Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("while cpuid\ndo echo hi ; done", "TTTTETT");
+    }
+
+    public void testWhile4Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("while cpuid ; do\necho hi ; done", "TTTTTETT");
+    }
+    
+    public void testWhile5Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("while cpuid ; do echo hi\ndone", "TTTTTET");
+    }
+   
+    public void testForCommand() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("for X in a b c ; do echo hi ; done", "TFTFEETTTETT");
+    }
+   
+    public void testFor2Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("for X in a b c\ndo echo hi ; done", "TFTFEETTETT");
+    }
+
+    public void testFor3Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("for X in a b c ; do\necho hi ; done", "TFTFEETTTETT");
+    }
+   
+    public void testFor4Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("for X in a b c ; do echo hi\ndone", "TFTFEETTTET");
+    }
+   
+    public void testCaseCommand() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("case 3 in ( 1 | 2 ) echo hi ;; 3 ) echo bye ; esac", "TFTTFTFTTETETTETT");
+    }
+    
+    public void testCase2Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("case 3\nin ( 1 | 2 ) echo hi ;; 3 ) echo bye ; esac", "TFTTFTFTTETETTETT");
+    }
+    
+    public void testCase3Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("case 3 in\n( 1 | 2 ) echo hi ;; 3 ) echo bye ; esac", "TFTTFTFTTETETTETT");
+    }
+    
+    public void testCase4Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("case 3 in ( 1 | 2 )\necho hi ;; 3 ) echo bye ; esac", "TFTTFTFTTETETTETT");
+    }
+    
+    public void testCase5Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("case 3 in ( 1 | 2 ) echo hi\n;; 3 ) echo bye ; esac", "TFTTFTFTTETETTETT");
+    }
+    
+    public void testCase6Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("case 3 in ( 1 | 2 ) echo hi ;;\n3 ) echo bye ; esac", "TFTTFTFTTETETTETT");
+    }
+    
+    public void testCase7Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("case 3 in ( 1 | 2 ) echo hi ;; 3 )\necho bye ; esac", "TFTTFTFTTETETTETT");
+    }
+    
+    public void testCase8Command() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("case 3 in ( 1 | 2 ) echo hi ;; 3 ) echo bye\nesac", "TFTTFTFTTETETTET");
+    }
+    
+    public void testBadCommand() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("cpuid hi", "TE");
+    }
+    
+    public void testBad2Command() throws ShellSyntaxException, CompletionException {
+        try {
+            doCompletionTest("if fi ;", "T?");
+        } catch (CompletionException ex) {
+            assertEquals("Cannot find an alias or load a command class for 'fi'", ex.getMessage());
+        }
+    }
+   
     private void doCompletionTest(String input, String flags) 
         throws ShellSyntaxException, CompletionException {
         BjorneInterpreter interpreter = new BjorneInterpreter();
