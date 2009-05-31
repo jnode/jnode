@@ -22,7 +22,6 @@ package org.jnode.shell;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.console.CompletionInfo;
-import org.jnode.shell.bjorne.BjorneCompleter;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ArgumentBundle;
 

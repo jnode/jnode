@@ -43,7 +43,7 @@ import org.jnode.vm.VmExit;
 /**
  * This CommandInvoker runs a command in the current thread, using the command
  * classes <code>public static void main(String[] args)</code> entry point.
- * The {@link #invokeAsynchronous(CommandLine, CommandInfo)} method is not 
+ * The {@link #invokeAsynchronous(CommandLine)} method is not 
  * supported for this implementation of the CommandInvoker API.
  * 
  * @author Sam Reid
@@ -76,7 +76,10 @@ public class DefaultCommandInvoker implements SimpleCommandInvoker {
     }
     
     /**
-     * Invoke the command. 
+     * Invoke the command, running is by calling the entry point method from the
+     * current thread.  No redirection is allowed.
+     * 
+     * @param cmdLine the command line.
      */
     public int invoke(CommandLine cmdLine) throws ShellException {
         CommandInfo cmdInfo = cmdLine.parseCommandLine(shell);
