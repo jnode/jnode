@@ -175,19 +175,19 @@ public class BjorneCompletionTests extends TestCase {
     }
    
     public void testForCommand() throws ShellSyntaxException, CompletionException {
-        doCompletionTest("for X in a b c ; do echo hi ; done", "TFTFEETTTETT");
+        doCompletionTest("for X in 1 2 3 ; do echo hi ; done", "TFTEEETTTETT");
     }
    
     public void testFor2Command() throws ShellSyntaxException, CompletionException {
-        doCompletionTest("for X in a b c\ndo echo hi ; done", "TFTFEETTETT");
+        doCompletionTest("for X in 1 2 3\ndo echo hi ; done", "TFTEEETTETT");
     }
 
     public void testFor3Command() throws ShellSyntaxException, CompletionException {
-        doCompletionTest("for X in a b c ; do\necho hi ; done", "TFTFEETTTETT");
+        doCompletionTest("for X in 1 2 3 ; do\necho hi ; done", "TFTEEETTTETT");
     }
    
     public void testFor4Command() throws ShellSyntaxException, CompletionException {
-        doCompletionTest("for X in a b c ; do echo hi\ndone", "TFTFEETTTET");
+        doCompletionTest("for X in 1 2 3 ; do echo hi\ndone", "TFTEEETTTET");
     }
    
     public void testCaseCommand() throws ShellSyntaxException, CompletionException {
@@ -233,6 +233,10 @@ public class BjorneCompletionTests extends TestCase {
             assertEquals("Cannot find an alias or load a command class for 'fi'", ex.getMessage());
         }
     }
+    
+    public void testRedirCommand() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("echo hi > /", "TETZ");
+    }
    
     private void doCompletionTest(String input, String flags) 
         throws ShellSyntaxException, CompletionException {
@@ -268,6 +272,14 @@ public class BjorneCompletionTests extends TestCase {
                     } else {
                         assertTrue("got unexpected completions: " + diag(partial, completions), completionWords.size() == 0);
                     }
+                    break;
+                case 'Z':
+                    // Expect completions if the last char is NOT ' '
+                    if (wordStart >= partial.length()) {
+                    } else {
+                        assertTrue("got no completions: " + diag(partial, completions), completionWords.size() > 0);
+                    }
+                    break;
                 case '?':
                     // Maybe completions, maybe not
             }

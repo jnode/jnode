@@ -107,24 +107,27 @@ public class CommandCompletions implements CompletionInfo {
      * Render for debug purposes
      */
     public String toString() {
-        StringBuilder sb = new StringBuilder("CompletionInfo{");
+        StringBuilder sb = new StringBuilder("CommandCompletions{");
         sb.append("competionStart=").append(completionStart);
         sb.append(",completions=");
         if (completions == null) {
             sb.append("null");
         } else {
-            sb.append("{");
+            sb.append('[');
             boolean first = true;
             for (String completion : completions) {
                 if (first) {
                     first = false;
                 } else {
-                    sb.append(",");
+                    sb.append(',');
                 }
+                sb.append('\'');
                 sb.append(completion);
+                sb.append('\'');
             }
-            sb.append("]");
+            sb.append(']');
         }
+        sb.append('}');
         return sb.toString();
     }
 

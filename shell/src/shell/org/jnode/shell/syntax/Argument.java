@@ -474,7 +474,7 @@ public abstract class Argument<V> {
         this.bundle = bundle;
     }
     
-    ArgumentBundle getBundle() {
+    public ArgumentBundle getBundle() {
         return bundle;
     }
     

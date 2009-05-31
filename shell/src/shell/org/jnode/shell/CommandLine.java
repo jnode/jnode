@@ -629,13 +629,9 @@ public class CommandLine implements Completable, Iterable<String> {
         } else {
             // We haven't got a command name yet, so complete the partial command name string
             // as an AliasArgument.
-            AliasArgument cmdNameArg = new AliasArgument("cmdName", Argument.SINGLE);
-            ArgumentBundle bundle = new ArgumentBundle();
-            // An Argument expects to be bound and will barff if this is not the case.
-            bundle.addArgument(cmdNameArg);
-            bundle.setStatus(ArgumentBundle.PARSING);
-            cmdNameArg.complete(completion, cmd, 0);
-            completion.setCompletionStart(commandToken == null ? 0 : commandToken.start);
+            ArgumentCompleter ac = new ArgumentCompleter(
+                    new AliasArgument("cmdName", Argument.SINGLE), commandToken);
+            ac.complete(completion, shell);
         }
     }
 
