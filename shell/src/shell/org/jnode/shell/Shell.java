@@ -105,25 +105,25 @@ public interface Shell extends InputCompleter {
      * Set a shell property.  Some properties have special meaning to a Shell
      * and may cause its behavior to change.
      * 
-     * @param propName the name of the property
+     * @param key the name of the property
      * @param value the property value
      * @throws ShellException This may be thrown if the name / value pair is
      *     not acceptable.
      */
-    public void setProperty(String propName, String value) throws ShellException;
+    public void setProperty(String key, String value) throws ShellException;
     
     /**
      * Get the current value of a shell property.  
      * 
-     * @param propName the property name.
+     * @param key the property name.
      * @return the property value or {@code null}
      */
-    public String getProperty(String propName);
+    public String getProperty(String key);
     
     /**
      * Remove a shell property.  Special properties typically may not be removed,
      * 
-     * @param propName the name of the property
+     * @param key the name of the property
      * @throws ShellException This may be thrown if the property cannot be removed.
      */
     public void removeProperty(String key) throws ShellException;

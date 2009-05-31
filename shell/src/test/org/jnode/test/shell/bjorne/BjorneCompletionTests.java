@@ -259,25 +259,30 @@ public class BjorneCompletionTests extends TestCase {
             switch (flags.charAt(inWord)) {
                 case 'T':
                     // Expect completions
-                    assertTrue("got no completions: " + diag(partial, completions), completionWords.size() > 0);
+                    assertTrue("got no completions: " + diag(partial, completions), 
+                            completionWords.size() > 0);
                     break;
                 case 'F':
                     // Expect no completions
-                    assertTrue("got unexpected completions: " + diag(partial, completions), completionWords.size() == 0);
+                    assertTrue("got unexpected completions: " + diag(partial, completions),
+                            completionWords.size() == 0);
                     break;
                 case 'E':
                     // Expect completions if the last char is ' ', otherwise not
                     if (wordStart >= partial.length()) {
-                        assertTrue("got no completions: " + diag(partial, completions), completionWords.size() > 0);
+                        assertTrue("got no completions: " + diag(partial, completions),
+                                completionWords.size() > 0);
                     } else {
-                        assertTrue("got unexpected completions: " + diag(partial, completions), completionWords.size() == 0);
+                        assertTrue("got unexpected completions: " + diag(partial, completions), 
+                                completionWords.size() == 0);
                     }
                     break;
                 case 'Z':
                     // Expect completions if the last char is NOT ' '
                     if (wordStart >= partial.length()) {
                     } else {
-                        assertTrue("got no completions: " + diag(partial, completions), completionWords.size() > 0);
+                        assertTrue("got no completions: " + diag(partial, completions), 
+                                completionWords.size() > 0);
                     }
                     break;
                 case '?':
@@ -285,7 +290,8 @@ public class BjorneCompletionTests extends TestCase {
             }
             for (String completionWord : completionWords) {
                 if (!completionWord.startsWith(lastWord)) {
-                    fail("completion(s) don't start with '" + lastWord + "': " + diag(partial, completions));
+                    fail("completion(s) don't start with '" + lastWord + "': " + 
+                            diag(partial, completions));
                 }
             }
         }

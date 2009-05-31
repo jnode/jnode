@@ -55,7 +55,6 @@ public final class CommandInfo {
      * @param clazz the designated {@code Class} for executing the command
      * @param commandName the name, or alias, for the command
      * @param syntaxBundle the syntax definition to parse the command line against
-     * @param argBundle the optional {@code ArgumentBundle} to parse the command line against
      */
     public CommandInfo(Class<?> clazz, String commandName, SyntaxBundle syntaxBundle, boolean internal) {
         this.clazz = clazz;
@@ -94,7 +93,7 @@ public final class CommandInfo {
     }
     
     /**
-     * Checks wether this command is considered internal or not.
+     * Checks whether this command is considered internal or not.
      *
      * @return true if this is an internal command
      * @see org.jnode.shell.alias.AliasManager#isInternal

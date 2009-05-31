@@ -612,7 +612,8 @@ public class BjorneParser {
             CommandNode cond = parseCompoundList(TOK_THEN_BIT);
             allowLineBreaks();
             expectNext(TOK_THEN_BIT, RULE_1_CONTEXT);
-            return new IfCommandNode(CMD_ELIF, cond, parseCompoundList(TOK_ELIF_BIT | TOK_ELSE_BIT | TOK_FI_BIT), parseOptElsePart());
+            return new IfCommandNode(CMD_ELIF, cond, 
+                    parseCompoundList(TOK_ELIF_BIT | TOK_ELSE_BIT | TOK_FI_BIT), parseOptElsePart());
         } else {
             return parseCompoundList(TOK_FI_BIT);
         } 

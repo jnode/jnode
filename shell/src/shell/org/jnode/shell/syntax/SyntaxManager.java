@@ -25,7 +25,8 @@ import org.jnode.shell.syntax.ArgumentSpecLoader.ArgumentSpec;
 
 /**
  * A SyntaxManager manages the association between a command "alias" and 
- * the Syntax that specifies its argument syntax.  
+ * the Syntax that specifies its argument syntax.  The manager can also
+ * record a set of argument specs for non-native commands.
  * 
  * @author crawley@jnode.org
  */
@@ -39,14 +40,23 @@ public interface SyntaxManager {
     public static final String SYNTAXES_EP_NAME = "org.jnode.shell.syntaxes";
 
     /**
-     * Add a syntax bundle
+     * Add a syntax bundle, using the alias name embedded in the bundle.
      * 
      * @param bundle The syntax to be added
      */
     public abstract void add(SyntaxBundle bundle);
 
     /**
-     * Remove the syntaxBundle and argumentBundle(if one exists) for an alias
+     * Add the argument specs for a non-native command; i.e. one which does
+     * not define and register its own arguments.
+     *
+     * @param argSpecs the specs for the arguments
+     * @param alias the alias
+     */
+    public abstract void add(String alias, ArgumentSpec<?>[] argSpecs);
+    
+    /**
+     * Remove the syntaxBundle and argumentBundle (if one exists) for an alias
      * 
      * @param alias The alias
      */
@@ -55,18 +65,10 @@ public interface SyntaxManager {
     /**
      * Gets the syntax bundle for a given alias
      * 
-     * @param alias The alias
+     * @param alias the alias
      * @return The syntax for the given alias, or <code>null</code>
      */
     public abstract SyntaxBundle getSyntaxBundle(String alias);
-    
-    /**
-     * Add an argument bundle for a bare command.
-     *
-     * @param bundle an argument bundle holding the arguments of a bare command
-     * @param alias the alias to bind the arguments to
-     */
-    public abstract void add(String alias, ArgumentSpec<?>[] args);
     
     /**
      * Gets the argument bundle for a given alias if one exists.
