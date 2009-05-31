@@ -143,6 +143,41 @@ public class BjorneToken extends CommandLine.Token {
 
     public static final int TOK_IN = 39;
     public static final long TOK_IN_BIT = (1L << TOK_IN);
+    
+    // The following token types specialize the 'word' and 'name' types.
+    // A token won't be assigned one of these types, but the corresponding
+    // bits are included in the expectedSet bitsets to tell the completer
+    // what kind of completion to use.
+
+    public static final int TOK_COMMAND_NAME = 40;
+    public static final long TOK_COMMAND_NAME_BITS = (1L << TOK_COMMAND_NAME) + TOK_WORD_BIT;
+
+    public static final int TOK_COMMAND_WORD = 41;
+    public static final long TOK_COMMAND_WORD_BITS = (1L << TOK_COMMAND_WORD) + TOK_WORD_BIT;
+
+    public static final int TOK_FUNCTION_NAME = 42;
+    public static final long TOK_FUNCTION_NAME_BITS = (1L << TOK_FUNCTION_NAME) + TOK_NAME_BIT;
+    
+    public static final int TOK_HERE_END = 43;
+    public static final long TOK_HERE_END_BITS = (1L << TOK_HERE_END) + TOK_WORD_BIT;
+
+    public static final int TOK_FOR_NAME = 44;
+    public static final long TOK_FOR_NAME_BITS = (1L << TOK_FOR_NAME) + TOK_NAME_BIT;
+    
+    public static final int TOK_FOR_WORD = 45;
+    public static final long TOK_FOR_WORD_BITS = (1L << TOK_FOR_WORD) + TOK_WORD_BIT;
+    
+    public static final int TOK_PATTERN = 46;
+    public static final long TOK_PATTERN_BITS = (1L << TOK_PATTERN) + TOK_WORD_BIT;
+
+    public static final int TOK_FILE_NAME = 47;
+    public static final long TOK_FILE_NAME_BITS = (1L << TOK_FILE_NAME) + TOK_WORD_BIT;
+
+    public static final int TOK_CASE_WORD = 48;
+    public static final long TOK_CASE_WORD_BITS = (1L << TOK_CASE_WORD) + TOK_WORD_BIT;
+    
+    
+    // Contexts that affect the parsing of words
 
     public static final int BASE_CONTEXT = 0;
 

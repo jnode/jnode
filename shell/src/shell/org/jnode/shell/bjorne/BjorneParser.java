@@ -49,7 +49,10 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_BANG_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_BAR_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_CASE;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_CASE_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_CASE_WORD_BITS;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_CLOBBER_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_COMMAND_NAME_BITS;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_COMMAND_WORD_BITS;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_DGREAT_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_DLESS;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_DLESSDASH;
@@ -66,11 +69,16 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_END_OF_LINE_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_END_OF_STREAM;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_END_OF_STREAM_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_ESAC_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_FILE_NAME_BITS;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_FI_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_FOR;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_FOR_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_FOR_NAME_BITS;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_FOR_WORD_BITS;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_FUNCTION_NAME_BITS;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_GREATAND_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_GREAT_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_HERE_END_BITS;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_IF;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_IF_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_IN_BIT;
@@ -83,8 +91,8 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSGREAT_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LESS_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LPAREN;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LPAREN_BIT;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_NAME_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_OR_IF_BIT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_PATTERN_BITS;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_RBRACE_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_RPAREN_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_SEMI;
@@ -95,7 +103,6 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_UNTIL_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_WHILE;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_WHILE_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_WORD;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_WORD_BIT;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -220,8 +227,8 @@ public class BjorneParser {
 
     private CommandNode parseOptAndOr() throws ShellSyntaxException {
         allowLineBreaks();
-        if (optPeek(TOK_LBRACE_BIT | TOK_LPAREN_BIT | TOK_WORD_BIT | TOK_IF_BIT | 
-                TOK_WHILE_BIT | TOK_UNTIL_BIT | TOK_CASE_BIT | TOK_FOR_BIT | 
+        if (optPeek(TOK_LBRACE_BIT | TOK_LPAREN_BIT | TOK_COMMAND_NAME_BITS | TOK_FUNCTION_NAME_BITS |  
+                TOK_IF_BIT | TOK_WHILE_BIT | TOK_UNTIL_BIT | TOK_CASE_BIT | TOK_FOR_BIT | 
                 TOK_IO_NUMBER_BIT | TOK_LESS_BIT | TOK_GREAT_BIT | TOK_DLESS_BIT | 
                 TOK_DGREAT_BIT | TOK_LESSAND_BIT | TOK_GREATAND_BIT | TOK_LESSGREAT |
                 TOK_CLOBBER_BIT, RULE_1_CONTEXT) != null) {
@@ -307,7 +314,15 @@ public class BjorneParser {
                 redirects.add(parseRedirect());
             }
         }
-        token = optNext(TOK_WORD_BIT);
+        if (assignments.isEmpty() && redirects.isEmpty()) {
+            // An empty command without assignments or redirections is illegal ...
+            // but the real reason to call expectNext is to ensure that we don't
+            // get stuck on a line-break.
+            token = expectNext(TOK_COMMAND_NAME_BITS);
+        } else {
+            // An empty command with assignments and/or redirections is legal
+            token = optNext(TOK_COMMAND_NAME_BITS);
+        }
         try {
             if (token != null) {
                 // This is the command name.
@@ -315,7 +330,7 @@ public class BjorneParser {
 
                 // Deal with any command arguments and embedded / trailing
                 // redirections.
-                while ((token = optPeek(TOK_WORD_BIT | TOK_IO_NUMBER_BIT | TOK_LESS_BIT |
+                while ((token = optPeek(TOK_COMMAND_WORD_BITS | TOK_IO_NUMBER_BIT | TOK_LESS_BIT |
                         TOK_GREAT_BIT | TOK_DLESS_BIT | TOK_DGREAT_BIT | TOK_LESSAND_BIT | 
                         TOK_GREATAND_BIT | TOK_LESSGREAT_BIT | TOK_CLOBBER_BIT)) != null) {
                     if (token.getTokenType() == TOK_WORD) {
@@ -329,10 +344,7 @@ public class BjorneParser {
                 builtin = BjorneInterpreter.isBuiltin(commandWord);
                 // FIXME ... built-in commands should use the Syntax mechanisms so
                 // that completion, help, etc will work as expected.
-            } else {
-                // An empty command is legal, as are assignments and redirections
-                // w/o a command.
-            }
+            } 
         } catch (IncompleteCommandException ex) {
             if (completer != null) {
                 completer.setCommand(new SimpleCommandNode(CMD_COMMAND, 
@@ -362,7 +374,7 @@ public class BjorneParser {
     }
 
     private FunctionDefinitionNode parseFunctionDefinition() throws ShellSyntaxException {
-        BjorneToken fname = optNext(TOK_NAME_BIT, RULE_8_CONTEXT);
+        BjorneToken fname = optNext(TOK_FUNCTION_NAME_BITS, RULE_8_CONTEXT);
         if (fname == null) {
             return null;
         }
@@ -432,14 +444,14 @@ public class BjorneParser {
                 TOK_DLESS_BIT | TOK_DLESSDASH_BIT);
         int tt = token.getTokenType();
         if (tt == TOK_DLESS || tt == TOK_DLESSDASH) {
-            arg = expectNext(TOK_WORD_BIT);
+            arg = expectNext(TOK_HERE_END_BITS);
             RedirectionNode res = new RedirectionNode(tt, io, arg);
             // (HERE document capture will start when we reach the next 
             // real (i.e. not '\' escaped) line break ... see processLineBreaks())
             hereRedirections.add(res);
             return res;
         } else {
-            arg = expectNext(TOK_WORD_BIT);
+            arg = expectNext(TOK_FILE_NAME_BITS);
             // (Corresponding token type and redirection type values are the same)
             return new RedirectionNode(tt, io, arg);
         }
@@ -497,7 +509,7 @@ public class BjorneParser {
 
     private CaseCommandNode parseCaseCommand() throws ShellSyntaxException {
         next();
-        BjorneToken word = expectNext(TOK_WORD_BIT);
+        BjorneToken word = expectNext(TOK_CASE_WORD_BITS);
         List<CaseItemNode> caseItems = new LinkedList<CaseItemNode>();
         allowLineBreaks();
         expectNext(TOK_IN_BIT, RULE_6_CONTEXT);
@@ -530,7 +542,7 @@ public class BjorneParser {
     private BjorneToken[] parsePattern() throws ShellSyntaxException {
         List<BjorneToken> pattern = new LinkedList<BjorneToken>();
         while (true) {
-            BjorneToken token = expectNext(TOK_WORD_BIT);
+            BjorneToken token = expectNext(TOK_PATTERN_BITS);
             pattern.add(token);
             if (optNext(TOK_BAR_BIT) == null) {
                 break;
@@ -541,14 +553,14 @@ public class BjorneParser {
 
     private ForCommandNode parseForCommand() throws ShellSyntaxException {
         next();
-        BjorneToken var = expectNext(TOK_NAME_BIT, RULE_5_CONTEXT);
+        BjorneToken var = expectNext(TOK_FOR_NAME_BITS, RULE_5_CONTEXT);
         skipLineBreaks();
         List<BjorneToken> words = new LinkedList<BjorneToken>();
         if (optNext(TOK_IN_BIT, RULE_6_CONTEXT) != null) {
-            BjorneToken word = expectNext(TOK_WORD_BIT);
+            BjorneToken word = expectNext(TOK_FOR_WORD_BITS);
             do {
                 words.add(word);
-                word = optNext(TOK_WORD_BIT);
+                word = optNext(TOK_FOR_WORD_BITS);
             } while (word != null);
             expectNext(TOK_SEMI_BIT | TOK_END_OF_LINE_BIT);
         }

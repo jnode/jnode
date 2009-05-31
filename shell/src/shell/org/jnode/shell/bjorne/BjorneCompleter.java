@@ -1,12 +1,30 @@
 package org.jnode.shell.bjorne;
 
-import org.apache.log4j.Logger;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_ASSIGNMENT;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_CASE_WORD;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_COMMAND_NAME;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_COMMAND_WORD;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_END_OF_LINE;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_END_OF_STREAM;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_FILE_NAME;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_FOR_NAME;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_FOR_WORD;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_FUNCTION_NAME;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_HERE_END;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_IO_NUMBER;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_NAME;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_PATTERN;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_WORD;
+
 import org.jnode.driver.console.CompletionInfo;
+import org.jnode.shell.ArgumentCompleter;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.Completable;
 import org.jnode.shell.help.CompletionException;
-import static org.jnode.shell.bjorne.BjorneToken.*;
+import org.jnode.shell.syntax.AliasArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
 
 /**
  * This class is used by the Bjorne parser to capture completion information.
@@ -33,7 +51,6 @@ public class BjorneCompleter implements Completable {
 
     @Override
     public void complete(CompletionInfo completion, CommandShell shell) throws CompletionException {
-        Logger.getLogger(BjorneCompleter.class).debug(toString());
         if (endToken == null) {
             if (penultimateToken == null) {
                 new CommandLine(null, null).complete(completion, shell);
@@ -52,28 +69,66 @@ public class BjorneCompleter implements Completable {
             }
         }
         String partial;
+        BjorneToken token;
         long expectedSet;
         if (penultimateToken == null || penultimateToken.end < endToken.end) {
             partial = "";
             expectedSet = endExpectedSet;
             completion.setCompletionStart(endToken.start);
+            token = endToken;
         } else {
             partial = penultimateToken.unparse();
             expectedSet = penultimateExpectedSet | endExpectedSet;
             completion.setCompletionStart(penultimateToken.start);
+            token = penultimateToken;
         }
-        Logger.getLogger(BjorneCompleter.class).debug(
-                "Combined expected set = " + BjorneToken.formatExpectedSet(expectedSet));
-        Logger.getLogger(BjorneCompleter.class).debug("partial = '" + partial + "'");
-        expectedSet &= ~(TOK_END_OF_LINE_BIT | TOK_END_OF_STREAM_BIT | TOK_WORD_BIT | 
-                TOK_NAME_BIT | TOK_ASSIGNMENT_BIT | TOK_IO_NUMBER_BIT);
+        if (!partial.equals(token.getText())) {
+            token = new BjorneToken(token.getTokenType(), token.unparse(), token.start, token.end);
+        }
         for (int i = 0; i < 64; i++) {
             if (((1L << i) & expectedSet) == 0) {
                 continue;
             }
-            String candidate = BjorneToken.toString(i);
-            if (candidate.startsWith(partial)) {
-                completion.addCompletion(candidate);
+            switch (i) {
+                case TOK_END_OF_LINE:
+                case TOK_END_OF_STREAM:
+                    // These are not completable
+                    break;
+                case TOK_WORD: 
+                case TOK_NAME: 
+                    // These are generic token types... completion is based on more specific types
+                    break;
+                case TOK_IO_NUMBER:
+                case TOK_COMMAND_WORD:
+                case TOK_FUNCTION_NAME:
+                case TOK_HERE_END:
+                case TOK_FOR_NAME:
+                case TOK_PATTERN:
+                case TOK_CASE_WORD:
+                    // Ignore for purposes of completion
+                    break;
+                case TOK_ASSIGNMENT:
+                    // FIXME ...complete 1st part against shell variable namespace and 2nd part against
+                    // file system namespace
+                    break;
+                case TOK_FOR_WORD:
+                case TOK_FILE_NAME:
+                    // Complete against the file system namespace
+                    ArgumentCompleter ac = new ArgumentCompleter(
+                            new FileArgument("?", Argument.MANDATORY, null), token);
+                    ac.complete(completion, shell);
+                    break;
+                case TOK_COMMAND_NAME:
+                    // Complete against the command/alias/function namespaces
+                    ac = new ArgumentCompleter(
+                            new AliasArgument("?", Argument.MANDATORY, null), token);
+                    ac.complete(completion, shell);
+                    break;
+                default:
+                    String candidate = BjorneToken.toString(i);
+                    if (candidate.startsWith(partial)) {
+                        completion.addCompletion(candidate);
+                    }
             }
         }
     }

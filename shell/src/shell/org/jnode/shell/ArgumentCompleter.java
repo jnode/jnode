@@ -20,8 +20,11 @@
  
 package org.jnode.shell;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.console.CompletionInfo;
+import org.jnode.shell.bjorne.BjorneCompleter;
 import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.ArgumentBundle;
 
 /**
  * This class wraps an Argument as a Completable for use in a default syntax.
@@ -43,9 +46,13 @@ public class ArgumentCompleter implements Completable {
     public ArgumentCompleter(Argument<?> argument, CommandLine.Token token) {
         this.argument = argument;
         this.token = token;
+        if (argument.getBundle() == null) {
+            new ArgumentBundle(argument).setStatus(ArgumentBundle.PARSING);
+        }
     }
 
     public void complete(CompletionInfo completion, CommandShell shell) {
+        Logger.getLogger(ArgumentCompleter.class).debug("text = " + (token == null ? "" : token.text));
         argument.complete(completion, token == null ? "" : token.text, 0);
         if (token != null) {
             completion.setCompletionStart(token.start);
