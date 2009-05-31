@@ -51,7 +51,6 @@ public class ArgumentCompleter implements Completable {
     }
 
     public void complete(CompletionInfo completion, CommandShell shell) {
-        Logger.getLogger(ArgumentCompleter.class).debug("text = " + (token == null ? "" : token.text));
         argument.complete(completion, token == null ? "" : token.text, 0);
         if (token != null) {
             completion.setCompletionStart(token.start);

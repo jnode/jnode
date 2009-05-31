@@ -228,7 +228,7 @@ public class BjorneCompletionTests extends TestCase {
     
     public void testBad2Command() throws ShellSyntaxException, CompletionException {
         try {
-            doCompletionTest("if fi ;", "T?");
+            doCompletionTest("if fi ;", "T??");
         } catch (CompletionException ex) {
             assertEquals("Cannot find an alias or load a command class for 'fi'", ex.getMessage());
         }
