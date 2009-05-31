@@ -38,7 +38,6 @@ help         Output these messages
 		<java classpathref="cp-test" classname="org.jnode.test.shell.harness.TestHarness">
 			<arg value="-E" />
 			<arg value="-v"/>
-			<arg value="-d"/>
 			<arg value="-s" />
 			<arg value="${root.dir}" />
 			<arg value="${basedir}/src/test/org/jnode/test/shell/all-tests.xml" />
