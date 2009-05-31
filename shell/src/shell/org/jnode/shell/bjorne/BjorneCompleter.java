@@ -61,11 +61,9 @@ public class BjorneCompleter implements Completable {
         }
         if (command != null) {
             BjorneToken[] words = command.getWords();
-            if (words.length > 0 && words[words.length - 1] == penultimateToken) {
+            if (words.length > 1 && words[words.length - 1] == penultimateToken) {
                 boolean argumentAnticipated = penultimateToken.end < endToken.end;
                 command.complete(completion, context, shell, argumentAnticipated);
-            } else if (words.length == 0) {
-                new CommandLine(null, null).complete(completion, shell);
             }
         }
         String partial;
