@@ -163,7 +163,8 @@ public class BjorneToken extends CommandLine.Token {
 
     public static final int TOK_FOR_NAME = 44;
     public static final long TOK_FOR_NAME_BITS = (1L << TOK_FOR_NAME) + TOK_NAME_BIT;
-    
+//  }
+
     public static final int TOK_FOR_WORD = 45;
     public static final long TOK_FOR_WORD_BITS = (1L << TOK_FOR_WORD) + TOK_WORD_BIT;
     
@@ -425,6 +426,24 @@ public class BjorneToken extends CommandLine.Token {
                 return "<assignment>";
             case TOK_IO_NUMBER:
                 return "<io number>";
+            case TOK_COMMAND_NAME:
+                return "<command name>";
+            case TOK_COMMAND_WORD:
+                return "<command word>";
+            case TOK_FUNCTION_NAME:
+                return "<function name>";
+            case TOK_HERE_END: 
+                return "<here end>";
+            case TOK_FOR_NAME:
+                return "<for name>";
+            case TOK_FOR_WORD:
+                return "<for word>";
+            case TOK_PATTERN:
+                return "<case pattern>";
+            case TOK_FILE_NAME:
+                return "<file name>";
+            case TOK_CASE_WORD:
+                return "<case word>";
             default:
                 return "unknown (" + tt + ")";
         }

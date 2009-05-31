@@ -297,7 +297,7 @@ public class BjorneTokenizer {
         int start = pos - 1;
         switch (ch) {
             case EOS:
-                return makeToken(TOK_END_OF_STREAM, start);
+                return makeToken(TOK_END_OF_STREAM, len);
             case '\n':
                 return makeToken(TOK_END_OF_LINE, start);
             case '#':
