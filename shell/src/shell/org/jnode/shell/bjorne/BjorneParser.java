@@ -86,7 +86,6 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_IO_NUMBER_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LBRACE;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LBRACE_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSAND_BIT;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSGREAT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSGREAT_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LESS_BIT;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LPAREN;
@@ -230,7 +229,7 @@ public class BjorneParser {
         if (optPeek(TOK_LBRACE_BIT | TOK_LPAREN_BIT | TOK_COMMAND_NAME_BITS | TOK_FUNCTION_NAME_BITS |  
                 TOK_IF_BIT | TOK_WHILE_BIT | TOK_UNTIL_BIT | TOK_CASE_BIT | TOK_FOR_BIT | 
                 TOK_IO_NUMBER_BIT | TOK_LESS_BIT | TOK_GREAT_BIT | TOK_DLESS_BIT | 
-                TOK_DGREAT_BIT | TOK_LESSAND_BIT | TOK_GREATAND_BIT | TOK_LESSGREAT |
+                TOK_DGREAT_BIT | TOK_LESSAND_BIT | TOK_GREATAND_BIT | TOK_LESSGREAT_BIT |
                 TOK_CLOBBER_BIT, RULE_1_CONTEXT) != null) {
             return parseAndOr();
         } else {
@@ -752,9 +751,9 @@ public class BjorneParser {
                     completer.addToEndExpectedSet(expectedSet);
                 }
             } else {
-                if (pt == null || pt.start < token.start) {
+                if (pt == null || pt.start != token.start) {
                     completer.setPenultimateToken(token);
-                    if (pt != null && pt.getTokenType() == TOK_END_OF_LINE) {
+                    if (pt != null && pt.getTokenType() == TOK_END_OF_LINE && pt.start < token.start) {
                         completer.addToPenultimateExpectedSet(expectedSet);
                     } else {
                         completer.setPenultimateExpectedSet(expectedSet);

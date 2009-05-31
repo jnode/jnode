@@ -479,4 +479,7 @@ public class BjorneToken extends CommandLine.Token {
         return sb.toString();
     }
 
+    public static String toString(BjorneToken token) {
+        return token != null ? (token + "/" + token.start + "/" + token.end) : "null";
+    }
 }

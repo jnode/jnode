@@ -181,14 +181,11 @@ public class BjorneCompleter implements Completable {
     
     @Override
     public String toString() {
-        return "BjorneCompleter{endToken=" + toString(endToken) +
+        return "BjorneCompleter{endToken=" + BjorneToken.toString(endToken) +
             ",endExpectedSet={" + BjorneToken.formatExpectedSet(endExpectedSet) +
-            "},penultimateToken=" + toString(penultimateToken) +
+            "},penultimateToken=" + BjorneToken.toString(penultimateToken) +
             ",penultimateExpectedSet={" + BjorneToken.formatExpectedSet(penultimateExpectedSet) + 
             "},command=" + command + "}";
     }
     
-    private String toString(BjorneToken token) {
-        return token != null ? (token + "/" + token.start + "/" + token.end) : "null";
-    }
 }
