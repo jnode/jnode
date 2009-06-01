@@ -31,9 +31,9 @@ import org.jnode.driver.input.KeyboardInterpreterException;
 import org.jnode.driver.input.KeyboardLayoutManager;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.help.SyntaxErrorException;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ClassNameArgument;
+import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.CountryArgument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.KeyboardLayoutArgument;
@@ -109,7 +109,7 @@ public class LoadkeysCommand extends AbstractCommand {
         if (argAdd.isSet()) {
             String layoutID = getLayoutID(mgr);
             if (!argClass.isSet()) {
-                throw new SyntaxErrorException(ex_syntax_class);
+                throw new CommandSyntaxException(ex_syntax_class);
             }
             String className = argClass.getValue();
             mgr.add(layoutID, className);
@@ -141,16 +141,16 @@ public class LoadkeysCommand extends AbstractCommand {
         }
     }
 
-    private String getLayoutID(KeyboardLayoutManager mgr) throws SyntaxErrorException {
+    private String getLayoutID(KeyboardLayoutManager mgr) throws CommandSyntaxException {
         if (!argTriple.isSet()) {
             if (argLayout.isSet()) {
                 return argLayout.getValue();
             } else {
-                throw new SyntaxErrorException(ex_syntax_layout);
+                throw new CommandSyntaxException(ex_syntax_layout);
             }
         } else {
             if (!argCountry.isSet()) {
-                throw new SyntaxErrorException(ex_syntax_country);
+                throw new CommandSyntaxException(ex_syntax_country);
             }
             String country = argCountry.getValue();
             String language = argLanguage.isSet() ? argLanguage.getValue() : "";

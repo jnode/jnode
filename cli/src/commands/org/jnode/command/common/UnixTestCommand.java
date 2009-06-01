@@ -27,7 +27,7 @@ import java.util.Stack;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.SyntaxErrorException;
+import org.jnode.shell.syntax.CommandSyntaxException;
 
 
 /**
@@ -123,7 +123,7 @@ public class UnixTestCommand extends AbstractCommand {
         args = commandLine.getArguments();
         try {
             if (bracketted && args.length == 0) {
-                throw new SyntaxErrorException("missing ']'");
+                throw new CommandSyntaxException("missing ']'");
             } else if (bracketted && !args[args.length - 1].equals("]")) {
                 processAsOptions(args);
                 res = true;
@@ -135,7 +135,7 @@ public class UnixTestCommand extends AbstractCommand {
                     Object obj = evaluate();
                     if (pos <= lastArg) {
                         if (args[pos].equals(")")) {
-                            throw new SyntaxErrorException("unmatched ')'");
+                            throw new CommandSyntaxException("unmatched ')'");
                         } else {
                             throw new AssertionError("I'm confused!  pos = " + pos + 
                                     ", lastArg = " + lastArg + ", next arg is " + args[pos]);
@@ -153,13 +153,13 @@ public class UnixTestCommand extends AbstractCommand {
             if (!res) {
                 exit(1);
             }
-        } catch (SyntaxErrorException ex) {
+        } catch (CommandSyntaxException ex) {
             getError().getPrintWriter().println(ex.getMessage());
             exit(2);
         }
     }
 
-    private Object evaluate() throws SyntaxErrorException {
+    private Object evaluate() throws CommandSyntaxException {
         evaluateExpression(false);
         while (!operatorStack.isEmpty()) {
             reduce();
@@ -170,27 +170,27 @@ public class UnixTestCommand extends AbstractCommand {
         return operandStack.pop();
     }
 
-    private void evaluateExpression(boolean nested) throws SyntaxErrorException {
+    private void evaluateExpression(boolean nested) throws CommandSyntaxException {
         evaluatePrimary(nested);
         while (pos <= lastArg) {
             String tok = next();
             Operator op = OPERATOR_MAP.get(tok);
             if (op == null) {
-                throw new SyntaxErrorException("expected an operator");
+                throw new CommandSyntaxException("expected an operator");
             }
             switch(op.kind) {
                 case OP_UNARY:
-                    throw new SyntaxErrorException("misplaced unary operator");
+                    throw new CommandSyntaxException("misplaced unary operator");
                 case OP_BINARY:
                     evaluatePrimary(nested);
                     reduceAndPush(op, popOperand());
                     break;
                 case OP_SPECIAL:
                     if (op.opNo == OP_LPAREN) {
-                        throw new SyntaxErrorException("misplaced '('");
+                        throw new CommandSyntaxException("misplaced '('");
                     } else if (op.opNo == OP_RPAREN) {
                         if (!nested) {
-                            throw new SyntaxErrorException("misplaced ')'");
+                            throw new CommandSyntaxException("misplaced ')'");
                         }
                         back();
                         return;
@@ -199,7 +199,7 @@ public class UnixTestCommand extends AbstractCommand {
         }
     }
 
-    private void evaluatePrimary(boolean nested) throws SyntaxErrorException {
+    private void evaluatePrimary(boolean nested) throws CommandSyntaxException {
         String tok = next();
         Operator op = OPERATOR_MAP.get(tok);
         if (op == null) {
@@ -211,13 +211,13 @@ public class UnixTestCommand extends AbstractCommand {
                     operandStack.push(next());
                     break;
                 case OP_BINARY:
-                    throw new SyntaxErrorException("misplaced binary operator");
+                    throw new CommandSyntaxException("misplaced binary operator");
                 case OP_SPECIAL:
                     if (op.opNo == OP_LPAREN) {
                         operatorStack.push(op); // ... as a marker.
                         evaluateExpression(true);
                         if (!next().equals(")")) {
-                            throw new SyntaxErrorException("missing ')'");
+                            throw new CommandSyntaxException("missing ')'");
                         }
                         while (operatorStack.peek() != op) {
                             reduce();
@@ -226,13 +226,13 @@ public class UnixTestCommand extends AbstractCommand {
                             throw new AssertionError("cannot find my marker!");
                         }
                     } else {
-                        throw new SyntaxErrorException("unmatched ')'");
+                        throw new CommandSyntaxException("unmatched ')'");
                     }
             }
         }
     }
 
-    private void reduceAndPush(Operator operator, Object operand) throws SyntaxErrorException {
+    private void reduceAndPush(Operator operator, Object operand) throws CommandSyntaxException {
         while (!operatorStack.isEmpty() && operator.priority <= operatorStack.peek().priority) {
             reduce();
         }
@@ -240,7 +240,7 @@ public class UnixTestCommand extends AbstractCommand {
         operandStack.push(operand);
     }
 
-    private void reduce() throws SyntaxErrorException {
+    private void reduce() throws CommandSyntaxException {
         Operator operator = operatorStack.pop();
         Object operand = null, operand2 = null;
         if (operator.kind == OP_UNARY) {
@@ -321,7 +321,7 @@ public class UnixTestCommand extends AbstractCommand {
         }
     }
 
-    private void processAsOptions(String[] args) throws SyntaxErrorException {
+    private void processAsOptions(String[] args) throws CommandSyntaxException {
         PrintWriter err = getError().getPrintWriter();
         for (String option : args) {
             if (option.equals("--help")) {
@@ -329,7 +329,7 @@ public class UnixTestCommand extends AbstractCommand {
             } else if (option.equals("--version")) {
                 err.println("JNode test 0.0");
             } else {
-                throw new SyntaxErrorException("unknown option '" + option + "'");
+                throw new CommandSyntaxException("unknown option '" + option + "'");
             }
         }
     }
@@ -346,51 +346,51 @@ public class UnixTestCommand extends AbstractCommand {
         operandStack.push(new Long(value));
     }
 
-    private Object popOperand() throws SyntaxErrorException {
+    private Object popOperand() throws CommandSyntaxException {
         if (operandStack.isEmpty()) {
-            throw new SyntaxErrorException("missing LHS for operator");
+            throw new CommandSyntaxException("missing LHS for operator");
         }
         return operandStack.pop();
     }
 
-    private long toNumber(Object obj) throws SyntaxErrorException {
+    private long toNumber(Object obj) throws CommandSyntaxException {
         if (obj instanceof Long) {
             return ((Long) obj).longValue();
         } else if (obj instanceof String) {
             try {
                 return Long.parseLong((String) obj);
             } catch (NumberFormatException ex) {
-                throw new SyntaxErrorException(
+                throw new CommandSyntaxException(
                         "operand is not a number: '" + obj.toString() + "'");
             }
         } else {
-            throw new SyntaxErrorException("subexpression is not an INTEGER");
+            throw new CommandSyntaxException("subexpression is not an INTEGER");
         }
     }
 
-    private boolean toBoolean(Object obj) throws SyntaxErrorException {
+    private boolean toBoolean(Object obj) throws CommandSyntaxException {
         if (obj instanceof Boolean) {
             return obj == Boolean.TRUE;
         } else if (obj instanceof String) {
             return ((String) obj).length() > 0;
         } else {
-            throw new SyntaxErrorException("operand is an INTEGER");
+            throw new CommandSyntaxException("operand is an INTEGER");
         }
     }
 
-    private String toString(Object obj) throws SyntaxErrorException {
+    private String toString(Object obj) throws CommandSyntaxException {
         if (obj instanceof String) {
             return (String) obj;
         } else {
-            throw new SyntaxErrorException("operand is not a STRING");
+            throw new CommandSyntaxException("operand is not a STRING");
         }
     }
 
-    private File toFile(Object obj) throws SyntaxErrorException {
+    private File toFile(Object obj) throws CommandSyntaxException {
         if (obj instanceof String) {
             return new File((String) obj);
         } else {
-            throw new SyntaxErrorException("operand is not a FILENAME");
+            throw new CommandSyntaxException("operand is not a FILENAME");
         }
     }
 
@@ -401,7 +401,7 @@ public class UnixTestCommand extends AbstractCommand {
         return args[pos++];
     }
 
-    private void back() throws SyntaxErrorException {
+    private void back() throws CommandSyntaxException {
         pos--;
     }
 

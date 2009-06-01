@@ -31,7 +31,7 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 
 import org.jnode.shell.help.HelpFactory;
-import org.jnode.shell.help.SyntaxErrorException;
+import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.vm.VmExit;
 
@@ -127,7 +127,7 @@ public class DefaultCommandInvoker implements SimpleCommandInvoker {
                         throw ex2;
                     }
                 }
-            } catch (SyntaxErrorException ex) {
+            } catch (CommandSyntaxException ex) {
                 HelpFactory.getHelpFactory().getHelp(cmdName, cmdInfo).usage(err);
                 err.println(ex.getMessage());
             } catch (VmExit ex) {
