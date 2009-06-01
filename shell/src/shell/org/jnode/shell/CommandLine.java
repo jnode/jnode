@@ -100,6 +100,8 @@ public class CommandLine implements Completable, Iterable<String> {
     private final Token[] argumentTokens;
 
     private CommandIO[] ios;
+    
+    private CommandInfo commandInfo;
 
     private boolean argumentAnticipated = false;
 
@@ -588,23 +590,23 @@ public class CommandLine implements Completable, Iterable<String> {
     public void complete(CompletionInfo completion, CommandShell shell) throws CompletionException {
         String cmd = (commandToken == null) ? "" : commandToken.text.trim();
         if (!cmd.equals("") && (argumentTokens.length > 0 || argumentAnticipated)) {
-            CommandInfo cmdClass;
+            CommandInfo ci;
             try {
-                cmdClass = shell.getCommandInfo(cmd);
+                ci = getCommandInfo(shell);
             } catch (ShellException ex) {
                 throw new CompletionException(ex.getMessage(), ex);
             }
             
             Command command;
             try {
-                command = cmdClass.createCommandInstance();
+                command = ci.createCommandInstance();
             } catch (Throwable ex) {
                 throw new CompletionException("Problem creating a command instance", ex);
             }
 
             // Get the command's argument bundle and syntax
             ArgumentBundle bundle = (command == null)
-                ? cmdClass.getArgumentBundle()
+                ? ci.getArgumentBundle()
                 : command.getArgumentBundle();
             SyntaxBundle syntaxes = shell.getSyntaxManager().getSyntaxBundle(cmd);
 
@@ -636,10 +638,27 @@ public class CommandLine implements Completable, Iterable<String> {
     }
 
     public CommandInfo getCommandInfo(CommandShell shell) throws ShellException {
-        String cmd = (commandToken == null) ? "" : commandToken.text.trim();
-        if (cmd.equals("")) {
-            return null;
+        if (commandInfo == null) {
+            String cmd = (commandToken == null) ? "" : commandToken.text.trim();
+            if (!cmd.equals("")) {
+                commandInfo = shell.getCommandInfo(cmd);
+            }
         }
-        return shell.getCommandInfo(cmd);
+        return commandInfo;
+    }
+
+    public void setCommandInfo(CommandInfo commandInfo) {
+        this.commandInfo = commandInfo;
+    }
+
+    public CommandInfo getCommandInfo() {
+        if (commandInfo == null) {
+            throw new IllegalStateException("commandInfo not set");
+        }
+        return commandInfo;
+    }
+
+    public boolean isInternal() {
+        return getCommandInfo().isInternal();
     }
 }

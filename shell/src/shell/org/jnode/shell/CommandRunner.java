@@ -67,7 +67,7 @@ public class CommandRunner implements CommandRunnable {
     final Properties sysProps;
     final Map<String, String> env;
     final boolean redirected;
-    final CommandInfo cmdInfo;
+    // final CommandInfo cmdInfo;
     
     Class<?> targetClass;
     Method method;
@@ -75,12 +75,11 @@ public class CommandRunner implements CommandRunnable {
     private int rc;
     
 
-    public CommandRunner(SimpleCommandInvoker invoker, CommandLine commandLine, CommandInfo cmdInfo, CommandIO[] ios,
+    public CommandRunner(SimpleCommandInvoker invoker, CommandLine commandLine, CommandIO[] ios,
             Properties sysProps, Map<String, String> env, boolean redirected) {
         this.invoker = invoker;
         this.redirected = redirected;
         this.commandLine = commandLine;
-        this.cmdInfo = cmdInfo;
         this.ios = ios;
         this.shellErr = ios[Command.SHELL_ERR].getPrintWriter();
         this.env = env;
@@ -93,7 +92,7 @@ public class CommandRunner implements CommandRunnable {
             execute();
         } catch (SyntaxErrorException ex) {
             try {
-                HelpFactory.getHelpFactory().getHelp(commandLine.getCommandName(), cmdInfo).usage(shellErr);
+                HelpFactory.getHelpFactory().getHelp(commandLine.getCommandName(), commandLine.getCommandInfo()).usage(shellErr);
                 shellErr.println(ex.getMessage());
             } catch (HelpException e) {
                 shellErr.println("Exception while trying to get the command usage");
@@ -121,36 +120,38 @@ public class CommandRunner implements CommandRunnable {
      * the main method for the class could not be found.
      */
     private void prepare() throws ShellException {
+        CommandInfo commandInfo;
         Command command;
         try {
-            command = cmdInfo.createCommandInstance();
+            commandInfo = commandLine.getCommandInfo();
+            command = commandInfo.createCommandInstance();
         } catch (Exception ex) {
             throw new ShellInvocationException("Problem while creating command instance", ex);
         }
         // make this happen before setting up the main() method call for
         // bare commands. For commands without a bare command definition
         // this will return silently having done nothing.
-        cmdInfo.parseCommandLine(commandLine);
+        commandInfo.parseCommandLine(commandLine);
         if (command == null) {
             try {
-                method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
+                method = commandInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
                 int modifiers = method.getModifiers();
                 if ((modifiers & Modifier.STATIC) == 0 || (modifiers & Modifier.PUBLIC) == 0) {
                     new ShellInvocationException("The 'main' method for " + 
-                            cmdInfo.getCommandClass() + " is not public static");
+                            commandInfo.getCommandClass() + " is not public static");
                 }
                 if (redirected) {
                     throw new ShellInvocationException(
-                            "The 'main' method for " + cmdInfo.getCommandClass() +
+                            "The 'main' method for " + commandInfo.getCommandClass() +
                             " does not allow redirection or pipelining");
                 }
                 // We've checked the method access, and we must ignore the class access.
                 method.setAccessible(true);
-                targetClass = cmdInfo.getCommandClass();
+                targetClass = commandInfo.getCommandClass();
                 args = new Object[] {commandLine.getArguments()};
             } catch (NoSuchMethodException e) {
                 throw new ShellInvocationException(
-                        "No entry point method found for " + cmdInfo.getCommandClass());
+                        "No entry point method found for " + commandInfo.getCommandClass());
             }
         }
     }
@@ -164,6 +165,7 @@ public class CommandRunner implements CommandRunnable {
      */
     private void execute() throws Throwable {
         try {
+            CommandInfo commandInfo = commandLine.getCommandInfo();
             if (method != null) {
                 try {
                     // This saves the Command instance that has the command line state
@@ -171,7 +173,7 @@ public class CommandRunner implements CommandRunnable {
                     // method can get hold of it.  This is the magic that allows a command
                     // that implements 'main' as "new MyCommand().execute(args)" to get the
                     // parsed command line arguments, etc.
-                    AbstractCommand.saveCurrentCommand(cmdInfo.getCommandInstance());
+                    AbstractCommand.saveCurrentCommand(commandInfo.getCommandInstance());
 
                     // Call the command's entry point method reflectively
                     Object obj = Modifier.isStatic(method.getModifiers()) ? null
@@ -189,7 +191,7 @@ public class CommandRunner implements CommandRunnable {
                 // command class, the default implementation from AbstractCommand will
                 // bounce us to the older execute(CommandLine, InputStream, PrintStream,
                 // PrintStream) method.
-                Command cmd = cmdInfo.createCommandInstance();
+                Command cmd = commandInfo.createCommandInstance();
                 cmd.initialize(commandLine, getIOs());
                 cmd.execute();
             }
@@ -237,6 +239,10 @@ public class CommandRunner implements CommandRunnable {
         return commandLine;
     }
 
+    public boolean isInternal() {
+        return commandLine.isInternal();
+    }
+
     public String getCommandName() {
         return commandLine != null ? commandLine.getCommandName() : null;
     }
@@ -247,10 +253,6 @@ public class CommandRunner implements CommandRunnable {
 
     public Map<String, String> getEnv() {
         return env;
-    }
-
-    public CommandInfo getCommandInfo() {
-        return cmdInfo;
     }
 
     public void flushStreams() {

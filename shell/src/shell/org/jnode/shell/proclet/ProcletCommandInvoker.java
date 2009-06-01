@@ -80,7 +80,7 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker implements Comman
     
     protected CommandThreadImpl createThread(CommandRunner cr) {
         CommandIO[] ios = cr.getIOs();
-        if (cr.getCommandInfo().isInternal()) {
+        if (cr.isInternal()) {
             return new CommandThreadImpl(cr, cr.getCommandName());
         } else {
             return Proclet.createProclet(cr, cr.getSysProps(), cr.getEnv(), 
