@@ -93,14 +93,14 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
         } catch (ClassCastException ex) {
             throw new ShellFailureException("streams array broken", ex);
         }
-        CommandInfo cmdInfo = shell.getCommandInfo(cmdLine.getCommandName());
-        return new CommandRunner(this, cmdLine, cmdInfo, ios, sysProps, env, redirected);
+        // Make sure that the command info is set
+        cmdLine.getCommandInfo(shell);
+        return new CommandRunner(this, cmdLine, ios, sysProps, env, redirected);
     }
 
     protected int runIt(CommandLine cmdLine, CommandRunner cr) throws ShellInvocationException {
-        CommandInfo cmdInfo = cr.getCommandInfo();
         try {
-            if (cmdInfo.isInternal()) {
+            if (cr.isInternal()) {
                 cr.run();
             } else {
                 try {
@@ -128,8 +128,7 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
     }
 
     protected CommandThread forkIt(CommandLine cmdLine, CommandRunner cr) throws ShellInvocationException {
-        CommandInfo cmdInfo = cr.getCommandInfo();
-        if (cmdInfo.isInternal()) {
+        if (cr.getCommandLine().isInternal()) {
             throw new ShellFailureException("unexpected internal command");
         }
         try {
