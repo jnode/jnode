@@ -128,7 +128,7 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
     }
 
     protected CommandThread forkIt(CommandLine cmdLine, CommandRunner cr) throws ShellInvocationException {
-        if (cr.getCommandLine().isInternal()) {
+        if (cr.isInternal()) {
             throw new ShellFailureException("unexpected internal command");
         }
         try {

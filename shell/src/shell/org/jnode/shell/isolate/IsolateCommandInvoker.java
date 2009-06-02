@@ -73,16 +73,11 @@ public class IsolateCommandInvoker extends AsyncCommandInvoker implements Comman
     }
 
     @Override
-    protected CommandThread createThread(CommandRunner cr) 
-        throws ShellInvocationException {
-        if (cr.isInternal()) {
-            return new CommandThreadImpl(cr, cr.getCommandName());
-        } else {
-            try {
-                return new IsolateCommandThreadImpl(cr);
-            } catch (IOException ex) {
-                throw new ShellInvocationException(ex);
-            }
+    protected CommandThread createThread(CommandRunner cr) throws ShellInvocationException {
+        try {
+            return new IsolateCommandThreadImpl(cr);
+        } catch (IOException ex) {
+            throw new ShellInvocationException(ex);
         }
     }
 }
