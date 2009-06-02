@@ -574,8 +574,8 @@ public class CommandLine implements Completable, Iterable<String> {
      *
      * @param shell the context for resolving command aliases and locating syntaxes
      * @return a CompandInfo which includes the command instance to which the arguments have been bound
-     * @throws CommandSyntaxException if the chosen syntax doesn't match the command
-     *                                line arguments.
+     * @throws ShellException if the chosen syntax doesn't match the command line arguments or there
+     * was a problem instantiating the command
      */
     public CommandInfo parseCommandLine(Shell shell) throws ShellException {
         String cmd = (commandToken == null) ? "" : commandToken.text.trim();

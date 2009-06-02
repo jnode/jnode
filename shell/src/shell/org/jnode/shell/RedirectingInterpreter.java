@@ -39,7 +39,6 @@ import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandInput;
 import org.jnode.shell.io.CommandOutput;
 import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.FileArgument;
 
 /**
@@ -245,12 +244,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                         desc.toFileName.text + "': " + ex.getMessage());
             }
             desc.commandLine.setStreams(new CommandIO[] {in, out, err, CommandLine.DEFAULT_STDERR});
-            try {
-                return shell.invoke(desc.commandLine, null, null);
-            } catch (CommandSyntaxException ex) {
-                throw new ShellException(
-                        "Command arguments don't match syntax", ex);
-            }
+            return shell.invoke(desc.commandLine, null, null);
         } finally {
             try {
                 if (desc.fromFileName != null) {

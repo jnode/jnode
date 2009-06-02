@@ -171,9 +171,8 @@ public final class CommandInfo {
      * will have been previously supplied to parse against.
      *
      * @param cmdLine the command line containing the tokens to parse against the argument bundle.
-     * @throws CommandSyntaxException if the chosen syntax doesn't match the command
-     *                                line arguments.
-     * @throws ShellException for problems instantiating the command class.
+     * @throws ShellException for problems instantiating the command class, or problems parsing
+     *         the command arguments.
      */
     public void parseCommandLine(CommandLine cmdLine) throws ShellException {
         try {
