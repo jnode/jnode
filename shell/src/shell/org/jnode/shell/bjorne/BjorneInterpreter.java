@@ -54,7 +54,6 @@ import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ShellSyntaxException;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandOutput;
-import org.jnode.shell.syntax.CommandSyntaxException;
 
 /**
  * This is the JNode implementation of the Bourne Shell language.  The long term
@@ -333,11 +332,7 @@ public class BjorneInterpreter implements CommandInterpreter {
             return builtin.invoke(cmdLine, this, context);
         } else {
             cmdLine.setStreams(streams);
-            try {
-                return shell.invoke(cmdLine, sysProps, env);
-            } catch (CommandSyntaxException ex) {
-                throw new ShellException("Command arguments don't match syntax", ex);
-            }
+            return shell.invoke(cmdLine, sysProps, env);
         }
     }
 
