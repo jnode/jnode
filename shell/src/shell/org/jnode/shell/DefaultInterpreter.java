@@ -36,7 +36,6 @@ import org.jnode.shell.CommandLine.Token;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.HelpFactory;
-import org.jnode.shell.syntax.CommandSyntaxException;
 
 /**
  * This interpreter simply parses the command line into a command name and
@@ -100,11 +99,7 @@ public class DefaultInterpreter implements CommandInterpreter {
         if (cmd == null) {
             return 0;
         }
-        try {
-            return shell.invoke(cmd, null, null);
-        } catch (CommandSyntaxException ex) {
-            throw new ShellException("Command arguments don't match syntax", ex);
-        }
+        return shell.invoke(cmd, null, null);
     }
 
     /**
