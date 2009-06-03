@@ -99,6 +99,8 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
     }
 
     protected int runIt(CommandLine cmdLine, CommandRunner cr) throws ShellInvocationException {
+        Throwable terminatingException = null;
+        int rc = -1;
         try {
             if (cr.isInternal()) {
                 cr.run();
@@ -116,15 +118,20 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
                 threadProcess.start(null);
                 threadProcess.waitFor();
             }
-            return cr.getRC();
-        } catch (Exception ex) {
-            throw new ShellInvocationException("Uncaught Exception in command", ex);
-        } catch (Error ex) {
-            throw new ShellInvocationException("Fatal Error in command", ex);
+            terminatingException = cr.getTerminatingException();
+            rc = cr.getRC();
+        } catch (ShellInvocationException ex) {
+            throw ex;
+        } catch (Throwable ex) {
+            terminatingException = ex;
         } finally {
             this.blockingThread = null;
             this.blocking = false;
         }
+        if (terminatingException != null) {
+            shell.diagnose(terminatingException, cmdLine);
+        }
+        return rc;
     }
 
     protected CommandThread forkIt(CommandLine cmdLine, CommandRunner cr) throws ShellInvocationException {

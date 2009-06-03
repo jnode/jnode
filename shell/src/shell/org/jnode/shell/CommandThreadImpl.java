@@ -26,10 +26,19 @@ package org.jnode.shell;
  * @author crawley@jnode.org
  */
 public class CommandThreadImpl extends Thread implements CommandThread {
-
+    
     private ThreadExitListener listener;
     private CommandRunnable runner;
-
+    private Throwable terminatingException;
+    
+    private UncaughtExceptionHandler myUncaughtExceptionHandler = new UncaughtExceptionHandler() {
+        public void uncaughtException(Thread thr, Throwable exc) {
+            synchronized(CommandThreadImpl.this) {
+                terminatingException = exc;
+            }
+        }
+    };
+    
     /**
      * @param group the parent group for the thread
      * @param runner the runnable that will run the command
@@ -40,6 +49,7 @@ public class CommandThreadImpl extends Thread implements CommandThread {
             long size) {
         super(group, runner, name, size);
         this.runner = runner;
+        setUncaughtExceptionHandler(myUncaughtExceptionHandler);
     }
 
     /**
@@ -50,6 +60,7 @@ public class CommandThreadImpl extends Thread implements CommandThread {
     public CommandThreadImpl(ThreadGroup group, CommandRunnable runner, String name) {
         super(group, runner, name);
         this.runner = runner;
+        setUncaughtExceptionHandler(myUncaughtExceptionHandler);
     }
 
     /**
@@ -101,5 +112,10 @@ public class CommandThreadImpl extends Thread implements CommandThread {
         } catch (InterruptedException ie) {
             //ignore
         }
+    }
+
+    @Override
+    public synchronized Throwable getTerminatingException() {
+        return (terminatingException != null) ? terminatingException : runner.getTerminatingException();
     }
 }

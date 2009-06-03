@@ -126,6 +126,12 @@ public class IsolateCommandThreadImpl implements CommandThread {
         // FIXME ... maybe we should check that the thread has terminated.
         return rc;
     }
+    
+    @Override
+    public Throwable getTerminatingException() {
+        // FIXME ... implement this
+        return null;
+    }
 
     @Override
     public boolean isAlive() {

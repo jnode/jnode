@@ -46,6 +46,13 @@ public interface CommandThread {
      * @return zero for success, non-zero for failure
      */
     public int getReturnCode();
+    
+    /**
+     * Get the exception that caused the thread to terminate.
+     * 
+     * @return the exception or {@code null}
+     */
+    public Throwable getTerminatingException();
 
     /**
      * @return <code>true</code> if the thread is still executing.

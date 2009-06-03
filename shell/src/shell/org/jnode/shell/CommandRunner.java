@@ -34,11 +34,8 @@ import java.security.PrivilegedActionException;
 import java.util.Map;
 import java.util.Properties;
 
-import org.jnode.shell.help.HelpException;
-import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandOutput;
-import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.vm.VmExit;
 
 /**
@@ -67,13 +64,12 @@ public class CommandRunner implements CommandRunnable {
     final Properties sysProps;
     final Map<String, String> env;
     final boolean redirected;
-    // final CommandInfo cmdInfo;
     
     Class<?> targetClass;
     Method method;
     Object[] args;
     private int rc;
-    
+    private Throwable terminatingException;
 
     public CommandRunner(SimpleCommandInvoker invoker, CommandLine commandLine, CommandIO[] ios,
             Properties sysProps, Map<String, String> env, boolean redirected) {
@@ -90,22 +86,24 @@ public class CommandRunner implements CommandRunnable {
         try {
             prepare();
             execute();
-        } catch (CommandSyntaxException ex) {
-            try {
-                HelpFactory.getHelpFactory().getHelp(commandLine.getCommandName(), commandLine.getCommandInfo()).usage(shellErr);
-                shellErr.println(ex.getMessage());
-            } catch (HelpException e) {
-                shellErr.println("Exception while trying to get the command usage");
-                stackTrace(ex);
-            }
+//        } catch (CommandSyntaxException ex) {
+//            try {
+//                HelpFactory.getHelpFactory().getHelp(commandLine.getCommandName(), commandLine.getCommandInfo()).usage(shellErr);
+//                shellErr.println(ex.getMessage());
+//            } catch (HelpException e) {
+//                shellErr.println("Exception while trying to get the command usage");
+//                stackTrace(ex);
+//            }
         } catch (VmExit ex) {
             setRC(ex.getStatus());
-        } catch (Exception ex) {
-            shellErr.println("Exception in command");
-            stackTrace(ex);
+//        } catch (Exception ex) {
+//            shellErr.println("Exception in command");
+//            stackTrace(ex);
+//        } catch (Throwable ex) {
+//            shellErr.println("Fatal error in command");
+//            stackTrace(ex);
         } catch (Throwable ex) {
-            shellErr.println("Fatal error in command");
-            stackTrace(ex);
+            setTerminatingException(ex);
         }
     }
     
@@ -159,11 +157,11 @@ public class CommandRunner implements CommandRunnable {
     /**
      * Executes the command.
      *
-     * For a JNode command, this will initialie and execute the command. For
+     * For a JNode command, this will initialize and execute the command. For
      * other commands the main method will be invoked via reflection with the
      * set of arguments supplied on the command line.
      */
-    private void execute() throws Throwable {
+    private void execute() throws Exception {
         try {
             CommandInfo commandInfo = commandLine.getCommandInfo();
             if (method != null) {
@@ -198,7 +196,12 @@ public class CommandRunner implements CommandRunnable {
         } catch (PrivilegedActionException ex) {
             Exception ex2 = ex.getException();
             if (ex2 instanceof InvocationTargetException) {
-                throw ex2.getCause();
+                Throwable cause = ex2.getCause();
+                if (cause instanceof Exception) {
+                    throw (Exception) cause;
+                } else {
+                    throw (Error) cause;
+                }
             } else {
                 throw ex2;
             }
@@ -211,6 +214,14 @@ public class CommandRunner implements CommandRunnable {
 
     void setRC(int rc) {
         this.rc = rc;
+    }
+    
+    public Throwable getTerminatingException() {
+        return terminatingException;
+    }
+
+    void setTerminatingException(Throwable terminatingException) {
+        this.terminatingException = terminatingException;
     }
 
     void stackTrace(Throwable ex) {

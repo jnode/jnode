@@ -5,6 +5,7 @@ import org.jnode.shell.ShellException;
 
 public abstract class BjorneSubshellRunner implements CommandRunnable {
     private int rc;
+    private Throwable terminatingException;
     private final BjorneContext context;
     
     public BjorneSubshellRunner(BjorneContext context) {
@@ -21,13 +22,17 @@ public abstract class BjorneSubshellRunner implements CommandRunnable {
     public int getRC() {
         return rc;
     }
+    
+    @Override
+    public Throwable getTerminatingException() {
+        return terminatingException;
+    }
 
     public final void run() {
         try {
             rc = doRun();
-        } catch (ShellException ex) {
-            // FIXME ... this isn't right ...
-            rc = 1;
+        } catch (Throwable ex) {
+            terminatingException = ex;
         }
     }
 
