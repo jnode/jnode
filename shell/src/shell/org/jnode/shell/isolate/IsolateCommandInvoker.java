@@ -30,7 +30,6 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandRunner;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.CommandThread;
-import org.jnode.shell.CommandThreadImpl;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellInvocationException;
 import org.jnode.shell.SimpleCommandInvoker;

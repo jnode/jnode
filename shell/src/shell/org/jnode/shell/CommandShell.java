@@ -58,6 +58,9 @@ import org.jnode.driver.console.textscreen.KeyboardReader;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpException;
+import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandInput;
 import org.jnode.shell.io.CommandInputOutput;
@@ -402,13 +405,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                                 continuation = readInputLine();
                             }
                             if (continuation == null) {
-                                diagnose(ex);
+                                diagnose(ex, null);
                                 break;
                             } else {
                                 input = input + "\n" + continuation;
                             }
                         } catch (ShellException ex) {
-                            diagnose(ex);
+                            diagnose(ex, null);
                             done = true;
                         }
                     } while (!done);
@@ -430,47 +433,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 }
             }
         }
-    }
-
-    private void diagnose(ShellException ex) {
-        Throwable cause = ex.getCause();
-        // Try to turn this into something that is moderately intelligible
-        // for the common cases ...
-        if (cause != null) {
-            errPW.println(ex.getMessage());
-            if (cause instanceof CommandSyntaxException) {
-                List<Context> argErrors = ((CommandSyntaxException) cause).getArgErrors();
-                if (argErrors != null) {
-                    // The parser can produce many errors as each of the alternatives
-                    // in the tree are explored.  The following assumes that errors
-                    // produced when we get farthest along in the token stream are most
-                    // likely to be the "real" errors.
-                    int rightmostPos = 0;
-                    for (Context context : argErrors) {
-                        if (context.sourcePos > rightmostPos) {
-                            rightmostPos = context.sourcePos;
-                        }
-                    }
-                    for (Context context : argErrors) {
-                        if (context.sourcePos < rightmostPos) {
-                            continue;
-                        }
-                        if (context.token != null) {
-                            errPW.println("   " + context.exception.getMessage() + ": " +
-                                    context.token.text);
-                        } else {
-                            errPW.println("   " + context.exception.getMessage() + ": " +
-                                    context.syntax.format());
-                        }
-                    }
-                }
-            } else {
-                errPW.println(cause.getMessage());
-            }
-        } else {
-            errPW.println("Shell exception: " + ex.getMessage());
-        }
-        stackTrace(ex);
     }
 
     public void configureShell() throws ShellException {
@@ -1101,5 +1063,60 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     @Override
     public String escapeWord(String word) {
         return interpreter.escapeWord(word);
+    }
+
+    /**
+     * Diagnose an exception thrown during the invocation or completion of a command.
+     * 
+     * @param ex the exception to be diagnosed
+     * @param cmdLine the command line in which it occurred, or {@code null}
+     */
+    public void diagnose(Throwable ex, CommandLine cmdLine) {
+        if (ex instanceof CommandSyntaxException) {
+            try {
+                List<Context> argErrors = ((CommandSyntaxException) ex).getArgErrors();
+                if (argErrors != null) {
+                    // The parser can produce many errors as each of the alternatives
+                    // in the tree are explored.  The following assumes that errors
+                    // produced when we get farthest along in the token stream are most
+                    // likely to be the "real" errors.
+                    errPW.println("Command syntax error(s): ");
+                    int rightmostPos = 0;
+                    for (Context context : argErrors) {
+                        if (context.sourcePos > rightmostPos) {
+                            rightmostPos = context.sourcePos;
+                        }
+                    }
+                    for (Context context : argErrors) {
+                        if (context.sourcePos < rightmostPos) {
+                            continue;
+                        }
+                        if (context.token != null) {
+                            errPW.println("   " + context.exception.getMessage() + ": " +
+                                    context.token.text);
+                        } else {
+                            errPW.println("   " + context.exception.getMessage() + ": " +
+                                    context.syntax.format());
+                        }
+                    }
+                } else {
+                    errPW.println("Command syntax error: " + ex.getMessage());
+                }
+                if (cmdLine != null) {
+                    Help help = HelpFactory.getHelpFactory().getHelp(
+                            cmdLine.getCommandName(), cmdLine.getCommandInfo());
+                    help.usage(errPW);
+                }
+            } catch (HelpException e) {
+                errPW.println("Exception while trying to get the command usage");
+                stackTrace(ex);
+            }
+        } else if (ex instanceof Exception) {
+            errPW.println("Exception in command: " + ex.getMessage());
+            stackTrace(ex);
+        } else {
+            errPW.println("Fatal error in command: " + ex.getMessage());
+            stackTrace(ex);
+        }
     }
 }
