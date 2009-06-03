@@ -835,12 +835,10 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     private CommandInput getInputStream() {
         if (isHistoryEnabled()) {
             // Insert a filter on the input stream that adds completed input
-            // lines
-            // to the application input history. (Since the filter is stateless,
+            // lines to the application input history. (Since the filter is stateless,
             // it doesn't really matter if we do this multiple times.)
             // FIXME if we partition the app history by application, we will
-            // need
-            // to bind the history object in the history input stream
+            // need to bind the history object in the history input stream
             // constructor.
             return new CommandInput(new HistoryInputStream(cin.getInputStream()));
         } else {
@@ -894,7 +892,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     public int runCommandFile(File file, String alias, String[] args) throws ShellException {
-        // FIXME extend to allow arguments to be passed to the script.
         boolean enabled = setHistoryEnabled(false);
         try {
             CommandInterpreter interpreter = createInterpreter(new FileReader(file));
@@ -909,26 +906,29 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
 
-    public int runCommandResource(String resource, String[] args) throws ShellException {
+    /**
+     * Run a command script located using the shell's classloader.  The behavior is analogous
+     * to {@link #runCommandFile(File, String, String[]), with the resourceName used as the
+     * alias. 
+     * 
+     * @param resourceName the script resource name.
+     */
+    public int runCommandResource(String resourceName, String[] args) throws ShellException {
         boolean enabled = setHistoryEnabled(false);
         try {
-            int result;
-            // FIXME throw ShellException if resource or interpreter not found
-            InputStream input = getClass().getResourceAsStream(resource);
+            InputStream input = getClass().getResourceAsStream(resourceName);
             if (input == null) {
-                throw new ShellException("Cannot find resource '" + resource + "'");
-            } else {
-                CommandInterpreter interpreter = createInterpreter(new InputStreamReader(input));
-                Reader reader = new InputStreamReader(getClass().getResourceAsStream(resource));
-                result = interpreter.interpret(this, reader, resource, args);
+                throw new ShellException("Cannot find resource '" + resourceName + "'");
             }
-            return result;
+            CommandInterpreter interpreter = createInterpreter(new InputStreamReader(input));
+            Reader reader = new InputStreamReader(getClass().getResourceAsStream(resourceName));
+            return interpreter.interpret(this, reader, resourceName, args);
         } finally {
             setHistoryEnabled(enabled);
         }
     }
     
-    public CommandInterpreter createInterpreter(Reader reader) throws ShellException {
+    private CommandInterpreter createInterpreter(Reader reader) throws ShellException {
         try {
             final BufferedReader br = new BufferedReader(reader);
             CommandInterpreter interpreter;
@@ -1035,10 +1035,16 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         return syntaxMgr;
     }
 
+    /**
+     * @deprecated Don't use this method.  I intend to get rid of it.
+     */
     public PrintWriter getOut() {
         return outPW;
     }
 
+    /**
+     * @deprecated Don't use this method.  I intend to get rid of it.
+     */
     public PrintWriter getErr() {
         return errPW;
     }
