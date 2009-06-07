@@ -34,7 +34,7 @@ import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.RepeatSyntax;
 import org.jnode.shell.syntax.Syntax;
 
-public class RepeatedSyntaxTest extends TestCase {
+public class RepeatSyntaxTest extends TestCase {
 
     public static class Test extends AbstractCommand {
         private final FileArgument arg =

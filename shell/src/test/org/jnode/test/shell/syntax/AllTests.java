@@ -36,7 +36,7 @@ public class AllTests {
         suite.addTestSuite(MuParserTest2.class);
         suite.addTestSuite(ArgumentMultiplicityTest.class);
         suite.addTestSuite(CommandLineTest.class);
-        suite.addTestSuite(RepeatedSyntaxTest.class);
+        suite.addTestSuite(RepeatSyntaxTest.class);
         suite.addTestSuite(SequenceSyntaxTest.class);
         suite.addTestSuite(OptionSyntaxTest.class);
         suite.addTestSuite(PowersetSyntaxTest.class);
