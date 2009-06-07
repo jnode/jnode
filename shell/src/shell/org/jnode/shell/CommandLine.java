@@ -22,6 +22,7 @@ package org.jnode.shell;
 
 import java.util.NoSuchElementException;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.io.CommandIO;
@@ -608,7 +609,10 @@ public class CommandLine implements Completable, Iterable<String> {
             ArgumentBundle bundle = (command == null)
                 ? ci.getArgumentBundle()
                 : command.getArgumentBundle();
-            SyntaxBundle syntaxes = shell.getSyntaxManager().getSyntaxBundle(cmd);
+            SyntaxBundle syntaxes = ci.getSyntaxBundle();
+            if (syntaxes == null) {
+                syntaxes = shell.getSyntaxManager().getSyntaxBundle(cmd);
+            }
 
             if (bundle == null) {
                 // We're missing the argument bundle.  We assume this is a 'classic' Java application 
@@ -622,7 +626,7 @@ public class CommandLine implements Completable, Iterable<String> {
                 // We're missing the syntax, but we do have an argument bundle.  Generate
                 // a default syntax from the bundle.
                 syntaxes = new SyntaxBundle(cmd, bundle.createDefaultSyntax());
-            }
+            }   
             try {
                 bundle.complete(this, syntaxes, completion);
             } catch (CommandSyntaxException ex) {
