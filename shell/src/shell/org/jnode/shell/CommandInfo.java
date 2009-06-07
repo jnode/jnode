@@ -91,7 +91,8 @@ public class CommandInfo {
      * @param syntaxBundle the syntax definition to parse the command line against
      * @param instance a prebuilt command instance
      */
-    CommandInfo(Class<?> clazz, String commandName, SyntaxBundle syntaxBundle, ArgumentBundle argBundle, Command instance) {
+    CommandInfo(Class<?> clazz, String commandName, SyntaxBundle syntaxBundle, 
+            ArgumentBundle argBundle, Command instance) {
         this.clazz = clazz;
         this.internal = true;
         this.commandName = commandName;

@@ -33,7 +33,7 @@ public class CommandThreadImpl extends Thread implements CommandThread {
     
     private UncaughtExceptionHandler myUncaughtExceptionHandler = new UncaughtExceptionHandler() {
         public void uncaughtException(Thread thr, Throwable exc) {
-            synchronized(CommandThreadImpl.this) {
+            synchronized (CommandThreadImpl.this) {
                 terminatingException = exc;
             }
         }

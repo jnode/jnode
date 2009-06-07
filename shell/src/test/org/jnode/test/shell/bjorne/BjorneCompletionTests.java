@@ -280,6 +280,7 @@ public class BjorneCompletionTests extends TestCase {
                 case 'Z':
                     // Expect completions if the last char is NOT ' '
                     if (wordStart >= partial.length()) {
+                        //
                     } else {
                         assertTrue("got no completions: " + diag(partial, completions), 
                                 completionWords.size() > 0);

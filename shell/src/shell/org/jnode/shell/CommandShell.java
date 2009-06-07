@@ -908,7 +908,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     /**
      * Run a command script located using the shell's classloader.  The behavior is analogous
-     * to {@link #runCommandFile(File, String, String[]), with the resourceName used as the
+     * to {@link #runCommandFile(File, String, String[])}, with the resourceName used as the
      * alias. 
      * 
      * @param resourceName the script resource name.
