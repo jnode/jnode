@@ -86,22 +86,8 @@ public class CommandRunner implements CommandRunnable {
         try {
             prepare();
             execute();
-//        } catch (CommandSyntaxException ex) {
-//            try {
-//                HelpFactory.getHelpFactory().getHelp(commandLine.getCommandName(), commandLine.getCommandInfo()).usage(shellErr);
-//                shellErr.println(ex.getMessage());
-//            } catch (HelpException e) {
-//                shellErr.println("Exception while trying to get the command usage");
-//                stackTrace(ex);
-//            }
         } catch (VmExit ex) {
             setRC(ex.getStatus());
-//        } catch (Exception ex) {
-//            shellErr.println("Exception in command");
-//            stackTrace(ex);
-//        } catch (Throwable ex) {
-//            shellErr.println("Fatal error in command");
-//            stackTrace(ex);
         } catch (Throwable ex) {
             setTerminatingException(ex);
         }

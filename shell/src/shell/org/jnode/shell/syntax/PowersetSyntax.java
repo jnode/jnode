@@ -73,7 +73,7 @@ public class PowersetSyntax extends GroupSyntax {
             res = new MuAlternation(label, null, 
                     new MuSequence(new MuAlternation((String) null, childMuSyntaxes),
                             new MuBackReference(label)));
-            } 
+        } 
         res.resolveBackReferences();
         return res;
     }

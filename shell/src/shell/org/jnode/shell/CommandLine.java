@@ -22,7 +22,6 @@ package org.jnode.shell;
 
 import java.util.NoSuchElementException;
 
-import org.apache.log4j.Logger;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.io.CommandIO;
