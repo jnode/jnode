@@ -37,7 +37,7 @@ final class ReturnBuiltin extends BjorneBuiltin {
         new SyntaxBundle("return", new OptionalSyntax(new ArgumentSyntax("rc")));
     
     static final Factory FACTORY = new Factory() {
-        public BjorneBuiltinCommandInfo createInstance(BjorneContext context) {
+        public BjorneBuiltinCommandInfo buildCommandInfo(BjorneContext context) {
             return new BjorneBuiltinCommandInfo("return", SYNTAX, new ReturnBuiltin(), context);
         }
     };

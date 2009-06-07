@@ -38,7 +38,7 @@ final class ExportBuiltin extends BjorneBuiltin {
         new SyntaxBundle("export", new RepeatSyntax(new ArgumentSyntax("export")));
     
     static final Factory FACTORY = new Factory() {
-        public BjorneBuiltinCommandInfo createInstance(BjorneContext context) {
+        public BjorneBuiltinCommandInfo buildCommandInfo(BjorneContext context) {
             return new BjorneBuiltinCommandInfo("export", SYNTAX, new ExportBuiltin(), context);
         }
     };

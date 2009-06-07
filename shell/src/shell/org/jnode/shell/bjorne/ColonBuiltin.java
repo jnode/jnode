@@ -35,7 +35,7 @@ final class ColonBuiltin extends BjorneBuiltin {
     private static final SyntaxBundle SYNTAX = new SyntaxBundle(":", new SequenceSyntax());
     
     static final Factory FACTORY = new Factory() {
-        public BjorneBuiltinCommandInfo createInstance(BjorneContext context) {
+        public BjorneBuiltinCommandInfo buildCommandInfo(BjorneContext context) {
             return new BjorneBuiltinCommandInfo(":", SYNTAX, new ColonBuiltin(), context);
         }
     };

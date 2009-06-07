@@ -138,6 +138,11 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
         throws CompletionException {
         try {
             CommandLine command = context.buildCommandLine(words);
+            if (builtin) {
+                BjorneBuiltinCommandInfo commandInfo = 
+                    BjorneInterpreter.BUILTINS.get(command.getCommandName()).buildCommandInfo(context);
+                command.setCommandInfo(commandInfo);
+            } 
             command.setArgumentAnticipated(argumentAnticipated);
             command.complete(completion, shell);
         } catch (ShellException ex) {

@@ -37,7 +37,7 @@ import org.jnode.vm.VmExit;
 abstract class BjorneBuiltin extends AbstractCommand {
     
     static interface Factory {
-        BjorneBuiltinCommandInfo createInstance(BjorneContext context);
+        BjorneBuiltinCommandInfo buildCommandInfo(BjorneContext context);
     }
     
     private BjorneContext parentContext;

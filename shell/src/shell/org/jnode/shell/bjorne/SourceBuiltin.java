@@ -42,7 +42,7 @@ final class SourceBuiltin extends BjorneBuiltin {
         new SyntaxBundle("source", new ArgumentSyntax("script"));
     
     static final Factory FACTORY = new Factory() {
-        public BjorneBuiltinCommandInfo createInstance(BjorneContext context) {
+        public BjorneBuiltinCommandInfo buildCommandInfo(BjorneContext context) {
             return new BjorneBuiltinCommandInfo("source", SYNTAX, new SourceBuiltin(), context);
         }
     };
