@@ -110,16 +110,28 @@ public class RepeatSyntax extends GroupSyntax {
         MuSyntax childSyntax = child.prepare(bundle);
         MuSyntax res, tail;
         if (maxCount == Integer.MAX_VALUE) {
-            tail = new MuAlternation(label, 
-                    null, 
-                    new MuSequence(childSyntax, new MuBackReference(label)));
+            if (eager) {
+                tail = new MuAlternation(label, 
+                        new MuSequence(childSyntax, new MuBackReference(label)),
+                        null);
+            } else {
+                tail = new MuAlternation(label, 
+                        null, 
+                        new MuSequence(childSyntax, new MuBackReference(label)));
+            }
         } else {
             int tailCount = maxCount - minCount;
             tail = null;
             while (tailCount-- > 0) {
-                tail = new MuAlternation(
-                        (MuSyntax) null, 
-                        (tail == null) ? childSyntax : new MuSequence(childSyntax, tail));
+                if (eager) {
+                    tail = new MuAlternation(
+                            (tail == null) ? childSyntax : new MuSequence(childSyntax, tail),
+                            null);
+                } else {
+                    tail = new MuAlternation(
+                            (MuSyntax) null, 
+                            (tail == null) ? childSyntax : new MuSequence(childSyntax, tail));
+                }
             }
         }
         if (minCount == 0) {

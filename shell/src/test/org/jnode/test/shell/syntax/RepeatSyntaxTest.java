@@ -32,20 +32,23 @@ import org.jnode.shell.syntax.ArgumentSyntax;
 import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.RepeatSyntax;
+import org.jnode.shell.syntax.SequenceSyntax;
 import org.jnode.shell.syntax.Syntax;
 
 public class RepeatSyntaxTest extends TestCase {
 
     public static class Test extends AbstractCommand {
-        private final FileArgument arg =
+        private final FileArgument arg1 =
             new FileArgument("arg1", Argument.OPTIONAL + Argument.MULTIPLE);
+        private final FileArgument arg2 =
+            new FileArgument("arg2", Argument.OPTIONAL + Argument.MULTIPLE);
 
         public Test() {
-            registerArguments(arg);
+            registerArguments(arg1, arg2);
         }
 
         public void execute() throws Exception {
-            getOutput().getPrintWriter().print(arg.getValue());
+            getOutput().getPrintWriter().print(arg1.getValue());
         }
     }
 
@@ -63,7 +66,7 @@ public class RepeatSyntaxTest extends TestCase {
 
     public void testZeroToMany() throws Exception {
         TestShell shell = new TestShell();
-        shell.addAlias("cmd", "org.jnode.test.shell.syntax.RepeatedSyntaxTest$Test");
+        shell.addAlias("cmd", "org.jnode.test.shell.syntax.RepeatSyntaxTest$Test");
         shell.addSyntax("cmd", new RepeatSyntax(new ArgumentSyntax("arg1")));
 
         CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
@@ -85,7 +88,7 @@ public class RepeatSyntaxTest extends TestCase {
 
     public void testOneToMany() throws Exception {
         TestShell shell = new TestShell();
-        shell.addAlias("cmd", "org.jnode.test.shell.syntax.RepeatedSyntaxTest$Test");
+        shell.addAlias("cmd", "org.jnode.test.shell.syntax.RepeatSyntaxTest$Test");
         shell.addSyntax("cmd", new RepeatSyntax(new ArgumentSyntax("arg1"), 1, Integer.MAX_VALUE));
 
         CommandLine cl;
@@ -113,7 +116,7 @@ public class RepeatSyntaxTest extends TestCase {
 
     public void testOneToTwo() throws Exception {
         TestShell shell = new TestShell();
-        shell.addAlias("cmd", "org.jnode.test.shell.syntax.RepeatedSyntaxTest$Test");
+        shell.addAlias("cmd", "org.jnode.test.shell.syntax.RepeatSyntaxTest$Test");
         shell.addSyntax("cmd", new RepeatSyntax(new ArgumentSyntax("arg1"), 1, 2));
 
         CommandLine cl;
@@ -150,7 +153,7 @@ public class RepeatSyntaxTest extends TestCase {
 
     public void testThreeToSix() throws Exception {
         TestShell shell = new TestShell();
-        shell.addAlias("cmd", "org.jnode.test.shell.syntax.RepeatedSyntaxTest$Test");
+        shell.addAlias("cmd", "org.jnode.test.shell.syntax.RepeatSyntaxTest$Test");
         shell.addSyntax("cmd", new RepeatSyntax(new ArgumentSyntax("arg1"), 3, 6));
 
         CommandLine cl;
@@ -214,5 +217,57 @@ public class RepeatSyntaxTest extends TestCase {
         } catch (CommandSyntaxException ex) {
             // expected
         }
+    }
+    
+    public void testLazy() throws Exception {
+        TestShell shell = new TestShell();
+        shell.addAlias("cmd", "org.jnode.test.shell.syntax.RepeatSyntaxTest$Test");
+        shell.addSyntax("cmd", new SequenceSyntax(
+                new RepeatSyntax(new ArgumentSyntax("arg1")),
+                new RepeatSyntax(new ArgumentSyntax("arg2"))));
+
+        CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
+        CommandInfo cmdInfo = cl.parseCommandLine(shell);
+        Command cmd = cmdInfo.createCommandInstance();
+        assertEquals(0, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
+        assertEquals(0, cmd.getArgumentBundle().getArgument("arg2").getValues().length);
+
+        cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
+        cmdInfo = cl.parseCommandLine(shell);
+        cmd = cmdInfo.createCommandInstance();
+        assertEquals(0, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
+        assertEquals(1, cmd.getArgumentBundle().getArgument("arg2").getValues().length);
+
+        cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1"), new Token("F1")}, null);
+        cmdInfo = cl.parseCommandLine(shell);
+        cmd = cmdInfo.createCommandInstance();
+        assertEquals(0, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
+        assertEquals(2, cmd.getArgumentBundle().getArgument("arg2").getValues().length);
+    }
+    
+    public void testEager() throws Exception {
+        TestShell shell = new TestShell();
+        shell.addAlias("cmd", "org.jnode.test.shell.syntax.RepeatSyntaxTest$Test");
+        shell.addSyntax("cmd", new SequenceSyntax(
+                new RepeatSyntax(null, new ArgumentSyntax("arg1"), 0, Integer.MAX_VALUE, true, null),
+                new RepeatSyntax(new ArgumentSyntax("arg2"))));
+
+        CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
+        CommandInfo cmdInfo = cl.parseCommandLine(shell);
+        Command cmd = cmdInfo.createCommandInstance();
+        assertEquals(0, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
+        assertEquals(0, cmd.getArgumentBundle().getArgument("arg2").getValues().length);
+
+        cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
+        cmdInfo = cl.parseCommandLine(shell);
+        cmd = cmdInfo.createCommandInstance();
+        assertEquals(1, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
+        assertEquals(0, cmd.getArgumentBundle().getArgument("arg2").getValues().length);
+
+        cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1"), new Token("F1")}, null);
+        cmdInfo = cl.parseCommandLine(shell);
+        cmd = cmdInfo.createCommandInstance();
+        assertEquals(2, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
+        assertEquals(0, cmd.getArgumentBundle().getArgument("arg2").getValues().length);
     }
 }
