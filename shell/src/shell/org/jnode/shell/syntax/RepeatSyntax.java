@@ -24,8 +24,11 @@ import org.jnode.nanoxml.XMLElement;
 
 
 /**
- * A RepeatedSyntax instance specifies that a given 'child' syntax may appear
- * some number of times.
+ * A RepeatedSyntax instance specifies that a given 'child' syntax may be repeated
+ * a number of times as determined by the constructor arguments.  These allow you
+ * to specify a minimum and/or maximum bound on the number of repetitions, and to
+ * specify whether the syntax is 'eager' (i.e. matching as many instances as possible) or
+ * 'lazy' (i.e. matching as few instances as possible).
  * 
  * @author crawley@jnode.org
  */
@@ -34,6 +37,7 @@ public class RepeatSyntax extends GroupSyntax {
     private final Syntax child;
     private final int minCount;
     private final int maxCount;
+    private final boolean eager;
 
     /**
      * Construct syntax with caller-specified repetition count range and a label.
@@ -42,9 +46,12 @@ public class RepeatSyntax extends GroupSyntax {
      * @param child the child Syntax that may be repeated.
      * @param minCount the minimum number of occurrences required.
      * @param maxCount the maximum number of occurrences allowed.
+     * @param eager if {@code true}, the syntax matches as many child instances
+     *     as possible, subject to the 'maxCount' constraint.
      * @param description the description for this syntax
      */
-    public RepeatSyntax(String label, Syntax child, int minCount, int maxCount, String description) {
+    public RepeatSyntax(String label, Syntax child, int minCount, int maxCount, 
+            boolean eager, String description) {
         super(label, description, child);
         if (minCount < 0 || maxCount < minCount) {
             throw new IllegalArgumentException("bad min/max counts");
@@ -52,6 +59,7 @@ public class RepeatSyntax extends GroupSyntax {
         this.child = child;
         this.minCount = minCount;
         this.maxCount = maxCount;
+        this.eager = eager;
     }
     
     /**
@@ -63,7 +71,7 @@ public class RepeatSyntax extends GroupSyntax {
      * @param maxCount the maximum number of occurrences allowed.
      */
     public RepeatSyntax(String label, Syntax child, int minCount, int maxCount) {
-        this(label, child, minCount, maxCount, null);
+        this(label, child, minCount, maxCount, false, null);
     }
 
     /**
@@ -74,7 +82,7 @@ public class RepeatSyntax extends GroupSyntax {
      * @param maxCount the maximum number of occurrences allowed.
      */
     public RepeatSyntax(Syntax child, int minCount, int maxCount) {
-        this(null, child, minCount, maxCount, null);
+        this(null, child, minCount, maxCount, false, null);
     }
     
     /**
@@ -83,7 +91,7 @@ public class RepeatSyntax extends GroupSyntax {
      * @param child the child Syntax that may be repeated.
      */
     public RepeatSyntax(Syntax child) {
-        this(null, child, 0, Integer.MAX_VALUE, null);
+        this(null, child, 0, Integer.MAX_VALUE, false, null);
     }
     
     @Override
@@ -169,6 +177,9 @@ public class RepeatSyntax extends GroupSyntax {
         }
         if (maxCount != Integer.MAX_VALUE) {
             element.setAttribute("maxCount", maxCount);
+        }
+        if (eager) {
+            element.setAttribute("eager", "true");
         }
         return element;
     }

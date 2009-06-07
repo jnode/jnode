@@ -100,13 +100,15 @@ public class SyntaxSpecLoader {
             }
         } else if (kind.equals("powerset")) {
             int nos = syntaxElement.getNosChildren();
+            boolean eager = getFlag(syntaxElement, "eager", false);
             Syntax[] members = new Syntax[nos];
             for (int i = 0; i < nos; i++) {
                 members[i] = doLoad(syntaxElement.getChild(i));
             }
-            return new PowersetSyntax(label, description, members);
+            return new PowersetSyntax(label, eager, description, members);
         } else if (kind.equals("repeat")) {
             int nos = syntaxElement.getNosChildren();
+            boolean eager = getFlag(syntaxElement, "eager", false);
             int minCount = getCount(syntaxElement, "minCount", 0);
             int maxCount = getCount(syntaxElement, "maxCount", Integer.MAX_VALUE);
             Syntax[] members = new Syntax[nos];
@@ -114,7 +116,7 @@ public class SyntaxSpecLoader {
                 members[i] = doLoad(syntaxElement.getChild(i));
             }
             Syntax childSyntax = (members.length == 1) ? members[0] : new SequenceSyntax(members);
-            return new RepeatSyntax(label, childSyntax, minCount, maxCount, description);
+            return new RepeatSyntax(label, childSyntax, minCount, maxCount, eager, description);
         } else if (kind.equals("sequence")) {
             int nos = syntaxElement.getNosChildren();
             Syntax[] seq = new Syntax[nos];

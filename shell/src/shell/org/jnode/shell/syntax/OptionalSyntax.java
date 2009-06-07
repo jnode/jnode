@@ -43,11 +43,11 @@ public class OptionalSyntax extends GroupSyntax {
     }
 
     public OptionalSyntax(String label, Syntax...syntaxes) {
-        this(label, null, syntaxes);
+        this(label, null, false, syntaxes);
     }
 
     public OptionalSyntax(Syntax...syntaxes) {
-        this(null, null, syntaxes);
+        this(null, null, false, syntaxes);
     }
 
     @Override
