@@ -40,7 +40,7 @@ final class AliasBuiltin extends BjorneBuiltin {
         new SyntaxBundle("alias", new RepeatSyntax(new ArgumentSyntax("alias")));
     
     static final Factory FACTORY = new Factory() {
-        public BjorneBuiltinCommandInfo createInstance(BjorneContext context) {
+        public BjorneBuiltinCommandInfo buildCommandInfo(BjorneContext context) {
             return new BjorneBuiltinCommandInfo("alias", SYNTAX, new AliasBuiltin(), context);
         }
     };

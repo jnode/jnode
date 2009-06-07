@@ -41,7 +41,7 @@ final class ExitBuiltin extends BjorneBuiltin {
         new SyntaxBundle("exit", new OptionalSyntax(new ArgumentSyntax("status")));
     
     static final Factory FACTORY = new Factory() {
-        public BjorneBuiltinCommandInfo createInstance(BjorneContext context) {
+        public BjorneBuiltinCommandInfo buildCommandInfo(BjorneContext context) {
             return new BjorneBuiltinCommandInfo("exit", SYNTAX, new ExitBuiltin(), context);
         }
     };

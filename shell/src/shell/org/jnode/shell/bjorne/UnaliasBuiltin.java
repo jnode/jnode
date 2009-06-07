@@ -41,7 +41,7 @@ final class UnaliasBuiltin extends BjorneBuiltin {
             new RepeatSyntax(new ArgumentSyntax("alias"), 1, Integer.MAX_VALUE));
     
     static final Factory FACTORY = new Factory() {
-        public BjorneBuiltinCommandInfo createInstance(BjorneContext context) {
+        public BjorneBuiltinCommandInfo buildCommandInfo(BjorneContext context) {
             return new BjorneBuiltinCommandInfo("unalias", SYNTAX, new UnaliasBuiltin(), context);
         }
     };

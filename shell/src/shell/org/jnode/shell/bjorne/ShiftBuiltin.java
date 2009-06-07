@@ -37,7 +37,7 @@ final class ShiftBuiltin extends BjorneBuiltin {
         new SyntaxBundle("shift", new OptionalSyntax(new ArgumentSyntax("count")));
     
     static final Factory FACTORY = new Factory() {
-        public BjorneBuiltinCommandInfo createInstance(BjorneContext context) {
+        public BjorneBuiltinCommandInfo buildCommandInfo(BjorneContext context) {
             return new BjorneBuiltinCommandInfo("shift", SYNTAX, new ShiftBuiltin(), context);
         }
     };

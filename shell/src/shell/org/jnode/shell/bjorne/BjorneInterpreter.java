@@ -128,7 +128,7 @@ public class BjorneInterpreter implements CommandInterpreter {
     public static final CommandNode EMPTY = 
         new SimpleCommandNode(CMD_EMPTY, new BjorneToken[0], false);
 
-    private static HashMap<String, BjorneBuiltin.Factory> BUILTINS = 
+    static HashMap<String, BjorneBuiltin.Factory> BUILTINS = 
         new HashMap<String, BjorneBuiltin.Factory>();
     
     private static boolean DEBUG = false;
@@ -326,7 +326,7 @@ public class BjorneInterpreter implements CommandInterpreter {
             Properties sysProps, Map<String, String> env, boolean isBuiltin)
         throws ShellException {
         if (isBuiltin) {
-            BjorneBuiltinCommandInfo builtin = BUILTINS.get(cmdLine.getCommandName()).createInstance(context);
+            BjorneBuiltinCommandInfo builtin = BUILTINS.get(cmdLine.getCommandName()).buildCommandInfo(context);
             cmdLine.setCommandInfo(builtin);
         } 
         cmdLine.setStreams(streams);

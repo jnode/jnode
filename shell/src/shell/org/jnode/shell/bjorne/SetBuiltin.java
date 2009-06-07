@@ -47,7 +47,7 @@ final class SetBuiltin extends BjorneBuiltin {
                 new RepeatSyntax(new ArgumentSyntax("newArgs"))));
     
     static final Factory FACTORY = new Factory() {
-        public BjorneBuiltinCommandInfo createInstance(BjorneContext context) {
+        public BjorneBuiltinCommandInfo buildCommandInfo(BjorneContext context) {
             return new BjorneBuiltinCommandInfo("set", SYNTAX, new SetBuiltin(), context);
         }
     };
