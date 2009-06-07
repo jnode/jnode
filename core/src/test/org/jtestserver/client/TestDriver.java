@@ -84,7 +84,6 @@ public class TestDriver {
         return new TestDriver(config, client, process);
     }
     
-    private final List<String> tests = new ArrayList<String>();
     private final Config config;
     private final TestListRW testListRW;
     private final TestRouter instance;
