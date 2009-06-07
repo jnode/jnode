@@ -62,4 +62,15 @@ public class SyntaxBundle {
             return new AlternativesSyntax(syntaxes).prepare(bundle);
         }
     }
+
+    public String format(ArgumentBundle bundle) {
+        StringBuilder sb = new StringBuilder();
+        for (Syntax syntax : syntaxes) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(syntax.format(bundle));
+        }
+        return sb.toString();
+    }
 }

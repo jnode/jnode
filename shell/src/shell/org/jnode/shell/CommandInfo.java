@@ -179,6 +179,16 @@ public class CommandInfo {
     }
     
     /**
+     * Gets the syntax bundle attached when the CommandInfo was created.
+     * 
+     * @return the initial syntax bundle.
+     */
+    public SyntaxBundle getSyntaxBundle() {
+        return syntaxBundle;
+    }
+
+    
+    /**
      * Perform command line argument parsing in preparation to invoking a command.
      * This locates the command's class and a suitable command line syntax, then
      * parses against the Syntax, binding the command arguments to Argument objects
