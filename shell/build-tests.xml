@@ -24,12 +24,6 @@ help         Output these messages
 			<arg value="-s"/>
 			<arg value="${root.dir}"/>
 			<arg value="${basedir}/src/test/org/jnode/test/shell/bjorne/bjorne-shell-tests.xml"/>
-		</java>
-		<java classpathref="cp-test" classname="org.jnode.test.shell.harness.TestHarness">
-			<arg value="-E"/>
-			<arg value="-v"/>
-			<arg value="-s"/>
-			<arg value="${root.dir}"/>
 			<arg value="${basedir}/src/test/org/jnode/test/shell/bjorne/bjorne-builtin-tests.xml"/>
 		</java>
 	</target>

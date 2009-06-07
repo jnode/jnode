@@ -1281,4 +1281,8 @@ public class BjorneContext {
             substituteAliases(list, pos + i, depth + 1);
         }
     }
+
+    BjorneInterpreter getInterpreter() {
+        return interpreter;
+    }
 }

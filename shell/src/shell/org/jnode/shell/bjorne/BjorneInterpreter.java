@@ -128,26 +128,26 @@ public class BjorneInterpreter implements CommandInterpreter {
     public static final CommandNode EMPTY = 
         new SimpleCommandNode(CMD_EMPTY, new BjorneToken[0], false);
 
-    private static HashMap<String, BjorneBuiltin> BUILTINS = 
-        new HashMap<String, BjorneBuiltin>();
+    private static HashMap<String, BjorneBuiltin.Factory> BUILTINS = 
+        new HashMap<String, BjorneBuiltin.Factory>();
     
     private static boolean DEBUG = false;
     
     private static long subshellCount;
 
     static {
-        BUILTINS.put("alias", new AliasBuiltin());
-        BUILTINS.put("break", new BreakBuiltin());
-        BUILTINS.put("continue", new ContinueBuiltin());
-        BUILTINS.put("exit", new ExitBuiltin());
-        BUILTINS.put("export", new ExportBuiltin());
-        BUILTINS.put("return", new ReturnBuiltin());
-        BUILTINS.put("set", new SetBuiltin());
-        BUILTINS.put("shift", new ShiftBuiltin());
-        BUILTINS.put("source", new SourceBuiltin());
-        BUILTINS.put("unalias", new UnaliasBuiltin());
-        BUILTINS.put(".", new SourceBuiltin());
-        BUILTINS.put(":", new ColonBuiltin());
+        BUILTINS.put("alias", AliasBuiltin.FACTORY);
+        BUILTINS.put("break", BreakBuiltin.FACTORY);
+        BUILTINS.put("continue", ContinueBuiltin.FACTORY);
+        BUILTINS.put("exit", ExitBuiltin.FACTORY);
+        BUILTINS.put("export", ExportBuiltin.FACTORY);
+        BUILTINS.put("return", ReturnBuiltin.FACTORY);
+        BUILTINS.put("set", SetBuiltin.FACTORY);
+        BUILTINS.put("shift", ShiftBuiltin.FACTORY);
+        BUILTINS.put("source", SourceBuiltin.FACTORY);
+        BUILTINS.put("unalias", UnaliasBuiltin.FACTORY);
+        BUILTINS.put(".", SourceBuiltin.FACTORY);
+        BUILTINS.put(":", ColonBuiltin.FACTORY);
     }
 
     private CommandShell shell;
@@ -326,14 +326,11 @@ public class BjorneInterpreter implements CommandInterpreter {
             Properties sysProps, Map<String, String> env, boolean isBuiltin)
         throws ShellException {
         if (isBuiltin) {
-            // FIXME ... built-in commands should use the Syntax mechanisms so
-            // that completion, help, etc will work as expected.
-            BjorneBuiltin builtin = BUILTINS.get(cmdLine.getCommandName());
-            return builtin.invoke(cmdLine, this, context);
-        } else {
-            cmdLine.setStreams(streams);
-            return shell.invoke(cmdLine, sysProps, env);
-        }
+            BjorneBuiltinCommandInfo builtin = BUILTINS.get(cmdLine.getCommandName()).createInstance(context);
+            cmdLine.setCommandInfo(builtin);
+        } 
+        cmdLine.setStreams(streams);
+        return shell.invoke(cmdLine, sysProps, env);
     }
 
     public BjorneContext createContext() throws ShellFailureException {
