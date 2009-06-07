@@ -20,8 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package org.jtestserver.client.utils;
 
 import java.io.PrintWriter;
+
 import java.io.StringWriter;
 import java.util.logging.Formatter;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 /**
@@ -36,9 +38,47 @@ public class LoggingFormatter extends Formatter {
      */
     @Override
     public String format(LogRecord record) {
-        StringBuilder sb = new StringBuilder(record.getLevel().getName()).append(": ");
-        sb.append(record.getSourceClassName()).append('#').append(record.getSourceMethodName());
-        sb.append(": ").append(record.getMessage());
+        String loggerName = record.getLoggerName();
+        String level = record.getLevel().getName();
+        String message = record.getMessage();
+/*        
+        System.err.println("message0=" + message.replace(':', '#'));
+        String serverLogger = ProcessRunner.SERVER_LOGGER.getName(); 
+        if (serverLogger.equals(record.getLoggerName())) {
+            int idx = message.indexOf(serverLogger);            
+            if (idx >= 0) {
+                message = message.substring(idx + serverLogger.length() + 1);
+                message = message.trim();
+                
+                System.err.println("message1=" + message.replace(':', '#'));
+                idx = message.indexOf(':');                
+                if (idx >= 0) {
+                    try {
+                        level = Level.parse(message.substring(0, idx)).getName();
+                        
+                        message = message.substring(idx + 1);
+                        message = message.trim();
+                        
+                        System.err.println("message2=" + message.replace(':', '#'));
+                        idx = message.indexOf(':');                        
+                        if (idx >= 0) {
+                            loggerName = message.substring(0, idx);
+                            
+                            message = message.substring(idx + 1);
+                            message = message.trim();
+                        }
+                    } catch (IllegalArgumentException iae) {
+                        // ignore errors from Level.parse(...) method
+                    }
+                }
+            }
+        }
+*/        
+        StringBuilder sb = new StringBuilder(level);
+        sb.append(": ").append(loggerName);            
+        
+        //sb.append(record.getSourceMethodName());        
+        sb.append(": ").append(message);
         if (record.getThrown() != null) {
             StringWriter sw = new StringWriter();
             record.getThrown().printStackTrace(new PrintWriter(sw));
