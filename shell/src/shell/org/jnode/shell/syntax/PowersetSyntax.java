@@ -28,21 +28,26 @@ import org.jnode.nanoxml.XMLElement;
  * The syntax allows a child syntax to appear more than once, subject to Argument
  * multiplicity constraints.  As with an Alternatives, the child syntaxes are tried
  * one at a time in the same order as the they were provided to the constructor.
+ * The 'eager' parameter specifies whether the syntax is 'eager' (i.e. matching as 
+ * many instances as possible) or 'lazy' (i.e. matching as few instances as possible).
  * 
  * @author crawley@jnode.org
  */
 public class PowersetSyntax extends GroupSyntax {
     
-    public PowersetSyntax(String label, String description, Syntax...syntaxes) {
+    private final boolean eager;
+    
+    public PowersetSyntax(String label, boolean eager, String description, Syntax...syntaxes) {
         super(label, description, syntaxes);
+        this.eager = eager;
     }
 
     public PowersetSyntax(String label, Syntax...syntaxes) {
-        this(label, null, syntaxes);
+        this(label, false, null, syntaxes);
     }
 
     public PowersetSyntax(Syntax...syntaxes) {
-        this(null, null, syntaxes);
+        this(null, false, null, syntaxes);
     }
 
     @Override
@@ -58,9 +63,17 @@ public class PowersetSyntax extends GroupSyntax {
             childMuSyntaxes[i] = children[i].prepare(bundle);
         }
         String label = this.label == null ? MuSyntax.genLabel() : this.label;
-        MuSyntax res = new MuAlternation(label, null, 
-                new MuSequence(new MuAlternation((String) null, childMuSyntaxes),
-                        new MuBackReference(label)));
+        MuSyntax res;
+        if (eager) {
+            res = new MuAlternation(label, 
+                    new MuSequence(new MuAlternation((String) null, childMuSyntaxes),
+                            new MuBackReference(label)),
+                    null);
+        } else {
+            res = new MuAlternation(label, null, 
+                    new MuSequence(new MuAlternation((String) null, childMuSyntaxes),
+                            new MuBackReference(label)));
+            } 
         res.resolveBackReferences();
         return res;
     }
@@ -89,6 +102,10 @@ public class PowersetSyntax extends GroupSyntax {
 
     @Override
     public XMLElement toXML() {
-        return basicElement("powerSet");
+        XMLElement element = basicElement("powerSet");
+        if (eager) {
+            element.setAttribute("eager", "true");
+        }
+        return element;
     }
 }
