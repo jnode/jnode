@@ -19,6 +19,7 @@
  */
  package org.jnode.shell.bjorne;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.CommandSyntaxException;
@@ -52,4 +53,13 @@ public class SetFlagArgument extends Argument<Boolean> {
         return Boolean.valueOf(tok.charAt(0) == '+');
     }
 
+    @Override
+    public void doComplete(CompletionInfo completion, String partial, int flags) {
+        if (("-" + flagCh).startsWith(partial)) {
+            completion.addCompletion("-" + flagCh);
+        }
+        if (("+" + flagCh).startsWith(partial)) {
+            completion.addCompletion("+" + flagCh);
+        }
+    }
 }
