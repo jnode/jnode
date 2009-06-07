@@ -20,12 +20,16 @@
  
 package org.jnode.shell.bjorne;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.jnode.shell.CommandLine;
-import org.jnode.shell.ShellException;
-import org.jnode.shell.ShellSyntaxException;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.ArgumentSyntax;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.OptionalSyntax;
+import org.jnode.shell.syntax.PowersetSyntax;
+import org.jnode.shell.syntax.RepeatSyntax;
+import org.jnode.shell.syntax.StringArgument;
+import org.jnode.shell.syntax.SequenceSyntax;
+import org.jnode.shell.syntax.SyntaxBundle;
+import org.jnode.shell.syntax.VerbSyntax;
 
 /**
  * This class implements the 'set' built-in.  It works by updating the state
@@ -34,45 +38,50 @@ import org.jnode.shell.ShellSyntaxException;
  * @author crawley@jnode.org
  */
 final class SetBuiltin extends BjorneBuiltin {
+    private static final SyntaxBundle SYNTAX = 
+        new SyntaxBundle("set", new SequenceSyntax(
+                new PowersetSyntax(null, true, null,
+                        new ArgumentSyntax("echoExpansions"),
+                        new ArgumentSyntax("suppressGlobbing")),
+                new OptionalSyntax(null, null, true, new VerbSyntax(null, "--", "forceNew", null, null)),
+                new RepeatSyntax(new ArgumentSyntax("newArgs"))));
     
-    public int invoke(CommandLine command, BjorneInterpreter interpreter,
-            BjorneContext context) throws ShellException {
-        context = context.getParent();
-        boolean optsDone = false;
-        boolean forceNewArgs = false;
-        List<String> newArgs = new ArrayList<String>();
-        String[] args = command.getArguments();
-        for (int i = 0; i < args.length; i++) {
-            String arg = args[i];
-            if (optsDone) {
-                newArgs.add(arg);
-            } else if (arg.length() == 0 || 
-                    (arg.charAt(0) != '-' && arg.charAt(0) != '+')) {
-                optsDone = true;
-                newArgs.add(arg);
-            } else if (arg.equals("--")) {
-                optsDone = true;
-                forceNewArgs = true;
-            } else {
-                boolean set = arg.charAt(0) == '-';
-                for (int j = 1; j < arg.length(); j++) {
-                    switch (arg.charAt(j)) {
-                        case 'x': 
-                            context.setEchoExpansions(set);
-                            break;
-                        case 'f': 
-                            context.setGlobbing(!set);
-                            break;
-                        default:
-                            throw new ShellSyntaxException(
-                                    "Unknown set option: " + (set ? "-" : "+") + arg.charAt(j));
-                    }
-                }
-            }
+    static final Factory FACTORY = new Factory() {
+        public BjorneBuiltinCommandInfo createInstance(BjorneContext context) {
+            return new BjorneBuiltinCommandInfo("set", SYNTAX, new SetBuiltin(), context);
         }
-        if (forceNewArgs || newArgs.size() > 0) {
-            context.setArgs(newArgs.toArray(new String[newArgs.size()]));
+    };
+    
+    private final SetFlagArgument flagEchoExpansions = new SetFlagArgument(
+            "echoExpansions", 'x', Argument.OPTIONAL, "controls echoing of expanded commands before execution");
+
+    private final SetFlagArgument flagSuppressGlobing = new SetFlagArgument(
+            "suppressGlobbing", 'f', Argument.OPTIONAL, "controls file globbing");
+
+    private final FlagArgument flagForceNewArgs = new FlagArgument(
+            "forceNew", Argument.OPTIONAL, "setting this flag forces setting of new arguments");
+    
+    private final StringArgument argNewArgs = new StringArgument(
+            "newArgs", Argument.OPTIONAL + Argument.MULTIPLE, "new arguments ");
+    
+    private SetBuiltin() {
+        super("the bjorne 'set' command sets or clears shell flags and/or sets new arguments");
+        registerArguments(flagEchoExpansions, flagForceNewArgs, flagSuppressGlobing, argNewArgs);
+    }
+    
+    @Override
+    public void execute() throws Exception {
+        BjorneContext pc = getParentContext();
+        if (flagEchoExpansions.isSet()) {
+            pc.setEchoExpansions(!flagEchoExpansions.getValue());
         }
-        return 0;
+        if (flagSuppressGlobing.isSet()) {
+            pc.setGlobbing(flagSuppressGlobing.getValue());
+        }
+        if (argNewArgs.isSet()) {
+            pc.setArgs(argNewArgs.getValues());
+        } else if (flagForceNewArgs.isSet()) {
+            pc.setArgs(new String[0]);
+        }
     }
 }

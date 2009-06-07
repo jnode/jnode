@@ -20,7 +20,7 @@
  
 package org.jnode.shell.bjorne;
 
-import org.jnode.shell.ShellException;
+import org.jnode.shell.ShellControlException;
 
 /**
  * This exception is used to implement constructs that exit scopes
@@ -28,7 +28,7 @@ import org.jnode.shell.ShellException;
  * 
  * @author crawley@jnode.org
  */
-class BjorneControlException extends ShellException {
+class BjorneControlException extends ShellControlException {
 
     private static final long serialVersionUID = 1L;
 

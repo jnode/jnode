@@ -39,7 +39,7 @@ import org.jnode.shell.syntax.SyntaxBundle;
  * @author crawley@jnode.org
  * @author chris boertien
  */
-public final class CommandInfo {
+public class CommandInfo {
     
     private final Class<?> clazz;
     private final String commandName;
@@ -81,6 +81,23 @@ public final class CommandInfo {
         this.commandName = commandName;
         this.syntaxBundle = syntaxBundle;
         this.argBundle = argBundle;
+    }
+    
+    /**
+     * Creates a CommandInfo object for a builtin command.
+     *
+     * @param clazz the designated {@code Class} for executing the command
+     * @param commandName the name, or alias, for the command
+     * @param syntaxBundle the syntax definition to parse the command line against
+     * @param instance a prebuilt command instance
+     */
+    CommandInfo(Class<?> clazz, String commandName, SyntaxBundle syntaxBundle, ArgumentBundle argBundle, Command instance) {
+        this.clazz = clazz;
+        this.internal = true;
+        this.commandName = commandName;
+        this.syntaxBundle = syntaxBundle;
+        this.instance = instance;
+        this.argBundle = instance.getArgumentBundle();
     }
     
     /**

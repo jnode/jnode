@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: Shell.java 5542 2009-06-03 14:47:18Z crawley $
  *
  * Copyright (C) 2003-2009 JNode.org
  *
@@ -17,35 +17,16 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-package org.jnode.shell.bjorne;
-
-import org.jnode.shell.syntax.SequenceSyntax;
-import org.jnode.shell.syntax.SyntaxBundle;
-
-
+ package org.jnode.shell;
 
 /**
- * This builtin does nothing.  It is intended for use in places where
- * the syntax requires a command; e.g. in an 'if' statement.
+ * Subtypes of ShellControlException are used by interpreter and should be allowed
+ * to propagate by invokers.
  * 
  * @author crawley@jnode.org
  */
-final class ColonBuiltin extends BjorneBuiltin {
-    private static final SyntaxBundle SYNTAX = new SyntaxBundle(":", new SequenceSyntax());
-    
-    static final Factory FACTORY = new Factory() {
-        public BjorneBuiltinCommandInfo createInstance(BjorneContext context) {
-            return new BjorneBuiltinCommandInfo(":", SYNTAX, new ColonBuiltin(), context);
-        }
-    };
-    
-    private ColonBuiltin() {
-        super("The no-op command");
-    }
-    
-    @Override
-    public void execute() throws Exception {
-        // no-op
-    }
+public abstract class ShellControlException extends ShellException {
+
+    private static final long serialVersionUID = 1L;
+
 }

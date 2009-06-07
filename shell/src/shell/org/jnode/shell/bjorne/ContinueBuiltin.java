@@ -20,10 +20,11 @@
  
 package org.jnode.shell.bjorne;
 
-import java.util.Iterator;
-
-import org.jnode.shell.CommandLine;
-import org.jnode.shell.ShellException;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.ArgumentSyntax;
+import org.jnode.shell.syntax.IntegerArgument;
+import org.jnode.shell.syntax.OptionalSyntax;
+import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
  * This class implements the 'continue' built-in.  This is done by throwing a 
@@ -32,27 +33,27 @@ import org.jnode.shell.ShellException;
  * @author crawley@jnode.org
  */
 final class ContinueBuiltin extends BjorneBuiltin {
-    @SuppressWarnings("deprecation")
-    public int invoke(CommandLine command, BjorneInterpreter interpreter,
-            BjorneContext context) throws ShellException {
-        Iterator<String> it = command.iterator();
-        if (!it.hasNext()) {
-            throw new BjorneControlException(BjorneInterpreter.BRANCH_CONTINUE,
-                    1);
-        } else {
-            String arg = it.next();
-            try {
-                int count = Integer.parseInt(arg);
-                if (count > 0) {
-                    throw new BjorneControlException(
-                            BjorneInterpreter.BRANCH_CONTINUE, count);
-                }
-                error("continue: " + arg + ": loop count out of range", context);
-            } catch (NumberFormatException ex) {
-                error("continue: " + arg + ": numeric argument required",
-                        context);
-            }
+    private static final SyntaxBundle SYNTAX = 
+        new SyntaxBundle("continue", new OptionalSyntax(new ArgumentSyntax("count")));
+    
+    static final Factory FACTORY = new Factory() {
+        public BjorneBuiltinCommandInfo createInstance(BjorneContext context) {
+            return new BjorneBuiltinCommandInfo("continue", SYNTAX, new ContinueBuiltin(), context);
         }
-        return 1;
+    };
+    
+    private final IntegerArgument argCount = new IntegerArgument(
+            "count", Argument.OPTIONAL, 1, Integer.MAX_VALUE, "the enclosing loop count");
+    
+    
+    private ContinueBuiltin() {
+        super("Continue to the next iteration of an enclosing loop");
+        registerArguments(argCount);
+    }
+
+    @Override
+    public void execute() throws Exception {
+        int count = argCount.isSet() ? argCount.getValue() : 1;
+        throw new BjorneControlException(BjorneInterpreter.BRANCH_CONTINUE, count);
     }
 }

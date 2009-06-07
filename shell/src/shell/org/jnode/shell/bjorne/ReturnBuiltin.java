@@ -20,10 +20,11 @@
  
 package org.jnode.shell.bjorne;
 
-import java.util.Iterator;
-
-import org.jnode.shell.CommandLine;
-import org.jnode.shell.ShellException;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.ArgumentSyntax;
+import org.jnode.shell.syntax.IntegerArgument;
+import org.jnode.shell.syntax.OptionalSyntax;
+import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
  * This class implements the 'return' built-in.  This is done by throwing a 
@@ -32,22 +33,27 @@ import org.jnode.shell.ShellException;
  * @author crawley@jnode.org
  */
 final class ReturnBuiltin extends BjorneBuiltin {
-    @SuppressWarnings("deprecation")
-    public int invoke(CommandLine command, BjorneInterpreter interpreter,
-            BjorneContext context) throws ShellException {
-        Iterator<String> it = command.iterator();
-        if (!it.hasNext()) {
-            throw new BjorneControlException(BjorneInterpreter.BRANCH_RETURN,
-                    context.getLastReturnCode());
-        } else {
-            String arg = it.next();
-            try {
-                throw new BjorneControlException(
-                        BjorneInterpreter.BRANCH_RETURN, Integer.parseInt(arg));
-            } catch (NumberFormatException ex) {
-                error("return: " + arg + ": numeric argument required", context);
-            }
+    private static final SyntaxBundle SYNTAX =
+        new SyntaxBundle("return", new OptionalSyntax(new ArgumentSyntax("rc")));
+    
+    static final Factory FACTORY = new Factory() {
+        public BjorneBuiltinCommandInfo createInstance(BjorneContext context) {
+            return new BjorneBuiltinCommandInfo("return", SYNTAX, new ReturnBuiltin(), context);
         }
-        return 1;
+    };
+
+    private final IntegerArgument argRC = new IntegerArgument(
+            "rc", Argument.OPTIONAL, 1, Integer.MAX_VALUE, "the return code");
+    
+    
+    private ReturnBuiltin() {
+        super("Return from the current shell function call");
+        registerArguments(argRC);
+    }
+
+    @Override
+    public void execute() throws Exception {
+        int rc = argRC.isSet() ? argRC.getValue() : 0;
+        throw new BjorneControlException(BjorneInterpreter.BRANCH_RETURN, rc);
     }
 }

@@ -98,7 +98,7 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
         return new CommandRunner(this, cmdLine, ios, sysProps, env, redirected);
     }
 
-    protected int runIt(CommandLine cmdLine, CommandRunner cr) throws ShellInvocationException {
+    protected int runIt(CommandLine cmdLine, CommandRunner cr) throws ShellException {
         Throwable terminatingException = null;
         int rc = -1;
         try {
@@ -129,6 +129,9 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
             this.blocking = false;
         }
         if (terminatingException != null) {
+            if (terminatingException instanceof ShellControlException) {
+                throw (ShellControlException) terminatingException;
+            }
             shell.diagnose(terminatingException, cmdLine);
         }
         return rc;
