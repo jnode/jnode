@@ -49,7 +49,7 @@ public class ProcessRunner {
     /**
      * Logger used by our {@link PipeInputStream}s.
      */
-    private static final Logger SERVER_LOGGER = Logger.getLogger("Server");
+    static final Logger SERVER_LOGGER = Logger.getLogger("Server");
     
     /**
      * Default work directory for the processes we are launching.
@@ -165,7 +165,7 @@ public class ProcessRunner {
         }
         process = Runtime.getRuntime().exec(command, envArray, workDir);
 
-        outputPipe = new PipeInputStream(process.getInputStream(), SERVER_LOGGER, Level.INFO,
+        outputPipe = new PipeInputStream(process.getInputStream(), SERVER_LOGGER, Level.FINEST,
                 outputListener);
         outputPipe.start();
 
