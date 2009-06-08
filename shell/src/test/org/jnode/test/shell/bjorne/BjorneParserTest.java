@@ -49,8 +49,8 @@ public class BjorneParserTest extends TestCase {
     public void test3() throws ShellException {
         assertEquals(
                 "SimpleCommand{nodeType=1,"
-                        + "redirects=[Redirect{redirectionType=60,io=IO_NUMBER{1},arg=WORD{/tmp/foo}},"
-                        + "Redirect{redirectionType=62,arg=WORD{/tmp/bar}}],"
+                        + "redirects=[Redirect{redirectionType=6,io=IO_NUMBER{1},arg=WORD{/tmp/foo}},"
+                        + "Redirect{redirectionType=7,arg=WORD{/tmp/bar}}],"
                         + "words=[WORD{ls},WORD{-l}]}",
                 doTest("ls -l 1< /tmp/foo > /tmp/bar"));
     }
