@@ -49,7 +49,7 @@ import org.jnode.test.shell.syntax.TestShell;
  * 
  * @author crawley@jnode.org
  */
-public class BjorneCompletionTests extends TestCase {
+public class BjorneCompletionTest extends TestCase {
     
     static TestShell shell;
     static {
