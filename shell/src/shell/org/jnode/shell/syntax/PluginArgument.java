@@ -40,7 +40,7 @@ public class PluginArgument extends StringArgument {
     }
   
     @Override
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         try {
             // get the plugin manager
             final PluginManager piMgr = InitialNaming.lookup(PluginManager.NAME);
@@ -49,7 +49,7 @@ public class PluginArgument extends StringArgument {
             for (PluginDescriptor descr : piMgr.getRegistry()) {
                 final String id = descr.getId();
                 if (id.startsWith(partial)) {
-                    completion.addCompletion(id);
+                    completions.addCompletion(id);
                 }
             }
         } catch (NameNotFoundException ex) {

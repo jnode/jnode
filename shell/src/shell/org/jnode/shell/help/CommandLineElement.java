@@ -46,7 +46,7 @@ abstract class CommandLineElement {
 
     public abstract String format();
     public abstract void describe(HelpFactory help, PrintWriter out);
-    public abstract void complete(CompletionInfo completion, String partial);
+    public abstract void complete(CompletionInfo completions, String partial);
 
     /** 
      * Indicates if the element is satisfied.

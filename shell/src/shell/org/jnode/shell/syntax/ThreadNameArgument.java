@@ -51,7 +51,7 @@ public class ThreadNameArgument extends StringArgument {
      * Complete the 'partial' against the names of all existing Thread objects
      * by traversing the ThreadGroup / Thread hierarchy from its root.
      */
-    public void doComplete(final CompletionInfo completion, final String partial, final int flags) {
+    public void doComplete(final CompletionInfo completions, final String partial, final int flags) {
         ThreadGroup grp = Thread.currentThread().getThreadGroup();
         while (grp.getParent() != null) {
             grp = grp.getParent();
@@ -60,21 +60,21 @@ public class ThreadNameArgument extends StringArgument {
         final ThreadGroup grp_f = grp;
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
             public Void run() {
-                findList(grp_f, partial, completion);
+                findList(grp_f, partial, completions);
                 return null;
             }
         });
         
     }
 
-    private void findList(ThreadGroup grp, String partial, CompletionInfo completion) {
+    private void findList(ThreadGroup grp, String partial, CompletionInfo completions) {
         final Thread[] ts = new Thread[grp.activeCount()];
         grp.enumerate(ts);
         for (Thread t : ts) {
             if (t != null) {
                 final String name = t.getName();
                 if (name.startsWith(partial)) {
-                    completion.addCompletion(name);
+                    completions.addCompletion(name);
                 }
             }
         }
@@ -82,7 +82,7 @@ public class ThreadNameArgument extends StringArgument {
         grp.enumerate(gs);
         for (ThreadGroup g : gs) {
             if (g != null) {
-                findList(g, partial, completion);
+                findList(g, partial, completions);
             }
         }
     }

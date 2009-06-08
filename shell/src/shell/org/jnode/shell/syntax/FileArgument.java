@@ -114,7 +114,7 @@ public class FileArgument extends Argument<File> {
     }
 
     @Override
-    public void doComplete(final CompletionInfo completion, 
+    public void doComplete(final CompletionInfo completions, 
             final String partial, final int flags) {
         // Get last full directory from the partial pathname.
         final int idx = partial.lastIndexOf(File.separatorChar);
@@ -155,9 +155,9 @@ public class FileArgument extends Argument<File> {
                     String name = prefix + n;
                     if (name.startsWith(partial)) {
                         if (new File(f, n).isDirectory()) {
-                            completion.addCompletion(name + File.separatorChar, true);
+                            completions.addCompletion(name + File.separatorChar, true);
                         } else {
-                            completion.addCompletion(name);
+                            completions.addCompletion(name);
                         }
                     }
                 }
@@ -170,12 +170,12 @@ public class FileArgument extends Argument<File> {
         int tmp = partial.length() - idx;
         if ((tmp == 3 && partial.endsWith("..")) ||
             (tmp == 2 && partial.endsWith("."))) {
-            completion.addCompletion(partial + File.separatorChar, true);
+            completions.addCompletion(partial + File.separatorChar, true);
         }
         
         // Add "-" as a possible completion?
         if (partial.length() == 0 && (flags & HYPHEN_IS_SPECIAL) != 0) {
-            completion.addCompletion("-");
+            completions.addCompletion("-");
         }
     }
 

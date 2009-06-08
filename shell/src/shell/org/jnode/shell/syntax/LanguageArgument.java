@@ -50,10 +50,10 @@ public class LanguageArgument extends Argument<String> {
     }
     
     @Override
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         for (String language : validLanguages) {
             if (language.startsWith(partial)) {
-                completion.addCompletion(language);
+                completions.addCompletion(language);
             }
         }
     }

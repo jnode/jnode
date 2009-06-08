@@ -62,13 +62,13 @@ public abstract class MappedArgument<V> extends Argument<V> {
      * Complete partial against the domain of the valueMap.
      */
     @Override
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         if (caseInsensitive) {
             partial = partial.toLowerCase();
         }
         for (String str : valueMap.keySet()) {
             if (str.startsWith(partial)) {
-                completion.addCompletion(str);
+                completions.addCompletion(str);
             }
         }
     }

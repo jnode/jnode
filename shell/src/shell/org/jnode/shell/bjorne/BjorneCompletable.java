@@ -26,7 +26,7 @@ import org.jnode.shell.help.CompletionException;
 
 public interface BjorneCompletable {
 
-    void complete(CompletionInfo completion, BjorneContext context,
+    void complete(CompletionInfo completions, BjorneContext context,
             CommandShell shell, boolean argumentAnticipated) 
         throws CompletionException;
 

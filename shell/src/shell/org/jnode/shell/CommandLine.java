@@ -587,7 +587,7 @@ public class CommandLine implements Completable, Iterable<String> {
         return cmdInfo;
     }
 
-    public void complete(CompletionInfo completion, CommandShell shell) throws CompletionException {
+    public void complete(CompletionInfo completions, CommandShell shell) throws CompletionException {
         String cmd = (commandToken == null) ? "" : commandToken.text.trim();
         if (!cmd.equals("") && (argumentTokens.length > 0 || argumentAnticipated)) {
             CommandInfo ci;
@@ -627,7 +627,7 @@ public class CommandLine implements Completable, Iterable<String> {
                 syntaxes = new SyntaxBundle(cmd, bundle.createDefaultSyntax());
             }   
             try {
-                bundle.complete(this, syntaxes, completion);
+                bundle.complete(this, syntaxes, completions);
             } catch (CommandSyntaxException ex) {
                 throw new CompletionException("Command syntax problem", ex);
             }
@@ -636,7 +636,7 @@ public class CommandLine implements Completable, Iterable<String> {
             // as an AliasArgument.
             ArgumentCompleter ac = new ArgumentCompleter(
                     new AliasArgument("cmdName", Argument.SINGLE), commandToken);
-            ac.complete(completion, shell);
+            ac.complete(completions, shell);
         }
     }
 

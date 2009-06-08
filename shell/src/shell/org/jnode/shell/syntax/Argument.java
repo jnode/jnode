@@ -440,13 +440,13 @@ public abstract class Argument<V> {
      * @param completion the CompletionInfo object for registering any completions.
      * @param partial the argument string to be completed.
      */
-    public final void complete(CompletionInfo completion, String partial, int flags) {
+    public final void complete(CompletionInfo completions, String partial, int flags) {
         if (isSet() && !isMultiple()) {
             throw new SyntaxMultiplicityException("this argument cannot be repeated");
         }
         flags = (flags & ~NONOVERRIDABLE_FLAGS) | this.flags;
         checkFlags(flags);
-        doComplete(completion, partial, flags);
+        doComplete(completions, partial, flags);
     }
 
     /**

@@ -50,10 +50,10 @@ public class CountryArgument extends Argument<String> {
     }
     
     @Override
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         for (String country : validCountries) {
             if (country.startsWith(partial)) {
-                completion.addCompletion(country);
+                completions.addCompletion(country);
             }
         }
     }

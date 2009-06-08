@@ -50,12 +50,12 @@ public class IBMPartitionTypeArgument extends Argument<IBMPartitionTypes> {
     }
 
     @Override
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         partial = partial.toLowerCase();
         for (IBMPartitionTypes pt : IBMPartitionTypes.values()) {
             String code = Integer.toHexString(pt.getCode());
             if (code.startsWith(partial)) {
-                completion.addCompletion(code);
+                completions.addCompletion(code);
             }
         }
     }

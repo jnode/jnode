@@ -56,7 +56,7 @@ public class AliasArgument extends Argument<String> {
         return value.text;
     }
 
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         try {
             // get the alias manager
             final AliasManager aliasMgr = 
@@ -65,7 +65,7 @@ public class AliasArgument extends Argument<String> {
             // collect matching aliases
             for (String alias : aliasMgr.aliases()) {
                 if (alias.startsWith(partial)) {
-                    completion.addCompletion(alias);
+                    completions.addCompletion(alias);
                 }
             }
         } catch (NameNotFoundException ex) {

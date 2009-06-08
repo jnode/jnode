@@ -49,10 +49,10 @@ public class BjorneCompleter implements Completable {
     }
 
     @Override
-    public void complete(CompletionInfo completion, CommandShell shell) throws CompletionException {
+    public void complete(CompletionInfo completions, CommandShell shell) throws CompletionException {
         if (endToken == null) {
             if (penultimateToken == null) {
-                completeCommandWord(completion, shell, new BjorneToken(""));
+                completeCommandWord(completions, shell, new BjorneToken(""));
                 return;
             }
             endToken = penultimateToken;
@@ -62,9 +62,9 @@ public class BjorneCompleter implements Completable {
             BjorneToken[] words = command.getWords();
             if (words.length > 1 && words[words.length - 1] == penultimateToken) {
                 boolean argumentAnticipated = penultimateToken.end < endToken.end;
-                command.complete(completion, context, shell, argumentAnticipated);
+                command.complete(completions, context, shell, argumentAnticipated);
             } else if (words.length == 1 && words[0] == penultimateToken && penultimateToken.end < endToken.end) {
-                command.complete(completion, context, shell, true);
+                command.complete(completions, context, shell, true);
             }
         }
         String partial;
@@ -73,12 +73,12 @@ public class BjorneCompleter implements Completable {
         if (penultimateToken == null || penultimateToken.end < endToken.end) {
             partial = "";
             expectedSet = endExpectedSet;
-            completion.setCompletionStart(endToken.start);
+            completions.setCompletionStart(endToken.start);
             token = endToken;
         } else {
             partial = penultimateToken.unparse();
             expectedSet = penultimateExpectedSet | endExpectedSet;
-            completion.setCompletionStart(penultimateToken.start);
+            completions.setCompletionStart(penultimateToken.start);
             token = penultimateToken;
         }
         if (!partial.equals(token.getText())) {
@@ -109,38 +109,38 @@ public class BjorneCompleter implements Completable {
                 case TOK_ASSIGNMENT:
                     ArgumentCompleter ac = new ArgumentCompleter(
                             new AssignmentArgument("?", context, Argument.MANDATORY, null), token);
-                    ac.complete(completion, shell);
+                    ac.complete(completions, shell);
                     break;
                 case TOK_FOR_WORD:
                 case TOK_FILE_NAME:
                     // Complete against the file system namespace
                     ac = new ArgumentCompleter(
                             new FileArgument("?", Argument.MANDATORY, null), token);
-                    ac.complete(completion, shell);
+                    ac.complete(completions, shell);
                     break;
                 case TOK_COMMAND_NAME:
                     // Complete against the command/alias/function namespaces
-                    completeCommandWord(completion, shell, token);
+                    completeCommandWord(completions, shell, token);
                     break;
                 default:
                     String candidate = BjorneToken.toString(i);
                     if (candidate.startsWith(partial)) {
-                        completion.addCompletion(candidate);
+                        completions.addCompletion(candidate);
                     }
             }
         }
     }
     
-    private void completeCommandWord(CompletionInfo completion, CommandShell shell, BjorneToken token) {
+    private void completeCommandWord(CompletionInfo completions, CommandShell shell, BjorneToken token) {
         // FIXME ... do aliases and functions ...
         for (String builtinName : BjorneInterpreter.BUILTINS.keySet()) {
             if (builtinName.startsWith(token.text)) {
-                completion.addCompletion(builtinName);
+                completions.addCompletion(builtinName);
             }
         }
         ArgumentCompleter ac = new ArgumentCompleter(
                 new AliasArgument("?", Argument.MANDATORY, null), token);
-        ac.complete(completion, shell);
+        ac.complete(completions, shell);
     }
 
     public void setEndToken(BjorneToken endToken) {

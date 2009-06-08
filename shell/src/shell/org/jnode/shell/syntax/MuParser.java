@@ -108,10 +108,10 @@ public class MuParser {
      * @param bundle the container for Argument objects; e.g. provided by the command.
      * @throws CommandSyntaxException
      */
-    public void parse(MuSyntax rootSyntax, CompletionInfo completion,
+    public void parse(MuSyntax rootSyntax, CompletionInfo completions,
             SymbolSource<Token> source, ArgumentBundle bundle) 
         throws CommandSyntaxException, SyntaxFailureException {
-        parse(rootSyntax, completion, source, bundle, DEFAULT_STEP_LIMIT);
+        parse(rootSyntax, completions, source, bundle, DEFAULT_STEP_LIMIT);
     }
     
     /**
@@ -127,7 +127,7 @@ public class MuParser {
      * means that there is no limit.
      * @throws CommandSyntaxException
      */
-    public synchronized void parse(MuSyntax rootSyntax, CompletionInfo completion, 
+    public synchronized void parse(MuSyntax rootSyntax, CompletionInfo completions, 
             SymbolSource<Token> source, ArgumentBundle bundle, int stepLimit) 
         throws CommandSyntaxException, SyntaxFailureException {
         // FIXME - deal with syntax error messages and completion
@@ -166,7 +166,7 @@ public class MuParser {
                     if (DEBUG) {
                         log.debug("exhausted syntax stack too soon");
                     }
-                } else if (completion != null && !backtrackStack.isEmpty()) {
+                } else if (completions != null && !backtrackStack.isEmpty()) {
                     if (DEBUG) {
                         log.debug("try alternatives for completion");
                     }
@@ -193,11 +193,11 @@ public class MuParser {
                         String symbol = ((MuSymbol) syntax).getSymbol();
                         token = source.hasNext() ? source.next() : null;
 
-                        if (completion == null || source.hasNext()) {
+                        if (completions == null || source.hasNext()) {
                             backtrack = token == null || !token.text.equals(symbol);
                         } else {
                             if (token == null) {
-                                completion.addCompletion(symbol);
+                                completions.addCompletion(symbol);
                                 backtrack = true;
                             } else if (source.whitespaceAfterLast()) {
                                 if (!token.text.equals(symbol)) {
@@ -205,8 +205,8 @@ public class MuParser {
                                 }
                             } else {
                                 if (symbol.startsWith(token.text)) {
-                                    completion.addCompletion(symbol);
-                                    completion.setCompletionStart(token.start);
+                                    completions.addCompletion(symbol);
+                                    completions.setCompletionStart(token.start);
                                 }
                                 backtrack = true;
                             }
@@ -220,7 +220,7 @@ public class MuParser {
                         try {
                             if (source.hasNext()) {
                                 token = source.next();
-                                if (completion == null || source.hasNext() || source.whitespaceAfterLast()) {
+                                if (completions == null || source.hasNext() || source.whitespaceAfterLast()) {
                                     arg.accept(token, flags);
                                     if (!backtrackStack.isEmpty()) {
                                         backtrackStack.getFirst().argsModified.add(arg);
@@ -229,13 +229,13 @@ public class MuParser {
                                         }
                                     }
                                 } else {
-                                    arg.complete(completion, token.text, flags);
-                                    completion.setCompletionStart(token.start);
+                                    arg.complete(completions, token.text, flags);
+                                    completions.setCompletionStart(token.start);
                                     backtrack = true;
                                 }
                             } else {
-                                if (completion != null) {
-                                    arg.complete(completion, "", flags);
+                                if (completions != null) {
+                                    arg.complete(completions, "", flags);
                                 }
                                 backtrack = true;
                             }
@@ -353,7 +353,7 @@ public class MuParser {
                 }
                 // If we are still backtracking and we are out of choices ...
                 if (backtrack) {
-                    if (completion == null) {
+                    if (completions == null) {
                         throw new CommandSyntaxException("ran out of alternatives", argFailures);
                     } else {
                         if (DEBUG) {

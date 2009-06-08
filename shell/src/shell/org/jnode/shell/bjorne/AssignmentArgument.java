@@ -56,14 +56,14 @@ public class AssignmentArgument extends Argument<String> {
     }
 
     @Override
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         int pos = partial.indexOf('=');
         if (pos != -1) {
             return;
         }
         for (String varName : context.getVariableNames()) {
             if (varName.startsWith(partial)) {
-                completion.addCompletion(varName, true);
+                completions.addCompletion(varName, true);
             }
         }
     }

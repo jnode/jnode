@@ -54,12 +54,12 @@ public class SetFlagArgument extends Argument<Boolean> {
     }
 
     @Override
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         if (("-" + flagCh).startsWith(partial)) {
-            completion.addCompletion("-" + flagCh);
+            completions.addCompletion("-" + flagCh);
         }
         if (("+" + flagCh).startsWith(partial)) {
-            completion.addCompletion("+" + flagCh);
+            completions.addCompletion("+" + flagCh);
         }
     }
 }
