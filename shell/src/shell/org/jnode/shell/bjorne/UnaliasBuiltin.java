@@ -27,7 +27,6 @@ import org.jnode.shell.syntax.ArgumentSyntax;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.OptionSyntax;
 import org.jnode.shell.syntax.RepeatSyntax;
-import org.jnode.shell.syntax.StringArgument;
 import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
@@ -42,18 +41,19 @@ final class UnaliasBuiltin extends BjorneBuiltin {
     
     static final Factory FACTORY = new Factory() {
         public BjorneBuiltinCommandInfo buildCommandInfo(BjorneContext context) {
-            return new BjorneBuiltinCommandInfo("unalias", SYNTAX, new UnaliasBuiltin(), context);
+            return new BjorneBuiltinCommandInfo("unalias", SYNTAX, new UnaliasBuiltin(context), context);
         }
     };
     
     private final FlagArgument flagAll = new FlagArgument(
             "all", Argument.OPTIONAL, "if set, undefine all aliases");
     
-    private final StringArgument argAlias = new StringArgument(
-            "alias", Argument.OPTIONAL + Argument.MULTIPLE, "aliases to be undefined");
+    private final BjorneAliasNameArgument argAlias; 
     
-    private UnaliasBuiltin() {
+    private UnaliasBuiltin(BjorneContext context) {
         super("undefined Bjorne shell aliases");
+        argAlias = new BjorneAliasNameArgument(
+                "alias", context, Argument.OPTIONAL + Argument.MULTIPLE, "aliases to be undefined");
         registerArguments(flagAll, argAlias);
     }
     
