@@ -69,7 +69,7 @@ public class LongArgument extends Argument<Long> {
     }
   
     @Override
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         // FIXME ... maybe someone could figure out how to partial
         // completion efficiently when max - min is large?
         if (max - min >= 0 && max - min < COMPLETION_THRESHOLD) {
@@ -77,7 +77,7 @@ public class LongArgument extends Argument<Long> {
                 String candidate = Long.toString(i);
                 System.err.println("Testing completion '" + candidate + "'");
                 if (candidate.startsWith(partial)) {
-                    completion.addCompletion(candidate);
+                    completions.addCompletion(candidate);
                 }
             }
         }

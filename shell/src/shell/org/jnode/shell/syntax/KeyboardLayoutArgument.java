@@ -51,13 +51,13 @@ public class KeyboardLayoutArgument extends StringArgument {
     }
 
     @Override
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         try {
             KeyboardLayoutManager mgr = InitialNaming.lookup(KeyboardLayoutManager.NAME);
             // collect matching devices
             for (String layout : mgr.layouts()) {
                 if (layout.startsWith(partial)) {
-                    completion.addCompletion(layout);
+                    completions.addCompletion(layout);
                 }
             }
         } catch (NameNotFoundException ex) {

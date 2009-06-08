@@ -43,7 +43,7 @@ public class NFSHostNameArgument extends Argument<String> {
         super(name, flags, new String[0], description);
     }
 
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         int index = partial.indexOf(':');
         if (index <= 0) {
             return;
@@ -88,7 +88,7 @@ public class NFSHostNameArgument extends Argument<String> {
         for (int i = 0; i < exportEntryList.size(); i++) {
             ExportEntry exportEntry = exportEntryList.get(i);
             if (exportEntry.getDirectory().startsWith(partialDirectory)) {
-                completion.addCompletion(hostName + ":" + exportEntry.getDirectory());
+                completions.addCompletion(hostName + ":" + exportEntry.getDirectory());
             }
         }
     }

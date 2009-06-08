@@ -49,10 +49,10 @@ public class ArgumentCompleter implements Completable {
         }
     }
 
-    public void complete(CompletionInfo completion, CommandShell shell) {
-        argument.complete(completion, token == null ? "" : token.text, 0);
+    public void complete(CompletionInfo completions, CommandShell shell) {
+        argument.complete(completions, token == null ? "" : token.text, 0);
         if (token != null) {
-            completion.setCompletionStart(token.start);
+            completions.setCompletionStart(token.start);
         }
     }
 

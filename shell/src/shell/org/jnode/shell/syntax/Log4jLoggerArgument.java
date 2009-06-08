@@ -56,12 +56,12 @@ public class Log4jLoggerArgument extends Argument<Logger> {
      * Complete against existing logger names.
      */
     @Override
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         Enumeration<?> en = LogManager.getCurrentLoggers();
         while (en.hasMoreElements()) {
             String loggerName = ((Logger) en.nextElement()).getName();
             if (loggerName.startsWith(partial)) {
-                completion.addCompletion(loggerName);
+                completions.addCompletion(loggerName);
             }
         }
     }

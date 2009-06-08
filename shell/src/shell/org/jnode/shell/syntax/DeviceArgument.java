@@ -70,7 +70,7 @@ public class DeviceArgument extends Argument<Device> {
     }
 
     @Override
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         final DeviceManager devMgr = getDeviceManager();
 
         // collect matching devices
@@ -80,7 +80,7 @@ public class DeviceArgument extends Argument<Device> {
             }
             final String devId = dev.getId();
             if (devId.startsWith(partial)) {
-                completion.addCompletion(devId);
+                completions.addCompletion(devId);
             }
         }
     }

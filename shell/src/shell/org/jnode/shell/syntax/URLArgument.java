@@ -62,7 +62,7 @@ public class URLArgument extends Argument<URL> {
     }
 
     @Override
-    public void doComplete(final CompletionInfo completion, final String partial, final int flags) {
+    public void doComplete(final CompletionInfo completions, final String partial, final int flags) {
         try {
             // If 'partial' is a well-formed "file:" URL with no host, port, 
             // user or query, do completion on the path component.
@@ -78,7 +78,7 @@ public class URLArgument extends Argument<URL> {
                 for (String c : myCompletion.getCompletions()) {
                     // (Kludge - the 'true' argument prevents an extra space
                     // character from being appended to the completions.)
-                    completion.addCompletion("file:" + c, true);
+                    completions.addCompletion("file:" + c, true);
                 }
             }
         } catch (MalformedURLException ex) {

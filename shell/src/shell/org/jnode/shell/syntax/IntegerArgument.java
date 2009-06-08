@@ -68,14 +68,14 @@ public class IntegerArgument extends Argument<Integer> {
     }
   
     @Override
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         // FIXME ... maybe someone could figure out how to partial
         // completion efficiently when max - min is large?
         if (max - min >= 0 && max - min < COMPLETION_THRESHOLD) {
             for (int i = min; i <= max; i++) {
                 String candidate = Integer.toString(i);
                 if (candidate.startsWith(partial)) {
-                    completion.addCompletion(candidate);
+                    completions.addCompletion(candidate);
                 }
             }
         }
