@@ -27,7 +27,6 @@ import java.util.TreeMap;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ArgumentSyntax;
 import org.jnode.shell.syntax.RepeatSyntax;
-import org.jnode.shell.syntax.StringArgument;
 import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
@@ -41,15 +40,16 @@ final class AliasBuiltin extends BjorneBuiltin {
     
     static final Factory FACTORY = new Factory() {
         public BjorneBuiltinCommandInfo buildCommandInfo(BjorneContext context) {
-            return new BjorneBuiltinCommandInfo("alias", SYNTAX, new AliasBuiltin(), context);
+            return new BjorneBuiltinCommandInfo("alias", SYNTAX, new AliasBuiltin(context), context);
         }
     };
     
-    private final StringArgument argAlias = new StringArgument(
-            "alias", Argument.OPTIONAL + Argument.MULTIPLE, "an alias to be defined or printed");
+    private final BjorneAliasDefinitionArgument argAlias; 
     
-    private AliasBuiltin() {
+    private AliasBuiltin(BjorneContext context) {
         super("define or list aliases");
+        argAlias = new BjorneAliasDefinitionArgument(
+                "alias", context, Argument.OPTIONAL + Argument.MULTIPLE, "an alias to be defined or printed");
         registerArguments(argAlias);
     }
 
