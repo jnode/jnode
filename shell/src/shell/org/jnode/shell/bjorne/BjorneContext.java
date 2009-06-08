@@ -40,6 +40,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -1284,5 +1285,9 @@ public class BjorneContext {
 
     BjorneInterpreter getInterpreter() {
         return interpreter;
+    }
+
+    public Collection<String> getVariableNames() {
+        return variables.keySet();
     }
 }

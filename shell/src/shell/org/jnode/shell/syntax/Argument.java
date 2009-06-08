@@ -462,11 +462,11 @@ public abstract class Argument<V> {
      * an override should avoid posting completions that would not be accepted
      * by the {@link #doAccept} method, as this will lead to confusing behavior.
      * 
-     * @param completion the {@link CompletionInfo} object for posting possible
+     * @param completions the {@link CompletionInfo} object for posting possible
      *    completions.
      * @param partial the argument string to be completed.
      */
-    public void doComplete(CompletionInfo completion, String partial, int flags) {
+    public void doComplete(CompletionInfo completions, String partial, int flags) {
         // set no completion
     }
 

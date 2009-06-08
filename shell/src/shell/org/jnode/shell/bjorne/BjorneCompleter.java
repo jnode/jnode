@@ -107,13 +107,14 @@ public class BjorneCompleter implements Completable {
                     // Ignore for purposes of completion
                     break;
                 case TOK_ASSIGNMENT:
-                    // FIXME ...complete 1st part against shell variable namespace and 2nd part against
-                    // file system namespace
+                    ArgumentCompleter ac = new ArgumentCompleter(
+                            new AssignmentArgument("?", context, Argument.MANDATORY, null), token);
+                    ac.complete(completion, shell);
                     break;
                 case TOK_FOR_WORD:
                 case TOK_FILE_NAME:
                     // Complete against the file system namespace
-                    ArgumentCompleter ac = new ArgumentCompleter(
+                    ac = new ArgumentCompleter(
                             new FileArgument("?", Argument.MANDATORY, null), token);
                     ac.complete(completion, shell);
                     break;
