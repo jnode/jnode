@@ -34,7 +34,7 @@ import org.jnode.shell.bjorne.BjorneContext;
 import org.jnode.shell.bjorne.BjorneToken;
 import org.jnode.shell.io.CommandIOHolder;
 
-public class BjorneContextTests extends TestCase {
+public class BjorneContextTest extends TestCase {
 
     public void testContext() {
         new BjorneContext(null, null);

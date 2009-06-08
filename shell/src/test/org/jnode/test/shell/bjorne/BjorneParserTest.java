@@ -26,9 +26,9 @@ import org.jnode.shell.ShellException;
 import org.jnode.shell.bjorne.BjorneParser;
 import org.jnode.shell.bjorne.BjorneTokenizer;
 
-public class BjorneParserTests extends TestCase {
+public class BjorneParserTest extends TestCase {
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     public void testParser() throws ShellException {
         new BjorneParser(new BjorneTokenizer(""), null);

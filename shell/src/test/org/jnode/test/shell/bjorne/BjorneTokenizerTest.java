@@ -71,7 +71,7 @@ import org.jnode.shell.IncompleteCommandException;
 import org.jnode.shell.bjorne.BjorneToken;
 import org.jnode.shell.bjorne.BjorneTokenizer;
 
-public class BjorneTokenizerTests extends TestCase {
+public class BjorneTokenizerTest extends TestCase {
 
     public void testBjorneTokenizer() throws IncompleteCommandException {
         new BjorneTokenizer("hello");
