@@ -12,9 +12,11 @@ help         Output these messages
 	</target>
 
 	<target name="all-junit">
+		<delete dir="${basedir}/reports/junit"/>
+		<mkdir dir="${basedir}/reports/junit"/>
 		<junit showoutput="on" printsummary="on" fork="on">
 			<classpath refid="cp-test"/>
-			<test name="org.jnode.test.fs.filesystem.FSTestSuite"/>
+			<test name="org.jnode.test.fs.filesystem.FSTestSuite" todir="${basedir}/reports/junit"/>
 		</junit>
 	</target>
 
