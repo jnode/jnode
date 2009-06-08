@@ -105,6 +105,10 @@ public class BjorneCompletionTest extends TestCase {
     public void testPipe2Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("echo hi |\necho", "TETT");
     }
+    
+    public void testSourceCommand() throws ShellSyntaxException, CompletionException {
+        doCompletionTest("source /", "TT");
+    }
 
     public void testIfCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("if cpuid ; then echo hi ; fi", "TTTTTETT");
