@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ArgumentSyntax;
 import org.jnode.shell.syntax.RepeatSyntax;
-import org.jnode.shell.syntax.StringArgument;
 import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
@@ -39,16 +38,17 @@ final class ExportBuiltin extends BjorneBuiltin {
     
     static final Factory FACTORY = new Factory() {
         public BjorneBuiltinCommandInfo buildCommandInfo(BjorneContext context) {
-            return new BjorneBuiltinCommandInfo("export", SYNTAX, new ExportBuiltin(), context);
+            return new BjorneBuiltinCommandInfo("export", SYNTAX, new ExportBuiltin(context), context);
         }
     };
     
-    private final StringArgument argExport = new StringArgument(
-            "export", Argument.MANDATORY, "variables to be exported");
+    private final AssignmentArgument argExport; 
     
     
-    ExportBuiltin() {
+    ExportBuiltin(BjorneContext context) {
         super("Export shell variables to the environment");
+        argExport = new AssignmentArgument(
+                "export", context, Argument.MANDATORY, "variables to be exported");
         registerArguments(argExport);
     }
 
