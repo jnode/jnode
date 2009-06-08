@@ -132,7 +132,7 @@ public class BjorneCompleter implements Completable {
     }
     
     private void completeCommandWord(CompletionInfo completions, CommandShell shell, BjorneToken token) {
-        // FIXME ... do aliases and functions ...
+        // FIXME ... do functions ...
         for (String builtinName : BjorneInterpreter.BUILTINS.keySet()) {
             if (builtinName.startsWith(token.text)) {
                 completions.addCompletion(builtinName);
@@ -140,6 +140,9 @@ public class BjorneCompleter implements Completable {
         }
         ArgumentCompleter ac = new ArgumentCompleter(
                 new AliasArgument("?", Argument.MANDATORY, null), token);
+        ac.complete(completions, shell);
+        ac = new ArgumentCompleter(
+                new BjorneAliasNameArgument("?", context, Argument.MANDATORY, null), token);
         ac.complete(completions, shell);
     }
 
