@@ -18,7 +18,6 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_WORD;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.ArgumentCompleter;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.Completable;
 import org.jnode.shell.help.CompletionException;
@@ -53,7 +52,7 @@ public class BjorneCompleter implements Completable {
     public void complete(CompletionInfo completion, CommandShell shell) throws CompletionException {
         if (endToken == null) {
             if (penultimateToken == null) {
-                new CommandLine(null, null).complete(completion, shell);
+                completeCommandWord(completion, shell, new BjorneToken(""));
                 return;
             }
             endToken = penultimateToken;
@@ -118,9 +117,7 @@ public class BjorneCompleter implements Completable {
                     break;
                 case TOK_COMMAND_NAME:
                     // Complete against the command/alias/function namespaces
-                    ac = new ArgumentCompleter(
-                            new AliasArgument("?", Argument.MANDATORY, null), token);
-                    ac.complete(completion, shell);
+                    completeCommandWord(completion, shell, token);
                     break;
                 default:
                     String candidate = BjorneToken.toString(i);
@@ -129,6 +126,18 @@ public class BjorneCompleter implements Completable {
                     }
             }
         }
+    }
+    
+    private void completeCommandWord(CompletionInfo completion, CommandShell shell, BjorneToken token) {
+        // FIXME ... do aliases and functions ...
+        for (String builtinName : BjorneInterpreter.BUILTINS.keySet()) {
+            if (builtinName.startsWith(token.text)) {
+                completion.addCompletion(builtinName);
+            }
+        }
+        ArgumentCompleter ac = new ArgumentCompleter(
+                new AliasArgument("?", Argument.MANDATORY, null), token);
+        ac.complete(completion, shell);
     }
 
     public void setEndToken(BjorneToken endToken) {
