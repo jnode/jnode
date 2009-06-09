@@ -775,6 +775,11 @@ Hi mum again
         <output>Hi
 </output>
     </testSpec>
+    <testSpec title="weird pipeline" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+        echo Hi | aa=bb
+        </script>
+    </testSpec>
     <testSpec title="subshell" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 echo &gt; @TEMP_DIR@/1 Hi mum

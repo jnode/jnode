@@ -127,9 +127,13 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
     
     public CommandThread fork(CommandShell shell, BjorneContext context) 
         throws ShellException {
-        CommandLine command = context.buildCommandLine(getWords());
-        command.setStreams(context.getIOs());
-        return shell.invokeAsynchronous(command);
+        if (words.length > 0) {
+            CommandLine command = context.buildCommandLine(words);
+            command.setStreams(context.getIOs());
+            return shell.invokeAsynchronous(command);
+        } else {
+            return null;
+        }
     }
 
     @Override
