@@ -501,7 +501,7 @@ public class BjorneParser {
     private CommandNode parseBraceGroup() throws ShellSyntaxException {
         next();
         CommandNode compoundList = parseCompoundList(TOK_RBRACE_BIT);
-        expectPeek(TOK_RBRACE_BIT);
+        expectNext(TOK_RBRACE_BIT, RULE_1_CONTEXT);
         compoundList.setNodeType(CMD_BRACE_GROUP);
         return compoundList;
     }

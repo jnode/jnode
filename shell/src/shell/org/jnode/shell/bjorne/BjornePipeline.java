@@ -161,7 +161,11 @@ class BjornePipeline {
         synchronized (this) {
             for (PipelineStage stage : stages) {
                 ThreadCallback callback = new ThreadCallback(stage.context);
-                stage.thread.start(callback);
+                if (stage.thread != null) {
+                    stage.thread.start(callback);
+                } else {
+                    callback.notifyThreadExited(null);
+                }
             }
             while (activeStageCount > 0) {
                 try {
@@ -171,7 +175,8 @@ class BjornePipeline {
                     break;
                 }
             }
-            return stages[stages.length - 1].thread.getReturnCode();
+            CommandThread lastThread = stages[stages.length - 1].thread;
+            return (lastThread == null) ? 0 : lastThread.getReturnCode();
         }
     }
 
