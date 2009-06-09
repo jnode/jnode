@@ -100,20 +100,25 @@ public class IfCommandNode extends CommandNode {
 
     @Override
     public int execute(BjorneContext context) throws ShellException {
-        int rc = cond.execute(context);
-        if (rc == 0) {
-            if (thenPart != null) {
-                return thenPart.execute(context);
+        try {
+            context.evaluateRedirectionsAndPushHolders(getRedirects());
+            int rc = cond.execute(context);
+            if (rc == 0) {
+                if (thenPart != null) {
+                    return thenPart.execute(context);
+                }
+            } else {
+                if (elsePart != null) {
+                    return elsePart.execute(context);
+                }
             }
-        } else {
-            if (elsePart != null) {
-                return elsePart.execute(context);
+            if ((getFlags() & BjorneInterpreter.FLAG_BANG) != 0) {
+                rc = (rc == 0) ? -1 : 0;
             }
+            return rc;
+        } finally {
+            context.popHolders();
         }
-        if ((getFlags() & BjorneInterpreter.FLAG_BANG) != 0) {
-            rc = (rc == 0) ? -1 : 0;
-        }
-        return rc;
     }
     
     @Override

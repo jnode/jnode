@@ -30,7 +30,6 @@ import org.jnode.shell.CommandThreadImpl;
 import org.jnode.shell.Completable;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.help.CompletionException;
-import org.jnode.shell.io.CommandIOHolder;
 
 
 public class ListCommandNode extends CommandNode implements Completable {
@@ -59,25 +58,26 @@ public class ListCommandNode extends CommandNode implements Completable {
     public int execute(BjorneContext context) throws ShellException {
         int listFlags = getFlags();
         int rc = 0;
-        try {
-            if ((listFlags & BjorneInterpreter.FLAG_PIPE) != 0) {
-                BjornePipeline pipeline = buildPipeline(context);
-                try {
-                    pipeline.wire();
-                    rc = pipeline.run(context.getShell());
-                } finally {
-                    pipeline.closeStreams();
-                }
-            } else {
-                if (getNodeType() == BjorneInterpreter.CMD_SUBSHELL) {
+        if ((listFlags & BjorneInterpreter.FLAG_PIPE) != 0) {
+            BjornePipeline pipeline = buildPipeline(context);
+            try {
+                pipeline.wire();
+                rc = pipeline.run(context.getShell());
+            } finally {
+                pipeline.closeStreams();
+            }
+        } else {
+            int nt = getNodeType();
+            try {
+                if (nt == BjorneInterpreter.CMD_SUBSHELL) {
                     // This simulates creating a 'subshell'.
                     context = new BjorneContext(context);
-                    CommandIOHolder[] holders = context.evaluateRedirections(getRedirects());
-                    for (int i = 0; i < holders.length; i++) {
-                        context.setIO(i, holders[i]);
-                    }
+                    context.evaluateRedirectionsAndPushHolders(getRedirects());
+                } else if (nt == BjorneInterpreter.CMD_BRACE_GROUP) {
+                    context.evaluateRedirectionsAndPushHolders(getRedirects());
                 }
                 
+
                 for (CommandNode command : commands) {
                     int commandFlags = command.getFlags();
                     if ((commandFlags & BjorneInterpreter.FLAG_AND_IF) != 0) {
@@ -92,10 +92,10 @@ public class ListCommandNode extends CommandNode implements Completable {
                     }
                     rc = command.execute(context);
                 }
-            }
-        } finally {
-            if (getNodeType() == BjorneInterpreter.CMD_SUBSHELL) {
-                context.closeIOs();
+            } finally {
+                if (nt == BjorneInterpreter.CMD_SUBSHELL || nt == BjorneInterpreter.CMD_BRACE_GROUP) {
+                    context.popHolders();
+                }
             }
         }
         if ((listFlags & BjorneInterpreter.FLAG_BANG) != 0) {

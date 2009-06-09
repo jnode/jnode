@@ -74,39 +74,44 @@ public class LoopCommandNode extends CommandNode {
     }
 
     public int execute(BjorneContext context) throws ShellException {
-        int rc = 0;
-        while (true) {
-            rc = cond.execute(context);
-            if (rc != 0 && getNodeType() == BjorneInterpreter.CMD_WHILE ||
-                    rc == 0 && getNodeType() == BjorneInterpreter.CMD_UNTIL) {
-                break;
-            }
-            try {
-                if (body != null) {
-                    body.execute(context);
+        try {
+            int rc = 0;
+            context.evaluateRedirectionsAndPushHolders(getRedirects());
+            while (true) {
+                rc = cond.execute(context);
+                if (rc != 0 && getNodeType() == BjorneInterpreter.CMD_WHILE ||
+                        rc == 0 && getNodeType() == BjorneInterpreter.CMD_UNTIL) {
+                    break;
                 }
-            } catch (BjorneControlException ex) {
-                int control = ex.getControl();
-                if (control == BjorneInterpreter.BRANCH_BREAK || 
-                    control == BjorneInterpreter.BRANCH_CONTINUE) {
-                    if (ex.getCount() > 1) {
-                        ex.decrementCount();
+                try {
+                    if (body != null) {
+                        body.execute(context);
+                    }
+                } catch (BjorneControlException ex) {
+                    int control = ex.getControl();
+                    if (control == BjorneInterpreter.BRANCH_BREAK || 
+                            control == BjorneInterpreter.BRANCH_CONTINUE) {
+                        if (ex.getCount() > 1) {
+                            ex.decrementCount();
+                            throw ex;
+                        }
+                        if (control == BjorneInterpreter.BRANCH_BREAK) {
+                            break;
+                        } else {
+                            continue;
+                        }
+                    } else {
                         throw ex;
                     }
-                    if (control == BjorneInterpreter.BRANCH_BREAK) {
-                        break;
-                    } else {
-                        continue;
-                    }
-                } else {
-                    throw ex;
                 }
             }
+            if ((getFlags() & BjorneInterpreter.FLAG_BANG) != 0) {
+                rc = (rc == 0) ? -1 : 0;
+            }
+            return rc;
+        } finally {
+            context.popHolders();
         }
-        if ((getFlags() & BjorneInterpreter.FLAG_BANG) != 0) {
-            rc = (rc == 0) ? -1 : 0;
-        }
-        return rc;
     }
     
     @Override

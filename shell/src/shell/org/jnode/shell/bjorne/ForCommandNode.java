@@ -92,13 +92,18 @@ public class ForCommandNode extends CommandNode {
 
     @Override
     public int execute(BjorneContext context) throws ShellException {
-        int rc = 0;
-        List<BjorneToken> expanded = context.expandAndSplit(words);
-        for (BjorneToken word : expanded) {
-            context.setVariable(var.getText(), word.getText());
-            rc = body.execute(context);
+        try {
+            int rc = 0;
+            context.evaluateRedirectionsAndPushHolders(getRedirects());
+            List<BjorneToken> expanded = context.expandAndSplit(words);
+            for (BjorneToken word : expanded) {
+                context.setVariable(var.getText(), word.getText());
+                rc = body.execute(context);
+            }
+            return rc;
+        } finally {
+            context.popHolders();
         }
-        return rc;
     }
     
     @Override
