@@ -859,4 +859,47 @@ Hi mum again
                 false
         </script>
     </testSpec>
+    <testSpec title="brace group" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                { echo hi ; echo there ; }
+        </script>
+        <output>hi
+there
+</output>
+    </testSpec>
+    <testSpec title="brace group redir" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                { echo hi ; echo there ; } &gt; @TEMP_DIR@/1 
+        </script>
+        <file name="1" input="false">hi
+there
+</file>
+    </testSpec>
+    <testSpec title="for redir" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                for i in 1 2 3 ; do echo $i ; done &gt; @TEMP_DIR@/1 
+        </script>
+        <file name="1" input="false">1
+2
+3
+</file>
+    </testSpec>
+    <testSpec title="while redir" command="test" runMode="AS_SCRIPT" rc="1">
+        <script>#!bjorne
+                A=5
+                while expr $A != 0 ; do echo $A ; A=`expr $A - 1`; done &gt; @TEMP_DIR@/1 
+        </script>
+        <file name="1" input="false">1
+5
+1
+4
+1
+3
+1
+2
+1
+1
+0
+</file>
+    </testSpec>
 </testSet>

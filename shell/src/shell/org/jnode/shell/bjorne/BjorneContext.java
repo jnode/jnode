@@ -125,6 +125,8 @@ public class BjorneContext {
     private String options = "";
 
     private CommandIOHolder[] holders;
+    
+    private List<CommandIOHolder[]> savedHolders;
 
     private boolean echoExpansions;
 
@@ -1091,6 +1093,30 @@ public class BjorneContext {
         CommandIOHolder[] res = copyStreamHolders(holders);
         evaluateRedirections(redirects, res);
         return res;
+    }
+    
+    /**
+     * Evaluate the redirections for this command, saving the context's existing IOs 
+     * 
+     * @param redirects the redirection nodes to be evaluated
+     * @throws ShellException
+     */
+    void evaluateRedirectionsAndPushHolders(RedirectionNode[] redirects) throws ShellException {
+        if (savedHolders == null) {
+            savedHolders = new ArrayList<CommandIOHolder[]>(1);
+        }
+        savedHolders.add(holders);
+        holders = copyStreamHolders(holders);
+        evaluateRedirections(redirects, holders);
+    }
+    
+    /**
+     * Close the context's current IO, restoring the previous ones.
+     * @throws ShellException
+     */
+    void popHolders() {
+        closeIOs();
+        holders = savedHolders.remove(savedHolders.size() - 1);
     }
     
     /**

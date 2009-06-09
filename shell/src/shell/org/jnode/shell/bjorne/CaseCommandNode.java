@@ -60,24 +60,28 @@ public class CaseCommandNode extends CommandNode {
 
     @Override
     public int execute(BjorneContext context) throws ShellException {
-        int rc = 0;
-
-        CharSequence expandedWord = context.dollarBacktickExpand(word.text);
-    LOOP:
-        for (CaseItemNode caseItem : caseItems) {
-            for (BjorneToken pattern : caseItem.getPattern()) {
-                CharSequence pat = context.dollarBacktickExpand(pattern.text);
-                if (context.patternMatch(expandedWord, pat)) {
-                    rc = caseItem.getBody().execute(context);
-                    break LOOP;
+        try {
+            int rc = 0;
+            context.evaluateRedirectionsAndPushHolders(getRedirects());
+            CharSequence expandedWord = context.dollarBacktickExpand(word.text);
+        LOOP:
+            for (CaseItemNode caseItem : caseItems) {
+                for (BjorneToken pattern : caseItem.getPattern()) {
+                    CharSequence pat = context.dollarBacktickExpand(pattern.text);
+                    if (context.patternMatch(expandedWord, pat)) {
+                        rc = caseItem.getBody().execute(context);
+                        break LOOP;
+                    }
                 }
             }
-        }
 
-        if ((getFlags() & BjorneInterpreter.FLAG_BANG) != 0) {
-            rc = (rc == 0) ? -1 : 0;
+            if ((getFlags() & BjorneInterpreter.FLAG_BANG) != 0) {
+                rc = (rc == 0) ? -1 : 0;
+            }
+            return rc;
+        } finally {
+            context.popHolders();
         }
-        return rc;
     }
     
     @Override
