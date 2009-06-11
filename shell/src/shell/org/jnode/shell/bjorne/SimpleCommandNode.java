@@ -26,6 +26,7 @@ import org.jnode.shell.CommandShell;
 import org.jnode.shell.CommandThread;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
+import org.jnode.shell.ShellInvocationException;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandIOHolder;
@@ -111,6 +112,9 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
                     rc = childContext.execute(command, ios, builtin);
                 }
             }
+        } catch (ShellInvocationException ex) {
+            context.getShell().resolvePrintStream(context.getIO(2)).println(ex.getMessage());
+            rc = 1;
         } finally {
             if (holders != null) {
                 for (CommandIOHolder holder : holders) {

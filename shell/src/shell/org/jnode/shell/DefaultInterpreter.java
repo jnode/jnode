@@ -114,7 +114,7 @@ public class DefaultInterpreter implements CommandInterpreter {
     public int interpret(CommandShell shell, Reader reader, String alias, String[] args) 
         throws ShellException {
         if (args != null && args.length > 0) {
-            throw new ShellException(
+            throw new ShellInvocationException(
                     "The " + getName() + " interpreter does not support script file arguments");
         }
         try {
@@ -130,7 +130,7 @@ public class DefaultInterpreter implements CommandInterpreter {
             }
             return rc;
         } catch (IOException ex) {
-            throw new ShellException("Problem reading command file: " + ex.getMessage(), ex);
+            throw new ShellInvocationException("Problem reading command file: " + ex.getMessage(), ex);
         } finally {
             if (reader != null) {
                 try {
@@ -161,7 +161,7 @@ public class DefaultInterpreter implements CommandInterpreter {
         try {
             return interpret(shell, new FileReader(file), alias, args);
         } catch (FileNotFoundException ex) {
-            throw new ShellException("Problem reading command file: " + ex.getMessage(), ex);
+            throw new ShellInvocationException("Problem reading command file: " + ex.getMessage(), ex);
         }
     }
     

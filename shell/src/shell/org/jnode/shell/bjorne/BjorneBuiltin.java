@@ -24,6 +24,7 @@ import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
+import org.jnode.shell.ShellInvocationException;
 import org.jnode.vm.VmExit;
 
 /**
@@ -64,7 +65,7 @@ abstract class BjorneBuiltin extends AbstractCommand {
         } catch (VmExit ex) {
             return ex.getStatus();
         } catch (Exception ex) {
-            throw new ShellException("Exception in bjorne builtin", ex);
+            throw new ShellInvocationException("Exception in bjorne builtin", ex);
         }
         return 0;
     }
