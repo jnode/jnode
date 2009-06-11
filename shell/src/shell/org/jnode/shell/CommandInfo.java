@@ -218,9 +218,9 @@ public class CommandInfo {
                 bundle.parse(cmdLine, syntaxBundle);
             }
         } catch (InstantiationException ex) {
-            throw new ShellException("Command class cannot be instantiated", ex);
+            throw new ShellInvocationException("Command class cannot be instantiated", ex);
         } catch (IllegalAccessException ex) {
-            throw new ShellException("Command class cannot be instantiated", ex);
+            throw new ShellInvocationException("Command class cannot be instantiated", ex);
         }
     }
 }

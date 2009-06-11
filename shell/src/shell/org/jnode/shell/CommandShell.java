@@ -655,14 +655,14 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 return new CommandInfo(cls, cmd, syntaxBundle, argBundle);
             }
         } catch (ClassNotFoundException ex) {
-            throw new ShellException("Cannot load the command class for alias '" + cmd + "'", ex);
+            throw new ShellInvocationException("Cannot load the command class for alias '" + cmd + "'", ex);
         } catch (NoSuchAliasException ex) {
             try {
                 final ClassLoader cl = 
                     Thread.currentThread().getContextClassLoader();
                 return new CommandInfo(cl.loadClass(cmd), cmd, syntaxBundle, false);
             } catch (ClassNotFoundException ex2) {
-                throw new ShellException(
+                throw new ShellInvocationException(
                         "Cannot find an alias or load a command class for '" + cmd + "'", ex);
             }
         }
@@ -900,7 +900,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             }
             return interpreter.interpret(this, file, alias, args);
         } catch (IOException ex) {
-            throw new ShellException("Cannot open command file: " + ex.getMessage(), ex);
+            throw new ShellInvocationException("Cannot open command file: " + ex.getMessage(), ex);
         } finally {
             setHistoryEnabled(enabled);
         }
@@ -918,7 +918,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         try {
             InputStream input = getClass().getResourceAsStream(resourceName);
             if (input == null) {
-                throw new ShellException("Cannot find resource '" + resourceName + "'");
+                throw new ShellInvocationException("Cannot find resource '" + resourceName + "'");
             }
             CommandInterpreter interpreter = createInterpreter(new InputStreamReader(input));
             Reader reader = new InputStreamReader(getClass().getResourceAsStream(resourceName));

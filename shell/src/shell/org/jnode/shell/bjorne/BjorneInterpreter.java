@@ -51,6 +51,7 @@ import org.jnode.shell.Completable;
 import org.jnode.shell.IncompleteCommandException;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
+import org.jnode.shell.ShellInvocationException;
 import org.jnode.shell.ShellSyntaxException;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandOutput;
@@ -288,7 +289,7 @@ public class BjorneInterpreter implements CommandInterpreter {
             }
             return rc;
         } catch (IOException ex) {
-            throw new ShellException("Problem reading command file: " + ex.getMessage(), ex);
+            throw new ShellInvocationException("Problem reading command file: " + ex.getMessage(), ex);
         } finally {
             if (reader != null) {
                 try {
@@ -305,7 +306,7 @@ public class BjorneInterpreter implements CommandInterpreter {
         try {
             return interpret(shell, new FileReader(file), alias, args);
         } catch (FileNotFoundException ex) {
-            throw new ShellException("Problem reading command file: " + ex.getMessage(), ex);
+            throw new ShellInvocationException("Problem reading command file: " + ex.getMessage(), ex);
         }
     }
     

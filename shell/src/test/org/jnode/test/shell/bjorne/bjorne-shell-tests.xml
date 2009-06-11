@@ -902,4 +902,14 @@ there
 0
 </file>
     </testSpec>
+    <testSpec title="unknown command" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                foo
+                echo hi 
+        </script>
+        <output >hi
+</output>
+        <error>Cannot find an alias or load a command class for 'foo'
+</error>
+    </testSpec>
 </testSet>
