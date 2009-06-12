@@ -26,7 +26,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jtestserver.client.process.kvm.CommandLineBuilder;
 
 /**
  * @author Fabien DUMINY (fduminy@jnode.org)
