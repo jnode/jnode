@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jtestserver.client.process.VmManager;
+import org.jtestserver.client.utils.CommandLineBuilder;
 import org.jtestserver.client.utils.ProcessRunner;
 import org.jtestserver.client.utils.SystemUtils;
 import org.jtestserver.client.utils.SystemUtils.ProcessStatus;
