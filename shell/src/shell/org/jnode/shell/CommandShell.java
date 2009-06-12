@@ -79,6 +79,7 @@ import org.jnode.shell.syntax.SyntaxManager;
 import org.jnode.shell.syntax.CommandSyntaxException.Context;
 import org.jnode.util.ReaderInputStream;
 import org.jnode.util.SystemInputStream;
+import org.jnode.vm.VmExit;
 import org.jnode.vm.VmSystem;
 
 /**
@@ -370,7 +371,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             }
         });
 
-        while (!isExited()) {
+        while (!isExited() && !VmSystem.isShuttingDown()) {
             String input = null;
             try {
                 clearEof();
@@ -416,10 +417,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                         }
                     } while (!done);
                 }
-
-                if (VmSystem.isShuttingDown()) {
-                    exited = true;
-                }
+            } catch (VmExit ex) {
+                // This should only happen if the interpreter wants the shell to
+                // exit.  The interpreter will typically intercept any VmExits 
+                // resulting from commands calling AbstractCommand.exit(int).
+                exit();
             } catch (Throwable ex) {
                 errPW.println("Uncaught exception while processing command(s): "
                         + ex.getMessage());

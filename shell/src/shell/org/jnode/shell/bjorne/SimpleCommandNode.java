@@ -30,6 +30,7 @@ import org.jnode.shell.ShellInvocationException;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandIOHolder;
+import org.jnode.vm.VmExit;
 
 public class SimpleCommandNode extends CommandNode implements BjorneCompletable {
 
@@ -111,6 +112,12 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
                 } else {
                     rc = childContext.execute(command, ios, builtin);
                 }
+            }
+        } catch (BjorneControlException ex) {
+            if (ex.getControl() == BjorneInterpreter.BRANCH_EXIT) {
+                throw new VmExit(ex.getCount());
+            } else {
+                throw ex;
             }
         } catch (ShellInvocationException ex) {
             context.getShell().resolvePrintStream(context.getIO(2)).println(ex.getMessage());
