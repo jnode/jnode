@@ -55,6 +55,7 @@ import org.jnode.shell.ShellInvocationException;
 import org.jnode.shell.ShellSyntaxException;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandOutput;
+import org.jnode.vm.VmExit;
 
 /**
  * This is the JNode implementation of the Bourne Shell language.  The long term
@@ -171,9 +172,7 @@ public class BjorneInterpreter implements CommandInterpreter {
         } catch (BjorneControlException ex) {
             switch (ex.getControl()) {
                 case BjorneInterpreter.BRANCH_EXIT:
-                    // FIXME this is not right.  If 'exit' is run in an interactive
-                    // shell, the shell needs to exit.
-                    return ex.getCount();
+                    throw new VmExit(ex.getCount());
                 case BjorneInterpreter.BRANCH_BREAK:
                     throw new ShellSyntaxException(
                             "'break' has been executed in an inappropriate context");
@@ -284,6 +283,8 @@ public class BjorneInterpreter implements CommandInterpreter {
                             throw ex;
                         }
                         line = line + "\n" + continuation;
+                    } catch (VmExit ex) {
+                        return ex.getStatus();
                     }
                 } while (!done);
             }
