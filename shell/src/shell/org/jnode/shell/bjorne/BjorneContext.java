@@ -264,13 +264,13 @@ public class BjorneContext {
      * @param name the name of the variable to be set
      * @param value a non-null value for the variable
      */
-    public void setVariable(String name, String value) {
+    protected void setVariable(String name, String value) {
         value.length(); // Check that the value is non-null.
         VariableSlot var = variables.get(name);
         if (var == null) {
             variables.put(name, new VariableSlot(name, value, false));
-        } else {
-            var.value = value;
+        } else if (!var.isReadOnly()) {
+            var.setValue(value);
         }
     }
 
@@ -289,8 +289,24 @@ public class BjorneContext {
      * 
      * @param name the name of the variable to be unset
      */
-    void unsetVariableValue(String name) {
-        variables.remove(name);
+    void unsetVariable(String name) {
+        if (!variables.get(name).isReadOnly()) {
+            variables.remove(name);
+        }
+    }
+
+    /**
+     * This method implements 'readonly NAME'
+     * 
+     * @param name the name of the variable to be marked as readonly
+     */
+    void setVariableReadonly(String name, boolean readonly) {
+        VariableSlot var = variables.get(name);
+        if (var == null) {
+            var = new VariableSlot(name, "", false);
+            variables.put(name, var);
+        }
+        var.setReadOnly(readonly);
     }
 
     /**
@@ -298,14 +314,14 @@ public class BjorneContext {
      * 
      * @param name the name of the variable to be exported / unexported
      */
-    void setExported(String name, boolean exported) {
+    void setVariableExported(String name, boolean exported) {
         VariableSlot var = variables.get(name);
         if (var == null) {
             if (exported) {
                 variables.put(name, new VariableSlot(name, "", exported));
             }
         } else {
-            var.exported = exported;
+            var.setExported(exported);
         }
     }
     
@@ -921,7 +937,7 @@ public class BjorneContext {
     private String variable(String parameter) throws ShellSyntaxException {
         if (BjorneToken.isName(parameter)) {
             VariableSlot var = variables.get(parameter);
-            return (var != null) ? var.value : null;
+            return (var != null) ? var.getValue() : null;
         } else {
             try {
                 int argNo = Integer.parseInt(parameter);
@@ -1003,8 +1019,8 @@ public class BjorneContext {
     private Map<String, String> buildEnvFromExports() {
         HashMap<String, String> map = new HashMap<String, String>(variables.size());
         for (VariableSlot var : variables.values()) {
-            if (var.exported) {
-                map.put(var.name, var.value);
+            if (var.isExported()) {
+                map.put(var.getName(), var.getValue());
             }
         }
         return Collections.unmodifiableMap(map);

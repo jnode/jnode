@@ -31,10 +31,29 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.PathnamePattern;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.bjorne.BjorneContext;
+import org.jnode.shell.bjorne.BjorneInterpreter;
 import org.jnode.shell.bjorne.BjorneToken;
 import org.jnode.shell.io.CommandIOHolder;
 
+/**
+ * Some unit tests for the BjorneContext class, focusing on the expansion and word-splitting
+ * methods.
+ * 
+ * @author crawley@jnode.org
+ */
 public class BjorneContextTest extends TestCase {
+    
+    // This class simply allows us to call the setVariable method directly
+    private static class TestBjorneContext extends BjorneContext {
+        TestBjorneContext(BjorneInterpreter interpreter, CommandIOHolder[] holders) {
+            super(interpreter, holders);
+        }
+        
+        @Override
+        protected void setVariable(String name, String value) {
+            super.setVariable(name, value);
+        }
+    }
 
     public void testContext() {
         new BjorneContext(null, null);
@@ -96,7 +115,7 @@ public class BjorneContextTest extends TestCase {
     }
 
     public void testExpand10() throws ShellException {
-        BjorneContext context = new BjorneContext(null, null);
+        TestBjorneContext context = new TestBjorneContext(null, null);
         context.setVariable("A", "A");
         List<BjorneToken> expansion = context.expandAndSplit(
                 new BjorneToken("$A"));
@@ -104,7 +123,7 @@ public class BjorneContextTest extends TestCase {
     }
 
     public void testExpand11() throws ShellException {
-        BjorneContext context = new BjorneContext(null, null);
+        TestBjorneContext context = new TestBjorneContext(null, null);
         context.setVariable("A", "A");
         List<BjorneToken> expansion = context.expandAndSplit(
                 new BjorneToken("\\$A"));
@@ -112,7 +131,7 @@ public class BjorneContextTest extends TestCase {
     }
 
     public void testExpand12() throws ShellException {
-        BjorneContext context = new BjorneContext(null, null);
+        TestBjorneContext context = new TestBjorneContext(null, null);
         context.setVariable("A", "A");
         List<BjorneToken> expansion = context.expandAndSplit(
                 new BjorneToken("\"$A\""));
@@ -120,7 +139,7 @@ public class BjorneContextTest extends TestCase {
     }
 
     public void testExpand13() throws ShellException {
-        BjorneContext context = new BjorneContext(null, null);
+        TestBjorneContext context = new TestBjorneContext(null, null);
         context.setVariable("A", "A");
         List<BjorneToken> expansion = context.expandAndSplit(
                 new BjorneToken("'$A'"));
@@ -128,7 +147,7 @@ public class BjorneContextTest extends TestCase {
     }
 
     public void testExpand14() throws ShellException {
-        BjorneContext parentContext = new BjorneContext(null, new CommandIOHolder[0]);
+        TestBjorneContext parentContext = new TestBjorneContext(null, new CommandIOHolder[0]);
         parentContext.setVariable("A", "A");
         BjorneContext context = new BjorneContext(parentContext);
         List<BjorneToken> expansion = context.expandAndSplit(

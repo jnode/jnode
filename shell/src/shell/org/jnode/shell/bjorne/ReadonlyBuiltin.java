@@ -28,27 +28,27 @@ import org.jnode.shell.syntax.RepeatSyntax;
 import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
- * This class implements the 'export' built-in.
+ * This class implements the 'readonly' built-in.
  * 
  * @author crawley@jnode.org
  */
-final class ExportBuiltin extends BjorneBuiltin {
+final class ReadonlyBuiltin extends BjorneBuiltin {
     private static final SyntaxBundle SYNTAX = 
-        new SyntaxBundle("export", new RepeatSyntax(new ArgumentSyntax("export")));
+        new SyntaxBundle("readonly", new RepeatSyntax(new ArgumentSyntax("readonly")));
     
     static final Factory FACTORY = new Factory() {
         public BjorneBuiltinCommandInfo buildCommandInfo(BjorneContext context) {
-            return new BjorneBuiltinCommandInfo("export", SYNTAX, new ExportBuiltin(context), context);
+            return new BjorneBuiltinCommandInfo("readonly", SYNTAX, new ReadonlyBuiltin(context), context);
         }
     };
     
     private final AssignmentArgument argVariables; 
     
     
-    ExportBuiltin(BjorneContext context) {
-        super("Export shell variables to the environment");
+    ReadonlyBuiltin(BjorneContext context) {
+        super("Mark shell variables as readonly");
         argVariables = new AssignmentArgument(
-                "export", context, Argument.MANDATORY, "variables to be exported");
+                "readonly", context, Argument.MANDATORY, "variables to be marked as readonly");
         registerArguments(argVariables);
     }
 
@@ -62,19 +62,19 @@ final class ExportBuiltin extends BjorneBuiltin {
             for (String var : argVariables.getValues()) {
                 int pos = var.indexOf('=');
                 if (pos == -1) {
-                    pc.setVariableExported(var, true);
+                    pc.setVariableReadonly(var, true);
                 } else if (pos == 0) { 
-                    err.println("export: " + var + ": not a valid identifier");
+                    err.println("readonly: " + var + ": not a valid identifier");
                     errorCount++;
                 } else {
                     String name = var.substring(0, pos);
                     String value = var.substring(pos + 1);
                     if (!BjorneToken.isName(name)) {
-                        err.println("export: " + name + ": not a valid identifier");
+                        err.println("readonly: " + name + ": not a valid identifier");
                         errorCount++;
                     }
                     pc.setVariable(name, value);
-                    pc.setVariableExported(name, true);
+                    pc.setVariableReadonly(name, true);
                 }
             }
         }
