@@ -115,7 +115,17 @@ B -1-
 B -1-
 B -1-
 B -1-
-B -1-
+</output>
+    </testSpec>
+    <testSpec title="unset" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                A=1
+                echo A -${A}-
+                unset A
+                echo A -${A}-
+        </script>
+        <output>A -1-
+A --
 </output>
     </testSpec>
 </testSet>
