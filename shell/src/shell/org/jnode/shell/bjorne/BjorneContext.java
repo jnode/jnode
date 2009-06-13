@@ -275,13 +275,24 @@ public class BjorneContext {
     }
 
     /**
-     * Test if the variable is currently set here in this context.
+     * Test if the variable is set in this context.
      * 
      * @param name the name of the variable to be tested
      * @return <code>true</code> if the variable is set.
      */
     boolean isVariableSet(String name) {
         return variables.get(name) != null;
+    }
+
+    /**
+     * Test if the variable is readonly in this context.
+     * 
+     * @param name the name of the variable to be tested
+     * @return <code>true</code> if the variable is set.
+     */
+    boolean isVariableReadonly(String name) {
+        VariableSlot var = variables.get(name);
+        return var != null && var.isReadOnly();
     }
 
     /**
