@@ -900,7 +900,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             if (alias == null) {
                 alias = file.getAbsolutePath();
             }
-            return interpreter.interpret(this, file, alias, args);
+            return interpreter.interpret(this, new FileReader(file), alias, args);
         } catch (IOException ex) {
             throw new ShellInvocationException("Cannot open command file: " + ex.getMessage(), ex);
         } finally {

@@ -21,9 +21,6 @@
 package org.jnode.shell;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -145,24 +142,6 @@ public class DefaultInterpreter implements CommandInterpreter {
     @Override
     public boolean supportsMultilineCommands() {
         return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * The default interpreter and its subtypes treat a command script as a sequence of commands. 
-     * Commands are expected to consist of exactly one line.  Any line whose first non-whitespace 
-     * character is '#' will be ignored.  Command line arguments from the script are not supported,
-     * and will result in a {@link ShellException} being thrown.
-     */
-    @Override
-    public int interpret(CommandShell shell, File file, String alias, String[] args) 
-        throws ShellException {
-        try {
-            return interpret(shell, new FileReader(file), alias, args);
-        } catch (FileNotFoundException ex) {
-            throw new ShellInvocationException("Problem reading command file: " + ex.getMessage(), ex);
-        }
     }
     
     @Override
