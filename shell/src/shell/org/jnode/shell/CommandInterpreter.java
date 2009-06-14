@@ -20,7 +20,6 @@
  
 package org.jnode.shell;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.io.Reader;
 
@@ -51,20 +50,6 @@ public interface CommandInterpreter {
      * @throws ShellException
      */
     int interpret(CommandShell shell, String line) throws ShellException;
-    
-    /**
-     * Parse and execute a command file, returning the resulting return code.
-     * 
-     * @param shell the CommandShell that provides low-level command invocation,
-     *        command history and so on.
-     * @param file the file to be interpreted
-     * @param alias this will supply the script's notional command name to the interpreter.
-     * @param args command line arguments to be passed to the script.  If this parameter 
-     * is {@code null}, no arguments are passed.
-     * @return the return code.
-     * @throws ShellException
-     */
-    int interpret(CommandShell shell, File file, String alias, String[] args) throws ShellException;
 
     /**
      * Parse and execute a command file, returning the resulting return code.

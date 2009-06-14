@@ -31,9 +31,6 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSAND;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSGREAT;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -301,15 +298,6 @@ public class BjorneInterpreter implements CommandInterpreter {
                     // ignore
                 }
             }
-        }
-    }
-
-    @Override
-    public int interpret(CommandShell shell, File file, String alias, String[] args) throws ShellException {
-        try {
-            return interpret(shell, new FileReader(file), alias, args);
-        } catch (FileNotFoundException ex) {
-            throw new ShellInvocationException("Problem reading command file: " + ex.getMessage(), ex);
         }
     }
     
