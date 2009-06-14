@@ -20,10 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package org.jtestserver.client.utils;
 
 import java.io.PrintWriter;
-
 import java.io.StringWriter;
 import java.util.logging.Formatter;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 /**
