@@ -36,7 +36,7 @@ import org.jtestserver.client.utils.SystemUtils.ProcessStatus;
  * @author Fabien DUMINY (fduminy@jnode.org)
  *
  */
-public class KVM implements VmManager {
+public class KVM implements VmManager<KVMConfig> {
     /**
      * Option used to specify the actual operating system to run in KVM.
      */
@@ -50,28 +50,12 @@ public class KVM implements VmManager {
     private final ProcessRunner runner = new ProcessRunner();
     
     /**
-     * Configuration used to build the command line that will launch KVM.
-     */
-    private final KVMConfig config;
-    
-    private final String startCommandLine;
-    
-    /**
-     * 
-     * @param config Configuration used to build the command line that will launch KVM.
-     */
-    public KVM(KVMConfig config) {
-        this.config = config;
-        this.startCommandLine = createStartCommandLine().toString();
-        this.config.setVmName(startCommandLine);
-    }
-    
-    /**
      * {@inheritDoc}
      * The implementation is launching {@code ps} through a command line.
      */
     @Override
-    public List<String> getRunningVMs() throws IOException {
+    public List<String> getRunningVMs(KVMConfig config) throws IOException {
+        String startCommandLine = createStartCommandLine(config).toString();        
         List<ProcessStatus> processes = SystemUtils.getInstance().getProcessStatus(KVM_COMMAND);
         List<String> runningVMs = new ArrayList<String>(processes.size());
         for (ProcessStatus ps : processes) {
@@ -87,8 +71,10 @@ public class KVM implements VmManager {
      * The implementation is launching {@code kvm} through a command line.  
      */
     @Override
-    public boolean start(String vm) throws IOException {
-        return runner.execute(createStartCommandLine());
+    public boolean start(KVMConfig config) throws IOException {
+        CommandLineBuilder cmdLine = createStartCommandLine(config);
+        config.setVmName(cmdLine.toString());
+        return runner.execute(cmdLine);
     }
 
     /**
@@ -96,10 +82,10 @@ public class KVM implements VmManager {
      * The implementation is launching {@code kill} through a command line.
      */
     @Override
-    public boolean stop(String vm) throws IOException {
+    public boolean stop(KVMConfig config) throws IOException {
         boolean success = true;
         for (ProcessStatus ps : SystemUtils.getInstance().getProcessStatus(KVM_COMMAND)) {
-            if (ps.getArguments().equals(vm)) {
+            if (ps.getArguments().equals(createStartCommandLine(config).toString())) {
                 success &= SystemUtils.getInstance().killProcess(ps.getIdentifier());
             }
         }
@@ -107,7 +93,7 @@ public class KVM implements VmManager {
         return success;
     }
     
-    private CommandLineBuilder createStartCommandLine() {
+    private CommandLineBuilder createStartCommandLine(KVMConfig config) {
         CommandLineBuilder cmdLine = new CommandLineBuilder(KVM_COMMAND); 
         cmdLine.append("-m").append(config.getMemory());
         cmdLine.append(OPTION_CDROM).append(config.getCdrom().getAbsolutePath());

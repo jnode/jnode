@@ -30,14 +30,13 @@ import org.jtestserver.client.process.vmware.VMwareConfig;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestVMware extends TestVmManager {
+public class TestVMware extends TestVmManager<VMwareConfig> {
     @Before
     public void setUp() throws IOException {
         Config config = new CustomConfigReader(ConfigReader.VMWARE_TYPE).readConfig();
-        VMwareConfig vmwareConfig = (VMwareConfig) config.getVMConfig();
+        this.config = (VMwareConfig) config.getVMConfig();
 
-        vmManager = new VMware(vmwareConfig);
-        vmName = vmwareConfig.getVmName();
+        vmManager = new VMware((VMwareConfig) this.config);
     }
 
     @Test(expected = IOException.class)
@@ -57,6 +56,6 @@ public class TestVMware extends TestVmManager {
         VMwareConfig vmwareConfig = (VMwareConfig) config.getVMConfig();
 
         VMware vmware = new VMware(vmwareConfig);
-        vmware.getRunningVMs();
+        vmware.getRunningVMs(vmwareConfig);
     }
 }

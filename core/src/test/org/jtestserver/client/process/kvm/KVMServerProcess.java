@@ -48,7 +48,7 @@ public class KVMServerProcess implements ServerProcess {
      */
     public KVMServerProcess(KVMConfig config) {
         this.config = config;
-        kvm = new KVM(config);
+        kvm = new KVM();
     }
     
     /**
@@ -56,7 +56,7 @@ public class KVMServerProcess implements ServerProcess {
      */
     @Override
     public synchronized void start() throws IOException {
-        kvm.start(config.getVmName());
+        kvm.start(config);
     }
     
     /**
@@ -64,7 +64,7 @@ public class KVMServerProcess implements ServerProcess {
      */
     @Override
     public synchronized void stop() throws IOException {        
-        kvm.stop(config.getVmName());        
+        kvm.stop(config);        
     }
 
     /**
@@ -73,7 +73,7 @@ public class KVMServerProcess implements ServerProcess {
     @Override
     public boolean isAlive() throws IOException {
         boolean isRunning = false;
-        for (String vm : kvm.getRunningVMs()) {
+        for (String vm : kvm.getRunningVMs(config)) {
             if (config.getVmName().equals(vm)) {
                 isRunning = true;
                 break;

@@ -34,7 +34,7 @@ import org.jtestserver.client.utils.PipeInputStream.Listener;
  * @author Fabien DUMINY (fduminy@jnode.org)
  *
  */
-public class VMware implements VmManager {
+public class VMware implements VmManager<VMwareConfig> {
     /**
      * The {@link ProcessRunner} used to manage the new VMware process.
      */
@@ -60,8 +60,8 @@ public class VMware implements VmManager {
      * The implementation is using the command line to communicate with the VMware server.
      */
     @Override
-    public boolean start(String vm) throws IOException {
-        return executeCommand("start", vm);
+    public boolean start(VMwareConfig config) throws IOException {
+        return executeCommand("start", config.getVmName());
     }
     
     /**
@@ -69,8 +69,8 @@ public class VMware implements VmManager {
      * The implementation is using the command line to communicate with the VMware server.
      */
     @Override
-    public boolean stop(String vm) throws IOException {        
-        return executeCommand("stop", vm);
+    public boolean stop(VMwareConfig config) throws IOException {        
+        return executeCommand("stop", config.getVmName());
     }
 
     /**
@@ -78,7 +78,7 @@ public class VMware implements VmManager {
      * The implementation is using the command line to communicate with the VMware server.
      */
     @Override
-    public List<String> getRunningVMs() throws IOException {
+    public List<String> getRunningVMs(VMwareConfig config) throws IOException {
         final List<String> runningVMs = new ArrayList<String>();
         boolean success  = executeCommand(new PipeInputStream.Listener() {
 

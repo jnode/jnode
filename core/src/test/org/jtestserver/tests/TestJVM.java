@@ -27,12 +27,11 @@ import org.jtestserver.client.process.jvm.JVM;
 import org.jtestserver.client.process.jvm.JVMConfig;
 import org.junit.Before;
 
-public class TestJVM extends TestVmManager {
+public class TestJVM extends TestVmManager<JVMConfig> {
     @Before
     public void setUp() throws IOException {
         Config config = new CustomConfigReader(ConfigReader.JVM_TYPE).read(AllTests.CONFIG_DIRECTORY);
-        JVMConfig jvmConfig = (JVMConfig) config.getVMConfig();
-        vmManager = new JVM(jvmConfig);
-        vmName  = jvmConfig.getVmName();
+        this.config = (JVMConfig) config.getVMConfig();
+        vmManager = new JVM();
     }
 }
