@@ -21,19 +21,17 @@ package org.jtestserver.tests;
 
 import java.io.IOException;
 
-
 import org.jtestserver.client.Config;
 import org.jtestserver.client.ConfigReader;
 import org.jtestserver.client.process.kvm.KVM;
 import org.jtestserver.client.process.kvm.KVMConfig;
 import org.junit.Before;
 
-public class TestKVM extends TestVmManager {
+public class TestKVM extends TestVmManager<KVMConfig> {
     @Before
     public void setUp() throws IOException {
         Config config = new CustomConfigReader(ConfigReader.KVM_TYPE).read(AllTests.CONFIG_DIRECTORY);
-        KVMConfig kvmConfig = (KVMConfig) config.getVMConfig();
-        vmManager = new KVM(kvmConfig);
-        vmName  = kvmConfig.getVmName();
+        this.config = (KVMConfig) config.getVMConfig();
+        vmManager = new KVM();
     }
 }

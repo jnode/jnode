@@ -29,29 +29,31 @@ import java.util.List;
  * @author Fabien DUMINY (fduminy@jnode.org)
  *
  */
-public interface VmManager {
+public interface VmManager<T extends VMConfig> {
     /**
      * Starts the VM given by its name. 
-     * @param vm name of the VM to start
+     * @param config the configuration parameters for the VM.
      * @return true on success
      * @throws IOException
      */
-    boolean start(String vm) throws IOException;
+    boolean start(T config) throws IOException;
     
     /**
      * Stops the VM given by its name.
      * 
      * @param vm name of the vm to stop
+     * @param config the configuration parameters for the VM.
      * @return true on success
      * @throws IOException
      */
-    boolean stop(String vm) throws IOException;
+    boolean stop(T config) throws IOException;
 
     /**
      * Get the names of the currently running VMs.
      * 
+     * @param config the configuration parameters for the VM.
      * @return list of VM names
      * @throws IOException
      */
-    List<String> getRunningVMs() throws IOException;
+    List<String> getRunningVMs(T config) throws IOException;
 }

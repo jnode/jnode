@@ -36,26 +36,17 @@ import org.jtestserver.client.utils.SystemUtils.ProcessStatus;
  * @author Fabien DUMINY (fduminy@jnode.org)
  *
  */
-public class JVM implements VmManager {
+public class JVM implements VmManager<JVMConfig> {
     private static final String JAVA_COMMAND = "java";
     
     private final ProcessRunner runner = new ProcessRunner();
     
-    private final JVMConfig config;
-    
-    private final String startCommandLine;
-    
-    public JVM(JVMConfig config) {
-        this.config = config;
-        this.startCommandLine = createStartCommandLine().toString();
-        this.config.setVmName(startCommandLine);
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<String> getRunningVMs() throws IOException {
+    public List<String> getRunningVMs(JVMConfig config) throws IOException {
+        String startCommandLine = createStartCommandLine(config).toString();        
         List<ProcessStatus> processes = SystemUtils.getInstance().getProcessStatus(JAVA_COMMAND);
         List<String> runningVMs = new ArrayList<String>(processes.size());
         for (ProcessStatus ps : processes) {
@@ -70,20 +61,22 @@ public class JVM implements VmManager {
      * {@inheritDoc}
      */
     @Override
-    public boolean start(String vm) throws IOException {
-        
+    public boolean start(JVMConfig config) throws IOException {        
         //runner.setWorkDir(new File(classesDir));
-        return runner.execute(createStartCommandLine());
+        
+        CommandLineBuilder cmdLine = createStartCommandLine(config);
+        config.setVmName(cmdLine.toString());
+        return runner.execute(cmdLine);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean stop(String vm) throws IOException {
+    public boolean stop(JVMConfig config) throws IOException {
         boolean success = true;
         for (ProcessStatus ps : SystemUtils.getInstance().getProcessStatus(JAVA_COMMAND)) {
-            if (ps.getArguments().equals(vm)) {
+            if (ps.getArguments().equals(createStartCommandLine(config).toString())) {
                 success &= SystemUtils.getInstance().killProcess(ps.getIdentifier());
             }
         }
@@ -91,7 +84,7 @@ public class JVM implements VmManager {
         return success;
     }
     
-    private CommandLineBuilder createStartCommandLine() {
+    private CommandLineBuilder createStartCommandLine(JVMConfig config) {
         String java = new File(config.getJavaHome(), "bin/" + JAVA_COMMAND).getAbsolutePath();
         CommandLineBuilder cmdLine = new CommandLineBuilder(java);
         

@@ -45,7 +45,7 @@ public class JVMServerProcess implements ServerProcess {
      */
     public JVMServerProcess(JVMConfig jvmConfig) {
         this.config = jvmConfig;
-        jvm = new JVM(config);
+        jvm = new JVM();
     }
 
     
@@ -54,7 +54,7 @@ public class JVMServerProcess implements ServerProcess {
      */
     @Override
     public synchronized void start() throws IOException {
-        jvm.start(config.getVmName());
+        jvm.start(config);
     }
     
     /**
@@ -62,7 +62,7 @@ public class JVMServerProcess implements ServerProcess {
      */
     @Override
     public synchronized void stop() throws IOException {        
-        jvm.stop(config.getVmName());        
+        jvm.stop(config);        
     }
 
     /**
@@ -71,7 +71,7 @@ public class JVMServerProcess implements ServerProcess {
     @Override
     public boolean isAlive() throws IOException {
         boolean isRunning = false;
-        for (String vm : jvm.getRunningVMs()) {
+        for (String vm : jvm.getRunningVMs(config)) {
             if (config.getVmName().equals(vm)) {
                 isRunning = true;
                 break;

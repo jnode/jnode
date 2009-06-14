@@ -55,7 +55,7 @@ public class VMwareServerProcess implements ServerProcess {
      */
     @Override
     public synchronized void start() throws IOException {
-        vmware.start(config.getVmName());
+        vmware.start(config);
     }
     
     /**
@@ -63,7 +63,7 @@ public class VMwareServerProcess implements ServerProcess {
      */
     @Override
     public synchronized void stop() throws IOException {        
-        vmware.stop(config.getVmName());        
+        vmware.stop(config);        
     }
 
     /**
@@ -72,7 +72,7 @@ public class VMwareServerProcess implements ServerProcess {
     @Override
     public boolean isAlive() throws IOException {
         boolean isRunning = false;
-        for (String vm : vmware.getRunningVMs()) {
+        for (String vm : vmware.getRunningVMs(config)) {
             if (config.getVmName().equals(vm)) {
                 isRunning = true;
                 break;
