@@ -100,6 +100,14 @@ public class JVMConfig implements VMConfig {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getVmType() {
+        return "JVM";
+    }
+
+    /**
      * @param vmName
      */
     void setVmName(String vmName) {

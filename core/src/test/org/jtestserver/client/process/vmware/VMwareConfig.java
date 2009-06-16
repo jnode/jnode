@@ -100,7 +100,15 @@ public class VMwareConfig implements VMConfig {
     public String getVmName() {
         return vmName;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getVmType() {
+        return "VMware";
+    }
+
     /**
      * {@inheritDoc}
      */
