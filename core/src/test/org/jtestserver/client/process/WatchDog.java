@@ -18,30 +18,29 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-package org.jtestserver.client.utils;
+package org.jtestserver.client.process;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jtestserver.client.Config;
-import org.jtestserver.client.process.ServerProcess;
 
 /**
- * That abstract utility class is used to watch a {@link ServerProcess} and 
- * check regularly that it is alive. Users have to implement the abstract 
- * method {@link #processDead()}, which is called when the WatchDog has detected
- *  that the process is not alive.
+ * That utility class is used to watch a list of {@link ServerProcess} and 
+ * check regularly that they are alive.
  * @author Fabien DUMINY (fduminy@jnode.org)
  *
  */
-public abstract class WatchDog extends Thread {
+public class WatchDog extends Thread {
     private static final Logger LOGGER = Logger.getLogger(WatchDog.class.getName());
         
     /**
-     * The {@link ServerProcess} to watch.
+     * The list of {@link ServerProcess} to watch.
      */
-    private final ServerProcess process;
+    private final List<ServerProcess> processes;
     
     /**
      * Configuration of the WatchDog.
@@ -59,13 +58,24 @@ public abstract class WatchDog extends Thread {
      * @param process to watch.
      * @param config
      */
-    public WatchDog(ServerProcess process, Config config) {
-        this.process = process;
+    public WatchDog(Config config) {
+        processes = new Vector<ServerProcess>();
         this.config = config;
         setDaemon(true);
         start();
     }
 
+    public void watch(ServerProcess process) {
+        processes.add(process);
+    }
+
+    /**
+     * @param process
+     */
+    public void unwatch(ServerProcess process) {
+        processes.remove(process);
+    }
+    
     /**
      * Start watching the {@link ServerProcess}
      */
@@ -87,23 +97,35 @@ public abstract class WatchDog extends Thread {
     public void run() {
         while (true) {
             if (watch) {
-                while (processIsAlive()) {
-                    goSleep();
+                for (ServerProcess process : processes) {
+                    if (!processIsAlive(process)) {
+                        if (watch) {
+                            processDead(process);
+                        }
+                    }
+                    
+                    if (!watch) {
+                        break;
+                    }
                 }
-                
-                if (watch) {
-                    processDead();
-                }
-            } else {
-                goSleep();
             }
+            
+            goSleep();
         }
     }
     
     /**
-     * Callback method used to notify that the watched process is dead.
+     * Callback method used to notify that a process is dead.
+     * @param process The {@link ServerProcess} that just died.
      */
-    protected abstract void processDead();
+    protected void processDead(ServerProcess process) {
+        LOGGER.warning("process is dead. restarting it.");
+        try {
+            process.start();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "error while restarting", e);
+        }        
+    }
     
     /**
      * Sleep for the amount of time specified in the configuration.
@@ -116,7 +138,12 @@ public abstract class WatchDog extends Thread {
         }
     }
     
-    private boolean processIsAlive() {
+    /**
+     * Checks if the given process is alive.
+     * @param process The process to check.
+     * @return true if the process is alive.
+     */
+    private boolean processIsAlive(ServerProcess process) {
         try {
             return process.isAlive();
         } catch (IOException e) {

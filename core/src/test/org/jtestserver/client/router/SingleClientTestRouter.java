@@ -26,6 +26,7 @@ import java.util.Deque;
 
 import org.jtestserver.client.Config;
 import org.jtestserver.client.TestDriverInstance;
+import org.jtestserver.client.process.WatchDog;
 import org.jtestserver.client.process.ServerProcess;
 import org.jtestserver.common.protocol.Client;
 import org.jtestserver.common.protocol.ProtocolException;
@@ -38,9 +39,11 @@ public class SingleClientTestRouter implements TestRouter {
     private final Deque<String> tests = new ArrayDeque<String>();
     
     private final TestDriverInstance instance;
+    private final WatchDog watchDog;
     
     public SingleClientTestRouter(Config config, Client<?, ?> client, ServerProcess process) {
-        instance = new TestDriverInstance(config, client, process);
+        watchDog = new WatchDog(config);
+        instance = new TestDriverInstance(config, client, process, watchDog);
     }
     
     /**
@@ -56,7 +59,8 @@ public class SingleClientTestRouter implements TestRouter {
      */
     @Override
     public void start() throws IOException, ProtocolException {
-        instance.startInstance();
+        instance.startInstance();        
+        watchDog.startWatching();
     }
     
     /**
@@ -64,6 +68,7 @@ public class SingleClientTestRouter implements TestRouter {
      */
     @Override
     public void stop() throws IOException, ProtocolException {
+        watchDog.stopWatching();
         instance.stopInstance();
     }
 

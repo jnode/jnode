@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 
 import org.jtestserver.client.Config;
 import org.jtestserver.client.TestDriverInstance;
+import org.jtestserver.client.process.WatchDog;
 import org.jtestserver.client.process.ServerProcess;
 import org.jtestserver.common.protocol.Client;
 import org.jtestserver.common.protocol.ProtocolException;
@@ -52,12 +53,14 @@ public class MultipleClientTestRouter implements TestRouter {
     private final AtomicInteger numberOfTests = new AtomicInteger(0);
     private final CompletionService<TestRouterResult> completionService;
     private final ExecutorService executorService;
-    
+    private final WatchDog watchDog;
+        
     public MultipleClientTestRouter(Config config, Client<?, ?> client, ServerProcess process) {
+        watchDog = new WatchDog(config);
         int nbInstances = 10;
         instances = new ArrayList<TestDriverInstance>(nbInstances);
         for (int i = 0; i < nbInstances; i++) {
-            instances.add(new TestDriverInstance(config, client, process));
+            instances.add(new TestDriverInstance(config, client, process, watchDog));
         }
         
         executorService = Executors.newFixedThreadPool(instances.size());
