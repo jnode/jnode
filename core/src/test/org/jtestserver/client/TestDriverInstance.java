@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jtestserver.client.process.WatchDog;
 import org.jtestserver.client.process.ServerProcess;
-import org.jtestserver.client.utils.WatchDog;
 import org.jtestserver.common.protocol.Client;
 import org.jtestserver.common.protocol.ProtocolException;
 import org.jtestserver.common.protocol.TimeoutException;
@@ -39,31 +39,20 @@ public class TestDriverInstance {
     private final ServerProcess process;
     private final WatchDog watchDog;
     
-    public TestDriverInstance(Config config, Client<?, ?> client, ServerProcess process) {
+    public TestDriverInstance(Config config, Client<?, ?> client, ServerProcess process, WatchDog watchDog) {
         this.client = new DefaultTestClient(client);
         this.process = process;
-        watchDog = new WatchDog(process, config) {
-
-            @Override
-            protected void processDead() {
-                LOGGER.warning("process is dead. restarting it.");
-                try {
-                    TestDriverInstance.this.process.start();
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, "error while restarting", e);
-                }
-            }
-        };
+        this.watchDog = watchDog; 
     }
     
     public void startInstance() throws IOException, ProtocolException {
         process.start();
-        watchDog.startWatching();
+        watchDog.watch(process);
     }
 
     public void stopInstance() throws IOException, ProtocolException {
         // stop the watch dog before actually stop the process
-        watchDog.stopWatching();
+        watchDog.unwatch(process);
 
         LOGGER.info("killing running servers");        
         boolean killed = false;
