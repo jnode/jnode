@@ -44,10 +44,8 @@ import java.util.logging.Logger;
 
 import net.sourceforge.nanoxml.XMLParseException;
 
-import org.jtestserver.client.process.ServerProcess;
-import org.jtestserver.client.router.MultipleClientTestRouter;
-import org.jtestserver.client.router.TestRouter;
-import org.jtestserver.client.router.TestRouterResult;
+import org.jtestserver.client.TestManager.Result;
+import org.jtestserver.client.process.ServerProcessManager;
 import org.jtestserver.client.utils.ConfigurationUtils;
 import org.jtestserver.client.utils.TestListRW;
 import org.jtestserver.common.protocol.Client;
@@ -80,25 +78,25 @@ public class TestDriver {
         Client<?, ?> client = protocol.createClient(serverAddress, serverPort);
         client.setTimeout(config.getClientTimeout());
         
-        ServerProcess process = config.getVMConfig().createServerProcess();
-        return new TestDriver(config, client, process);
+        return new TestDriver(config, client);
     }
     
     private final Config config;
     private final TestListRW testListRW;
-    private final TestRouter instance;
-    private final String processClassName;
+    private final TestManager testManager;
+    private final ServerProcessManager processManager;
+    private final String vmType;
     
-    private TestDriver(Config config, Client<?, ?> client, ServerProcess process) {
+    private TestDriver(Config config, Client<?, ?> client) {
         this.config = config;
         testListRW = new TestListRW(config);
-        //instance = new SingleClientTestRouter(config, client, process);
-        instance = new MultipleClientTestRouter(config, client, process);
-        processClassName = process.getClass().getName();
+        testManager = new TestManager(client);
+        processManager = new ServerProcessManager(config);
+        vmType = config.getVMConfig().getVmType();
     }
     
     public void start() throws Exception {
-        instance.start();
+        processManager.startAll();
  
         try {
             Run latestRun = Run.getLatest(config);
@@ -111,13 +109,13 @@ public class TestDriver {
             if (latestRun == null) {
                 LOGGER.info("running list of all tests");
                 runResult = runTests(null, true, workingList, crashingList, newRun.getTimestampString());
-                runResult.setSystemProperty("jtestserver.process", processClassName);
+                runResult.setSystemProperty("jtestserver.process", vmType);
 
             } else {
                 LOGGER.info("running list of working tests");
                 File workingTests = latestRun.getWorkingTests();
                 runResult = runTests(workingTests, true, workingList, crashingList, newRun.getTimestampString());
-                runResult.setSystemProperty("jtestserver.process", processClassName);
+                runResult.setSystemProperty("jtestserver.process", vmType);
                 
                 LOGGER.info("running list of crashing tests");
                 File crashingTests = latestRun.getCrashingTests();
@@ -134,7 +132,7 @@ public class TestDriver {
             
             compareRuns(latestRun, newRun, runResult);
         } finally {        
-            instance.stop();
+            processManager.stopAll();
         }
     }
     
@@ -187,19 +185,19 @@ public class TestDriver {
             }
             
             LOGGER.info("adding test " + test);            
-            instance.addTest(test);
+            testManager.runTest(test);
         }
 
         RunResult result = new RunResult(timestamp);
         boolean firstTest = true;
-        while (instance.hasPendingTests()) {
+        while (testManager.hasPendingTests()) {
             boolean working = false;
             RunResult delta = null;
             String test = null;
             
             try {
                 LOGGER.info("getting a result");
-                TestRouterResult runnerResult = instance.getResult(); 
+                Result runnerResult = testManager.getResult(); 
                 delta = runnerResult.getRunResult();
                 test = runnerResult.getTest();
                 LOGGER.info("got a result for " + test);
