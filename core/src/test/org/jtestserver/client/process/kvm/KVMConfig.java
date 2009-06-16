@@ -116,6 +116,14 @@ public class KVMConfig implements VMConfig {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getVmType() {
+        return "KVM";
+    }
+    
+    /**
      * @param vmName name of the VM
      */
     void setVmName(String vmName) {

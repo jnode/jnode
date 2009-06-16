@@ -39,4 +39,9 @@ public interface VMConfig {
      * @return a new instance of {@link ServerProcess} for this VM.
      */
     ServerProcess createServerProcess();
+
+    /**
+     * @return The type of the VM.
+     */
+    String getVmType();
 }
