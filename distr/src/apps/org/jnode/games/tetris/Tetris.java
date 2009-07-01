@@ -377,13 +377,27 @@ public class Tetris extends JComponent implements KeyListener, MouseListener {
                         }
                         if (hasRoom(bi, x, y + 1)) {
                             y++;
-                            SwingUtilities.invokeLater(runRepaint);
+                            try {
+                                SwingUtilities.invokeAndWait(runRepaint);
+                            } catch (InterruptedException x) {
+                                //ignore
+                            }
                         } else {
                             newBlock();
                             if (!hasRoom(bi, x, y)) {
                                 setUp(false);
                                 end = true;
-                                SwingUtilities.invokeLater(runRepaint);
+                                try {
+                                    SwingUtilities.invokeAndWait(runRepaint);
+                                } catch (InterruptedException x) {
+                                    //ignore
+                                }
+                                continue;
+                            }
+                            try {
+                                SwingUtilities.invokeAndWait(runRepaint);
+                            } catch (InterruptedException x) {
+                                //ignore
                             }
                         }
                         after = System.currentTimeMillis();
@@ -439,6 +453,9 @@ public class Tetris extends JComponent implements KeyListener, MouseListener {
                     for (int j = 1; j < WIDTH_C + 1; j++) {
                         WORLD[j][i - k] = WORLD[j][i - k - 1];
                     }
+                }
+                for (int j = 1; j < WIDTH_C + 1; j++) {
+                    WORLD[j][1] = 0;
                 }
             }
         }
