@@ -468,6 +468,7 @@ public class ParseNode {
                     }
                 } else if (unprefixed) {
                     // search scopes for unprefixed name
+                    //FIXME searchedNode is null in this case !
                     while (searchedNode != null && searchedNode.parent != null) {
                         originNode = originNode.parent;
                         searchedNode = originNode.findName(name, opcode);
