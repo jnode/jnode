@@ -191,7 +191,9 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
 
     public Font createFont(int format, InputStream stream) throws FontFormatException, IOException {
         String name = fontTypeToProviderName.get(format);
-        if (name == null) throw new IllegalArgumentException("unknown format " + name);
+        if (name == null) {
+            throw new IllegalArgumentException("unknown format " + format);
+        }
 
         for (FontProvider<?> prv : getProviders()) {
             if (prv.getName().equals(name)) {
