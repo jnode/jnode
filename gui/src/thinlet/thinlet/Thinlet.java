@@ -4906,7 +4906,7 @@ public class Thinlet extends Container
 		if (item == null) { // first item
 			return get(component, ":comp");
 		}
-		else if ("tree" == classname) { // next tree node
+		else if ("tree".equalsIgnoreCase(classname)) { // next tree node
 			Object next = get(item, ":comp");
 			if ((next == null) || !getBoolean(item, "expanded", true)) { // no subnode or collapsed
 				while ((item != component) && ((next = get(item, ":next")) == null)) {
@@ -6229,7 +6229,7 @@ public class Thinlet extends Container
 	private boolean setString(Object component,
 			String key, String value, String defaultvalue) {
 		if (allI18n && (langResource != null) &&
-				((key == "text") || (key == "tooltip"))) {
+				(("text".equalsIgnoreCase(key)) || ("tooltip".equalsIgnoreCase(key)))) {
 			putProperty(component, "i18n." + key, null); // for I18N
 		}
 		return set(component, key, value); // use defaultvalue
