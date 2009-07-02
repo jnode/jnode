@@ -115,19 +115,19 @@ public abstract class AbstractDatagramSocketImpl extends DatagramSocketImpl impl
         }
         switch (option_id) {
             case IP_TOS:
-                return new Integer(tos);
+                return Integer.valueOf(tos);
             case SO_BINDADDR:
                 return laddr;
             case SO_BROADCAST:
-                return new Boolean(broadcast);
+                return Boolean.valueOf(broadcast);
             case SO_RCVBUF:
-                return new Integer(EthernetConstants.ETH_FRAME_LEN);
+                return Integer.valueOf(EthernetConstants.ETH_FRAME_LEN);
             case SO_SNDBUF:
-                return new Integer(EthernetConstants.ETH_FRAME_LEN);
+                return Integer.valueOf(EthernetConstants.ETH_FRAME_LEN);
             case SO_TRANSMIT_IF:
                 return (device == null) ? null : NetworkInterface.getByName(device.getId());
             case SO_TIMEOUT:
-                return new Integer(timeout);
+                return Integer.valueOf(timeout);
             default:
                 return doGetOption(option_id);
         }
