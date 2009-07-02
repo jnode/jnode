@@ -138,7 +138,7 @@ public class NFS2Client {
         try {
             port = portmap.getPort(NFS_PROGRAM, NFS_VERSION,
                             protocol == Protocol.UDP ? OncRpcProtocols.ONCRPC_UDP
-                                    : OncRpcProtocols.ONCRPC_UDP);
+                                    : OncRpcProtocols.ONCRPC_TCP);
         } finally {
             portmap.close();
         }
