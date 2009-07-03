@@ -339,20 +339,20 @@ GLABEL Q43org5jnode2vm6Unsafe23getCpuCycles2e2829J
 ; DO NOT USE THAT METHOD : it's bogus (especially for 64 bits CPU) and has not yet been tested       
 GLABEL Q43org5jnode2vm6Unsafe23callVbeFunction2e28Lorg2fvmmagic2funboxed2fAddress3bILorg2fvmmagic2funboxed2fAddress3b29I
 	push ADI
-	mov EAX,[ESP+(3*SLOT_SIZE)] ; function
-	mov EDI,[ESP+(2*SLOT_SIZE)] ; bufferPtr
+	mov eax,[esp+(3*SLOT_SIZE)] ; function
+	mov edi,[esp+(2*SLOT_SIZE)] ; bufferPtr
 	
 	; move higher 16 bits of EDI to ES
-	mov EBX, EDI
-	shr EBX, 16
+	mov ebx, edi
+	shr ebx, 16
 %ifdef BITS32	
-	mov ES, EBX
+	mov es, ebx
 ; TODO how should we do for 64 bits CPU ?	
 %endif
 	
 	; keep only lower 16 bits of EDI
-	and EDI, 0x0000FFFF
+	and edi, 0x0000FFFF
 	
-	call dword far [ESP+(4*SLOT_SIZE)] ; codePtr 
+	call dword [esp+(4*SLOT_SIZE)] ; codePtr 
 	pop ADI
 	ret SLOT_SIZE*3
