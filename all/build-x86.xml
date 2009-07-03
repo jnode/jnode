@@ -131,7 +131,7 @@
 		<taskdef name="asm" classname="org.jnode.ant.taskdefs.Asm" classpathref="cp-x86" />
 
 		<genconst destfile="${build.native.dir}/src/java.inc" bits="${jnode.bits}"
-                  classesURL="file:///${jnode-core.jar}/,jar:file://${classlib.jar}!/,file:///${root.dir}/builder/build/classes/">
+                  classesURL="file:///${jnode-core.jar}/,jar:file:///${classlib.jar}!/,file:///${root.dir}/builder/build/classes/">
 			<class classname="java.lang.Throwable" />
 			<class classname="org.jnode.build.x86.BootImageBuilder" static="on" />
 			<class classname="org.jnode.vm.SoftByteCodes" static="on" />
