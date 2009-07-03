@@ -129,7 +129,7 @@ public class FatShortDirEntry extends FatDirEntry {
         } catch (CharacterCodingException ex) {
             log.debug("CharacterCodingException: CodePage error");
             log.debug("go on with standard decoding");
-            baseName = new String(base);
+            baseName = base;
         }
 
         if (ncase.isLowerBase())
@@ -149,7 +149,7 @@ public class FatShortDirEntry extends FatDirEntry {
         } catch (CharacterCodingException ex) {
             log.debug("CharacterCodingException: CodePage error");
             log.debug("go on with standard decoding");
-            extName = new String(ext);
+            extName = ext;
         }
 
         if (ncase.isLowerExt())
