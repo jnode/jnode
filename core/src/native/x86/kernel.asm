@@ -26,7 +26,7 @@ mb_header:
 	dd mb_header				; header_addr
 	dd sys_start				; load_addr
 	dd 0 						; load_end_addr (patched up by BootImageBuilder)
-	dd 0						; bss_end_addr
+	dd 0						; bss_end_addr (patched up by BootImageBuilder)
 	dd real_start				; entry_addr
 	dd 0						; mode_type 
 	dd 0						; width
