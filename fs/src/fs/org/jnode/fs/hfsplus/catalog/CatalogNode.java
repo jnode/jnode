@@ -97,16 +97,20 @@ public class CatalogNode extends AbstractNode {
     }
 
     /**
-     * @param key
+     * Find node record based on it's key.
+     * 
+     * @param key The key to search.
      * @return a NodeRecord or {@code null}
      */
     public NodeRecord find(final CatalogKey key) {
         NodeRecord largestMatchingRecord = null;
         for (int index = 0; index < this.getNodeDescriptor().getNumRecords(); index++) {
             NodeRecord record = this.getNodeRecord(index);
-            if ((record.getKey().compareTo(key) <= 0)
-                && (record.getKey().compareTo(largestMatchingRecord.getKey()) > 0)) {
-                largestMatchingRecord = record;
+            if ((record.getKey().compareTo(key) <= 0)) {
+                if (largestMatchingRecord != null &&
+                        record.getKey().compareTo(largestMatchingRecord.getKey()) > 0) {
+                    largestMatchingRecord = record;
+                }
             }
         }
         return largestMatchingRecord;
