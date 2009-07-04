@@ -353,6 +353,6 @@ GLABEL Q43org5jnode2vm6Unsafe23callVbeFunction2e28Lorg2fvmmagic2funboxed2fAddres
 	; keep only lower 16 bits of EDI
 	and edi, 0x0000FFFF
 	
-	call dword [esp+(4*SLOT_SIZE)] ; codePtr 
+	call dword far [esp+(4*SLOT_SIZE)] ; codePtr
 	pop ADI
 	ret SLOT_SIZE*3
