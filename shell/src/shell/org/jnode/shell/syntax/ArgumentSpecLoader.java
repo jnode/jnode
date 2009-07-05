@@ -130,6 +130,7 @@ public class ArgumentSpecLoader {
     /**
      * Parses an argument.
      */
+    @SuppressWarnings("unchecked")
     private ArgumentSpec<?> doLoad(SyntaxSpecAdapter element) {
         if (!element.getName().equals("argument")) {
             throw new SyntaxFailureException("Not a valid child of 'argument-bundle': " + element.getName());
