@@ -111,7 +111,7 @@
           <option argLabel="force"       shortName="f" longName="force" />
           <option argLabel="interactive" shortName="i" longName="interactive" />
           <option argLabel="verbose"     shortName="v" longName="verbose" />
-          <option argLabel="one-fs"      longName="one-file-system"/>
+          <option argLabel="onefs"       longName="one-file-system"/>
         </optionSet>
         <repeat minCount="1">
           <argument argLabel="paths"/>
