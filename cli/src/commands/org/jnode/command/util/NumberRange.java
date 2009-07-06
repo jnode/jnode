@@ -35,7 +35,6 @@ package org.jnode.command.util;
  * both ranges are also infinite in that direction.
  *
  * @author chris boertien
- * @see {@link org.jnode.command.argument.NumberRangeArgument}
  */
 public final class NumberRange implements Comparable<NumberRange> {
 
@@ -94,8 +93,7 @@ public final class NumberRange implements Comparable<NumberRange> {
      * is considered less than one that is positively infinite.
      *
      * @param that the NumberRange to compare this one to
-     * @return -1 if this comes before that, 1 if that comes before this, 0 if they are equal
-     * @see {@link #equals}
+     * @return -1 if this comes before that, 1 if that comes before this, 0 if they are equal.
      */
     public int compareTo(NumberRange that) {
         if (equals(that)) {
@@ -132,7 +130,7 @@ public final class NumberRange implements Comparable<NumberRange> {
      * </ul>
      *
      * @param that the NumberRage to compare with
-     * @return true if both NumberRanges are equal
+     * @return true if the NumberRanges are equal
      */
     public boolean equals(NumberRange that) {
         boolean a1 = isStartInfinite();
@@ -187,7 +185,7 @@ public final class NumberRange implements Comparable<NumberRange> {
     /**
      * Does this NumberRange represent a range that is positively infinite.
      *
-     * @return true if the end position is >= positive infinity.
+     * @return true if the end position is &gt;= positive infinity.
      */
     public boolean isEndInfinite() {
         return end >= positiveInfinity;
@@ -196,7 +194,7 @@ public final class NumberRange implements Comparable<NumberRange> {
     /**
      * Does this NumberRange represent a range that is negatively infinite.
      *
-     * @return true if the start positition is <= negative infinity
+     * @return true if the start position is &lt;= negative infinity
      */
     public boolean isStartInfinite() {
         return start <= negativeInfinity;

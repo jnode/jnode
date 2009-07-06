@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 import org.jnode.shell.PathnamePattern;
+
 /**
  * <p>
  * <code>AbstractDirectoryWalker</code> - walk through a directory hierarchy
@@ -41,7 +42,7 @@ import org.jnode.shell.PathnamePattern;
  * relatively to the given directory and walk recursively through the directory
  * hierarchy until stopping depth is reached. <br>
  * On its way, it will call "handleFile()" and "handleDir()" for every file and
- * directory, that is not filtered out by any of the filteres set for this
+ * directory, that is not filtered out by any of the filters set for this
  * DirectoryWalker.
  * 
  * @author Alexander Kerner
@@ -97,7 +98,7 @@ public abstract class AbstractDirectoryWalker {
          * Create the filter with the given pattern and orientation
          *
          * @param pattern the regular expression to match with
-         * @param exclude, if true, reverse the sense of matching and
+         * @param exclude  if true, reverse the sense of matching and
          * exclude files that match the pattern.
          */
         public RegexPatternFilter(String pattern, boolean exclude) {
@@ -122,7 +123,7 @@ public abstract class AbstractDirectoryWalker {
         /**
          * Create the filter with the given mod time and direction
          *
-         * @param size the time point to filter on
+         * @param time the time point to filter on
          * @param newer if true, accept if the file mtime is &gt; time, false
          * accepts if the file mtime is &lt;= to time.
          */
@@ -171,27 +172,27 @@ public abstract class AbstractDirectoryWalker {
     private volatile boolean cancelled = false;
 
     /**
-     * Walk the directory heirarchies of the given directories.
+     * Walk the directory hierarchies of the given directories.
      *
      * Before walking begins on each of the given directories, the
      * extending class has a chance to do some initialization through
-     * {@code handleStartingDir}. Once walking has commenced, each file
+     * {@link #handleStartingDir(File)}. Once walking has commenced, each file
      * will be checked against the current set of constraints, and
      * passed to the extending class for further processing if accepted.
      * When walking is complete for that branch, the {@code lastAction}
      * method is called, and the walker moves on to the next directory,
      * or returns if there are no more directories to walk.
      *
-     * If an IOException propogates beyond the {@code walk} method, there
+     * If an IOException propagates beyond the {@code walk} method, there
      * is currently no way to resume walking. The following reasons may
      * cause this to happen.
      * <ul>
      * <li>Any of the supplied directories are null, or not a directory.
      * <li>A SecurityException was triggered, and the caller has not overriden
-     * the {@code handleRestrictedDir} method.
+     * the {@link #handleRestrictedFile(File)} method.
      * </ul>
      * 
-     * @param dirs Array of <code>File</code> to walk through.
+     * @param dirs array of {@link java.io.File} to walk through.
      * @throws IOException if any IO error occurs.
      * @throws NullPointerException if dirs is null, or contains no directories
      */
@@ -215,7 +216,7 @@ public abstract class AbstractDirectoryWalker {
                 handle(stack.pop());
             }
             lastAction(cancelled);
-            // if this was cancelled, we need to clear the stack
+            // if this was canceled, we need to clear the stack
             stack.clear();
         }
     }
@@ -235,7 +236,7 @@ public abstract class AbstractDirectoryWalker {
         try {
             // Don't descend into directories beyond maxDepth
             if (file.file.isDirectory() && (maxDepth == null || file.depth < maxDepth) && dirNotFiltered(file.file)) {
-                handleChilds(file);
+                handleChildren(file);
             }
         } catch (SecurityException e) {
             // Exception rises, when access to folder content was denied
@@ -246,7 +247,7 @@ public abstract class AbstractDirectoryWalker {
     /**
      * Add a directories contents to the stack.
      */
-    private void handleChilds(final FileObject file) throws IOException, SecurityException {
+    private void handleChildren(final FileObject file) throws IOException, SecurityException {
         final Stack<File> stack = new Stack<File>();
         final File[] content = file.file.listFiles();
         if (content == null) {
@@ -292,7 +293,7 @@ public abstract class AbstractDirectoryWalker {
      * Process a file through a set of file filters.
      *
      * This may be called from extending classes in order to bypass
-     * the regaular walking procedure.
+     * the regular walking procedure.
      *
      * As an example, if the caller simply wants to process specific
      * files through the filter set, without setting up a full directory
@@ -325,10 +326,10 @@ public abstract class AbstractDirectoryWalker {
     }
 
     /**
-     * Stop walking the current directory heirarchy.
+     * Stop walking the current directory hierarchy.
      *
      * This will not stop the walker altogether if there were multiple directories
-     * passed to {@code walk}. Instead, walking of the current directory heirarchy
+     * passed to {@code walk}. Instead, walking of the current directory hierarchy
      * will stop, {@code lastAction(true)} is called, and the walker is reset with
      * the next directory. If this it was the last directory, or there was only one
      * then walk will return without error.
@@ -358,7 +359,7 @@ public abstract class AbstractDirectoryWalker {
      * The maximum depth level (inclusive) at which to stop handling files.
      *
      * When the walker reaches this level, it will not recurse any deeper
-     * into the file heirarchy. If the maximjm depth is 0, the initial directory
+     * into the file hierarchy. If the maximum depth is 0, the initial directory
      * will be handled, but the walker will not query for its contents.
      *
      * A negative value will be seen as null.
@@ -378,8 +379,8 @@ public abstract class AbstractDirectoryWalker {
      * must be accepted by the set of filters supplied. If no filters are
      * supplied, then every file and directory will be handled.
      *
-     * @param filter <code>FileFilter</code> to be added to this
-     *            DirectoryWalkers FilterSet.
+     * @param filter a {@link FileFilter} to be added to this
+     *            DirectoryWalker's FilterSet.
      */
     public synchronized void addFilter(FileFilter filter) {
         filters.add(filter);
@@ -392,7 +393,7 @@ public abstract class AbstractDirectoryWalker {
      * directory filters supplied. If no filters are supplied, then this
      * will not prevent recursing of directories.
      *
-     * @param filter <code>FileFilter</code> to be added
+     * @param filter {@link FileFilter} to be added
      */
     public synchronized void addDirectoryFilter(FileFilter filter) {
         dirFilters.add(filter);
@@ -400,18 +401,18 @@ public abstract class AbstractDirectoryWalker {
     
     /**
      * Handle a file or directory that triggered a SecurityException.
-     *
-     * This method is called, when access to a file was denied.<br>
-     * Default implementation will rise a <code>IOException</code> instead of
-     * <code>SecurityException</code>. May be overridden by extending classes to
+     * This method is called, when access to a file was denied.
+     * <p>
+     * The default implementation will raise an {@link IOException} instead of a
+     * {@link SecurityException}. May be overridden by extending classes to
      * do something else.
      *
-     * Because this method throws an IOException that will propogate beyond the
+     * Because this method throws an IOException that will propagate beyond the
      * walk method, if an application wishes to continue walking after encountering
      * a SecurityException while accessing a file or directory, then it must override
      * this and provide an implementation that does not throw an exception.
      * 
-     * @param file <code>File</code>-object, to which access was restricted.
+     * @param file {@code File} object, to which access was restricted.
      * @throws IOException in default implementation.
      */
     protected void handleRestrictedFile(final File file) throws IOException {
@@ -430,7 +431,7 @@ public abstract class AbstractDirectoryWalker {
      * Override this to do some initialization before starting to walk each of the
      * given directory roots.
      * 
-     * @param file <code>File</code>-object, that represents starting dir.
+     * @param file {@code File} object, that represents starting dir.
      * @throws IOException if IO error occurs.
      */
     protected void handleStartingDir(final File file) throws IOException {
@@ -438,7 +439,7 @@ public abstract class AbstractDirectoryWalker {
     }
     
     /**
-     * This method is called, when walking has finished. <br>
+     * This method is called, when walking has finished.
      * By default, it does nothing. May be overridden by extending classes to do something else.
      * @param wasCancelled true, if directory walking was aborted.
      */
@@ -451,7 +452,7 @@ public abstract class AbstractDirectoryWalker {
      *
      * Override this to perform some operation on this directory.
      *
-     * @param file <code>File</code>-object, that represents current directory.
+     * @param file {@code File} object, that represents current directory.
      * @throws IOException if IO error occurs.
      */
     public abstract void handleDir(final File file) throws IOException;
@@ -461,7 +462,7 @@ public abstract class AbstractDirectoryWalker {
      *
      * Override this to perform some operation on this file.
      *
-     * @param file <code>File</code>-object, that represents current file.
+     * @param file {@code File} object, that represents current file.
      * @throws IOException if IO error occurs.
      */
     public abstract void handleFile(final File file) throws IOException;
@@ -471,7 +472,7 @@ public abstract class AbstractDirectoryWalker {
      *
      * Override this to perform some operation on this special file.
      *
-     * @param <code>File</code> object that represents a special file.
+     * @param file {@code File} object that represents a special file.
      * @throws IOException if an IO error occurs.
      */
     public void handleSpecialFile(File file) throws IOException {

@@ -102,7 +102,7 @@ public class MuParser {
      * have been used to populate Argument values in the ArgumentBundle.
      * 
      * @param rootSyntax the root of the MuSyntax graph.
-     * @param completion if this is not <code>null</null>, do a completion parse, and record
+     * @param completions if this is not <code>null</null>, do a completion parse, and record
      *     the completions here.
      * @param source the source of Tokens to be parsed
      * @param bundle the container for Argument objects; e.g. provided by the command.
@@ -119,7 +119,7 @@ public class MuParser {
      * have been used to populate Argument values in the ArgumentBundle.
      * 
      * @param rootSyntax the root of the MuSyntax graph.
-     * @param completion if this is not <code>null</null>, do a completion parse, and record
+     * @param completions if this is not <code>null</null>, do a completion parse, and record
      *     the completions here.
      * @param source the source of Tokens to be parsed
      * @param bundle the container for Argument objects; e.g. provided by the command.
