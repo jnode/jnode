@@ -107,7 +107,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jnode.shell.IncompleteCommandException;
 import org.jnode.shell.ShellSyntaxException;
 
 /**
@@ -122,14 +121,11 @@ public class BjorneParser {
     private final BjorneTokenizer tokens;
     private BjorneCompleter completer;
     
-    private final String continuationPrompt;
-    
     private final List<RedirectionNode> hereRedirections = new ArrayList<RedirectionNode>();
     private boolean allowLineBreaks;
 
-    public BjorneParser(BjorneTokenizer tokens, String continuationPrompt) {
+    public BjorneParser(BjorneTokenizer tokens) {
         this.tokens = tokens;
-        this.continuationPrompt = continuationPrompt;
     }
 
     /**
@@ -143,6 +139,9 @@ public class BjorneParser {
     public CommandNode parse() throws ShellSyntaxException {
         hereRedirections.clear();
         List<CommandNode> commands = new LinkedList<CommandNode>();
+        // (The POSIX syntax doesn't seem to allow line breaks at the start, but I
+        // don't think that can be right ...)
+        skipLineBreaks();
         while (peek().getTokenType() != TOK_END_OF_STREAM) {
             CommandNode command = parseList();
             commands.add(command);
@@ -344,12 +343,6 @@ public class BjorneParser {
                 // FIXME ... built-in commands should use the Syntax mechanisms so
                 // that completion, help, etc will work as expected.
             } 
-        } catch (IncompleteCommandException ex) {
-            if (completer != null) {
-                completer.setCommand(new SimpleCommandNode(CMD_COMMAND, 
-                        words.toArray(new BjorneToken[words.size()]), builtin));
-            }
-            throw ex;
         } catch (ShellSyntaxException ex) {
             if (completer != null) {
                 completer.setCommand(words.size() == 0 ? null : 
@@ -693,21 +686,21 @@ public class BjorneParser {
         return token;
     }
     
-    private BjorneToken next() throws IncompleteCommandException {
+    private BjorneToken next() throws ShellSyntaxException {
         if (allowLineBreaks) {
             doLineBreaks(0L, false);
         }
         return tokens.next();
     }
     
-    private BjorneToken peek() throws IncompleteCommandException {
+    private BjorneToken peek() throws ShellSyntaxException {
         if (allowLineBreaks) {
             doLineBreaks(0L, false);
         }
         return tokens.peek();
     }
     
-    private BjorneToken peekEager() throws IncompleteCommandException {
+    private BjorneToken peekEager() throws ShellSyntaxException {
         if (allowLineBreaks) {
             doLineBreaks(0L, true);
         }
@@ -721,9 +714,8 @@ public class BjorneParser {
         if (((1L << tt) & expectedSet) == 0L) {
             if (mandatory) {
                 if (tt == TOK_END_OF_STREAM) {
-                    throw new IncompleteCommandException(
-                            "EOF reached while looking for " + BjorneToken.formatExpectedSet(expectedSet), 
-                            continuationPrompt);
+                    throw new ShellSyntaxException(
+                            "EOF reached while looking for " + BjorneToken.formatExpectedSet(expectedSet));
                 } else {
                     throw new ShellSyntaxException(
                             "expected " + BjorneToken.formatExpectedSet(expectedSet) + " but got " + token);
@@ -765,16 +757,16 @@ public class BjorneParser {
         }
     }
     
-    private void skipLineBreaks() throws IncompleteCommandException {
+    private void skipLineBreaks() throws ShellSyntaxException {
         this.allowLineBreaks = true;
         doLineBreaks(0L, false);
     }
 
-    private void allowLineBreaks() throws IncompleteCommandException {
+    private void allowLineBreaks() throws ShellSyntaxException {
         this.allowLineBreaks = true;
     }
 
-    private void doLineBreaks(long expectedSet, boolean needMore) throws IncompleteCommandException {
+    private void doLineBreaks(long expectedSet, boolean needMore) throws ShellSyntaxException {
         // NB: use tokens.peek() / next() rather than the wrappers here!!
         this.allowLineBreaks = false;
         BjorneToken token = tokens.peek();
@@ -782,9 +774,8 @@ public class BjorneParser {
         if (tt == TOK_END_OF_STREAM) {
             captureCompletions(token, expectedSet);
             if (needMore) {
-                throw new IncompleteCommandException(
-                        "EOF reached while looking for optional linebreak(s)", 
-                        continuationPrompt);
+                throw new ShellSyntaxException(
+                        "EOF reached while looking for optional linebreak(s)");
             } 
         } else if (tt == TOK_END_OF_LINE) {
             tokens.next();
@@ -797,9 +788,8 @@ public class BjorneParser {
                 } else if (tt == TOK_END_OF_STREAM) {
                     captureCompletions(token, expectedSet);
                     if (needMore) {
-                        throw new IncompleteCommandException(
-                                "EOF reached while dealing with optional linebreak(s)", 
-                                continuationPrompt);
+                        throw new ShellSyntaxException(
+                                "EOF reached while dealing with optional linebreak(s)");
                     } else {
                         break;
                     }
@@ -810,7 +800,7 @@ public class BjorneParser {
         }
     }
 
-    private void captureHereDocuments() throws IncompleteCommandException {
+    private void captureHereDocuments() throws ShellSyntaxException {
         for (RedirectionNode redirection : hereRedirections) {
             StringBuilder sb = new StringBuilder();
             String marker = redirection.getArg().getText();
@@ -818,8 +808,8 @@ public class BjorneParser {
             while (true) {
                 String line = tokens.readHereLine(trimTabs);
                 if (line == null) {
-                    throw new IncompleteCommandException("EOF reached while looking for '" +
-                            marker + "' to end a HERE document", continuationPrompt);
+                    throw new ShellSyntaxException("EOF reached while looking for '" +
+                            marker + "' to end a HERE document");
                 }
                 if (line.equals(marker)) {
                     break;

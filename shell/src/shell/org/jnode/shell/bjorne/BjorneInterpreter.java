@@ -30,7 +30,6 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_LESS;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSAND;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSGREAT;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -45,10 +44,8 @@ import org.jnode.shell.CommandInterpreter;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.Completable;
-import org.jnode.shell.IncompleteCommandException;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
-import org.jnode.shell.ShellInvocationException;
 import org.jnode.shell.ShellSyntaxException;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandOutput;
@@ -164,10 +161,10 @@ public class BjorneInterpreter implements CommandInterpreter {
         return "bjorne";
     }
 
-    @Override
-    public int interpret(CommandShell shell, String command) throws ShellException {
+    public int interpret(CommandShell shell, Reader reader) 
+        throws ShellException {
         try {
-            return interpret(shell, command, null, false);
+            return interpret(shell, reader, null, false);
         } catch (BjorneControlException ex) {
             switch (ex.getControl()) {
                 case BjorneInterpreter.BRANCH_EXIT:
@@ -194,7 +191,7 @@ public class BjorneInterpreter implements CommandInterpreter {
         BjorneTokenizer tokens = new BjorneTokenizer(partial);
         BjorneCompleter completions = new BjorneCompleter(context);
         try {
-            new BjorneParser(tokens, "> ").parse(completions);
+            new BjorneParser(tokens).parse(completions);
         } catch (ShellSyntaxException ex) {
             // squelch both syntax and incomplete command exceptions.
         }
@@ -217,7 +214,7 @@ public class BjorneInterpreter implements CommandInterpreter {
         }
     }
 
-    int interpret(CommandShell shell, String command, StringWriter capture, boolean source) 
+    int interpret(CommandShell shell, Reader reader, StringWriter capture, boolean source) 
         throws ShellException {
         BjorneContext myContext;
         // FIXME ... I think there is something wrong / incomplete with the way I'm handling
@@ -229,8 +226,8 @@ public class BjorneInterpreter implements CommandInterpreter {
             myContext = new BjorneContext(this);
             myContext.setIO(1, new CommandOutput(capture), true);
         }
-        BjorneTokenizer tokens = new BjorneTokenizer(command);
-        CommandNode tree = new BjorneParser(tokens, "> ").parse();
+        BjorneTokenizer tokens = new BjorneTokenizer(reader);
+        CommandNode tree = new BjorneParser(tokens).parse();
         if (tree == null) {
             // An empty command line
             return myContext.getLastReturnCode();
@@ -252,44 +249,27 @@ public class BjorneInterpreter implements CommandInterpreter {
         context.setCommand(alias == null ? "" : alias);
         context.setArgs(args == null ? new String[0] : args);
         try {
-            BufferedReader br = new BufferedReader(reader);
-            String line;
-            int rc = 0;
-            while ((line = br.readLine()) != null) {
-                boolean done = false;
-                do {
-                    try {
-                        rc = interpret(shell, line, null, false);
-                        done = true;
-                    } catch (BjorneControlException ex) {
-                        switch (ex.getControl()) {
-                            case BjorneInterpreter.BRANCH_EXIT:
-                                // The script will exit immediately
-                                return ex.getCount();
-                            case BjorneInterpreter.BRANCH_BREAK:
-                                throw new ShellSyntaxException(
-                                    "'break' has been executed in an inappropriate context");
-                            case BjorneInterpreter.BRANCH_CONTINUE:
-                                throw new ShellSyntaxException(
-                                    "'continue' has been executed in an inappropriate context");
-                            case BjorneInterpreter.BRANCH_RETURN:
-                                throw new ShellSyntaxException(
-                                    "'return' has been executed in an inappropriate context");
-                        }
-                    } catch (IncompleteCommandException ex) {
-                        String continuation = br.readLine();
-                        if (continuation == null) {
-                            throw ex;
-                        }
-                        line = line + "\n" + continuation;
-                    } catch (VmExit ex) {
-                        return ex.getStatus();
-                    }
-                } while (!done);
+            return interpret(shell, reader, null, false);
+        } catch (BjorneControlException ex) {
+            switch (ex.getControl()) {
+                case BjorneInterpreter.BRANCH_EXIT:
+                    // The script will exit immediately
+                    return ex.getCount();
+                case BjorneInterpreter.BRANCH_BREAK:
+                    throw new ShellSyntaxException(
+                            "'break' has been executed in an inappropriate context");
+                case BjorneInterpreter.BRANCH_CONTINUE:
+                    throw new ShellSyntaxException(
+                            "'continue' has been executed in an inappropriate context");
+                case BjorneInterpreter.BRANCH_RETURN:
+                    throw new ShellSyntaxException(
+                            "'return' has been executed in an inappropriate context");
+                default:
+                    throw new ShellFailureException(
+                            "unknown 'control' in BjorneControlException");
             }
-            return rc;
-        } catch (IOException ex) {
-            throw new ShellInvocationException("Problem reading command file: " + ex.getMessage(), ex);
+        } catch (VmExit ex) {
+            return ex.getStatus();
         } finally {
             if (reader != null) {
                 try {
@@ -318,7 +298,8 @@ public class BjorneInterpreter implements CommandInterpreter {
             Properties sysProps, Map<String, String> env, boolean isBuiltin)
         throws ShellException {
         if (isBuiltin) {
-            BjorneBuiltinCommandInfo builtin = BUILTINS.get(cmdLine.getCommandName()).buildCommandInfo(context);
+            BjorneBuiltinCommandInfo builtin = 
+                BUILTINS.get(cmdLine.getCommandName()).buildCommandInfo(context);
             cmdLine.setCommandInfo(builtin);
         } 
         cmdLine.setStreams(streams);

@@ -66,92 +66,58 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_UNTIL;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_WHILE;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_WORD;
 
-import org.jnode.shell.IncompleteCommandException;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+
 import org.jnode.shell.ShellFailureException;
+import org.jnode.shell.ShellSyntaxException;
 
 public class BjorneTokenizer {
 
-    private final char[] chars;
-
-    private final int len;
-
-    private int pos;
+    private final Reader reader;
 
     private BjorneToken prev, current, next;
 
-
     private static final int EOS = -1;
+    private static final int INVALID = -2;
+    
+    private int pos = 0;
+    private int lastCh = INVALID;
+    private int nextCh = INVALID;
 
     private final boolean debug;
 
     /**
      * Create a tokenizer for the supplied shell input text.
      * @param text the text to be tokenized
-     * @throws IncompleteCommandException if the text ends with a line continuation
+     * @throws ShellSyntaxException 
      */
-    public BjorneTokenizer(String text) throws IncompleteCommandException {
-        this(text, false);
+    public BjorneTokenizer(String text) 
+        throws ShellSyntaxException {
+        this(new StringReader(text), false);
+    }
+
+    /**
+     * Create a tokenizer for the supplied shell input reader.
+     * @param reader the reader to be tokenized.
+     * @throws ShellSyntaxException 
+     */
+    public BjorneTokenizer(Reader reader) 
+        throws ShellSyntaxException {
+        this(reader, false);
     }
 
     /**
      * Create a tokenizer for the supplied shell input text.
-     * @param text the text to be tokenized
+     * @param reader the reader to be tokenized.
      * @param debug if {@code true}, produce debug output
-     * @throws IncompleteCommandException if the text ends with a line continuation
+     * @throws ShellSyntaxException 
      */
-    public BjorneTokenizer(String text, boolean debug) throws IncompleteCommandException {
-        chars = foldContinuations(text);
-        len = chars.length;
+    public BjorneTokenizer(Reader reader, boolean debug) 
+        throws ShellSyntaxException {
+        this.reader = reader;
         this.debug = debug;
-    }
-
-    /**
-     * Rewrite the supplied text to fold any line continuations.
-     * 
-     * @param text the text to be processed
-     * @return the characters of text with any line continuations removed.
-     * @throws IncompleteCommandException
-     */
-    private char[] foldContinuations(String text) throws IncompleteCommandException {
-        // FIXME this is wrong ... if we are going to imitate the documented behaviour
-        // of bash.  (In bash, if the the MARKER is quoted, '\<newline>' is apparently
-        // not interpreted as a continuation.)
-        if (text.indexOf('\\') == -1) {
-            return text.toCharArray();
-        }
-        int len = text.length();
-        StringBuilder sb = new StringBuilder(len);
-        boolean escape = false;
-        for (int i = 0; i < len; i++) {
-            char ch = text.charAt(i);
-            switch (ch) {
-                case '\\':
-                    if (escape) {
-                        sb.append('\\');
-                    } else if (i == len - 1) {
-                        // If we get a continuation sequence at the end of the
-                        // text, the simplest thing is to ask for more input.
-                        throw new IncompleteCommandException(
-                                "More input required after '\\<newline>'", " > ");
-                    }
-                    escape = !escape;
-                    break;
-                case '\n':
-                    if (!escape) {
-                        sb.append('\n');
-                    } else {
-                        escape = false;
-                    }
-                    break;
-                default:
-                    if (escape) {
-                        sb.append('\\');
-                        escape = false;
-                    }
-                    sb.append(ch);
-            }
-        }
-        return sb.toString().toCharArray();
     }
 
     /**
@@ -180,7 +146,7 @@ public class BjorneTokenizer {
     public BjorneToken peek(int context) {
         BjorneToken res = reinterpret(peek(), context);
         if (debug) {
-            System.err.println("--> " + res);
+            System.err.println("peek(" + context + ") --> " + res);
         }
         return res;
     }
@@ -240,7 +206,7 @@ public class BjorneTokenizer {
     public BjorneToken next(int context) {
         BjorneToken res = reinterpret(next(), context);
         if (debug) {
-            System.err.println("--> " + res);
+            System.err.println("next(" + context + ") --> " + res);
         }
         return res;
     }
@@ -290,15 +256,17 @@ public class BjorneTokenizer {
             System.err.print("advance() ... {" + prev + "," + current + ","
                     + next + "} ...");
         }
-        int ch = nextCh();
+        int ch = peekCh();
         while (ch == '\t' || ch == ' ') {
-            ch = nextCh();
+            nextCh();
+            ch = peekCh();
         }
-        int start = pos - 1;
+        int start = getPos() - 1;
         switch (ch) {
             case EOS:
-                return makeToken(TOK_END_OF_STREAM, len);
+                return makeToken(TOK_END_OF_STREAM, getPos());
             case '\n':
+                nextCh();
                 return makeToken(TOK_END_OF_LINE, start);
             case '#':
                 while ((ch = nextCh()) != EOS) {
@@ -308,8 +276,10 @@ public class BjorneTokenizer {
                 }
                 return makeToken(TOK_END_OF_STREAM, start);
             case '(':
+                nextCh();
                 return makeToken(TOK_LPAREN, start);
             case ')':
+                nextCh();
                 return makeToken(TOK_RPAREN, start);
             case '<':
             case '>':
@@ -323,18 +293,18 @@ public class BjorneTokenizer {
     }
 
     private BjorneToken makeToken(int tokenType, int start) {
-        return new BjorneToken(tokenType, "", start, pos);
+        return new BjorneToken(tokenType, "", start, getPos());
     }
 
     private BjorneToken makeToken(int tokenType, String value, int start) {
-        return new BjorneToken(tokenType, value, start, pos);
+        return new BjorneToken(tokenType, value, start, getPos());
     }
 
     private BjorneToken parseWord() {
         int quoteChar = 0;
         StringBuffer sb = new StringBuffer();
-        int ch = prevCh();
-        int start = pos - 1;
+        int ch = peekCh();
+        int start = getPos() - 1;
     LOOP: 
         while (true) {
             switch (ch) {
@@ -364,31 +334,36 @@ public class BjorneTokenizer {
                     }
                     break;
                 case '\\':
-                    ch = nextCh();
+                    nextCh();
+                    ch = peekCh();
                     if (ch == '\n') {
-                        ch = nextCh();
+                        // A '\\' followed by a newline is a line continuation:
+                        // the two characters are skipped.
+                        nextCh();
+                        ch = peekCh();
                         continue;
+                    } else if (ch == EOS) {
+                        // Silently eat a '\\' at the end of stream position.
+                        nextCh();
+                        break LOOP;
                     } else {
+                        // The '\\' is included in the (raw) word.
                         sb.append('\\');
-                        if (ch == EOS) {
-                            break LOOP;
-                        }
                     }
                     break;
                 default:
-                    /* empty */
+                    // include anything else in the word.
                     break;
             }
             sb.append((char) ch);
-            ch = nextCh();
-        }
-        if (ch != EOS) {
-            backupCh();
+            nextCh();
+            ch = peekCh();
         }
         if (ch == '<' || ch == '>') {
             boolean allDigits = true;
             for (int i = 0; i < sb.length(); i++) {
                 ch = sb.charAt(i);
+                // FIXME ... I should deal with "\\\n" here I think.
                 if (ch < '0' || ch > '9') {
                     allDigits = false;
                     break;
@@ -402,8 +377,8 @@ public class BjorneTokenizer {
     }
 
     private BjorneToken parseOperator() {
-        int start = pos - 1;
-        switch (prevCh()) {
+        int start = getPos() - 1;
+        switch (nextCh()) {
             case '<':
                 switch (peekCh()) {
                     case '<':
@@ -458,26 +433,37 @@ public class BjorneTokenizer {
         throw new ShellFailureException("bad lexer state");
     }
 
-    private int nextCh() {
-        return (pos >= len) ? EOS : chars[pos++];
+    private int nextCh() throws ShellFailureException {
+        try {
+            if (nextCh == INVALID) {
+                if (lastCh != EOS) {
+                    lastCh = reader.read();
+                    pos++;
+                }
+            } else {
+                lastCh = nextCh;
+                nextCh = INVALID;
+                pos++;
+            }
+            return lastCh;
+        } catch (IOException ex) {
+            throw new ShellFailureException("Unexpected exception", ex);
+        }
     }
 
     private int peekCh() {
-        return (pos >= len) ? EOS : chars[pos];
-    }
-
-    private int prevCh() {
-        if (pos <= 0) {
-            throw new ShellFailureException("nextCh not called yet");
+        try {
+            if (nextCh == INVALID) {
+                nextCh = reader.read();
+            }
+            return nextCh;
+        } catch (IOException ex) {
+            throw new ShellFailureException("Unexpected exception", ex);
         }
-        return chars[pos - 1];
     }
-
-    private void backupCh() {
-        if (pos == 0) {
-            throw new ShellFailureException("cannot backup");
-        }
-        pos--;
+    
+    private int getPos() {
+        return pos;
     }
 
     /**

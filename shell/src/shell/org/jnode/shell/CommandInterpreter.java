@@ -41,24 +41,14 @@ public interface CommandInterpreter {
     }
 
     /**
-     * Parse and execute a command line, and return the resulting return code.
-     * 
-     * @param shell the CommandShell that provides low-level command invocation,
-     *        command history and so on.
-     * @param line the line of input to be interpreted.
-     * @return the return code.
-     * @throws ShellException
-     */
-    int interpret(CommandShell shell, String line) throws ShellException;
-
-    /**
-     * Parse and execute a command file, returning the resulting return code.
+     * Parse and execute commands read from a reader, returning the resulting return code.
      * 
      * @param shell the CommandShell that provides low-level command invocation,
      *        command history and so on.
      * @param reader the reader to be interpreted. <b>The implementation must close it.</b> 
-     * @param alias this will supply the script's notional command name to the interpreter.
-     * @param args command line arguments to be passed to the script.  If this parameter 
+     * @param alias this will supply a script's notional command name to the interpreter.  If 
+     * this parameter is {@code null}, no command name passed.
+     * @param args optional command line arguments to be passed to the script.  If this parameter 
      * is {@code null}, no arguments are passed.
      * @return the return code.
      * @throws ShellException

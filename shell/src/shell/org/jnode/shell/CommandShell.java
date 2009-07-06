@@ -379,44 +379,10 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 readingCommand = true;
                 input = readInputLine();
                 if (input.length() > 0) {
-                    // This hairy bit of code deals with shell commands that span multiple
-                    // input lines.  If an interpreter encounters the end of the line that
-                    // we have given it and it requires more input to get a complete command,
-                    // it may throw IncompleteCommandException.  The shell responds by 
-                    // outputting a different prompt (supplied in the exception), and then
-                    // attempting to get the next line.  If that succeeds, the line is 
-                    // appended to the input we gave the interpreter last time, and the
-                    // interpreter is called again.  This continues until either the
-                    // interpreter manages to run the command, or we get some other
-                    // shell syntax exception.
-                    boolean done = false;
-                    do {
-                        try {
-                            runCommand(input, true, this.interpreter);
-                            done = true;
-                        } catch (IncompleteCommandException ex) {
-                            String continuation = null;
-                            // (Tell completer to use command history not app. history)
-                            readingCommand = true;
-                            if (this.interpreter.supportsMultilineCommands()) {
-                                String prompt = ex.getPrompt();
-                                if (prompt != null) {
-                                    outPW.print(prompt);
-                                }
-                                continuation = readInputLine();
-                            }
-                            if (continuation == null) {
-                                diagnose(ex, null);
-                                break;
-                            } else {
-                                input = input + "\n" + continuation;
-                            }
-                        } catch (ShellException ex) {
-                            diagnose(ex, null);
-                            done = true;
-                        }
-                    } while (!done);
+                    runCommand(input, true, this.interpreter);
                 }
+            } catch (ShellException ex) {
+                diagnose(ex, null);
             } catch (VmExit ex) {
                 // This should only happen if the interpreter wants the shell to
                 // exit.  The interpreter will typically intercept any VmExits 
@@ -427,6 +393,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                         + ex.getMessage());
                 stackTrace(ex);
             } finally {
+                // FIXME ...
                 if (input != null && input.trim().length() > 0) {
                     String lines[] = input.split("\\n");
                     for (String line : lines) {
@@ -564,8 +531,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
         
-    private int runCommand(String cmdLineStr, boolean interactive,
-            CommandInterpreter interpreter) throws ShellException {
+    private int runCommand(String command, boolean interactive, CommandInterpreter interpreter) 
+        throws ShellException {
         try {
             if (interactive) {
                 clearEof();
@@ -574,7 +541,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 // for input completion
                 applicationHistory.set(new InputHistory());
             }
-            return interpreter.interpret(this, cmdLineStr);
+            return interpreter.interpret(this, new StringReader(command), null, null);
         } finally {
             if (interactive) {
                 applicationHistory.set(null);

@@ -20,6 +20,8 @@
  
 package org.jnode.test.shell.bjorne;
 
+import java.io.StringReader;
+
 import junit.framework.TestCase;
 
 import org.jnode.shell.ShellException;
@@ -31,7 +33,7 @@ public class BjorneParserTest extends TestCase {
     private static final boolean DEBUG = false;
 
     public void testParser() throws ShellException {
-        new BjorneParser(new BjorneTokenizer(""), null);
+        new BjorneParser(new BjorneTokenizer(""));
     }
 
     public void test1() throws ShellException {
@@ -147,7 +149,7 @@ public class BjorneParserTest extends TestCase {
     }
 
     private String doTest(String input) throws ShellException {
-        BjorneParser p = new BjorneParser(new BjorneTokenizer(input, DEBUG), null);
+        BjorneParser p = new BjorneParser(new BjorneTokenizer(new StringReader(input), DEBUG));
         String res = p.parse().toString();
         if (DEBUG) {
             System.err.println(res);

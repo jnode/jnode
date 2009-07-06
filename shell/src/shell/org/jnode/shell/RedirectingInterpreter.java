@@ -68,7 +68,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
     }
 
     @Override
-    public int interpret(CommandShell shell, String line) throws ShellException {
+    protected int interpret(CommandShell shell, String line) throws ShellException {
         Tokenizer tokenizer = new Tokenizer(line, REDIRECTS_FLAG);
         List<CommandDescriptor> commands = new LinkedList<CommandDescriptor>();
         parse(tokenizer, commands, false);

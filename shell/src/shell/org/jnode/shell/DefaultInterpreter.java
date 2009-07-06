@@ -89,20 +89,11 @@ public class DefaultInterpreter implements CommandInterpreter {
     public String getName() {
         return "default";
     }
-
-    @Override
-    public int interpret(CommandShell shell, String line) throws ShellException {
-        CommandLine cmd = doParseCommandLine(line);
-        if (cmd == null) {
-            return 0;
-        }
-        return shell.invoke(cmd, null, null);
-    }
-
+    
     /**
      * {@inheritDoc}
      * 
-     * The default interpreter and its subtypes treat a command script as a sequence of commands. 
+     * The default interpreter treats a command script as a sequence of commands. 
      * Commands are expected to consist of exactly one line.  Any line whose first non-whitespace 
      * character is '#' will be ignored.  Command line arguments from the script are not supported,
      * and will result in a {@link ShellException} being thrown.
@@ -167,6 +158,15 @@ public class DefaultInterpreter implements CommandInterpreter {
         return false;
     }
     
+    protected int interpret(CommandShell shell, String line) 
+        throws ShellException {
+        CommandLine cmd = doParseCommandLine(line);
+        if (cmd == null) {
+            return 0;
+        }
+        return shell.invoke(cmd, null, null);
+    }
+
     private CommandLine doParseCommandLine(String line) throws ShellException {
         Tokenizer tokenizer = new Tokenizer(line);
         if (!tokenizer.hasNext()) {
