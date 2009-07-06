@@ -437,7 +437,7 @@ public abstract class Argument<V> {
      * non-trivial completion.  Completions should be registered by calling one
      * of the 'addCompletion' methods on the CompletionInfo.
      * 
-     * @param completion the CompletionInfo object for registering any completions.
+     * @param completions the CompletionInfo object for registering any completions.
      * @param partial the argument string to be completed.
      */
     public final void complete(CompletionInfo completions, String partial, int flags) {
