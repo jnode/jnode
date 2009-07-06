@@ -59,37 +59,27 @@ final class SourceBuiltin extends BjorneBuiltin {
     @Override
     public void execute() throws Exception {
         File file = argScript.getValue();
-        long size = file.length();
-        String commandStr = null;
-        FileReader fin = null;
+        FileReader reader = null;
         try {
-            fin = new FileReader(file);
-            if (size > 1000000) {
-                // Since we are going to read the whole script into memory, we
-                // need to set some limit on the script's file size ...
-                getError().getPrintWriter().println("source: " + file + ": file too big");
-                exit(1);
+            reader = new FileReader(file);
+
+            // TODO ... implement args.
+            BjorneContext pc = getParentContext();
+            int rc = pc.getInterpreter().interpret(pc.getShell(), reader, "", new String[0]);
+            if (rc != 0) {
+                exit(rc);
             }
-            char[] buffer = new char[(int) size];
-            int nosRead = fin.read(buffer);
-            commandStr = new String(buffer, 0, nosRead);
         } catch (IOException ex) {
             getError().getPrintWriter().println("source: " + file + ": " + ex.getMessage());
             exit(1);
         } finally {
-            if (fin != null) {
+            if (reader != null) {
                 try {
-                    fin.close();
+                    reader.close();
                 } catch (IOException ex) {
                     /* blah */
                 }
             }
-        }
-        // TODO ... implement args.
-        BjorneContext pc = getParentContext();
-        int rc = pc.getInterpreter().interpret(pc.getShell(), commandStr, null, true);
-        if (rc != 0) {
-            exit(rc);
         }
     }
 }

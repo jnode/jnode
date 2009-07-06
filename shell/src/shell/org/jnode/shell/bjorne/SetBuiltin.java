@@ -26,8 +26,8 @@ import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.OptionalSyntax;
 import org.jnode.shell.syntax.PowersetSyntax;
 import org.jnode.shell.syntax.RepeatSyntax;
-import org.jnode.shell.syntax.StringArgument;
 import org.jnode.shell.syntax.SequenceSyntax;
+import org.jnode.shell.syntax.StringArgument;
 import org.jnode.shell.syntax.SyntaxBundle;
 import org.jnode.shell.syntax.VerbSyntax;
 

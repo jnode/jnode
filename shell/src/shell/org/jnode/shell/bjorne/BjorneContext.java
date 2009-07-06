@@ -53,7 +53,6 @@ import java.util.regex.Pattern;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
-import org.jnode.shell.IncompleteCommandException;
 import org.jnode.shell.PathnamePattern;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
@@ -595,7 +594,7 @@ public class BjorneContext {
 
     private StringBuffer runBacktickCommand(String commandLine) throws ShellException {
         StringWriter capture = new StringWriter();
-        interpreter.interpret(interpreter.getShell(), commandLine, capture, false);
+        interpreter.interpret(interpreter.getShell(), new StringReader(commandLine), capture, false);
         StringBuffer output = capture.getBuffer();
         while (output.length() > 0 && output.charAt(output.length() - 1) == '\n') {
             output.setLength(output.length() - 1);
@@ -1300,8 +1299,7 @@ public class BjorneContext {
         return interpreter.getUniqueName();
     }
 
-    public BjorneToken[] substituteAliases(BjorneToken[] words) 
-        throws IncompleteCommandException {
+    public BjorneToken[] substituteAliases(BjorneToken[] words) throws ShellSyntaxException {
         String alias = aliases.get(words[0].getText());
         if (alias == null) {
             return words;
@@ -1311,8 +1309,7 @@ public class BjorneContext {
         return list.toArray(new BjorneToken[list.size()]);
     }
         
-    private void substituteAliases(List<BjorneToken> list, int pos, int depth) 
-        throws IncompleteCommandException {
+    private void substituteAliases(List<BjorneToken> list, int pos, int depth) throws ShellSyntaxException {
         if (depth > 10) {
             throw new ShellFailureException("probable cycle detected in alias expansion");
         }
