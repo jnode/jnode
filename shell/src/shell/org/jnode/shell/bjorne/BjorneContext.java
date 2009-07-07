@@ -423,40 +423,55 @@ public class BjorneContext {
         return wordTokens;
     }
     
+    /**
+     * Do quote removal on a list of tokens
+     * 
+     * @param wordTokens the tokens to be processed.
+     * @return the de-quoted tokens
+     */
     private List<BjorneToken> dequote(List<BjorneToken> wordTokens) {
         List<BjorneToken> resTokens = new LinkedList<BjorneToken>();
         for (BjorneToken token : wordTokens) {
-            String text = token.getText();
-            int len = text.length();
-            StringBuffer sb = new StringBuffer(len);
-            int quote = 0;
-            for (int i = 0; i < len; i++) {
-                char ch = text.charAt(i);
-                switch (ch) {
-                    case '"':
-                    case '\'':
-                        if (quote == 0) {
-                            quote = ch;
-                        } else if (quote == ch) {
-                            quote = 0;
-                        } else {
-                            sb.append(ch);
-                        }
-                        break;
-                    case '\\':
-                        if (i + 1 < len) {
-                            ch = text.charAt(++i);
-                        }
-                        sb.append(ch);
-                        break;
-                    default:
-                        sb.append(ch);
-                        break;
-                }
-            }
-            resTokens.add(token.remake(sb));
+            resTokens.add(token.remake(dequote(token.getText())));
         }
         return resTokens;
+    }
+    
+    /**
+     * Do quote removal on a String
+     * 
+     * @param text the text to be processed.
+     * @return the de-quoted text
+     */
+     static StringBuffer dequote(String text) {
+        int len = text.length();
+        StringBuffer sb = new StringBuffer(len);
+        int quote = 0;
+        for (int i = 0; i < len; i++) {
+            char ch = text.charAt(i);
+            switch (ch) {
+                case '"':
+                case '\'':
+                    if (quote == 0) {
+                        quote = ch;
+                    } else if (quote == ch) {
+                        quote = 0;
+                    } else {
+                        sb.append(ch);
+                    }
+                    break;
+                case '\\':
+                    if (i + 1 < len) {
+                        ch = text.charAt(++i);
+                    }
+                    sb.append(ch);
+                    break;
+                default:
+                    sb.append(ch);
+                break;
+            }
+        }
+        return sb;
     }
 
     /**

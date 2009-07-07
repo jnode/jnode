@@ -31,8 +31,7 @@ public class RedirectionNode {
     
     private boolean expandable = true;
 
-    public RedirectionNode(final int redirectionType, BjorneToken io,
-            BjorneToken arg) {
+    public RedirectionNode(final int redirectionType, BjorneToken io, BjorneToken arg) {
         super();
         this.redirectionType = redirectionType;
         this.io = io;
@@ -78,4 +77,9 @@ public class RedirectionNode {
     public boolean isHereDocumentExpandable() {
         return expandable;
     }
+
+    public void setHereDocumentExpandable(boolean expandable) {
+        this.expandable = expandable;
+    }
+
 }

@@ -222,11 +222,10 @@ public class BjorneTokenizer {
      * This method bypasses normal tokenization and reads a raw line of
      * text up to the next NL (or the end of stream).
      * 
-     * @param trimTabs if {@code true}, trim any leading TABs from the line
      * @return the line read without the terminating NL.  If we got an
      * end of stream immediately, return {@code null}.
      */
-    public String readHereLine(boolean trimTabs) {
+    public String readRawLine() {
         StringBuilder sb = new StringBuilder(40);
         while (true) {
             int ch = nextCh();
@@ -235,11 +234,6 @@ public class BjorneTokenizer {
                     return sb.toString();
                 case EOS:
                     return (sb.length() > 0) ? sb.toString() : null;
-                case '\t':
-                    if (!trimTabs || sb.length() > 0) {
-                        sb.append('\t');
-                    }
-                    break;
                 default:
                     sb.append((char) ch);
             }
