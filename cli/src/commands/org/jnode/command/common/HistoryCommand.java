@@ -40,7 +40,7 @@ import org.jnode.shell.syntax.StringArgument;
 public class HistoryCommand extends AbstractCommand {
 
     private static final String help_index = "A history list index";
-    private static final String help_prefix = "A histor list prefix (>= 0)";
+    private static final String help_prefix = "A history list prefix (>= 0)";
     private static final String help_test = "If set, don't try to execute the history command";
     private static final String help_super = "Command history list or execute";
     private static final String err_not_found_1 = "History command #%d not found%n";

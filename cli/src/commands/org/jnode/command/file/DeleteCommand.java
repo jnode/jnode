@@ -43,7 +43,7 @@ import org.jnode.shell.syntax.FlagArgument;
  * @author Martin Husted Hartvig (hagar at jnode.org)
  * @author crawley@jnode.org
  * @author chris boertien
- * @see {@link http://www.opengroup.org/onlinepubs/009695399/utilities/rm.html}
+ * @see <a href="http://www.opengroup.org/onlinepubs/009695399/utilities/rm.html">POSIX "rm" command</a>
  */
 public class DeleteCommand extends AbstractCommand {
     
