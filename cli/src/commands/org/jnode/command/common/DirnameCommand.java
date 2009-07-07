@@ -25,8 +25,8 @@ import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.StringArgument;
 
 /**
- * Unix `dirname` command
- * @see http://www.opengroup.org/onlinepubs/000095399/utilities/dirname.html
+ * Command to get the directory part of a pathname.
+ * @see <a href="http://www.opengroup.org/onlinepubs/000095399/utilities/dirname.html">POSIX "dirname" command</a>
  * @author chris boertien
  */
 public class DirnameCommand extends AbstractCommand {

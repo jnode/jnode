@@ -35,9 +35,9 @@ import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
 
 /**
- * Word, line and byte or character count command.
+ * Count the words, lines and bytes or characters in a file or stream.
  * 
- * @see {@link http://www.opengroup.org/onlinepubs/7990989775/xcu/wc.html}
+ * @see <a href="http://www.opengroup.org/onlinepubs/7990989775/xcu/wc.html">POSIX "wc" command</a>
  * @author cy6erGn0m
  * @author Yves Galante
  */
@@ -45,7 +45,7 @@ public class WcCommand extends AbstractCommand {
 
     private static final String STR_SUPER = "Print newline, word, and byte counts for each file.";
     private static final String STR_TOTAL = "total";
-    private static final String STR_ERROR_DIR = "File is a directoy : ";
+    private static final String STR_ERROR_DIR = "File is a directory : ";
     private static final String STR_ERROR_NOT_EXIST = "File not exist : ";
     private static final String STR_ERROR_CANT_READ = "File can't be read : ";
     private static final String STR_ERROR_IO_EX = "IO error";
@@ -161,10 +161,8 @@ public class WcCommand extends AbstractCommand {
     /**
      * Prints results.
      * 
-     * @param printWriter
-     *            the print writer
-     * @param listWc
-     *            the world count stream list
+     * @param printWriter the print writer
+     * @param listWc the world count stream list
      */
     private void printResults(PrintWriter printWriter, List<WcStream> listWc) {
 

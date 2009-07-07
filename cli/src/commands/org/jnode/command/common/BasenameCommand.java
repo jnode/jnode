@@ -25,9 +25,9 @@ import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.StringArgument;
 
 /**
- * Unix `basename` command.
+ * Command to get the filename part of a pathname.
  * 
- * @see {@link http://www.opengroup.org/onlinepubs/000095399/utilities/basename.html}
+ * @see <a href="http://www.opengroup.org/onlinepubs/000095399/utilities/basename.html">POSIX "basename" command</a>
  * @author chris boertien
  */
 public class BasenameCommand extends AbstractCommand {
