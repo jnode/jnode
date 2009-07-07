@@ -161,7 +161,7 @@ public class ArchiveCommand extends AbstractCommand {
                     if (forced) {
                         file.delete();
                     } else {
-                        if (prompt_yn(file + prompt_overwrite, true)) {
+                        if (askUser(file + prompt_overwrite, true)) {
                             file.delete();
                         } else {
                             notice("Skipping " + file);
@@ -212,7 +212,7 @@ public class ArchiveCommand extends AbstractCommand {
         if (obj != null) {
             try {
                 obj.close();
-            } catch (IOException _) {
+            } catch (IOException ex) {
                 //ignore
             }
         }
@@ -225,7 +225,7 @@ public class ArchiveCommand extends AbstractCommand {
         if (zfile != null) {
             try {
                 zfile.close();
-            } catch (IOException _) {
+            } catch (IOException ex) {
                 // ignore
             }
         }
@@ -241,7 +241,7 @@ public class ArchiveCommand extends AbstractCommand {
      * @param defaultY if {#code true}, the default answer is yes, otherwise no.
      * @return true if the user said yes, false if the user said no
      */
-    protected boolean prompt_yn(String s, boolean defaultY) {
+    protected boolean askUser(String s, boolean defaultY) {
         int choice;
         // put a cap on the looping to prevent non-terminal stdin 
         // from an infinite loop
@@ -249,7 +249,7 @@ public class ArchiveCommand extends AbstractCommand {
             stdoutWriter.print(s);
             try {
                 choice = stdinReader.read();
-            } catch (IOException _) {
+            } catch (IOException ex) {
                 throw new RuntimeException("Problem with stdin");
             }
             stdoutWriter.println();
@@ -288,8 +288,8 @@ public class ArchiveCommand extends AbstractCommand {
         if ((outMode & OUT_ERROR) == OUT_ERROR) stderrWriter.println(s);
     }
     
-    protected void fatal(String s, int exit_code) {
+    protected void fatal(String s, int exitCode) {
         stderrWriter.println("Fatal error: " + s);
-        exit(exit_code);
+        exit(exitCode);
     }
 }
