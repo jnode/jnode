@@ -766,6 +766,12 @@ public class BjorneParser {
         this.allowLineBreaks = true;
     }
 
+    /**
+     * Skip optional linebreaks.
+     * @param expectedSet the tokens expected after the line breaks
+     * @param needMore if {@code true} we need a token after the line breaks,
+     *     otherwise, it is OK to have no more tokens.
+     */
     private void doLineBreaks(long expectedSet, boolean needMore) throws ShellSyntaxException {
         // NB: use tokens.peek() / next() rather than the wrappers here!!
         this.allowLineBreaks = false;
@@ -800,16 +806,32 @@ public class BjorneParser {
         }
     }
 
+    /**
+     * Capture all current HERE documents, dealing with TAB stripping (if required)
+     * and recording on the relevant redirection object.  We don't do expansions at
+     * this point, but we set the flag to say if expansion is required.
+     * 
+     * @throws ShellSyntaxException
+     */
     private void captureHereDocuments() throws ShellSyntaxException {
         for (RedirectionNode redirection : hereRedirections) {
             StringBuilder sb = new StringBuilder();
-            String marker = redirection.getArg().getText();
+            String rawMarker = redirection.getArg().getText();
+            String marker = BjorneContext.dequote(rawMarker).toString();
             boolean trimTabs = redirection.getRedirectionType() == TOK_DLESSDASH;
             while (true) {
-                String line = tokens.readHereLine(trimTabs);
+                String line = tokens.readRawLine();
                 if (line == null) {
                     throw new ShellSyntaxException("EOF reached while looking for '" +
                             marker + "' to end a HERE document");
+                }
+                if (trimTabs) {
+                    int len = line.length();
+                    int i;
+                    for (i = 0; i < len && line.charAt(i) == '\t'; i++) { /**/  }
+                    if (i > 0) {
+                        line = line.substring(i);
+                    }
                 }
                 if (line.equals(marker)) {
                     break;
@@ -817,6 +839,7 @@ public class BjorneParser {
                 sb.append(line).append('\n');
             }
             redirection.setHereDocument(sb.toString());
+            redirection.setHereDocumentExpandable(marker.equals(rawMarker));
         }
         hereRedirections.clear();
     }

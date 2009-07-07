@@ -735,6 +735,19 @@ Hi mum 4
 Hi mum 5
 </output>
     </testSpec>
+    <testSpec title="here 4" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                for i in 1 2 3 4 5 ; do cat &lt;&lt; "EOF" ; done 
+Hi mum `echo $i`
+EOF
+        </script>
+        <output>Hi mum `echo $i`
+Hi mum `echo $i`
+Hi mum `echo $i`
+Hi mum `echo $i`
+Hi mum `echo $i`
+</output>
+    </testSpec>
     <testSpec title="pipeline" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 echo &gt; @TEMP_DIR@/1 Hi mum
