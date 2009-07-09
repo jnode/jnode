@@ -288,7 +288,7 @@
           <then>
             <delete file="${classlib.jar}"/>
             <echo message="Creating ${classlib.jar}"/>
-            <exec executable="unpack200">
+            <exec executable="${java.home}/bin/unpack200">
               <arg file="${root.dir}/all/lib/classlib.pack.gz"/>
               <arg file="${classlib.jar}"/>
             </exec>
