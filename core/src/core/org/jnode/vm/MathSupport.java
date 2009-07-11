@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.annotation.MagicPermission;
@@ -39,6 +39,24 @@ public final class MathSupport {
      * New Implementation
      */
     public static long ldiv(long num, long den) {
+        if (num == Long.MIN_VALUE) {
+            if (den == Long.MIN_VALUE) {
+                return 1;
+            } else {
+                long q = ldiv(num + 1, den);
+                long r = num + 1 - q * den;
+                if (Math.abs(r) == Math.abs(den) - 1) {
+                    return q < 0 ? q - 1 : q + 1;
+                } else {
+                    return q;
+                }
+            }
+        }
+
+        if(den == Long.MIN_VALUE) {
+            return 0;
+        }
+
         boolean neg = false;
         if (num < 0) {
             num = -num;
@@ -74,11 +92,27 @@ public final class MathSupport {
             return -result;
         return result;
     }
-
     /**
      * new implementation
      */
     public static long lrem(long num, long den) {
+        if (num == Long.MIN_VALUE) {
+            if (den == Long.MIN_VALUE) {
+                return 0;
+            } else {
+                long r = lrem(num + 1, den);
+                if (Math.abs(r) == Math.abs(den) - 1) {
+                    return 0;
+                } else {
+                    return r < 0 ? r - 1 : r > 0 ? r + 1 : -1;
+                }
+            }
+        }
+
+        if(den == Long.MIN_VALUE) {
+            return num;
+        }
+
         final boolean neg;
         if (num < 0) {
             num = -num;
@@ -113,7 +147,6 @@ public final class MathSupport {
             return -num;
         return num;
     }
-
     /*
     private final char[] v = new char[5];
     private final char[] u = new char[5];
