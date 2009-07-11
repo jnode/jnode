@@ -609,7 +609,7 @@ public class BjorneContext {
 
     private StringBuffer runBacktickCommand(String commandLine) throws ShellException {
         StringWriter capture = new StringWriter();
-        interpreter.interpret(interpreter.getShell(), new StringReader(commandLine), capture, false);
+        interpreter.interpret(interpreter.getShell(), new StringReader(commandLine), false, capture, false);
         StringBuffer output = capture.getBuffer();
         while (output.length() > 0 && output.charAt(output.length() - 1) == '\n') {
             output.setLength(output.length() - 1);

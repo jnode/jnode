@@ -99,7 +99,7 @@ public class DefaultInterpreter implements CommandInterpreter {
      * and will result in a {@link ShellException} being thrown.
      */
     @Override
-    public int interpret(CommandShell shell, Reader reader, String alias, String[] args) 
+    public int interpret(CommandShell shell, Reader reader, boolean script, String alias, String[] args) 
         throws ShellException {
         if (args != null && args.length > 0) {
             throw new ShellInvocationException(
@@ -111,28 +111,23 @@ public class DefaultInterpreter implements CommandInterpreter {
             int rc = 0;
             while ((line = br.readLine()) != null) {
                 line = line.trim();
-                if (line.length() == 0 || line.startsWith("#")) {
-                    continue;
+                if (line.length() > 0 && !line.startsWith("#")) {
+                    rc = interpret(shell, line);
                 }
-                rc = interpret(shell, line);
+                if (!script) {
+                    break;
+                }
             }
             return rc;
         } catch (IOException ex) {
-            throw new ShellInvocationException("Problem reading command file: " + ex.getMessage(), ex);
+            throw new ShellInvocationException("Problem reading command: " + ex.getMessage(), ex);
         } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException ex) {
-                    // ignore
-                }
+            try {
+                reader.close();
+            } catch (IOException ex) {
+                // ignore
             }
         }
-    }
-
-    @Override
-    public boolean supportsMultilineCommands() {
-        return false;
     }
     
     @Override

@@ -138,21 +138,18 @@ public class BjorneParser {
      */
     public CommandNode parse() throws ShellSyntaxException {
         hereRedirections.clear();
-        List<CommandNode> commands = new LinkedList<CommandNode>();
+        CommandNode command = null;
         // (The POSIX syntax doesn't seem to allow line breaks at the start, but I
         // don't think that can be right ...)
         skipLineBreaks();
-        while (peek().getTokenType() != TOK_END_OF_STREAM) {
-            CommandNode command = parseList();
-            commands.add(command);
-            allowLineBreaks();
-        }
+        command = parseOptList();
+        allowLineBreaks();
         captureHereDocuments();
-        return listToNode(commands);
+        return command;
     }
     
     /**
-     * Parse a 'complete_command' capturing completions.parseAndOr
+     * Parse a 'complete_command' capturing completions.
      * 
      * @param completer holder object for capturing completion information.
      * @return the CommandNode representing the complete command.
@@ -169,14 +166,14 @@ public class BjorneParser {
     }
 
     /**
-     * Parse 'list ::= list separator_op and_or | and_or'
+     * Parse 'list ::= list separator_op and_or | and_or' or empty
      * 
      * @return the CommandNode representing the list.
      * @throws ShellSyntaxException
      */
-    private CommandNode parseList() throws ShellSyntaxException {
+    private CommandNode parseOptList() throws ShellSyntaxException {
         List<CommandNode> commands = new LinkedList<CommandNode>();
-        CommandNode command = parseAndOr();
+        CommandNode command = parseOptAndOr();
         while (command != null) {
             commands.add(command);
             BjorneToken token = expectPeek(
@@ -693,13 +690,6 @@ public class BjorneParser {
         return tokens.next();
     }
     
-    private BjorneToken peek() throws ShellSyntaxException {
-        if (allowLineBreaks) {
-            doLineBreaks(0L, false);
-        }
-        return tokens.peek();
-    }
-    
     private BjorneToken peekEager() throws ShellSyntaxException {
         if (allowLineBreaks) {
             doLineBreaks(0L, true);
@@ -853,5 +843,10 @@ public class BjorneParser {
         } else {
             return new ListCommandNode(CMD_LIST, commands);
         }
+    }
+
+    public String getContinuationPrompt() {
+        // FIXME ... use PS2, PS4 or whatever as appropriate.
+        return "> ";
     }
 }
