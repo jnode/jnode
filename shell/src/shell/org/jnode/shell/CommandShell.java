@@ -541,7 +541,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 // for input completion
                 applicationHistory.set(new InputHistory());
             }
-            return interpreter.interpret(this, new StringReader(command), null, null);
+            Reader reader = interactive ? new CommandShellReader(command, interpreter, outPW, in) :
+                new StringReader(command);
+            return interpreter.interpret(this, reader, !interactive, null, null);
         } finally {
             if (interactive) {
                 applicationHistory.set(null);
@@ -867,7 +869,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             if (alias == null) {
                 alias = file.getAbsolutePath();
             }
-            return interpreter.interpret(this, new FileReader(file), alias, args);
+            return interpreter.interpret(this, new FileReader(file), true, alias, args);
         } catch (IOException ex) {
             throw new ShellInvocationException("Cannot open command file: " + ex.getMessage(), ex);
         } finally {
@@ -891,7 +893,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             }
             CommandInterpreter interpreter = createInterpreter(new InputStreamReader(input));
             Reader reader = new InputStreamReader(getClass().getResourceAsStream(resourceName));
-            return interpreter.interpret(this, reader, resourceName, args);
+            return interpreter.interpret(this, reader, true, resourceName, args);
         } finally {
             setHistoryEnabled(enabled);
         }

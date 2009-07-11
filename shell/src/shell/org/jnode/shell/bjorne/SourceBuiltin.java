@@ -65,7 +65,7 @@ final class SourceBuiltin extends BjorneBuiltin {
 
             // TODO ... implement args.
             BjorneContext pc = getParentContext();
-            int rc = pc.getInterpreter().interpret(pc.getShell(), reader, "", new String[0]);
+            int rc = pc.getInterpreter().interpret(pc.getShell(), reader, true, "", new String[0]);
             if (rc != 0) {
                 exit(rc);
             }
