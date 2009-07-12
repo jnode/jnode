@@ -53,7 +53,7 @@ public final class MathSupport {
             }
         }
 
-        if(den == Long.MIN_VALUE) {
+        if (den == Long.MIN_VALUE) {
             return 0;
         }
 
@@ -109,7 +109,7 @@ public final class MathSupport {
             }
         }
 
-        if(den == Long.MIN_VALUE) {
+        if (den == Long.MIN_VALUE) {
             return num;
         }
 

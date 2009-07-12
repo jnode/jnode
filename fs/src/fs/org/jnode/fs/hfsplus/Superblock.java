@@ -27,7 +27,6 @@ import java.util.Date;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.jnode.driver.ApiNotFoundException;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
 import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
@@ -436,7 +435,7 @@ public class Superblock extends HfsPlusObject {
         return data;
     }
     
-    public void update() throws IOException{
+    public void update() throws IOException {
         fs.getApi().write(1024, ByteBuffer.wrap(data));
     }
 

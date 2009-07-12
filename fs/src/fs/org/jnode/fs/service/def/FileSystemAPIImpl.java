@@ -288,7 +288,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
             entryCache.setEntry(entryPath.toString(), child);
             entryPath.setLength(directoryPathSize);
 
-            if(name != null){
+            if (name != null) {
                 list.add(name);
             }
         }

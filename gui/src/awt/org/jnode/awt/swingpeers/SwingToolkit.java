@@ -478,7 +478,8 @@ public final class SwingToolkit extends JNodeToolkit {
             }
         } else {
             comp = super.getTopComponentAt(x, y);
-            SwingBaseWindow<?, ?> window = (SwingBaseWindow<?, ?>) SwingUtilities.getAncestorOfClass(SwingBaseWindow.class, comp);
+            SwingBaseWindow<?, ?> window = (SwingBaseWindow<?, ?>) SwingUtilities.
+                getAncestorOfClass(SwingBaseWindow.class, comp);
             if (window != null) {
                 Rectangle r = window.getBounds();
                 Insets ins = window.getSwingPeer().getInsets();
