@@ -43,6 +43,9 @@ import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.l1a.X86Level1ACompiler;
 
 /**
+ * Bytecode to native compiler test.
+ * Runt this class in the root directory of the JNode source tree.
+ *
  * @author epr
  */
 public class CompilerTest {
@@ -70,8 +73,9 @@ public class CompilerTest {
 //            "org.jnode.vm.SoftByteCodes",
 //            "org.jnode.vm.VmSystem",
 //      "org.jnode.vm.VmStacReader",
-        "org.jnode.vm.classmgr.VmType",
+//        "org.jnode.vm.classmgr.VmType",
 //            "org.jnode.test.ArrayLongTest",
+            "org.jnode.test.ArrayTest",
 //            "org.jnode.test.Linpack",
 //            "org.jnode.test.MultiANewArrayTest",
 //            "org.jnode.test.Sieve",
@@ -111,11 +115,16 @@ public class CompilerTest {
         } else {
             arch = new VmX86Architecture32();
         }
-        final VmSystemClassLoader cl = new VmSystemClassLoader(new File(dir)
-            .toURL(), arch);
-        VmType.initializeForBootImage(cl);
+        File classes = new File("./core/build/classes/").getCanonicalFile();
+        File classlib = new File("./all/lib/classlib.jar").getCanonicalFile();
+        final VmSystemClassLoader cl = new VmSystemClassLoader(new java.net.URL[]{
+            classes.toURI().toURL(),
+            new java.net.URL("jar:"+ classlib.toURI().toURL() + "!/"),
+        }, arch);
+
         final Vm vm = new Vm("?", arch, cl.getSharedStatics(), false, cl, null);
         vm.toString();
+        VmType.initializeForBootImage(cl);
         System.out.println("Architecture: " + arch.getFullName());
 
         //final ObjectResolver resolver = new DummyResolver();
