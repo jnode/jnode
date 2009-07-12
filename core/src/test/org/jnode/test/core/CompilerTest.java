@@ -75,7 +75,7 @@ public class CompilerTest {
 //      "org.jnode.vm.VmStacReader",
 //        "org.jnode.vm.classmgr.VmType",
 //            "org.jnode.test.ArrayLongTest",
-            "org.jnode.test.ArrayTest",
+        "org.jnode.test.ArrayTest",
 //            "org.jnode.test.Linpack",
 //            "org.jnode.test.MultiANewArrayTest",
 //            "org.jnode.test.Sieve",
@@ -119,7 +119,7 @@ public class CompilerTest {
         File classlib = new File("./all/lib/classlib.jar").getCanonicalFile();
         final VmSystemClassLoader cl = new VmSystemClassLoader(new java.net.URL[]{
             classes.toURI().toURL(),
-            new java.net.URL("jar:"+ classlib.toURI().toURL() + "!/"),
+            new java.net.URL("jar:" + classlib.toURI().toURL() + "!/"),
         }, arch);
 
         final Vm vm = new Vm("?", arch, cl.getSharedStatics(), false, cl, null);

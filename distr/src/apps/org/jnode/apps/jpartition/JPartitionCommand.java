@@ -79,7 +79,8 @@ public class JPartitionCommand extends AbstractCommand {
     /**
      * {@inheritDoc}
      */
-    public void doExecute(boolean install, InputStream in, PrintStream out, PrintStream err, boolean consoleView, boolean swingView) throws Exception { 
+    public void doExecute(boolean install, InputStream in, PrintStream out, PrintStream err, boolean consoleView,
+                          boolean swingView) throws Exception { 
         ViewFactory viewFactory =
                 consoleView ? new ConsoleViewFactory()
                         : swingView ? new SwingViewFactory() : null;

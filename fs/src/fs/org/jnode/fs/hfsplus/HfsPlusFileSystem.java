@@ -153,7 +153,8 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
             volumeHeader.create(params);
             log.debug("Volume header : \n" + volumeHeader.toString());
             long volumeBlockUsed =
-                    volumeHeader.getTotalBlocks() - volumeHeader.getFreeBlocks() - ((volumeHeader.getBlockSize() == 512) ? 2 : 1);
+                volumeHeader.getTotalBlocks() - volumeHeader.getFreeBlocks() - ((volumeHeader.getBlockSize() == 512) ?
+                    2 : 1);
             // ---
             log.debug("Write allocation bitmap bits to disk.");
             writeAllocationFile((int) volumeBlockUsed);

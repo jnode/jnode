@@ -93,7 +93,7 @@ public class HfsPlusDirectory extends HfsPlusEntry implements FSDirectory {
         Catalog catalog = fs.getCatalog();
         Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
         LeafRecord fileRecord = catalog.createNode(name, this.folder
-                        .getFolderId(), new CatalogNodeId(volumeHeader.getNextCatalogId()), CatalogFile.RECORD_TYPE_FILE);
+        .getFolderId(), new CatalogNodeId(volumeHeader.getNextCatalogId()), CatalogFile.RECORD_TYPE_FILE);
         
         HFSPlusEntry newEntry = new HFSPlusFile(fs, this, name, folderRecord);
         newEntry.setDirty();

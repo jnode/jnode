@@ -350,7 +350,7 @@ public class BCELDependencyChecker extends AbstractPluginTask {
                 usedPlugins.put(fragment.getFullPluginId(), fragment);
             }
 
-            for (PluginPrerequisite prerequisite: plugin.descr.getPrerequisites()) {
+            for (PluginPrerequisite prerequisite : plugin.descr.getPrerequisites()) {
                 String idOfUsedPlugin =
                     createFullPluginId(prerequisite.getPluginId(), prerequisite.getPluginVersion());
                 usedPlugins.put(idOfUsedPlugin, findPlugin(idOfUsedPlugin));

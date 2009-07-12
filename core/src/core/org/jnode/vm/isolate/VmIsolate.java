@@ -55,7 +55,6 @@ import org.jnode.annotation.SharedStatics;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.scheduler.VmThread;
-import gnu.classpath.SystemProperties;
 
 /**
  * VM specific implementation of the Isolate class.
