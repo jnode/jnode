@@ -995,20 +995,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         return syntaxMgr;
     }
 
-    /**
-     * @deprecated Don't use this method.  I intend to get rid of it.
-     */
-    public PrintWriter getOut() {
-        return outPW;
-    }
-
-    /**
-     * @deprecated Don't use this method.  I intend to get rid of it.
-     */
-    public PrintWriter getErr() {
-        return errPW;
-    }
-
     @Override
     public void addConsoleOuputRecorder(Writer writer) {
         // FIXME do security check

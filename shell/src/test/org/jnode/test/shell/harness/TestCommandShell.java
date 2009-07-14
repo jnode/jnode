@@ -22,7 +22,6 @@ package org.jnode.test.shell.harness;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
@@ -53,16 +52,6 @@ public class TestCommandShell extends CommandShell {
         this.cin = new CommandInput(in);
         this.cout = new CommandOutput(out);
         this.cerr = new CommandOutput(err);
-    }
-
-    @Override
-    public PrintWriter getErr() {
-        return cerr.getPrintWriter(true);
-    }
-
-    @Override
-    public PrintWriter getOut() {
-        return cout.getPrintWriter(false);
     }
 
     @Override
