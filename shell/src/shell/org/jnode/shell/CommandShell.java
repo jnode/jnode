@@ -322,7 +322,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 if (e.startsWith(COMMAND_KEY)) {
                     final String cmd = e.substring(COMMAND_KEY.length());
                     outPW.println(prompt() + cmd);
-                    runCommand(cmd, false, this.interpreter);
+                    runCommand(cmd);
                 }
             } catch (Throwable ex) {
                 errPW.println("Error while processing bootarg commands: "
@@ -373,13 +373,24 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
         while (!isExited() && !VmSystem.isShuttingDown()) {
             String input = null;
+            CommandShellReader reader = null;
             try {
                 clearEof();
                 outPW.print(prompt());
                 readingCommand = true;
                 input = readInputLine();
                 if (input.length() > 0) {
-                    runCommand(input, true, this.interpreter);
+                    try {
+                        clearEof();
+                        readingCommand = false;
+                        // Each interactive command is launched with a fresh history
+                        // for input completion
+                        applicationHistory.set(new InputHistory());
+                        reader = new CommandShellReader(input, interpreter, outPW, in);
+                        interpreter.interpret(this, reader, false, null, null);
+                    } finally {
+                        applicationHistory.set(null);
+                    }
                 }
             } catch (ShellException ex) {
                 diagnose(ex, null);
@@ -393,10 +404,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                         + ex.getMessage());
                 stackTrace(ex);
             } finally {
-                // FIXME ...
-                if (input != null && input.trim().length() > 0) {
-                    String lines[] = input.split("\\n");
-                    for (String line : lines) {
+                if (reader != null) {
+                    for (String line : reader.getLines()) {
                         addToCommandHistory(line);
                     }
                 }
@@ -530,26 +539,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             ((KeyboardReader) in).clearSoftEOF();
         }
     }
-        
-    private int runCommand(String command, boolean interactive, CommandInterpreter interpreter) 
-        throws ShellException {
-        try {
-            if (interactive) {
-                clearEof();
-                readingCommand = false;
-                // Each interactive command is launched with a fresh history
-                // for input completion
-                applicationHistory.set(new InputHistory());
-            }
-            Reader reader = interactive ? new CommandShellReader(command, interpreter, outPW, in) :
-                new StringReader(command);
-            return interpreter.interpret(this, reader, !interactive, null, null);
-        } finally {
-            if (interactive) {
-                applicationHistory.set(null);
-            }
-        }
-    }
 
     /**
      * Parse and run a command line using the CommandShell's current
@@ -559,7 +548,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @throws ShellException
      */
     public int runCommand(String command) throws ShellException {
-        return runCommand(command, false, this.interpreter);
+        return interpreter.interpret(this, new StringReader(command), true, null, null);
     }
 
     /**

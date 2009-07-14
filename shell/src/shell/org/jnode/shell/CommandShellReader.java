@@ -24,6 +24,8 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.CharBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This Reader class handles CommandShell line buffering in interactive mode.
@@ -36,10 +38,13 @@ class CommandShellReader extends Reader {
     private final Reader in;
     private final PrintWriter out;
     private final MultilineInterpreter interpreter;
+    private final List<String> lines = new ArrayList<String>(1);
 
     public CommandShellReader(String command, CommandInterpreter interpreter, PrintWriter out, Reader in) {
         this.interpreter = (interpreter instanceof MultilineInterpreter) ?
                 (MultilineInterpreter) interpreter : null;
+
+        this.lines.add(command);
         if (interpreter != null) {
             command += "\n";
         }
@@ -67,6 +72,7 @@ class CommandShellReader extends Reader {
                     sb.append((char) ch);
                 }
             }
+            this.lines.add(sb.toString());
             sb.append('\n');
             reader = new StringReader(sb.toString());
             return true;
@@ -147,6 +153,10 @@ class CommandShellReader extends Reader {
     @Override
     public long skip(long n) throws IOException {
         throw new UnsupportedOperationException("skip is not supported");
+    }
+
+    public List<String> getLines() {
+        return lines;
     }
     
 }
