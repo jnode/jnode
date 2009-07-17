@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.net.URL;
+import java.net.URLClassLoader;
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
 import javax.isolate.IsolateStatus;
@@ -155,7 +157,15 @@ public final class VmIsolate {
      */
     private BootableHashMap<VmIsolateLocal<?>, ?> isolateLocalMap = new BootableHashMap<VmIsolateLocal<?>, Object>();
 
+    /**
+     * List of isolates started by this isolate.
+     */
     private final List<VmIsolate> children = new LinkedList<VmIsolate>();
+
+    /**
+     * Additional classpath for this isolate.
+     */
+    private URL[] classpath;
 
     /**
      * Isolate states.
@@ -955,11 +965,10 @@ public final class VmIsolate {
                 myProps.setProperty(
                         (String) key, (String) initProperties.getProperty((String) key));
             }
-            VmSystem.getIOContext().setProperties(myProps);
+            System.setProperties(myProps);
 
             // Set context classloader
-            final ClassLoader loader = thread.getPluginManager().getRegistry()
-                .getPluginsClassLoader();
+            final ClassLoader loader = getClassLoader(thread);
             Thread.currentThread().setContextClassLoader(loader);
 
             // Fire started events.
@@ -1017,6 +1026,15 @@ public final class VmIsolate {
             } finally {
                 systemHalt(isolate, -1);
             }
+        }
+    }
+
+    private ClassLoader getClassLoader(IsolateThread thread) {
+        ClassLoader pluginsClassLoader = thread.getPluginManager().getRegistry().getPluginsClassLoader();
+        if (classpath == null) {
+            return pluginsClassLoader;
+        } else {
+            return new URLClassLoader(classpath, pluginsClassLoader);
         }
     }
 
@@ -1119,8 +1137,21 @@ public final class VmIsolate {
         return isolateLocalMap;
     }
 
+    /**
+     * Returns the current state of this isolate.
+     * @return the state
+     */
     public IsolateStatus.State getIsolateState() {
         return isolateState;
+    }
+
+    /**
+     * Set the classpath for this isolate to complement the default classpath.
+     *
+     * @param classpath an array of URLs holding the classpath entries as URLs
+     */
+    public void setClasspath(URL[] classpath) {
+        this.classpath = classpath;
     }
 
     /**
