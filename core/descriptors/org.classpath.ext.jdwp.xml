@@ -11,7 +11,7 @@
   license-name="classpath">
 
   <runtime>
-    <library name="classlib.jar">
+    <library name="jnode-core.jar">
       <export name="gnu.classpath.jdwp.*"/>
       <export name="gnu.classpath.jdwp.event.*"/>
       <export name="gnu.classpath.jdwp.event.filters.*"/>

@@ -390,7 +390,6 @@
                         <include name="org.classpath.ext.corba.xml"/>
                         <include name="org.classpath.ext.core.xml"/>
                         <include name="org.classpath.ext.imageio.xml"/>
-                        <include name="org.classpath.ext.jdwp.xml"/>
                         <include name="org.classpath.ext.management.xml"/>
                         <include name="org.classpath.ext.print.xml"/>
                         <include name="org.classpath.ext.security.xml"/>
@@ -478,7 +477,6 @@
                 <exclude name="org.classpath.ext.corba.xml"/>
                 <exclude name="org.classpath.ext.core.xml"/>
                 <exclude name="org.classpath.ext.imageio.xml"/>
-                <exclude name="org.classpath.ext.jdwp.xml"/>
                 <exclude name="org.classpath.ext.management.xml"/>
                 <exclude name="org.classpath.ext.print.xml"/>
                 <exclude name="org.classpath.ext.security.xml"/>
