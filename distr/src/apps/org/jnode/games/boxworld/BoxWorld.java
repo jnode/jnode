@@ -382,8 +382,7 @@ public class BoxWorld extends JComponent implements WindowListener, KeyListener,
     // *************************************
     // ************************************************************************************
 
-    // ----------------------------------KEY
-    // EVENTS----------------------------------------
+    // ----------------------------------KEY EVENTS----------------------------------------
 
     public void keyPressed(KeyEvent e) {
         if (gameMode == START_MODE) {
@@ -406,8 +405,7 @@ public class BoxWorld extends JComponent implements WindowListener, KeyListener,
         }
     }
 
-    // ----------------------------------MOUSE
-    // EVENTS---------------------------------------
+    // ----------------------------------MOUSE EVENTS---------------------------------------
     public void mousePressed(MouseEvent e) {
         if (SwingUtilities.isLeftMouseButton(e)) {
             if (this.contains(e.getX(), e.getY())) {
@@ -450,8 +448,7 @@ public class BoxWorld extends JComponent implements WindowListener, KeyListener,
         }
     }
 
-    // ----------------------------------ACTION
-    // EVENTS-------------------------------------
+    // ----------------------------------ACTION EVENTS-------------------------------------
     // FROM MENU
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
