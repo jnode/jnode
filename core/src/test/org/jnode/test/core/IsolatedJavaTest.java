@@ -93,6 +93,7 @@ public class IsolatedJavaTest {
 
         if (classArgs == null)
             classArgs = new String[0];
+
         Isolate newIsolate;
         if (properties != null && properties.size() > 0) {
             newIsolate = new Isolate(properties, mainClass, classArgs);
