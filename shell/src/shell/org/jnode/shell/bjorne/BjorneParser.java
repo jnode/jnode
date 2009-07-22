@@ -138,13 +138,16 @@ public class BjorneParser {
      */
     public CommandNode parse() throws ShellSyntaxException {
         hereRedirections.clear();
-        CommandNode command = null;
-        // (The POSIX syntax doesn't seem to allow line breaks at the start, but I
-        // don't think that can be right ...)
-        skipLineBreaks();
-        command = parseOptList();
-        allowLineBreaks();
-        captureHereDocuments();
+        CommandNode command = parseOptList();
+        if (command != null) {
+            allowLineBreaks();
+            captureHereDocuments();
+        } else {
+            noLineBreaks();
+            if (optNext(TOK_END_OF_LINE_BIT) != null) {
+                command = new SimpleCommandNode(CMD_COMMAND, new BjorneToken[0], false);
+            }
+        }
         return command;
     }
     
@@ -221,7 +224,7 @@ public class BjorneParser {
     }
 
     private CommandNode parseOptAndOr() throws ShellSyntaxException {
-        allowLineBreaks();
+        // allowLineBreaks();
         if (optPeek(TOK_LBRACE_BIT | TOK_LPAREN_BIT | TOK_COMMAND_NAME_BITS | TOK_FUNCTION_NAME_BITS |  
                 TOK_IF_BIT | TOK_WHILE_BIT | TOK_UNTIL_BIT | TOK_CASE_BIT | TOK_FOR_BIT | 
                 TOK_IO_NUMBER_BIT | TOK_LESS_BIT | TOK_GREAT_BIT | TOK_DLESS_BIT | 
@@ -754,6 +757,10 @@ public class BjorneParser {
 
     private void allowLineBreaks() throws ShellSyntaxException {
         this.allowLineBreaks = true;
+    }
+
+    private void noLineBreaks() throws ShellSyntaxException {
+        this.allowLineBreaks = false;
     }
 
     /**

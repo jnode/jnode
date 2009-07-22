@@ -35,8 +35,6 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,12 +140,12 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     private SyntaxManager syntaxMgr;
 
     /**
-     * Keeps a reference to the console this CommandShell is using *
+     * Keeps a reference to the console this CommandShell is using.
      */
     private TextConsole console;
 
     /**
-     * Contains the archive of commands. *
+     * Contains the archive of commands.
      */
     private InputHistory commandHistory = new InputHistory();
 
@@ -158,7 +156,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         new InheritableThreadLocal<InputHistory>();
 
     /**
-     * When true, {@link complete(String)} performs command completion.
+     * When {@code true}, command input characters are being requested / read 
+     * from the console.  This controls whether command or application history
+     * is used, and whether command completion may be active.
      */
     private boolean readingCommand;
 
@@ -274,7 +274,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 new InputStreamReader(System.in), 
                 new OutputStreamWriter(System.out), 
                 new OutputStreamWriter(System.err));
-        this.readingCommand = true;
     }
 
     
@@ -321,7 +320,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             try {
                 if (e.startsWith(COMMAND_KEY)) {
                     final String cmd = e.substring(COMMAND_KEY.length());
-                    outPW.println(prompt() + cmd);
                     runCommand(cmd);
                 }
             } catch (Throwable ex) {
@@ -372,25 +370,17 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         });
 
         while (!isExited() && !VmSystem.isShuttingDown()) {
-            String input = null;
             CommandShellReader reader = null;
             try {
                 clearEof();
-                outPW.print(prompt());
-                readingCommand = true;
-                input = readInputLine();
-                if (input.length() > 0) {
-                    try {
-                        clearEof();
-                        readingCommand = false;
-                        // Each interactive command is launched with a fresh history
-                        // for input completion
-                        applicationHistory.set(new InputHistory());
-                        reader = new CommandShellReader(input, interpreter, outPW, in);
-                        interpreter.interpret(this, reader, false, null, null);
-                    } finally {
-                        applicationHistory.set(null);
-                    }
+                try {
+                    // Each interactive command is launched with a fresh history
+                    // for input completion
+                    applicationHistory.set(new InputHistory());
+                    reader = new CommandShellReader(this, interpreter, outPW, in);
+                    interpreter.interpret(this, reader, false, null, null);
+                } finally {
+                    applicationHistory.set(null);
                 }
             } catch (ShellException ex) {
                 diagnose(ex, null);
@@ -403,6 +393,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 errPW.println("Uncaught exception while processing command(s): "
                         + ex.getMessage());
                 stackTrace(ex);
+                try {
+                    Thread.sleep(100000);
+                } catch (InterruptedException ex2) {
+                    
+                }
             } finally {
                 if (reader != null) {
                     for (String line : reader.getLines()) {
@@ -447,6 +442,10 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
         // Now become interactive
         ownThread = Thread.currentThread();
+    }
+    
+    protected void setReadingCommand(boolean readingCommand) {
+        this.readingCommand = readingCommand;
     }
     
     @Override
@@ -522,18 +521,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             ex.printStackTrace(errPW);
         }
     }
-
-    private String readInputLine() throws IOException {
-        StringBuffer sb = new StringBuffer(40);
-        while (true) {
-            int ch = in.read();
-            if (ch == -1 || ch == '\n') {
-                return sb.toString();
-            }
-            sb.append((char) ch);
-        }
-    }
-
+    
     private void clearEof() {
         if (in instanceof KeyboardReader) {
             ((KeyboardReader) in).clearSoftEOF();
@@ -659,51 +647,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         } else {
             return CommandShell.applicationHistory.get();
         }
-    }
-
-    /**
-     * Gets the expanded prompt
-     */
-    protected String prompt() {
-        String prompt = getProperty(PROMPT_PROPERTY_NAME);
-        final StringBuffer result = new StringBuffer();
-        boolean commandMode = false;
-        try {
-            StringReader reader = new StringReader(prompt);
-            int i;
-            while ((i = reader.read()) != -1) {
-                char c = (char) i;
-                if (commandMode) {
-                    switch (c) {
-                        case 'P':
-                            result.append(new File(System.getProperty(DIRECTORY_PROPERTY_NAME, "")));
-                            break;
-                        case 'G':
-                            result.append("> ");
-                            break;
-                        case 'D':
-                            final Date now = new Date();
-                            DateFormat.getDateTimeInstance().format(now, result, null);
-                            break;
-                        default:
-                            result.append(c);
-                    }
-                    commandMode = false;
-                } else {
-                    switch (c) {
-                        case '$':
-                            commandMode = true;
-                            break;
-                        default:
-                            result.append(c);
-                    }
-                }
-            }
-        } catch (Exception ioex) {
-            // This should never occur
-            log.error("Error in prompt()", ioex);
-        }
-        return result.toString();
     }
     
     /**

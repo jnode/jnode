@@ -40,10 +40,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.jnode.shell.CommandInterpreter;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.Completable;
-import org.jnode.shell.MultilineInterpreter;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ShellSyntaxException;
@@ -57,7 +57,7 @@ import org.jnode.vm.VmExit;
  * 
  * @author crawley@jnode.org
  */
-public class BjorneInterpreter implements MultilineInterpreter {
+public class BjorneInterpreter implements CommandInterpreter {
 
     public static final int CMD_EMPTY = 0;
 
@@ -218,7 +218,6 @@ public class BjorneInterpreter implements MultilineInterpreter {
             do {
                 CommandNode tree = parser.parse();
                 if (tree == null) {
-                    // end of file ...
                     break;
                 }
                 if (DEBUG) {
@@ -271,8 +270,19 @@ public class BjorneInterpreter implements MultilineInterpreter {
     }
     
     @Override
-    public String getContinuationPrompt() {
-        return parser == null ? null : parser.getContinuationPrompt();
+    public String getPrompt(CommandShell shell, boolean continuation) {
+        String res = context.getVariable(continuation ? "PS2" : "PS1");
+        return (res == null) ? "$ " : expandPrompt(res);
+    }
+
+    private String expandPrompt(String prompt) {
+        // FIXME implement
+        return prompt;
+    }
+
+    @Override
+    public boolean supportsMultiline() {
+        return true;
     }
 
     private void bindShell(CommandShell shell) {

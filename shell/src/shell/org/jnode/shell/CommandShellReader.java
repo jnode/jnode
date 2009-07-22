@@ -37,28 +37,34 @@ class CommandShellReader extends Reader {
     private StringReader reader;
     private final Reader in;
     private final PrintWriter out;
-    private final MultilineInterpreter interpreter;
+    private final CommandShell shell;
+    private final CommandInterpreter interpreter;
     private final List<String> lines = new ArrayList<String>(1);
 
-    public CommandShellReader(String command, CommandInterpreter interpreter, PrintWriter out, Reader in) {
-        this.interpreter = (interpreter instanceof MultilineInterpreter) ?
-                (MultilineInterpreter) interpreter : null;
-
-        this.lines.add(command);
-        if (interpreter != null) {
-            command += "\n";
-        }
-        this.reader = new StringReader(command);
+    public CommandShellReader(CommandShell shell, CommandInterpreter interpreter, 
+            PrintWriter out, Reader in) 
+        throws IOException {
+        this.shell = shell;
+        this.interpreter = interpreter;
         this.out = out;
         this.in = in;
+        nextReader(true);
     }
     
-    private boolean nextReader() throws IOException {
-        if (interpreter != null) {
-            String prompt = interpreter.getContinuationPrompt();
-            out.print(prompt);
-            out.flush();
-            StringBuilder sb = new StringBuilder(40);
+    private boolean nextReader(boolean first) throws IOException {
+        String prompt;
+        if (first) {
+            prompt = interpreter.getPrompt(shell, false);
+        } else if (interpreter.supportsMultiline()) {
+            prompt = interpreter.getPrompt(shell, true);
+        } else {
+            return false;
+        }
+        out.print(prompt);
+        out.flush();
+        StringBuilder sb = new StringBuilder(40);
+        try {
+            shell.setReadingCommand(true);
             while (true) {
                 int ch = in.read();
                 if (ch == -1) {
@@ -72,22 +78,22 @@ class CommandShellReader extends Reader {
                     sb.append((char) ch);
                 }
             }
-            this.lines.add(sb.toString());
-            sb.append('\n');
-            reader = new StringReader(sb.toString());
-            return true;
-        } else {
-            return false;
+        } finally {
+            shell.setReadingCommand(false);
         }
+        this.lines.add(sb.toString());
+        sb.append('\n');
+        reader = new StringReader(sb.toString());
+        return true;
     }
     
     @Override
     public int read() throws IOException {
         if (reader == null) {
-            throw new IOException("CommandShellReader is closed");
+            return -1;
         }
         int res = reader.read();
-        if (res == -1 && nextReader()) {
+        if (res == -1 && nextReader(false)) {
             res = reader.read();
         }
         return res;
@@ -111,10 +117,10 @@ class CommandShellReader extends Reader {
     @Override
     public int read(char[] cbuf, int off, int len) throws IOException {
         if (reader == null) {
-            throw new IOException("CommandShellReader is closed");
+            return -1;
         }
         int res = reader.read(cbuf, off, len);
-        if (res == 0 && nextReader()) {
+        if (res == 0 && nextReader(false)) {
             res = reader.read(cbuf, off, len);
         }
         return res;
@@ -128,10 +134,10 @@ class CommandShellReader extends Reader {
     @Override
     public int read(CharBuffer target) throws IOException {
         if (reader == null) {
-            throw new IOException("CommandShellReader is closed");
+            return -1;
         }
         int res = reader.read(target);
-        if (res == 0 && nextReader()) {
+        if (res == 0 && nextReader(false)) {
             res = reader.read(target);
         }
         return res;
@@ -140,9 +146,9 @@ class CommandShellReader extends Reader {
     @Override
     public boolean ready() throws IOException {
         if (reader == null) {
-            throw new IOException("CommandShellReader is closed");
+            return false;
         }
-        return true;
+        return reader.ready();
     }
 
     @Override

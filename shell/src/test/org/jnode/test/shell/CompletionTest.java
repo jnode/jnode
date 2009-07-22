@@ -96,9 +96,9 @@ public class CompletionTest extends TestCase {
         System.setProperty("user.dir", userDirName);
     }
 
-    public class TestCommandShell extends CommandShell {
+    public class MyTestCommandShell extends CompletionHelper.TestCommandShell {
 
-        public TestCommandShell() throws NameNotFoundException {
+        public MyTestCommandShell() throws NameNotFoundException {
             super(new TestAliasManager(), new TestSyntaxManager());
             ShellUtils.getShellManager().registerShell(this);
 
@@ -132,7 +132,7 @@ public class CompletionTest extends TestCase {
     }
 
     public void testDefaultInterpreterNewSyntax() throws Exception {
-        TestCommandShell cs = new TestCommandShell();
+        MyTestCommandShell cs = new MyTestCommandShell();
         cs.setProperty(CommandShell.INTERPRETER_PROPERTY_NAME, "default");
 
         final String[] propertyCompletions = getExpectedPropertyNameCompletions();

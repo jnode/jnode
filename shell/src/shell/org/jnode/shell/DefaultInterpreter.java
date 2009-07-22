@@ -21,10 +21,14 @@
 package org.jnode.shell;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringReader;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
@@ -244,6 +248,56 @@ public class DefaultInterpreter implements CommandInterpreter {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Get and expand the default command prompt.
+     */
+    public String getPrompt(CommandShell shell, boolean continuation) {
+        String prompt = shell.getProperty(CommandShell.PROMPT_PROPERTY_NAME);
+        final StringBuffer result = new StringBuffer();
+        boolean commandMode = false;
+        StringReader reader = new StringReader(prompt);
+        int i;
+        try {
+            while ((i = reader.read()) != -1) {
+                char c = (char) i;
+                if (commandMode) {
+                    switch (c) {
+                        case 'P':
+                            result.append(new File(System.getProperty(CommandShell.DIRECTORY_PROPERTY_NAME, "")));
+                            break;
+                        case 'G':
+                            result.append("> ");
+                            break;
+                        case 'D':
+                            final Date now = new Date();
+                            DateFormat.getDateTimeInstance().format(now, result, null);
+                            break;
+                        default:
+                            result.append(c);
+                    }
+                    commandMode = false;
+                } else {
+                    switch (c) {
+                        case '$':
+                            commandMode = true;
+                            break;
+                        default:
+                            result.append(c);
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            // A StringReader shouldn't give an IOException unless we close it ... which we don't!
+            LOG.error("Impossible", ex);
+        }
+        return result.toString();
+    }
+    
+    @Override
+    public boolean supportsMultiline() {
+        return false;
     }
 
     /**
