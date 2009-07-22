@@ -52,13 +52,40 @@ public abstract class AbstractNode implements Node {
     public abstract NodeRecord getNodeRecord(int index);
 
     @Override
-    public void addNodeRecord(NodeRecord record) {
+    public boolean addNodeRecord(NodeRecord record) {
+        int freeSpace = getFreeSize();
+        if(freeSpace < record.getSize() + 2){
+            return false;
+        }
         Integer lastOffset = offsets.get(offsets.size() - 1);
         Integer newOffset = lastOffset + record.getSize();
         offsets.add(newOffset);
         records.add(record);
+        return true;
     }
-
+    
+    public boolean check(int treeHeigth){
+        // Node type is correct.
+        if(this.getNodeDescriptor().getKind() < NodeDescriptor.BT_LEAF_NODE || this.getNodeDescriptor().getKind() > NodeDescriptor.BT_MAP_NODE){
+            return false;
+        }
+        
+        if(this.getNodeDescriptor().getHeight() > treeHeigth){
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Return amount of free space remaining.
+     * @return remaining free space.
+     */
+    protected int getFreeSize(){
+        int freeOffset = offsets.get(offsets.size() - 1);
+        int freeSize = size - freeOffset - (descriptor.getNumRecords() << 1) - OFFSET_SIZE;
+        return freeSize;
+    }
+    
     public byte[] getBytes() {
         byte[] datas = new byte[size];
         System.arraycopy(descriptor.getBytes(), 0, datas, 0, NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH);
