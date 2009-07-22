@@ -33,7 +33,7 @@ public class IsolatedJavaTest {
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if ("-cp".equals(arg) || "-classpath".equals(arg)) {
-                if (arg.length() > i + 1) {
+                if (args.length > i + 1) {
                     parseClasspath(args[i + 1]);
                     i++;
                 } else {
@@ -42,7 +42,7 @@ public class IsolatedJavaTest {
             } else if (arg.startsWith("-D")) {
                 parseSystemProperty(arg);
             } else if (arg.startsWith("-jar")) {
-                if (arg.length() > i + 1) {
+                if (args.length > i + 1) {
                     parseJarAndArgs(args, i);
                     break;
                 } else {
