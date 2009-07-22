@@ -136,6 +136,7 @@ public class BjorneContext {
         this.holders = holders;
         this.variables = new HashMap<String, VariableSlot>();
         this.aliases = new TreeMap<String, String>();
+        initVariables();
     }
 
     public BjorneContext(BjorneInterpreter interpreter) {
@@ -149,6 +150,12 @@ public class BjorneContext {
         res[Command.STD_ERR] = new CommandIOHolder(CommandLine.DEFAULT_STDERR, false);
         res[Command.SHELL_ERR] = new CommandIOHolder(CommandLine.DEFAULT_STDERR, false);
         return res;
+    }
+
+    private void initVariables() {
+        setVariable("PS1", "$ ");
+        setVariable("PS2", "> ");
+        setVariable("PS4", "+ ");
     }
 
     /**
@@ -1355,4 +1362,15 @@ public class BjorneContext {
     public Collection<String> getVariableNames() {
         return variables.keySet();
     }
+
+    public String getVariable(String name) {
+        VariableSlot slot = variables.get(name);
+        if (slot == null) {
+            return "";
+        } else if (slot.getValue() == null) {
+            return "";
+        } else {
+            return slot.getValue();
+        }
+    } 
 }

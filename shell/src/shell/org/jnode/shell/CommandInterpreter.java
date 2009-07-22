@@ -86,6 +86,22 @@ public interface CommandInterpreter {
      * @return the word with any necessary escaping or quoting added.
      */
     String escapeWord(String word);
+    
+    /**
+     * Test if the interpreter supports multiline commands.
+     * 
+     * @return {@code true} if the interpreter supports multiline commands.
+     */
+    boolean supportsMultiline();
+
+    /**
+     * Get the command prompt.
+     * 
+     * @param shell the shell that is supplying command input.
+     * @param continuation {@code true} if the interpreter is expecting a continuation line.
+     * @return the command prompt
+     */
+    String getPrompt(CommandShell shell, boolean continuation);
 
     /**
      * Get incremental help for the partial command line.  If the interpreter

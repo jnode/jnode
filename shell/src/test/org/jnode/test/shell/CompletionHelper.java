@@ -28,6 +28,8 @@ import junit.framework.TestCase;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandShell;
+import org.jnode.test.shell.syntax.TestAliasManager;
+import org.jnode.test.shell.syntax.TestSyntaxManager;
 
 /**
  * Helper methods for doing completion tests.
@@ -35,8 +37,21 @@ import org.jnode.shell.CommandShell;
  * @author crawley@jnode.org
  */
 public class CompletionHelper {
+    
+    public static class TestCommandShell extends CommandShell {
+        
+        protected TestCommandShell(TestAliasManager testAliasManager,
+                TestSyntaxManager testSyntaxManager) {
+            super(testAliasManager, testSyntaxManager);
+        }
 
-    public static void checkCompletions(CommandShell cs, String line, String[] expected, int startPos) {
+        public void setReadingCommand(boolean readingCommand) {
+            super.setReadingCommand(readingCommand);
+        }
+    }
+
+    public static void checkCompletions(TestCommandShell cs, String line, String[] expected, int startPos) {
+        cs.setReadingCommand(true);
         CompletionInfo ci = cs.complete(line);
         SortedSet<String> completions = ci.getCompletions();
         if (completions.size() != expected.length) {
