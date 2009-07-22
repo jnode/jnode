@@ -42,8 +42,8 @@ public class CatalogNode extends AbstractNode {
     public CatalogNode(NodeDescriptor descriptor, final int nodeSize) {
         this.descriptor = descriptor;
         this.size = nodeSize;
-        this.records = new ArrayList<NodeRecord>(this.descriptor.getNumRecords());
-        this.offsets = new ArrayList<Integer>(this.descriptor.getNumRecords() + 1);
+        this.records = new ArrayList<NodeRecord>(descriptor.getNumRecords());
+        this.offsets = new ArrayList<Integer>(descriptor.getNumRecords() + 1);
         this.offsets.add(Integer.valueOf(NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH));
     }
 
