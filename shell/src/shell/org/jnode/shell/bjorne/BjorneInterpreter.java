@@ -271,8 +271,12 @@ public class BjorneInterpreter implements CommandInterpreter {
     
     @Override
     public String getPrompt(CommandShell shell, boolean continuation) {
-        String res = context.getVariable(continuation ? "PS2" : "PS1");
-        return (res == null) ? "$ " : expandPrompt(res);
+        try {
+            String res = context.variable(continuation ? "PS2" : "PS1");
+            return (res == null) ? "$ " : expandPrompt(res);
+        } catch (ShellSyntaxException ex) {
+            return "$ ";
+        }
     }
 
     private String expandPrompt(String prompt) {

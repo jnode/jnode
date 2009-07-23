@@ -54,6 +54,22 @@ echo $?
 1
 </output>
     </testSpec>
+    <testSpec title="quote handling" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+echo ${PS1}+
+PS1="] "
+echo ${PS1}+
+PS1='] '
+echo ${PS1}+
+PS1=]\ 
+echo ${PS1}+
+</script>
+        <output>$ +
+] +
+] +
+] +
+</output>
+    </testSpec>
     <testSpec title="``" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 A=1
