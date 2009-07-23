@@ -966,7 +966,7 @@ public class BjorneContext {
     }
 
 
-    private String variable(String parameter) throws ShellSyntaxException {
+    String variable(String parameter) throws ShellSyntaxException {
         if (BjorneToken.isName(parameter)) {
             VariableSlot var = variables.get(parameter);
             return (var != null) ? var.getValue() : null;
@@ -1124,7 +1124,7 @@ public class BjorneContext {
                 }
                 String name = assignment.substring(0, pos);
                 String value = dollarBacktickExpand(assignment.substring(pos + 1)).toString();
-                this.setVariable(name, value);
+                this.setVariable(name, dequote(value).toString());
             }
         }
     }
@@ -1363,14 +1363,4 @@ public class BjorneContext {
         return variables.keySet();
     }
 
-    public String getVariable(String name) {
-        VariableSlot slot = variables.get(name);
-        if (slot == null) {
-            return "";
-        } else if (slot.getValue() == null) {
-            return "";
-        } else {
-            return slot.getValue();
-        }
-    } 
 }
