@@ -162,7 +162,8 @@ public class FdiskCommand extends AbstractCommand {
         }
         BlockDeviceAPI api = dev.getAPI(BlockDeviceAPI.class);
         IDEDriveDescriptor descriptor = ideDev.getDescriptor();
-        ByteBuffer MBR = ByteBuffer.allocate(IDEConstants.SECTOR_SIZE);
+        int sectorSize = IDEConstants.SECTOR_SIZE;
+        ByteBuffer MBR = ByteBuffer.allocate(sectorSize);
         api.read(0, MBR);
         if (IBMPartitionTable.containsPartitionTable(MBR.array())) {
             IBMPartitionTable partitionTable = 
@@ -175,14 +176,25 @@ public class FdiskCommand extends AbstractCommand {
 
             int i = 0;
             for (IBMPartitionTableEntry entry : partitionTable) {
-                //IBMPartitionTableEntry entry = (IBMPartitionTableEntry)partitionTable.getEntry(i);
                 IBMPartitionTypes si = entry.getSystemIndicator();
                 if (si != IBMPartitionTypes.PARTTYPE_EMPTY) {
+                    // Calculate number of blocks
+                    long sectors = entry.getNrSectors();
+                    long blocks = sectors;
+                    long odd = 0;
+
+                    if (sectorSize < 1024) {
+                        blocks /= (1024 / sectorSize);
+                        odd = sectors % (1024 / sectorSize);
+                    } else {
+                        blocks *= (sectorSize / 1024);
+                    }
+                    
                     out.println("ID " + i  + " " +
                             (entry.getBootIndicator() ? "Boot" : "No") + "    " +
                             entry.getStartLba() + "    " +
-                            (entry.getStartLba() + entry.getNrSectors()) + "    " +
-                            entry.getNrSectors() + "    " + si);
+                            (entry.getStartLba() + sectors) + "    " +
+                            blocks + ((odd!=0)?"+":"") + "    " + si);
                 }
                 if (entry.isExtended()) {
                     final List<IBMPartitionTableEntry> exPartitions = partitionTable.getExtendedPartitions();
