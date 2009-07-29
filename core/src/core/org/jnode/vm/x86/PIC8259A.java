@@ -45,8 +45,9 @@ final class PIC8259A {
      */
     private final ProcessorLock lock = new ProcessorLock();
 
-    // IO resources
+    /** PIC Master IO resource */
     private final IOResource io8259_A;
+    /** PIC Slave IO resource */
     private final IOResource io8259_B;
 
     /**
