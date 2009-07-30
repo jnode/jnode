@@ -74,16 +74,19 @@
   </target>
 
   <target name="native2ascii" depends="javacc" if="run.native2ascii">
-      <native2ascii src="${jnasm-preprocessor-gen.dir}" includes="JNAsmPP.java"
-                    dest="${jnasm-preprocessor-gen.dir}" ext=".tmp"/>
-      <move file="${jnasm-preprocessor-gen.dir}/JNAsmPP.tmp"
-            tofile="${jnasm-preprocessor-gen.dir}/JNAsmPP.java" overwrite="yes"/>
-      <native2ascii src="${jnasm-assembler-gen.dir}" includes="JNAsm.java"
-                    dest="${jnasm-assembler-gen.dir}" ext=".tmp"/>
-      <move file="${jnasm-assembler-gen.dir}/JNAsm.tmp"
-            tofile="${jnasm-assembler-gen.dir}/JNAsm.java" overwrite="yes"/>
+  	<!-- Don't swap move & native2ascii tasks ! On Windows, we need to call them 
+  	         in that order because native2ascii prevent from overwritting its source file -->
+    <move file="${jnasm-preprocessor-gen.dir}/JNAsmPP.java"
+        tofile="${jnasm-preprocessor-gen.dir}/JNAsmPP" overwrite="yes"/>
+    <native2ascii src="${jnasm-preprocessor-gen.dir}" includes="JNAsmPP"
+                 dest="${jnasm-preprocessor-gen.dir}" ext=".java"/>
+     
+    <move file="${jnasm-assembler-gen.dir}/JNAsm.java"
+        tofile="${jnasm-assembler-gen.dir}/JNAsm" overwrite="yes"/>
+    <native2ascii src="${jnasm-assembler-gen.dir}" includes="JNAsm"
+                 dest="${jnasm-assembler-gen.dir}" ext=".java"/> 
   </target>
-
+	
 <!-- Compile all subproject java files -->
   <target name="compile" depends="native2ascii">
     <jnode.compile>
