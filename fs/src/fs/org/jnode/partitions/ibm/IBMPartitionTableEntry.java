@@ -32,6 +32,7 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
 
     private final byte[] bs;
     private final int ofs;
+    private long odd;
     @SuppressWarnings("unused")
     private final IBMPartitionTable parent;
 
@@ -137,6 +138,23 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
     public void setNrSectors(long v) {
         LittleEndian.setInt32(bs, ofs + 12, (int) v);
     }
+    
+    public long getNbrBlocks(int sectorSize){
+    	long sectors = getNrSectors();
+    	long blocks = sectors;
+    	if (sectorSize < 1024) {
+    		blocks /= (1024 / sectorSize);
+    		odd = getNrSectors() % (1024 / sectorSize);
+    	} else {
+    		blocks *= (sectorSize / 1024);
+    	}
+    	return blocks;
+    }
+    
+    public boolean isOdd(){
+    	return odd!=0;
+    }
+    
 
     public void clear() {
         for (int i = 0; i < 16; i++) {
