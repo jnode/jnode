@@ -180,6 +180,17 @@
     </patternset>
 
     <target name="prepare">
+    	<!-- Fail on a Windows platform if there are spaces in the root dir's pathname.  It will
+    	             lead to mkisofs dying with a misleading error message.  bluebit / crawley 2008-05-03 -->
+        <fail message="Cannot build JNode from a directory with spaces in the pathname.">
+          <condition>
+            <and>
+              <os family="windows"/>
+              <contains string="${root.dir}" substring=" " casesensitive="false" />
+            </and>
+          </condition>
+        </fail>
+    	
         <fail message="Java Runtime version 1.6 needed. Your version is: ${java.runtime.version}">
             <condition>
                 <not>
