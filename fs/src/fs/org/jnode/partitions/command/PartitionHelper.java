@@ -35,7 +35,9 @@ import org.jnode.driver.bus.ide.IDEConstants;
 import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.fs.fat.BootSector;
 import org.jnode.fs.fat.GrubBootSector;
+import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
+import org.jnode.partitions.ibm.IBMPartitionTableType;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
 import org.jnode.partitions.ibm.MasterBootRecord;
 
@@ -69,6 +71,10 @@ public class PartitionHelper {
         reloadMBR();
     }
 
+    public IDEDevice getDevice(){
+    	return current;
+    }
+    
     public void initMbr() throws DeviceNotFoundException, ApiNotFoundException, IOException {
         out.println("Initialize MBR ...");
 
@@ -89,8 +95,6 @@ public class PartitionHelper {
             bs.getPartition(2).setSystemIndicator(IBMPartitionTypes.PARTTYPE_EMPTY);
             bs.getPartition(3).setSystemIndicator(IBMPartitionTypes.PARTTYPE_EMPTY);
         }
-
-        // reloadMBR();
     }
 
     public void write() throws IOException, Exception {
@@ -117,11 +121,23 @@ public class PartitionHelper {
         bs = new BootSector(MBR.array());
     }
 
-    private void checkMBR() throws IOException {
+    public void checkMBR() throws IOException {
         if (!MBR.containsPartitionTable())
-            throw new IOException("This device doesn't contain a valid MBR, use --initmbr.");
+            throw new IOException("This device doesn't contain a valid partition table.");
+    }
+    
+    public IBMPartitionTable getPartitionTable(){
+    	return new IBMPartitionTable(new IBMPartitionTableType(), MBR.array(), current);
     }
 
+    public int getNbPartitions() {
+        return bs.getNbPartitions();
+    }
+    
+    public IBMPartitionTableEntry getPartition(int partNr) {
+    	return bs.getPartition(partNr);
+    }
+    
     public void modifyPartition(int id, boolean bootIndicator, long start, long size,
             boolean sizeUnit, IBMPartitionTypes fs) throws IOException {
         checkMBR();
@@ -141,9 +157,7 @@ public class PartitionHelper {
         entry.setNrSectors(nbSectors);
     }
 
-    public int getNbPartitions() {
-        return bs.getNbPartitions();
-    }
+    
 
     public void deletePartition(int partNumber) throws IOException {
         checkMBR();
