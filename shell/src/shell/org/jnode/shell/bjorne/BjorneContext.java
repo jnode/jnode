@@ -156,6 +156,7 @@ public class BjorneContext {
         setVariable("PS1", "$ ");
         setVariable("PS2", "> ");
         setVariable("PS4", "+ ");
+        setVariable("IFS", " \t\n");
     }
 
     /**
@@ -568,7 +569,7 @@ public class BjorneContext {
      * @param wordTokens the destination for the tokens.
      * @throws ShellException
      */
-    private void splitAndAppend(BjorneToken token, List<BjorneToken> wordTokens)
+     void splitAndAppend(BjorneToken token, List<BjorneToken> wordTokens)
         throws ShellException {
         String text = token.getText();
         StringBuffer sb = null;

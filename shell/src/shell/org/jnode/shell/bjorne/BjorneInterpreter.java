@@ -137,6 +137,7 @@ public class BjorneInterpreter implements CommandInterpreter {
         BUILTINS.put("continue", ContinueBuiltin.FACTORY);
         BUILTINS.put("exit", ExitBuiltin.FACTORY);
         BUILTINS.put("export", ExportBuiltin.FACTORY);
+        BUILTINS.put("read", ReadBuiltin.FACTORY);
         BUILTINS.put("readonly", ReadonlyBuiltin.FACTORY);
         BUILTINS.put("return", ReturnBuiltin.FACTORY);
         BUILTINS.put("set", SetBuiltin.FACTORY);
@@ -153,6 +154,8 @@ public class BjorneInterpreter implements CommandInterpreter {
     private BjorneContext context;
     
     private BjorneParser parser;
+    
+    private Reader reader;
 
     public BjorneInterpreter() {
         this.context = new BjorneContext(this);
@@ -210,13 +213,15 @@ public class BjorneInterpreter implements CommandInterpreter {
             myContext.setIO(1, new CommandOutput(capture), true);
         }
         BjorneTokenizer tokens = new BjorneTokenizer(reader);
-        // (Save the current parser value in the case where we are called
+        // (Save the current parser and reader objects in the case where we are called
         // recursively ... to interpret a back-tick command.)
-        BjorneParser saved = parser;
+        BjorneParser savedParser = this.parser;
+        Reader savedReader = this.reader;
+        this.reader = reader;
         parser = new BjorneParser(tokens);
         try {
             do {
-                CommandNode tree = parser.parse();
+                CommandNode tree = this.parser.parse();
                 if (tree == null) {
                     break;
                 }
@@ -227,7 +232,8 @@ public class BjorneInterpreter implements CommandInterpreter {
             } while (script);
             return myContext.getLastReturnCode();
         } finally {
-            parser = saved;
+            this.parser = savedParser;
+            this.reader = savedReader;
         }
     }
 
@@ -287,6 +293,10 @@ public class BjorneInterpreter implements CommandInterpreter {
     @Override
     public boolean supportsMultiline() {
         return true;
+    }
+    
+    Reader getReader() {
+        return this.reader;
     }
 
     private void bindShell(CommandShell shell) {
