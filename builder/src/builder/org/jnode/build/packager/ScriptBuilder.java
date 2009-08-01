@@ -43,6 +43,7 @@ import org.jnode.build.BuildException;
  *
  */
 public class ScriptBuilder extends PackagerTask {
+    private static final String SET_COMMAND = "propset ";
     private static final String JAVA = "java ";
     private static final String DEFINE_SYS_PROPERTY = "-D";
     
@@ -110,13 +111,13 @@ public class ScriptBuilder extends PackagerTask {
             fw.write("\n");
 
             fw.write("# enable exception tracing\n");
-            fw.write("set jnode.debug true\n");
+            fw.write(SET_COMMAND + "jnode.debug true\n");
             fw.write("\n");
             
             fw.write("# set system properties\n");                
             final Map<String, String> properties = cmd.getSystemProperties();
             for (String name : properties.keySet()) {
-                fw.write("set " + name + " " + properties.get(name) + "\n");
+                fw.write(SET_COMMAND + name + " " + properties.get(name) + "\n");
             }
             fw.write("\n");
             
