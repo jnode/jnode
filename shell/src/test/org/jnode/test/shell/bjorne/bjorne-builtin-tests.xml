@@ -128,4 +128,27 @@ B -1-
 A --
 </output>
     </testSpec>
+    <testSpec title="read" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                read &lt;&lt;EOF
+1 2 3
+EOF
+                read A B C &lt;&lt;EOF 
+1 2 3
+EOF
+                echo +$A+ +$B+ +$C+
+                read A B C D &lt;&lt;EOF 
+ 1 2 3 
+EOF
+                echo +$A+ +$B+ +$C+ +$D+
+                read A B &lt;&lt;EOF 
+ 1 2 3 
+EOF
+                echo +$A+ +$B+
+        </script>
+        <output>+1+ +2+ +3+
++1+ +2+ +3+ ++
++1+ +2 3+
+</output>
+    </testSpec>
 </testSet>
