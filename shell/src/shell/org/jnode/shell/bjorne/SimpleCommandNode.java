@@ -63,7 +63,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("SimpleCommand{").append(super.toString());
         if (assignments != null) {
             sb.append(",assignments=");

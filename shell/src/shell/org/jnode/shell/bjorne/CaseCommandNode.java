@@ -47,7 +47,7 @@ public class CaseCommandNode extends CommandNode {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("CaseCommand{").append(super.toString());
         sb.append(",word=").append(word);
         if (caseItems != null) {

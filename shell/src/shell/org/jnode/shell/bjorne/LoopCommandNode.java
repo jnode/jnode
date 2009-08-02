@@ -65,7 +65,7 @@ public class LoopCommandNode extends CommandNode {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("LoopCommand{").append(super.toString());
         sb.append(",cond=").append(cond);
         sb.append(",body=").append(body);

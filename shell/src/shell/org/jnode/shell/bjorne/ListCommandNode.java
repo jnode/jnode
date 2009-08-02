@@ -46,7 +46,7 @@ public class ListCommandNode extends CommandNode implements Completable {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("ListCommand{").append(super.toString());
         sb.append(",commands=");
         appendArray(sb, commands);

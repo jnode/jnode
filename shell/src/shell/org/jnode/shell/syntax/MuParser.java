@@ -371,7 +371,7 @@ public class MuParser {
 
     
     private static String showStack(Deque<MuSyntax> stack, boolean oneLine) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (MuSyntax syntax : stack) {
             if (sb.length() > 0) {
                 sb.append(", ");

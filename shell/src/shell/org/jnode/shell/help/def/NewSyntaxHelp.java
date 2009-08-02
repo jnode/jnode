@@ -140,7 +140,7 @@ public class NewSyntaxHelp extends TextHelpBase implements EnhancedHelp {
     }
 
     public void describeOption(FlagArgument arg, TreeSet<String> flagTokens, PrintWriter out) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (String flagToken : flagTokens) {
             if (sb.length() > 0) {
                 sb.append(" | ");
