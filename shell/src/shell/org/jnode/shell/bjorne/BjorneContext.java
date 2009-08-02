@@ -451,9 +451,9 @@ public class BjorneContext {
      * @param text the text to be processed.
      * @return the de-quoted text
      */
-     static StringBuffer dequote(String text) {
+     static StringBuilder dequote(String text) {
         int len = text.length();
-        StringBuffer sb = new StringBuffer(len);
+        StringBuilder sb = new StringBuilder(len);
         int quote = 0;
         for (int i = 0; i < len; i++) {
             char ch = text.charAt(i);
@@ -572,7 +572,7 @@ public class BjorneContext {
      void splitAndAppend(BjorneToken token, List<BjorneToken> wordTokens)
         throws ShellException {
         String text = token.getText();
-        StringBuffer sb = null;
+        StringBuilder sb = null;
         int len = text.length();
         int quote = 0;
         for (int i = 0; i < len; i++) {
@@ -625,9 +625,9 @@ public class BjorneContext {
         return output;
     }
 
-    private StringBuffer accumulate(StringBuffer sb, char ch) {
+    private StringBuilder accumulate(StringBuilder sb, char ch) {
         if (sb == null) {
-            sb = new StringBuffer();
+            sb = new StringBuilder();
         }
         sb.append(ch);
         return sb;
@@ -643,7 +643,7 @@ public class BjorneContext {
      */
     public CharSequence dollarBacktickExpand(CharSequence text) throws ShellException {
         CharIterator ci = new CharIterator(text);
-        StringBuffer sb = new StringBuffer(text.length());
+        StringBuilder sb = new StringBuilder(text.length());
         char quote = 0;
         int backtickStart = -1;
         int ch = ci.nextCh();
@@ -719,7 +719,7 @@ public class BjorneContext {
             case '-':
                 return specialVariable(ch, quote == '"');
             default:
-                StringBuffer sb = new StringBuffer().append((char) ch);
+                StringBuilder sb = new StringBuilder().append((char) ch);
                 ch = ci.peekCh();
                 while ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || ch == '_') {
                     sb.append((char) ch);
@@ -732,7 +732,7 @@ public class BjorneContext {
 
     private String dollarBraceExpansion(CharIterator ci) throws ShellException {
         // Scan to the '}' that matches the '${'
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int braceLevel = 1;
         int ch = ci.nextCh();
         int quote = 0;

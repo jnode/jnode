@@ -46,7 +46,7 @@ public class FunctionDefinitionNode extends CommandNode {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("FunctionDefinition{").append(super.toString());
         sb.append(",name=").append(name);
         sb.append(",body=").append(body);

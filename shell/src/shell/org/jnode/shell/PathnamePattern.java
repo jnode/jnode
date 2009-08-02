@@ -419,7 +419,7 @@ public class PathnamePattern {
         // in the source pattern being accidentally mapped to Java regex
         // meta-characters.
         int len = pattern.length();
-        StringBuffer sb = new StringBuffer(len);
+        StringBuilder sb = new StringBuilder(len);
         char quote = (pp == null) ? ((char) 0) : pp.lastQuote;
         boolean eager = (flags & EAGER) != 0;
         for (int i = 0; i < len; i++) {
@@ -446,7 +446,7 @@ public class PathnamePattern {
                 case '[':
                     if ((flags & CHARACTER_CLASSES) != 0) {
                         int j;
-                        StringBuffer sb2 = new StringBuffer(len);
+                        StringBuilder sb2 = new StringBuilder(len);
                         boolean charClassOK = true;
                     LOOP: 
                         for (j = i + 1; j < len; j++) {
@@ -564,7 +564,7 @@ public class PathnamePattern {
     }
 
     public String toRegexString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("PathnamePattern{source='").append(this.source);
         sb.append("',absolute=").append(this.isAbsolute);
         sb.append(",patterns=[");

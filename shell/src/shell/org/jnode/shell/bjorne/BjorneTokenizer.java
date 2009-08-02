@@ -296,7 +296,7 @@ public class BjorneTokenizer {
 
     private BjorneToken parseWord() {
         int quoteChar = 0;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int ch = peekCh();
         int start = getPos() - 1;
     LOOP: 

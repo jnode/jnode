@@ -85,7 +85,7 @@ public class IfCommandNode extends CommandNode {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("IfCommand{").append(super.toString());
         sb.append(",cond=").append(cond);
         if (thenPart != null) {

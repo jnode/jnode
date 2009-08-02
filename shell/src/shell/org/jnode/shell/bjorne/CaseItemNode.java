@@ -39,7 +39,7 @@ public class CaseItemNode {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("CaseItem{");
         if (pattern != null) {
             sb.append("pattern=");
