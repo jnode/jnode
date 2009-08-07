@@ -279,7 +279,7 @@ public class Catalog {
         int currentNodeNumber = getBTHeaderRecord().getRootNode();
         int nodeSize = getBTHeaderRecord().getNodeSize();
         ByteBuffer nodeData = ByteBuffer.allocate(nodeSize);
-        fs.getApi().read(catalogHeaderNodeOffset + (currentNodeNumber * nodeSize), buffer);
+        fs.getApi().read(catalogHeaderNodeOffset + (currentNodeNumber * nodeSize), nodeData);
         CatalogNode node = new CatalogNode(nodeData.array(), nodeSize);
         int currentOffset = 0;
         CatalogKey cKey = new CatalogKey(parentID, nodeName);
