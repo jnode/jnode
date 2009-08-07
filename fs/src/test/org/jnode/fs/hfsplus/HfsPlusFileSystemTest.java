@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import java.io.File;
@@ -36,58 +36,72 @@ import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.fs.service.def.FileSystemPlugin;
+import org.jnode.test.support.TestUtils;
 
 public class HfsPlusFileSystemTest extends TestCase {
-    private String TEST_IMAGE_FILENAME = "/home/flesire/kvm/hfs2.img";
-
-    public void testCreate() {
-        try {
-            File file = new File(TEST_IMAGE_FILENAME);
-            Device device = new FileDevice(file, "rw");
-            DummyPluginDescriptor desc = new DummyPluginDescriptor(true);
-            DummyExtensionPoint ep = new DummyExtensionPoint("types",
-                    "org.jnode.fs.types", "types");
-            desc.addExtensionPoint(ep);
-            DummyExtension extension = new DummyExtension();
-            DummyConfigurationElement element = new DummyConfigurationElement();
-            element
-                    .addAttribute("class", HfsPlusFileSystemType.class
-                            .getName());
-            extension.addElement(element);
-            ep.addExtension(extension);
-
-            FileSystemService fss = new FileSystemPlugin(desc);
-            HfsPlusFileSystemType type = fss
-                    .getFileSystemType(HfsPlusFileSystemType.ID);
-            HfsPlusFileSystem fs = new HfsPlusFileSystem(device, false, type);
-            HFSPlusParams params = new HFSPlusParams();
-            params.setVolumeName("testdrive");
-            params.setBlockSize(HFSPlusParams.OPTIMAL_BLOCK_SIZE);
-            params.setJournaled(false);
-            params.setJournalSize(HFSPlusParams.DEFAULT_JOURNAL_SIZE);
-            fs.create(params);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    
+    private Device device;
+    private FileSystemService fss;
+    
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        // create test device.
+        device = createTestDisk(false);
+        // create file system service.
+        fss = createFSService();
+     
     }
 
-    public void testRead() {
-        File file = new File(TEST_IMAGE_FILENAME);
-        try {
-            Device device = new FileDevice(file, "rw");
-            HfsPlusFileSystem fs = new HfsPlusFileSystemType().create(device,
-                    false);
-            fs.read();
-            fs.createRootEntry();
-            @SuppressWarnings("unused")
-            FSDirectory root = fs.getRootEntry().getDirectory();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (FileSystemException e) {
-            e.printStackTrace();
-        }
+    public void testCreate() throws Exception {
+        HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
+        HfsPlusFileSystem fs = new HfsPlusFileSystem(device, false, type);
+        HFSPlusParams params = new HFSPlusParams();
+        params.setVolumeName("testdrive");
+        params.setBlockSize(HFSPlusParams.OPTIMAL_BLOCK_SIZE);
+        params.setJournaled(false);
+        params.setJournalSize(HFSPlusParams.DEFAULT_JOURNAL_SIZE);
+        fs.create(params);
+        Superblock vh = fs.getVolumeHeader();
+        assertEquals(Superblock.HFSPLUS_SUPER_MAGIC, vh.getMagic());
+        assertEquals(4096, vh.getBlockSize());
+
+    }
+
+    public void testRead() throws Exception {
+        HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
+        HfsPlusFileSystem fs = new HfsPlusFileSystem(device, false, type);
+        HFSPlusParams params = new HFSPlusParams();
+        params.setVolumeName("testdrive");
+        params.setBlockSize(HFSPlusParams.OPTIMAL_BLOCK_SIZE);
+        params.setJournaled(false);
+        params.setJournalSize(HFSPlusParams.DEFAULT_JOURNAL_SIZE);
+        fs.create(params);
+        fs.close();
+        fs = new HfsPlusFileSystemType().create(device, false);
+        fs.read();
+        fs.createRootEntry();
+        FSDirectory root = fs.getRootEntry().getDirectory();
+        root.addDirectory("test");
+    }
+
+    private Device createTestDisk(boolean formatted) throws IOException {
+        File file = TestUtils.makeTempFile("hfsDevice", "10M");
+        Device device = new FileDevice(file, "rw");
+        return device;
+
+    }
+
+    private FileSystemService createFSService() {
+        DummyPluginDescriptor desc = new DummyPluginDescriptor(true);
+        DummyExtensionPoint ep = new DummyExtensionPoint("types", "org.jnode.fs.types", "types");
+        desc.addExtensionPoint(ep);
+        DummyExtension extension = new DummyExtension();
+        DummyConfigurationElement element = new DummyConfigurationElement();
+        element.addAttribute("class", HfsPlusFileSystemType.class.getName());
+        extension.addElement(element);
+        ep.addExtension(extension);
+        return new FileSystemPlugin(desc);
     }
 
 }
