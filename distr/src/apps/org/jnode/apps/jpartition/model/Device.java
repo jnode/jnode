@@ -26,6 +26,14 @@ import java.util.List;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.Formatter;
 
+/**
+ * A virtual device is used to represents the state of a physical device
+ * after all pending operations have been applied. It's used by the user
+ * interface to display the expected final result.
+ *  
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class Device implements Bounded {
     private final String name;
     private final long size;
@@ -41,31 +49,56 @@ public class Device implements Bounded {
         this.hasPartititionTable = !partitions.isEmpty();
     }
 
+    /**
+     * Get the name if this virtual device.
+     * @return name if this virtual device.
+     */
     public final String getName() {
         return name;
     }
 
+    /**
+     * Get the size if this virtual device.
+     * @return size if this virtual device.
+     */
     public final long getSize() {
         return size;
     }
 
+    /**
+     * Say if the virtual device has a partition table.
+     * @return <code>true</code> if the virtual device has a partition table.
+     */
     public final boolean hasPartititionTable() {
         return hasPartititionTable;
     }
 
+    /**
+     * Get the list of partitions of this virtual device.
+     * @return
+     */
     public final List<Partition> getPartitions() {
         checkPartitionned();
         return Collections.unmodifiableList(partitions);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getEnd() {
         return size - 1;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getStart() {
         return 0;
     }
 
+    /**
+     * @return true if this virtual device is equals to the given object.
+     */
     public final boolean equals(Object o) {
         if (!(o instanceof Device)) {
             return false;
@@ -75,14 +108,27 @@ public class Device implements Bounded {
         return name.equals(other.name);
     }
 
+    /**
+     * Get the hashcode of this virtual device. 
+     */
     public final int hashCode() {
         return name.hashCode();
     }
 
+    /**
+     * Get the physical device associated to this virtual device.
+     * @return
+     */
     final org.jnode.driver.Device getDevice() {
         return device;
     }
 
+    /**
+     * Add a partition to this virtual device.
+     * @param start The start of this partition (included).
+     * @param size The size of this partition.
+     * @return The new virtual partition.
+     */
     final Partition addPartition(long start, long size) {
         final long end = (start + size - 1);
         checkBounds(this, "start", start);
@@ -130,6 +176,10 @@ public class Device implements Bounded {
         return newPart;
     }
 
+    /**
+     * Remove a partition from this virtual device.
+     * @param offset An offset that should match a used partition in this virtual device.
+     */
     final void removePartition(long offset) {
         int index = findPartition(offset, true);
         if (index < 0) {
@@ -163,6 +213,11 @@ public class Device implements Bounded {
         partitions.set(index, new Partition(start, size, false));
     }
 
+    /**
+     * Format a partition of this virtual device. 
+     * @param offset An offset that should match a used partition in this virtual device.
+     * @param formatter The formatter to use.
+     */
     final void formatPartition(long offset, Formatter<? extends FileSystem<?>> formatter) {
         int index = findPartition(offset, true);
         if (index < 0) {
@@ -173,6 +228,15 @@ public class Device implements Bounded {
         part.format(formatter);
     }
 
+    /**
+     * Find a partition in this virtual device.
+     * @param offset An offset that should match a used partition in this virtual
+     * device.
+     * @param used true if the matching partition must be used.
+     * @return The index (zero based) of the partition in this virtual device, -1
+     * if there is no partition at the given offset or its <i>used</i> state
+     * doesn't match the <code>used</code> parameter.
+     */
     private final int findPartition(long offset, boolean used) {
         checkPartitionned();
         checkOffset(offset);
@@ -189,6 +253,11 @@ public class Device implements Bounded {
         return result;
     }
 
+    /**
+     * Checks that the given offset is valid.
+     * @param offset The offset to check.
+     * @throws DeviceException if the offset is not valid.
+     */
     private final void checkOffset(long offset) {
         if ((offset < 0) || (offset >= size)) {
             throw new DeviceException("offset(" + offset + ") out of bounds. should be >=0 and <" +
@@ -196,12 +265,23 @@ public class Device implements Bounded {
         }
     }
 
+    /**
+     * Checks that this virtual device is partitioned.
+     * @throws DeviceException if this virtual device is not partitioned.
+     */
     private final void checkPartitionned() {
         if (!hasPartititionTable) {
             throw new DeviceException("device has no partition table");
         }
     }
 
+    /**
+     * Checks that the given value is inside the bounds.
+     * @param bounded The bounds inside which the value should be.
+     * @param name The name of the value (used in case a {@link DeviceException} is thrown.
+     * @param value The value to check.
+     * @throws DeviceException if the value is not inside the bounds.
+     */
     private final void checkBounds(Bounded bounded, String valueName, long value) {
         if (value < bounded.getStart()) {
             throw new DeviceException(valueName + " must be >= " + bounded.getStart());

@@ -20,22 +20,46 @@
  
 package org.jnode.apps.jpartition.model;
 
+/**
+ * Represents an exception happening while trying to do something on a {@link Device}.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class DeviceException extends RuntimeException {
 
     private static final long serialVersionUID = -6289552400638465023L;
 
+    /**
+     * @see RuntimeException#RuntimeException()
+     */
     public DeviceException() {
         super();
     }
 
+    /**
+     * 
+     * @param message
+     * @param cause
+     * @see RuntimeException#RuntimeException(String, Throwable)
+     */
     public DeviceException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * 
+     * @param message
+     * @see RuntimeException#RuntimeException(String)
+     */
     public DeviceException(String message) {
         super(message);
     }
 
+    /**
+     * 
+     * @param cause
+     * @see RuntimeException#RuntimeException(Throwable)
+     */
     public DeviceException(Throwable cause) {
         super(cause);
     }
