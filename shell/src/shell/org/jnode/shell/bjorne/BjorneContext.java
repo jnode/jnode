@@ -613,7 +613,7 @@ public class BjorneContext {
         }
     }
 
-    private StringBuffer runBacktickCommand(String commandLine) throws ShellException {
+    protected StringBuffer runBacktickCommand(String commandLine) throws ShellException {
         StringWriter capture = new StringWriter();
         interpreter.interpret(interpreter.getShell(), new StringReader(commandLine), false, capture, false);
         StringBuffer output = capture.getBuffer();
@@ -1027,9 +1027,24 @@ public class BjorneContext {
     public boolean isSet(String name) {
         return variables.get(name) != null;
     }
-    
-    private String dollarParenExpand(CharIterator ci) throws ShellException {
-        throw new ShellSyntaxException("$( and $(( not implemented yet");
+
+    private CharSequence dollarParenExpand(CharIterator ci) throws ShellException {
+        if (ci.peekCh() == '(') {
+            ci.nextCh();
+            return dollarParenParenExpand(ci);
+        }
+        else {
+            String commandLine = dollarBacktickExpand(ci, ')').toString();
+            if (ci.nextCh() != ')') {
+                throw new ShellSyntaxException("Unmatched \"(\" (left parenthesis)");
+            }
+            return runBacktickCommand(commandLine);
+        }
+    }
+
+    private CharSequence dollarParenParenExpand(CharIterator ci) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 //    private String dollarParenExpand(CharIterator ci) throws ShellException {
