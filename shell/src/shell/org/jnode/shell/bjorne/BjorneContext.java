@@ -72,10 +72,8 @@ import org.jnode.shell.io.CommandOutput;
  * @author crawley@jnode.org
  */
 public class BjorneContext {
-    
-    private static final int NONE = 0;
 
-    private static final int PREHASH = 1;
+    private static final int NONE = 1;
 
     private static final int HASH = 2;
 
@@ -409,7 +407,7 @@ public class BjorneContext {
         for (BjorneToken token : tokens) {
             dollarBacktickSplit(token, wordTokens);
         }
-        wordTokens = doFileExpansions(wordTokens);
+        wordTokens = fileExpand(wordTokens);
         wordTokens = dequote(wordTokens);
         return wordTokens;
     }
@@ -426,7 +424,7 @@ public class BjorneContext {
         for (BjorneToken token : tokens) {
             dollarBacktickSplit(token, wordTokens);
         }
-        wordTokens = doFileExpansions(wordTokens);
+        wordTokens = fileExpand(wordTokens);
         wordTokens = dequote(wordTokens);
         return wordTokens;
     }
@@ -504,7 +502,7 @@ public class BjorneContext {
         }
     }
     
-    private List<BjorneToken> doFileExpansions(List<BjorneToken> wordTokens) {
+    private List<BjorneToken> fileExpand(List<BjorneToken> wordTokens) {
         if (globbing || tildeExpansion) {
             List<BjorneToken> globbedWordTokens = new LinkedList<BjorneToken>();
             for (BjorneToken wordToken : wordTokens) {
@@ -512,7 +510,7 @@ public class BjorneContext {
                     wordToken = tildeExpand(wordToken);
                 }
                 if (globbing) {
-                    globAndAppend(wordToken, globbedWordTokens);
+                    globAppend(wordToken, globbedWordTokens);
                 } else {
                     globbedWordTokens.add(wordToken);
                 }
@@ -541,7 +539,7 @@ public class BjorneContext {
         }
     }
     
-    private void globAndAppend(BjorneToken wordToken, List<BjorneToken> globbedWordTokens) {
+    private void globAppend(BjorneToken wordToken, List<BjorneToken> globbedWordTokens) {
         // Try to deal with the 'not-a-pattern' case quickly and cheaply.
         String word = wordToken.getText();
         if (!PathnamePattern.isPattern(word)) {
@@ -642,37 +640,26 @@ public class BjorneContext {
      * @throws ShellException
      */
     public CharSequence dollarBacktickExpand(CharSequence text) throws ShellException {
-        CharIterator ci = new CharIterator(text);
-        StringBuilder sb = new StringBuilder(text.length());
-        char quote = 0;
-        int backtickStart = -1;
-        int ch = ci.nextCh();
-        while (ch != -1) {
+        return dollarBacktickExpand(new CharIterator(text), -1);
+    }
+    
+    private CharSequence dollarBacktickExpand(CharIterator ci, int terminator) throws ShellException {
+        StringBuilder sb = new StringBuilder(ci.nosRemaining());
+        int ch = ci.peekCh();
+        while (ch != -1 && ch != terminator) {
+            ci.nextCh();
             switch (ch) {
                 case '"':
+                    sb.append(doubleQuoteExpand(ci));
+                    break;
                 case '\'':
-                    if (quote == 0) {
-                        quote = (char) ch;
-                    } else if (quote == ch) {
-                        quote = 0;
-                    }
-                    sb.append((char) ch);
+                    sb.append(singleQuoteExpand(ci));
                     break;
                 case '`':
-                    if (backtickStart == -1) {
-                        backtickStart = sb.length();
-                    } else {
-                        StringBuffer tmp = runBacktickCommand(sb.substring(backtickStart));
-                        sb.replace(backtickStart, sb.length(), tmp.toString());
-                        backtickStart = -1;
-                    }
+                    sb.append(backQuoteExpand(ci));
                     break;
-                case ' ':
-                case '\t':
-                    sb.append(' ');
-                    while ((ch = ci.peekCh()) == ' ' || ch == '\t') {
-                        ci.nextCh();
-                    }
+                case '$':
+                    sb.append(dollarExpand(ci, (char) -1));
                     break;
                 case '\\':
                     sb.append((char) ch);
@@ -680,36 +667,111 @@ public class BjorneContext {
                         sb.append((char) ch);
                     }
                     break;
+                default:
+                    sb.append((char) ch);
+                    break;
+            }
+            ch = ci.peekCh();
+        }
+        return sb;
+    }
+
+    private StringBuilder doubleQuoteExpand(CharIterator ci) throws ShellException {
+        StringBuilder sb = new StringBuilder(ci.nosRemaining());
+        sb.append('"');
+        int ch = ci.nextCh();
+        while (ch != -1) {
+            switch (ch) {
+                case '\'':
+                    sb.append(singleQuoteExpand(ci));
+                    break;
+                case '"':
+                    sb.append('"');
+                    return sb;
                 case '$':
-                    if (quote == '\'') {
-                        sb.append('$');
-                    } else {
-                        String tmp = dollarExpansion(ci, quote);
-                        sb.append(tmp == null ? "" : tmp);
+                    sb.append(dollarExpand(ci, '"'));
+                    break;
+                case '\\':
+                    sb.append((char) ch);
+                    if ((ch = ci.nextCh()) != -1) {
+                        sb.append((char) ch);
                     }
                     break;
-
                 default:
                     sb.append((char) ch);
                     break;
             }
             ch = ci.nextCh();
         }
-        if (backtickStart != -1) {
-            throw new ShellFailureException("unmatched '`'");
-        }
-        return sb;
+        throw new ShellSyntaxException("Unmatched \"'\" (double quote)");
     }
 
-    private String dollarExpansion(CharIterator ci, char quote) throws ShellException {
+    private Object singleQuoteExpand(CharIterator ci) throws ShellSyntaxException {
+        StringBuilder sb = new StringBuilder(ci.nosRemaining());
+        sb.append('\'');
         int ch = ci.nextCh();
+        while (ch != -1) {
+            switch (ch) {
+                case '\'':
+                    sb.append('\'');
+                    return sb;
+                case '\\':
+                    sb.append((char) ch);
+                    if ((ch = ci.nextCh()) != -1) {
+                        sb.append((char) ch);
+                    }
+                    break;
+                default:
+                    sb.append((char) ch);
+                    break;
+            }
+            ch = ci.nextCh();
+        }
+        throw new ShellSyntaxException("Unmatched '\"' (single quote)");
+    }
+
+    private CharSequence backQuoteExpand(CharIterator ci) throws ShellException {
+        StringBuilder sb = new StringBuilder(ci.nosRemaining());
+        int ch = ci.nextCh();
+        while (ch != -1) {
+            switch (ch) {
+                case '"':
+                    sb.append(doubleQuoteExpand(ci));
+                    break;
+                case '\'':
+                    sb.append(singleQuoteExpand(ci));
+                    break;
+                case '`':
+                    return runBacktickCommand(sb.toString());
+                case '$':
+                    sb.append(dollarExpand(ci, '`'));
+                    break;
+                case '\\':
+                    sb.append((char) ch);
+                    if ((ch = ci.nextCh()) != -1) {
+                        sb.append((char) ch);
+                    }
+                    break;
+                default:
+                    sb.append((char) ch);
+                    break;
+            }
+            ch = ci.nextCh();
+        }
+        throw new ShellSyntaxException("Unmatched \"`\" (back quote)");
+    }
+
+    private CharSequence dollarExpand(CharIterator ci, char quote) throws ShellException {
+        int ch = ci.peekCh();
         switch (ch) {
             case -1:
                 return "$";
             case '{':
-                return dollarBraceExpansion(ci);
+                ci.nextCh();
+                return dollarBraceExpand(ci);
             case '(':
-                return dollarParenExpansion(ci);
+                ci.nextCh();
+                return dollarParenExpand(ci);
             case '$':
             case '#':
             case '@':
@@ -717,169 +779,93 @@ public class BjorneContext {
             case '?':
             case '!':
             case '-':
+                ci.nextCh();
                 return specialVariable(ch, quote == '"');
             default:
-                StringBuilder sb = new StringBuilder().append((char) ch);
-                ch = ci.peekCh();
-                while ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || ch == '_') {
-                    sb.append((char) ch);
-                    ci.nextCh();
-                    ch = ci.peekCh();
-                }
-                return variable(sb.toString());
+                String parameter = parseParameter(ci);
+                String value = (parameter.length() == 0) ? "$" : variable(parameter);
+                return value == null ? "" : value;
         }
     }
-
-    private String dollarBraceExpansion(CharIterator ci) throws ShellException {
-        // Scan to the '}' that matches the '${'
-        StringBuilder sb = new StringBuilder();
-        int braceLevel = 1;
-        int ch = ci.nextCh();
-        int quote = 0;
-    LOOP: 
-        while (ch != -1) {
-            switch (ch) {
-                case '}':
-                    if (quote == 0) {
-                        braceLevel--;
-                        if (braceLevel == 0) {
-                            break LOOP;
-                        }
-                    }
-                    break;
-                case '{':
-                    if (quote == 0) {
-                        braceLevel++;
-                    }
-                    break;
-                case '\\':
-                    sb.append((char) ch);
-                    ch = ci.nextCh();
-                    break;
-                case '"':
-                case '\'':
-                    if (quote == 0) {
-                        quote = ch;
-                    } else if (quote == ch) {
-                        quote = 0;
-                    }
-                    break;
-                default:
-                    // Nothing to do
-                    break;
+    
+    private CharSequence dollarBraceExpand(CharIterator ci) throws ShellException {
+        int ch = ci.peekCh();
+        if (ch == '#') {
+            ci.nextCh();
+            String parameter = parseParameter(ci);
+            if (ci.nextCh() != '}') {
+                throw new ShellSyntaxException("Unmatched \"{\"");
             }
-            if (ch != -1) {
-                sb.append((char) ch);
-            }
-            ch = ci.nextCh();
+            String value = variable(parameter);
+            return (value != null) ? Integer.toString(value.length()) : "0";
         }
-        
-        if (braceLevel > 0) {
-            throw new ShellSyntaxException("unmatched '{'");
-        }
-
-        // Deal with case where the braces are empty ...
-        if (sb.length() == 0) {
-            return "";
-        }
-
-        // Extract the parameter name, noting a leading '#' operator
+        String parameter = parseParameter(ci);
+        ch = ci.nextCh();
         int operator = NONE;
-        int i;
-    LOOP: 
-        for (i = 0; i < sb.length(); i++) {
-            char ch2 = sb.charAt(i);
-            switch (ch2) {
-                case '#':
-                    if (i == 0) {
-                        operator = PREHASH;
-                    } else {
-                        break LOOP;
-                    }
-                    break;
-                case '%':
-                case ':':
-                case '=':
-                case '?':
-                case '+':
-                case '-':
-                    break LOOP;
-                default:
-                    // Include this in the parameter name for now.
-                    break;
-            }
+        switch (ch) {
+            case -1:
+                throw new ShellSyntaxException("Unmatched \"{\"");
+            case '}':
+                break;
+            case '#':
+                if (ci.peekCh() == '#') {
+                    ci.nextCh();
+                    operator = DHASH;
+                } else {
+                    operator = HASH;
+                }
+                break;
+            case '%':
+                if (ci.peekCh() == '%') {
+                    ci.nextCh();
+                    operator = DPERCENT;
+                } else {
+                    operator = PERCENT;
+                }
+                break;
+            case ':':
+                switch (ci.peekCh()) {
+                    case '=':
+                        operator = COLONEQUALS;
+                        break;
+                    case '+':
+                        operator = COLONPLUS;
+                        break;
+                    case '?':
+                        operator = COLONQUERY;
+                        break;
+                    case '-':
+                        operator = COLONHYPHEN;
+                        break;
+                    default:
+                        throw new ShellSyntaxException("bad substitution operator");
+                }
+                ci.nextCh();
+                break;
+            case '=':
+                operator = EQUALS;
+                break;
+            case '?':
+                operator = QUERY;
+                break;
+            case '+':
+                operator = PLUS;
+                break;
+            case '-':
+                operator = HYPHEN;
+                break;
+            default:
+                throw new ShellSyntaxException("unrecognized substitution operator (\"" + (char) ch + "\")");
         }
-
-        String parameter = sb.substring(operator == NONE ? 0 : 1, i);
-        String word = null;
-
-        if (i < sb.length()) {
-            // Work out what the operator is ...
-            char opch = sb.charAt(i);
-            char opch2 = (i + 1 < sb.length()) ? sb.charAt(i + 1) : (char) 0;
-            switch (opch) {
-                case '#':
-                    operator = (opch2 == '#') ? DHASH : HASH;
-                    break;
-                case '%':
-                    operator = (opch2 == '%') ? DPERCENT : PERCENT;
-                    break;
-                case ':':
-                    switch (opch2) {
-                        case '=':
-                            operator = COLONEQUALS;
-                            break;
-                        case '+':
-                            operator = COLONPLUS;
-                            break;
-                        case '?':
-                            operator = COLONQUERY;
-                            break;
-                        case '-':
-                            operator = COLONHYPHEN;
-                            break;
-                        default:
-                            throw new ShellSyntaxException("bad substitution");
-                    }
-                    break;
-                case '=':
-                    operator = EQUALS;
-                    break;
-                case '?':
-                    operator = QUERY;
-                    break;
-                case '+':
-                    operator = PLUS;
-                    break;
-                case '-':
-                    operator = HYPHEN;
-                    break;
-                default:
-                    throw new ShellFailureException("bad state");
-            }
-            // Adjust for two-character operators
-            switch (operator) {
-                case EQUALS:
-                case QUERY:
-                case PLUS:
-                case HYPHEN:
-                case HASH:
-                case PERCENT:
-                    i++;
-                    break;
-                default:
-                    i += 2;
-                    break;
-            }
-            // Extract the word
-            word = sb.substring(i);
+        String value = variable(parameter);
+        if (operator == NONE) {
+            return (value != null) ? value : "";
+        } 
+        String word = dollarBacktickExpand(ci, '}').toString();
+        if (ci.nextCh() != '}') {
+            throw new ShellSyntaxException("Unmatched \"{\"");
         }
-        String value = dollarExpansion(new CharIterator(parameter), '\000');
         switch (operator) {
-            case NONE:
-                return (value != null) ? value : "";
-            case PREHASH:
-                return (value != null) ? Integer.toString(value.length()) : "0";
             case HYPHEN:
                 return (value == null) ? word : value;
             case COLONHYPHEN:
@@ -919,16 +905,27 @@ public class BjorneContext {
                     return value;
                 }
             case HASH:
-                return patternEdit(value, word, false, false);
+                return patternEdit(value.toString(), word, false, false);
             case DHASH:
-                return patternEdit(value, word, false, true);
+                return patternEdit(value.toString(), word, false, true);
             case PERCENT:
-                return patternEdit(value, word, true, false);
+                return patternEdit(value.toString(), word, true, false);
             case DPERCENT:
-                return patternEdit(value, word, true, true);
+                return patternEdit(value.toString(), word, true, true);
             default:
-                throw new ShellFailureException("not implemented");
+                throw new ShellFailureException("unimplemented substitution operator (" + operator + ")");
         }
+    }
+
+    private String parseParameter(CharIterator ci) throws ShellSyntaxException {
+        StringBuilder sb = new StringBuilder();
+        int ch = ci.peekCh();
+        while (Character.isLetterOrDigit((char) ch) || ch == '_') {
+            sb.append((char) ch);
+            ci.nextCh();
+            ch = ci.peekCh();
+        }
+        return sb.toString();
     }
 
     private String patternEdit(String value, String pattern, boolean suffix, boolean eager) {
@@ -1030,10 +1027,80 @@ public class BjorneContext {
     public boolean isSet(String name) {
         return variables.get(name) != null;
     }
-
-    private String dollarParenExpansion(CharIterator ci) {
-        throw new ShellFailureException("not implemented");
+    
+    private String dollarParenExpand(CharIterator ci) throws ShellException {
+        throw new ShellSyntaxException("$( and $(( not implemented yet");
     }
+
+//    private String dollarParenExpand(CharIterator ci) throws ShellException {
+//        StringBuilder sb = extractToMatchingParen(ci);
+//        if (sb.length() > 0 && sb.charAt(sb.length()) == ')') {
+//            throw new ShellSyntaxException(
+//                    "There should be a space between the two ')'s in '$(...))'");
+//        }
+//        return runBacktickCommand(sb.toString()).toString();
+//    }
+//
+//    private StringBuilder extractToMatchingParen(CharIterator ci) throws ShellSyntaxException {
+//        StringBuilder sb = new StringBuilder(40);
+//        Deque<Character> stack = new ArrayDeque<Character>();
+//        int ch;
+//        boolean more = true;
+//        do {
+//            ch = ci.nextCh();
+//            switch (ch) {
+//                case -1:
+//                    if (!stack.isEmpty()) {
+//                        throw new ShellSyntaxException("unmatched '('");
+//                    }
+//                    more = false;
+//                    break;
+//                case ')':
+//                    if (stack.isEmpty()) {
+//                        more = false;
+//                    } else {
+//                        sb.append(')');
+//                        if (stack.peekFirst() == '(') {
+//                            stack.removeFirst();
+//                        }
+//                    }
+//                    break;
+//                case '(':
+//                    if (stack.isEmpty() || stack.peekFirst() == '(') {
+//                        stack.addFirst('(');
+//                    }
+//                    sb.append('(');
+//                    break;
+//                case '"':
+//                case '\'':
+//                case '`':
+//                    sb.append((char) ch);
+//                    if (stack.isEmpty()) { 
+//                        stack.addFirst((char) ch);
+//                    } else {
+//                        char top = stack.peekFirst();
+//                        if (top != '"' && top != '\'' && top != '`') {
+//                            stack.addFirst('"');
+//                        } else if (top == ch) {
+//                            stack.removeFirst();
+//                        }
+//                    }
+//                    break;
+//                case '\\':
+//                    sb.append('\\');
+//                    ch = ci.nextCh();
+//                    if (ch == -1) {
+//                        more = false;
+//                    } else {
+//                        sb.append((char) ch);
+//                    }
+//                    break;
+//                default:
+//                    sb.append((char) ch);
+//            }
+//        } while (more);
+//        return sb;
+//    }
 
     int execute(CommandLine command, CommandIO[] streams, boolean isBuiltin) throws ShellException {
         if (isEchoExpansions()) {

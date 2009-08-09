@@ -189,6 +189,41 @@ public class BjorneContextTest extends TestCase {
         expansion = context.buildCommandLine(new BjorneToken("~"));
         checkExpansion(expansion, new String[] {"~"});
     }
+    
+    public void testExpand17() throws ShellException {
+        TestBjorneContext context = new TestBjorneContext(null, null);
+        context.setVariable("A", "A");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("${A}"));
+        checkExpansion(expansion, new String[] {"A"});
+    }
+
+    public void testExpand18() throws ShellException {
+        TestBjorneContext context = new TestBjorneContext(null, null);
+        context.setVariable("A", "A");
+        context.setVariable("B", "");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("${#A} ${#B} ${#C}"));
+        checkExpansion(expansion, new String[] {"1", "0", "0"});
+    }
+
+    public void testExpand19() throws ShellException {
+        TestBjorneContext context = new TestBjorneContext(null, null);
+        context.setVariable("A", "A");
+        context.setVariable("B", "");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("${A:-X} ${B:-Y} ${C:-Z}"));
+        checkExpansion(expansion, new String[] {"A", "Y", "Z"});
+    }
+
+    public void testExpand20() throws ShellException {
+        TestBjorneContext context = new TestBjorneContext(null, null);
+        context.setVariable("A", "");
+        context.setVariable("B", "B");
+        List<BjorneToken> expansion = context.expandAndSplit(
+                new BjorneToken("${A:-$B} ${A:-${B}} ${A:-${A:-$B}} ${A:-'${B}'}"));
+        checkExpansion(expansion, new String[] {"B", "B", "B", "${B}"});
+    }
 
     private void checkExpansion(List<BjorneToken> expansion, String[] expected) {
         int i;
