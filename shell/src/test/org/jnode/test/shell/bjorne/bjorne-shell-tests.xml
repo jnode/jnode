@@ -70,13 +70,27 @@ echo ${PS1}+
 ] +
 </output>
     </testSpec>
-    <testSpec title="``" command="test" runMode="AS_SCRIPT" rc="0">
+    <testSpec title="`...`" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 A=1
 echo $A
 B=`expr $A + 1`
 echo $B
 C=`echo $A $A`
+echo $C
+</script>
+        <output>1
+2
+1 1
+</output>
+    </testSpec>
+    <testSpec title="$(...)" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+A=1
+echo $A
+B="$(expr $A + 1)"
+echo $B
+C="$(echo $A $A)"
 echo $C
 </script>
         <output>1
