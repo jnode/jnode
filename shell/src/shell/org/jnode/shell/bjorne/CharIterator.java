@@ -47,4 +47,8 @@ class CharIterator {
     public int lastCh() {
         return (pos > start) ? str.charAt(pos - 1) : -1;
     }
+
+    public int nosRemaining() {
+        return limit - pos;
+    }
 }
