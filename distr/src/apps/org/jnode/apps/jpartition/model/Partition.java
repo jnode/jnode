@@ -23,6 +23,14 @@ package org.jnode.apps.jpartition.model;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.Formatter;
 
+/**
+ * A virtual partition represents the state of a partition of a physical
+ * device after all pending operations have been applied. It's used by the user
+ * interface to display the expected final result.
+ *  
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class Partition implements Bounded {
     private static final long MIN_SIZE = 1;
 
@@ -41,26 +49,51 @@ public class Partition implements Bounded {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getStart() {
         return start;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getEnd() {
         return getStart() + size - 1;
     }
 
+    /**
+     * Get the size of this partition.
+     * @return
+     */
     public final long getSize() {
         return size;
     }
 
+    /**
+     * Indicates whether this partition is used or not. 
+     * @return
+     */
     public final boolean isUsed() {
         return used;
     }
 
+    /**
+     * @return a {@link String} representation of this partition.
+     */
     public final String toString() {
         return "[" + getStart() + "," + getEnd() + "]";
     }
 
+    /**
+     * @return One of these values :<br>
+     * <ul>
+     * <li>"" if this partition is not used</li> 
+     * <li>"unformatted" if this partition is not formatted</li>
+     * <li>In other cases : the file system format of this partition (ext2, fat32, ...)</li>
+     * </ul> 
+     */
     public final String getFormat() {
         String format = "";
         if (isUsed()) {
