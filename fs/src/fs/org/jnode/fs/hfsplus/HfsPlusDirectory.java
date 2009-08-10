@@ -87,18 +87,19 @@ public class HfsPlusDirectory extends HfsPlusEntry implements FSDirectory {
     }
 
     private final FSEntry createFileEntry(final String name) throws IOException {
-        /*if (fs.isReadOnly()) {
-            throw new ReadOnlyFileSystemException();
-        }
-        Catalog catalog = fs.getCatalog();
-        Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
-        LeafRecord fileRecord = catalog.createNode(name, this.folder
-        .getFolderId(), new CatalogNodeId(volumeHeader.getNextCatalogId()), CatalogFile.RECORD_TYPE_FILE);
-        
-        HFSPlusEntry newEntry = new HFSPlusFile(fs, this, name, folderRecord);
-        newEntry.setDirty();
-        volumeHeader.setFileCount(volumeHeader.getFileCount() + 1);
-        log.debug("New volume header :\n" + volumeHeader.toString());*/
+        /*
+         * if (fs.isReadOnly()) { throw new ReadOnlyFileSystemException(); }
+         * Catalog catalog = fs.getCatalog(); Superblock volumeHeader =
+         * ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader(); LeafRecord
+         * fileRecord = catalog.createNode(name, this.folder .getFolderId(), new
+         * CatalogNodeId(volumeHeader.getNextCatalogId()),
+         * CatalogFile.RECORD_TYPE_FILE);
+         * 
+         * HFSPlusEntry newEntry = new HFSPlusFile(fs, this, name,
+         * folderRecord); newEntry.setDirty();
+         * volumeHeader.setFileCount(volumeHeader.getFileCount() + 1);
+         * log.debug("New volume header :\n" + volumeHeader.toString());
+         */
 
         return null;
     }
@@ -224,10 +225,11 @@ public class HfsPlusDirectory extends HfsPlusEntry implements FSDirectory {
         }
         Catalog catalog = fs.getCatalog();
         Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
-        LeafRecord folderRecord = catalog.createNode(name, this.folder.getFolderId(), 
-            new CatalogNodeId(volumeHeader.getNextCatalogId()), CatalogFolder.RECORD_TYPE_FOLDER_THREAD);
+        LeafRecord folderRecord =
+                catalog.createNode(name, this.folder.getFolderId(), new CatalogNodeId(volumeHeader
+                        .getNextCatalogId()), CatalogFolder.RECORD_TYPE_FOLDER_THREAD);
         folder.setValence(folder.getValence() + 1);
-        
+
         HfsPlusEntry newEntry = new HfsPlusDirectory(fs, this, name, folderRecord);
         newEntry.setDirty();
         volumeHeader.setFolderCount(volumeHeader.getFolderCount() + 1);

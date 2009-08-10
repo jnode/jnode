@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import javax.naming.NameNotFoundException;
@@ -29,9 +29,9 @@ import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 
 public class HfsPlusFileSystemFormatter extends Formatter<HfsPlusFileSystem> {
-    
+
     private HFSPlusParams params;
-    
+
     public HfsPlusFileSystemFormatter(HFSPlusParams params) {
         super(new HfsPlusFileSystemType());
         this.params = params;
