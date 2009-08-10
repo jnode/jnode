@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.partitions.ibm;
 
 import org.jnode.driver.block.CHS;
@@ -69,8 +69,7 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
         // pgwiasda
         // there are more than one type of extended Partitions
         return (id == IBMPartitionTypes.PARTTYPE_WIN95_FAT32_EXTENDED ||
-                id == IBMPartitionTypes.PARTTYPE_LINUX_EXTENDED || 
-                id == IBMPartitionTypes.PARTTYPE_DOS_EXTENDED);
+                id == IBMPartitionTypes.PARTTYPE_LINUX_EXTENDED || id == IBMPartitionTypes.PARTTYPE_DOS_EXTENDED);
     }
 
     public boolean getBootIndicator() {
@@ -138,23 +137,22 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
     public void setNrSectors(long v) {
         LittleEndian.setInt32(bs, ofs + 12, (int) v);
     }
-    
-    public long getNbrBlocks(int sectorSize){
-    	long sectors = getNrSectors();
-    	long blocks = sectors;
-    	if (sectorSize < 1024) {
-    		blocks /= (1024 / sectorSize);
-    		odd = getNrSectors() % (1024 / sectorSize);
-    	} else {
-    		blocks *= (sectorSize / 1024);
-    	}
-    	return blocks;
+
+    public long getNbrBlocks(int sectorSize) {
+        long sectors = getNrSectors();
+        long blocks = sectors;
+        if (sectorSize < 1024) {
+            blocks /= (1024 / sectorSize);
+            odd = getNrSectors() % (1024 / sectorSize);
+        } else {
+            blocks *= (sectorSize / 1024);
+        }
+        return blocks;
     }
-    
-    public boolean isOdd(){
-    	return odd!=0;
+
+    public boolean isOdd() {
+        return odd != 0;
     }
-    
 
     public void clear() {
         for (int i = 0; i < 16; i++) {
