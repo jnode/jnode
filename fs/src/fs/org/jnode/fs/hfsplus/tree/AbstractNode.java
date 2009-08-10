@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.tree;
 
 import java.util.List;
@@ -54,7 +54,7 @@ public abstract class AbstractNode implements Node {
     @Override
     public boolean addNodeRecord(NodeRecord record) {
         int freeSpace = getFreeSize();
-        if(freeSpace < record.getSize() + 2){
+        if (freeSpace < record.getSize() + 2) {
             return false;
         }
         Integer lastOffset = offsets.get(offsets.size() - 1);
@@ -63,32 +63,35 @@ public abstract class AbstractNode implements Node {
         records.add(record);
         return true;
     }
-    
-    public boolean check(int treeHeigth){
+
+    public boolean check(int treeHeigth) {
         // Node type is correct.
-        if(this.getNodeDescriptor().getKind() < NodeDescriptor.BT_LEAF_NODE || this.getNodeDescriptor().getKind() > NodeDescriptor.BT_MAP_NODE){
+        if (this.getNodeDescriptor().getKind() < NodeDescriptor.BT_LEAF_NODE ||
+                this.getNodeDescriptor().getKind() > NodeDescriptor.BT_MAP_NODE) {
             return false;
         }
-        
-        if(this.getNodeDescriptor().getHeight() > treeHeigth){
+
+        if (this.getNodeDescriptor().getHeight() > treeHeigth) {
             return false;
         }
         return true;
     }
-    
+
     /**
      * Return amount of free space remaining.
+     * 
      * @return remaining free space.
      */
-    protected int getFreeSize(){
+    protected int getFreeSize() {
         int freeOffset = offsets.get(offsets.size() - 1);
         int freeSize = size - freeOffset - (descriptor.getNumRecords() << 1) - OFFSET_SIZE;
         return freeSize;
     }
-    
+
     public byte[] getBytes() {
         byte[] datas = new byte[size];
-        System.arraycopy(descriptor.getBytes(), 0, datas, 0, NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH);
+        System.arraycopy(descriptor.getBytes(), 0, datas, 0,
+                NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH);
         int offsetIndex = 0;
         int offset;
         for (NodeRecord record : records) {
@@ -101,13 +104,13 @@ public abstract class AbstractNode implements Node {
         BigEndian.setInt16(datas, size - ((offsetIndex + 1) * 2), offset);
         return datas;
     }
-    
+
     public String toString() {
         StringBuffer b = new StringBuffer();
         b.append((this.isLeafNode()) ? "Leaf node" : "Index node").append("\n");
         b.append(this.getNodeDescriptor().toString()).append("\n");
         b.append("Offsets : ").append(offsets.toString());
         return b.toString();
-        
+
     }
 }

@@ -22,7 +22,7 @@ package org.jnode.fs.hfsplus.tree;
 
 public interface Node {
 
-    public final static int OFFSET_SIZE = 2;
+    public static final int OFFSET_SIZE = 2;
 
     public NodeDescriptor getNodeDescriptor();
 

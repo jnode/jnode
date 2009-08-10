@@ -159,7 +159,7 @@ public class HFSPlusParams {
      * 
      * @param blockSize Size of a block.
      * @param nodeSize Size of a node.
-     * @param sectors  Number of sector for the device.
+     * @param sectors Number of sector for the device.
      * @param catalog If true, calculate catalog clump size. In the other case,
      *            calculate extent clump size.
      * 

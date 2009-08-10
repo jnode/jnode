@@ -36,8 +36,8 @@ public class HfsUtils {
      * Convert time from/to java time to/from mac time.
      * 
      * @param time in seconds since reference date.
-     * @param encode if {code true}, convert from java to mac, otherwise
-     * convert from mac to java.
+     * @param encode if {code true}, convert from java to mac, otherwise convert
+     *            from mac to java.
      * 
      * @return the converted time
      */
