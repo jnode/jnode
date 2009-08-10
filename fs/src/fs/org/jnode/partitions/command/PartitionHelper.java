@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.partitions.command;
 
 import java.io.IOException;
@@ -53,16 +53,16 @@ public class PartitionHelper {
 
     private final MasterBootRecord MBR;
     private BootSector bs;
-    
+
     private final PrintWriter out;
 
-    public PartitionHelper(String deviceId, PrintWriter out) throws DeviceNotFoundException, ApiNotFoundException,
-            IOException, NameNotFoundException {
+    public PartitionHelper(String deviceId, PrintWriter out) throws DeviceNotFoundException,
+            ApiNotFoundException, IOException, NameNotFoundException {
         this((IDEDevice) DeviceUtils.getDeviceManager().getDevice(deviceId), out);
     }
 
-    public PartitionHelper(IDEDevice device, PrintWriter out) throws DeviceNotFoundException, ApiNotFoundException,
-            IOException {
+    public PartitionHelper(IDEDevice device, PrintWriter out) throws DeviceNotFoundException,
+            ApiNotFoundException, IOException {
         this.current = device;
         this.api = current.getAPI(BlockDeviceAPI.class);
         this.MBR = new MasterBootRecord(api);
@@ -71,10 +71,10 @@ public class PartitionHelper {
         reloadMBR();
     }
 
-    public IDEDevice getDevice(){
-    	return current;
+    public IDEDevice getDevice() {
+        return current;
     }
-    
+
     public void initMbr() throws DeviceNotFoundException, ApiNotFoundException, IOException {
         out.println("Initialize MBR ...");
 
@@ -82,7 +82,8 @@ public class PartitionHelper {
         bs = new GrubBootSector(PLAIN_MASTER_BOOT_SECTOR);
 
         if (MBR.containsPartitionTable()) {
-            out.println("This device already contains a partition table. Copy the already existing partitions.");
+            out
+                    .println("This device already contains a partition table. Copy the already existing partitions.");
 
             for (int i = 0; i < 4; i++) {
                 final IBMPartitionTableEntry oldEntry = oldMBR.getPartition(i);
@@ -125,19 +126,19 @@ public class PartitionHelper {
         if (!MBR.containsPartitionTable())
             throw new IOException("This device doesn't contain a valid partition table.");
     }
-    
-    public IBMPartitionTable getPartitionTable(){
-    	return new IBMPartitionTable(new IBMPartitionTableType(), MBR.array(), current);
+
+    public IBMPartitionTable getPartitionTable() {
+        return new IBMPartitionTable(new IBMPartitionTableType(), MBR.array(), current);
     }
 
     public int getNbPartitions() {
         return bs.getNbPartitions();
     }
-    
+
     public IBMPartitionTableEntry getPartition(int partNr) {
-    	return bs.getPartition(partNr);
+        return bs.getPartition(partNr);
     }
-    
+
     public void modifyPartition(int id, boolean bootIndicator, long start, long size,
             boolean sizeUnit, IBMPartitionTypes fs) throws IOException {
         checkMBR();
@@ -156,8 +157,6 @@ public class PartitionHelper {
         entry.setStartLba(start);
         entry.setNrSectors(nbSectors);
     }
-
-    
 
     public void deletePartition(int partNumber) throws IOException {
         checkMBR();
@@ -179,8 +178,8 @@ public class PartitionHelper {
         bs.getPartition(partNumber).setBootIndicator(!currentStatus);
     }
 
-    private static final byte PLAIN_MASTER_BOOT_SECTOR[] = {
-        (byte) 0xEB, (byte) 0x48, (byte) 0x90, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+    private static final byte PLAIN_MASTER_BOOT_SECTOR[] =
+    {(byte) 0xEB, (byte) 0x48, (byte) 0x90, (byte) 0x00, (byte) 0x00, (byte) 0x00,
         (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
         (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
         (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
