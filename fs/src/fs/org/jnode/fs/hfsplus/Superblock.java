@@ -27,7 +27,6 @@ import java.util.Date;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.jnode.driver.ApiNotFoundException;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
 import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
@@ -37,7 +36,7 @@ import org.jnode.util.NumberUtils;
 /**
  * HFS+ volume header definition.
  * 
- * @author Fabien L.
+ * @author Fabien Lesire
  * 
  */
 public class Superblock extends HfsPlusObject {
