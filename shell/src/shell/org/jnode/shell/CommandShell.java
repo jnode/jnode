@@ -396,7 +396,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 try {
                     Thread.sleep(100000);
                 } catch (InterruptedException ex2) {
-                    
+                    //ignore
                 }
             } finally {
                 if (reader != null) {
