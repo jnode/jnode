@@ -449,7 +449,7 @@ public class BjorneContext {
      * @param text the text to be processed.
      * @return the de-quoted text
      */
-     static StringBuilder dequote(String text) {
+    static StringBuilder dequote(String text) {
         int len = text.length();
         StringBuilder sb = new StringBuilder(len);
         int quote = 0;
@@ -474,7 +474,7 @@ public class BjorneContext {
                     break;
                 default:
                     sb.append(ch);
-                break;
+                    break;
             }
         }
         return sb;
@@ -567,7 +567,7 @@ public class BjorneContext {
      * @param wordTokens the destination for the tokens.
      * @throws ShellException
      */
-     void splitAndAppend(BjorneToken token, List<BjorneToken> wordTokens)
+    void splitAndAppend(BjorneToken token, List<BjorneToken> wordTokens)
         throws ShellException {
         String text = token.getText();
         StringBuilder sb = null;
@@ -1032,8 +1032,7 @@ public class BjorneContext {
         if (ci.peekCh() == '(') {
             ci.nextCh();
             return dollarParenParenExpand(ci);
-        }
-        else {
+        } else {
             String commandLine = dollarBacktickExpand(ci, ')').toString();
             if (ci.nextCh() != ')') {
                 throw new ShellSyntaxException("Unmatched \"(\" (left parenthesis)");

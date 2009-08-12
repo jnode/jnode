@@ -164,7 +164,7 @@ final class ReadBuiltin extends BjorneBuiltin {
                         break;
                     default:
                         sb2.append("\\\n");
-                    break;
+                        break;
                 }
             }
             String ifsWhitespace = sb1.toString();
@@ -183,7 +183,7 @@ final class ReadBuiltin extends BjorneBuiltin {
                         ifsNonWhitespace + "][" + ifsWhitespace + "]*(|[^" + ifsWhitespace + "].*)");
             } else if (ifsWhitespace.length() > 0) {
                 ifsSplittingPattern = Pattern.compile(
-                        "([^" + ifsWhitespace +"]*)[" + ifsWhitespace + "]+(|[^" + ifsWhitespace + "].*)");
+                        "([^" + ifsWhitespace + "]*)[" + ifsWhitespace + "]+(|[^" + ifsWhitespace + "].*)");
             } else {
                 ifsSplittingPattern = Pattern.compile(
                         "([^" + ifsNonWhitespace + "]*)[" + ifsNonWhitespace + "](.*)");

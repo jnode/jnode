@@ -21,7 +21,6 @@
 package org.jnode.fs.hfsplus;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import junit.framework.TestCase;
@@ -33,7 +32,6 @@ import org.jnode.emu.plugin.model.DummyExtension;
 import org.jnode.emu.plugin.model.DummyExtensionPoint;
 import org.jnode.emu.plugin.model.DummyPluginDescriptor;
 import org.jnode.fs.FSDirectory;
-import org.jnode.fs.FileSystemException;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.fs.service.def.FileSystemPlugin;
 import org.jnode.test.support.TestUtils;

@@ -1,7 +1,6 @@
 package org.jnode.test.core;
 
 import javax.isolate.Isolate;
-import javax.isolate.IsolateStartupException;
 import javax.isolate.Link;
 import javax.isolate.LinkMessage;
 import javax.isolate.IsolateStatus;
@@ -12,8 +11,6 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Properties;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -75,8 +72,7 @@ public class IsolatedJavaTest {
                     arg.startsWith("-agentpath") ||
                     arg.startsWith("-javaagent") ||
                     arg.startsWith("-splash") ||
-                    false
-                ) {
+                    false) {
                 //ignore
             } else if (arg.startsWith("-")) {
                 //error invalid option
@@ -116,7 +112,7 @@ public class IsolatedJavaTest {
             Link link = newIsolate.newStatusLink();
             newIsolate.start();
             //wait for exit
-            for (; ;) {
+            for (;;) {
                 LinkMessage msg = link.receive();
                 if (msg.containsStatus() && IsolateStatus.State.EXITED.equals(msg.extractStatus().getState()))
                     break;
