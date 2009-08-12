@@ -1149,7 +1149,7 @@ clean             Remove all intermediate build results.
     </target>
 
     <target name="checkstyle" description="check the mandatory code conventions">
-        <taskdef resource="checkstyletask.properties" classpath="../core/lib/checkstyle-all-4.4.jar"/>
+        <taskdef resource="checkstyletask.properties" classpath="../core/lib/checkstyle-all-5.0.jar"/>
         <checkstyle config="jnode_checks.xml">
             <fileset dir="../builder/src/builder" includes="**/*.java"/>
             <fileset dir="../builder/src/configure" includes="**/*.java"/>
@@ -1177,7 +1177,7 @@ clean             Remove all intermediate build results.
     </target>
 
     <target name="checkstyle-new" description="check the recommanded code conventions">
-        <taskdef resource="checkstyletask.properties" classpath="../core/lib/checkstyle-all-4.4.jar"/>
+        <taskdef resource="checkstyletask.properties" classpath="../core/lib/checkstyle-all-5.0.jar"/>
         <checkstyle config="new_checks.xml">
             <!--
             <fileset dir="../builder/src/builder" includes="**/*.java"/>
