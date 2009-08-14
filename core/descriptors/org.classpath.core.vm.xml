@@ -2,12 +2,12 @@
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
 <plugin id="rt.vm"
-  name="Classpath AWT classes"
+  name="Native classes for the classlib"
   version="@VERSION@"
   system="true"
   plugin-version="@VERSION@"
-  provider-name="Classpath"
-  provider-url="http://classpath.org"
+  provider-name="JNode.org"
+  provider-url="http://jnode.org"
   license-name="classpath">
 
   <runtime>
@@ -34,6 +34,7 @@
         <export name="javax.imageio.spi.*"/>
         <export name="sun.reflect.*"/>
         <export name="sun.misc.*"/>
+        <export name="sun.management.*"/>
         <export name="sun.security.provider.*"/>
 
         <export name="javax.isolate.*"/>
