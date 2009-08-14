@@ -35,6 +35,7 @@
       <export name="sun.management.counter.*"/>
       <export name="sun.management.counter.perf.*"/>
       <export name="sun.management.jmxremote.*"/>
+      <export name="sun.management.resources.*"/>
     </library>
   </runtime>
   
