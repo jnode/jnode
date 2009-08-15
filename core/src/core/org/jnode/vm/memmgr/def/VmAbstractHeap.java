@@ -177,7 +177,7 @@ abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
     protected abstract void initialize(Address start, Address end, int slotSize);
 
     /**
-     * Let a selected set of objects in this heap make a visit to the given visitor.
+     * Let a selected set of objects in this heap accept the given <code>visitor</code>.
      * The selection is made based on the objectflags. The objectflags are masked
      * by flagsMask and the result is compared with flagsValue, if they are equal
      * the object is visited.
