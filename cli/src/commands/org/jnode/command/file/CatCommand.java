@@ -52,16 +52,16 @@ import org.jnode.shell.syntax.URLArgument;
  */
 public class CatCommand extends AbstractCommand {
 
-    private static final String help_file = "the files to be concatenated";
-    private static final String help_url = "the urls to be concatenated";
-    private static final String help_urls = "If set, arguments will be urls";
-    private static final String help_num_nb = "If set, number nonempty output lines";
-    private static final String help_num = "If set, number all output lines";
-    private static final String help_ends = "If set, print a $ at the end of each lines";
-    private static final String help_squeeze = "If set, supress printing of sequential blank lines";
-    private static final String help_super = "Concatenate the contents of files, urls or standard input";
-    private static final String err_url = "Cannot fetch %s: %s%n";
-    private static final String err_file = "Cannot open %sn";
+    private static final String HELP_FILE = "the files to be concatenated";
+    private static final String HELP_URL = "the urls to be concatenated";
+    private static final String HELP_URLS = "If set, arguments will be urls";
+    private static final String HELP_NUM_NB = "If set, number nonempty output lines";
+    private static final String HELP_NUM = "If set, number all output lines";
+    private static final String HELP_ENDS = "If set, print a $ at the end of each lines";
+    private static final String HELP_SQUEEZE = "If set, supress printing of sequential blank lines";
+    private static final String HELP_SUPER = "Concatenate the contents of files, urls or standard input";
+    private static final String ERR_URL = "Cannot fetch %s: %s%n";
+    private static final String ERR_FILE = "Cannot open %sn";
     
     private final FileArgument argFile;
     private final FlagArgument argNumNB;
@@ -87,17 +87,17 @@ public class CatCommand extends AbstractCommand {
     private boolean useStreams;
     
     public CatCommand() {
-        super(help_super);
+        super(HELP_SUPER);
         int fileFlags = Argument.MULTIPLE | Argument.EXISTING | FileArgument.HYPHEN_IS_SPECIAL;
-        argFile    = new FileArgument("file", fileFlags, help_file);
-        argNumNB   = new FlagArgument("num-nonblank", 0, help_num_nb);
-        argNumAll  = new FlagArgument("num", 0, help_num);
-        argEnds    = new FlagArgument("show-ends", 0, help_ends);
-        argSqueeze = new FlagArgument("squeeze", 0, help_squeeze);
+        argFile    = new FileArgument("file", fileFlags, HELP_FILE);
+        argNumNB   = new FlagArgument("num-nonblank", 0, HELP_NUM_NB);
+        argNumAll  = new FlagArgument("num", 0, HELP_NUM);
+        argEnds    = new FlagArgument("show-ends", 0, HELP_ENDS);
+        argSqueeze = new FlagArgument("squeeze", 0, HELP_SQUEEZE);
         registerArguments(argFile, argNumNB, argNumAll, argEnds, argSqueeze);
         
-        argUrl  = new URLArgument("url", Argument.MULTIPLE | Argument.EXISTING, help_url);
-        argUrls = new FlagArgument("urls", Argument.OPTIONAL, help_urls);
+        argUrl  = new URLArgument("url", Argument.MULTIPLE | Argument.EXISTING, HELP_URL);
+        argUrls = new FlagArgument("urls", Argument.OPTIONAL, HELP_URLS);
         registerArguments(argUrl, argUrls);
     }
     
@@ -131,7 +131,7 @@ public class CatCommand extends AbstractCommand {
                 try {
                     is = url.openStream();
                 } catch (IOException ex) {
-                    err.format(err_url, url, ex.getLocalizedMessage());
+                    err.format(ERR_URL, url, ex.getLocalizedMessage());
                     rc = 1;
                 }
                 if (is != null) {
@@ -227,7 +227,7 @@ public class CatCommand extends AbstractCommand {
         } else {
             ret = IOUtils.openInputStream(file);
             if (ret == null) {
-                err.format(err_file, file);
+                err.format(ERR_FILE, file);
             }
         }
         
@@ -249,7 +249,7 @@ public class CatCommand extends AbstractCommand {
         } else {
             ret = IOUtils.openBufferedReader(file, BUFFER_SIZE);
             if (ret == null) {
-                err.format(err_file, file);
+                err.format(ERR_FILE, file);
             }
         }
         
