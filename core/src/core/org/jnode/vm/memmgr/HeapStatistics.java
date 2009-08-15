@@ -20,6 +20,8 @@
  
 package org.jnode.vm.memmgr;
 
+import java.io.IOException;
+
 import org.jnode.vm.VmSystemObject;
 
 /**
@@ -46,9 +48,10 @@ public abstract class HeapStatistics extends VmSystemObject {
     public abstract void setMinimumTotalSize(long bytes);
 
     /**
-     * Convert the statistical data to a string.
-     *
-     * @see java.lang.Object#toString()
+     * Write the statistical data to an {@link Appendable}.
+     * 
+     * @param a
+     * @throws IOException 
      */
-    public abstract String toString();
+    public abstract void writeTo(Appendable a) throws IOException;
 }

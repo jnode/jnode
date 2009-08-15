@@ -20,6 +20,7 @@
  
 package org.jnode.command.system;
 
+import java.io.BufferedWriter;
 import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
@@ -69,7 +70,7 @@ public class OnHeapCommand extends AbstractCommand {
             stats.setMinimumTotalSize(argMinTotalSize.getValue());
         }
 
-        out.println(stats.toString());
+        stats.writeTo(new BufferedWriter(getOutput().getWriter(), 2048));
     }
 
 }

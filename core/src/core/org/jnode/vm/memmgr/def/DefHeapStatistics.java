@@ -20,6 +20,7 @@
  
 package org.jnode.vm.memmgr.def;
 
+import java.io.IOException;
 import java.util.TreeMap;
 
 import org.jnode.util.NumberUtils;
@@ -74,8 +75,11 @@ final class DefHeapStatistics extends HeapStatistics {
         this.minTotalSize = bytes;
     }
 
-    public String toString() {
-        final StringBuilder sb = new StringBuilder();
+    /**
+     * {@inheritDoc}
+     * @throws IOException 
+     */
+    public void writeTo(Appendable a) throws IOException {
         boolean first = true;
 
         for (HeapCounter c : countData.values()) {
@@ -83,15 +87,13 @@ final class DefHeapStatistics extends HeapStatistics {
                 if (first) {
                     first = false;
                 } else {
-                    sb.append(newline);
+                    a.append(newline);
                 }
-                c.append(sb);
+                c.append(a);
             }
         }
-
-        return sb.toString();
     }
-
+    
     static final class HeapCounter {
 
         private final String name;
@@ -122,18 +124,19 @@ final class DefHeapStatistics extends HeapStatistics {
             return objectSize * (long) instanceCount;
         }
 
-        public void append(StringBuilder sb) {
-            sb.append(name);
-            sb.append("  #");
-            sb.append(instanceCount);
+        public void append(Appendable a) throws IOException {
+            a.append(name);
+            a.append("  #");
+            a.append(Integer.toString(instanceCount));
 
             if (objectSize != 0) {
-                sb.append(usage);
+                a.append(usage);
                 long size = getTotalSize();
                 if (size >= 1024) {
-                    sb.append(NumberUtils.size(size) + " (" + getTotalSize() + "b)");
+                    a.append(NumberUtils.toBinaryByte(size)).append(" (");
+                    a.append(Long.toString(size)).append("b)");
                 } else {
-                    sb.append(size + "b");
+                    a.append(Long.toString(size)).append('b');
                 }
             }
         }
