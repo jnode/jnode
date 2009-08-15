@@ -6,5 +6,6 @@
     <include setName="paste-command-tests.xml"/>
     <include setName="sort-command-tests.xml"/>
     <include setName="tail-command-tests.xml"/>
+    <include setName="tee-command-tests.xml"/>
     <include setName="wc-command-tests.xml"/>
 </testSet>

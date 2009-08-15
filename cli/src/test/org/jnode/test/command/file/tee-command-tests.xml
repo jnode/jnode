@@ -1,0 +1,255 @@
+<testSet title="tee command tests">
+    <plugin id="org.jnode.command.file"/>
+    <plugin id="org.jnode.shell.bjorne" class="org.jnode.test.shell.bjorne.BjornePseudoPlugin"/>
+    <testSpec title="no file" command="tee" runMode="AS_ALIAS" rc="0">
+        <input>1234
+</input>
+        <output>1234
+</output>
+    </testSpec>
+    <testSpec title="single-file" command="run" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo 1234 | tee @TEMP_DIR@/out
+        </script>
+        <file name="out" input="false">1234
+</file>
+        <output>1234
+</output>
+    </testSpec>
+    <testSpec title="max-files" command="run" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo 1234 | tee @TEMP_DIR@/out @TEMP_DIR@/out_1 @TEMP_DIR@/out_2 @TEMP_DIR@/out_3 @TEMP_DIR@/out_4 @TEMP_DIR@/out_5 @TEMP_DIR@/out_6 @TEMP_DIR@/out_7 @TEMP_DIR@/out_8 @TEMP_DIR@/out_9 @TEMP_DIR@/out_10 @TEMP_DIR@/out_11 @TEMP_DIR@/out_12
+        </script>
+        <file name="out" input="false">1234
+</file>
+        <file name="out_1" input="false">1234
+</file>
+        <file name="out_2" input="false">1234
+</file>
+        <file name="out_3" input="false">1234
+</file>
+        <file name="out_4" input="false">1234
+</file>
+        <file name="out_5" input="false">1234
+</file>
+        <file name="out_6" input="false">1234
+</file>
+        <file name="out_7" input="false">1234
+</file>
+        <file name="out_8" input="false">1234
+</file>
+        <file name="out_9" input="false">1234
+</file>
+        <file name="out_10" input="false">1234
+</file>
+        <file name="out_11" input="false">1234
+</file>
+        <file name="out_12" input="false">1234
+</file>
+        <output>1234
+</output>
+    </testSpec>
+    <testSpec title="more-then-max-files" command="run" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo 1234 | tee @TEMP_DIR@/out @TEMP_DIR@/out_1 @TEMP_DIR@/out_2 @TEMP_DIR@/out_3 @TEMP_DIR@/out_4 @TEMP_DIR@/out_5 @TEMP_DIR@/out_6 @TEMP_DIR@/out_7 @TEMP_DIR@/out_8 @TEMP_DIR@/out_9 @TEMP_DIR@/out_10 @TEMP_DIR@/out_11 @TEMP_DIR@/out_12 @TEMP_DIR@/out_13
+        </script>
+        <file name="out" input="false">1234
+</file>
+        <file name="out_1" input="false">1234
+</file>
+        <file name="out_2" input="false">1234
+</file>
+        <file name="out_3" input="false">1234
+</file>
+        <file name="out_4" input="false">1234
+</file>
+        <file name="out_5" input="false">1234
+</file>
+        <file name="out_6" input="false">1234
+</file>
+        <file name="out_7" input="false">1234
+</file>
+        <file name="out_8" input="false">1234
+</file>
+        <file name="out_9" input="false">1234
+</file>
+        <file name="out_10" input="false">1234
+</file>
+        <file name="out_11" input="false">1234
+</file>
+        <file name="out_12" input="false">1234
+</file>
+        <output>1234
+</output>
+    </testSpec>
+    
+    
+    <testSpec title="append-single-file" command="run" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo 1234 | tee -a @TEMP_DIR@/out
+        </script>
+        <file name="out" input="true">Already in File out
+</file>
+        <file name="out" input="false">Already in File out
+1234
+</file>
+        <output>1234
+</output>
+    </testSpec>
+    <testSpec title="append-max-files" command="run" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo 1234 | tee -a @TEMP_DIR@/out @TEMP_DIR@/out_1 @TEMP_DIR@/out_2 @TEMP_DIR@/out_3 @TEMP_DIR@/out_4 @TEMP_DIR@/out_5 @TEMP_DIR@/out_6 @TEMP_DIR@/out_7 @TEMP_DIR@/out_8 @TEMP_DIR@/out_9 @TEMP_DIR@/out_10 @TEMP_DIR@/out_11 @TEMP_DIR@/out_12
+        </script>
+        
+        <!-- Exiting files -->
+        <file name="out" input="true">Already in File out
+</file>
+        <file name="out_1" input="true">Already in File out_1
+</file>
+        <file name="out_2" input="true">Already in File out_2
+</file>
+        <file name="out_3" input="true">Already in File out_3
+</file>
+        <file name="out_4" input="true">Already in File out_4
+</file>
+        <file name="out_5" input="true">Already in File out_5
+</file>
+        <file name="out_6" input="true">Already in File out_6
+</file>
+        <file name="out_7" input="true">Already in File out_7
+</file>
+        <file name="out_8" input="true">Already in File out_8
+</file>
+        <file name="out_9" input="true">Already in File out_9
+</file>
+        <file name="out_10" input="true">Already in File out_10
+</file>
+        <file name="out_11" input="true">Already in File out_11
+</file>
+        <file name="out_12" input="true">Already in File out_12
+</file>
+
+        <!-- Output files -->
+        <file name="out" input="false">Already in File out
+1234
+</file>
+        <file name="out_1" input="false">Already in File out_1
+1234
+</file>
+        <file name="out_2" input="false">Already in File out_2
+1234
+</file>
+        <file name="out_3" input="false">Already in File out_3
+1234
+</file>
+        <file name="out_4" input="false">Already in File out_4
+1234
+</file>
+        <file name="out_5" input="false">Already in File out_5
+1234
+</file>
+        <file name="out_6" input="false">Already in File out_6
+1234
+</file>
+        <file name="out_7" input="false">Already in File out_7
+1234
+</file>
+        <file name="out_8" input="false">Already in File out_8
+1234
+</file>
+        <file name="out_9" input="false">Already in File out_9
+1234
+</file>
+        <file name="out_10" input="false">Already in File out_10
+1234
+</file>
+        <file name="out_11" input="false">Already in File out_11
+1234
+</file>
+        <file name="out_12" input="false">Already in File out_12
+1234
+</file>
+        <output>1234
+</output>
+    </testSpec>
+    <testSpec title="append-more-than-max-files" command="run" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo 1234 | tee -a @TEMP_DIR@/out @TEMP_DIR@/out_1 @TEMP_DIR@/out_2 @TEMP_DIR@/out_3 @TEMP_DIR@/out_4 @TEMP_DIR@/out_5 @TEMP_DIR@/out_6 @TEMP_DIR@/out_7 @TEMP_DIR@/out_8 @TEMP_DIR@/out_9 @TEMP_DIR@/out_10 @TEMP_DIR@/out_11 @TEMP_DIR@/out_12 @TEMP_DIR@/out_13
+        </script>
+        
+        <!-- Exiting files -->
+        <file name="out" input="true">Already in File out
+</file>
+        <file name="out_1" input="true">Already in File out_1
+</file>
+        <file name="out_2" input="true">Already in File out_2
+</file>
+        <file name="out_3" input="true">Already in File out_3
+</file>
+        <file name="out_4" input="true">Already in File out_4
+</file>
+        <file name="out_5" input="true">Already in File out_5
+</file>
+        <file name="out_6" input="true">Already in File out_6
+</file>
+        <file name="out_7" input="true">Already in File out_7
+</file>
+        <file name="out_8" input="true">Already in File out_8
+</file>
+        <file name="out_9" input="true">Already in File out_9
+</file>
+        <file name="out_10" input="true">Already in File out_10
+</file>
+        <file name="out_11" input="true">Already in File out_11
+</file>
+        <file name="out_12" input="true">Already in File out_12
+</file>
+        <file name="out_13" input="true">Already in File out_13
+</file>
+
+        <!-- Output files -->
+        <file name="out" input="false">Already in File out
+1234
+</file>
+        <file name="out_1" input="false">Already in File out_1
+1234
+</file>
+        <file name="out_2" input="false">Already in File out_2
+1234
+</file>
+        <file name="out_3" input="false">Already in File out_3
+1234
+</file>
+        <file name="out_4" input="false">Already in File out_4
+1234
+</file>
+        <file name="out_5" input="false">Already in File out_5
+1234
+</file>
+        <file name="out_6" input="false">Already in File out_6
+1234
+</file>
+        <file name="out_7" input="false">Already in File out_7
+1234
+</file>
+        <file name="out_8" input="false">Already in File out_8
+1234
+</file>
+        <file name="out_9" input="false">Already in File out_9
+1234
+</file>
+        <file name="out_10" input="false">Already in File out_10
+1234
+</file>
+        <file name="out_11" input="false">Already in File out_11
+1234
+</file>
+        <file name="out_12" input="false">Already in File out_12
+1234
+</file>
+        <file name="out_13" input="false">Already in File out_13
+</file>
+        <output>1234
+</output>
+    </testSpec>
+</testSet>
