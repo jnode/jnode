@@ -44,6 +44,7 @@
     <alias name="rm"      class="org.jnode.command.file.DeleteCommand"/>
     <alias name="sort"    class="org.jnode.command.file.SortCommand"/>
     <alias name="tail"    class="org.jnode.command.file.TailCommand"/>
+    <alias name="tee"     class="org.jnode.command.file.TeeCommand"/>
     <alias name="touch"   class="org.jnode.command.file.TouchCommand"/>
     <alias name="wc"      class="org.jnode.command.file.WcCommand"/>
   </extension>
@@ -345,6 +346,16 @@
           <option argLabel="verbose"   shortName="v" longName="verbose"/>
           <option argLabel="bytes"     shortName="c" longName="bytes"/>
           <option argLabel="lines"     shortName="n" longName="lines"/>
+        </optionSet>
+        <repeat>
+          <argument argLabel="files"/>
+        </repeat>
+      </sequence>
+    </syntax>
+    <syntax alias="tee">
+      <sequence>
+        <optionSet label="globals">
+          <option argLabel="append"    shortName="a" longName="append"/>
         </optionSet>
         <repeat>
           <argument argLabel="files"/>
