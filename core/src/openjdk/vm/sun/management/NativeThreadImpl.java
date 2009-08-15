@@ -1,6 +1,10 @@
 package sun.management;
 
 import java.lang.management.ThreadInfo;
+import java.util.ArrayList;
+import org.jnode.vm.Vm;
+import org.jnode.vm.scheduler.VmThreadVisitor;
+import org.jnode.vm.scheduler.VmThread;
 
 /**
  * @see sun.management.ThreadImpl
@@ -10,9 +14,17 @@ class NativeThreadImpl {
      * @see sun.management.ThreadImpl#getThreads()
      */
     private static Thread[] getThreads() {
-        //todo implement it
-        return new Thread[0];
+        final ArrayList<Thread> tl = new ArrayList<Thread>();
+        Vm.getVm().getScheduler().visitAllThreads(new VmThreadVisitor() {
+            @Override
+            public boolean visit(VmThread thread) {
+                tl.add(thread.asThread());
+                return true;
+            }
+        });
+        return tl.toArray(new Thread[tl.size()]);
     }
+
     /**
      * @see sun.management.ThreadImpl#getThreadInfo0(long[], int, java.lang.management.ThreadInfo[])
      */
@@ -23,41 +35,43 @@ class NativeThreadImpl {
      * @see sun.management.ThreadImpl#getThreadTotalCpuTime0(long)
      */
     private static long getThreadTotalCpuTime0(long arg1) {
-        //todo implement it
-        return 0;
+        //todo add CPU time mesurement support
+        throw new UnsupportedOperationException();
     }
     /**
      * @see sun.management.ThreadImpl#getThreadUserCpuTime0(long)
      */
     private static long getThreadUserCpuTime0(long arg1) {
-        //todo implement it
-        return 0;
+        //todo add CPU time mesurement support
+        throw new UnsupportedOperationException();
     }
     /**
      * @see sun.management.ThreadImpl#setThreadCpuTimeEnabled0(boolean)
      */
     private static void setThreadCpuTimeEnabled0(boolean arg1) {
-        //todo implement it
+        //todo add CPU time mesurement support
+        throw new UnsupportedOperationException();
     }
     /**
      * @see sun.management.ThreadImpl#setThreadContentionMonitoringEnabled0(boolean)
      */
     private static void setThreadContentionMonitoringEnabled0(boolean arg1) {
-        //todo implement it
+        //todo add thread contention monitoring support
+        throw new UnsupportedOperationException();
     }
     /**
      * @see sun.management.ThreadImpl#findMonitorDeadlockedThreads0()
      */
     private static Thread[] findMonitorDeadlockedThreads0() {
         //todo implement it
-        return new Thread[0];
+        return null;
     }
     /**
      * @see sun.management.ThreadImpl#findDeadlockedThreads0()
      */
     private static Thread[] findDeadlockedThreads0() {
         //todo implement it
-        return new Thread[0];
+        return null;
     }
     /**
      * @see sun.management.ThreadImpl#resetPeakThreadCount0()
