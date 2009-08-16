@@ -64,27 +64,27 @@ public abstract class VmProcessor extends VmSystemObject {
     private volatile Word threadSwitchIndicator;
 
     /**
-     * Reference to myself; used in assembly code
+     * Reference to myself; used in assembly code.
      */
     final VmProcessor me;
 
     /**
-     * The current thread on this processor
+     * The current thread on this processor.
      */
     protected volatile VmThread currentThread;
 
     /**
-     * The isolated statics table of the current thread (int[])
+     * The isolated statics table of the current thread (int[]).
      */
     private volatile Object isolatedStaticsTable;
 
     /**
-     * The isolated statics table of the current thread
+     * The isolated statics table of the current thread.
      */
     private volatile VmIsolatedStatics isolatedStatics;
 
     /**
-     * The next thread to schedule on this processor
+     * The next thread to schedule on this processor.
      */
     volatile VmThread nextThread;
 
@@ -99,54 +99,54 @@ public abstract class VmProcessor extends VmSystemObject {
     protected volatile Address kernelStackEnd;
 
     /**
-     * The identifier of this processor
+     * The identifier of this processor.
      */
     private int id;
 
     /**
-     * The identifier of this processor as string
+     * The identifier of this processor as string.
      */
     private String idString;
 
     /**
-     * IRQ manager for this processor
+     * IRQ manager for this processor.
      */
     private IRQManager irqMgr;
 
     /**
-     * Address of threadSwitchIndicator
+     * Address of threadSwitchIndicator.
      */
     private Address tsiAddress;
 
     /**
-     * The scheduler that is used
+     * The scheduler that is used.
      */
     private final VmScheduler scheduler;
 
     /**
-     * The architecture of this processor
+     * The architecture of this processor.
      */
     private final VmArchitecture architecture;
 
     /**
-     * The idle thread
+     * The idle thread.
      */
     private IdleThread idleThread;
 
     private int lockCount;
 
     /**
-     * CPU identification
+     * CPU identification.
      */
     private transient CpuID cpuId;
 
     /**
-     * The statics table (int[])
+     * The statics table (int[]).
      */
     private volatile Object staticsTable;
 
     /**
-     * The processor speed indication
+     * The processor speed indication.
      */
     private float jnodeMips;
 
@@ -155,12 +155,12 @@ public abstract class VmProcessor extends VmSystemObject {
     private int sameThreadPriorityCount;
 
     /**
-     * The data specific to this processor used by the heap manager
+     * The data specific to this processor used by the heap manager.
      */
     private final Object heapData;
 
     /**
-     * Per processor MathSupport memory structures
+     * Per processor MathSupport memory structures.
      */
     private final MathSupport mathSupport = new MathSupport();
 
@@ -177,27 +177,27 @@ public abstract class VmProcessor extends VmSystemObject {
     private final int[] compilerIds;
 
     /**
-     * Indicate the a thread switch is needed
+     * Indicate the a thread switch is needed.
      */
     public static final int TSI_SWITCH_NEEDED = 0x0001;
 
     /**
-     * Indicate that the system is ready for thread switching
+     * Indicate that the system is ready for thread switching.
      */
     public static final int TSI_SYSTEM_READY = 0x0002;
 
     /**
-     * Indicate the a thread switch is in progress
+     * Indicate the a thread switch is in progress.
      */
     public static final int TSI_SWITCH_ACTIVE = 0x0004;
 
     /**
-     * Indicate the a thread switch cannot occur
+     * Indicate the a thread switch cannot occur.
      */
     public static final int TSI_BLOCK_SWITCH = 0x0008;
 
     /**
-     * Indicate the a thread switch is requested
+     * Indicate the a thread switch is requested.
      */
     public static final int TSI_SWITCH_REQUESTED = TSI_SWITCH_NEEDED
         | TSI_SYSTEM_READY;
@@ -215,7 +215,7 @@ public abstract class VmProcessor extends VmSystemObject {
     }
 
     /**
-     * Initialize this instance
+     * Initialize this instance.
      *
      * @param id
      * @param architecture
@@ -256,7 +256,7 @@ public abstract class VmProcessor extends VmSystemObject {
     }
 
     /**
-     * Gets the current thread on this processor
+     * Gets the current thread on this processor.
      *
      * @return The current thread on this processor
      * @throws org.vmmagic.pragma.UninterruptiblePragma
@@ -298,7 +298,7 @@ public abstract class VmProcessor extends VmSystemObject {
     }
 
     /**
-     * Create an ID string for the given id
+     * Create an ID string for the given id.
      *
      * @param id
      * @return the ID string
@@ -501,14 +501,14 @@ public abstract class VmProcessor extends VmSystemObject {
     }
 
     /**
-     * Create a new thread
+     * Create a new thread.
      *
      * @return The new thread
      */
     protected abstract VmThread createThread(VmIsolatedStatics isolatedStatics);
 
     /**
-     * Create a new thread
+     * Create a new thread.
      *
      * @param javaThread
      * @return The new thread
@@ -518,7 +518,7 @@ public abstract class VmProcessor extends VmSystemObject {
     }
 
     /**
-     * Create a new thread
+     * Create a new thread.
      *
      * @param javaThread
      * @return The new thread
@@ -536,7 +536,7 @@ public abstract class VmProcessor extends VmSystemObject {
     protected abstract int[] getIrqCounters();
 
     /**
-     * Mark the system are ready for thread switching
+     * Mark the system as ready for thread switching.
      */
     @Internal
     public final void systemReadyForThreadSwitch() {
@@ -548,8 +548,8 @@ public abstract class VmProcessor extends VmSystemObject {
     }
 
     /**
-     * Gets the address of the threadSwitchIndicator field in this object. It is
-     * assumed the this field is the first field of this class!
+     * Gets the address of the threadSwitchIndicator field in this object. <b>It is
+     * assumed this field is the first field of this class!</b>
      *
      * @return The address of the thread switch indicator
      */
@@ -590,7 +590,7 @@ public abstract class VmProcessor extends VmSystemObject {
     /**
      * Load the CPU id.
      *
-     * @param id The idenfication returned by Unsafe.getCpuID
+     * @param id The identification returned by Unsafe.getCpuID
      * @return CpuID
      */
     protected abstract CpuID loadCPUID(int[] id);
@@ -630,7 +630,7 @@ public abstract class VmProcessor extends VmSystemObject {
     }
 
     /**
-     * Calculate the processor speed and delay loops.
+     * Calculate the processor speed in "JNodeMips" and delay loops.
      */
     @Internal
     public final void calibrate() {
@@ -643,7 +643,7 @@ public abstract class VmProcessor extends VmSystemObject {
     /**
      * Gets the processor speed indication.
      *
-     * @return the notional processor speed.
+     * @return the processor speed in "JNodeMips".
      */
     public final float getJNodeMips() {
         return jnodeMips;
