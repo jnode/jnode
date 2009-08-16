@@ -102,7 +102,6 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     private Object annotationDefault;
     private byte[] rawAnnotationDefault;
-    private byte[] rawAnnotations;
     private byte[] rawParameterAnnotations;
 
     /**
@@ -694,14 +693,6 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     public void setRawAnnotationDefault(byte[] rawAnnotationDefault) {
         this.rawAnnotationDefault = rawAnnotationDefault;
-    }
-
-    public byte[] getRawAnnotations() {
-        return rawAnnotations;
-    }
-
-    public void setRawAnnotations(byte[] rawAnnotations) {
-        this.rawAnnotations = rawAnnotations;
     }
 
     public byte[] getRawParameterAnnotations() {

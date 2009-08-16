@@ -426,6 +426,9 @@ public final class ClassDecoder {
             final String attrName = cp.getUTF8(data.getChar());
             final int length = data.getInt();
             if (VmArray.equals(RuntimeVisibleAnnotationsAttrName, attrName)) {
+                byte[] buf = new byte[length];
+                data.slice().get(buf);
+                cls.setRawAnnotations(buf);
                 rVisAnn = readRuntimeAnnotations(data, cp, true, clc);
             } else if (VmArray.equals(RuntimeInvisibleAnnotationsAttrName,
                 attrName)) {
@@ -641,6 +644,7 @@ public final class ClassDecoder {
                 // Read field attributes
                 final int acount = data.getChar();
                 VmAnnotation[] rVisAnn = null;
+                byte[] rawAnnotations = null;
                 Object constantValue = null;
                 for (int a = 0; a < acount; a++) {
                     final String attrName = cp.getUTF8(data.getChar());
@@ -650,6 +654,8 @@ public final class ClassDecoder {
                         constantValue = cp.getAny(data.getChar());
                     } else if (VmArray.equals(
                         RuntimeVisibleAnnotationsAttrName, attrName)) {
+                        rawAnnotations = new byte[length];
+                        data.slice().get(rawAnnotations);
                         rVisAnn = readRuntimeAnnotations(data, cp, true, loader);
                     } else if (VmArray.equals(
                         RuntimeInvisibleAnnotationsAttrName, attrName)) {
@@ -659,8 +665,7 @@ public final class ClassDecoder {
                     }
                 }
 
-                ftable[i] = new FieldData(name, signature, modifiers,
-                    constantValue, rVisAnn);
+                ftable[i] = new FieldData(name, signature, modifiers, constantValue, rVisAnn, rawAnnotations);
             }
             return ftable;
         } else {
@@ -773,8 +778,7 @@ public final class ClassDecoder {
             }
             ftable[i] = fs;
 
-            // Read field attributes
-            final VmAnnotation[] rVisAnn = fd.rVisAnn;
+            // Read field attributes            
             if (isstatic && (fd.constantValue != null)) {
                 switch (signature.charAt(0)) {
                     case 'B':
@@ -782,34 +786,28 @@ public final class ClassDecoder {
                     case 'I':
                     case 'S':
                     case 'Z':
-                        statics.setInt(staticsIdx, ((VmConstInt) fd.constantValue)
-                            .intValue());
+                        statics.setInt(staticsIdx, ((VmConstInt) fd.constantValue).intValue());
                         break;
                     case 'D':
-                        final long lval = Double
-                            .doubleToRawLongBits(((VmConstDouble) fd.constantValue)
-                                .doubleValue());
+                        final long lval = Double.doubleToRawLongBits(((VmConstDouble) fd.constantValue).doubleValue());
                         statics.setLong(staticsIdx, lval);
                         break;
                     case 'F':
-                        final int ival = Float
-                            .floatToRawIntBits(((VmConstFloat) fd.constantValue)
-                                .floatValue());
+                        final int ival = Float.floatToRawIntBits(((VmConstFloat) fd.constantValue) .floatValue());
                         statics.setInt(staticsIdx, ival);
                         break;
                     case 'J':
-                        statics.setLong(staticsIdx,
-                            ((VmConstLong) fd.constantValue).longValue());
+                        statics.setLong(staticsIdx, ((VmConstLong) fd.constantValue).longValue());
                         break;
                     default:
                         // throw new IllegalArgumentException("signature "
                         // + signature);
-                        statics.setObject(staticsIdx,
-                            (VmConstString) fd.constantValue);
+                        statics.setObject(staticsIdx, fd.constantValue);
                         break;
                 }
             }
-            fs.setRuntimeAnnotations(rVisAnn);
+            fs.setRuntimeAnnotations(fd.rVisAnn);
+            fs.setRawAnnotations(fd.rawAnnotations);
         }
 
         // Align the instance fields for minimal object size.
@@ -951,9 +949,7 @@ public final class ClassDecoder {
                         mts.setBytecode(readCode(data, cls, cp, mts));
                     } else if (VmArray.equals(ExceptionsAttrName, attrName)) {
                         mts.setExceptions(readExceptions(data, cls, cp));
-                    } else if (VmArray.equals(
-                        RuntimeVisibleAnnotationsAttrName, attrName)) {
-
+                    } else if (VmArray.equals(RuntimeVisibleAnnotationsAttrName, attrName)) {
                         byte[] buf = new byte[length];
                         data.slice().get(buf);
                         mts.setRawAnnotations(buf);
@@ -962,21 +958,16 @@ public final class ClassDecoder {
                         //rVisAnn = readRuntimeAnnotations(data, cp, true, cl);
                         rVisAnn = readRuntimeAnnotations2(data, cp, true, cl, cls);
 
-                    } else if (VmArray.equals(
-                        RuntimeInvisibleAnnotationsAttrName, attrName)) {
+                    } else if (VmArray.equals(RuntimeInvisibleAnnotationsAttrName, attrName)) {
                         rInvisAnn = readRuntimeAnnotations(data, cp, false, cl);
-                    } else if (VmArray.equals(
-                        RuntimeVisibleParameterAnnotationsAttrName,
-                        attrName)) {
+                    } else if (VmArray.equals(RuntimeVisibleParameterAnnotationsAttrName, attrName)) {
 
                         byte[] buf = new byte[length];
                         data.slice().get(buf);
                         mts.setRawParameterAnnotations(buf);
                         //todo will get obsolate with openjdk based annotation support
                         readRuntimeParameterAnnotations(data, cp, true, cl);
-                    } else if (VmArray.equals(
-                        RuntimeInvisibleParameterAnnotationsAttrName,
-                        attrName)) {
+                    } else if (VmArray.equals(RuntimeInvisibleParameterAnnotationsAttrName, attrName)) {
                         readRuntimeParameterAnnotations(data, cp, false, cl);
                     } else if (VmArray.equals(AnnotationDefaultAttrName, attrName)) {
                         //todo will get obsolate with openjdk based annotation support
@@ -1466,38 +1457,46 @@ public final class ClassDecoder {
     }
 
     private static final class PragmaAnnotation {
+        private static final String[] EMPTY_PACKAGES = new String[0];
         public final char flags;
 
         public final String typeDescr;
 
-        private final String[] allowedPackages;
+        private String[] allowedPackages;
 
         public PragmaAnnotation(Class<? extends Annotation> cls, char flags) {
             this.typeDescr = "L" + cls.getName().replace('.', '/') + ";";
             this.flags = flags;
-            final AllowedPackages ann = cls
-                .getAnnotation(AllowedPackages.class);
-            if (ann != null) {
-                allowedPackages = ann.value();
-            } else {
-                allowedPackages = null;
-            }
         }
 
         /**
          * Is this annotation allowed for the given classname.
          */
         public final void checkPragmaAllowed(String className) {
-            if (allowedPackages != null) {
-                final String pkg = className.substring(0, className
-                    .lastIndexOf('.'));
+            //lazy initialization of allowPackages to avoid startup failure
+            if (allowedPackages == null) {
+                String class_name = typeDescr.substring(1, typeDescr.length() - 1).replace('/', '.');
+                try {
+                    Class<Annotation> cls = (Class<Annotation>) Class.forName(class_name);
+                    final AllowedPackages ann = cls.getAnnotation(AllowedPackages.class);
+                    if (ann != null) {
+                        allowedPackages = ann.value();
+                    } else {
+                        allowedPackages = EMPTY_PACKAGES;
+                    }
+                } catch (ClassNotFoundException x) {
+                    throw new RuntimeException(x);
+                }
+            }
+
+            if (allowedPackages.length > 0) {
+                final String pkg = className.substring(0, className.lastIndexOf('.'));
                 for (String allowedPkg : allowedPackages) {
                     if (pkg.equals(allowedPkg)) {
                         return;
                     }
                 }
-                throw new SecurityException("Pragma " + typeDescr
-                    + " is not allowed in class " + className);
+                throw new SecurityException("Pragma " + typeDescr + " is not allowed in class " + className);
             }
         }
     }
@@ -1513,6 +1512,7 @@ public final class ClassDecoder {
 
         public final VmAnnotation[] rVisAnn;
 
+        public final byte[] rawAnnotations;
         /**
          * @param name
          * @param signature
@@ -1521,12 +1521,13 @@ public final class ClassDecoder {
          * @param rVisAnn
          */
         public FieldData(String name, String signature, int modifiers,
-                         Object value, VmAnnotation[] rVisAnn) {
+                         Object value, VmAnnotation[] rVisAnn, byte[] rawAnnotations) {
             this.name = name;
             this.signature = signature;
             this.modifiers = modifiers;
             this.constantValue = value;
             this.rVisAnn = rVisAnn;
+            this.rawAnnotations = rawAnnotations;
         }
 
     }

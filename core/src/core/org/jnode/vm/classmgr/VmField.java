@@ -133,9 +133,8 @@ public abstract class VmField extends VmMember {
             if (slot == -1) {
                 throw new ClassFormatError("Invalid field: " + this.getName());
             }
-            //todo add annotations
             javaField = new Field(d_class.asClass(), getName(), getType().asClass(), getModifiers(), slot,
-                getSignature(), null);
+                getSignature(), getRawAnnotations());
             javaFieldHolder.set(javaField);
         }
         return javaField;
