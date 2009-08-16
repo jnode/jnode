@@ -71,8 +71,8 @@ public class CMOSPlugin extends Plugin implements CMOSService {
     protected void startPlugin() throws PluginException {
         try {
             final ResourceOwner owner = new SimpleResourceOwner("CMOS");
-            cmos = (CMOS) AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
-                public Object run() throws ResourceNotFreeException {
+            cmos = AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction<CMOS>() {
+                public CMOS run() throws ResourceNotFreeException {
                     return new CMOS(owner);
                 }
             });

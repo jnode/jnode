@@ -343,8 +343,8 @@ final class DMA implements DMAConstants {
     private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length)
         throws ResourceNotFreeException, DMAException {
         try {
-            return (IOResource) AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
-                public Object run() throws ResourceNotFreeException {
+            return AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction<IOResource>() {
+                public IOResource run() throws ResourceNotFreeException {
                     return rm.claimIOResource(owner, low, length);
                 }
             });

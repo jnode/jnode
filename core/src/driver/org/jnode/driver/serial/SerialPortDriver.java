@@ -186,10 +186,10 @@ public class SerialPortDriver extends Driver implements SerialPortAPI,
                                   final ResourceOwner owner, final int low, final int length)
         throws ResourceNotFreeException, DriverException {
         try {
-            return (IOResource) AccessControllerUtils
-                .doPrivileged(new PrivilegedExceptionAction() {
+            return AccessControllerUtils
+                .doPrivileged(new PrivilegedExceptionAction<IOResource>() {
 
-                    public Object run() throws ResourceNotFreeException {
+                    public IOResource run() throws ResourceNotFreeException {
                         return rm.claimIOResource(owner, low, length);
                     }
                 });
