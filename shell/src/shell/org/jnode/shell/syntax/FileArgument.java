@@ -23,10 +23,11 @@ package org.jnode.shell.syntax;
 import java.io.File;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
+import java.security.PrivilegedActionException;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
-import org.jnode.annotation.DoPrivileged;
 import sun.security.action.GetPropertyAction;
 
 /**
@@ -80,34 +81,48 @@ public class FileArgument extends Argument<File> {
     }
 
     @Override
-    @DoPrivileged
-    protected File doAccept(Token token, int flags) throws CommandSyntaxException {
+    protected File doAccept(final Token token, final int flags) throws CommandSyntaxException {
         if (token.text.length() > 0) {
-            File file = new File(token.text);
-            if ((flags & HYPHEN_IS_SPECIAL) == 0 || !file.getPath().equals("-")) {
-                if (isExisting(flags) && !file.exists()) {
-                    throw new CommandSyntaxException("this file or directory does not exist");
-                }
-                if (isNonexistent(flags) && file.exists()) {
-                    throw new CommandSyntaxException("this file or directory already exist");
-                }
-                if ((flags & ALLOW_DODGY_NAMES) == 0) {
-                    File f = file;
-                    do {
-                        // This assumes that option names start with '-'.
-                        if (f.getName().startsWith("-")) {
-                            if (f == file && !file.isAbsolute() && f.getParent() == null) {
-                                // The user most likely meant this to be an option name ...
-                                throw new CommandSyntaxException("unexpected or unknown option");
-                            } else {
-                                throw new CommandSyntaxException("file or directory name starts with a '-'");
+            try {
+                return AccessController.doPrivileged(new PrivilegedExceptionAction<File>() {
+                    @Override
+                    public File run() throws Exception {
+                        File file = new File(token.text);
+                        if ((flags & HYPHEN_IS_SPECIAL) == 0 || !file.getPath().equals("-")) {
+                            if (isExisting(flags) && !file.exists()) {
+                                throw new CommandSyntaxException("this file or directory does not exist");
+                            }
+                            if (isNonexistent(flags) && file.exists()) {
+                                throw new CommandSyntaxException("this file or directory already exist");
+                            }
+                            if ((flags & ALLOW_DODGY_NAMES) == 0) {
+                                File f = file;
+                                do {
+                                    // This assumes that option names start with '-'.
+                                    if (f.getName().startsWith("-")) {
+                                        if (f == file && !file.isAbsolute() && f.getParent() == null) {
+                                            // The user most likely meant this to be an option name ...
+                                            throw new CommandSyntaxException("unexpected or unknown option");
+                                        } else {
+                                            throw new CommandSyntaxException(
+                                                "file or directory name starts with a '-'");
+                                        }
+                                    }
+                                    f = f.getParentFile();
+                                } while (f != null);
                             }
                         }
-                        f = f.getParentFile();
-                    } while (f != null);
+                        return file;
+                    }
+                });
+            } catch (PrivilegedActionException x) {
+                Exception e = x.getException();
+                if (e instanceof CommandSyntaxException) {
+                    throw (CommandSyntaxException) e;
+                } else {
+                    throw new RuntimeException(e);
                 }
             }
-            return file;
         } else {
             throw new CommandSyntaxException("invalid file name");
         }

@@ -29,8 +29,6 @@ import org.jnode.fs.FSEntry;
 import org.jnode.fs.jifs.JIFSDirectory;
 import org.jnode.fs.jifs.JIFSFile;
 import org.jnode.fs.jifs.files.JIFSFthread;
-import org.jnode.annotation.DoPrivileged;
-
 
 /**
  * Directory containing one file for each java.lang.thread. Based on the thread
@@ -50,14 +48,19 @@ public class JIFSDthreads extends JIFSDirectory {
         setParent(parent);
     }
 
-    @DoPrivileged
     public void refresh() {
         super.clear();
-        ThreadGroup grp = Thread.currentThread().getThreadGroup();
-        while (grp.getParent() != null) {
-            grp = grp.getParent();
-        }
-        addGroup(grp);
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            @Override
+            public Object run() {
+                ThreadGroup grp = Thread.currentThread().getThreadGroup();
+                while (grp.getParent() != null) {
+                    grp = grp.getParent();
+                }
+                addGroup(grp);
+                return null;
+            }
+        });
     }
 
     private void addGroup(final ThreadGroup grp) {
