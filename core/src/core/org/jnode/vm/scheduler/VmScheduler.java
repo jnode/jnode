@@ -43,32 +43,32 @@ import org.jnode.annotation.Uninterruptible;
 public final class VmScheduler {
 
     /**
-     * Reference to current architecture
+     * Reference to current architecture.
      */
     private final VmArchitecture architecture;
 
     /**
-     * Lock for the allThreadsQueue
+     * Lock for the allThreadsQueue.
      */
     private final ProcessorLock allThreadsLock;
 
     /**
-     * Queue holding all threads
+     * Queue holding all threads.
      */
     private final VmThreadQueue.AllThreadsQueue allThreadsQueue;
 
     /**
-     * My ready queue
+     * My ready queue.
      */
     private final VmThreadQueue.ScheduleQueue readyQueue;
 
     /**
-     * My sleep queue
+     * My sleep queue.
      */
     private final VmThreadQueue.SleepQueue sleepQueue;
 
     /**
-     * Lock used to protect the ready and sleep queue
+     * Lock used to protect the ready and sleep queue.
      */
     private final ProcessorLock queueLock;
 
@@ -196,7 +196,7 @@ public final class VmScheduler {
 
     /**
      * Add the given thread to the ready queue to the scheduler and remove it
-     * from the sleep queue (if it still was on the sleep queue)
+     * from the sleep queue (if it still was on the sleep queue).
      *
      * @param thread
      * @param ignorePriority If true, the thread is always added to the back of the list,
@@ -437,7 +437,7 @@ public final class VmScheduler {
     }
 
     /**
-     * Unlock the queues
+     * Unlock the queues.
      */
     @Inline
     @Uninterruptible
