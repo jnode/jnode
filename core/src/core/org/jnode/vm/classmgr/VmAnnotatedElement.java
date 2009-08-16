@@ -155,4 +155,25 @@ abstract class VmAnnotatedElement extends VmSystemObject implements
      * @return the parent element
      */
     protected abstract VmAnnotatedElement getSuperElement();
+
+    /**
+     * Raw runtime annotations to be parsed by java.lang.Class of OpenJDK.
+     */
+    private byte[] rawAnnotations;
+
+    /**
+     * Returns the raw runtime annotations.
+     * @return the raw annotation data as a byte[]
+     */
+    public byte[] getRawAnnotations() {
+        return rawAnnotations;
+    }
+
+    /**
+     * Sets the raw runtime annotations.
+     * @param rawAnnotations the raw annotation data as a byte[]
+     */
+    public void setRawAnnotations(byte[] rawAnnotations) {
+        this.rawAnnotations = rawAnnotations;
+    }
 }
