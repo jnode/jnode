@@ -94,6 +94,20 @@ final class DefHeapStatistics extends HeapStatistics {
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        try {
+            writeTo(sb);
+        } catch (IOException e) {
+            // normally, it will never happen 
+            throw new RuntimeException(e);
+        }
+        return sb.toString();
+    }
+
     static final class HeapCounter {
 
         private final String name;
