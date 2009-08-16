@@ -124,6 +124,11 @@ public abstract class VmProcessor extends VmSystemObject {
     private final VmScheduler scheduler;
 
     /**
+     * The kernel debugger that is used.
+     */
+    private final KernelDebugger kernelDebugger;
+    
+    /**
      * The architecture of this processor.
      */
     private final VmArchitecture architecture;
@@ -228,6 +233,7 @@ public abstract class VmProcessor extends VmSystemObject {
         this.me = this;
         this.architecture = architecture;
         this.scheduler = scheduler;
+        this.kernelDebugger = new KernelDebugger(scheduler);
         this.staticsTable = sharedStatics.getTable();
         this.isolatedStatics = isolatedStatics;
         this.isolatedStaticsTable = isolatedStatics.getTable();
@@ -431,7 +437,7 @@ public abstract class VmProcessor extends VmSystemObject {
 
             // Process kernel debugger data
             if (Unsafe.isKdbEnabled()) {
-                scheduler.processAllKdbInput();
+                kernelDebugger.processAllKdbInput();
             }
 
             // Dispatch interrupts if we already have an IRQ manager.
