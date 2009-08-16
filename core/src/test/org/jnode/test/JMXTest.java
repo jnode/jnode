@@ -34,7 +34,7 @@ import javax.management.MBeanServerFactory;
 public class JMXTest {
 
     public static void main(String[] args) throws Exception {
-        AccessController.doPrivileged(new PrivilegedExceptionAction() {
+        AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
             public Object run() throws Exception {
                 MBeanServerFactory.createMBeanServer();
                 printMBeanServers();

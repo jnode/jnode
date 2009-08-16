@@ -481,10 +481,10 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
                                   final ResourceOwner owner) throws ResourceNotFreeException,
         DriverException {
         try {
-            return (IOResource) AccessControllerUtils
-                .doPrivileged(new PrivilegedExceptionAction() {
+            return AccessControllerUtils
+                .doPrivileged(new PrivilegedExceptionAction<IOResource>() {
 
-                    public Object run() throws ResourceNotFreeException {
+                    public IOResource run() throws ResourceNotFreeException {
                         return rm.claimIOResource(owner, PCI_FIRST_PORT,
                             PCI_LAST_PORT - PCI_FIRST_PORT + 1);
                     }
