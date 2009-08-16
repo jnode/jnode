@@ -78,7 +78,7 @@ kdb_send_char%1:
 	
 	mov edx,[kdb_port]
 	mov eax,ebx
-	out dx,al
+	out dx,al           ; Send the character
 	IODELAY
 	jmp %%ret
 	
