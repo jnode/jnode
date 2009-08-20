@@ -951,8 +951,7 @@ public class BjorneContext {
         return sb.toString();
     }
 
-
-    String variable(String parameter) throws ShellSyntaxException {
+    protected String variable(String parameter) throws ShellSyntaxException {
         if (BjorneToken.isName(parameter)) {
             VariableSlot var = variables.get(parameter);
             return (var != null) ? var.getValue() : null;
