@@ -23,6 +23,7 @@ package org.jnode.test.shell.bjorne;
 import junit.framework.TestCase;
 
 import org.jnode.shell.ShellException;
+import org.jnode.shell.ShellSyntaxException;
 import org.jnode.shell.bjorne.BjorneArithmeticEvaluator;
 import org.jnode.shell.bjorne.BjorneContext;
 import org.jnode.shell.io.CommandIOHolder;
@@ -44,12 +45,14 @@ public class BjorneArithmeticEvaluatorTest extends TestCase {
             super(null, null);
         }
         
-        /**
-         * Expose method for testing
-         */
         @Override
         protected void setVariable(String name, String value) {
             super.setVariable(name, value);
+        }
+        
+        @Override
+        protected String variable(String name) throws ShellSyntaxException {
+            return super.variable(name);
         }
     }
     
@@ -97,4 +100,65 @@ public class BjorneArithmeticEvaluatorTest extends TestCase {
         assertEquals("0", ev.evaluateExpression(" - B"));
     }
     
+    public void testInfixOperators() throws ShellException {
+        TestBjorneContext context = new TestBjorneContext();
+        context.setVariable("A", "1");
+        TestBjorneArithmeticEvaluator ev = new TestBjorneArithmeticEvaluator(context);
+        assertEquals("2", ev.evaluateExpression("1 + 1"));
+        assertEquals("2", ev.evaluateExpression("A + 1"));
+        assertEquals("0", ev.evaluateExpression("1 - 1"));
+        assertEquals("0", ev.evaluateExpression("1 - A"));
+        assertEquals("4", ev.evaluateExpression("2 * 2"));
+        assertEquals("2", ev.evaluateExpression("4 / 2"));
+        assertEquals("1", ev.evaluateExpression("4 % 3"));
+        assertEquals("27", ev.evaluateExpression("3 ** 3"));
+        try {
+            ev.evaluateExpression("4 / 0");
+            fail("no exception for '4 / 0'");
+        } catch (ShellException ex) {
+            // expected
+        }
+        try {
+            ev.evaluateExpression("4 % 0");
+            fail("no exception for '4 % 0'");
+        } catch (ShellException ex) {
+            // expected
+        }
+    }
+    
+    public void testInfixPrecedence() throws ShellException {
+        TestBjorneContext context = new TestBjorneContext();
+        context.setVariable("A", "1");
+        TestBjorneArithmeticEvaluator ev = new TestBjorneArithmeticEvaluator(context);
+        assertEquals("0", ev.evaluateExpression("-1 * 2 + 2"));
+        assertEquals("4", ev.evaluateExpression("1 * 2 + 2"));
+        assertEquals("5", ev.evaluateExpression("1 + 2 * 2"));
+        assertEquals("9", ev.evaluateExpression("1 + 2 * 2 ** 2"));
+        assertEquals("8", ev.evaluateExpression("1 + 2 * 2 ** 2 + -A"));
+    }
+    
+    public void testParentheses() throws ShellException {
+        TestBjorneContext context = new TestBjorneContext();
+        context.setVariable("A", "1");
+        TestBjorneArithmeticEvaluator ev = new TestBjorneArithmeticEvaluator(context);
+        assertEquals("-4", ev.evaluateExpression("-1 * (2 + 2)"));
+        assertEquals("4", ev.evaluateExpression("(1 * 2 + 2)"));
+        assertEquals("6", ev.evaluateExpression("((1) + 2) * 2"));
+        assertEquals("17", ev.evaluateExpression("1 + (2 * 2) ** 2"));
+        assertEquals("10", ev.evaluateExpression("1 + 2 * 2 ** 2 + -(-1)"));
+    }
+    
+    public void testIncDec() throws ShellException {
+        TestBjorneContext context = new TestBjorneContext();
+        context.setVariable("A", "1");
+        TestBjorneArithmeticEvaluator ev = new TestBjorneArithmeticEvaluator(context);
+        assertEquals("1", ev.evaluateExpression("A++"));
+        assertEquals("2", context.variable("A"));
+        assertEquals("3", ev.evaluateExpression("++A"));
+        assertEquals("3", context.variable("A"));
+        assertEquals("3", ev.evaluateExpression("A--"));
+        assertEquals("2", context.variable("A"));
+        assertEquals("1", ev.evaluateExpression("--A"));
+        assertEquals("1", context.variable("A"));
+    }
 }
