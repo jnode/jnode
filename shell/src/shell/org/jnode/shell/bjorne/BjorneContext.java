@@ -74,29 +74,17 @@ import org.jnode.shell.io.CommandOutput;
 public class BjorneContext {
 
     private static final int NONE = 1;
-
     private static final int HASH = 2;
-
     private static final int DHASH = 3;
-
     private static final int PERCENT = 4;
-
     private static final int DPERCENT = 5;
-
-    private static final int HYPHEN = 6;
-
-    private static final int COLONHYPHEN = 7;
-
+    private static final int MINUS = 6;
+    private static final int COLONMINUS = 7;
     private static final int EQUALS = 8;
-
     private static final int COLONEQUALS = 9;
-
     private static final int PLUS = 10;
-
     private static final int COLONPLUS = 11;
-
     private static final int QUERY = 12;
-
     private static final int COLONQUERY = 13;
 
     private final BjorneInterpreter interpreter;
@@ -835,7 +823,7 @@ public class BjorneContext {
                         operator = COLONQUERY;
                         break;
                     case '-':
-                        operator = COLONHYPHEN;
+                        operator = COLONMINUS;
                         break;
                     default:
                         throw new ShellSyntaxException("bad substitution operator");
@@ -852,7 +840,7 @@ public class BjorneContext {
                 operator = PLUS;
                 break;
             case '-':
-                operator = HYPHEN;
+                operator = MINUS;
                 break;
             default:
                 throw new ShellSyntaxException("unrecognized substitution operator (\"" + (char) ch + "\")");
@@ -866,9 +854,9 @@ public class BjorneContext {
             throw new ShellSyntaxException("Unmatched \"{\"");
         }
         switch (operator) {
-            case HYPHEN:
+            case MINUS:
                 return (value == null) ? word : value;
-            case COLONHYPHEN:
+            case COLONMINUS:
                 return (value == null || value.length() == 0) ? word : value;
             case PLUS:
                 return (value == null) ? "" : word;
@@ -917,7 +905,7 @@ public class BjorneContext {
         }
     }
 
-    private String parseParameter(CharIterator ci) throws ShellSyntaxException {
+    String parseParameter(CharIterator ci) throws ShellSyntaxException {
         StringBuilder sb = new StringBuilder();
         int ch = ci.peekCh();
         while (Character.isLetterOrDigit((char) ch) || ch == '_') {
@@ -1040,81 +1028,44 @@ public class BjorneContext {
             return runBacktickCommand(commandLine);
         }
     }
-
-    private CharSequence dollarParenParenExpand(CharIterator ci) {
-        // TODO Auto-generated method stub
-        return null;
+    
+    private CharSequence dollarParenParenExpand(CharIterator ci) throws ShellException {
+        // Different shells handle $(( ... )) differently, but dash seems to do what 
+        // the POSIX spec seems to say.  In the first phase, we look for the matching '))'
+        // keeping track of nested parentheses and performing any $ expansions.  Double
+        // quotes should be treated as literal.
+        StringBuilder sb = new StringBuilder();
+        int nesting = 0;
+        boolean done = false;
+        do {
+            int ch = ci.peekCh();
+            switch (ch) {
+                case '(':
+                    nesting++;
+                    sb.append('(');
+                    break;
+                case ')':
+                    if (nesting > 0) {
+                        nesting--;
+                        sb.append(')');
+                    } else if (ci.peekCh() == ')') {
+                        ci.nextCh();
+                        done = true;
+                    } else {
+                        sb.append(')');
+                    }
+                    break;
+                case '$':
+                    sb.append(dollarExpand(ci, '\000'));
+                    break;
+                case -1:
+                    throw new ShellSyntaxException("Unmatched \"((\" (double left parenthesis)");
+                default:
+                    sb.append((char) ch);
+            }
+        } while (!done);
+        return new BjorneArithmeticEvaluator(this).evaluateExpression(sb);
     }
-
-//    private String dollarParenExpand(CharIterator ci) throws ShellException {
-//        StringBuilder sb = extractToMatchingParen(ci);
-//        if (sb.length() > 0 && sb.charAt(sb.length()) == ')') {
-//            throw new ShellSyntaxException(
-//                    "There should be a space between the two ')'s in '$(...))'");
-//        }
-//        return runBacktickCommand(sb.toString()).toString();
-//    }
-//
-//    private StringBuilder extractToMatchingParen(CharIterator ci) throws ShellSyntaxException {
-//        StringBuilder sb = new StringBuilder(40);
-//        Deque<Character> stack = new ArrayDeque<Character>();
-//        int ch;
-//        boolean more = true;
-//        do {
-//            ch = ci.nextCh();
-//            switch (ch) {
-//                case -1:
-//                    if (!stack.isEmpty()) {
-//                        throw new ShellSyntaxException("unmatched '('");
-//                    }
-//                    more = false;
-//                    break;
-//                case ')':
-//                    if (stack.isEmpty()) {
-//                        more = false;
-//                    } else {
-//                        sb.append(')');
-//                        if (stack.peekFirst() == '(') {
-//                            stack.removeFirst();
-//                        }
-//                    }
-//                    break;
-//                case '(':
-//                    if (stack.isEmpty() || stack.peekFirst() == '(') {
-//                        stack.addFirst('(');
-//                    }
-//                    sb.append('(');
-//                    break;
-//                case '"':
-//                case '\'':
-//                case '`':
-//                    sb.append((char) ch);
-//                    if (stack.isEmpty()) { 
-//                        stack.addFirst((char) ch);
-//                    } else {
-//                        char top = stack.peekFirst();
-//                        if (top != '"' && top != '\'' && top != '`') {
-//                            stack.addFirst('"');
-//                        } else if (top == ch) {
-//                            stack.removeFirst();
-//                        }
-//                    }
-//                    break;
-//                case '\\':
-//                    sb.append('\\');
-//                    ch = ci.nextCh();
-//                    if (ch == -1) {
-//                        more = false;
-//                    } else {
-//                        sb.append((char) ch);
-//                    }
-//                    break;
-//                default:
-//                    sb.append((char) ch);
-//            }
-//        } while (more);
-//        return sb;
-//    }
 
     int execute(CommandLine command, CommandIO[] streams, boolean isBuiltin) throws ShellException {
         if (isEchoExpansions()) {
