@@ -98,6 +98,20 @@ echo $C
 1 1
 </output>
     </testSpec>
+    <testSpec title="$((...))" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+A=1
+echo $A
+B="$((A + 1))"
+echo $B
+C="$(($B + 1))"
+echo $C
+</script>
+        <output>1
+2
+3
+</output>
+    </testSpec>
     <testSpec title="if ... then ... fi" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 if true ; then echo HI ; fi
