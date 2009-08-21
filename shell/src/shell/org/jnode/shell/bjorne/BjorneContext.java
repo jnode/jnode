@@ -1029,10 +1029,6 @@ public class BjorneContext {
     }
     
     private CharSequence dollarParenParenExpand(CharIterator ci) throws ShellException {
-        // Different shells handle $(( ... )) differently, but dash seems to do what 
-        // the POSIX spec seems to say.  In the first phase, we look for the matching '))'
-        // keeping track of nested parentheses and performing any $ expansions.  Double
-        // quotes should be treated as literal.
         StringBuilder sb = new StringBuilder();
         int nesting = 0;
         boolean done = false;
@@ -1054,16 +1050,15 @@ public class BjorneContext {
                         sb.append(')');
                     }
                     break;
-                case '$':
-                    sb.append(dollarExpand(ci, '\000'));
-                    break;
                 case -1:
                     throw new ShellSyntaxException("Unmatched \"((\" (double left parenthesis)");
                 default:
                     sb.append((char) ch);
             }
+            ci.nextCh();
         } while (!done);
-        return new BjorneArithmeticEvaluator(this).evaluateExpression(sb);
+        CharSequence tmp = dollarBacktickExpand(new CharIterator(sb), '\000');
+        return new BjorneArithmeticEvaluator(this).evaluateExpression(tmp);
     }
 
     int execute(CommandLine command, CommandIO[] streams, boolean isBuiltin) throws ShellException {
