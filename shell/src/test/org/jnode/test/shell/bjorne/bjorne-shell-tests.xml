@@ -969,4 +969,14 @@ there
         <error>Cannot find an alias or load a command class for 'foo'
 </error>
     </testSpec>
+    <testSpec title="shell function" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                foo() {
+                    echo hi
+                }
+                foo
+        </script>
+        <output >hi
+</output>
+    </testSpec>
 </testSet>

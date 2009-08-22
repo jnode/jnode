@@ -90,8 +90,10 @@ public class BjorneContext {
     private final BjorneInterpreter interpreter;
 
     private Map<String, VariableSlot> variables;
-    
+
     private TreeMap<String, String> aliases;
+    
+    private TreeMap<String, CommandNode> functions;
 
     private String command = "";
 
@@ -122,6 +124,7 @@ public class BjorneContext {
         this.holders = holders;
         this.variables = new HashMap<String, VariableSlot>();
         this.aliases = new TreeMap<String, String>();
+        this.functions = new TreeMap<String, CommandNode>();
         initVariables();
     }
 
@@ -157,6 +160,7 @@ public class BjorneContext {
         this.holders = copyStreamHolders(parent.holders);
         this.variables = copyVariables(parent.variables);
         this.aliases = new TreeMap<String, String>(parent.aliases);
+        this.functions = new TreeMap<String, CommandNode>(parent.functions);
         this.globbing = parent.globbing;
         this.tildeExpansion = parent.tildeExpansion;
         this.echoExpansions = parent.echoExpansions;
@@ -406,15 +410,8 @@ public class BjorneContext {
      * @param tokens the tokens to be expanded and split into words
      * @throws ShellException
      */
-    public List<BjorneToken> expandAndSplit(BjorneToken ... tokens) 
-        throws ShellException {
-        List<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
-        for (BjorneToken token : tokens) {
-            dollarBacktickSplit(token, wordTokens);
-        }
-        wordTokens = fileExpand(wordTokens);
-        wordTokens = dequote(wordTokens);
-        return wordTokens;
+    public List<BjorneToken> expandAndSplit(BjorneToken ... tokens) throws ShellException {
+        return expandAndSplit(Arrays.asList(tokens));
     }
     
     /**
@@ -1061,7 +1058,7 @@ public class BjorneContext {
         return new BjorneArithmeticEvaluator(this).evaluateExpression(tmp);
     }
 
-    int execute(CommandLine command, CommandIO[] streams, boolean isBuiltin) throws ShellException {
+    int execute(CommandLine command, CommandIO[] streams) throws ShellException {
         if (isEchoExpansions()) {
             StringBuilder sb = new StringBuilder();
             sb.append(" + ").append(command.getCommandName());
@@ -1071,7 +1068,7 @@ public class BjorneContext {
             resolvePrintStream(streams[Command.STD_ERR]).println(sb);
         }
         Map<String, String> env = buildEnvFromExports();
-        lastReturnCode = interpreter.executeCommand(command, this, streams, null, env, isBuiltin);
+        lastReturnCode = interpreter.executeCommand(command, this, streams, null, env);
         return lastReturnCode;
     }
 
@@ -1388,6 +1385,14 @@ public class BjorneContext {
 
     public Collection<String> getVariableNames() {
         return variables.keySet();
+    }
+
+    void defineFunction(BjorneToken name, CommandNode body) {
+        functions.put(name.getText(), body);
+    }
+
+    CommandNode getFunction(String name) {
+        return functions.get(name);
     }
 
 }

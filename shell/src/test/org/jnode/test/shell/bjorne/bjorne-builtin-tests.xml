@@ -74,26 +74,6 @@ hi echo hi
         <output>fred='ls'
 </output>
     </testSpec>
-    <testSpec title="builtins recognized early" command="test" runMode="AS_SCRIPT" rc="0">
-        <script>#!bjorne
-                alias fred=ls
-                alias
-                unalias -a
-                echo done
-                UNALIAS=unalias
-                alias fred=dir
-                alias
-                $UNALIAS -a
-                echo done
-        </script>
-        <output>fred='ls'
-done
-fred='dir'
-done
-</output>
-        <error>Cannot find an alias or load a command class for 'unalias'
-</error>
-    </testSpec>
     <testSpec title="readonly" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 readonly A

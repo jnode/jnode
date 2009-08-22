@@ -48,12 +48,6 @@ abstract class BjorneBuiltin extends AbstractCommand {
     
     /**
      * Temporary adapter method.  Unconverted builtin classes override this.
-     * 
-     * @param command
-     * @param interpreter
-     * @param context
-     * @return
-     * @throws ShellException
      */
     int invoke(CommandLine command, BjorneInterpreter interpreter,
             BjorneContext context) throws ShellException {
