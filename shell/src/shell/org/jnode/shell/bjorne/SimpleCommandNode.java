@@ -38,12 +38,10 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
 
     private final BjorneToken[] words;
     
-    private final boolean builtin;
 
-    public SimpleCommandNode(int nodeType, BjorneToken[] words, boolean builtin) {
+    public SimpleCommandNode(int nodeType, BjorneToken[] words) {
         super(nodeType);
         this.words = words;
-        this.builtin = builtin;
     }
 
     public void setAssignments(BjorneToken[] assignments) {
@@ -58,19 +56,12 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
         return assignments;
     }
 
-    public boolean isBuiltin() {
-        return builtin;
-    }
-
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("SimpleCommand{").append(super.toString());
         if (assignments != null) {
             sb.append(",assignments=");
             appendArray(sb, assignments);
-        }
-        if (builtin) {
-            sb.append(",builtin=true");
         }
         if (words != null) {
             sb.append(",words=");
@@ -110,7 +101,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
                     throw new ShellFailureException(
                             "asynchronous execution (&) not implemented yet");
                 } else {
-                    rc = childContext.execute(command, ios, builtin);
+                    rc = childContext.execute(command, ios);
                 }
             }
         } catch (BjorneControlException ex) {
@@ -153,9 +144,10 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
         throws CompletionException {
         try {
             CommandLine command = context.buildCommandLine(words);
-            if (builtin) {
+            String commandName = command.getCommandName();
+            if (commandName != null && BjorneInterpreter.isBuiltin(commandName)) {
                 BjorneBuiltinCommandInfo commandInfo = 
-                    BjorneInterpreter.BUILTINS.get(command.getCommandName()).buildCommandInfo(context);
+                    BjorneInterpreter.BUILTINS.get(commandName).buildCommandInfo(context);
                 command.setCommandInfo(commandInfo);
             } 
             command.setArgumentAnticipated(argumentAnticipated);

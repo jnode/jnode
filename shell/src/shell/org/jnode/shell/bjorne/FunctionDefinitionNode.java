@@ -56,7 +56,8 @@ public class FunctionDefinitionNode extends CommandNode {
 
     @Override
     public int execute(BjorneContext context) {
-        return -1;
+        context.defineFunction(name, body);
+        return 0;
     }
     
     @Override

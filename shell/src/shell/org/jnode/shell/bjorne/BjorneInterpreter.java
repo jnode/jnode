@@ -122,7 +122,7 @@ public class BjorneInterpreter implements CommandInterpreter {
     public static final int FLAG_PIPE = 0x0010;
 
     public static final CommandNode EMPTY = 
-        new SimpleCommandNode(CMD_EMPTY, new BjorneToken[0], false);
+        new SimpleCommandNode(CMD_EMPTY, new BjorneToken[0]);
 
     static HashMap<String, BjorneBuiltin.Factory> BUILTINS = 
         new HashMap<String, BjorneBuiltin.Factory>();
@@ -313,13 +313,19 @@ public class BjorneInterpreter implements CommandInterpreter {
     }
 
     int executeCommand(CommandLine cmdLine, BjorneContext context, CommandIO[] streams, 
-            Properties sysProps, Map<String, String> env, boolean isBuiltin)
+            Properties sysProps, Map<String, String> env)
         throws ShellException {
-        if (isBuiltin) {
-            BjorneBuiltinCommandInfo builtin = 
-                BUILTINS.get(cmdLine.getCommandName()).buildCommandInfo(context);
+        String commandName = cmdLine.getCommandName();
+        if (isBuiltin(commandName)) {
+            BjorneBuiltinCommandInfo builtin = BUILTINS.get(commandName).buildCommandInfo(context);
             cmdLine.setCommandInfo(builtin);
-        } 
+        } else {
+            CommandNode body = context.getFunction(commandName);
+            if (body != null) {
+                // FIXME setup a new context, streams and args.
+                return body.execute(context);
+            }
+        }
         cmdLine.setStreams(streams);
         return shell.invoke(cmdLine, sysProps, env);
     }

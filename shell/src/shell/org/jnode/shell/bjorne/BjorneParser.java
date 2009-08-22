@@ -145,7 +145,7 @@ public class BjorneParser {
         } else {
             noLineBreaks();
             if (optNext(TOK_END_OF_LINE_BIT) != null) {
-                command = new SimpleCommandNode(CMD_COMMAND, new BjorneToken[0], false);
+                command = new SimpleCommandNode(CMD_COMMAND, new BjorneToken[0]);
             }
         }
         return command;
@@ -292,7 +292,6 @@ public class BjorneParser {
         List<BjorneToken> assignments = new LinkedList<BjorneToken>();
         List<RedirectionNode> redirects = new LinkedList<RedirectionNode>();
         List<BjorneToken> words = new LinkedList<BjorneToken>();
-        boolean builtin = false;
 
         // Deal with cmd_prefix'es before the command name; i.e. assignments and
         // redirections
@@ -338,21 +337,17 @@ public class BjorneParser {
                         redirects.add(parseRedirect());
                     }
                 }
-                String commandWord = words.get(0).getText();
-                builtin = BjorneInterpreter.isBuiltin(commandWord);
-                // FIXME ... built-in commands should use the Syntax mechanisms so
-                // that completion, help, etc will work as expected.
             } 
         } catch (ShellSyntaxException ex) {
             if (completer != null) {
                 completer.setCommand(words.size() == 0 ? null : 
                     new SimpleCommandNode(CMD_COMMAND, 
-                            words.toArray(new BjorneToken[words.size()]), builtin));
+                            words.toArray(new BjorneToken[words.size()])));
             }
             throw ex;
         }
         SimpleCommandNode res = new SimpleCommandNode(CMD_COMMAND, 
-                words.toArray(new BjorneToken[words.size()]), builtin);
+                words.toArray(new BjorneToken[words.size()]));
         if (completer != null) {
             completer.setCommand(words.size() == 0 ? null : res);
         }
@@ -382,8 +377,6 @@ public class BjorneParser {
     }
 
     private CommandNode parseFunctionBody() throws ShellSyntaxException {
-        // TODO ... need to set the context to 'rule 9' while parsing the
-        // function body
         CommandNode body = parseCompoundCommand();
         body.setRedirects(parseOptRedirects());
         return body;
