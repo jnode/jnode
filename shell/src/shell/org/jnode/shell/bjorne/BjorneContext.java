@@ -1183,6 +1183,27 @@ public class BjorneContext {
     }
     
     /**
+     * Evaluate the redirections for this command against a set of streams, saving the context's existing IOs.
+     * 
+     * @param redirects the redirection nodes to be evaluated
+     * @param streams the base CommandIOs for the redirection calculation.
+     * @throws ShellException
+     */
+    void evaluateRedirectionsAndPushHolders(RedirectionNode[] redirects, CommandIO[] streams) 
+        throws ShellException {
+        if (savedHolders == null) {
+            savedHolders = new ArrayList<CommandIOHolder[]>(1);
+        }
+        savedHolders.add(holders);
+        holders = new CommandIOHolder[streams.length];
+        for (int i = 0; i < holders.length; i++) {
+            // Don't take ownership of the streams.
+            holders[i] = new CommandIOHolder(streams[i], false);
+        }
+        evaluateRedirections(redirects, holders);
+    }
+    
+    /**
      * Close the context's current IO, restoring the previous ones.
      * @throws ShellException
      */
@@ -1199,8 +1220,8 @@ public class BjorneContext {
      * @return the stream state after redirections
      * @throws ShellException
      */
-    void evaluateRedirections(
-            RedirectionNode[] redirects, CommandIOHolder[] holders) throws ShellException {
+    void evaluateRedirections(RedirectionNode[] redirects, CommandIOHolder[] holders) 
+        throws ShellException {
         if (redirects == null) {
             return;
         }

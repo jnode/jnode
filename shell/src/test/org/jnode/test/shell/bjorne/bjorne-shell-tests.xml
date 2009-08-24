@@ -976,7 +976,20 @@ there
                 }
                 foo
         </script>
-        <output >hi
+        <output>hi
 </output>
+    </testSpec>
+    <testSpec title="shell function 2" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                foo() {
+                    echo $1 $2
+                }
+                foo hi there
+                foo bye mum &gt;&amp;2
+        </script>
+        <output>hi there
+</output>
+        <error>bye mum
+</error>
     </testSpec>
 </testSet>
