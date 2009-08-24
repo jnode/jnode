@@ -22,11 +22,12 @@ package org.jnode.vm.memmgr.def;
 
 import java.io.PrintWriter;
 
-import org.jnode.vm.MemoryBlockManager;
-import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmMagic;
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.MagicPermission;
+import org.jnode.vm.MemoryBlockManager;
+import org.jnode.vm.ObjectVisitor;
+import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -451,17 +452,21 @@ public final class DefaultHeapManager extends VmHeapManager {
         final HeapStatisticsVisitor heapStatisticsVisitor = new HeapStatisticsVisitor(
             heapStatistics);
 
+        accept(heapStatisticsVisitor, false);
+
+        return heapStatistics;
+    }
+    
+    private void accept(ObjectVisitor visitor, boolean locking) {
         VmDefaultHeap heap = firstNormalHeap;
         final Word zero = Word.zero();
 
         while (heap != null) {
-            heap.walk(heapStatisticsVisitor, false, zero, zero);
+            heap.walk(visitor, locking, zero, zero);
             heap = heap.getNext();
         }
-
-        return heapStatistics;
     }
-
+    
     /**
      * @see org.jnode.vm.memmgr.VmHeapManager#createProcessorHeapData(org.jnode.vm.scheduler.VmProcessor)
      */
