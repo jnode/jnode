@@ -322,27 +322,34 @@ public class BjorneInterpreter implements CommandInterpreter {
         } else {
             CommandNode body = context.getFunction(commandName);
             if (body != null) {
-                // FIXME setup a new context, streams and args.
-                return body.execute(context);
+                context.evaluateRedirectionsAndPushHolders(body.getRedirects(), streams);
+                String[] savedArgs = context.getArgs();
+                try {
+                    context.setArgs(cmdLine.getArguments());
+                    return body.execute(context);
+                } finally {
+                    context.popHolders();
+                    context.setArgs(savedArgs);
+                }
             }
         }
         cmdLine.setStreams(streams);
         return shell.invoke(cmdLine, sysProps, env);
     }
 
-    public BjorneContext createContext() throws ShellFailureException {
+    BjorneContext createContext() throws ShellFailureException {
         return new BjorneContext(this);
     }
 
-    public CommandShell getShell() {
+    CommandShell getShell() {
         return shell;
     }
 
-    public PrintStream resolvePrintStream(CommandIO commandIOIF) {
+    PrintStream resolvePrintStream(CommandIO commandIOIF) {
         return shell.resolvePrintStream(commandIOIF);
     }
 
-    public InputStream resolveInputStream(CommandIO stream) {
+    InputStream resolveInputStream(CommandIO stream) {
         return shell.resolveInputStream(stream);
     }
     
@@ -350,7 +357,7 @@ public class BjorneInterpreter implements CommandInterpreter {
         return subshellCount++;
     }
 
-    public String getUniqueName() {
+    String getUniqueName() {
         return getName() + "-" + getSubshellNumber();
     }
 }
