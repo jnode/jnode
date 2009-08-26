@@ -120,8 +120,6 @@ public class EntryPoints extends VmSystemObject {
 
     private final VmWriteBarrier writeBarrier;
 
-    private final VmMethod yieldPoint;
-
     private final VmMethod recompileMethod;
 
     private final int magic;
@@ -243,7 +241,6 @@ public class EntryPoints extends VmSystemObject {
                 "org.jnode.vm.scheduler.VmProcessor", true);
             vmThreadSwitchIndicatorOffset =
                 ((VmInstanceField) testField(processorClass.getField("threadSwitchIndicator"))).getOffset();
-            yieldPoint = testMethod(processorClass.getMethod("yieldPoint", "()V"));
             vmProcessorMeField = (VmInstanceField) testField(processorClass.getField("me"));
             vmProcessorStackEnd = (VmInstanceField) testField(processorClass
                 .getField("stackEnd"));
@@ -626,14 +623,6 @@ public class EntryPoints extends VmSystemObject {
      */
     public final VmMethod getClassCastFailedMethod() {
         return classCastFailedMethod;
-    }
-
-    /**
-     * @return Returns the yieldPoint.
-     * @see org.jnode.vm.scheduler.VmProcessor#yieldPoint()
-     */
-    public final VmMethod getYieldPoint() {
-        return yieldPoint;
     }
 
     /**

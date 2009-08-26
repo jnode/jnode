@@ -349,14 +349,6 @@ public abstract class VmProcessor extends VmSystemObject {
     }
 
     /**
-     * This method is called by the generated yieldpoints if a threadswitch is
-     * requested.
-     */
-    final void yieldPoint() {
-
-    }
-
-    /**
      * Is this processor busy switching threads.
      *
      * @return true or false
@@ -419,8 +411,8 @@ public abstract class VmProcessor extends VmSystemObject {
     }
 
     /**
-     * This method is called by the timer interrupt with interrupts disabled.
-     * Keep this method as short and as fast as possible!
+     * This method is called by the "yieldpoint" interrupt handler (see "vm-ints.asm") 
+     * with interrupts disabled.  Try to keep it as short and as fast as possible!
      *
      * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
