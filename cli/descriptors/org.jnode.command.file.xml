@@ -262,7 +262,8 @@
       <option argLabel="url" shortName="u" longName="url" description="print a hex dump of a URL"/>
     </syntax>
     <syntax alias="ls">
-      <empty description="list the current directory"/>
+      <empty description="with -l, print sizes in human readable format (e.g., 1K 234M 2G)"/>
+      <option argLabel="humanReadable" shortName="h" longName="human-readable"/>
       <repeat>
         <argument argLabel="path" description="list files or directories"/>
       </repeat>
