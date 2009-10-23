@@ -279,10 +279,10 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
             final String name = child.getName();
 
             // never include the parent directory and the current directory in
-            // the result
-            // if they exist by any chance
-            if (name.equals(".") || name.equals(".."))
+            // the result if they exist by any chance.
+            if (".".equals(name) || "..".equals(name)){
                 continue;
+            }
 
             entryPath.append(name);
             entryCache.setEntry(entryPath.toString(), child);
