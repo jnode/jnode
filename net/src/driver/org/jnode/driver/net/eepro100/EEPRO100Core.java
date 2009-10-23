@@ -177,7 +177,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         for (y = 0, x = 0, sum = 0; x < eeSize; x++) {
             int value = doEepromCmd((eeReadCmd | (x << 16)), 27);
             eeprom[x] = value;
-            sum += new Integer(value).shortValue();
+            sum += (short)value;
             if (x < 3) {
                 hwAddrArr[y++] = (byte) value;
                 hwAddrArr[y++] = (byte) (value >> 8);
@@ -407,7 +407,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         regs.setReg16(SCBeeprom, EE_ENB);
         eepromDelay(2);
         regs.setReg16(SCBeeprom, (EE_ENB & ~EE_CS));
-        return NumberUtils.toUnsigned(new Integer(retVal).shortValue());
+        return NumberUtils.toUnsigned((short)retVal);
     }
 
     // --- OTHER METHODS

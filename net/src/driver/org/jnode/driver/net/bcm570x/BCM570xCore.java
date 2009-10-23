@@ -561,14 +561,12 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
                 final SocketBuffer skbuf = null; // rxRing.getPacket(pktLen);
 
                 try {
-                    // FIXME ... this always throws an NPE since skbuf is null
-                    if (skbuf.getSize() > 0) {
+                    
+                    if (skbuf != null && skbuf.getSize() > 0) {
                         driver.onReceive(skbuf);
                     }
                 } catch (NetworkException e) {
-                    e.printStackTrace(); // To change body of catch statement
-                                            // use Options | File
-                    // Templates.
+                    e.printStackTrace(); 
                 } finally {
                     // FIXME
                 }

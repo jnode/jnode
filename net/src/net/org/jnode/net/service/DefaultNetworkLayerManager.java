@@ -109,7 +109,7 @@ public class DefaultNetworkLayerManager implements NetworkLayerManager,
      * @throws NoSuchProtocolException
      */
     public NetworkLayer getNetworkLayer(int protocolID) throws NoSuchProtocolException {
-        final NetworkLayer pt = (NetworkLayer) layers.get(new Integer(protocolID));
+        final NetworkLayer pt = (NetworkLayer) layers.get(Integer.valueOf(protocolID));
         if (pt == null) {
             throw new NoSuchProtocolException("protocolID " + protocolID);
         }
