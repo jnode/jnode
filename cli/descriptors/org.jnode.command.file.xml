@@ -151,14 +151,29 @@
       <argument argLabel="path" description="list a file or directory"/>
     </syntax>
     <syntax alias="du">
-      <sequence description="print file sizes">
+      <sequence description="Disk Usage - report the amount of disk space used by the specified directory and for each subdirectory.">
         <repeat minCount="0">
           <argument argLabel="directory" description="directory to start printing sizes recursively"/>
         </repeat>
         <optionSet>
-          <option argLabel="sum"            shortName="s" longName="summarize"/>
-          <option argLabel="all"            shortName="a" longName="all"/>
-          <option argLabel="human-readable" shortName="h" longName="human-readable"/>
+          <option argLabel="all"            		shortName="a" longName="all"/>
+          <option argLabel="block-size-1"	        shortName="b" longName="bytes"/>
+          <option argLabel="total"            		shortName="c" longName="total"/>
+          <option argLabel="derefArgs"            	shortName="D" longName="dereference-args"/>
+          <option argLabel="human-readable-1024"	shortName="h" longName="human-readable"/>
+          <option argLabel="human-readable-1000"	shortName="H" longName="si"/>
+          <option argLabel="block-size-1024"        shortName="k" longName="kilobytes"/>
+          <option argLabel="count-links"        	shortName="l" longName="count-links"/>
+          <option argLabel="dereference"	        shortName="L" longName="dereference"/>
+          <option argLabel="max-depth"	        	shortName=""  longName="max-depth"/> <!-- max-depth has no shortname -->
+          <option argLabel="block-size-1024x1024"   shortName="m" longName="megabytes"/>
+          <option argLabel="summarize"		        shortName="s" longName="summarize"/>
+          <option argLabel="separate-dirs"	        shortName="S" longName="separate-dirs"/>
+          <option argLabel="one-file-system"	    shortName="x" longName="one-file-system"/> <!-- can't test this currently -->
+          <option argLabel="exclude"		        shortName=""  longName="exclude"/> <!-- exclude has no shortname -->
+          <option argLabel="exclude-from"	        shortName="X" longName="exclude-from"/>
+          <option argLabel="block-size-custom"	    shortName="B" longName="block-size"/> <!-- not in man page, but works on unix like systems -->
+          <option argLabel="filesystem-block-size"	shortName=""  longName="fs-block-size"/> <!-- not in man page, but works on unix like systems -->
         </optionSet>
       </sequence>
     </syntax>    
