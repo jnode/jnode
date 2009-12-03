@@ -173,10 +173,10 @@
           <option argLabel="exclude"		        shortName=""  longName="exclude"/> <!-- exclude has no shortname -->
           <option argLabel="exclude-from"	        shortName="X" longName="exclude-from"/>
           <option argLabel="block-size-custom"	    shortName="B" longName="block-size"/> <!-- not in man page, but works on unix like systems -->
-          <option argLabel="filesystem-block-size"	shortName=""  longName="fs-block-size"/> <!-- not in man page, but works on unix like systems -->
+          <option argLabel="filesystem-block-size"	shortName=""  longName="fs-block-size"/> <!-- testing -->
         </optionSet>
       </sequence>
-    </syntax>    
+    </syntax>
     <syntax alias="find">
       <sequence description="find files or directories">
         <repeat minCount="0">

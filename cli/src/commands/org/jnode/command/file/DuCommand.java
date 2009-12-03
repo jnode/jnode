@@ -56,7 +56,7 @@ public class DuCommand extends AbstractCommand {
     private static final String HELP_TOTAL =
             "Print a grand total of all arguments after all arguments have been processed. This can be used to find out the total disk usage of a given set of files or directories.";
     private static final String HELP_DEREF_ARGS =
-            "Dereference symbolic links that are command line arguments. Does not affect other symbolic links.  This is helpful for finding out the disk usage of directories, such as `/usr/tmp', which are often symbolic links.";
+            "Dereference symbolic links that are command line arguments. Does not affect other symbolic links.  This is helpful for finding out the disk usage of directories, such as `/usr/tmp', which are often symbolic links. (not implemented";
     private static final String HELP_HUMAN_READABLE_1024 =
             "Append a size letter such as `M' for megabytes to each size. Powers of 1024 are used, not 1000; `M' stands for 1,048,576 bytes. Use the `-H' or `--si' option if you prefer powers of 1000.";
     private static final String HELP_HUMAN_READABLE_1000 =
@@ -64,22 +64,22 @@ public class DuCommand extends AbstractCommand {
     private static final String HELP_BLOCK_SIZE_1024 =
             "Print sizes in 1024-byte blocks, overriding the default block size";
     private static final String HELP_COUNT_LINKS =
-            "Count the size of all files, even if they have appeared already (as a hard link).";
+            "Count the size of all files, even if they have appeared already (as a hard link). (not implemented";
     private static final String HELP_DEREF =
-            "Dereference symbolic links (show the disk space used by the file or directory that the link points to instead of the space used by the link).";
+            "Dereference symbolic links (show the disk space used by the file or directory that the link points to instead of the space used by the link). (not implemented";
     private static final String HELP_MAX_DEPTH =
-            "Show the total for each directory (and file if -all) that is at most MAX_DEPTH levels down from the root of the hierarchy.  The root is at level 0, so `du --max-depth=0' is equivalent to `du -s'.";
+            "Show the total for each directory (and file if -all) that is at most MAX_DEPTH levels down from the root of the hierarchy.  The root is at level 0, so `du --max-depth=0' is equivalent to `du -s'. (not tested)";
     private static final String HELP_BLOCK_SIZE_1024x1024 =
             "Print sizes in megabyte (that is, 1,048,576-byte) blocks.";
     private static final String HELP_SUM = "Display only a total for each argument.";
     private static final String HELP_SEPERATE_DIRS =
             "Report the size of each directory separately, not including the sizes of subdirectories.";
     private static final String HELP_ONE_FS =
-            "Skip directories that are on different filesystems from the one that the argument being processed is on.";
+            "Skip directories that are on different filesystems from the one that the argument being processed is on. (not implemented)";
     private static final String HELP_EXCLUDE =
-            "When recursing, skip subdirectories or files matching PAT. For example, `du --exclude='*.o'' excludes files whose names end in `.o'.";
+            "When recursing, skip subdirectories or files matching PAT. For example, `du --exclude='*.o'' excludes files whose names end in `.o'. (not tested)";
     private static final String HELP_EXCLUDE_FROM =
-            "Like `--exclude', except take the patterns to exclude from FILE, one per line.  If FILE is `-', take the patterns from standard input.";
+            "Like `--exclude', except take the patterns to exclude from FILE, one per line.  If FILE is `-', take the patterns from standard input. (not implemented)";
     private static final String HELP_BLOCK_SIZE_CUSTOM =
             "Print sizes in the user defined block size, overriding the default block size";
     private static final String HELP_FS_BLOCK_SIZE =
@@ -225,7 +225,7 @@ public class DuCommand extends AbstractCommand {
 
     private void printFileSize(final File filename, final long size) {
         if (argAll.isSet()) {
-            out.println(size + "\t" + filename);
+            out.println(sizeToString(size) + "\t" + filename);
         }
     }
 
@@ -325,7 +325,7 @@ public class DuCommand extends AbstractCommand {
                     retValue = ((FSBlockDeviceAPI) device).getSectorSize();
 
                 } else {
-                    logger.warn("No FSBlockDeviceAPI device for device" + device);
+                    logger.warn("No FSBlockDeviceAPI device for device: " + device);
                     logger.info("Using default block-size: " + DEFAULT_FILESYSTEM_BLOCK_SIZE);
                     logger.info("override with --fs-block-size");
                 }
@@ -386,12 +386,9 @@ public class DuCommand extends AbstractCommand {
 
         public Directory getParent() {
 
-            long dirSize = size + calc(directory.length()); // only the size for
-            // this directory +
-            // files (in other
-            // words: excludes
-            // the size of
-            // subDirs)
+            long dirSize = size + calc(directory.length());
+            // only the size for this directory + files 
+            // (in other words: excludes the size of subDirs)
             long subDirSize = 0;
 
             while (!subDirs.isEmpty()) {
@@ -407,6 +404,11 @@ public class DuCommand extends AbstractCommand {
 
         public long getSize() {
             return size;
+        }
+        
+        @Override
+        public int hashCode() {
+            return directory.hashCode();
         }
 
         public boolean equals(Object other) {
@@ -450,18 +452,28 @@ public class DuCommand extends AbstractCommand {
         }
 
         @Override
+        /**
+         * Set the "root" Directory to the Starting Dir
+         */
         protected void handleStartingDir(File file) throws IOException {
             log("starting dir: " + file);
             root = new Directory(null, file);
         }
 
         @Override
+        /**
+         * Calculate the "root" directory and reset the "current" directory .. we are done for now
+         */
         protected void lastAction(boolean wasCancelled) {
             root.getParent();
+            currentDir = null;
             totalSize = root.getSize();
         }
 
         @Override
+        /**
+         * add the currently handled directory/file to the correct position in the hierarchy
+         */
         public void handleDir(File file) {
             log("handleDir: " + file);
 
