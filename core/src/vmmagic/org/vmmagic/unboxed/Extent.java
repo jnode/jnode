@@ -14,8 +14,14 @@
 package org.vmmagic.unboxed;
 
 /**
- * Commenting required
- * 
+ * <u>JNode specific notes</u> : This class contains some "magic"
+ * methods that are interpreted by the VM itself, instead of being executed
+ * as normal java methods.  The actual method bodies are not used. <br/>
+ * For further details, see the  
+ * {@link org.jnode.vm.compiler.BaseMagicHelper.MagicClass list of "magic" classes} 
+ * and the 
+ * {@link org.jnode.vm.compiler.BaseMagicHelper.MagicMethod list of "magic" methods}.
+ *  
  * @author Daniel Frampton
  */
 public final class Extent implements UnboxedObject {
