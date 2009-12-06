@@ -18,7 +18,15 @@ import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.Uninterruptible;
 
 /**
- * Stub implementation of an Address type. Needs commenting.
+ * Stub implementation of an Address type.
+ * <p/>
+ * <u>JNode specific notes</u> : This class contains some "magic"
+ * methods that are interpreted by the VM itself, instead of being executed
+ * as normal java methods.  The actual method bodies are not used. <br/>
+ * For further details, see the  
+ * {@link org.jnode.vm.compiler.BaseMagicHelper.MagicClass list of "magic" classes} 
+ * and the 
+ * {@link org.jnode.vm.compiler.BaseMagicHelper.MagicMethod list of "magic" methods}. 
  * 
  * @author Daniel Frampton
  */
