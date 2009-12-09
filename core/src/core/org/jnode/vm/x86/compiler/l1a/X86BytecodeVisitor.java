@@ -73,7 +73,7 @@ import org.jnode.vm.x86.compiler.X86JumpTable;
 
 /**
  * Actual converter from bytecodes to X86 native code. Uses a virtual stack to
- * delay item emission, as described in the ORP project
+ * delay item emission, as described in the <a href="http://orp.sourceforge.net/">Open Runtime Platform (ORP)</a> project.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Patrik Reali
@@ -1647,7 +1647,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup2_x2()
      */
     public final void visit_dup2_x2() {
-        // TODO: port to ORP style
+        // TODO: port to ORP style (http://orp.sourceforge.net/)
 
         // Push all on the stack, since this opcode is just too complicated
         vstack.push(eContext);
@@ -2800,7 +2800,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         if (declClass.isMagicType()) {
             magicHelper.emitMagic(eContext, method, false, this, currentMethod);
         } else {
-            // TODO: port to orp-style
+            // TODO: port to ORP style (http://orp.sourceforge.net/)
             vstack.push(eContext);
 
             dropParameters(mts, true);
@@ -2826,7 +2826,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
                 /* Get objectref -> EAX */
                 os.writeMOV(asize, helper.AAX, helper.SP, argSlotCount
                     * slotSize);
-                /* Get VMT of objectef -> EAX */
+                /* Get VMT of objectref -> EAX */
                 os.writeMOV(asize, helper.AAX, helper.AAX, tibOffset);
                 /* Get entry in VMT -> EAX */
                 os.writeMOV(asize, helper.AAX, helper.AAX,
@@ -3169,7 +3169,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         counters.getCounter("ldiv").inc();
 
         if (os.isCode32()) {
-            // TODO: port to orp-style
+            // TODO: port to ORP style (http://orp.sourceforge.net/)
             vstack.push(eContext);
             final LongItem v2 = vstack.popLong();
             final LongItem v1 = vstack.popLong();
@@ -3228,7 +3228,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         if (os.isCode32()) {
             final Label curInstrLabel = getCurInstrLabel();
 
-            // TODO: port to orp-style
+            // TODO: port to ORP style (http://orp.sourceforge.net/)
             vstack.push(eContext);
             final LongItem v2 = vstack.popLong();
             final LongItem v1 = vstack.popLong();
@@ -3359,7 +3359,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_lrem() {
         if (os.isCode32()) {
-            // TODO: port to orp-style
+            // TODO: port to ORP style (http://orp.sourceforge.net/)
             vstack.push(eContext);
             Item v2 = vstack.pop(JvmType.LONG);
             Item v1 = vstack.pop(JvmType.LONG);
