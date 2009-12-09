@@ -60,7 +60,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
 
     private TypeSizeInfo typeSizeInfo;
 
-    private final ThreadLocal nativeStreamHolder = new ThreadLocal();
+    private final ThreadLocal<X86BinaryAssembler> nativeStreamHolder = new ThreadLocal<X86BinaryAssembler>();
 
     /**
      * Initialize this compiler
@@ -76,8 +76,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
     }
 
     public NativeStream createNativeStream(ObjectResolver resolver) {
-        X86BinaryAssembler os;
-        os = (X86BinaryAssembler) nativeStreamHolder.get();
+        X86BinaryAssembler os = nativeStreamHolder.get();
         if (os == null) {
             os = new X86BinaryAssembler((X86CpuID) VmProcessor.current()
                 .getCPUID(), mode, 0);
@@ -91,7 +90,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
     protected final CompiledMethod doCompileAbstract(VmMethod method,
                                                      NativeStream nos, int level, boolean isBootstrap) {
         if (isBootstrap) {
-            // System.out.println("Abstraxct method " + method);
+            // System.out.println("Abstract method " + method);
             final CompiledMethod cm = new CompiledMethod(level);
             final X86Assembler os = (X86Assembler) nos;
             // Create the helper
