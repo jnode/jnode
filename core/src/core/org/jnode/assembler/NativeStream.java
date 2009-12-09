@@ -232,7 +232,7 @@ public abstract class NativeStream {
         }
 
         /**
-         * Gets the object i'm refering to.
+         * Gets the object i'm referring to.
          *
          * @return Object
          */
