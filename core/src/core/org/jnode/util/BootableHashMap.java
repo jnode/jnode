@@ -38,16 +38,16 @@ public class BootableHashMap<K, V> extends VmSystemObject implements Map<K, V> {
     private transient boolean locked;
 
     /**
-     * Constructs an empty HashMap with the default initial capacity (16)
-     * and the default load factor (0.75).
+     * Constructs an empty HashMap.
+     * @see java.util.HashMap#HashMap()
      */
     public BootableHashMap() {
         this.hashCode = super.hashCode();
     }
 
     /**
-     * Constructs an empty HashMap with the default initial capacity (16)
-     * and the default load factor (0.75).
+     * Constructs an empty HashMap.
+     * @see java.util.HashMap#HashMap(int)
      *
      * @param initialCapacity
      */
@@ -141,7 +141,7 @@ public class BootableHashMap<K, V> extends VmSystemObject implements Map<K, V> {
 
     /**
      * @param key
-     * @return True if the key is contained, false otherwiser
+     * @return True if the key is contained, false otherwise
      */
     public boolean containsKey(Object key) {
         return getMapCache().containsKey(key);
@@ -232,7 +232,7 @@ public class BootableHashMap<K, V> extends VmSystemObject implements Map<K, V> {
     }
 
     /**
-     * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
+     * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
     public void verifyBeforeEmit() {
