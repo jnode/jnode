@@ -218,14 +218,18 @@ public class BootableHashMap<K, V> extends VmSystemObject implements Map<K, V> {
             throw new RuntimeException("Cannot change a locked BootableHashMap");
         }
         if (mapCache == null) {
-            mapCache = new HashMap<K, V>();
             if (entryArray != null) {
                 final int max = entryArray.length;
+                
+                mapCache = new HashMap<K, V>(max);                
                 for (int i = 0; i < max; i++) {
                     final Entry<K, V> e = entryArray[i];
                     mapCache.put(e.getKey(), e.getValue());
                 }
+                
                 entryArray = null;
+            } else {
+                mapCache = new HashMap<K, V>();                
             }
         }
         return mapCache;
