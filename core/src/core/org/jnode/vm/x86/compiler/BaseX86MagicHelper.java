@@ -23,7 +23,7 @@ package org.jnode.vm.x86.compiler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Operation;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.compiler.BaseMagicHelper;
+import org.jnode.vm.classmgr.BaseMagicHelper;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
