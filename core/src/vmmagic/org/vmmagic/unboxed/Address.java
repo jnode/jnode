@@ -24,9 +24,9 @@ import org.jnode.annotation.Uninterruptible;
  * methods that are interpreted by the VM itself, instead of being executed
  * as normal java methods.  The actual method bodies are not used. <br/>
  * For further details, see the  
- * {@link org.jnode.vm.compiler.BaseMagicHelper.MagicClass list of "magic" classes} 
+ * {@link org.jnode.vm.classmgr.BaseMagicHelper.MagicClass list of "magic" classes} 
  * and the 
- * {@link org.jnode.vm.compiler.BaseMagicHelper.MagicMethod list of "magic" methods}. 
+ * {@link org.jnode.vm.classmgr.BaseMagicHelper.MagicMethod list of "magic" methods}. 
  * 
  * @author Daniel Frampton
  */

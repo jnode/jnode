@@ -20,12 +20,12 @@
  
 package org.jnode.vm.x86.compiler.l1b;
 
-import static org.jnode.vm.compiler.BaseMagicHelper.MagicMethod.ATTEMPTINT;
-import static org.jnode.vm.compiler.BaseMagicHelper.MagicMethod.FROMINTZEROEXTEND;
-import static org.jnode.vm.compiler.BaseMagicHelper.MagicMethod.INTBITSTOFLOAT;
-import static org.jnode.vm.compiler.BaseMagicHelper.MagicMethod.LOADCHAR;
-import static org.jnode.vm.compiler.BaseMagicHelper.MagicMethod.LOADCHAR_OFS;
-import static org.jnode.vm.compiler.BaseMagicHelper.MagicMethod.LONGBITSTODOUBLE;
+import static org.jnode.vm.classmgr.BaseMagicHelper.MagicMethod.ATTEMPTINT;
+import static org.jnode.vm.classmgr.BaseMagicHelper.MagicMethod.FROMINTZEROEXTEND;
+import static org.jnode.vm.classmgr.BaseMagicHelper.MagicMethod.INTBITSTOFLOAT;
+import static org.jnode.vm.classmgr.BaseMagicHelper.MagicMethod.LOADCHAR;
+import static org.jnode.vm.classmgr.BaseMagicHelper.MagicMethod.LOADCHAR_OFS;
+import static org.jnode.vm.classmgr.BaseMagicHelper.MagicMethod.LONGBITSTODOUBLE;
 
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Constants;

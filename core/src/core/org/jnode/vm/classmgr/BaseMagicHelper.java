@@ -18,13 +18,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.vm.compiler;
+package org.jnode.vm.classmgr;
 
 import java.util.Map;
 
 import org.jnode.util.BootableHashMap;
-import org.jnode.vm.classmgr.VmMethod;
-import org.jnode.vm.classmgr.VmType;
 import org.jnode.annotation.SharedStatics;
 
 /**
@@ -94,6 +92,23 @@ public class BaseMagicHelper {
             } else {
                 return mc;
             }
+        }
+        
+        /**
+         * Indicate if the given class name corresponds to a magic class.
+         * 
+         * @param name Name of a class.
+         * @return true if the class is magic.
+         */
+        static boolean isMagic(String name) {
+            boolean magic = false;
+            for (MagicClass mc : values()) {
+                if (mc.name.equals(name)) {
+                    magic = true;
+                    break;
+                }
+            }
+            return magic;
         }
     }
 
