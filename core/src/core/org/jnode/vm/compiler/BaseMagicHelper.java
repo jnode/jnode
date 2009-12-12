@@ -18,11 +18,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.vm.classmgr;
+package org.jnode.vm.compiler;
 
 import java.util.Map;
 
 import org.jnode.util.BootableHashMap;
+import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.classmgr.VmType;
 import org.jnode.annotation.SharedStatics;
 
 /**
