@@ -95,23 +95,6 @@ public class BaseMagicHelper {
                 return mc;
             }
         }
-        
-        /**
-         * Indicate if the given class name corresponds to a magic class.
-         * 
-         * @param name Name of a class.
-         * @return true if the class is magic.
-         */
-        static boolean isMagic(String name) {
-            boolean magic = false;
-            for (MagicClass mc : values()) {
-                if (mc.name.equals(name)) {
-                    magic = true;
-                    break;
-                }
-            }
-            return magic;
-        }
     }
 
     /**
