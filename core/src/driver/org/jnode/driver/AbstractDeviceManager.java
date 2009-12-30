@@ -43,37 +43,37 @@ import org.jnode.util.StopWatch;
 public abstract class AbstractDeviceManager implements DeviceManager {
 
     /**
-     * All registered devices
+     * All registered devices.
      */
     private final Map<String, Device> devices = new HashMap<String, Device>();
 
     /**
-     * All registered device to driver mappers
+     * All registered device to driver mappers.
      */
     private final List<DeviceToDriverMapper> mappers = new ArrayList<DeviceToDriverMapper>();
 
     /**
-     * All registered device finders
+     * All registered device finders.
      */
     private final List<DeviceFinder> finders = new ArrayList<DeviceFinder>();
 
     /**
-     * All listeners to my events
+     * All listeners to my events.
      */
     private final List<DeviceManagerListener> listeners = new LinkedList<DeviceManagerListener>();
 
     /**
-     * All listeners to device events
+     * All listeners to device events.
      */
     private final List<DeviceListener> deviceListeners = new LinkedList<DeviceListener>();
 
     /**
-     * The system bus
+     * The system bus.
      */
     private final Bus systemBus;
 
     /**
-     * The JNode command line
+     * The JNode command line.
      */
     private final String cmdLine;
 
@@ -84,7 +84,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
     private long fastStartTimeout = 1000;
 
     /**
-     * Create a new instance
+     * Create a new instance.
      */
     public AbstractDeviceManager() {
         this((String) AccessController.doPrivileged(new GetPropertyAction(
@@ -92,7 +92,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
     }
 
     /**
-     * Create a new instance
+     * Create a new instance.
      * @param commandLine command line or an empty string
      */
     protected AbstractDeviceManager(String commandLine) {
@@ -151,7 +151,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
      * startup is delayed.
      * <li>Connect the driver to the device, if a driver is found
      * <li>Attempt to start the device. If this fails an exception is printed
-     * in the log. You can test if the device was started successfully, by read
+     * in the log. You can test if the device was started successfully, by reading 
      * the <code>isStarted</code> status.
      * </ul>
      * Note that if the device already has a driver connected to it, the first
@@ -308,7 +308,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
     }
 
     /**
-     * Rename a device, optionally using an autonumber postfix
+     * Rename a device, optionally using an autonumber postfix.
      *
      * @param device
      * @param name
@@ -346,7 +346,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
     }
 
     /**
-     * Add a listener
+     * Add a listener.
      *
      * @param listener
      */
@@ -357,7 +357,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
     }
 
     /**
-     * Add a listener
+     * Add a listener.
      *
      * @param listener
      */
@@ -368,7 +368,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
     }
 
     /**
-     * Add a device listener
+     * Add a device listener.
      *
      * @param listener
      */
@@ -379,7 +379,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
     }
 
     /**
-     * Add a device listener
+     * Add a device listener.
      *
      * @param listener
      */
@@ -390,7 +390,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
     }
 
     /**
-     * Stop all devices
+     * Stop all devices.
      */
     public final void stopDevices() {
         while (!devices.isEmpty()) {
@@ -407,7 +407,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
 
     /**
      * Gets the system bus. The system bus is the root of all hardware busses
-     * and devices connected to these busses.
+     * and devices connected to these buses.
      *
      * @return The system bus
      */
@@ -488,7 +488,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
     }
 
     /**
-     * Start this manager
+     * Start this manager.
      *
      * @throws PluginException
      */
@@ -509,7 +509,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
     }
 
     /**
-     * Stop this manager
+     * Stop this manager.
      *
      * @throws PluginException
      */
@@ -540,7 +540,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
     }
 
     /**
-     * Fire a deviceUnregister event to all my listeners
+     * Fire a deviceUnregister event to all my listeners.
      *
      * @param device
      */
@@ -626,7 +626,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
     }
 
     /**
-     * Comparator used to sort DeviceToDriverMapper's.
+     * Comparator used to sort {@link org.jnode.driver.DeviceToDriverMapper DeviceToDriverMapper}s.
      *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */

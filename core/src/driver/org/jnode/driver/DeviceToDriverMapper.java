@@ -24,7 +24,7 @@ package org.jnode.driver;
  * Interface used to search for a suitable driver for a given device.
  * <p/>
  * Each DeviceToDriverMapper must be registered in the DeviceManager
- * and is called in order of registration to search for a suitable driver.
+ * in order to be used while searching for a suitable driver.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -51,11 +51,10 @@ public interface DeviceToDriverMapper {
     public static final int MATCH_DEVCLASS = 2;
 
     /**
-     * Return a suitable driver for the given device, or if no suitable
-     * driver is found, return <code>null</code>.
+     * Return a suitable driver for the given device or <code>null</code>.
      *
      * @param device
-     * @return A suitable driver of <code>null</code> if no suitable driver is found.
+     * @return A suitable driver or <code>null</code> if no suitable driver is found.
      */
     public Driver findDriver(Device device);
 
