@@ -635,14 +635,12 @@ public abstract class AbstractDeviceManager implements DeviceManager {
         public static final MapperComparator INSTANCE = new MapperComparator();
 
         /**
-         * @param o1
-         * @param o2
+         * @param m1
+         * @param m2
          * @return int
          * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          */
-        public int compare(DeviceToDriverMapper o1, DeviceToDriverMapper o2) {
-            final DeviceToDriverMapper m1 = (DeviceToDriverMapper) o1;
-            final DeviceToDriverMapper m2 = (DeviceToDriverMapper) o2;
+        public int compare(DeviceToDriverMapper m1, DeviceToDriverMapper m2) {
             final int ml1 = m1.getMatchLevel();
             final int ml2 = m2.getMatchLevel();
             if (ml1 < ml2) {
