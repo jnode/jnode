@@ -21,7 +21,6 @@
 package org.jnode.vm.classmgr;
 
 import org.jnode.annotation.Inline;
-import org.jnode.vm.VmArchitecture;
 
 /**
  * <description>
@@ -32,19 +31,21 @@ public class ObjectLayout {
 
     /**
      * The offset of the flags of an object from the start of the object. This
-     * value must be multiplied by {@link VmArchitecture#getReferenceSize() SLOT_SIZE} to get the offset in bytes.
+     * value must be multiplied by {@link org.jnode.vm.VmArchitecture#getReferenceSize() SLOT_SIZE}
+     * to get the offset in bytes.
      */
     public static final int FLAGS_SLOT = -2;
 
     /**
      * The offset of the TIB of an object from the start of the object. This
-     * value must be multiplied by {@link VmArchitecture#getReferenceSize() SLOT_SIZE} to get the offset in bytes.
+     * value must be multiplied by {@link org.jnode.vm.VmArchitecture#getReferenceSize() SLOT_SIZE}
+     * to get the offset in bytes.
      */
     public static final int TIB_SLOT = -1;
 
     /**
      * The size of the header of an object. This value must be multiplied by
-     * {@link VmArchitecture#getReferenceSize() SLOT_SIZE} to get the size in bytes.
+     * {@link org.jnode.vm.VmArchitecture#getReferenceSize() SLOT_SIZE} to get the size in bytes.
      */
     public static final int HEADER_SLOTS = 2;
 

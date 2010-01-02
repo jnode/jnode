@@ -74,7 +74,8 @@ import org.jnode.vm.x86.compiler.X86JumpTable;
 
 /**
  * Actual converter from bytecodes to X86 native code. Uses a virtual stack to
- * delay item emission, as described in the <a href="http://orp.sourceforge.net/">Open Runtime Platform (ORP)</a> project.
+ * delay item emission, as described in the <a href="http://orp.sourceforge.net/">Open Runtime Platform (ORP)</a>
+ * project.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Patrik Reali
