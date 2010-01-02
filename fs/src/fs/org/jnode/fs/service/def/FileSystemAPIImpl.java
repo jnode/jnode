@@ -280,7 +280,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
             // never include the parent directory and the current directory in
             // the result if they exist by any chance.
-            if (".".equals(name) || "..".equals(name)){
+            if (".".equals(name) || "..".equals(name)) {
                 continue;
             }
 
