@@ -1,7 +1,7 @@
 /*
- * $Id: GetPropertiesAction.java 4973 2009-02-02 07:52:47Z lsantha $
+ * $Id$
  *
- * Copyright (C) 2003-2009 JNode.org
+ * Copyright (C) 2003-2010 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
