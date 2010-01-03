@@ -860,18 +860,9 @@ clean             Remove all intermediate build results.
         <header update="on" headerFile="${root.dir}/all/template/header.txt">
             <fileset dir="${root.dir}/builder/src/builder" includes="**/*.java"/>
             <fileset dir="${root.dir}/cli/src/commands" includes="**/*.java"/>
-            <fileset dir="${root.dir}/core/src/classpath/ext" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/classpath/ext" includes="**/*.java" excludes="gnu/classpath/jdwp/**/*.java"/>
             <fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java"
-                    excludes="gnu/classpath/jdwp/VMFrame.java,
-                               gnu/classpath/jdwp/VMIdManager.java,
-                               gnu/classpath/jdwp/VMMethod.java,
-                               gnu/classpath/jdwp/VMVirtualMachine.java,
-                               gnu/classpath/VMStackWalker.java,
-                               gnu/java/lang/VMInstrumentationImpl.java,
-                               gnu/java/nio/VMChannel.java,
-                               java/lang/Thread.java,
-                               java/lang/VMProcess.java,
-                               java/lang/VMSystem.java"/>
+                     excludes="java/lang/VMProcess.java,java/lang/VMSystem.java"/>
             <fileset dir="${root.dir}/core/src/openjdk/vm" includes="**/*.java" excludes="java/lang/NativeStrictMath.java"/>
             <fileset dir="${root.dir}/core/src/core" includes="**/*.java" excludes="org/jnode/imageio/jpeg/JPEGDecoder"/>
             <fileset dir="${root.dir}/core/src/mmtk-vm" includes="**/*.java" excludes="org/mmtk/vm/**/*.java"/>
