@@ -11,7 +11,7 @@ class NativeUnixOperatingSystem {
      */
     private static long getCommittedVirtualMemorySize(UnixOperatingSystem instance) {
         //todo implement it
-        return 0;
+        return -1;
     }
     /**
      * @see com.sun.management.UnixOperatingSystem#getTotalSwapSpaceSize()
@@ -32,7 +32,7 @@ class NativeUnixOperatingSystem {
      */
     private static long getProcessCpuTime(UnixOperatingSystem instance) {
         //todo implement it
-        return 0;
+        return -1;
     }
     /**
      * @see com.sun.management.UnixOperatingSystem#getFreePhysicalMemorySize()
