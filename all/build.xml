@@ -1199,12 +1199,16 @@ clean             Remove all intermediate build results.
     </target>
 
   <target name="findbugs" depends="assemble-plugins">
-    <taskdef name="findbugs" classpath="../core/lib/findbugs/lib/findbugs-ant.jar"
+    <property name="findbugs.home" value="../builder/lib/findbugs"/>
+    <property name="findbugs.output" value="${reports.dir}/findbugs.html"/>
+    <taskdef name="findbugs" classpath="${findbugs.home}/lib/findbugs-ant.jar"
              classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
-    <findbugs home="../core/lib/findbugs/" output="html" outputFile="./build/findbugs.html" >
+    <findbugs home="${findbugs.home}" output="html" outputFile="${findbugs.output}" >
       <auxclasspath>
           <pathelement location="./build/plugins/rt_${jnode-ver}.jar" />
+          <pathelement location="./build/plugins/rt.vm_${jnode-ver}.jar" />
           <pathelement location="./build/plugins/org.classpath.ext.core_${jnode-ver}.jar" />
+          <pathelement location="./build/plugins/org.classpath.ext.security_${jnode-ver}.jar" />
           <pathelement location="./build/plugins/nanoxml_1.4.jar" />
           <pathelement location="${nanoxml-java.jar}" />
           <pathelement location="${log4j.jar}" />
