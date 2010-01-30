@@ -31,7 +31,6 @@ package org.jnode.util;
 public class ByteQueue {
     // FIXME ... Looking at the way this class is used, I think it may needs an 
     // atomic drain operation and/or a close operation.
-    // FIXME ... The method names are wrong.  'PUSH' and 'POP' is for stacks not queues!!
     // FIXME ... Make the ByteQueue API and behavior mirror the Queue API and behavior.
     
     /**
@@ -66,7 +65,7 @@ public class ByteQueue {
      * made by removing (and discarding) the byte at the head of the queue.
      * @param o the byte to be added to the queue.
      */
-    public synchronized void push(byte o) {
+    public synchronized void enQueue(byte o) {
         data[bottom] = o;
         bottom++;
         if (bottom >= size) {
@@ -88,7 +87,7 @@ public class ByteQueue {
      * 
      * @return the byte removed, or zero if the method call was interrupted.
      */
-    public synchronized byte pop() {
+    public synchronized byte deQueue() {
         while (top == bottom) { /* Q is empty */
             try {
                 wait();
@@ -110,7 +109,7 @@ public class ByteQueue {
 
     /**
      * Remove a byte from the head of the queue, blocking with a timeout if data is
-     * not immediately available.  Unlike {@link #pop()}, this method does <b>not</b>
+     * not immediately available.  Unlike {@link #deQueue()}, this method does <b>not</b>
      * return zero when interrupted!
      * 
      * @param timeout the maximum time (in milliseconds) to wait for data to become 
@@ -119,7 +118,7 @@ public class ByteQueue {
      * @throws InterruptedException if the method call is interrupted.
      * @throws TimeoutException if no data is available within the required time.
      */
-    public synchronized byte pop(long timeout)
+    public synchronized byte deQueue(long timeout)
         throws TimeoutException, InterruptedException {
         while (top == bottom) { /* Q is empty */
             wait(timeout);
@@ -140,7 +139,7 @@ public class ByteQueue {
     /**
      * Return the byte at the head of the queue without removing it.   If data is
      * not immediately available, the method will block (with a timeout) until 
-     * data is available.  Unlike {@link #pop()}, this method does <b>not</b>
+     * data is available.  Unlike {@link #deQueue()}, this method does <b>not</b>
      * return zero when interrupted!
      *
      * @param timeout the maximum time (in milliseconds) to wait for data to become 
@@ -164,9 +163,15 @@ public class ByteQueue {
      * Test if there is no data in the queue.
      * @return {@code true} if the queue is empty, {@code false} otherwise.
      */
-    public boolean isEmpty() {
+    public synchronized boolean isEmpty() {
         // FIXME ... this should be synchronized.
         return (top == bottom);
     }
-    
+
+    /**
+     * Clears the queue.
+     */
+    public synchronized void clear() {
+        top = bottom = 0;
+    }
 }

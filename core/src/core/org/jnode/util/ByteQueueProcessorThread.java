@@ -96,7 +96,7 @@ public class ByteQueueProcessorThread extends Thread {
     public void run() {
         while (!stop) {
             try {
-                final byte value = queue.pop();
+                final byte value = queue.deQueue();
                 processor.process(value);
             } catch (Exception ex) {
                 handleException(ex);
