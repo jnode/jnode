@@ -56,7 +56,7 @@ public final class DefaultHeapManager extends VmHeapManager {
      * When this percentage of the free memory has been allocated, a GC is
      * triggered (0..1.0)
      */
-    public static float GC_TRIGGER_PERCENTAGE = 0.75f;
+    public static final float GC_TRIGGER_PERCENTAGE = 0.75f;
 
     /**
      * The boot heap
