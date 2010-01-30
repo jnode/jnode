@@ -46,12 +46,12 @@ import org.vmmagic.unboxed.Offset;
 @MagicPermission
 public abstract class VmHeapManager extends VmSystemObject {
 
-    public static int TRACE_BASIC = 1;   // enable basic debugging of GC phases
-    public static int TRACE_ALLOC = 2;   // enable debugging of GC internal allocation
-    public static int TRACE_TRIGGER = 4;   // enable debugging of GC triggering / scheduling
-    public static int TRACE_OOM = 8;   // enable debugging of OOM events
-    public static int TRACE_AD_HOC = 16;  // enable ad hoc debugging
-    public static int TRACE_FLAGS = 31;  // all of the above
+    public static final int TRACE_BASIC = 1;   // enable basic debugging of GC phases
+    public static final int TRACE_ALLOC = 2;   // enable debugging of GC internal allocation
+    public static final int TRACE_TRIGGER = 4;   // enable debugging of GC triggering / scheduling
+    public static final int TRACE_OOM = 8;   // enable debugging of OOM events
+    public static final int TRACE_AD_HOC = 16;  // enable ad hoc debugging
+    public static final int TRACE_FLAGS = 31;  // all of the above
 
     /**
      * Has this manager been initialized yet

@@ -46,7 +46,10 @@ public final class Main {
     public static final String MAIN_METHOD_SIGNATURE = "()I";
     public static final String REGISTRY_FIELD_NAME = "pluginRegistry";
 
-    protected static PluginRegistryModel pluginRegistry;
+    /**
+     *  Initialized in org.jnode.build.x86.BootImageBuilder.initMain().
+     */
+    private static PluginRegistryModel pluginRegistry;
 
     /**
      * First java entry point after the assembler kernel has booted.
