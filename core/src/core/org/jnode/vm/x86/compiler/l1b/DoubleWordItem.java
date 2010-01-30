@@ -217,8 +217,8 @@ public abstract class DoubleWordItem extends Item implements
      * Gets the offset from this item to the FramePointer register. This is only
      * valid if this item has a LOCAL kind.
      *
-     * @return In 32-bit mode, use {@link #getLsbOffsetToFP()}or
-     *         {@link #getMsbOffsetToFP()}instead.
+     * @return In 32-bit mode, use {@link #getLsbOffsetToFP(EmitterContext)} or
+     * {@link #getMsbOffsetToFP(EmitterContext)} instead.
      */
     final short getOffsetToFP(EmitterContext ec) {
         if (ec.getStream().isCode32()) {
@@ -739,7 +739,8 @@ public abstract class DoubleWordItem extends Item implements
     }
 
     /**
-     * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
+     * @see org.jnode.vm.x86.compiler.l1a.Item#spill(org.jnode.vm.x86.compiler.l1a.EmitterContext, 
+     * org.jnode.assembler.x86.X86Register)
      */
     final void spill(EmitterContext ec, X86Register reg) {
         final X86Assembler os = ec.getStream();
@@ -774,7 +775,7 @@ public abstract class DoubleWordItem extends Item implements
     }
 
     /**
-     * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
+     * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.X86Register)
      */
     final boolean uses(X86Register reg) {
         return (isGPR() && ((this.msb == reg) || (this.lsb == reg) || (this.reg == reg)));
@@ -783,7 +784,7 @@ public abstract class DoubleWordItem extends Item implements
     /**
      * enquire whether the item uses a volatile register
      *
-     * @param reg
+     * @param pool
      * @return true, when this item uses a volatile register.
      */
     final boolean usesVolatileRegister(X86RegisterPool pool) {
@@ -813,18 +814,9 @@ public abstract class DoubleWordItem extends Item implements
                     if (msb == null) {
                         throw new IllegalStateException("msb cannot be null");
                     }
-                    if (!(lsb instanceof GPR32)) {
-                        throw new IllegalStateException("lsb must be GPR32");
-                    }
-                    if (!(msb instanceof GPR32)) {
-                        throw new IllegalStateException("msb must be GPR32");
-                    }
                 } else {
                     if (reg == null) {
                         throw new IllegalStateException("reg cannot be null");
-                    }
-                    if (!(reg instanceof GPR64)) {
-                        throw new IllegalStateException("reg must be GPR64");
                     }
                 }
                 break;
