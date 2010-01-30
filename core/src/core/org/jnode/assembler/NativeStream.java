@@ -211,7 +211,7 @@ public abstract class NativeStream {
     /**
      * A wrapper for constructing objects in the native stream.
      */
-    public abstract class ObjectInfo {
+    public abstract static class ObjectInfo {
 
         /**
          * Mark the current location as the end of this object end fixup the objectheader.
@@ -219,7 +219,7 @@ public abstract class NativeStream {
         public abstract void markEnd();
     }
 
-    public abstract class ObjectRef {
+    public abstract static class ObjectRef {
         private Object object;
 
         /**

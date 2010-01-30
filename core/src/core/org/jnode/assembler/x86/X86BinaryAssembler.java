@@ -133,7 +133,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         }
     }
 
-    public final class UnresolvedOffset {
+    public static final class UnresolvedOffset {
         private final int offset;
 
         private final int patchSize;
