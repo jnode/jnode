@@ -93,13 +93,6 @@
     <!-- libraries needed to check plugin dependencies -->
     <property name="bcel-5.1.jar" value="${root.dir}/builder/lib/bcel-5.1.jar" />	
 
-    <!-- libraries needed to check rules in source code -->
-    <property name="pmd.jar" value="${root.dir}/builder/lib/pmd/pmd-3.0.jar"/>
-    <property name="jaxen.jar" value="${root.dir}/builder/lib/pmd/jaxen-core-1.0-fcs.jar"/>
-    <property name="saxpath.jar" value="${root.dir}/builder/lib/pmd/saxpath-1.0-fcs.jar"/>
-    <property name="xerces.jar" value="${root.dir}/builder/lib/pmd/xercesImpl-2.6.2.jar"/>
-    <property name="xmlParserAPIs.jar" value="${root.dir}/builder/pmd/lib/xmlParserAPIs-2.6.2.jar"/>
-
     <!-- lists of plugins to use while booting -->
     <property name="default-plugin-list" value="${root.dir}/all/conf/default-plugin-list.xml"/>
     <property name="full-plugin-list" value="${root.dir}/all/conf/full-plugin-list.xml"/>
@@ -1076,50 +1069,46 @@ clean             Remove all intermediate build results.
 		</checkDeps>
 	</target>
 
-    <!-- Define the task that check the rules -->
-    <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"
-        classpathref="cp-jnode">
-        <classpath>
-            <pathelement location="${pmd.jar}"/>
-            <pathelement location="${jaxen.jar}"/>
-            <pathelement location="${saxpath.jar}"/>
-            <pathelement location="${xerces.jar}"/>
-            <pathelement location="${xmlParserAPIs.jar}"/>
-        </classpath>
-    </taskdef>
+    <target name="pmd" depends="prepare">
+        <echo>
+            WARNING: PMD rulset must be customized before regular use.
+        </echo>
+        <property name="pmd.home" value="../builder/lib/pmd"/>
+        <!-- Define the task that check the rules -->
+        <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask">
+            <classpath>
+                <fileset dir="${pmd.home}" includes="*.jar"/>                
+            </classpath>
+        </taskdef>
+        <!-- Macro used to check that the rules are applied in the source code -->
+        <macrodef name="checkPMD">
+            <attribute name="projectName"/>
+            <attribute name="webSrcUrl"/>
+            <attribute name="projectSrc"/>
+            <sequential>
+                <property name="nbFailures" value="0"/>
+                <echo message="Scanning @{projectName}."/>
+                <property name="tmp" value="../@{projectSrc}"/>
+                <pmd failuresPropertyName="nbFailures">
+                    <formatter type="html" toFile="${reports.dir}/pmd_report-@{projectName}.html"/>
 
+                    <ruleset>rulesets/favorites.xml</ruleset>
+                    <ruleset>rulesets/basic.xml</ruleset>
 
-    <!-- Macro used to check that the rules are applied in the source code -->
-    <macrodef name="checkProjectRules">
-        <attribute name="projectName"/>
-        <attribute name="webSrcUrl"/>
-        <attribute name="projectSrc"/>
-        <sequential>
-            <property name="nbFailures" value="0"/>
-            <echo message="Scanning @{projectName}."/>
-            <property name="tmp" value="../@{projectSrc}"/>
-            <pmd failuresPropertyName="nbFailures">
-                <formatter type="html" toFile="${reports.dir}/pmd_report-@{projectName}.html"/>
-
-                <ruleset>rulesets/favorites.xml</ruleset>
-                <ruleset>rulesets/basic.xml</ruleset>
-
-                <fileset dir="../@{projectSrc}" includes="**/*.java"/>
-            </pmd>
-            <echo message="There was ${nbFailures} failures in @{projectName}."/>
-        </sequential>
-    </macrodef>
-
-    <target name="checkJNodeRules" depends="prepare">
+                    <fileset dir="../@{projectSrc}" includes="**/*.java"/>
+                </pmd>
+                <echo message="There was ${nbFailures} failures in @{projectName}."/>
+            </sequential>
+        </macrodef>
         <parallel>
-            <checkProjectRules projectName="distr" webSrcUrl="distr" projectSrc="distr"/>
-            <checkProjectRules projectName="JNode-Builder" webSrcUrl="builder" projectSrc="builder"/>
-            <checkProjectRules projectName="JNode-Core" webSrcUrl="core" projectSrc="core"/>
-            <checkProjectRules projectName="JNode-FS" webSrcUrl="fs" projectSrc="fs"/>
-            <checkProjectRules projectName="JNode-GUI" webSrcUrl="gui" projectSrc="gui"/>
-            <checkProjectRules projectName="JNode-Net" webSrcUrl="net" projectSrc="net"/>
-            <checkProjectRules projectName="JNode-Shell" webSrcUrl="shell" projectSrc="shell"/>
-            <checkProjectRules projectName="JNode-TestUI" webSrcUrl="textui" projectSrc="textui"/>
+            <checkPMD projectName="distr" webSrcUrl="distr" projectSrc="distr"/>
+            <checkPMD projectName="JNode-Builder" webSrcUrl="builder" projectSrc="builder"/>
+            <checkPMD projectName="JNode-Core" webSrcUrl="core" projectSrc="core"/>
+            <checkPMD projectName="JNode-FS" webSrcUrl="fs" projectSrc="fs"/>
+            <checkPMD projectName="JNode-GUI" webSrcUrl="gui" projectSrc="gui"/>
+            <checkPMD projectName="JNode-Net" webSrcUrl="net" projectSrc="net"/>
+            <checkPMD projectName="JNode-Shell" webSrcUrl="shell" projectSrc="shell"/>
+            <checkPMD projectName="JNode-TestUI" webSrcUrl="textui" projectSrc="textui"/>
         </parallel>
     </target>
 
