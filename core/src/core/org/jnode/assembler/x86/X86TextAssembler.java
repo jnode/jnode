@@ -55,7 +55,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 
     }
 
-    class ObjectRefImpl extends NativeStream.ObjectRef {
+    static class ObjectRefImpl extends NativeStream.ObjectRef {
 
         public ObjectRefImpl(Object object) {
             super(object);
