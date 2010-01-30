@@ -165,13 +165,13 @@ public class USBKeyboardDriver extends Driver implements USBPipeListener, USBCon
                 // Modifier changed
                 final int keyCode = usb_kbd_keycode[i + 224];
                 // It is an extended keycode
-                keyCodeQueue.push((byte) KeyboardInterpreter.XT_EXTENDED);
+                keyCodeQueue.enQueue((byte) KeyboardInterpreter.XT_EXTENDED);
                 if ((old[0] & bit) != 0) {
                     // Released
-                    keyCodeQueue.push((byte) (keyCode | KeyboardInterpreter.XT_RELEASE));
+                    keyCodeQueue.enQueue((byte) (keyCode | KeyboardInterpreter.XT_RELEASE));
                 } else {
                     // Pressed
-                    keyCodeQueue.push((byte) keyCode);
+                    keyCodeQueue.enQueue((byte) keyCode);
                 }
             }
         }
@@ -181,7 +181,7 @@ public class USBKeyboardDriver extends Driver implements USBPipeListener, USBCon
                 // Key released
                 final int keyCode = usb_kbd_keycode[old[i] & 0xFF];
                 if (keyCode > 0) {
-                    keyCodeQueue.push((byte) (keyCode | KeyboardInterpreter.XT_RELEASE));
+                    keyCodeQueue.enQueue((byte) (keyCode | KeyboardInterpreter.XT_RELEASE));
                 } else {
                     log.debug("Unknown scancode released " + (old[i] & 0xFF));
                 }
@@ -190,7 +190,7 @@ public class USBKeyboardDriver extends Driver implements USBPipeListener, USBCon
                 // Key pressed
                 final int keyCode = usb_kbd_keycode[cur[i] & 0xFF];
                 if (keyCode > 0) {
-                    keyCodeQueue.push((byte) keyCode);
+                    keyCodeQueue.enQueue((byte) keyCode);
                 } else {
                     log.debug("Unknown scancode pressed " + (cur[i] & 0xFF));
                 }
