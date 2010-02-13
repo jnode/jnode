@@ -55,7 +55,8 @@ class ItemStack {
     ItemStack(int expectedKind, int maxSize) {
         this.expectedKind = expectedKind;
         this.maxSize = maxSize;
-        reset();
+        stack = new Item[Math.min(8, maxSize)];
+        tos = 0;
     }
 
 //    /**
@@ -126,11 +127,14 @@ class ItemStack {
         return (stack[tos - 1] == item);
     }
 
-    final void pop() {
+    final void pop(EmitterContext ec) {
         if (tos <= 0) {
             throw new Error("Stack is empty");
         }
         tos--;
+        Item item = stack[tos];
+        if (item.getKind() != 0)
+            item.release(ec);
     }
 
     final void pop(Item item) {
@@ -162,8 +166,11 @@ class ItemStack {
     /**
      * Reset this stack. The stack will be empty afterwards.
      */
-    final void reset() {
-        stack = new Item[Math.min(8, maxSize)];
+    final void reset(EmitterContext ec) {
+        while (tos != 0) {
+            pop(ec);
+        }
+        
         tos = 0;
     }
 

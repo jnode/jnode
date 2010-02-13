@@ -527,7 +527,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         this.inlineDepth--;
 
         // Push the types on the vstack
-        inlinedMethodInfo.pushExitStack(ifac, vstack);
+        inlinedMethodInfo.pushExitStack(ifac, vstack, eContext);
 
         // Push the return value
         inlinedMethodInfo.pushReturnValue(helper);
@@ -1055,7 +1055,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             BootLog.debug("-- Start of BB " + bb);
         }
         startOfBB = true;
-        this.vstack.reset();
+        this.vstack.reset(eContext);
         eContext.getGPRPool().reset(os);
         // Push the result from the outer method stack on the vstack
         if (inlinedMethodInfo != null) {
@@ -1064,6 +1064,10 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         // Push the items on the vstack the result from a previous basic block.
         final TypeStack tstack = bb.getStartStack();
         vstack.pushAll(ifac, tstack);
+
+        //release constant local items
+        for (Item item : constLocals.values())
+            item.release(eContext);
         // Clear all constant locals
         constLocals.clear();
 
@@ -2013,6 +2017,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final IntItem v = vstack.popInt();
         if (v.isConstant()) {
             vstack.push(ifac.createIConst(eContext, (byte) v.getValue()));
+            v.release(eContext);
         } else {
             v.loadToBITS8GPR(eContext);
             final GPR r = v.getRegister();
@@ -2028,6 +2033,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final IntItem v = vstack.popInt();
         if (v.isConstant()) {
             vstack.push(ifac.createIConst(eContext, (char) v.getValue()));
+            v.release(eContext);
         } else {
             v.load(eContext);
             final GPR r = v.getRegister();
@@ -2057,6 +2063,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final IntItem v = vstack.popInt();
         if (v.isConstant()) {
             vstack.push(ifac.createLConst(eContext, v.getValue()));
+            v.release(eContext);
         } else {
             final X86RegisterPool pool = eContext.getGPRPool();
             final LongItem result;
@@ -2069,10 +2076,10 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
                 result = (LongItem) ifac.createReg(eContext, JvmType.LONG,
                     X86Register.EAX, X86Register.EDX);
                 os.writeCDQ(BITS32); /* Sign extend EAX -> EDX:EAX */
-                pool.transferOwnerTo(X86Register.EAX, result);
+                v.release(eContext);
+                pool.request(X86Register.EAX, result);
                 pool.transferOwnerTo(X86Register.EDX, result);
-                // We do not release v, because its register (EAX) is re-used in
-                // result
+                // EAX is re-used in result
             } else {
                 v.release(eContext);
                 L1AHelper.requestRegister(eContext, X86Register.RAX);
@@ -2094,6 +2101,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final IntItem v = vstack.popInt();
         if (v.isConstant()) {
             vstack.push(ifac.createIConst(eContext, (short) v.getValue()));
+            v.release(eContext);
         } else {
             v.load(eContext);
             final GPR r = v.getRegister();
@@ -2479,7 +2487,9 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         }
 
         // Local no longer constant
-        constLocals.remove(index);
+        Item item = constLocals.remove(index);
+        if (item != null)
+            item.release(eContext);
     }
 
     /**
@@ -4416,10 +4426,14 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final boolean vconst = val.isConstant();
         if (vconst) {
             // Store constant locals
-            constLocals.put(index, val.clone(eContext));
+            Item item = constLocals.put(index, val.clone(eContext));
+            if (item != null)
+                item.release(eContext);
         } else {
             // Not constant anymore, remove it
-            constLocals.remove(index);
+            Item item = constLocals.remove(index);
+            if (item != null)
+                item.release(eContext);
         }
         if (vconst && (jvmType == JvmType.INT)) {
             if (localEscapesBasicBlock(index)) {
