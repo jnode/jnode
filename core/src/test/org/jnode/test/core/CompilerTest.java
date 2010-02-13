@@ -147,6 +147,7 @@ public class CompilerTest {
                 final int cnt = type.getNoDeclaredMethods();
                 for (int i = 0; i < cnt; i++) {
                     final VmMethod method = type.getDeclaredMethod(i);
+                    System.out.println("Compiling method " + clsName + "#" + method.getName());
                     counts[ci]++;
                     compile(method, arch, cs[ci], cpuId, ci + 1);
                 }
