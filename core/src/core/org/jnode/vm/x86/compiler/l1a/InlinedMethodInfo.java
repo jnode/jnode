@@ -79,9 +79,10 @@ final class InlinedMethodInfo {
      * Push the stack elements of the outer method stack and the exit stack.
      *
      * @param vstack
+     * @param eContext
      */
-    final void pushExitStack(ItemFactory ifac, VirtualStack vstack) {
-        vstack.reset();
+    final void pushExitStack(ItemFactory ifac, VirtualStack vstack, EmitterContext eContext) {
+        vstack.reset(eContext);
         //vstack.pushAll(outerMethodStack);
         vstack.pushAll(ifac, exitStack);
     }

@@ -70,7 +70,7 @@ final class FPCompilerFPU extends FPCompiler {
             final FPUStack fpuStack = vstack.fpuStack;
             final FPU reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, true);
             final Item result = fpuStack.getItem(reg);
-            fpuStack.pop();
+            fpuStack.pop(ec);
 
             // Calculate
             os.writeFADDP(reg);
@@ -120,8 +120,8 @@ final class FPCompilerFPU extends FPCompiler {
         }
 
         // Pop fpu stack twice (FUCOMPP)
-        fpuStack.pop();
-        fpuStack.pop();
+        fpuStack.pop(ec);
+        fpuStack.pop(ec);
 
         final Label gtLabel = new Label(curInstrLabel + "gt");
         final Label ltLabel = new Label(curInstrLabel + "lt");
@@ -211,7 +211,7 @@ final class FPCompilerFPU extends FPCompiler {
             final FPUStack fpuStack = vstack.fpuStack;
             final FPU reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, false);
             final Item result = fpuStack.getItem(reg);
-            fpuStack.pop();
+            fpuStack.pop(ec);
 
             // Calculate
             os.writeFDIVP(reg);
@@ -283,7 +283,7 @@ final class FPCompilerFPU extends FPCompiler {
             final FPUStack fpuStack = vstack.fpuStack;
             final FPU reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, true);
             final Item result = fpuStack.getItem(reg);
-            fpuStack.pop();
+            fpuStack.pop(ec);
 
             // Calculate
             os.writeFMULP(reg);
@@ -447,7 +447,7 @@ final class FPCompilerFPU extends FPCompiler {
             fxchST1(os, fpuStack, reg);
 
             // Pop the fpuStack.tos
-            fpuStack.pop();
+            fpuStack.pop(ec);
 
             // Calculate
             os.writeFXCH(X86Register.ST1);
@@ -482,7 +482,7 @@ final class FPCompilerFPU extends FPCompiler {
             final FPUStack fpuStack = vstack.fpuStack;
             final FPU reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, false);
             final Item result = fpuStack.getItem(reg);
-            fpuStack.pop();
+            fpuStack.pop(ec);
 
             // Calculate
             os.writeFSUBP(reg);

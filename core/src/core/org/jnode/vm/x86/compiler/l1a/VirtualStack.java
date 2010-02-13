@@ -57,16 +57,18 @@ final class VirtualStack {
      * Constructor; create and initialize stack with default size
      */
     VirtualStack(X86Assembler os) {
-        this.operandStack = checkOperandStack ? new ItemStack(Item.Kind.STACK,
-            Integer.MAX_VALUE) : null;
-        reset();
-    }
-
-    void reset() {
+        this.operandStack = checkOperandStack ? new ItemStack(Item.Kind.STACK, Integer.MAX_VALUE) : null;
         stack = new Item[8];
         tos = 0;
+    }
+
+    void reset(EmitterContext ec) {
+        while (!isEmpty())
+            pop().release(ec);
+
+        tos = 0;
         if (checkOperandStack) {
-            operandStack.reset();
+            operandStack.reset(ec);
         }
     }
 
