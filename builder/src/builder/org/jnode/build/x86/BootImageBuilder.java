@@ -69,14 +69,12 @@ import org.jnode.vm.x86.VmX86Processor;
 import org.jnode.vm.x86.VmX86Processor32;
 import org.jnode.vm.x86.VmX86Processor64;
 import org.jnode.vm.x86.X86CpuID;
-import org.jnode.vm.x86.compiler.X86CompilerConstants;
 import org.jnode.vm.x86.compiler.X86JumpTable;
 
 /**
  * @author epr
  */
-public class BootImageBuilder extends AbstractBootImageBuilder implements
-    X86CompilerConstants {
+public class BootImageBuilder extends AbstractBootImageBuilder {
 
     public static final int LOAD_ADDR = 1024 * 1024;
 

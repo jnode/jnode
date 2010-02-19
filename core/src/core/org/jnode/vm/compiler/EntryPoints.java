@@ -127,10 +127,11 @@ public class EntryPoints extends VmSystemObject {
     /**
      * Create a new instance
      *
-     * @param loader
+     * @param loader  the VmClassLoader instance
+     * @param heapManager heap manager
+     * @param magic the compiler magic ID
      */
-    public EntryPoints(VmClassLoader loader, VmHeapManager heapManager,
-                       int magic) {
+    public EntryPoints(VmClassLoader loader, VmHeapManager heapManager, int magic) {
         try {
             this.magic = magic;
             // VmMember class
@@ -174,8 +175,7 @@ public class EntryPoints extends VmSystemObject {
             writeBarrier = (heapManager != null) ? heapManager
                 .getWriteBarrier() : null;
             if (writeBarrier != null) {
-                final VmType wbClass = loader.loadClass(writeBarrier.getClass()
-                    .getName(), true);
+                final VmType wbClass = loader.loadClass(writeBarrier.getClass().getName(), true);
                 arrayStoreWriteBarrier = testMethod(wbClass.getMethod(
                     "arrayStoreWriteBarrier",
                     "(Ljava/lang/Object;ILjava/lang/Object;)V"));
@@ -191,105 +191,79 @@ public class EntryPoints extends VmSystemObject {
             }
 
             // MonitorManager
-            this.vmMonitorManagerClass = loader.loadClass(
-                "org.jnode.vm.scheduler.MonitorManager", true);
-            monitorEnterMethod = testMethod(vmMonitorManagerClass.getMethod(
-                "monitorEnter", "(Ljava/lang/Object;)V"));
-            monitorExitMethod = testMethod(vmMonitorManagerClass.getMethod(
-                "monitorExit", "(Ljava/lang/Object;)V"));
+            this.vmMonitorManagerClass = loader.loadClass("org.jnode.vm.scheduler.MonitorManager", true);
+            monitorEnterMethod = testMethod(vmMonitorManagerClass.getMethod("monitorEnter", "(Ljava/lang/Object;)V"));
+            monitorExitMethod = testMethod(vmMonitorManagerClass.getMethod("monitorExit", "(Ljava/lang/Object;)V"));
 
             // MathSupport
-            final VmType vmClass = loader.loadClass("org.jnode.vm.MathSupport",
-                true);
+            final VmType vmClass = loader.loadClass("org.jnode.vm.MathSupport", true);
             ldivMethod = testMethod(vmClass.getMethod("ldiv", "(JJ)J"));
             lremMethod = testMethod(vmClass.getMethod("lrem", "(JJ)J"));
 
             // VmInstanceField
-            this.vmInstanceFieldClass = loader.loadClass(
-                "org.jnode.vm.classmgr.VmInstanceField", true);
-            vmFieldOffsetField = (VmInstanceField) testField(vmInstanceFieldClass
-                .getField("offset"));
+            this.vmInstanceFieldClass = loader.loadClass("org.jnode.vm.classmgr.VmInstanceField", true);
+            vmFieldOffsetField = (VmInstanceField) testField(vmInstanceFieldClass.getField("offset"));
 
             // VmStaticField
-            this.vmStaticFieldClass = loader.loadClass(
-                "org.jnode.vm.classmgr.VmStaticField", true);
-            vmFieldStaticsIndexField = (VmInstanceField) testField(vmStaticFieldClass
-                .getField("staticsIndex"));
+            this.vmStaticFieldClass = loader.loadClass("org.jnode.vm.classmgr.VmStaticField", true);
+            vmFieldStaticsIndexField = (VmInstanceField) testField(vmStaticFieldClass.getField("staticsIndex"));
 
             // VmInstanceMethod
-            this.vmInstanceMethodClass = loader.loadClass(
-                "org.jnode.vm.classmgr.VmInstanceMethod", true);
-            vmMethodTibOffsetField = (VmInstanceField) testField(vmInstanceMethodClass
-                .getField("tibOffset"));
+            this.vmInstanceMethodClass = loader.loadClass("org.jnode.vm.classmgr.VmInstanceMethod", true);
+            vmMethodTibOffsetField = (VmInstanceField) testField(vmInstanceMethodClass.getField("tibOffset"));
 
             // VmMethodCode
-            this.vmMethodCodeClass = loader.loadClass(
-                "org.jnode.vm.classmgr.VmMethodCode", true);
-            vmMethodSelectorField = (VmInstanceField) testField(vmInstanceMethodClass
-                .getField("selector"));
-            vmMethodNativeCodeField = (VmInstanceField) testField(vmInstanceMethodClass
-                .getField("nativeCode"));
+            this.vmMethodCodeClass = loader.loadClass("org.jnode.vm.classmgr.VmMethodCode", true);
+            vmMethodSelectorField = (VmInstanceField) testField(vmInstanceMethodClass.getField("selector"));
+            vmMethodNativeCodeField = (VmInstanceField) testField(vmInstanceMethodClass.getField("nativeCode"));
 
             // VmConstIMethodRef
-            final VmType cimrClass = loader.loadClass(
-                "org.jnode.vm.classmgr.VmConstIMethodRef", true);
-            this.vmConstIMethodRefSelectorField = (VmInstanceField) testField(cimrClass
-                .getField("selector"));
+            final VmType cimrClass = loader.loadClass("org.jnode.vm.classmgr.VmConstIMethodRef", true);
+            this.vmConstIMethodRefSelectorField = (VmInstanceField) testField(cimrClass.getField("selector"));
 
             // VmProcessor
-            final VmType processorClass = loader.loadClass(
-                "org.jnode.vm.scheduler.VmProcessor", true);
+            final VmType processorClass = loader.loadClass("org.jnode.vm.scheduler.VmProcessor", true);
             vmThreadSwitchIndicatorOffset =
                 ((VmInstanceField) testField(processorClass.getField("threadSwitchIndicator"))).getOffset();
             vmProcessorMeField = (VmInstanceField) testField(processorClass.getField("me"));
-            vmProcessorStackEnd = (VmInstanceField) testField(processorClass
-                .getField("stackEnd"));
-            vmProcessorSharedStaticsTable = (VmInstanceField) testField(processorClass
-                .getField("staticsTable"));
+            vmProcessorStackEnd = (VmInstanceField) testField(processorClass.getField("stackEnd"));
+            vmProcessorSharedStaticsTable = (VmInstanceField) testField(processorClass.getField("staticsTable"));
             vmProcessorIsolatedStaticsTable = (VmInstanceField) testField(processorClass
                 .getField("isolatedStaticsTable"));
 
             // VmType
-            final VmType typeClass = loader.loadClass(
-                "org.jnode.vm.classmgr.VmType", true);
-            vmTypeInitialize = testMethod(typeClass.getMethod("initialize",
-                "()V"));
-            vmTypeModifiers = (VmInstanceField) testField(typeClass
-                .getField("modifiers"));
-            vmTypeState = (VmInstanceField) testField(typeClass
-                .getField("state"));
+            final VmType typeClass = loader.loadClass("org.jnode.vm.classmgr.VmType", true);
+            vmTypeInitialize = testMethod(typeClass.getMethod("initialize", "()V"));
+            vmTypeModifiers = (VmInstanceField) testField(typeClass.getField("modifiers"));
+            vmTypeState = (VmInstanceField) testField(typeClass.getField("state"));
             vmTypeCp = (VmInstanceField) testField(typeClass.getField("cp"));
 
             // VmCP
-            final VmType cpClass = loader.loadClass(
-                "org.jnode.vm.classmgr.VmCP", true);
+            final VmType cpClass = loader.loadClass("org.jnode.vm.classmgr.VmCP", true);
             vmCPCp = (VmInstanceField) testField(cpClass.getField("cp"));
 
             // VmProcessor
             // VmThread
             final VmType vmThreadClass = loader.loadClass("org.jnode.vm.scheduler.VmThread", true);
-            systemExceptionMethod = testMethod(vmThreadClass.getMethod(
-                "systemException", "(II)Ljava/lang/Throwable;"));
+            systemExceptionMethod = testMethod(vmThreadClass.getMethod("systemException", "(II)Ljava/lang/Throwable;"));
 
             // VmMethod
-            final VmType vmMethodClass = loader.loadClass(
-                "org.jnode.vm.classmgr.VmMethod", true);
-            recompileMethod = testMethod(vmMethodClass.getDeclaredMethod(
-                "recompileMethod", "(II)V"));
+            final VmType vmMethodClass = loader.loadClass("org.jnode.vm.classmgr.VmMethod", true);
+            recompileMethod = testMethod(vmMethodClass.getDeclaredMethod("recompileMethod", "(II)V"));
 
         } catch (ClassNotFoundException ex) {
             throw new NoClassDefFoundError(ex.getMessage());
         }
     }
 
-    private final VmMethod testMethod(VmMethod method) {
+    private VmMethod testMethod(VmMethod method) {
         if (method == null) {
             throw new RuntimeException("Cannot find a method");
         }
         return method;
     }
 
-    private final VmField testField(VmField field) {
+    private VmField testField(VmField field) {
         if (field == null) {
             throw new RuntimeException("Cannot find a field");
         }

@@ -52,7 +52,9 @@ final class ItemFactory {
     /**
      * Create a constant item
      *
+     * @param ec
      * @param val
+     * @return
      */
     final IntItem createIConst(EmitterContext ec, int val) {
         final IntItem item = (IntItem) getOrCreate(JvmType.INT);
@@ -63,7 +65,9 @@ final class ItemFactory {
     /**
      * Create a constant item
      *
+     * @param ec
      * @param val
+     * @return
      */
     final FloatItem createFConst(EmitterContext ec, float val) {
         final FloatItem item = (FloatItem) getOrCreate(JvmType.FLOAT);
@@ -74,7 +78,9 @@ final class ItemFactory {
     /**
      * Create a constant item
      *
+     * @param ec
      * @param val
+     * @return
      */
     final RefItem createAConst(EmitterContext ec, VmConstString val) {
         final RefItem item = (RefItem) getOrCreate(JvmType.REFERENCE);
@@ -85,7 +91,9 @@ final class ItemFactory {
     /**
      * Create a constant item
      *
+     * @param ec
      * @param val
+     * @return
      */
     final LongItem createLConst(EmitterContext ec, long val) {
         final LongItem item = (LongItem) getOrCreate(JvmType.LONG);
@@ -96,7 +104,9 @@ final class ItemFactory {
     /**
      * Create a constant item
      *
+     * @param ec
      * @param val
+     * @return
      */
     final DoubleItem createDConst(EmitterContext ec, double val) {
         final DoubleItem item = (DoubleItem) getOrCreate(JvmType.DOUBLE);
@@ -108,6 +118,7 @@ final class ItemFactory {
      * Create a stack item.
      *
      * @param jvmType
+     * @return
      */
     public Item createStack(int jvmType) {
         final Item item = getOrCreate(jvmType);
@@ -119,6 +130,7 @@ final class ItemFactory {
      * Create an FPU stack item.
      *
      * @param jvmType
+     * @return
      */
     public Item createFPUStack(int jvmType) {
         final Item item = getOrCreate(jvmType);
@@ -130,6 +142,8 @@ final class ItemFactory {
      * Create an LOCAL item.
      *
      * @param jvmType
+     * @param ebpOffset
+     * @return
      */
     public Item createLocal(int jvmType, short ebpOffset) {
         final Item item = getOrCreate(jvmType);
@@ -141,6 +155,8 @@ final class ItemFactory {
      * Create an XMM item.
      *
      * @param jvmType
+     * @param xmm
+     * @return
      */
     public Item createLocal(int jvmType, X86Register.XMM xmm) {
         final Item item = getOrCreate(jvmType);
@@ -151,8 +167,10 @@ final class ItemFactory {
     /**
      * Create a word register item.
      *
+     * @param ec
      * @param jvmType
      * @param reg
+     * @return
      */
     public WordItem createReg(EmitterContext ec, int jvmType, X86Register reg) {
         final WordItem item = (WordItem) getOrCreate(jvmType);
@@ -163,9 +181,11 @@ final class ItemFactory {
     /**
      * Create a doubleword register item.
      *
+     * @param ec
      * @param jvmType
      * @param lsb
      * @param msb
+     * @return
      */
     public DoubleWordItem createReg(EmitterContext ec, int jvmType, X86Register.GPR lsb, X86Register.GPR msb) {
         if (!ec.getStream().isCode32()) {
@@ -179,9 +199,10 @@ final class ItemFactory {
     /**
      * Create a doubleword register item.
      *
+     * @param ec
      * @param jvmType
-     * @param lsb
-     * @param msb
+     * @param reg
+     * @return
      */
     public DoubleWordItem createReg(EmitterContext ec, int jvmType, X86Register.GPR64 reg) {
         final DoubleWordItem item = (DoubleWordItem) getOrCreate(jvmType);
@@ -216,8 +237,9 @@ final class ItemFactory {
      * Get an item out of the cache or if not present, create a new one.
      *
      * @param jvmType
+     * @return
      */
-    private final Item getOrCreate(int jvmType) {
+    private Item getOrCreate(int jvmType) {
         final ArrayList<? extends Item> list = getList(jvmType);
         final Item item;
         if (list.isEmpty()) {
@@ -234,8 +256,9 @@ final class ItemFactory {
      * Gets the cache array for a given type.
      *
      * @param jvmType
+     * @return
      */
-    private final ArrayList<? extends Item> getList(int jvmType) {
+    private ArrayList<? extends Item> getList(int jvmType) {
         switch (jvmType) {
             case JvmType.INT:
                 return intItems;
@@ -256,8 +279,9 @@ final class ItemFactory {
      * Create a new item of a given type.
      *
      * @param jvmType
+     * @return
      */
-    private final Item createNew(int jvmType) {
+    private Item createNew(int jvmType) {
         createCount++;
         switch (jvmType) {
             case JvmType.INT:
@@ -283,8 +307,9 @@ final class ItemFactory {
 
     /**
      * Gets the item factory. This item factory is singleton per thread.
+     * @return
      */
-    static final ItemFactory getFactory() {
+    static ItemFactory getFactory() {
         ItemFactory fac = (ItemFactory) itemFactory.get();
         if (fac == null) {
             fac = new ItemFactory();

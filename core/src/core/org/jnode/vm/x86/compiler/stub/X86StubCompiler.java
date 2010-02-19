@@ -36,6 +36,8 @@ import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.AbstractX86Compiler;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
+import static org.jnode.vm.x86.compiler.X86CompilerConstants.STUB_COMPILER_MAGIC;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */

@@ -45,13 +45,18 @@ import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.x86.X86CpuID;
 
+import static org.jnode.vm.x86.compiler.X86CompilerConstants.BITS32;
+import static org.jnode.vm.x86.compiler.X86CompilerConstants.BITS64;
+import static org.jnode.vm.x86.compiler.X86CompilerConstants.INTSIZE;
+import static org.jnode.vm.x86.compiler.X86CompilerConstants.PROCESSOR64;
+
 /**
  * Helpers class used by the X86 compilers.
  *
  * @author epr
  * @author patrik_reali
  */
-public class X86CompilerHelper implements X86CompilerConstants {
+public class X86CompilerHelper {
 
     /**
      * Address size ax register (EAX/RAX)

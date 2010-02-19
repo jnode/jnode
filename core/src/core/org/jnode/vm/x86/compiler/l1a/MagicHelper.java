@@ -55,6 +55,8 @@ final class MagicHelper extends BaseX86MagicHelper {
      * @param ec
      * @param method
      * @param isstatic
+     * @param bcv
+     * @param caller
      */
     public void emitMagic(EmitterContext ec, VmMethod method, boolean isstatic, X86BytecodeVisitor bcv,
                           VmMethod caller) {

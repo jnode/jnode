@@ -60,6 +60,8 @@ abstract class X86RegisterPool {
 
     /**
      * Initialize this instance.
+     * @param lastFirst
+     * @param minimumRequestIndex
      */
     public X86RegisterPool(boolean lastFirst, int minimumRequestIndex) {
         this.lastFirst = lastFirst;
@@ -73,6 +75,7 @@ abstract class X86RegisterPool {
      * Initialize register pool The order of this array determines the cost of
      * using the register. The cost of a register is lower when its index in
      * this array is higher.
+     * @return
      */
     protected abstract RegisterGroupUsage[] initialize();
 
@@ -92,6 +95,7 @@ abstract class X86RegisterPool {
      *
      * @param type  the register type (from Operand)
      * @param owner the register owner
+     * @param supportBits8
      * @return the allocated register or null
      */
     public final X86Register request(int type, Item owner, boolean supportBits8) {
@@ -119,14 +123,19 @@ abstract class X86RegisterPool {
     }
 
     /**
+     * @param type
      * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
+     * @return
      */
     public final X86Register request(int type) {
         return request(type, null, false);
     }
 
     /**
+     * @param type
+     * @param supportsBits8
      * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
+     * @return
      */
     public final X86Register request(int type, boolean supportsBits8) {
         return request(type, null, supportsBits8);
@@ -156,6 +165,7 @@ abstract class X86RegisterPool {
      * Require a particular register
      *
      * @param register
+     * @param owner
      * @return false, if the register is already in use
      */
     public final boolean request(X86Register register, Item owner) {
@@ -198,6 +208,7 @@ abstract class X86RegisterPool {
     }
 
     /**
+     * @param register
      * @see org.jnode.vm.compiler.ir.RegisterPool#release(java.lang.Object)
      */
     public final void release(X86Register register) {
@@ -244,7 +255,7 @@ abstract class X86RegisterPool {
      * @param reg
      * @return
      */
-    private final RegisterGroupUsage get(X86Register reg) {
+    private RegisterGroupUsage get(X86Register reg) {
         for (int i = regCount - 1; i >= 0; i--) {
             final RegisterGroupUsage ru = registers[i];
             if (ru.contains(reg)) {
@@ -561,6 +572,7 @@ abstract class X86RegisterPool {
          * Initialize this instance.
          *
          * @param reg
+         * @param callerSaved
          */
         public RegisterGroupUsage(RegisterEntry reg, boolean callerSaved) {
             this(new RegisterEntry[]{reg}, callerSaved);
@@ -571,9 +583,9 @@ abstract class X86RegisterPool {
          *
          * @param reg1
          * @param reg2
+         * @param callerSaved
          */
-        public RegisterGroupUsage(RegisterEntry reg1, RegisterEntry reg2,
-                                  boolean callerSaved) {
+        public RegisterGroupUsage(RegisterEntry reg1, RegisterEntry reg2, boolean callerSaved) {
             this(new RegisterEntry[]{reg1, reg2}, callerSaved);
         }
 
@@ -583,9 +595,9 @@ abstract class X86RegisterPool {
          * @param reg1
          * @param reg2
          * @param reg3
+         * @param callerSaved
          */
-        public RegisterGroupUsage(RegisterEntry reg1, RegisterEntry reg2,
-                                  RegisterEntry reg3, boolean callerSaved) {
+        public RegisterGroupUsage(RegisterEntry reg1, RegisterEntry reg2, RegisterEntry reg3, boolean callerSaved) {
             this(new RegisterEntry[]{reg1, reg2, reg3}, callerSaved);
         }
 
@@ -596,6 +608,7 @@ abstract class X86RegisterPool {
          * @param reg2
          * @param reg3
          * @param reg4
+         * @param callerSaved
          */
         public RegisterGroupUsage(RegisterEntry reg1, RegisterEntry reg2,
                                   RegisterEntry reg3, RegisterEntry reg4, boolean callerSaved) {
@@ -610,10 +623,10 @@ abstract class X86RegisterPool {
          * @param reg3
          * @param reg4
          * @param reg5
+         * @param callerSaved
          */
         public RegisterGroupUsage(RegisterEntry reg1, RegisterEntry reg2,
-                                  RegisterEntry reg3, RegisterEntry reg4, RegisterEntry reg5,
-                                  boolean callerSaved) {
+                                  RegisterEntry reg3, RegisterEntry reg4, RegisterEntry reg5, boolean callerSaved) {
             this(new RegisterEntry[]{reg1, reg2, reg3, reg4, reg5},
                 callerSaved);
         }
@@ -621,7 +634,8 @@ abstract class X86RegisterPool {
         /**
          * Initialize this instance.
          *
-         * @param reg
+         * @param regs
+         * @param callerSaved
          */
         public RegisterGroupUsage(RegisterEntry[] regs, boolean callerSaved) {
             this.regs = regs;
@@ -633,6 +647,8 @@ abstract class X86RegisterPool {
          * Register this register for the given owner.
          *
          * @param owner
+         * @param jvmType
+         * @param supportBits8
          * @return The register if request succeeds, null if this register group
          *         is already used.
          */
@@ -653,6 +669,7 @@ abstract class X86RegisterPool {
          * Register this register for the given owner.
          *
          * @param owner
+         * @param reg
          * @return The register if request succeeds, null if this register group
          *         is already used.
          */
@@ -696,6 +713,7 @@ abstract class X86RegisterPool {
 
         /**
          * Sets the current owner of this register.
+         * @param owner
          */
         public void setOwner(Item owner) {
             if (!this.inuse) {

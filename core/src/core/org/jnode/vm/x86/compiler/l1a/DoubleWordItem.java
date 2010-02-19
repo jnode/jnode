@@ -27,13 +27,14 @@ import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
-import org.jnode.vm.x86.compiler.X86CompilerConstants;
+
+import static org.jnode.vm.x86.compiler.X86CompilerConstants.INTSIZE;
+import static org.jnode.vm.x86.compiler.X86CompilerConstants.BITS64;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public abstract class DoubleWordItem extends Item implements
-    X86CompilerConstants {
+public abstract class DoubleWordItem extends Item {
 
     /**
      * LSB Register in 32-bit mode
@@ -52,16 +53,20 @@ public abstract class DoubleWordItem extends Item implements
 
     /**
      * Initialize a blank item.
+     * @param factory
      */
     protected DoubleWordItem(ItemFactory factory) {
         super(factory);
     }
 
     /**
+     * @param ec
      * @param kind
      * @param offsetToFP
      * @param lsb
      * @param msb
+     * @param reg
+     * @param xmm
      */
     protected final void initialize(EmitterContext ec, byte kind, short offsetToFP,
                                     X86Register.GPR lsb, X86Register.GPR msb, X86Register.GPR64 reg,
@@ -129,6 +134,7 @@ public abstract class DoubleWordItem extends Item implements
     /**
      * Create a clone of this item, which must be a constant.
      *
+     * @param ec
      * @return the clone
      */
     protected abstract DoubleWordItem cloneConstant(EmitterContext ec);
@@ -148,6 +154,7 @@ public abstract class DoubleWordItem extends Item implements
      * Gets the offset from the LSB part of this item to the FramePointer
      * register. This is only valid if this item has a LOCAL kind.
      *
+     * @param ec
      * @return the offset
      */
     final int getLsbOffsetToFP(EmitterContext ec) {
@@ -157,6 +164,7 @@ public abstract class DoubleWordItem extends Item implements
     /**
      * Gets the register holding the LSB part of this item in 32-bit mode.
      *
+     * @param ec
      * @return the register
      */
     final X86Register.GPR getLsbRegister(EmitterContext ec) {
@@ -174,6 +182,7 @@ public abstract class DoubleWordItem extends Item implements
      * Gets the offset from the MSB part of this item to the FramePointer
      * register. This is only valid if this item has a LOCAL kind.
      *
+     * @param ec
      * @return the offset
      */
     final int getMsbOffsetToFP(EmitterContext ec) {
@@ -183,6 +192,7 @@ public abstract class DoubleWordItem extends Item implements
     /**
      * Gets the register holding the MSB part of this item in 32-bit mode.
      *
+     * @param ec
      * @return the register
      */
     final X86Register.GPR getMsbRegister(EmitterContext ec) {
@@ -199,6 +209,7 @@ public abstract class DoubleWordItem extends Item implements
     /**
      * Gets the register holding this item in 64-bit mode.
      *
+     * @param ec
      * @return the register
      */
     final X86Register.GPR64 getRegister(EmitterContext ec) {
@@ -437,6 +448,7 @@ public abstract class DoubleWordItem extends Item implements
     /**
      * Load my constant to the given os in 32-bit mode.
      *
+     * @param ec
      * @param os
      * @param lsb
      * @param msb
@@ -447,6 +459,7 @@ public abstract class DoubleWordItem extends Item implements
     /**
      * Load my constant to the given os in 64-bit mode.
      *
+     * @param ec
      * @param os
      * @param reg
      */
@@ -591,6 +604,7 @@ public abstract class DoubleWordItem extends Item implements
     /**
      * Push my constant on the stack using the given os.
      *
+     * @param ec
      * @param os
      */
     protected abstract void pushConstant(EmitterContext ec, X86Assembler os);
@@ -680,9 +694,10 @@ public abstract class DoubleWordItem extends Item implements
     }
 
     /**
+     * @param ec
      * @see org.jnode.vm.x86.compiler.l1a.Item#release(EmitterContext)
      */
-    private final void cleanup(EmitterContext ec) {
+    private void cleanup(EmitterContext ec) {
         // assertCondition(!ec.getVStack().contains(this), "Cannot release while
         // on vstack");
         final X86RegisterPool pool = ec.getGPRPool();
@@ -721,7 +736,7 @@ public abstract class DoubleWordItem extends Item implements
         setKind((byte) 0);
     }
 
-    private final X86Register request(EmitterContext ec, X86RegisterPool pool) {
+    private X86Register request(EmitterContext ec, X86RegisterPool pool) {
         final X86Assembler os = ec.getStream();
         final X86Register r;
         if (os.isCode32()) {

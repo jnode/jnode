@@ -51,8 +51,7 @@ import org.vmmagic.unboxed.Address;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
-public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
-    X86CompilerConstants {
+public abstract class AbstractX86Compiler extends NativeCodeCompiler {
 
     private EntryPoints context;
 
@@ -65,7 +64,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
     /**
      * Initialize this compiler
      *
-     * @param loader
+     * @param loader the VmClassLoader
      */
     public final void initialize(VmClassLoader loader) {
         if (context == null) {

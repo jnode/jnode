@@ -32,12 +32,12 @@ import org.jnode.vm.compiler.IllegalModeException;
  */
 final class L1AHelper {
 
-    static final void assertCondition(boolean cond, String message) {
+    static void assertCondition(boolean cond, String message) {
         if (!cond)
             throw new Error("assert failed: " + message);
     }
 
-    static final void assertCondition(boolean cond, String message, Object param) {
+    static void assertCondition(boolean cond, String message, Object param) {
         if (!cond) {
             throw new Error("assert failed: " + message + param);
         }
@@ -46,27 +46,32 @@ final class L1AHelper {
     /**
      * Gets the 64-bit equivalent of the given 32-bit register.
      *
+     * @param eContext
      * @param src
      * @return the 64-bit register.
      */
-    static final GPR64 get64BitReg(EmitterContext eContext, GPR src) {
+    static GPR64 get64BitReg(EmitterContext eContext, GPR src) {
         return (GPR64) eContext.getGPRPool().getRegisterInSameGroup(src, JvmType.LONG);
     }
 
     /**
      * Release a register.
      *
+     * @param eContext
      * @param reg
      */
-    static final void releaseRegister(EmitterContext eContext, X86Register reg) {
+    static void releaseRegister(EmitterContext eContext, X86Register reg) {
         final X86RegisterPool pool = eContext.getGPRPool();
         pool.release(reg);
     }
 
     /**
      * Request two register for a 8-byte item.
+     * @param eContext
+     * @param jvmType
+     * @return
      */
-    static final DoubleWordItem requestDoubleWordRegisters(
+    static DoubleWordItem requestDoubleWordRegisters(
         EmitterContext eContext, int jvmType) {
         final X86RegisterPool pool = eContext.getGPRPool();
         final X86Assembler os = eContext.getStream();
@@ -89,8 +94,13 @@ final class L1AHelper {
 
     /**
      * Request two register for a 8-byte item.
+     * @param eContext
+     * @param jvmType
+     * @param lsb
+     * @param msb
+     * @return
      */
-    static final DoubleWordItem requestDoubleWordRegisters(
+    static DoubleWordItem requestDoubleWordRegisters(
         EmitterContext eContext, int jvmType, X86Register.GPR lsb, X86Register.GPR msb) {
         if (!eContext.getStream().isCode32()) {
             throw new IllegalModeException("Only support in 32-bit mode");
@@ -108,8 +118,12 @@ final class L1AHelper {
 
     /**
      * Request a 64-bit register for a 8-byte item.
+     * @param eContext
+     * @param jvmType
+     * @param reg
+     * @return
      */
-    static final DoubleWordItem requestDoubleWordRegister(
+    static DoubleWordItem requestDoubleWordRegister(
         EmitterContext eContext, int jvmType, GPR64 reg) {
         if (!eContext.getStream().isCode64()) {
             throw new IllegalModeException("Only support in 64-bit mode");
@@ -126,9 +140,10 @@ final class L1AHelper {
      * Request a register for calcuation, not tied to an item. Make sure to
      * release the register afterwards.
      *
+     * @param eContext
      * @param reg
      */
-    static final void requestRegister(EmitterContext eContext, X86Register reg) {
+    static void requestRegister(EmitterContext eContext, X86Register reg) {
         final X86RegisterPool pool = eContext.getGPRPool();
         if (!pool.isFree(reg)) {
             final Item i = (Item) pool.getOwner(reg);
@@ -142,8 +157,12 @@ final class L1AHelper {
     /**
      * Request a register of a given type, not tied to an item. Make sure to
      * release the register afterwards.
+     * @param eContext
+     * @param type
+     * @param supportsBits8
+     * @return
      */
-    static final X86Register requestRegister(EmitterContext eContext, int type,
+    static X86Register requestRegister(EmitterContext eContext, int type,
                                              boolean supportsBits8) {
         final X86RegisterPool pool = eContext.getGPRPool();
         X86Register r = pool.request(type, supportsBits8);
@@ -159,10 +178,11 @@ final class L1AHelper {
      * reserve a register for an item. The item is not loaded with the register.
      * The register is spilled if another item holds it.
      *
+     * @param eContext
      * @param reg the register to reserve
      * @param it  the item requiring the register
      */
-    static final void requestRegister(EmitterContext eContext, X86Register reg,
+    static void requestRegister(EmitterContext eContext, X86Register reg,
                                       Item it) {
         final X86RegisterPool pool = eContext.getGPRPool();
 
@@ -182,8 +202,12 @@ final class L1AHelper {
 
     /**
      * Request one register for a single word item.
+     * @param eContext
+     * @param jvmType
+     * @param supportsBits8
+     * @return
      */
-    static final WordItem requestWordRegister(EmitterContext eContext,
+    static WordItem requestWordRegister(EmitterContext eContext,
                                               int jvmType, boolean supportsBits8) {
         final X86RegisterPool pool = eContext.getGPRPool();
         final ItemFactory ifac = eContext.getItemFactory();
@@ -196,8 +220,12 @@ final class L1AHelper {
 
     /**
      * Request specific one register for a single word item.
+     * @param eContext
+     * @param jvmType
+     * @param reg
+     * @return
      */
-    static final WordItem requestWordRegister(EmitterContext eContext,
+    static WordItem requestWordRegister(EmitterContext eContext,
                                               int jvmType, X86Register reg) {
         final X86RegisterPool pool = eContext.getGPRPool();
         final ItemFactory ifac = eContext.getItemFactory();

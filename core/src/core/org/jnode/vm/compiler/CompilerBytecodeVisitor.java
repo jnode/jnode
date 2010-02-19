@@ -32,6 +32,7 @@ public abstract class CompilerBytecodeVisitor extends BytecodeVisitor {
 
     /**
      * The given basic block is about to start.
+     * @param bb
      */
     public abstract void startBasicBlock(BasicBlock bb);
 
@@ -57,6 +58,7 @@ public abstract class CompilerBytecodeVisitor extends BytecodeVisitor {
 
     /**
      * Push the given VmType on the stack.
+     * @param value
      */
     public abstract void visit_ldc(VmType<?> value);
 

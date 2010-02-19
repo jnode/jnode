@@ -68,6 +68,13 @@ final class EmitterContext {
 
     /**
      * Create a new context
+     * @param os
+     * @param helper
+     * @param vstack
+     * @param gprPool
+     * @param xmmPool
+     * @param ifac
+     * @param context
      */
     EmitterContext(X86Assembler os, X86CompilerHelper helper,
                    VirtualStack vstack, X86RegisterPool gprPool,

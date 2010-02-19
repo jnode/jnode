@@ -24,12 +24,11 @@ import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.FPU;
 import org.jnode.vm.bytecode.StackException;
-import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class FPUHelper implements X86CompilerConstants {
+final class FPUHelper {
 
     /**
      * Swap ST0 and the given item. Action is emitted to code & performed on
@@ -39,7 +38,7 @@ final class FPUHelper implements X86CompilerConstants {
      * @param fpuStack
      * @param item
      */
-    static final void fxch(X86Assembler os, FPUStack fpuStack, Item item) {
+    static void fxch(X86Assembler os, FPUStack fpuStack, Item item) {
         if (!fpuStack.isTos(item)) {
             final FPU fpuReg = fpuStack.getRegister(item);
             fxch(os, fpuStack, fpuReg);
@@ -53,7 +52,7 @@ final class FPUHelper implements X86CompilerConstants {
      * @param fpuStack
      * @param fpuReg
      */
-    static final void fxch(X86Assembler os, FPUStack fpuStack,
+    static void fxch(X86Assembler os, FPUStack fpuStack,
                            FPU fpuReg) {
         if (fpuReg == X86Register.ST0) {
             throw new StackException("Cannot fxch ST0");

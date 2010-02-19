@@ -42,8 +42,7 @@ public interface AbstractX86StackManager {
      * @param msbReg
      * @param jvmType the type of the registers contents as a {@link org.jnode.vm.JvmType}.
      */
-    public void writePUSH64(int jvmType, X86Register.GPR lsbReg,
-                            X86Register.GPR msbReg);
+    public void writePUSH64(int jvmType, X86Register.GPR lsbReg, X86Register.GPR msbReg);
 
     /**
      * Write code to push a 64-bit word on the stack
