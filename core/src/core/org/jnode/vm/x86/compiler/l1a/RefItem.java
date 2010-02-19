@@ -28,14 +28,13 @@ import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.VmConstString;
-import org.jnode.vm.x86.compiler.X86CompilerConstants;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
 /**
  * @author Patrik Reali
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class RefItem extends WordItem implements X86CompilerConstants {
+final class RefItem extends WordItem {
 
     // generate unique labels for writeStatics (should use current label)
     private long labelCounter;
@@ -44,6 +43,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 
     /**
      * Initialize a blank item
+     * @param factory
      */
     RefItem(ItemFactory factory) {
         super(factory);
@@ -55,7 +55,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
     }
 
     /**
-     * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant()
+     * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant(EmitterContext)
      */
     protected WordItem cloneConstant(EmitterContext ec) {
         return factory.createAConst(ec, getValue());

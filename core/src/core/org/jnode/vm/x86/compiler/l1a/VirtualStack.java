@@ -55,6 +55,7 @@ final class VirtualStack {
 
     /**
      * Constructor; create and initialize stack with default size
+     * @param os
      */
     VirtualStack(X86Assembler os) {
         this.operandStack = checkOperandStack ? new ItemStack(Item.Kind.STACK, Integer.MAX_VALUE) : null;
@@ -298,12 +299,12 @@ final class VirtualStack {
         return cnt;
     }
 
-    /**
-     * Push items on the virtual stack to the actual stack until there are no
-     * more volative registers in use on the stack.
-     *
-     * @param ec
-     */
+//    /**
+//     * Push items on the virtual stack to the actual stack until there are no
+//     * more volative registers in use on the stack.
+//     *
+//     * param ec
+//     */
     // final int pushAllVolatile(EmitterContext ec) {
     // int i = 0;
     // while ((i < tos) && stack[i].isStack()) {
@@ -348,6 +349,11 @@ final class VirtualStack {
     // }
     //
 
+    /**
+     *
+     * @param reg
+     * @return
+     */
     boolean uses(X86Register reg) {
         for (int i = 0; i < tos; i++) {
             if (stack[i].uses(reg)) {
@@ -373,6 +379,7 @@ final class VirtualStack {
     /**
      * Push items (kind = STACK) on stack for each type in the given typestack.
      *
+     * @param ifac
      * @param tstack May be null or empty
      */
     final void pushAll(ItemFactory ifac, TypeStack tstack) {
@@ -438,7 +445,7 @@ final class VirtualStack {
 
         /**
          * @see org.jnode.vm.x86.compiler.AbstractX86StackManager#writePUSH(int,
-         *      org.jnode.assembler.x86.Register)
+         * org.jnode.assembler.x86.X86Register.GPR)
          */
         public void writePUSH(int jvmType, X86Register.GPR reg) {
             final Item item = ifac.createReg(ec, jvmType, reg);
@@ -450,8 +457,7 @@ final class VirtualStack {
 
         /**
          * @see org.jnode.vm.x86.compiler.AbstractX86StackManager#writePUSH64(int,
-         *      org.jnode.assembler.x86.Register,
-         *      org.jnode.assembler.x86.Register)
+         * org.jnode.assembler.x86.X86Register.GPR, org.jnode.assembler.x86.X86Register.GPR)
          */
         public void writePUSH64(int jvmType, X86Register.GPR lsbReg,
                                 X86Register.GPR msbReg) {
@@ -467,7 +473,7 @@ final class VirtualStack {
 
         /**
          * @see org.jnode.vm.x86.compiler.AbstractX86StackManager#writePUSH64(int,
-         *      GPR64)
+         * org.jnode.assembler.x86.X86Register.GPR64)
          */
         public void writePUSH64(int jvmType, X86Register.GPR64 reg) {
             final Item item = ifac.createReg(ec, jvmType, reg);

@@ -58,6 +58,8 @@ final class FPUStack extends ItemStack {
 
     /**
      * Gets the item that is contained in the given register.
+     * @param fpuReg
+     * @return
      */
     final Item getItem(FPU fpuReg) {
         final int idx = tos - (fpuReg.getNr() + 1);

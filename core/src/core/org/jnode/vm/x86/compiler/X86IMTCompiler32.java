@@ -32,11 +32,12 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.compiler.CompiledIMT;
 import org.jnode.vm.compiler.IMTCompiler;
 
+import static org.jnode.vm.x86.compiler.X86CompilerConstants.BITS32;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class X86IMTCompiler32 extends IMTCompiler implements
-    X86CompilerConstants {
+public final class X86IMTCompiler32 extends IMTCompiler {
 
     /**
      * Register that holds the selector
@@ -60,6 +61,7 @@ public final class X86IMTCompiler32 extends IMTCompiler implements
      * destroyed)
      *
      * @param os
+     * @param method
      */
     public static void emitInvokeInterface(X86Assembler os, VmMethod method) {
         final int selector = method.getSelector();
@@ -95,8 +97,7 @@ public final class X86IMTCompiler32 extends IMTCompiler implements
      * @see org.jnode.vm.compiler.IMTCompiler#compile(ObjectResolver, Object[],
      *      boolean[])
      */
-    public CompiledIMT compile(ObjectResolver resolver__, Object[] imt,
-                               boolean[] imtCollisions) {
+    public CompiledIMT compile(ObjectResolver resolver__, Object[] imt, boolean[] imtCollisions) {
         final int imtLength = imt.length;
 
         // Calculate size of code array
@@ -186,10 +187,10 @@ public final class X86IMTCompiler32 extends IMTCompiler implements
      *
      * @param code
      * @param ofs
+     * @param staticsIndex
      * @return the new offset
      */
-    private final int genJmpStaticsCodeOfs(byte[] code, int ofs,
-                                           int staticsIndex) {
+    private int genJmpStaticsCodeOfs(byte[] code, int ofs, int staticsIndex) {
         final int offset = (staticsIndex + VmArray.DATA_OFFSET) * 4;
         // JMP [EDI+codeOfs]
         code[ofs++] = (byte) 0xFF;

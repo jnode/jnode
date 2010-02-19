@@ -158,11 +158,11 @@ public final class OptimizingBytecodeVisitor extends
     /**
      * Initialize this instance.
      *
+     * @param entryPoints
      * @param delegate
      * @param loader
      */
-    public OptimizingBytecodeVisitor(EntryPoints entryPoints,
-                                     InlineBytecodeVisitor delegate, VmClassLoader loader) {
+    public OptimizingBytecodeVisitor(EntryPoints entryPoints, InlineBytecodeVisitor delegate, VmClassLoader loader) {
         super(delegate);
         this.entryPoints = entryPoints;
         this.loader = loader;

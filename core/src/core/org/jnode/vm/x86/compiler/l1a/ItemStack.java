@@ -51,6 +51,8 @@ class ItemStack {
 
     /**
      * Constructor; create and initialize stack with default size
+     * @param expectedKind
+     * @param maxSize
      */
     ItemStack(int expectedKind, int maxSize) {
         this.expectedKind = expectedKind;
@@ -78,7 +80,7 @@ class ItemStack {
     /**
      * Grow the stack capacity.
      */
-    private final void grow() {
+    private void grow() {
         if (stack.length == maxSize) {
             throw new StackException("Stack full");
         } else {
@@ -165,6 +167,7 @@ class ItemStack {
 
     /**
      * Reset this stack. The stack will be empty afterwards.
+     * @param ec
      */
     final void reset(EmitterContext ec) {
         while (tos != 0) {

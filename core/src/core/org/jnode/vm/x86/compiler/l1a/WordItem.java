@@ -27,13 +27,12 @@ import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
-import org.jnode.vm.x86.compiler.X86CompilerConstants;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public abstract class WordItem extends Item implements X86CompilerConstants {
+public abstract class WordItem extends Item {
 
     private X86Register.GPR gpr;
 
@@ -106,6 +105,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
     /**
      * Create a clone of this item, which must be a constant.
      *
+     * @param ec
      * @return The cloned item
      */
     protected abstract WordItem cloneConstant(EmitterContext ec);
@@ -203,6 +203,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
     /**
      * Load my constant to the given os.
      *
+     * @param ec
      * @param os
      * @param reg
      */
@@ -259,6 +260,8 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      * Load item into the given register (only for Category 1 items), if its
      * kind matches the mask.
      *
+     * @param ec
+     * @param mask
      * @param t0 the destination register
      */
     final void loadToIf(EmitterContext ec, int mask, X86Register.GPR t0) {
@@ -330,6 +333,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
     /**
      * Push my constant on the stack using the given os.
      *
+     * @param ec
      * @param os
      */
     protected abstract void pushConstant(EmitterContext ec, X86Assembler os);
@@ -401,9 +405,10 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
     }
 
     /**
+     * @param ec
      * @see org.jnode.vm.x86.compiler.l1a.Item#release(EmitterContext)
      */
-    private final void cleanup(EmitterContext ec) {
+    private void cleanup(EmitterContext ec) {
         // assertCondition(!ec.getVStack().contains(this), "Cannot release while
         // on vstack");
         final X86RegisterPool pool = ec.getGPRPool();
@@ -440,7 +445,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
     }
 
     /**
-     * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
+     * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, org.jnode.assembler.x86.X86Register)
      */
     final void spill(EmitterContext ec, X86Register reg) {
         if (Vm.VerifyAssertions) {
@@ -465,7 +470,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
     }
 
     /**
-     * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
+     * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.X86Register)
      */
     final boolean uses(X86Register reg) {
         return (isGPR() && this.gpr.equals(reg));
@@ -474,7 +479,6 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
     /**
      * enquire whether the item uses a volatile register
      *
-     * @param reg
      * @return true, when this item uses a volatile register.
      */
     final boolean usesVolatileRegister(X86RegisterPool pool) {

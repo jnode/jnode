@@ -35,6 +35,7 @@ public class CompilerBytecodeParser extends BytecodeParser implements BytecodeFl
 
     /**
      * @param bc
+     * @param cfg
      * @param handler
      */
     protected CompilerBytecodeParser(VmByteCode bc, ControlFlowGraph cfg, CompilerBytecodeVisitor handler) {

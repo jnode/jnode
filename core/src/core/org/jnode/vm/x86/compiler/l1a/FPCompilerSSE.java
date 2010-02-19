@@ -91,7 +91,7 @@ final class FPCompilerSSE extends FPCompiler {
      * @param operation
      * @param commutative
      */
-    private final void arithOperation(int type, int operation, boolean commutative) {
+    private void arithOperation(int type, int operation, boolean commutative) {
         final ItemFactory ifac = ec.getItemFactory();
         Item v2 = vstack.pop(type);
         Item v1 = vstack.pop(type);
@@ -138,7 +138,7 @@ final class FPCompilerSSE extends FPCompiler {
      * @return True if the operand must be swapped. when not commutative, false
      *         is always returned.
      */
-    private final boolean prepareForOperation(Item destAndSource, Item source,
+    private boolean prepareForOperation(Item destAndSource, Item source,
                                               boolean commutative) {
         // WARNING: source was on top of the virtual stack (thus higher than
         // destAndSource)

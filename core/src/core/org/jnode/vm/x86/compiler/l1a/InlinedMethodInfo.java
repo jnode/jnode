@@ -45,7 +45,10 @@ final class InlinedMethodInfo {
     /**
      * Initialize this instance.
      *
+     * @param previous
      * @param inlinedMethod
+     * @param endOfInlineLabel
+     * @param previousLabelPrefix
      */
     public InlinedMethodInfo(InlinedMethodInfo previous, VmMethod inlinedMethod, Label endOfInlineLabel,
                              String previousLabelPrefix) {
@@ -69,6 +72,7 @@ final class InlinedMethodInfo {
     /**
      * Push the stack elements of the outer method stack.
      *
+     * @param ifac
      * @param vstack
      */
     final void pushOuterMethodStack(ItemFactory ifac, VirtualStack vstack) {
@@ -78,6 +82,7 @@ final class InlinedMethodInfo {
     /**
      * Push the stack elements of the outer method stack and the exit stack.
      *
+     * @param ifac
      * @param vstack
      * @param eContext
      */

@@ -38,9 +38,11 @@ import org.jnode.vm.Vm;
 final class FPCompilerFPU extends FPCompiler {
 
     /**
+     * @param bcv
      * @param os
      * @param ec
      * @param vstack
+     * @param arrayDataOffset
      */
     public FPCompilerFPU(X86BytecodeVisitor bcv, X86Assembler os,
                          EmitterContext ec, VirtualStack vstack, int arrayDataOffset) {
@@ -50,8 +52,6 @@ final class FPCompilerFPU extends FPCompiler {
     /**
      * fadd / dadd
      *
-     * @param ec
-     * @param vstack
      * @param type
      */
     final void add(int type) {
@@ -83,9 +83,6 @@ final class FPCompilerFPU extends FPCompiler {
     /**
      * fcmpg, fcmpl, dcmpg, dcmpl
      *
-     * @param os
-     * @param ec
-     * @param vstack
      * @param gt
      * @param type
      * @param curInstrLabel
@@ -166,8 +163,6 @@ final class FPCompilerFPU extends FPCompiler {
     /**
      * f2x / d2x
      *
-     * @param ec
-     * @param vstack
      */
     final void convert(int fromType, int toType) {
         final ItemFactory ifac = ec.getItemFactory();
@@ -191,8 +186,6 @@ final class FPCompilerFPU extends FPCompiler {
     /**
      * fdiv / ddiv
      *
-     * @param ec
-     * @param vstack
      * @param type
      */
     final void div(int type) {
@@ -230,7 +223,7 @@ final class FPCompilerFPU extends FPCompiler {
      * @param vstack
      * @param items
      */
-    static final void ensureStackCapacity(X86Assembler os, EmitterContext ec,
+    static void ensureStackCapacity(X86Assembler os, EmitterContext ec,
                                           VirtualStack vstack, int items) {
         final FPUStack fpuStack = vstack.fpuStack;
         if (!fpuStack.hasCapacity(items)) {
@@ -249,7 +242,7 @@ final class FPCompilerFPU extends FPCompiler {
      * @param fpuStack
      * @param fpuReg
      */
-    private static final void fxchST1(X86Assembler os, FPUStack fpuStack,
+    private static void fxchST1(X86Assembler os, FPUStack fpuStack,
                                       FPU fpuReg) {
         // We need reg to be ST1, if not swap
         if (fpuReg != X86Register.ST1) {
@@ -263,8 +256,6 @@ final class FPCompilerFPU extends FPCompiler {
     /**
      * fmul / dmul
      *
-     * @param ec
-     * @param vstack
      * @param type
      */
     final void mul(int type) {
@@ -296,8 +287,6 @@ final class FPCompilerFPU extends FPCompiler {
     /**
      * fneg / dneg
      *
-     * @param ec
-     * @param vstack
      * @param type
      */
     final void neg(int type) {
@@ -322,6 +311,11 @@ final class FPCompilerFPU extends FPCompiler {
 
     /**
      * Make sure that the given operand is on the top on the FPU stack.
+     * @param os
+     * @param ec
+     * @param vstack
+     * @param fpuStack
+     * @param left
      */
     private static void prepareForOperation(X86Assembler os,
                                                   EmitterContext ec, VirtualStack vstack, FPUStack fpuStack,
@@ -355,8 +349,14 @@ final class FPCompilerFPU extends FPCompiler {
      * <p/>
      * The item at ST0 is popped of the given fpuStack stack.
      *
+     * @param os
+     * @param ec
+     * @param vstack
+     * @param fpuStack
      * @param left
      * @param right
+     * @param commutative
+     * @return
      */
     private static FPU prepareForOperation(X86Assembler os,
                                                  EmitterContext ec, VirtualStack vstack, FPUStack fpuStack,
@@ -424,8 +424,6 @@ final class FPCompilerFPU extends FPCompiler {
     /**
      * frem / drem
      *
-     * @param ec
-     * @param vstack
      * @param type
      */
     final void rem(int type) {
@@ -462,8 +460,6 @@ final class FPCompilerFPU extends FPCompiler {
     /**
      * fsub / dsub
      *
-     * @param ec
-     * @param vstack
      * @param type
      */
     final void sub(int type) {

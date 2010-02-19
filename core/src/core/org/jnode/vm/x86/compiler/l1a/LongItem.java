@@ -27,13 +27,16 @@ import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
-import org.jnode.vm.x86.compiler.X86CompilerConstants;
+
+import static org.jnode.vm.x86.compiler.X86CompilerConstants.BITS32;
+import static org.jnode.vm.x86.compiler.X86CompilerConstants.LSB;
+import static org.jnode.vm.x86.compiler.X86CompilerConstants.MSB;
 
 /**
  * @author Patrik Reali
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class LongItem extends DoubleWordItem implements X86CompilerConstants {
+final class LongItem extends DoubleWordItem {
 
     private long value;
 
@@ -45,10 +48,13 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
     }
 
     /**
+     * @param ec
      * @param kind
      * @param offsetToFP
      * @param lsb
      * @param msb
+     * @param reg
+     * @param xmm
      * @param val
      */
     final void initialize(EmitterContext ec, byte kind, short offsetToFP, X86Register.GPR lsb,
@@ -62,7 +68,6 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
      * Load my constant to the given os in 32-bit mode.
      *
      * @param os
-     * @param reg
      */
     protected final void loadToConstant32(EmitterContext ec, X86Assembler os,
                                           GPR32 lsb, GPR32 msb) {
@@ -178,7 +183,7 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
     }
 
     /**
-     * @see org.jnode.vm.x86.compiler.l1a.DoubleWordItem#cloneConstant()
+     * @see org.jnode.vm.x86.compiler.l1a.DoubleWordItem#cloneConstant(EmitterContext) 
      */
     protected DoubleWordItem cloneConstant(EmitterContext ec) {
         return factory.createLConst(ec, getValue());

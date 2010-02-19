@@ -42,8 +42,10 @@ public abstract class IMTCompiler extends VmSystemObject {
     /**
      * Compile the given IMT.
      *
+     * @param resolver
      * @param imt
      * @param imtCollisions
+     * @return
      */
     public abstract CompiledIMT compile(ObjectResolver resolver, Object[] imt, boolean[] imtCollisions);
 }

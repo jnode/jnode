@@ -52,7 +52,7 @@ final class FloatItem extends WordItem {
     }
 
     /**
-     * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant()
+     * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant(EmitterContext)
      */
     protected WordItem cloneConstant(EmitterContext ec) {
         return factory.createFConst(ec, getValue());

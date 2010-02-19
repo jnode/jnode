@@ -88,8 +88,6 @@ abstract class FPCompiler {
     /**
      * fadd / dadd
      *
-     * @param ec
-     * @param vstack
      * @param type
      */
     abstract void add(int type);
@@ -97,9 +95,6 @@ abstract class FPCompiler {
     /**
      * fcmpg, fcmpl, dcmpg, dcmpl
      *
-     * @param os
-     * @param ec
-     * @param vstack
      * @param gt
      * @param type
      * @param curInstrLabel
@@ -109,16 +104,14 @@ abstract class FPCompiler {
     /**
      * f2x / d2x
      *
-     * @param ec
-     * @param vstack
+     * @param fromType
+     * @param toType
      */
     abstract void convert(int fromType, int toType);
 
     /**
      * fdiv / ddiv
      *
-     * @param ec
-     * @param vstack
      * @param type
      */
     abstract void div(int type);
@@ -126,8 +119,6 @@ abstract class FPCompiler {
     /**
      * fmul / dmul
      *
-     * @param ec
-     * @param vstack
      * @param type
      */
     abstract void mul(int type);
@@ -135,8 +126,6 @@ abstract class FPCompiler {
     /**
      * fneg / dneg
      *
-     * @param ec
-     * @param vstack
      * @param type
      */
     abstract void neg(int type);
@@ -144,8 +133,6 @@ abstract class FPCompiler {
     /**
      * frem / drem
      *
-     * @param ec
-     * @param vstack
      * @param type
      */
     abstract void rem(int type);
@@ -153,8 +140,6 @@ abstract class FPCompiler {
     /**
      * fsub / dsub
      *
-     * @param ec
-     * @param vstack
      * @param type
      */
     abstract void sub(int type);

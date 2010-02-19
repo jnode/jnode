@@ -36,6 +36,8 @@ import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.AbstractX86Compiler;
 
+import static org.jnode.vm.x86.compiler.X86CompilerConstants.L1A_COMPILER_MAGIC;
+
 /**
  * Native code compiler for the Intel x86 architecture.
  * <p/>

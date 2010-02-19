@@ -25,7 +25,6 @@ import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
-import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
  * @author Patrik Reali
@@ -33,7 +32,7 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
  *         IntItems are items with type INT
  */
 
-final class IntItem extends WordItem implements X86CompilerConstants {
+final class IntItem extends WordItem {
 
     private int value;
 
@@ -47,7 +46,7 @@ final class IntItem extends WordItem implements X86CompilerConstants {
     }
 
     /**
-     * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant()
+     * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant(EmitterContext)
      */
     protected WordItem cloneConstant(EmitterContext ec) {
         return factory.createIConst(ec, getValue());
