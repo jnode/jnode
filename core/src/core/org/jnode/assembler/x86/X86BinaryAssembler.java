@@ -81,8 +81,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
          * @return Return {@code true} if obj is 'equal to' this, {@code false} otherwise.
          */
         public final boolean equals(Object obj) {
-            // FIXME ... this method will throw exceptions where a well-behaved implementation 
-            // of 'equals' should return false; i.e. if obj is null or not a Key.
+            if(obj==null || !(obj instanceof Key)){
+                return false;
+            }
             obj = ((Key) obj).key;
             if (this.key instanceof Label) {
                 return key.equals(obj);
