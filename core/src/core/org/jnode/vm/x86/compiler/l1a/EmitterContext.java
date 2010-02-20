@@ -34,7 +34,7 @@ final class EmitterContext {
     /**
      * The output stream
      */
-    private final X86Assembler os;
+    private X86Assembler os;
 
     /**
      * Helper class
@@ -64,7 +64,7 @@ final class EmitterContext {
     /**
      * The compiler context
      */
-    private final EntryPoints context;
+    private EntryPoints context;
 
     /**
      * Create a new context
@@ -87,6 +87,13 @@ final class EmitterContext {
         this.xmmPool = xmmPool;
         this.itemfac = ifac;
         this.context = context;
+    }
+
+    public void reset(X86Assembler os, EntryPoints entryPoints) {
+        this.os = os;
+        this.context = entryPoints;
+        gprPool.reset(os);
+        xmmPool.reset(os);        
     }
 
     /**

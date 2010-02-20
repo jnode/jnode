@@ -111,12 +111,12 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
     /**
      * The destination compiled method
      */
-    private final CompiledMethod cm;
+    private CompiledMethod cm;
 
     /**
      * Current context
      */
-    private final EntryPoints context;
+    private EntryPoints context;
 
     /**
      * Bytecode Address of current instruction
@@ -156,7 +156,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
     /**
      * Emit logging info
      */
-    private final boolean log;
+    private boolean log;
 
     /**
      * Maximum number of local variable slots
@@ -166,7 +166,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
     /**
      * The output stream
      */
-    private final X86Assembler os;
+    private X86Assembler os;
 
     /**
      * Should we set the current instruction label on startInstruction?
@@ -201,7 +201,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
     /**
      * Magic method compiler
      */
-    private final MagicHelper magicHelper;
+    private MagicHelper magicHelper;
 
     /**
      * FP instruction compiler
@@ -211,7 +211,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
     /**
      * Type size information
      */
-    private final TypeSizeInfo typeSizeInfo;
+    private TypeSizeInfo typeSizeInfo;
 
     /**
      * Current inline depth (starting at 0)
@@ -248,6 +248,11 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
     private final CounterGroup counters = Vm.getVm().getCounterGroup(getClass().getName());
 
     /**
+     * It is true while the compilation of a method is in progress.
+     */
+    private boolean working;
+
+    /**
      * Create a new instance
      *
      * @param outputStream
@@ -264,7 +269,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
         this.context = context;
         this.typeSizeInfo = typeSizeInfo;
         this.magicHelper = magicHelper;
-        this.vstack = new VirtualStack(os);
+        this.vstack = new VirtualStack();
         final X86RegisterPool gprPool;
         final X86RegisterPool xmmPool;
         if (os.isCode32()) {
@@ -275,8 +280,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
             xmmPool = new X86RegisterPool.XMMs64();
         }
         this.ifac = ItemFactory.getFactory();
-        final AbstractX86StackManager stackMgr = vstack.createStackMgr(gprPool,
-            ifac);
+        final AbstractX86StackManager stackMgr = vstack.createStackMgr(gprPool, ifac);
         this.helper = new X86CompilerHelper(os, stackMgr, context, isBootstrap);
         this.cm = cm;
         final int slotSize = helper.SLOTSIZE;
@@ -284,11 +288,24 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
         this.arrayDataOffset = VmArray.DATA_OFFSET * slotSize;
         this.tibOffset = ObjectLayout.TIB_SLOT * slotSize;
         this.log = os.isLogEnabled();
-        this.eContext = new EmitterContext(os, helper, vstack, gprPool,
-            xmmPool, ifac, context);
+        this.eContext = new EmitterContext(os, helper, vstack, gprPool, xmmPool, ifac, context);
         vstack.initializeStackMgr(stackMgr, eContext);
         // TODO check for SSE support and switch to SSE compiler if available
         this.fpCompiler = new FPCompilerFPU(this, os, eContext, vstack, arrayDataOffset);
+    }
+
+    public void reset(NativeStream os, CompiledMethod cm, boolean bootstrap, EntryPoints entryPoints,
+                      MagicHelper magicHelper, TypeSizeInfo typeSizeInfo) {
+        this.os = (X86Assembler) os;
+        this.cm = cm;
+        this.context = entryPoints;
+        this.magicHelper = magicHelper;
+        this.typeSizeInfo = typeSizeInfo;
+        this.log = this.os.isLogEnabled();
+        this.vstack.reset(eContext);
+        this.helper.reset((X86Assembler) os, entryPoints);
+        this.eContext.reset((X86Assembler) os, entryPoints);
+        this.fpCompiler.reset((X86Assembler) os);
     }
 
     private void assertCondition(boolean cond, String message) {
@@ -639,7 +656,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
     /**
      * @see org.jnode.vm.bytecode.BytecodeVisitor#endMethod()
      */
-    public void endMethod() {
+    public synchronized void endMethod() {
         stackFrame.emitTrailer(typeSizeInfo, maxLocals);
         if (ItemFactory.CHECK_BALANCED_ITEM_FACTORY) {
             if (!ifac.isBalanced()) {
@@ -647,6 +664,11 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
                 ifac.balance();
             }
         }
+        working = false;
+    }
+
+    public synchronized boolean isWorking() {
+        return working;
     }
 
     /**
@@ -1142,7 +1164,8 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
      * @param method
      * @see org.jnode.vm.bytecode.BytecodeVisitor#startMethod(org.jnode.vm.classmgr.VmMethod)
      */
-    public void startMethod(VmMethod method) {
+    public synchronized void startMethod(VmMethod method) {
+        working = true;
         if (debug) {
             BootLog.debug("setMethod(" + method + ")");
         }

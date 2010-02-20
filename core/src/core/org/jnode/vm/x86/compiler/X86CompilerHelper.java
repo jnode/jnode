@@ -103,7 +103,7 @@ public class X86CompilerHelper {
      */
     public final int SLOTSIZE;
 
-    private final EntryPoints entryPoints;
+    private EntryPoints entryPoints;
 
     private VmMethod method;
 
@@ -119,7 +119,7 @@ public class X86CompilerHelper {
 
     private final AbstractX86StackManager stackMgr;
 
-    private final X86Assembler os;
+    private X86Assembler os;
 
     private final Map<VmType<?>, Label> classInitLabels = new HashMap<VmType<?>, Label>();
 
@@ -157,6 +157,11 @@ public class X86CompilerHelper {
         this.stackMgr = stackMgr;
         final X86CpuID cpuId = (X86CpuID) os.getCPUID();
         haveCMOV = cpuId.hasFeature(X86CpuID.FEAT_CMOV);
+    }
+
+    public void reset(X86Assembler x86Assembler, EntryPoints entryPoints) {
+        this.os = x86Assembler;
+        this.entryPoints = entryPoints;
     }
 
     /**

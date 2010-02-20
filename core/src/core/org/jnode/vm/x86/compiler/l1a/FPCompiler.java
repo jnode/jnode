@@ -32,7 +32,7 @@ import org.jnode.vm.JvmType;
 abstract class FPCompiler {
 
     protected final X86BytecodeVisitor bcv;
-    protected final X86Assembler os;
+    protected X86Assembler os;
     protected final EmitterContext ec;
     protected final VirtualStack vstack;
     protected final int arrayDataOffset;
@@ -83,6 +83,11 @@ abstract class FPCompiler {
         this.ec = ec;
         this.vstack = vstack;
         this.arrayDataOffset = arrayDataOffset;
+    }
+
+    void reset(X86Assembler os) {
+        this.os = os;
+        vstack.reset(ec);
     }
 
     /**
