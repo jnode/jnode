@@ -32,6 +32,7 @@ import org.jnode.vm.compiler.IllegalModeException;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class ItemFactory {
+    public static final boolean CHECK_BALANCED_ITEM_FACTORY = true;
 
     private static ThreadLocal itemFactory = new ThreadLocal();
 
@@ -47,7 +48,9 @@ final class ItemFactory {
 
     private int createCount = 0;
 
-    protected int releaseCount = 0;
+    private int getOrCreateCount = 0;
+
+    private int releaseCount = 0;
 
     /**
      * Create a constant item
@@ -217,7 +220,9 @@ final class ItemFactory {
      */
     @SuppressWarnings("unchecked")
     final <T extends Item> void release(T item) {
-        releaseCount++;
+        if (CHECK_BALANCED_ITEM_FACTORY) {
+            releaseCount++;
+        }
         if (Vm.VerifyAssertions) {
             Vm._assert(item.getKind() == 0, "Item is not yet released");
         }
@@ -240,6 +245,9 @@ final class ItemFactory {
      * @return
      */
     private Item getOrCreate(int jvmType) {
+        if (CHECK_BALANCED_ITEM_FACTORY) {
+            getOrCreateCount++;
+        }
         final ArrayList<? extends Item> list = getList(jvmType);
         final Item item;
         if (list.isEmpty()) {
@@ -282,7 +290,9 @@ final class ItemFactory {
      * @return
      */
     private Item createNew(int jvmType) {
-        createCount++;
+        if (CHECK_BALANCED_ITEM_FACTORY) {
+            createCount++;
+        }
         switch (jvmType) {
             case JvmType.INT:
                 return new IntItem(this);
@@ -316,5 +326,13 @@ final class ItemFactory {
             itemFactory.set(fac);
         }
         return fac;
+    }
+
+    boolean isBalanced() {
+        return getOrCreateCount == releaseCount;
+    }
+
+    void balance() {
+        getOrCreateCount = releaseCount = 0;
     }
 }

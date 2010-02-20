@@ -653,6 +653,17 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
      */
     public void endMethod() {
         stackFrame.emitTrailer(typeSizeInfo, maxLocals);
+        //release constant local items
+        for (Item item : constLocals.values())
+            item.release(eContext);
+        // Clear all constant locals
+        constLocals.clear();
+        if (ItemFactory.CHECK_BALANCED_ITEM_FACTORY) {
+            if (!ifac.isBalanced()) {
+                System.out.println("WARNING: unbalanced item handling in " + currentMethod.getFullName());
+                ifac.balance();
+            }
+        }
     }
 
     /**
