@@ -20,8 +20,6 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.x86.X86Assembler;
@@ -219,16 +217,6 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
      * Current inline depth (starting at 0)
      */
     private byte inlineDepth;
-
-    /**
-     * Register used by wstore (see xloadStored methods)
-     */
-    private GPR wstoreReg;
-
-    /**
-     * Constant values that are stored in local variables
-     */
-    private Map<Integer, Item> constLocals = new HashMap<Integer, Item>();
 
     /**
      * The current basic block
@@ -653,11 +641,6 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
      */
     public void endMethod() {
         stackFrame.emitTrailer(typeSizeInfo, maxLocals);
-        //release constant local items
-        for (Item item : constLocals.values())
-            item.release(eContext);
-        // Clear all constant locals
-        constLocals.clear();
         if (ItemFactory.CHECK_BALANCED_ITEM_FACTORY) {
             if (!ifac.isBalanced()) {
                 System.out.println("WARNING: unbalanced item handling in " + currentMethod.getFullName());
@@ -1081,12 +1064,6 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
         // Push the items on the vstack the result from a previous basic block.
         final TypeStack tstack = bb.getStartStack();
         vstack.pushAll(ifac, tstack);
-
-        //release constant local items
-        for (Item item : constLocals.values())
-            item.release(eContext);
-        // Clear all constant locals
-        constLocals.clear();
 
         if (debug) {
             BootLog.debug("-- VStack: " + vstack.toString());
@@ -2502,11 +2479,6 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
         } else {
             os.writeADD(BITS32, helper.BP, ebpOfs, incValue);
         }
-
-        // Local no longer constant
-        Item item = constLocals.remove(index);
-        if (item != null)
-            item.release(eContext);
     }
 
     /**
@@ -4344,16 +4316,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
      * @param index
      */
     private void wload(int jvmType, int index, boolean useStored) {
-        Item constValue = constLocals.get(index);
-        if (constValue != null) {
-            counters.getCounter("const-local").inc();
-            vstack.push(constValue.clone(eContext));
-        } else if (false && useStored && (wstoreReg != null)) {
-            vstack.push(L1AHelper.requestWordRegister(eContext, jvmType, wstoreReg));
-        } else {
-            vstack.push(ifac.createLocal(jvmType, stackFrame
-                .getEbpOffset(typeSizeInfo, index)));
-        }
+        vstack.push(ifac.createLocal(jvmType, stackFrame.getEbpOffset(typeSizeInfo, index)));
     }
 
     /**
@@ -4390,25 +4353,12 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
      */
     private void wstore(int jvmType, int index) {
         final int disp = stackFrame.getEbpOffset(typeSizeInfo, index);
-        wstoreReg = null;
-
         // Pin down (load) other references to this local
         vstack.loadLocal(eContext, disp);
 
         // Load
         final WordItem val = (WordItem) vstack.pop(jvmType);
         final boolean vconst = val.isConstant();
-        if (vconst) {
-            // Store constant locals
-            Item item = constLocals.put(index, val.clone(eContext));
-            if (item != null)
-                item.release(eContext);
-        } else {
-            // Not constant anymore, remove it
-            Item item = constLocals.remove(index);
-            if (item != null)
-                item.release(eContext);
-        }
         if (vconst && (jvmType == JvmType.INT)) {
             if (localEscapesBasicBlock(index)) {
                 // Store constant int
@@ -4443,7 +4393,6 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
             final GPR valr = val.getRegister();
             // Store
             os.writeMOV(valr.getSize(), helper.BP, disp, valr);
-            wstoreReg = valr;
         }
 
         // Release
