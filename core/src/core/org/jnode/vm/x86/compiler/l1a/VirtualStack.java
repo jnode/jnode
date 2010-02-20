@@ -20,7 +20,6 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
-import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
@@ -55,9 +54,8 @@ final class VirtualStack {
 
     /**
      * Constructor; create and initialize stack with default size
-     * @param os
      */
-    VirtualStack(X86Assembler os) {
+    VirtualStack() {
         this.operandStack = checkOperandStack ? new ItemStack(Item.Kind.STACK, Integer.MAX_VALUE) : null;
         stack = new Item[8];
         tos = 0;
