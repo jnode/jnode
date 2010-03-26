@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
@@ -105,7 +105,7 @@ public class PrimaryVolumeDescriptor extends VolumeDescriptor {
                 this.getRootDirectoryEntry().getLengthOfExtendedAttribute());
         out.println("\t\t- Location of the extent: " +
                 this.getRootDirectoryEntry().getLocationOfExtent());
-        //out.println(" - Length of the file identifier: " +
+        // out.println(" - Length of the file identifier: " +
         // this.getRootDirectoryEntry().getLengthOfFileIdentifier());
         out.println("\t\t- is directory: " + this.getRootDirectoryEntry().isDirectory());
         out.println("\t\t- File identifier: " + this.getRootDirectoryEntry().getFileIdentifier());
@@ -196,5 +196,9 @@ public class PrimaryVolumeDescriptor extends VolumeDescriptor {
      */
     public String getVolumeIdentifier() {
         return volumeIdentifier;
+    }
+
+    public long getSize() {
+        return this.getSpaceSize() * this.getLBSize();
     }
 }

@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.iso9660;
 
 import java.io.PrintStream;
@@ -45,7 +45,7 @@ public class SupplementaryVolumeDescriptor extends VolumeDescriptor {
      * @param buffer
      */
     public SupplementaryVolumeDescriptor(ISO9660Volume volume, byte[] buffer)
-        throws UnsupportedEncodingException {
+            throws UnsupportedEncodingException {
         super(volume, buffer);
         this.flags = getUInt8(buffer, 8);
         this.escapeSequences = getDChars(buffer, 89, 121 - 89);
@@ -71,8 +71,8 @@ public class SupplementaryVolumeDescriptor extends VolumeDescriptor {
     public void dump(PrintStream out) {
         out.println("Supplementary Volume Descriptor");
         out.println("\tFlags             " + flags);
-        //out.println("\tEscape sequences  " + escapeSequences);
-        //out.println("\tEncoding          " + encoding);
+        // out.println("\tEscape sequences  " + escapeSequences);
+        // out.println("\tEncoding          " + encoding);
         out.println("\tSystemIdentifier  " + systemIdentifier);
         out.println("\tVolumeIdentifier  " + volumeIdentifier);
         out.println("\tVolume Space Size " + spaceSize);
@@ -115,6 +115,7 @@ public class SupplementaryVolumeDescriptor extends VolumeDescriptor {
 
     /**
      * Gets a derived encoding name from the given escape sequences.
+     * 
      * @param escapeSequences
      * @return the encoding name
      */
@@ -136,6 +137,7 @@ public class SupplementaryVolumeDescriptor extends VolumeDescriptor {
 
     /**
      * Is the used encoding known to this system.
+     * 
      * @return {@code true} if the encoding known, otherwise {@code false}.
      */
     public final boolean isEncodingKnown() {
@@ -155,4 +157,5 @@ public class SupplementaryVolumeDescriptor extends VolumeDescriptor {
     public final EntryRecord getRootDirectoryEntry() {
         return this.rootDirectoryEntry;
     }
+
 }

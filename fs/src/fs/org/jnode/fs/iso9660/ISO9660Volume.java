@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
@@ -118,5 +118,17 @@ public class ISO9660Volume implements ISO9660Constants {
         } else {
             return primaryVolumeDescriptor.getRootDirectoryEntry();
         }
+    }
+
+    public PrimaryVolumeDescriptor getPrimaryVolumeDescriptor() {
+        return primaryVolumeDescriptor;
+    }
+
+    public SupplementaryVolumeDescriptor getSupplementaryVolumeDescriptor() {
+        return supplementaryVolumeDescriptor;
+    }
+
+    public long getSize() {
+        return primaryVolumeDescriptor.getSize();
     }
 }

@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
@@ -43,7 +43,7 @@ public class ISO9660FileSystem extends AbstractFileSystem<ISO9660Entry> {
      * @see org.jnode.fs.FileSystem#getDevice()
      */
     public ISO9660FileSystem(Device device, boolean readOnly, ISO9660FileSystemType type)
-        throws FileSystemException {
+            throws FileSystemException {
         super(device, readOnly, type);
 
         try {
@@ -108,17 +108,14 @@ public class ISO9660FileSystem extends AbstractFileSystem<ISO9660Entry> {
     }
 
     public long getFreeSpace() {
-        // TODO implement me
-        return -1;
+        return 0;
     }
 
     public long getTotalSpace() {
-        // TODO implement me
-        return -1;
+        return volume.getSize();
     }
 
     public long getUsableSpace() {
-        // TODO implement me
-        return -1;
+        return volume.getSize();
     }
 }
