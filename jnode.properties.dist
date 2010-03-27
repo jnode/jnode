@@ -17,6 +17,9 @@
 # jar packager (tool to easily create a jnode plugin from a regular jar file)
 # user.applications.dir = ${root.dir}/local/applications/
 
+# The jar packager adds the user plugins to the plugin list specified here.
+# target.plugin.list=default
+
 # -----------------------------------------------
 # Settings for the bootdisk image
 
