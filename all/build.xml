@@ -502,7 +502,7 @@
             pluginDir="${plugins.dir}"
             systemPluginList="${root.dir}/all/conf/system-plugin-list.xml">
             <insert userApplicationsDir="${user.applications.dir}"/>
-                    	
+
             <fileset dir="${root.dir}/all/conf">
                 <exclude name="system-plugin-list.xml"/>
                 <include name="*plugin-list.xml"/>
@@ -517,6 +517,7 @@
         <initjars destdir="${initjars.dir}"
             pluginDir="${plugins.dir}"
             systemPluginList="${root.dir}/all/conf/system-plugin-list.xml">
+            <insert userApplicationsDir="${user.applications.dir}"/>
             <fileset dir="${custom.plugin-list.dir}">
                 <include name="*plugin-list.xml"/>
             </fileset>
