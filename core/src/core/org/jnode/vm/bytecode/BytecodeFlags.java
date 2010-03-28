@@ -31,4 +31,5 @@ public interface BytecodeFlags {
     public static final byte F_START_OF_EXCEPTIONHANDLER = 0x08;
     public static final byte F_START_OF_INSTRUCTION = 0x10;
     public static final byte F_YIELDPOINT = 0x20;
+    public static final byte F_RET_TARGET = 0x40;
 }
