@@ -499,7 +499,6 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
                 code.setNext(this.compiledCode);
                 this.compiledCode = code;
                 this.nativeCode = code.getNativeCode();
-                this.compiledCode = code;
                 Vm.getVm().getSharedStatics().setMethodCode(
                     getSharedStaticsIndex(), code.getNativeCode());
                 this.nativeCodeOptLevel = (short) optLevel;
