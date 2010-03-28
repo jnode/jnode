@@ -240,38 +240,49 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
     protected CompiledMethod doCompile(VmMethod method, NativeStream os,
                                        int level, boolean isBootstrap) {
         final CompiledMethod cm = new CompiledMethod(level);
-        if (method.isNative()) {
-            Object label = new Label(method.getMangledName());
-            cm.setCodeStart(os.getObjectRef(label));
-        } else {
-            // Create the visitor
-            CompilerBytecodeVisitor bcv = createBytecodeVisitor(method,
-                cm, os, level, isBootstrap);
-            // Wrap in verifier if needed
-            if (!(bcv instanceof VerifyingCompilerBytecodeVisitor)) {
-                bcv = new VerifyingCompilerBytecodeVisitor<CompilerBytecodeVisitor>(bcv);
-            }
-            // Get the bytecode
-            final VmByteCode bc = method.getBytecode();
-            // Create the control flow graph
-            ControlFlowGraph cfg = (ControlFlowGraph) bc.getCompilerData();
-            if (cfg == null) {
-                cfg = new ControlFlowGraph(bc);
-                bc.setCompilerData(cfg);
-            }
-            // Compile the code 1 basic block at a time
-            final CompilerBytecodeParser parser = new CompilerBytecodeParser(
-                bc, cfg, bcv);
-            bcv.startMethod(method);
-            for (BasicBlock bb : cfg) {
-                bcv.startBasicBlock(bb);
-                parser.parse(bb.getStartPC(), bb.getEndPC(), false);
-                bcv.endBasicBlock();
-            }
-            bcv.endMethod();
+        try {
+            if (method.isNative()) {
+                Object label = new Label(method.getMangledName());
+                cm.setCodeStart(os.getObjectRef(label));
+            } else {
+                // Create the visitor
+                CompilerBytecodeVisitor bcv = getBytecodeVisitor(method, cm, os, level, isBootstrap);
 
-            //remove the compiler data to save memory, will be regenerated if needed
-            bc.setCompilerData(null);
+                try {
+                    // Wrap in verifier if needed
+                    if (!(bcv instanceof VerifyingCompilerBytecodeVisitor)) {
+                        bcv = new VerifyingCompilerBytecodeVisitor<CompilerBytecodeVisitor>(bcv);
+                    }
+                    // Get the bytecode
+                    final VmByteCode bc = method.getBytecode();
+                    // Create the control flow graph
+                    ControlFlowGraph cfg = (ControlFlowGraph) bc.getCompilerData();
+                    if (cfg == null) {
+                        cfg = new ControlFlowGraph(bc);
+                        bc.setCompilerData(cfg);
+                    }
+                    // Compile the code 1 basic block at a time
+                    final CompilerBytecodeParser parser = new CompilerBytecodeParser(bc, cfg, bcv);
+                    bcv.startMethod(method);
+                    for (BasicBlock bb : cfg) {
+                        bcv.startBasicBlock(bb);
+                        parser.parse(bb.getStartPC(), bb.getEndPC(), false);
+                        bcv.endBasicBlock();
+                    }
+                    bcv.endMethod();
+
+                    //remove the compiler data to save memory, will be regenerated if needed
+                    bc.setCompilerData(null);
+                } finally {
+                    releaseBytecodeVisitor(bcv);
+                }
+            }
+        } catch (RuntimeException x) {
+            System.err.println("ERROR in compilation of " + method.getFullName());
+            throw x;
+        } catch (Error x) {
+            System.err.println("ERROR in compilation of " + method.getFullName());
+            throw x;
         }
 
         return cm;
@@ -286,8 +297,8 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
      * @param isBootstrap
      * @return The compiled method
      */
-    protected abstract CompiledMethod doCompileAbstract(VmMethod method,
-                                                        NativeStream os, int level, boolean isBootstrap);
+    protected abstract CompiledMethod doCompileAbstract(VmMethod method, NativeStream os, int level,
+                                                        boolean isBootstrap);
 
     /**
      * Create the visitor that converts bytecodes into native code.
@@ -299,10 +310,17 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
      * @param isBootstrap
      * @return The new bytecode visitor.
      */
-    protected abstract CompilerBytecodeVisitor createBytecodeVisitor(
-        VmMethod method, CompiledMethod cm, NativeStream os, int level,
-        boolean isBootstrap);
+    protected abstract CompilerBytecodeVisitor createBytecodeVisitor(VmMethod method, CompiledMethod cm,
+                                                                     NativeStream os, int level, boolean isBootstrap);
 
+    protected CompilerBytecodeVisitor getBytecodeVisitor(VmMethod method, CompiledMethod cm, NativeStream os, 
+                                                         int level, boolean isBootstrap) {
+        return createBytecodeVisitor(method, cm, os, level, isBootstrap);
+    }
+
+    protected void releaseBytecodeVisitor(CompilerBytecodeVisitor visitor) {
+
+    }
     /**
      * Initialize this compiler
      *

@@ -20,8 +20,6 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.X86BinaryAssembler;
@@ -96,8 +94,6 @@ public final class X86Level1ACompiler extends AbstractX86Compiler {
 
     private final ThreadLocal<X86BytecodeVisitor> byteCodeVisitorHolder = new ThreadLocal<X86BytecodeVisitor>();
 
-    private final ThreadLocal<List<X86BytecodeVisitor>> byteCodeVisitorListHolder =
-        new ThreadLocal<List<X86BytecodeVisitor>>();
     /**
      * Create the visitor that converts bytecodes into native code.
      *
@@ -115,37 +111,14 @@ public final class X86Level1ACompiler extends AbstractX86Compiler {
         final EntryPoints entryPoints = getEntryPoints();
         X86BytecodeVisitor byteCodeVisitor = byteCodeVisitorHolder.get();
         if (byteCodeVisitor == null) {
-            byteCodeVisitor = new X86BytecodeVisitor(os, cm, isBootstrap, entryPoints,
-                getMagicHelper(), getTypeSizeInfo());
-            byteCodeVisitorHolder.set(byteCodeVisitor);
+            byteCodeVisitor = new X86BytecodeVisitor(os, cm, isBootstrap, entryPoints, getMagicHelper(),
+                getTypeSizeInfo());
         } else {
-            if (byteCodeVisitor.isWorking()) {
-                //slow path
-                List<X86BytecodeVisitor> vlist = byteCodeVisitorListHolder.get();
-                if (vlist == null) {
-                    vlist = new ArrayList<X86BytecodeVisitor>();
-                    byteCodeVisitorListHolder.set(vlist);
-                }
-                byteCodeVisitor = null;
-                for (X86BytecodeVisitor bv : vlist) {
-                    if (!bv.isWorking()) {
-                        byteCodeVisitor = bv;
-                        break;
-                    }
-                }
-                if (byteCodeVisitor == null) {
-                    byteCodeVisitor = new X86BytecodeVisitor(os, cm, isBootstrap, entryPoints,
-                        getMagicHelper(), getTypeSizeInfo());
-                    vlist.add(byteCodeVisitor);
-                } else {
-                    byteCodeVisitor.reset(os, cm, isBootstrap, entryPoints, getMagicHelper(), getTypeSizeInfo());
-                }
-            } else {            
-                byteCodeVisitor.reset(os, cm, isBootstrap, entryPoints, getMagicHelper(), getTypeSizeInfo());
-            }
+            byteCodeVisitorHolder.remove();
+            byteCodeVisitor.reset(os, cm, isBootstrap, entryPoints, getMagicHelper(), getTypeSizeInfo());            
         }
         cbv = byteCodeVisitor;
-        if (inlineMethods /*&& ((X86Assembler)os).isCode32()*/) {
+        if (inlineMethods) {
             final VmClassLoader loader = method.getDeclaringClass().getLoader();
             return new OptimizingBytecodeVisitor(entryPoints, cbv, loader);
         } else {
@@ -153,7 +126,18 @@ public final class X86Level1ACompiler extends AbstractX86Compiler {
         }
     }
 
-    private final MagicHelper getMagicHelper() {
+    @Override
+    protected synchronized void releaseBytecodeVisitor(CompilerBytecodeVisitor visitor) {
+        X86BytecodeVisitor bv;
+        if (inlineMethods) {
+            bv = (X86BytecodeVisitor) ((OptimizingBytecodeVisitor) visitor).getDelegate();
+        } else {
+            bv = (X86BytecodeVisitor) visitor;
+        }
+        byteCodeVisitorHolder.set(bv);
+    }
+
+    private MagicHelper getMagicHelper() {
         final MagicHelper helper = magicHelperHolder.get();
         if (helper != null) {
             return helper;
