@@ -27,6 +27,7 @@ import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
+import org.jnode.vm.bytecode.StackException;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
 /**
@@ -186,7 +187,22 @@ public abstract class WordItem extends Item {
                 break;
 
             case Kind.STACK:
-                // TODO: make sure this is on top os stack
+                // TODO: make sure 'this' is on top of stack
+                // TODO: implemen it for 64 bits
+                if (!stack.operandStack.isTos(this)) {
+
+                    int stack_loc = stack.operandStack.stackLocation(this);
+                    if (stack_loc < 0)
+                        throw new StackException("Item not found on stack");
+
+                    stack.operandStack.makeTop(stack_loc);
+
+                    //todo test it
+                    os.writeMOV(org.jnode.vm.x86.compiler.X86CompilerConstants.BITS32, reg, helper.SP, helper.SLOTSIZE);
+                    os.writeXCHG(helper.SP, org.jnode.vm.x86.compiler.X86CompilerConstants.BITS32 * stack_loc, reg);
+                    os.writeMOV(org.jnode.vm.x86.compiler.X86CompilerConstants.BITS32, helper.SP, helper.SLOTSIZE, reg);
+                }
+
                 if (VirtualStack.checkOperandStack) {
                     stack.operandStack.pop(this);
                 }

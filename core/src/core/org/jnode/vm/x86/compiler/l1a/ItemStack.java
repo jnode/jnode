@@ -26,6 +26,7 @@ import org.jnode.vm.bytecode.StackException;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Levente S\u00e1ntha
  */
 class ItemStack {
 
@@ -127,6 +128,36 @@ class ItemStack {
             throw new StackException("Stack is empty");
         }
         return (stack[tos - 1] == item);
+    }
+
+    /**
+     * Finds the position of the specified item on the stack starting from the top.
+     *
+     * @param item the item to find
+     * @return the position of the item or -1 if not found
+     */
+    final int stackLocation(Item item) {
+        int ret = -1;
+
+        int i = tos - 1;
+        while ((i >= 0) && (stack[i] != item))
+            i--;
+
+        if (i >= 0)
+            ret = tos - 1 - i;
+
+        return ret;
+    }
+
+    /**
+     * Exchanges the item at the specified position with the top item.
+     *
+     * @param pos the position of the item
+     */
+    final void makeTop(int pos) {
+        Item tmp = stack[tos - 1];
+        stack[tos - 1] = stack[tos - 1 - pos];
+        stack[tos - 1 - pos] = tmp;
     }
 
     final void pop(EmitterContext ec) {
