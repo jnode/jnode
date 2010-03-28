@@ -33,12 +33,14 @@ import java.util.HashSet;
  *
  * @author epr
  * @author Madhu Siddalingaiah
+ * @author Levente S\u00e1ntha
  */
 public class BasicBlock extends VmSystemObject {
 
     private final int startPC;
     private int endPC;
     private boolean startOfExceptionHandler;
+    private boolean retTarget;
     private TypeStack startStack;
     private BootableArrayList<BasicBlock> entryBlocks = new BootableArrayList<BasicBlock>();
 
@@ -85,6 +87,10 @@ public class BasicBlock extends VmSystemObject {
      */
     public final void setStartOfExceptionHandler(boolean startOfExceptionHandler) {
         this.startOfExceptionHandler = startOfExceptionHandler;
+    }
+
+    public void setRetTarget(boolean retTarget) {
+        this.retTarget = retTarget;
     }
 
     /**
@@ -188,6 +194,12 @@ public class BasicBlock extends VmSystemObject {
 
     private boolean isLive(Set<BasicBlock> checked) {
         if (startPC == 0)
+            return true;
+
+        if (startOfExceptionHandler)
+            return true;
+
+        if (retTarget)
             return true;
 
         if (entryBlocks != null) {
