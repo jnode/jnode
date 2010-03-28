@@ -313,11 +313,21 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
     protected abstract CompilerBytecodeVisitor createBytecodeVisitor(VmMethod method, CompiledMethod cm,
                                                                      NativeStream os, int level, boolean isBootstrap);
 
+    /**
+     * Returns an unused or newly created byte code visitor.
+     * @see #createBytecodeVisitor(org.jnode.vm.classmgr.VmMethod, CompiledMethod, org.jnode.assembler.NativeStream,
+     * int, boolean)
+     */
     protected CompilerBytecodeVisitor getBytecodeVisitor(VmMethod method, CompiledMethod cm, NativeStream os, 
                                                          int level, boolean isBootstrap) {
         return createBytecodeVisitor(method, cm, os, level, isBootstrap);
     }
 
+    /**
+     * Call this method when the specified bytecode visitor finished working.
+     *
+     * @param visitor a bytecode visitor
+     */
     protected void releaseBytecodeVisitor(CompilerBytecodeVisitor visitor) {
 
     }
