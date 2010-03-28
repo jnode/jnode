@@ -978,34 +978,7 @@ public final class ClassDecoder {
                         Class r_class;
                         VmType vtm = mts.getReturnType();
                         if (vtm.isPrimitive()) {
-                            switch (vtm.getJvmType()) {
-                                case JvmType.BOOLEAN:
-                                    vtm = VmType.fromClass(Boolean.class);
-                                    break;
-                                case JvmType.BYTE:
-                                    vtm = VmType.fromClass(Byte.class);
-                                    break;
-                                case JvmType.SHORT:
-                                    vtm = VmType.fromClass(Short.class);
-                                    break;
-                                case JvmType.CHAR:
-                                    vtm = VmType.fromClass(Character.class);
-                                    break;
-                                case JvmType.INT:
-                                    vtm = VmType.fromClass(Integer.class);
-                                    break;
-                                case JvmType.FLOAT:
-                                    vtm = VmType.fromClass(Float.class);
-                                    break;
-                                case JvmType.LONG:
-                                    vtm = VmType.fromClass(Long.class);
-                                    break;
-                                case JvmType.DOUBLE:
-                                    vtm = VmType.fromClass(Double.class);
-                                    break;
-
-                            }
-                            r_class = vtm.asClass();
+                            r_class = getClassForJvmType(vtm.getJvmType());
                         } else {
                             try {
                                 r_class = Class.forName(vtm.getName(), false, vtm.getLoader().asClassLoader());
@@ -1014,7 +987,7 @@ public final class ClassDecoder {
                             }
                         }
                         Object defo = AnnotationParser.parseMemberValue(r_class, data, new VmConstantPool(cls),
-                            cls.asClass());
+                            org.jnode.vm.Vm.isRunningVm() ? cls.asClass() : cls.asClassDuringBootstrap());
                         mts.setAnnotationDefault(defo);
                     } else {
                         skip(data, length);
@@ -1043,6 +1016,31 @@ public final class ClassDecoder {
                 }
             }
             cls.setMethodTable(mtable);
+        }
+    }
+
+    private static Class getClassForJvmType(int type) {
+        switch (type) {
+            case JvmType.BOOLEAN:
+                return boolean.class;
+            case JvmType.BYTE:
+                return byte.class;
+            case JvmType.SHORT:
+                return short.class;
+            case JvmType.CHAR:
+                return char.class;
+            case JvmType.INT:
+                return int.class;
+            case JvmType.FLOAT:
+                return float.class;
+            case JvmType.LONG:
+                return long.class;
+            case JvmType.DOUBLE:
+                return double.class;
+            case JvmType.VOID:
+                return void.class;
+            default:
+                throw new IllegalArgumentException("Invalid JVM type: " + type);
         }
     }
 
@@ -1226,34 +1224,7 @@ public final class ClassDecoder {
                     Class r_class;
                     VmType vtm = mts.getReturnType();
                     if (vtm.isPrimitive()) {
-                        switch (vtm.getJvmType()) {
-                            case JvmType.BOOLEAN:
-                                vtm = VmType.fromClass(Boolean.class);
-                                break;
-                            case JvmType.BYTE:
-                                vtm = VmType.fromClass(Byte.class);
-                                break;
-                            case JvmType.SHORT:
-                                vtm = VmType.fromClass(Short.class);
-                                break;
-                            case JvmType.CHAR:
-                                vtm = VmType.fromClass(Character.class);
-                                break;
-                            case JvmType.INT:
-                                vtm = VmType.fromClass(Integer.class);
-                                break;
-                            case JvmType.FLOAT:
-                                vtm = VmType.fromClass(Float.class);
-                                break;
-                            case JvmType.LONG:
-                                vtm = VmType.fromClass(Long.class);
-                                break;
-                            case JvmType.DOUBLE:
-                                vtm = VmType.fromClass(Double.class);
-                                break;
-
-                        }
-                        r_class = vtm.asClass();
+                        r_class = getClassForJvmType(vtm.getJvmType());
                     } else {
                         try {
                             r_class = vtm.getLoader().asClassLoader().loadClass(vtm.getName());
