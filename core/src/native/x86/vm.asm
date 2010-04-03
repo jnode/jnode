@@ -113,7 +113,7 @@ vm_print_string_ret:
 	ret
 
 ; -----------------------------------------------
-; Print a char array who's reference is in EAX
+; Print a char array whose reference is in EAX
 ; -----------------------------------------------
 vm_print_chararray:
 	SPINLOCK_ENTER console_lock
