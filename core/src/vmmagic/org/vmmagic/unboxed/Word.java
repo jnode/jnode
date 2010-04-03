@@ -20,12 +20,10 @@ import org.jnode.annotation.Uninterruptible;
  * <p/>
  * <u>JNode specific notes</u> : This class contains some "magic"
  * methods that are interpreted by the VM itself, instead of being executed
- * as normal java methods.  The actual method bodies are not used. <br/>
- * For further details, see the  
- * {@link org.jnode.vm.compiler.BaseMagicHelper.MagicClass list of "magic" classes} 
- * and the 
- * {@link org.jnode.vm.compiler.BaseMagicHelper.MagicMethod list of "magic" methods}.
- * 
+ * as normal java methods.  <b>The actual method bodies are never used</b>.
+ * @see {@link org.jnode.classmgr.VmType VmType} to get the list of "magic" classes
+ * @see {@link org.jnode.vm.compiler.BaseMagicHelper.MagicMethod MagicMethod}
+ * to get the list of "magic" methods
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Daniel Frampton
  * @see Address

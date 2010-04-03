@@ -23,7 +23,13 @@ import org.vmmagic.pragma.Uninterruptible;
  * distinction between objects the VM is written in, and objects that the VM is
  * managing. No operations that can not be completed in pure Java should be
  * allowed on Object.
- * 
+ * <br/><br/>
+ * <u>JNode specific notes</u> : This class contains some "magic"
+ * methods that are interpreted by the VM itself, instead of being executed
+ * as normal java methods.  <b>The actual method bodies are never used</b>.
+ * @see {@link org.jnode.classmgr.VmType VmType} to get the list of "magic" classes
+ * @see {@link org.jnode.vm.compiler.BaseMagicHelper.MagicMethod MagicMethod}
+ * to get the list of "magic" methods
  * @author Daniel Frampton
  */
 public final class ObjectReference implements Uninterruptible {
