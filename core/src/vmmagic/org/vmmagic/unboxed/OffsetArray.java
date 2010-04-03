@@ -14,8 +14,12 @@
 package org.vmmagic.unboxed;
 
 /**
- * Commenting required
- * 
+ * <u>JNode specific notes</u> : This class contains some "magic"
+ * methods that are interpreted by the VM itself, instead of being executed
+ * as normal java methods.  <b>The actual method bodies are never used</b>.
+ * @see {@link org.jnode.classmgr.VmType VmType} to get the list of "magic" classes
+ * @see {@link org.jnode.vm.compiler.BaseMagicHelper.MagicMethod MagicMethod}
+ * to get the list of "magic" methods
  * @author Daniel Frampton
  */
 final public class OffsetArray {

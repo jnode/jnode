@@ -20,82 +20,14 @@
  
 package org.jnode.vm.compiler;
 
-import java.util.Map;
-
+import org.jnode.annotation.SharedStatics;
 import org.jnode.util.BootableHashMap;
 import org.jnode.vm.classmgr.VmMethod;
-import org.jnode.vm.classmgr.VmType;
-import org.jnode.annotation.SharedStatics;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class BaseMagicHelper {
-
-    /**
-     * Enum of all magic classes.
-     *
-     * @author Ewout Prangsma (epr@users.sourceforge.net)
-     */
-    @SharedStatics
-    public enum MagicClass {
-        ADDRESS("org.vmmagic.unboxed.Address"),
-        EXTENT("org.vmmagic.unboxed.Extent"),
-        OBJECTREFERENCE("org.vmmagic.unboxed.ObjectReference"),
-        OFFSET("org.vmmagic.unboxed.Offset"),
-        WORD("org.vmmagic.unboxed.Word"),
-        ADDRESSARRAY("org.vmmagic.unboxed.AddressArray"),
-        EXTENTARRAY("org.vmmagic.unboxed.ExtentArray"),
-        OBJECTREFERENCEARRAY("org.vmmagic.unboxed.ObjectReferenceArray"),
-        OFFSETARRAY("org.vmmagic.unboxed.OffsetArray"),
-        WORDARRAY("org.vmmagic.unboxed.WordArray"),
-        VMMAGIC("org.jnode.vm.VmMagic");
-
-        /**
-         * Name of the class
-         */
-        private final String name;
-
-        /**
-         * Lookup table
-         */
-        private static final Map<String, MagicClass> nameToClass;
-
-        /**
-         * Initialize this instance.
-         *
-         * @param name
-         */
-        private MagicClass(String name) {
-            this.name = name;
-        }
-
-        /**
-         * Initialize the lookup table
-         */
-        static {
-            nameToClass = new BootableHashMap<String, MagicClass>();
-            for (MagicClass mc : values()) {
-                nameToClass.put(mc.name, mc);
-            }
-        }
-
-        /**
-         * Gets the MagicClass instance for the given type.
-         *
-         * @param type
-         * @return a MagicClass instance
-         * @throws InternalError When type is no magic type.
-         */
-        public static MagicClass get(VmType<?> type) {
-            MagicClass mc = nameToClass.get(type.getName());
-            if (mc == null) {
-                throw new InternalError("Unknown magic type " + type.getName());
-            } else {
-                return mc;
-            }
-        }
-    }
 
     /**
      * Enum of all methods in all magic classes.
