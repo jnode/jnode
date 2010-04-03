@@ -20,6 +20,17 @@
  
 package org.jnode.apps.jpartition.consoleview.components;
 
+/**
+ * Interface used to transform an object into a displayable String.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ * @param <T>
+ */
 public interface Labelizer<T> {
+    /**
+     * Get a displayable String representing the given value.
+     * @param value The value to transform.
+     * @return
+     */
     String getLabel(T value);
 }
