@@ -163,4 +163,12 @@ public class DummyPluginDescriptor implements PluginDescriptor {
     public PluginReference getPluginReference() {
         return null;
     }
+
+	@Override
+	public void firePluginStarted() {
+	}
+
+	@Override
+	public void firePluginStopped() {
+	}
 }
