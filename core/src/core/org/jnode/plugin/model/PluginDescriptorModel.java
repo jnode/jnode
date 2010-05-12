@@ -294,7 +294,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     }
 
     /**
-     * Fire the pluginStarted event to my listeners.
+     * {@inheritDoc}
      */
     public final void firePluginStarted() {
         final List<PluginDescriptorListener> listeners;
@@ -312,9 +312,9 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     }
 
     /**
-     * Fire the pluginStop event to my listeners.
+     * {@inheritDoc}
      */
-    public final void firePluginStop() {
+    public final void firePluginStopped() {
         final List<PluginDescriptorListener> listeners;
         synchronized (listenerLock) {
             if (this.listeners != null) {

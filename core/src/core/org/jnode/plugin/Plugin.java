@@ -24,7 +24,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.prefs.Preferences;
 
-import org.jnode.plugin.model.PluginDescriptorModel;
 import org.jnode.system.BootLog;
 
 
@@ -109,7 +108,7 @@ public abstract class Plugin {
                 try {
                     startPlugin();
                 } finally {
-                    ((PluginDescriptorModel) descriptor).firePluginStarted();
+                    descriptor.firePluginStarted();
                 }
             } catch (PluginException ex) {
                 throw ex;
@@ -134,7 +133,7 @@ public abstract class Plugin {
             started = false;
             try {
                 try {
-                    ((PluginDescriptorModel) descriptor).firePluginStop();
+                    descriptor.firePluginStopped();
                 } finally {
                     stopPlugin();
                 }

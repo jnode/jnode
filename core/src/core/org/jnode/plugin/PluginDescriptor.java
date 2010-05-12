@@ -20,6 +20,9 @@
  
 package org.jnode.plugin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Descriptor of a Plugin.
@@ -212,4 +215,14 @@ public interface PluginDescriptor {
      * @param listener
      */
     public void removeListener(PluginDescriptorListener listener);
+    
+    /**
+     * Fire the pluginStarted event to this descriptor's listeners.
+     */
+    public void firePluginStarted();
+
+    /**
+     * Fire the pluginStopped event to this descriptor's listeners.
+     */
+    public void firePluginStopped();
 }
