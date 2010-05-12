@@ -43,9 +43,9 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.AccessControllerUtils;
-import org.jnode.util.Counter;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
+import org.jnode.vm.objects.Counter;
 
 /**
  * @author Fabien Lesire (galatnm at gmail dot com)

@@ -31,11 +31,6 @@ import org.jnode.plugin.Extension;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.system.ResourceManager;
-import org.jnode.util.BootableArrayList;
-import org.jnode.util.Counter;
-import org.jnode.util.CounterGroup;
-import org.jnode.util.Statistic;
-import org.jnode.util.Statistics;
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.KernelSpace;
@@ -48,6 +43,11 @@ import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.jnode.vm.objects.BootableArrayList;
+import org.jnode.vm.objects.Counter;
+import org.jnode.vm.objects.CounterGroup;
+import org.jnode.vm.objects.Statistic;
+import org.jnode.vm.objects.Statistics;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmScheduler;
 
@@ -399,7 +399,7 @@ public final class Vm extends VmSystemObject implements Statistics {
     }
 
     /**
-     * @see org.jnode.util.Statistics#getStatistics()
+     * @see org.jnode.vm.objects.Statistics#getStatistics()
      */
     public synchronized Statistic[] getStatistics() {
         if (statistics != null) {

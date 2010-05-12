@@ -54,7 +54,6 @@ import org.jnode.plugin.model.Factory;
 import org.jnode.plugin.model.PluginDescriptorModel;
 import org.jnode.plugin.model.PluginJar;
 import org.jnode.plugin.model.PluginRegistryModel;
-import org.jnode.util.BootableHashMap;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Unsafe;
@@ -81,6 +80,7 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.jnode.vm.objects.BootableHashMap;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.vmmagic.unboxed.UnboxedObject;
 
@@ -1381,6 +1381,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.vm.classmgr");
         addCompileHighOptLevel("org.jnode.vm.compiler");
         addCompileHighOptLevel("org.jnode.vm.isolate");
+        addCompileHighOptLevel("org.jnode.vm.objects");
         addCompileHighOptLevel("org.jnode.vm.scheduler");
         for (NativeCodeCompiler compiler : getArchitecture().getCompilers()) {
             for (String packageName : compiler.getCompilerPackages()) {

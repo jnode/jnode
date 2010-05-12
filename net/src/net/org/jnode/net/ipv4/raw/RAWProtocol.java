@@ -29,7 +29,7 @@ import org.jnode.net.SocketBuffer;
 import org.jnode.net.ipv4.IPv4Constants;
 import org.jnode.net.ipv4.IPv4Protocol;
 import org.jnode.net.ipv4.IPv4Service;
-import org.jnode.util.Statistics;
+import org.jnode.vm.objects.Statistics;
 
 /**
  * @author epr

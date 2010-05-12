@@ -25,7 +25,7 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.NumberUtils;
-import org.jnode.util.TimeUtils;
+import org.jnode.vm.VmSystem;
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.MagicPermission;
@@ -215,7 +215,7 @@ final class LocalAPIC {
      */
     public final void loopUntilNotBusy() {
         while (isIPIPending()) {
-            TimeUtils.loop(1);
+            VmSystem.loop(1);
         }
     }
 

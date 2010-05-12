@@ -33,13 +33,13 @@ import java.util.Map;
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
-import org.jnode.util.BootableHashMap;
 import org.jnode.util.ByteBufferInputStream;
 import org.jnode.util.FileUtils;
 import org.jnode.util.JarBuffer;
 import org.jnode.vm.BootableObject;
 import org.jnode.vm.ResourceLoader;
 import org.jnode.vm.Vm;
+import org.jnode.vm.objects.BootableHashMap;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

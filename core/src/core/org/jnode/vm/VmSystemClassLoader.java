@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.jnode.assembler.ObjectResolver;
-import org.jnode.util.BootableArrayList;
 import org.jnode.util.ByteBufferInputStream;
 import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.ClassDecoder;
@@ -50,6 +49,7 @@ import org.jnode.vm.compiler.CompiledIMT;
 import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.isolate.VmIsolate;
+import org.jnode.vm.objects.BootableArrayList;
 import org.jnode.vm.scheduler.VmProcessor;
 
 /**

@@ -20,8 +20,8 @@
  
 package org.jnode.net.ipv4.raw;
 
-import org.jnode.util.Statistic;
-import org.jnode.util.Statistics;
+import org.jnode.vm.objects.Statistic;
+import org.jnode.vm.objects.Statistics;
 
 /**
  * @author epr

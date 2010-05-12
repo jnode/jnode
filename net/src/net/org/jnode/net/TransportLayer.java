@@ -24,7 +24,7 @@ import java.net.DatagramSocketImplFactory;
 import java.net.SocketException;
 import java.net.SocketImplFactory;
 
-import org.jnode.util.Statistics;
+import org.jnode.vm.objects.Statistics;
 
 /**
  * OSI transport layers must implement this interface.

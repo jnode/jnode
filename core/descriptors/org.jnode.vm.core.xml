@@ -25,6 +25,7 @@
       <export name="org.jnode.vm.compiler.*"/>
       <export name="org.jnode.vm.isolate.*"/>
       <export name="org.jnode.vm.memmgr.*"/>
+      <export name="org.jnode.vm.objects.*"/>
       <export name="org.jnode.vm.performance.*"/>
       <export name="org.jnode.vm.scheduler.*"/>
     </library>

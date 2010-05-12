@@ -18,10 +18,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.util;
+package org.jnode.vm.objects;
 
 import java.util.Map;
 import java.util.TreeMap;
+
 
 public class CounterGroup extends Statistic {
 
@@ -46,7 +47,7 @@ public class CounterGroup extends Statistic {
     }
 
     /**
-     * @see org.jnode.util.Statistic#getValue()
+     * @see org.jnode.vm.objects.Statistic#getValue()
      */
     @Override
     public Object getValue() {
@@ -54,7 +55,7 @@ public class CounterGroup extends Statistic {
     }
 
     /**
-     * @see org.jnode.util.Statistic#toString()
+     * @see org.jnode.vm.objects.Statistic#toString()
      */
     @Override
     public String toString() {

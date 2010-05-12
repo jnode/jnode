@@ -26,10 +26,10 @@ import org.jnode.system.BootLog;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.util.NumberUtils;
-import org.jnode.util.TimeUtils;
 import org.jnode.vm.CpuID;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
+import org.jnode.vm.VmSystem;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.LoadStatics;
 import org.jnode.annotation.MagicPermission;
@@ -233,13 +233,13 @@ public abstract class VmX86Processor extends VmProcessor {
         Unsafe.debug("Sending INIT IPI to " + getIdString() + "\n");
         localAPIC.sendInitIPI(getId(), true);
         localAPIC.loopUntilNotBusy();
-        TimeUtils.loop(10);
+        VmSystem.loop(10);
 
         // Send INIT-DeAssert IPI
         Unsafe.debug("Sending INIT-DeAssert IPI to " + getIdString() + "\n");
         localAPIC.sendInitIPI(getId(), false);
         localAPIC.loopUntilNotBusy();
-        TimeUtils.loop(10);
+        VmSystem.loop(10);
 
         final int numStarts = 2;
         for (int i = 0; i < numStarts; i++) {
@@ -249,7 +249,7 @@ public abstract class VmX86Processor extends VmProcessor {
             localAPIC.sendStartupIPI(getId(), bootCode);
             localAPIC.loopUntilNotBusy();
             // Unsafe.debug("Not busy");
-            TimeUtils.loop(100);
+            VmSystem.loop(100);
             localAPIC.clearErrors();
         }
 

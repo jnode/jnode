@@ -42,7 +42,6 @@ import javax.isolate.Link;
 import javax.naming.NameNotFoundException;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginManager;
-import org.jnode.util.BootableHashMap;
 import org.jnode.vm.IOContext;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.Unsafe;
@@ -56,6 +55,7 @@ import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.annotation.SharedStatics;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.objects.BootableHashMap;
 import org.jnode.vm.scheduler.VmThread;
 
 /**

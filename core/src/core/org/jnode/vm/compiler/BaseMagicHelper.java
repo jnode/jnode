@@ -21,8 +21,8 @@
 package org.jnode.vm.compiler;
 
 import org.jnode.annotation.SharedStatics;
-import org.jnode.util.BootableHashMap;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.objects.BootableHashMap;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

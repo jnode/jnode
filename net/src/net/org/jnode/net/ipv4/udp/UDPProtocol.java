@@ -42,7 +42,7 @@ import org.jnode.net.ipv4.IPv4Header;
 import org.jnode.net.ipv4.IPv4Protocol;
 import org.jnode.net.ipv4.IPv4Service;
 import org.jnode.net.ipv4.icmp.ICMPUtils;
-import org.jnode.util.Statistics;
+import org.jnode.vm.objects.Statistics;
 
 /**
  * @author epr

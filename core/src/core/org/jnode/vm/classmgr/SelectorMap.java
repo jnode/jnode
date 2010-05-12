@@ -20,9 +20,9 @@
  
 package org.jnode.vm.classmgr;
 
-import org.jnode.util.BootableHashMap;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.InternString;
+import org.jnode.vm.objects.BootableHashMap;
 
 /**
  * This class is used to maintain a mapping between a method signature (name+type)

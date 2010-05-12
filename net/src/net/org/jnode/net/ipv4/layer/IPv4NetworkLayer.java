@@ -55,7 +55,7 @@ import org.jnode.net.ipv4.udp.UDPProtocol;
 import org.jnode.net.ipv4.util.ResolverImpl;
 import org.jnode.net.util.NetUtils;
 import org.jnode.util.NumberUtils;
-import org.jnode.util.Statistics;
+import org.jnode.vm.objects.Statistics;
 
 /**
  * @author epr

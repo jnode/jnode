@@ -20,7 +20,7 @@
  
 package org.jnode.vm;
 
-import org.jnode.util.BootableHashMap;
+import org.jnode.vm.objects.BootableHashMap;
 
 /**
  *

@@ -34,7 +34,7 @@ import org.jnode.net.ipv4.IPv4Service;
 import org.jnode.util.Queue;
 import org.jnode.util.QueueProcessor;
 import org.jnode.util.QueueProcessorThread;
-import org.jnode.util.Statistics;
+import org.jnode.vm.objects.Statistics;
 
 /**
  * Protocol handler of the ICMP protocol.
