@@ -23,16 +23,16 @@ package org.jnode.boot;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.jnode.plugin.PluginDescriptor;
-import org.jnode.plugin.PluginManager;
-import org.jnode.plugin.manager.DefaultPluginManager;
-import org.jnode.plugin.model.PluginRegistryModel;
-import org.jnode.system.BootLog;
-import org.jnode.vm.Unsafe;
-import org.jnode.vm.VmSystem;
 import org.jnode.annotation.LoadStatics;
 import org.jnode.annotation.SharedStatics;
 import org.jnode.annotation.Uninterruptible;
+import org.jnode.plugin.PluginDescriptor;
+import org.jnode.plugin.PluginManager;
+import org.jnode.plugin.PluginRegistry;
+import org.jnode.plugin.manager.DefaultPluginManager;
+import org.jnode.system.BootLog;
+import org.jnode.vm.Unsafe;
+import org.jnode.vm.VmSystem;
 
 /**
  * First class that is executed when JNode boots.
@@ -49,7 +49,7 @@ public final class Main {
     /**
      *  Initialized in org.jnode.build.x86.BootImageBuilder.initMain().
      */
-    private static PluginRegistryModel pluginRegistry;
+    private static PluginRegistry pluginRegistry;
 
     /**
      * First java entry point after the assembler kernel has booted.

@@ -147,7 +147,7 @@ public class PluginCommand extends AbstractCommand {
     }
 
     private void loadPlugin(String id, String version) throws PluginException {
-        mgr.getRegistry().loadPlugin(mgr.getLoaderManager(), id, version);
+        mgr.getRegistry().loadPlugin(mgr.getLoaderManager(), id, version, true); //resolve=true
         out.format(fmt_load, id, version);
     }
     
@@ -156,11 +156,11 @@ public class PluginCommand extends AbstractCommand {
         final List<PluginReference> refs = reg.unloadPlugin(id);
         for (PluginReference ref : refs) {
             if (reg.getPluginDescriptor(ref.getId()) == null) {
-                reg.loadPlugin(mgr.getLoaderManager(), ref.getId(), ref.getVersion());
+                reg.loadPlugin(mgr.getLoaderManager(), ref.getId(), ref.getVersion(), true); //resolve=true
             }
         }
         if (reg.getPluginDescriptor(id) == null) {
-            reg.loadPlugin(mgr.getLoaderManager(), id, version);
+            reg.loadPlugin(mgr.getLoaderManager(), id, version, true); //resolve=true
         }
         out.format(fmt_reload, id, version);
     }
