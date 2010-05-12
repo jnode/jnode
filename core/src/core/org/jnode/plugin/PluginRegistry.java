@@ -59,10 +59,11 @@ public interface PluginRegistry extends Iterable<PluginDescriptor> {
      * @param loader
      * @param pluginId
      * @param pluginVersion
+     * @param resolve true to resolve the plugin dependencies, false otherwise
      * @return The descriptor of the loaded plugin.
      * @throws PluginException
      */
-    public PluginDescriptor loadPlugin(PluginLoader loader, String pluginId, String pluginVersion)
+    public PluginDescriptor loadPlugin(PluginLoader loader, String pluginId, String pluginVersion, boolean resolve)
         throws PluginException;
 
     /**

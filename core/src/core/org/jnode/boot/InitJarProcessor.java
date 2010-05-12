@@ -33,7 +33,7 @@ import java.util.jar.Manifest;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginLoader;
-import org.jnode.plugin.model.PluginRegistryModel;
+import org.jnode.plugin.PluginRegistry;
 import org.jnode.system.BootLog;
 import org.jnode.system.MemoryResource;
 import org.jnode.util.JarBuffer;
@@ -72,7 +72,7 @@ public class InitJarProcessor {
      *
      * @param piRegistry
      */
-    public List<PluginDescriptor> loadPlugins(PluginRegistryModel piRegistry) {
+    public List<PluginDescriptor> loadPlugins(PluginRegistry piRegistry) {
         if (jbuf == null) {
             return null;
         }
@@ -86,7 +86,7 @@ public class InitJarProcessor {
                     // Load it
                     loader.setBuffer(entry.getValue());
                     final PluginDescriptor descr = piRegistry.loadPlugin(
-                        loader, "", "", false);
+                        loader, "", "", false); //resolve=false
                     descriptors.add(descr);
                 } catch (PluginException ex) {
                     BootLog.error("Cannot load " + name, ex);

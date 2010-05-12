@@ -288,29 +288,27 @@ public final class PluginRegistryModel extends VmSystemObject implements
     }
 
     /**
-     * Load a plugin from a given loader.
-     *
-     * @param loader
-     * @param pluginId
-     * @param pluginVersion
-     * @return The descriptor of the loaded plugin.
-     * @throws PluginException
+     * {@inheritDoc}
      */
-    public PluginDescriptor loadPlugin(final PluginLoader loader, final String pluginId, final String pluginVersion)
+    public PluginDescriptor loadPlugin(final PluginLoader loader, final String pluginId, final String pluginVersion, boolean resolve)
         throws PluginException {
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(PluginSecurityConstants.LOAD_PERM);
         }
         // Load the requested plugin
-        final HashMap<String, PluginDescriptorModel> descriptors = new HashMap<String, PluginDescriptorModel>();
-        final PluginDescriptorModel descr = loadPlugin(loader, pluginId, pluginVersion, false);
-        descriptors.put(descr.getId(), descr);
-        // Load the dependent plugins
-        loadDependencies(loader, descr, descriptors);
-
-        // Resolve the loaded descriptors.
-        resolveDescriptors(descriptors.values());
+        final PluginDescriptorModel descr = loadPluginImpl(loader, pluginId, pluginVersion);
+        
+        if (resolve) {
+	        final HashMap<String, PluginDescriptorModel> descriptors = new HashMap<String, PluginDescriptorModel>();
+	        descriptors.put(descr.getId(), descr);
+	        // Load the dependent plugins
+	        loadDependencies(loader, descr, descriptors);
+	
+	        // Resolve the loaded descriptors.
+	        resolveDescriptors(descriptors.values());
+        }
+        
         return descr;
     }
 
@@ -343,13 +341,13 @@ public final class PluginRegistryModel extends VmSystemObject implements
         if (descriptors.containsKey(id)) {
             return;
         }
-        final PluginDescriptorModel descr = loadPlugin(loader, id, version, false);
+        final PluginDescriptorModel descr = loadPluginImpl(loader, id, version);
         descriptors.put(descr.getId(), descr);
         loadDependencies(loader, descr, descriptors);
     }
 
     /**
-     * Load a plugin from a given loader.
+     * Load a plugin from a given loader but doesn't resolve its dependencies.
      *
      * @param loader
      * @param pluginId
@@ -357,12 +355,8 @@ public final class PluginRegistryModel extends VmSystemObject implements
      * @return The descriptor of the loaded plugin.
      * @throws PluginException
      */
-    public PluginDescriptorModel loadPlugin(final PluginLoader loader, final String pluginId,
-                                            final String pluginVersion, boolean resolve) throws PluginException {
-        final SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(PluginSecurityConstants.LOAD_PERM);
-        }
+    private final PluginDescriptorModel loadPluginImpl(final PluginLoader loader, final String pluginId,
+                                            final String pluginVersion) throws PluginException {
         final PluginRegistryModel registry = this;
         final PluginJar pluginJar;
         try {
@@ -386,11 +380,7 @@ public final class PluginRegistryModel extends VmSystemObject implements
                 throw new PluginException(ex);
             }
         }
-        final PluginDescriptorModel descr = pluginJar.getDescriptorModel();
-        if (resolve) {
-            descr.resolve(this);
-        }
-        return descr;
+        return pluginJar.getDescriptorModel();
     }
 
     /**

@@ -225,7 +225,7 @@ public abstract class TestRunnerBase implements TestRunnable {
                 PluginManager mgr = InitialNaming.lookup(PluginManager.NAME);
                 PluginRegistry reg = mgr.getRegistry();
                 if (reg.getPluginDescriptor(id) == null) {
-                    reg.loadPlugin(mgr.getLoaderManager(), id, ver);
+                    reg.loadPlugin(mgr.getLoaderManager(), id, ver, true); //resolve=true
                 }
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
