@@ -18,20 +18,33 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.util;
+package org.jnode.vm.objects;
+
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class SynchronizedCounter extends Statistic {
-    private int counter;
+public final class Counter extends Statistic implements Comparable<Counter> {
 
-    public SynchronizedCounter(String name) {
-        super(name, null);
+    private static final String is = "=";
+
+    private int counter = 0;
+
+    public Counter(String name) {
+        this(name, null, 0);
     }
 
-    public SynchronizedCounter(String name, String description) {
+    public Counter(String name, String description) {
+        this(name, description, 0);
+    }
+
+    public Counter(String name, int value) {
+        this(name, null, value);
+    }
+
+    public Counter(String name, String description, int value) {
         super(name, description);
+        this.counter = value;
     }
 
     /**
@@ -50,8 +63,34 @@ public final class SynchronizedCounter extends Statistic {
     /**
      * Increment the counter of this statistic by 1.
      */
-    public synchronized void inc() {
+    public void inc() {
         counter++;
+    }
+
+    /**
+     * Reset the counter to 0.
+     */
+    public void reset() {
+        counter = 0;
+    }
+
+    /**
+     * Add <i>increment</i> to the counter of this statistic.
+     */
+    public void add(int increment) {
+        counter += increment;
+    }
+
+    /**
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    public int compareTo(Counter o) {
+        if (o.counter < this.counter) {
+            return 1;
+        } else if (o.counter > this.counter) {
+            return -1;
+        }
+        return 0;
     }
 
     /**
@@ -61,6 +100,10 @@ public final class SynchronizedCounter extends Statistic {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return getName() + "=" + counter;
+        StringBuilder sb = new StringBuilder(getName());
+        sb.append(is);
+        sb.append(counter);
+
+        return sb.toString();
     }
 }

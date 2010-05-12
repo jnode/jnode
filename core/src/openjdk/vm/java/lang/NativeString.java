@@ -23,8 +23,8 @@ package java.lang;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 import org.jnode.vm.InternString;
+import org.jnode.vm.objects.BootableHashMap;
 import org.jnode.annotation.SharedStatics;
-import org.jnode.util.BootableHashMap;
 
 /**
  *

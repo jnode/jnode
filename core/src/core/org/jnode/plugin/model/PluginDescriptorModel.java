@@ -41,10 +41,10 @@ import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.PluginReference;
 import org.jnode.plugin.Runtime;
 import org.jnode.system.BootLog;
-import org.jnode.util.BootableArrayList;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.isolate.VmIsolateLocal;
+import org.jnode.vm.objects.BootableArrayList;
 
 /**
  * Implementation of {@link org.jnode.plugin.PluginDescriptor}.

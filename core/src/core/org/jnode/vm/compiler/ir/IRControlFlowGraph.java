@@ -23,7 +23,6 @@ package org.jnode.vm.compiler.ir;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jnode.util.BootableArrayList;
 import org.jnode.util.ObjectArrayIterator;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.classmgr.VmByteCode;
@@ -31,6 +30,7 @@ import org.jnode.vm.compiler.ir.quad.AssignQuad;
 import org.jnode.vm.compiler.ir.quad.PhiAssignQuad;
 import org.jnode.vm.compiler.ir.quad.Quad;
 import org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad;
+import org.jnode.vm.objects.BootableArrayList;
 
 /**
  * @author Madhu Siddalingaiah

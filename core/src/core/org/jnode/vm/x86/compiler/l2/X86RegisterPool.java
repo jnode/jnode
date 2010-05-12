@@ -21,9 +21,9 @@
 package org.jnode.vm.x86.compiler.l2;
 
 import org.jnode.assembler.x86.X86Register;
-import org.jnode.util.BootableArrayList;
 import org.jnode.vm.compiler.ir.Operand;
 import org.jnode.vm.compiler.ir.RegisterPool;
+import org.jnode.vm.objects.BootableArrayList;
 
 /**
  * @author Madhu Siddalingaiah

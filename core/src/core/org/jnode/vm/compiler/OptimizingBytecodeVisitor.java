@@ -20,7 +20,6 @@
  
 package org.jnode.vm.compiler;
 
-import org.jnode.util.Counter;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.bytecode.BasicBlock;
@@ -32,6 +31,7 @@ import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmPrimitiveClass;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.objects.Counter;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

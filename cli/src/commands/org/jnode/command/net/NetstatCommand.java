@@ -28,8 +28,8 @@ import org.jnode.net.NetworkLayerManager;
 import org.jnode.net.TransportLayer;
 import org.jnode.net.util.NetUtils;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.util.Statistic;
-import org.jnode.util.Statistics;
+import org.jnode.vm.objects.Statistic;
+import org.jnode.vm.objects.Statistics;
 
 /**
  * @author epr

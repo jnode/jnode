@@ -1189,4 +1189,19 @@ public final class VmSystem {
             throw new RuntimeException("IO Context cannot be reset");
         }
     }
+
+	/**
+	 * Wait for ms milliseconds in a busy waiting loop.
+	 * This method is very CPU intensive, so be carefull.
+	 *
+	 * @param ms
+	 */
+	public static void loop(long ms) {
+	    final long start = currentKernelMillis();
+	    while (true) {
+	        if ((start + ms) <= currentKernelMillis()) {
+	            break;
+	        }
+	    }
+	}
 }

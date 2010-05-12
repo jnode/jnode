@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.util;
+package org.jnode.vm.objects;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -25,7 +25,7 @@ import java.util.Collection;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.net.NetDeviceAPI;
-import org.jnode.util.Statistics;
+import org.jnode.vm.objects.Statistics;
 
 /**
  * OSI network layers must implement this interface.
