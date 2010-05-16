@@ -20,7 +20,7 @@
  
 package org.jnode.plugin;
 
-import org.jnode.security.JNodePermission;
+import org.jnode.permission.JNodePermission;
 
 /**
  * @author epr

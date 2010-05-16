@@ -30,7 +30,7 @@
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
     <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
     <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/> 
-    <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
+    <permission class="org.jnode.permission.JNodePermission" name="getVmThread"/>
   </extension> 
         
 </plugin>

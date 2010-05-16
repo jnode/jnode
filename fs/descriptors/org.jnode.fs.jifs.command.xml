@@ -30,8 +30,8 @@
   </extension>
   
   <extension point="org.jnode.security.permissions">
-    <permission class="org.jnode.security.JNodePermission" name="stopPlugin"/>
-    <permission class="org.jnode.security.JNodePermission" name="startPlugin"/>
+    <permission class="org.jnode.permission.JNodePermission" name="stopPlugin"/>
+    <permission class="org.jnode.permission.JNodePermission" name="startPlugin"/>
   </extension> 
         
 </plugin>

@@ -38,6 +38,7 @@ import javax.naming.NamingException;
 import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.naming.InitialNaming;
+import org.jnode.permission.JNodePermission;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -46,7 +47,6 @@ import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.model.PluginRegistryModel;
-import org.jnode.security.JNodePermission;
 
 /**
  * @author epr

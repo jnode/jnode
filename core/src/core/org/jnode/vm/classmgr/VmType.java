@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 
 import org.jnode.assembler.NativeStream;
+import org.jnode.permission.JNodePermission;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.LoadCompileService;
 import org.jnode.vm.Unsafe;
@@ -50,7 +51,6 @@ import org.jnode.vm.compiler.CompileError;
 import org.jnode.vm.compiler.CompiledIMT;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.isolate.VmIsolateLocal;
-import org.jnode.security.JNodePermission;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 

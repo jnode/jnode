@@ -36,8 +36,8 @@
       <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
       <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
       <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
-      <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
-      <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
+      <permission class="org.jnode.permission.JNodePermission" name="getVmThread"/>
+      <permission class="org.jnode.permission.JNodePermission" name="getVmClass"/>
       <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
       <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
       <permission class="java.lang.RuntimePermission" name="writeFileDescriptor"/>

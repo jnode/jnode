@@ -304,13 +304,13 @@
     <permission class="java.lang.RuntimePermission"         name="setContextClassLoader"/>
     <permission class="java.lang.RuntimePermission"         name="modifyThreadGroup"/>
     <permission class="java.io.FilePermission"              name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
-    <permission class="org.jnode.security.JNodePermission"  name="createPluginLoader"/>
-    <permission class="org.jnode.security.JNodePermission"  name="loadPlugin"/>
-    <permission class="org.jnode.security.JNodePermission"  name="unloadPlugin"/>
-    <permission class="org.jnode.security.JNodePermission"  name="stopPlugin"/>
-    <permission class="org.jnode.security.JNodePermission"  name="halt"/>
-    <permission class="org.jnode.security.JNodePermission"  name="getVmThread"/>
-    <permission class="org.jnode.security.JNodePermission"  name="getVmClass"/>
+    <permission class="org.jnode.permission.JNodePermission"  name="createPluginLoader"/>
+    <permission class="org.jnode.permission.JNodePermission"  name="loadPlugin"/>
+    <permission class="org.jnode.permission.JNodePermission"  name="unloadPlugin"/>
+    <permission class="org.jnode.permission.JNodePermission"  name="stopPlugin"/>
+    <permission class="org.jnode.permission.JNodePermission"  name="halt"/>
+    <permission class="org.jnode.permission.JNodePermission"  name="getVmThread"/>
+    <permission class="org.jnode.permission.JNodePermission"  name="getVmClass"/>
     <permission class="java.lang.reflect.ReflectPermission" name="suppressAccessChecks"/>
   </extension>
   

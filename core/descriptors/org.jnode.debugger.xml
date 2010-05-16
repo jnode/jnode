@@ -22,7 +22,7 @@
   <extension point="org.jnode.security.permissions">
     <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
     <permission class="org.jnode.driver.DriverPermission" name="setPreferredListener"/>
-    <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
+    <permission class="org.jnode.permission.JNodePermission" name="getVmThread"/>
   </extension>
         
 </plugin>

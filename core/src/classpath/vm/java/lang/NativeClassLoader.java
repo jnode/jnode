@@ -24,11 +24,12 @@ import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 import java.io.InputStream;
 import java.io.IOException;
+
+import org.jnode.permission.JNodePermission;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.VmJavaClassLoader;
 import org.jnode.vm.VmSystem;
-import org.jnode.security.JNodePermission;
 
 /**
  *

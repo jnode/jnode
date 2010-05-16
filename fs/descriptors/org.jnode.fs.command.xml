@@ -47,7 +47,7 @@
     <permission class="java.net.NetPermission" name="specifyStreamHandler"/>
     <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
     <permission class="java.lang.RuntimePermission" name="exitVM"/>
-    <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
+    <permission class="org.jnode.permission.JNodePermission" name="getVmClass"/>
   </extension>
 
 </plugin>
