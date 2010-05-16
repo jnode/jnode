@@ -34,7 +34,7 @@ import org.jnode.driver.DriverException;
 import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.util.AbstractSurface;
 import org.jnode.driver.video.vgahw.VgaConstants;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceNotFreeException;
 
 /**
  * @author epr

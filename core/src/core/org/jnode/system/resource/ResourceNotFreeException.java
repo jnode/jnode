@@ -18,19 +18,19 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.system;
+package org.jnode.system.resource;
 
 /**
- * Direct Memory Access Exception.
+ * Requested resource is not available exception.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class DMAException extends Exception {
+public class ResourceNotFreeException extends Exception {
 
     /**
      *
      */
-    public DMAException() {
+    public ResourceNotFreeException() {
         super();
     }
 
@@ -38,21 +38,21 @@ public class DMAException extends Exception {
      * @param message
      * @param cause
      */
-    public DMAException(String message, Throwable cause) {
+    public ResourceNotFreeException(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
      * @param cause
      */
-    public DMAException(Throwable cause) {
+    public ResourceNotFreeException(Throwable cause) {
         super(cause);
     }
 
     /**
      * @param s
      */
-    public DMAException(String s) {
+    public ResourceNotFreeException(String s) {
         super(s);
     }
 }

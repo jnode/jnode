@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import org.jnode.driver.system.acpi.aml.ParseNode;
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

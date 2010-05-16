@@ -35,12 +35,12 @@ import org.jnode.driver.bus.usb.USBHostControllerAPI;
 import org.jnode.driver.bus.usb.USBHubAPI;
 import org.jnode.driver.bus.usb.USBPipe;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.IOResource;
-import org.jnode.system.IRQHandler;
-import org.jnode.system.IRQResource;
-import org.jnode.system.ResourceManager;
-import org.jnode.system.ResourceNotFreeException;
-import org.jnode.system.ResourceOwner;
+import org.jnode.system.resource.IOResource;
+import org.jnode.system.resource.IRQHandler;
+import org.jnode.system.resource.IRQResource;
+import org.jnode.system.resource.ResourceManager;
+import org.jnode.system.resource.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceOwner;
 import org.jnode.util.AccessControllerUtils;
 import org.jnode.util.NumberUtils;
 
@@ -178,7 +178,7 @@ public class UHCICore implements USBHostControllerAPI, UHCIConstants, IRQHandler
     }
 
     /**
-     * @see org.jnode.system.IRQHandler#handleInterrupt(int)
+     * @see org.jnode.system.resource.IRQHandler#handleInterrupt(int)
      */
     public final void handleInterrupt(int irq) {
         final int status = io.getStatus();

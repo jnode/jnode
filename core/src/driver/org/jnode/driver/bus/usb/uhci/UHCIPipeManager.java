@@ -29,7 +29,7 @@ import org.jnode.driver.bus.usb.USBControlPipe;
 import org.jnode.driver.bus.usb.USBDevice;
 import org.jnode.driver.bus.usb.USBEndPoint;
 import org.jnode.driver.bus.usb.USBPipe;
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.ResourceManager;
 
 /**
  * List of open pipes.

@@ -27,7 +27,7 @@ import org.jnode.driver.net.ethernet.spi.BasicEthernetDriver;
 import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.plugin.ConfigurationElement;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceNotFreeException;
 
 /**
  * @author Martin Husted Hartvig

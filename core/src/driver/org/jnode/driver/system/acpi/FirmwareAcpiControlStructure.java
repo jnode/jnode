@@ -20,8 +20,8 @@
  
 package org.jnode.driver.system.acpi;
 
-import org.jnode.system.MemoryResource;
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.MemoryResource;
+import org.jnode.system.resource.ResourceManager;
 
 /**
  * FirmwareAcpiControlStructure.

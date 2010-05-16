@@ -24,7 +24,7 @@ import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
 import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.partitions.ibm.IBMPartitionTableType;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceNotFreeException;
 
 /**
  * Implementation of a Factory class to create device, bus and IO objects

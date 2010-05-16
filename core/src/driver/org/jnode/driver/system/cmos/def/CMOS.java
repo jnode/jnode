@@ -23,10 +23,10 @@ package org.jnode.driver.system.cmos.def;
 import javax.naming.NameNotFoundException;
 import org.jnode.driver.system.cmos.CMOSConstants;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.IOResource;
-import org.jnode.system.ResourceManager;
-import org.jnode.system.ResourceNotFreeException;
-import org.jnode.system.ResourceOwner;
+import org.jnode.system.resource.IOResource;
+import org.jnode.system.resource.ResourceManager;
+import org.jnode.system.resource.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceOwner;
 
 /**
  * @author epr

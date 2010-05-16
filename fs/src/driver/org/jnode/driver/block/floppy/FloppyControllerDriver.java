@@ -31,7 +31,7 @@ import org.jnode.driver.DriverException;
 import org.jnode.driver.block.floppy.support.FloppyDeviceFactory;
 import org.jnode.driver.block.floppy.support.FloppyDriverUtils;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.util.TimeoutException;
 
 /**

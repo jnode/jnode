@@ -22,7 +22,7 @@ package org.jnode.driver.video.vgahw;
 
 import java.awt.image.IndexColorModel;
 
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 import org.jnode.util.NumberUtils;
 
 /**

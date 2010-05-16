@@ -23,7 +23,7 @@ package org.jnode.driver.net.via_rhine;
 import static org.jnode.driver.net.via_rhine.ViaRhineConstants.PKT_BUF_SZ;
 import static org.jnode.driver.net.via_rhine.ViaRhineConstants.RX_RING_SIZE;
 import org.jnode.net.SocketBuffer;
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.ResourceManager;
 
 /**
  * @author Levente S\u00e1ntha

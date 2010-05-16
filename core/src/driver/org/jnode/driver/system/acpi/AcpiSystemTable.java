@@ -20,7 +20,7 @@
  
 package org.jnode.driver.system.acpi;
 
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 
 /**
  * ACPI system table.

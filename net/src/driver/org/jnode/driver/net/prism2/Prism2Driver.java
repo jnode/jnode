@@ -27,7 +27,7 @@ import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.wireless.spi.WirelessDeviceCore;
 import org.jnode.driver.net.wireless.spi.WirelessEthernetDriver;
 import org.jnode.plugin.ConfigurationElement;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceNotFreeException;
 
 public class Prism2Driver extends WirelessEthernetDriver {
 

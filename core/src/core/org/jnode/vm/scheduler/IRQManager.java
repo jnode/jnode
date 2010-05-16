@@ -20,11 +20,11 @@
  
 package org.jnode.vm.scheduler;
 
-import org.jnode.system.IRQHandler;
-import org.jnode.system.IRQResource;
-import org.jnode.system.Resource;
-import org.jnode.system.ResourceNotFreeException;
-import org.jnode.system.ResourceOwner;
+import org.jnode.system.resource.IRQHandler;
+import org.jnode.system.resource.IRQResource;
+import org.jnode.system.resource.Resource;
+import org.jnode.system.resource.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceOwner;
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.PrivilegedActionPragma;
@@ -209,7 +209,7 @@ public abstract class IRQManager {
 
         /**
          * @return int
-         * @see org.jnode.system.IRQResource#getIRQ()
+         * @see org.jnode.system.resource.IRQResource#getIRQ()
          */
         public int getIRQ() {
             return irq;
@@ -226,7 +226,7 @@ public abstract class IRQManager {
 
         /**
          * @return The owner
-         * @see org.jnode.system.Resource#getOwner()
+         * @see org.jnode.system.resource.Resource#getOwner()
          */
         public ResourceOwner getOwner() {
             return owner;
@@ -237,7 +237,7 @@ public abstract class IRQManager {
         }
 
         /**
-         * @see org.jnode.system.Resource#release()
+         * @see org.jnode.system.resource.Resource#release()
          */
         public void release() {
             releaseIRQ(this);

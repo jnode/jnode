@@ -20,7 +20,7 @@
  
 package org.jnode.driver.net.lance;
 
-import org.jnode.system.IOResource;
+import org.jnode.system.resource.IOResource;
 
 /**
  * @author Chris

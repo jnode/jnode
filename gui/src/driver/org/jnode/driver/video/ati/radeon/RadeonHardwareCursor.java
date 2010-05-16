@@ -26,8 +26,8 @@ import org.apache.log4j.Logger;
 import org.jnode.driver.video.HardwareCursor;
 import org.jnode.driver.video.HardwareCursorAPI;
 import org.jnode.driver.video.HardwareCursorImage;
-import org.jnode.system.MemoryResource;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.MemoryResource;
+import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.util.NumberUtils;
 
 /**

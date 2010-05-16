@@ -22,8 +22,8 @@ package org.jnode.driver.net.via_rhine;
 
 import org.apache.log4j.Logger;
 import static org.jnode.driver.net.via_rhine.ViaRhineConstants.PKT_BUF_SZ;
-import org.jnode.system.MemoryResource;
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.MemoryResource;
+import org.jnode.system.resource.ResourceManager;
 import org.vmmagic.unboxed.Address;
 
 /**

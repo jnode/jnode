@@ -20,7 +20,7 @@
  
 package org.jnode.driver.net.via_rhine;
 
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.ResourceManager;
 
 /**
  * @author Levente S\u00e1ntha

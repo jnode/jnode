@@ -39,8 +39,8 @@ import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.driver.bus.ide.IDEDriveDescriptor;
 import org.jnode.driver.bus.ide.IDEDriverUtils;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.ResourceManager;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceManager;
+import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 
 public class MockObjectFactory {

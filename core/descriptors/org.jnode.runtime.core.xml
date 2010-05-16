@@ -24,7 +24,6 @@
       <export name="org.jnode.plugin.model.*"/>
       <export name="org.jnode.protocol.plugin.*"/>
       <export name="org.jnode.protocol.system.*"/>
-      <export name="org.jnode.system.*"/>
       <export name="org.jnode.system.event.*"/>
     </library>
   </runtime>

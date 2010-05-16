@@ -21,7 +21,7 @@
 package org.jnode.driver.bus.usb.uhci;
 
 import org.jnode.driver.bus.usb.USBConstants;
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.ResourceManager;
 
 /**
  * Schedule of TransferDescriptors and QueueHeads. This is the class that constructs and maintains

@@ -24,7 +24,7 @@ import org.vmmagic.unboxed.Address;
 
 /**
  * Class used to implement multi media support for
- * {@link org.jnode.system.MultiMediaMemoryResource}.
+ * {@link org.jnode.system.resource.MultiMediaMemoryResource}.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */

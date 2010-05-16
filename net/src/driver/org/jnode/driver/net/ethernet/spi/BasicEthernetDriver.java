@@ -27,7 +27,7 @@ import org.jnode.driver.net.NetworkException;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.util.TimeoutException;
 
 /**

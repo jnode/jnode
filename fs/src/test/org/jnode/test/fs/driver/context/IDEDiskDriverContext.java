@@ -26,7 +26,7 @@ import org.jnode.driver.block.ide.disk.IDEDiskDriver;
 import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.driver.bus.ide.IDEDriverUtils;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.ResourceManager;
 import org.jnode.test.fs.driver.BlockDeviceAPIContext;
 import org.jnode.test.fs.driver.BlockDeviceAPITestConfig;
 import org.jnode.test.fs.driver.factories.MockIDEDeviceFactory;

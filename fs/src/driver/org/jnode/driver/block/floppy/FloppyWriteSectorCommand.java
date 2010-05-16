@@ -22,7 +22,7 @@ package org.jnode.driver.block.floppy;
 
 import org.jnode.driver.block.CHS;
 import org.jnode.driver.block.Geometry;
-import org.jnode.system.DMAResource;
+import org.jnode.system.resource.DMAResource;
 import org.jnode.util.TimeoutException;
 
 /**

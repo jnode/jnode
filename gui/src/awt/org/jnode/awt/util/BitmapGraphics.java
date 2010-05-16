@@ -31,8 +31,8 @@ import java.awt.image.DataBufferUShort;
 import java.awt.image.Raster;
 import javax.naming.NamingException;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.MemoryResource;
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.MemoryResource;
+import org.jnode.system.resource.ResourceManager;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

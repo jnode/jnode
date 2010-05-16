@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
-import org.jnode.system.ResourceOwner;
+import org.jnode.system.resource.ResourceOwner;
 import org.jnode.util.StopWatch;
 
 /**
@@ -354,7 +354,7 @@ public class Device implements ResourceOwner {
 
     /**
      * @return The short description
-     * @see org.jnode.system.ResourceOwner#getShortDescription()
+     * @see org.jnode.system.resource.ResourceOwner#getShortDescription()
      */
     public String getShortDescription() {
         return getId();

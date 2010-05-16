@@ -32,11 +32,11 @@ import org.jnode.driver.system.firmware.AcpiDevice;
 import org.jnode.driver.system.firmware.AcpiRSDPInfo;
 import org.jnode.driver.system.firmware.FirmwareAPI;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.MemoryResource;
-import org.jnode.system.MemoryScanner;
-import org.jnode.system.ResourceManager;
-import org.jnode.system.ResourceNotFreeException;
-import org.jnode.system.ResourceOwner;
+import org.jnode.system.resource.MemoryResource;
+import org.jnode.system.resource.MemoryScanner;
+import org.jnode.system.resource.ResourceManager;
+import org.jnode.system.resource.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceOwner;
 import org.vmmagic.unboxed.Address;
 
 /**

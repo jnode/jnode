@@ -26,7 +26,7 @@ import org.jnode.driver.bus.usb.USBDevice;
 import org.jnode.driver.bus.usb.USBEndPoint;
 import org.jnode.driver.bus.usb.USBPacket;
 import org.jnode.driver.bus.usb.USBRequest;
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.ResourceManager;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

@@ -18,24 +18,41 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.system;
+package org.jnode.system.resource;
 
 /**
- * Hardware Interrupt Handler interface.
- * <p/>
- * An interrupt handler is called from the kernel with interrupts disabled. So keep and handling
- * here as short as possible!
+ * Direct Memory Access Exception.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public interface IRQHandler {
+public class DMAException extends Exception {
 
     /**
-     * Handle a given hardware interrupt. This method is called from the kernel with interrupts
-     * disabled. So keep and handling here as short as possible!
      *
-     * @param irq
      */
-    public void handleInterrupt(int irq);
+    public DMAException() {
+        super();
+    }
 
+    /**
+     * @param message
+     * @param cause
+     */
+    public DMAException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * @param cause
+     */
+    public DMAException(Throwable cause) {
+        super(cause);
+    }
+
+    /**
+     * @param s
+     */
+    public DMAException(String s) {
+        super(s);
+    }
 }

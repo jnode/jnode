@@ -27,7 +27,7 @@ import org.jnode.driver.net.ne2000.Ne2000Core;
 import org.jnode.driver.net.ne2000.Ne2000Driver;
 import org.jnode.driver.net.ne2000.Ne2000Flags;
 import org.jnode.plugin.ConfigurationElement;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceNotFreeException;
 
 /**
  * @author epr

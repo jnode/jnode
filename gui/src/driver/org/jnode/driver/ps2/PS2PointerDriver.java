@@ -28,7 +28,7 @@ import org.jnode.driver.DeviceException;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.input.AbstractPointerDriver;
 import org.jnode.driver.input.PointerInterpreter;
-import org.jnode.system.IRQResource;
+import org.jnode.system.resource.IRQResource;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
 

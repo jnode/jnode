@@ -22,7 +22,7 @@ package org.jnode.awt.image;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

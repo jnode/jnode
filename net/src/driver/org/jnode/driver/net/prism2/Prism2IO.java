@@ -33,7 +33,7 @@ import static org.jnode.driver.net.prism2.Prism2Constants.Register.STATUS;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.DriverException;
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 import org.jnode.util.LittleEndian;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeUtils;

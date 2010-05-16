@@ -28,7 +28,7 @@ import java.awt.image.Raster;
 
 import org.jnode.awt.util.BitmapGraphics;
 import org.jnode.driver.video.util.AbstractSurface;
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 
 /**
  * Drawing implementation for the Radeon driver.

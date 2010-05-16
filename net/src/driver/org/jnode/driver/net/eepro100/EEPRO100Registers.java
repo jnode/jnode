@@ -20,7 +20,7 @@
  
 package org.jnode.driver.net.eepro100;
 
-import org.jnode.system.IOResource;
+import org.jnode.system.resource.IOResource;
 
 /**
  * @author flesire

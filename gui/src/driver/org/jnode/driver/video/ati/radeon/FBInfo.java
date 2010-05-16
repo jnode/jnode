@@ -21,7 +21,7 @@
 package org.jnode.driver.video.ati.radeon;
 
 import org.apache.log4j.Logger;
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 import org.jnode.util.NumberUtils;
 
 /**

@@ -18,36 +18,32 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.system;
+package org.jnode.system.resource;
+
 
 /**
- * Type independent resource interface.
- * <p/>
- * Every resource in the system is owned by an owner and must be
- * released after it has been used.
+ * Interface of Manager or Direct Memory Access resources.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public interface Resource {
+public interface DMAManager {
 
     /**
-     * Gets the owner of this resource.
+     * Name used to bind this service into the Initial Namespace
+     */
+    public static final Class<DMAManager> NAME = DMAManager.class; //"system/DMAService";
+
+    /**
+     * Claim a DMA channel identified by the given number.
      *
-     * @return The owner
+     * @param owner
+     * @param dmanr
+     * @return The claimed resource
+     * @throws IllegalArgumentException Invalid dmanr
+     * @throws ResourceNotFreeException Requested DMA channel is in use
      */
-    public ResourceOwner getOwner();
+    public DMAResource claimDMAChannel(ResourceOwner owner, int dmanr)
+        throws IllegalArgumentException, ResourceNotFreeException;
 
-    /**
-     * Give up this resource. After this method has been called, the resource
-     * cannot be used anymore.
-     */
-    public void release();
-
-    /**
-     * Gets the parent resource if any.
-     *
-     * @return The parent resource, or null if this resource has no parent.
-     */
-    public Resource getParent();
 
 }

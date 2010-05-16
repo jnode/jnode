@@ -30,7 +30,7 @@ import org.jnode.driver.DeviceManager;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.util.TimeoutException;
 import org.jnode.work.Work;
 import org.jnode.work.WorkUtils;
