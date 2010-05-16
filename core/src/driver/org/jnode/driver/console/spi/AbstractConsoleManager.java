@@ -38,6 +38,8 @@ import java.util.Stack;
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceListener;
@@ -50,7 +52,6 @@ import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.PointerAPI;
 import org.jnode.driver.input.PointerEvent;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.BootLog;
 import org.jnode.system.event.FocusEvent;
 
 /**
@@ -117,7 +118,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
             this.kbApi = kbDev.getAPI(KeyboardAPI.class);
             this.kbApi.addKeyboardListener(this);
         } catch (ApiNotFoundException ex) {
-            BootLog.error("KeyboardAPI not found", ex);
+            BootLogInstance.get().error("KeyboardAPI not found", ex);
         }
     }
 
@@ -136,7 +137,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
             pointerDevs.add(pDev);
             pApi.addPointerListener(this);
         } catch (ApiNotFoundException ex) {
-            BootLog.error("PointerAPI not found", ex);
+            BootLogInstance.get().error("PointerAPI not found", ex);
         }
     }
 
@@ -163,7 +164,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
                 final PointerAPI pApi = pDev.getAPI(PointerAPI.class);
                 pApi.removePointerListener(this);
             } catch (ApiNotFoundException ex) {
-                BootLog.error("PointerAPI not found", ex);
+                BootLogInstance.get().error("PointerAPI not found", ex);
             }
         }
     }

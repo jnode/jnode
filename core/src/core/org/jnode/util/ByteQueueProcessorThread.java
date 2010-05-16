@@ -20,7 +20,8 @@
  
 package org.jnode.util;
 
-import org.jnode.system.BootLog;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -76,7 +77,7 @@ public class ByteQueueProcessorThread extends Thread {
      * @param ex
      */
     protected void handleException(Exception ex) {
-        BootLog.error("Exception in ByteQueueProcessor: " + getName(), ex);
+        BootLogInstance.get().error("Exception in ByteQueueProcessor: " + getName(), ex);
     }
 
     /**
@@ -85,7 +86,7 @@ public class ByteQueueProcessorThread extends Thread {
      * @param ex
      */
     protected void handleError(Error ex) {
-        BootLog.error("Error in ByteQueueProcessor: " + getName(), ex);
+        BootLogInstance.get().error("Error in ByteQueueProcessor: " + getName(), ex);
     }
 
     /**

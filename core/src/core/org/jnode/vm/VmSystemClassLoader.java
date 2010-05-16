@@ -323,7 +323,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             throw new ClassNotFoundException(name);
         }
 
-        // BootLog.debug("load class" + name);
+        // BootLogInstance.get().debug("load class" + name);
 
         if (name.indexOf('/') >= 0) {
             //throw new IllegalArgumentException("name contains '/'");

@@ -29,7 +29,8 @@ import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
-import org.jnode.system.BootLog;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.bytecode.BasicBlock;
@@ -549,7 +550,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
         helper.setLabelPrefix(inlinedMethodInfo.getPreviousLabelPrefix());
         this.inlinedMethodInfo = inlinedMethodInfo.getPrevious();
         if (debug) {
-            BootLog.debug("endInlinedMethod");
+            BootLogInstance.get().debug("endInlinedMethod");
         }
     }
 
@@ -1074,7 +1075,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
             os.log("Start of basic block " + bb);
         }
         if (debug) {
-            BootLog.debug("-- Start of BB " + bb);
+            BootLogInstance.get().debug("-- Start of BB " + bb);
         }
         startOfBB = true;
         this.vstack.reset(eContext);
@@ -1088,7 +1089,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
         vstack.pushAll(ifac, tstack);
 
         if (debug) {
-            BootLog.debug("-- VStack: " + vstack.toString());
+            BootLogInstance.get().debug("-- VStack: " + vstack.toString());
         }
     }
 
@@ -1101,7 +1102,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
             os.log("<inline name=\"" + inlinedMethod.getName() + "\">Start of inlined method code");
         }
         if (debug) {
-            BootLog.debug("startInlinedMethodCode(" + inlinedMethod + ")");
+            BootLogInstance.get().debug("startInlinedMethodCode(" + inlinedMethod + ")");
         }
         // TODO: check whether this is really needed
         // For now yes, because a new basic block resets the registerpool
@@ -1121,7 +1122,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
             os.log("Start of inlined method header " + inlinedMethod.getName());
         }
         if (debug) {
-            BootLog.debug("startInlinedMethodHeader(" + inlinedMethod + ")");
+            BootLogInstance.get().debug("startInlinedMethodHeader(" + inlinedMethod + ")");
         }
         maxLocals = newMaxLocals;
         final Label curInstrLabel = getCurInstrLabel();
@@ -1140,7 +1141,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
      */
     public void startInstruction(int address) {
         if (debug) {
-            BootLog.debug("#" + address + "\t" + vstack);
+            BootLogInstance.get().debug("#" + address + "\t" + vstack);
         }
         if (log) {
             if (debug) {
@@ -1167,7 +1168,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
     public synchronized void startMethod(VmMethod method) {
         working = true;
         if (debug) {
-            BootLog.debug("setMethod(" + method + ")");
+            BootLogInstance.get().debug("setMethod(" + method + ")");
         }
         this.currentMethod = method;
         this.maxLocals = method.getBytecode().getNoLocals();
@@ -2611,7 +2612,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
      */
     public void visit_inlinedReturn(int jvmType) {
         if (debug) {
-            BootLog.debug("inlinedReturn [type " + jvmType + "]");
+            BootLogInstance.get().debug("inlinedReturn [type " + jvmType + "]");
         }
 
         // Pop the return value
@@ -2774,7 +2775,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
             helper.invokeJavaMethod(sm);
             // Result is already on the stack.
         } catch (ClassCastException ex) {
-            BootLog.error(methodRef.getResolvedVmMethod().getClass().getName()
+            BootLogInstance.get().error(methodRef.getResolvedVmMethod().getClass().getName()
                 + "#" + methodRef.getName());
             throw ex;
         }
@@ -3342,7 +3343,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
      */
     public final void visit_lookupswitch(int defAddress, int[] matchValues, int[] addresses) {
         final int n = matchValues.length;
-        // BootLog.debug("lookupswitch length=" + n);
+        // BootLogInstance.get().debug("lookupswitch length=" + n);
 
         final IntItem key = vstack.popInt();
         key.load(eContext);

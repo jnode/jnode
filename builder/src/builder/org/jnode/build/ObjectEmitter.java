@@ -26,11 +26,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Set;
+
 import org.jnode.assembler.BootImageNativeStream;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.x86.X86BinaryAssembler;
-import org.jnode.system.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.BootableObject;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.VmArrayClass;
@@ -191,7 +192,7 @@ public class ObjectEmitter {
                 throw new BuildException(ex);
             }
             if (!fieldInfo.isExact()) {
-                BootLog.warn("Use of in-exact matching class (" + clsName
+                BootLogInstance.get().warn("Use of in-exact matching class (" + clsName
                     + ") in bootimage at " + location);
             }
             legalInstanceClasses.add(clsName);
@@ -460,7 +461,7 @@ public class ObjectEmitter {
                             + jdkField.getName() + " of class "
                             + cls.getName(), ex);
                     } catch (JNodeClassNotFoundException ex) {
-                        BootLog
+                    	BootLogInstance.get()
                             .warn("JNode class not found "
                                 + ex.getMessage());
                         value = null;

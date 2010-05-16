@@ -1784,7 +1784,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         if (!isCompiling()) {
             if (loader.isCompileRequired()) {
                 state |= VmTypeState.ST_COMPILING;
-                // BootLog.debug("Compiling " + getName());
+                // BootLogInstance.get().debug("Compiling " + getName());
 
                 // Compile the superclass (if any)
                 if (superClass != null) {

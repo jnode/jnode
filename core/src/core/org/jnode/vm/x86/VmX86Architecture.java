@@ -24,7 +24,6 @@ import java.nio.ByteOrder;
 import java.util.HashMap;
 
 import org.jnode.assembler.x86.X86Constants;
-import org.jnode.system.BootLog;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
@@ -37,6 +36,8 @@ import org.jnode.vm.VmMultiMediaSupport;
 import org.jnode.vm.VmSystem;
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.MagicPermission;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.NativeCodeCompiler;
@@ -163,11 +164,11 @@ public abstract class VmX86Architecture extends VmArchitecture {
             } else if ("L1A".equalsIgnoreCase(compiler)) {
                 this.compilers[1] = new X86Level1ACompiler();
             } else { 
-                BootLog.warn("JNode native compiler '" + compiler + "' is unknown.");
+                BootLogInstance.get().warn("JNode native compiler '" + compiler + "' is unknown.");
             }
         } 
         if (this.compilers[1] == null) {
-            BootLog.warn("JNode native compiler defaulting to 'L1A'");
+            BootLogInstance.get().warn("JNode native compiler defaulting to 'L1A'");
             this.compilers[1] = new X86Level1ACompiler();
         }
         this.testCompilers = null;
@@ -255,12 +256,12 @@ public abstract class VmX86Architecture extends VmArchitecture {
         final MPFloatingPointerStructure mp = MPFloatingPointerStructure.find(
             rm, ResourceOwner.SYSTEM);
         if (mp == null) {
-            BootLog.info("No MP table found");
+            BootLogInstance.get().info("No MP table found");
             // No MP table found.
             return;
         }
         try {
-            BootLog.info("Found " + mp);
+            BootLogInstance.get().info("Found " + mp);
             this.mpConfigTable = mp.getMPConfigTable();
         } finally {
             mp.release();
@@ -277,7 +278,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
             localAPIC = new LocalAPIC(rm, owner, mpConfigTable
                 .getLocalApicAddress());
         } catch (ResourceNotFreeException ex) {
-            BootLog.error("Cannot claim APIC region");
+            BootLogInstance.get().error("Cannot claim APIC region");
             return;
         }
 
@@ -297,7 +298,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
                         ioAPIC.dump(System.out);
                         break;
                     } catch (ResourceNotFreeException ex) {
-                        BootLog.error("Cannot claim I/O APIC region ", ex);
+                        BootLogInstance.get().error("Cannot claim I/O APIC region ", ex);
                     }
                 }
             }
@@ -307,7 +308,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
             // Detect Hyper threading on current (bootstrap) processor
             VmX86Processor.detectAndstartLogicalProcessors(rm);
         } catch (ResourceNotFreeException ex) {
-            BootLog.error("Cannot claim region for logical processor startup",
+            BootLogInstance.get().error("Cannot claim region for logical processor startup",
                 ex);
         }
 
@@ -343,12 +344,12 @@ public abstract class VmX86Architecture extends VmArchitecture {
             try {
                 newCpu.startup(rm);
             } catch (ResourceNotFreeException ex) {
-                BootLog.error("Cannot claim region for processor startup", ex);
+                BootLogInstance.get().error("Cannot claim region for processor startup", ex);
             }
         }
 
         // If there is more then one CPU, start sending timeslice interrupts now
-        BootLog.info("Activating timeslice interrupts");
+        BootLogInstance.get().info("Activating timeslice interrupts");
         bootCpu.activateTimeSliceInterrupts();
     }
 

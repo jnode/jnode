@@ -23,6 +23,7 @@ package org.jnode.vm;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.SharedStatics;
 import org.jnode.annotation.Uninterruptible;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmThread;
 import org.vmmagic.unboxed.Address;
@@ -244,9 +245,8 @@ public final class MemoryBlockManager extends VmSystemObject {
     /**
      * Initialize this manager.
      */
-    private static void initialize() {
+    private static void initialize() {    	
         Unsafe.debug("Initialize MemoryBlockManager\n");
-
         startPtr = blockAlign(Unsafe.getMemoryStart().toWord(), true).toAddress();
         endPtr = blockAlign(Unsafe.getMemoryEnd().toWord(), false).toAddress();
 

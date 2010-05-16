@@ -21,10 +21,11 @@
 package org.jnode.test.framework;
 
 import org.apache.log4j.Logger;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
-import org.jnode.system.BootLog;
 
 /**
  * @author Fabien DUMINY (fduminy at jnode.org)
@@ -44,7 +45,7 @@ public class TestRunnerPlugin extends Plugin {
     public TestRunnerPlugin(PluginDescriptor descriptor) {
         super(descriptor);
         manager = new TestManager(descriptor.getExtensionPoint("tests"));
-        BootLog.debug("TestRunnerPlugin created : classloader=" + descriptor.getPluginClassLoader());
+        BootLogInstance.get().debug("TestRunnerPlugin created : classloader=" + descriptor.getPluginClassLoader());
     }
 
     /**

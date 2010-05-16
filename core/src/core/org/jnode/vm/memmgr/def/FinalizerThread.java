@@ -20,8 +20,9 @@
  
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.system.BootLog;
 import org.jnode.annotation.MagicPermission;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.scheduler.Monitor;
 import org.vmmagic.unboxed.Word;
@@ -117,7 +118,7 @@ final class FinalizerThread extends Thread {
                 }
             } catch (Throwable ex) {
                 try {
-                    BootLog.error("Error in FinalizerThread", ex);
+                    BootLogInstance.get().error("Error in FinalizerThread", ex);
                 } catch (Throwable ex2) {
                     // Ignore
                 }

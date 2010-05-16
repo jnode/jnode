@@ -21,7 +21,9 @@
 package org.jnode.vm.bytecode;
 
 import java.util.TreeMap;
-import org.jnode.system.BootLog;
+
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
@@ -114,7 +116,7 @@ public class DeadBlockFinder extends BytecodeVisitorSupport implements BytecodeF
      */
     public void startInstruction(int address) {
         if (debug) {
-            BootLog.debug("#" + address);
+            BootLogInstance.get().debug("#" + address);
         }
         curAddress = address;
         super.startInstruction(address);
@@ -126,7 +128,7 @@ public class DeadBlockFinder extends BytecodeVisitorSupport implements BytecodeF
         }
         boolean next_is_bb = nextIsStartOfBB;
         if (nextIsStartOfBB) {
-            if (debug) BootLog.debug("\tnextIsStartOfBB\t" + nextFollowsTypeStack);
+            if (debug) BootLogInstance.get().debug("\tnextIsStartOfBB\t" + nextFollowsTypeStack);
             startBB(address, nextFollowsTypeStack);
             nextIsStartOfBB = false;
             nextFollowsTypeStack = true;
@@ -144,10 +146,10 @@ public class DeadBlockFinder extends BytecodeVisitorSupport implements BytecodeF
                 current.setRetTarget(true);
             }
 
-            if (debug) BootLog.debug("\tcurrent\t" + current);
+            if (debug) BootLogInstance.get().debug("\tcurrent\t" + current);
         }
         if (debug) {
-            BootLog.debug("#" + address);
+            BootLogInstance.get().debug("#" + address);
         }
     }
 
@@ -409,7 +411,7 @@ public class DeadBlockFinder extends BytecodeVisitorSupport implements BytecodeF
      */
     public void visit_ireturn() {
         if (debug) {
-            BootLog.debug("ireturn at " + curAddress);
+            BootLogInstance.get().debug("ireturn at " + curAddress);
         }
         endBB(false);
     }

@@ -27,6 +27,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
@@ -34,7 +36,6 @@ import org.jnode.plugin.ExtensionPointListener;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
-import org.jnode.system.BootLog;
 
 /**
  * Plugin that installs itself as an URL Handler Factory.
@@ -68,7 +69,7 @@ public class ProtocolHandlerFactoryPlugin extends Plugin implements
         try {
             setHandlerFactory(this);
         } catch (SecurityException ex) {
-            BootLog.error("Cannot set URL Handler Factory");
+            BootLogInstance.get().error("Cannot set URL Handler Factory");
         }
     }
 
@@ -80,7 +81,7 @@ public class ProtocolHandlerFactoryPlugin extends Plugin implements
         try {
             setHandlerFactory(null);
         } catch (SecurityException ex) {
-            BootLog.error("Cannot reset URL Handler Factory");
+            BootLogInstance.get().error("Cannot reset URL Handler Factory");
         }
     }
 
@@ -93,9 +94,9 @@ public class ProtocolHandlerFactoryPlugin extends Plugin implements
             try {
                 return (URLStreamHandler) cls.newInstance();
             } catch (InstantiationException ex) {
-                BootLog.error("Cannot instantiate " + cls.getName());
+                BootLogInstance.get().error("Cannot instantiate " + cls.getName());
             } catch (IllegalAccessException ex) {
-                BootLog.error("Illegal access to " + cls.getName());
+                BootLogInstance.get().error("Illegal access to " + cls.getName());
             }
         }
         return null;
@@ -150,7 +151,7 @@ public class ProtocolHandlerFactoryPlugin extends Plugin implements
                         final Class<? extends URLStreamHandler> cls = cl.loadClass(className);
                         handlerClasses.put(protocol, cls);
                     } catch (ClassNotFoundException ex) {
-                        BootLog.error("Cannot load protocol handler class " + className);
+                        BootLogInstance.get().error("Cannot load protocol handler class " + className);
                     }
                 }
             }

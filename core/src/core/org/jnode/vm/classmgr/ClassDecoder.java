@@ -25,7 +25,6 @@ import java.lang.annotation.Annotation;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 
-import org.jnode.system.BootLog;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.VmUtils;
 import org.jnode.annotation.AllowedPackages;
@@ -42,6 +41,8 @@ import org.jnode.annotation.NoWriteBarrier;
 import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.annotation.SharedStatics;
 import org.jnode.annotation.Uninterruptible;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.vmmagic.pragma.PragmaException;
 import org.vmmagic.pragma.UninterruptiblePragma;
 
@@ -243,7 +244,7 @@ public final class ClassDecoder {
         final int maj_version = data.getChar();
 
         if (false) {
-            BootLog.debug("Class file version " + maj_version + ";"
+            BootLogInstance.get().debug("Class file version " + maj_version + ";"
                 + min_version);
         }
 
@@ -497,7 +498,7 @@ public final class ClassDecoder {
             nativeType = cl.loadClass(nativeClassName, false);
         } catch (ClassNotFoundException ex) {
             if (verbose) {
-                BootLog.error("Native class replacement (" + nativeClassName
+                BootLogInstance.get().error("Native class replacement (" + nativeClassName
                     + ") not found");
             }
             return null;
@@ -512,7 +513,7 @@ public final class ClassDecoder {
 
         if (nativeMethod == null) {
             if (verbose) {
-                BootLog.error("Native method replacement (" + method
+                BootLogInstance.get().error("Native method replacement (" + method
                     + ") not found");
             }
             return null;

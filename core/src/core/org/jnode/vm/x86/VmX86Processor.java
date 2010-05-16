@@ -22,7 +22,6 @@ package org.jnode.vm.x86;
 
 import java.io.PrintWriter;
 
-import org.jnode.system.BootLog;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.util.NumberUtils;
@@ -36,6 +35,8 @@ import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.NoFieldAlignments;
 import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.annotation.Uninterruptible;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.performance.PerformanceCounters;
@@ -325,7 +326,7 @@ public abstract class VmX86Processor extends VmProcessor {
         try {
             detectAndstartLogicalProcessors(cpu.rm);
         } catch (ResourceNotFreeException ex) {
-            BootLog.error("Cannot detect logical processors", ex);
+            BootLogInstance.get().error("Cannot detect logical processors", ex);
         }
 
         // Run idle thread.

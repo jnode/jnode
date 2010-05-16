@@ -22,8 +22,9 @@ package org.jnode.work;
 
 import javax.naming.NameNotFoundException;
 
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.BootLog;
 
 
 /**
@@ -45,7 +46,7 @@ public class WorkUtils {
             wm.add(work);
             return true;
         } catch (NameNotFoundException ex) {
-            BootLog.error("Cannot find workmanager", ex);
+            BootLogInstance.get().error("Cannot find workmanager", ex);
             return false;
         }
     }

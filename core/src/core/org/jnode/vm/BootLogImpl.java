@@ -18,64 +18,49 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.system;
+package org.jnode.vm;
 
 import java.io.PrintStream;
 
-import org.jnode.vm.Unsafe;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 
 /**
  * Logging class used during bootstrap.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class BootLog {
+class BootLogImpl implements BootLog, BootableObject {
 
-    public static final int DEBUG = 1;
-    public static final int INFO = 2;
-    public static final int WARN = 3;
-    public static final int ERROR = 4;
-    public static final int FATAL = 5;
-
-    private static PrintStream debugOut;
+    private PrintStream debugOut;
 
     /**
-     * Log a debug message
-     *
-     * @param msg
+     * {@inheritDoc}
      */
-    public static void debug(String msg) {
+    public void debug(String msg) {
         final PrintStream out = (debugOut != null) ? debugOut : System.out;
         log(DEBUG, out, msg, null);
     }
 
     /**
-     * Log a debug message
-     *
-     * @param msg
-     * @param ex
+     * {@inheritDoc}
      */
-    public static void debug(String msg, Throwable ex) {
+    public void debug(String msg, Throwable ex) {
         final PrintStream out = (debugOut != null) ? debugOut : System.out;
         log(DEBUG, out, msg, ex);
     }
 
     /**
-     * Log an error message
-     *
-     * @param msg
+     * {@inheritDoc}
      */
-    public static void error(String msg) {
+    public void error(String msg) {
         log(ERROR, System.err, msg, null);
     }
 
     /**
-     * Log an error message
-     *
-     * @param msg
-     * @param ex
+     * {@inheritDoc}
      */
-    public static void error(String msg, Throwable ex) {
+    public void error(String msg, Throwable ex) {
         log(ERROR, System.err, msg, ex);
         /*try {
               Thread.sleep(2500);
@@ -85,68 +70,51 @@ public class BootLog {
     }
 
     /**
-     * Log an fatal message
-     *
-     * @param msg
+     * {@inheritDoc}
      */
-    public static void fatal(String msg) {
+    public void fatal(String msg) {
         log(FATAL, System.err, msg, null);
     }
 
     /**
-     * Log an fatal message
-     *
-     * @param msg
-     * @param ex
+     * {@inheritDoc}
      */
-    public static void fatal(String msg, Throwable ex) {
+    public void fatal(String msg, Throwable ex) {
         log(FATAL, System.err, msg, ex);
     }
 
     /**
-     * Log an info message
-     *
-     * @param msg
+     * {@inheritDoc}
      */
-    public static void info(String msg) {
+    public void info(String msg) {
         log(INFO, System.out, msg, null);
     }
 
     /**
-     * Log an info message
-     *
-     * @param msg
-     * @param ex
+     * {@inheritDoc}
      */
-    public static void info(String msg, Throwable ex) {
+    public void info(String msg, Throwable ex) {
         log(INFO, System.out, msg, ex);
     }
 
     /**
-     * Log an warning message
-     *
-     * @param msg
-     * @param ex
+     * {@inheritDoc}
      */
-    public static void warn(String msg, Throwable ex) {
+    public void warn(String msg, Throwable ex) {
         log(WARN, System.out, msg, ex);
     }
 
     /**
-     * Log an warning message
-     *
-     * @param msg
+     * {@inheritDoc}
      */
-    public static void warn(String msg) {
+    public void warn(String msg) {
         log(WARN, System.out, msg, null);
     }
 
     /**
-     * Set the stream to use for debug logs.
-     *
-     * @param out
+     * {@inheritDoc}
      */
-    public static void setDebugOut(PrintStream out) {
+    public void setDebugOut(PrintStream out) {
         debugOut = out;
     }
 
@@ -158,7 +126,7 @@ public class BootLog {
      * @param msg
      * @param ex
      */
-    private static void log(int level, PrintStream ps, String msg, Throwable ex) {
+    private void log(int level, PrintStream ps, String msg, Throwable ex) {
         if (ps != null) {
             if (msg != null) {
                 ps.println(msg);
@@ -177,4 +145,9 @@ public class BootLog {
             }
         }
     }
+
+	static void initialize() {
+        Unsafe.debug("Initialize BootLog\n");		
+		BootLogInstance.set(new BootLogImpl());
+	}
 }

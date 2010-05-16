@@ -33,21 +33,21 @@ import javax.naming.NameNotFoundException;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.jnode.naming.InitialNaming;
-import org.jnode.plugin.PluginManager;
-import org.jnode.security.JNodePermission;
-import org.jnode.system.BootLog;
-import org.jnode.system.MemoryResource;
-import org.jnode.system.ResourceManager;
-import org.jnode.system.ResourceNotFreeException;
-import org.jnode.system.ResourceOwner;
-import org.jnode.system.SimpleResourceOwner;
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.annotation.SharedStatics;
 import org.jnode.annotation.Uninterruptible;
+import org.jnode.bootlog.BootLogInstance;
+import org.jnode.naming.InitialNaming;
+import org.jnode.plugin.PluginManager;
+import org.jnode.security.JNodePermission;
+import org.jnode.system.MemoryResource;
+import org.jnode.system.ResourceManager;
+import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.ResourceOwner;
+import org.jnode.system.SimpleResourceOwner;
 import org.jnode.vm.classmgr.AbstractExceptionHandler;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmByteCode;
@@ -118,11 +118,13 @@ public final class VmSystem {
      * Initialize the Virtual Machine
      */
     public static void initialize() {
-        if (!inited) {
-
+        if (!inited) {            
+        	// Initialize BootLog
+        	BootLogImpl.initialize();
+        	
             // Initialize resource manager
             final ResourceManager rm = ResourceManagerImpl.initialize();
-
+            
             /* Initialize the system classloader */
             VmSystemClassLoader loader = (VmSystemClassLoader) (getVmClass(VmProcessor.current()).getLoader());
             systemLoader = loader;
@@ -249,16 +251,16 @@ public final class VmSystem {
         final Extent size = end.toWord().sub(start.toWord()).toExtent();
         if (size.toWord().isZero()) {
             // No initial jarfile
-            BootLog.info("No initial jarfile found");
+            BootLogInstance.get().info("No initial jarfile found");
             return null;
         } else {
-            BootLog.info("Found initial jarfile of " + size.toInt() + "b");
+            BootLogInstance.get().info("Found initial jarfile of " + size.toInt() + "b");
             try {
                 final ResourceOwner owner = new SimpleResourceOwner("System");
                 return rm.claimMemoryResource(owner, start, size,
                     ResourceManager.MEMMODE_NORMAL);
             } catch (ResourceNotFreeException ex) {
-                BootLog.error("Cannot claim initjar resource", ex);
+                BootLogInstance.get().error("Cannot claim initjar resource", ex);
                 return null;
             }
         }
@@ -566,7 +568,7 @@ public final class VmSystem {
             final VmType exClass = VmMagic.getObjectType(ex);
             final VmMethod method = reader.getMethod(frame);
             if (method == null) {
-                Unsafe.debug("Unknown method");
+                Unsafe.debug("Unknown method in class " + ex.getClass().getName());
                 return null;
             }
 
@@ -831,7 +833,7 @@ public final class VmSystem {
                     }
                 }
             } catch (Exception ex) {
-                BootLog.error("Error getting rtcIncrement ", ex);
+                BootLogInstance.get().error("Error getting rtcIncrement ", ex);
                 rtcIncrement = 1;
             }
         }

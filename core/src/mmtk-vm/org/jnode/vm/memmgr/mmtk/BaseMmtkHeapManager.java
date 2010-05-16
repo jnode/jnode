@@ -26,8 +26,9 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.naming.NameNotFoundException;
 
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.BootLog;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
@@ -234,9 +235,9 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
             heapResource = rm.claimMemoryResource(ResourceOwner.SYSTEM, start,
                     size, ResourceManager.MEMMODE_NORMAL);
         } catch (NameNotFoundException ex) {
-            BootLog.fatal("Cannot find resource manager", ex);
+            BootLogInstance.get().fatal("Cannot find resource manager", ex);
         } catch (ResourceNotFreeException ex) {
-            BootLog.fatal("Cannot claim available heap region", ex);
+            BootLogInstance.get().fatal("Cannot claim available heap region", ex);
         }
 
     }

@@ -20,10 +20,12 @@
  
 package org.jnode.driver;
 
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.plugin.PluginClassLoader;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginDescriptorListener;
-import org.jnode.system.BootLog;
+
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -143,10 +145,10 @@ public abstract class Driver {
             final Device dev = Driver.this.device;
             if (dev != null) {
                 try {
-                    BootLog.debug("Stopping device " + dev.getId() + " due to plugin stop");
+                    BootLogInstance.get().debug("Stopping device " + dev.getId() + " due to plugin stop");
                     dev.stop(true);
                 } catch (DriverException ex) {
-                    BootLog.error("Cannot stop device " + dev.getId(), ex);
+                    BootLogInstance.get().error("Cannot stop device " + dev.getId(), ex);
                 }
             }
             descriptor.removeListener(this);

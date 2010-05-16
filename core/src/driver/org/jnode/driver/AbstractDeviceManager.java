@@ -30,9 +30,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginException;
-import org.jnode.system.BootLog;
 import org.jnode.util.StopWatch;
 
 /**
@@ -172,7 +174,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
 
         // Test for no<id> on the command line
         if (cmdLine.indexOf("no" + device.getId()) >= 0) {
-            BootLog.info("Blocking the start of " + device.getId());
+            BootLogInstance.get().info("Blocking the start of " + device.getId());
             shouldStart = false;
         }
 
@@ -186,7 +188,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
                 start(device);
             } catch (DeviceNotFoundException ex) {
                 // Should not happen
-                BootLog.error("Device removed before being started", ex);
+                BootLogInstance.get().error("Device removed before being started", ex);
             }
         }
     }
@@ -247,7 +249,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
             }
         } catch (DeviceNotFoundException ex) {
             // Not found, so stop
-            BootLog.debug("Device not found in unregister");
+            BootLogInstance.get().debug("Device not found in unregister");
         }
     }
 
@@ -265,25 +267,25 @@ public abstract class AbstractDeviceManager implements DeviceManager {
         // Start it (if needed)
         if (!device.isStarted()) {
             try {
-                BootLog.debug("Starting " + device.getId());
+                BootLogInstance.get().debug("Starting " + device.getId());
                 //new DeviceStarter(device).start(getDefaultStartTimeout());
                 final StopWatch sw = new StopWatch();
                 device.start();
                 sw.stop();
                 if (sw.isElapsedLongerThen(defaultStartTimeout)) {
-                    BootLog.error("Device startup took " + sw + ": "
+                    BootLogInstance.get().error("Device startup took " + sw + ": "
                         + device.getId());
                 } else if (sw.isElapsedLongerThen(fastStartTimeout)) {
-                    BootLog.info("Device startup took " + sw + ": "
+                    BootLogInstance.get().info("Device startup took " + sw + ": "
                         + device.getId());
                 }
-                BootLog.debug("Started " + device.getId());
+                BootLogInstance.get().debug("Started " + device.getId());
             } catch (DriverException ex) {
-                BootLog.error("Cannot start " + device.getId(), ex);
+                BootLogInstance.get().error("Cannot start " + device.getId(), ex);
                 //} catch (TimeoutException ex) {
-                //    BootLog.warn("Timeout in start of " + device.getId());
+                //    BootLogInstance.get().warn("Timeout in start of " + device.getId());
             } catch (Throwable ex) {
-                BootLog.error("Cannot start " + device.getId(), ex);
+                BootLogInstance.get().error("Cannot start " + device.getId(), ex);
             }
         }
     }
@@ -301,9 +303,9 @@ public abstract class AbstractDeviceManager implements DeviceManager {
         getDevice(device.getId());
         // Stop it
         if (device.isStarted()) {
-            BootLog.debug("Starting " + device.getId());
+            BootLogInstance.get().debug("Starting " + device.getId());
             device.stop(false);
-            BootLog.debug("Stopped " + device.getId());
+            BootLogInstance.get().debug("Stopped " + device.getId());
         }
     }
 
@@ -396,10 +398,10 @@ public abstract class AbstractDeviceManager implements DeviceManager {
         while (!devices.isEmpty()) {
             final Device dev = (Device) devices.values().iterator().next();
             try {
-                BootLog.debug("Stopping device " + dev.getId());
+                BootLogInstance.get().debug("Stopping device " + dev.getId());
                 unregister(dev);
             } catch (DriverException ex) {
-                BootLog.error("Failed to stop device " + dev.getId(), ex);
+                BootLogInstance.get().error("Failed to stop device " + dev.getId(), ex);
             }
         }
 
@@ -432,10 +434,10 @@ public abstract class AbstractDeviceManager implements DeviceManager {
                         dev.setDriver(drv);
                         start(dev);
                     } catch (DriverException ex) {
-                        BootLog.error("Cannot start " + dev.getId(), ex);
+                        BootLogInstance.get().error("Cannot start " + dev.getId(), ex);
                     } catch (DeviceNotFoundException ex) {
                         // Should not happen
-                        BootLog.error("Device is gone before is can be started " + dev.getId(), ex);
+                        BootLogInstance.get().error("Device is gone before is can be started " + dev.getId(), ex);
                     }
                 }
             }
@@ -455,9 +457,9 @@ public abstract class AbstractDeviceManager implements DeviceManager {
             try {
                 finder.findDevices(this, systemBus);
             } catch (DeviceException ex) {
-                BootLog.error("Error while trying to find system devices", ex);
+                BootLogInstance.get().error("Error while trying to find system devices", ex);
             } catch (RuntimeException ex) {
-                BootLog
+                BootLogInstance.get()
                     .error(
                         "Runtime exception while trying to find system devices",
                         ex);
@@ -482,7 +484,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
                 }
             }
         }
-        BootLog.debug("No driver found for " + device
+        BootLogInstance.get().debug("No driver found for " + device
             + " delaying device startup");
         return null;
     }
@@ -533,7 +535,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
             sw.start();
             l.deviceRegistered(device);
             if (sw.isElapsedLongerThen(100)) {
-                BootLog.error("DeviceManagerListener took " + sw
+                BootLogInstance.get().error("DeviceManagerListener took " + sw
                     + " in deviceRegistered: " + l.getClass().getName());
             }
         }
@@ -554,7 +556,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
             sw.start();
             l.deviceUnregister(device);
             if (sw.isElapsedLongerThen(100)) {
-                BootLog.error("DeviceManagerListener took " + sw
+                BootLogInstance.get().error("DeviceManagerListener took " + sw
                     + " in deviceUnregister: " + l.getClass().getName());
             }
         }
@@ -575,7 +577,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
             sw.start();
             l.deviceStarted(device);
             if (sw.isElapsedLongerThen(100)) {
-                BootLog.error("DeviceListener (in manager) took " + sw
+                BootLogInstance.get().error("DeviceListener (in manager) took " + sw
                     + " in deviceStarted: " + l.getClass().getName());
             }
         }
@@ -596,7 +598,7 @@ public abstract class AbstractDeviceManager implements DeviceManager {
             sw.start();
             l.deviceStop(device);
             if (sw.isElapsedLongerThen(100)) {
-                BootLog.error("DeviceListener (in manager) took " + sw
+                BootLogInstance.get().error("DeviceListener (in manager) took " + sw
                     + " in deviceStop: " + l.getClass().getName());
             }
         }

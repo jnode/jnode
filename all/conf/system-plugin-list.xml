@@ -13,6 +13,7 @@ These (system) plugins are always included in the init-jar.
 
     <plugin id="org.jnode.runtime"/>
     <plugin id="org.jnode.runtime.core"/>
+    <plugin id="org.jnode.runtime.core.bootlog"/>
     <plugin id="org.jnode.security"/>
     <plugin id="org.jnode.util"/>
     <plugin id="org.jnode.vm"/>
