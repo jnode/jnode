@@ -22,7 +22,7 @@ package org.jnode.driver.net.lance;
 
 import org.apache.log4j.Logger;
 import org.jnode.net.SocketBuffer;
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 
 /**
  * @author Chris Cole

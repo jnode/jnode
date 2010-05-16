@@ -22,8 +22,8 @@ package org.jnode.vm.x86;
 
 import java.io.PrintWriter;
 
-import org.jnode.system.ResourceManager;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceManager;
+import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.CpuID;
 import org.jnode.vm.Unsafe;

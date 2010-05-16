@@ -30,7 +30,7 @@ import org.jnode.driver.net.ethernet.spi.BasicEthernetDriver;
 import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.net.wireless.AuthenticationMode;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceNotFreeException;
 
 /**
  * Base class for wireless ethernet drivers.

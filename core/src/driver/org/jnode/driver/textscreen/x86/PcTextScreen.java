@@ -26,11 +26,11 @@ import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.MemoryResource;
-import org.jnode.system.ResourceManager;
-import org.jnode.system.ResourceNotFreeException;
-import org.jnode.system.ResourceOwner;
-import org.jnode.system.SimpleResourceOwner;
+import org.jnode.system.resource.MemoryResource;
+import org.jnode.system.resource.ResourceManager;
+import org.jnode.system.resource.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceOwner;
+import org.jnode.system.resource.SimpleResourceOwner;
 import org.jnode.vm.Unsafe;
 import org.vmmagic.unboxed.Address;
 

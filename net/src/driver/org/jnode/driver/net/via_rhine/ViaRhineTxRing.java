@@ -24,7 +24,7 @@ import java.util.Arrays;
 import static org.jnode.driver.net.via_rhine.ViaRhineConstants.TX_RING_SIZE;
 import org.jnode.net.SocketBuffer;
 import static org.jnode.net.ethernet.EthernetConstants.ETH_ZLEN;
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.ResourceManager;
 
 /**
  * @author Levente S\u00e1ntha

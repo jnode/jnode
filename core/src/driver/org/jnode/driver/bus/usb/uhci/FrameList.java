@@ -20,7 +20,7 @@
  
 package org.jnode.driver.bus.usb.uhci;
 
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.ResourceManager;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

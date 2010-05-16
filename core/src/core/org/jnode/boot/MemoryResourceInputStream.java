@@ -23,7 +23,7 @@ package org.jnode.boot;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 import org.jnode.annotation.MagicPermission;
 
 

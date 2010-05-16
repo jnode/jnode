@@ -24,9 +24,9 @@ import java.nio.ByteOrder;
 import java.util.HashMap;
 
 import org.jnode.assembler.x86.X86Constants;
-import org.jnode.system.ResourceManager;
-import org.jnode.system.ResourceNotFreeException;
-import org.jnode.system.ResourceOwner;
+import org.jnode.system.resource.ResourceManager;
+import org.jnode.system.resource.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceOwner;
 import org.jnode.vm.MemoryMapEntry;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;

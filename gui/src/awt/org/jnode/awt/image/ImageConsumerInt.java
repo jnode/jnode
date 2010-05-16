@@ -24,7 +24,7 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.ColorModel;
 import org.apache.log4j.Logger;
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 
 /**
  * Image consumer that copies pixels of 32-bit to the destination.

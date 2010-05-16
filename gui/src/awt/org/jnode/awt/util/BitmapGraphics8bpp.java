@@ -23,7 +23,7 @@ package org.jnode.awt.util;
 import java.awt.Rectangle;
 import java.awt.image.Raster;
 import org.jnode.driver.video.Surface;
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 
 final class BitmapGraphics8bpp extends AbstractBitmapGraphics {
 

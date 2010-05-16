@@ -20,8 +20,8 @@
  
 package org.jnode.vm.scheduler;
 
-import org.jnode.system.IRQHandler;
-import org.jnode.system.ResourceOwner;
+import org.jnode.system.resource.IRQHandler;
+import org.jnode.system.resource.ResourceOwner;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.Uninterruptible;
 

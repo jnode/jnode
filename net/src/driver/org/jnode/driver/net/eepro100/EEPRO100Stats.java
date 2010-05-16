@@ -20,8 +20,8 @@
  
 package org.jnode.driver.net.eepro100;
 
-import org.jnode.system.MemoryResource;
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.MemoryResource;
+import org.jnode.system.resource.ResourceManager;
 import org.vmmagic.unboxed.Address;
 
 /**

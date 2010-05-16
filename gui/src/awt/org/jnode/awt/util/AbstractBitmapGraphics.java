@@ -24,8 +24,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.Raster;
 import org.apache.log4j.Logger;
-import org.jnode.system.MemoryResource;
-import org.jnode.system.MultiMediaMemoryResource;
+import org.jnode.system.resource.MemoryResource;
+import org.jnode.system.resource.MultiMediaMemoryResource;
 
 public abstract class AbstractBitmapGraphics extends BitmapGraphics {
     protected final int bytesPerLine;

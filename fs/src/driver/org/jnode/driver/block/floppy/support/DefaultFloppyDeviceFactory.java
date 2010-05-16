@@ -35,7 +35,7 @@ import org.jnode.driver.block.floppy.FloppyParameters;
 import org.jnode.driver.block.floppy.FloppyReadSectorCommand;
 import org.jnode.driver.block.floppy.FloppySeekCommand;
 import org.jnode.driver.block.floppy.FloppyWriteSectorCommand;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceNotFreeException;
 
 public class DefaultFloppyDeviceFactory implements FloppyDeviceFactory {
     public DefaultFloppyDeviceFactory() {

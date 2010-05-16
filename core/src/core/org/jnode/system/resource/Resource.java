@@ -18,22 +18,36 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.system;
+package org.jnode.system.resource;
 
 /**
- * Owner of a resource.
+ * Type independent resource interface.
+ * <p/>
+ * Every resource in the system is owned by an owner and must be
+ * released after it has been used.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public interface ResourceOwner {
-
-    public static final ResourceOwner SYSTEM = new SimpleResourceOwner("SYSTEM");
+public interface Resource {
 
     /**
-     * Gets a short description of this owner.
+     * Gets the owner of this resource.
      *
-     * @return The short description
+     * @return The owner
      */
-    public String getShortDescription();
+    public ResourceOwner getOwner();
+
+    /**
+     * Give up this resource. After this method has been called, the resource
+     * cannot be used anymore.
+     */
+    public void release();
+
+    /**
+     * Gets the parent resource if any.
+     *
+     * @return The parent resource, or null if this resource has no parent.
+     */
+    public Resource getParent();
 
 }

@@ -20,7 +20,7 @@
  
 package org.jnode.vm.x86;
 
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 import org.jnode.util.NumberUtils;
 
 

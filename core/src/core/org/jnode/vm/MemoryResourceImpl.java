@@ -23,13 +23,13 @@ package org.jnode.vm;
 import java.nio.ByteBuffer;
 import java.nio.MemoryRawData;
 
-import org.jnode.system.MemoryResource;
-import org.jnode.system.MultiMediaMemoryResource;
-import org.jnode.system.Resource;
-import org.jnode.system.ResourceManager;
-import org.jnode.system.ResourceNotFreeException;
-import org.jnode.system.ResourceOwner;
-import org.jnode.system.SimpleResourceOwner;
+import org.jnode.system.resource.MemoryResource;
+import org.jnode.system.resource.MultiMediaMemoryResource;
+import org.jnode.system.resource.Resource;
+import org.jnode.system.resource.ResourceManager;
+import org.jnode.system.resource.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceOwner;
+import org.jnode.system.resource.SimpleResourceOwner;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.vmmagic.unboxed.Address;
@@ -716,7 +716,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
     /**
      * (non-Javadoc)
      *
-     * @see org.jnode.system.MemoryResource#copy(int, int, int)
+     * @see org.jnode.system.resource.MemoryResource#copy(int, int, int)
      */
     public void copy(int srcMemPtr, int destMemPtr, int length) {
         testMemPtr(srcMemPtr, length);
@@ -836,7 +836,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#setByte(int, byte, int)
+     * @see org.jnode.system.resource.MemoryResource#setByte(int, byte, int)
      */
     public void setByte(int memPtr, byte value, int count) {
         testMemPtr(memPtr, count);
@@ -847,7 +847,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#setChar(int, char, int)
+     * @see org.jnode.system.resource.MemoryResource#setChar(int, char, int)
      */
     public void setChar(int memPtr, char value, int count) {
         testMemPtr(memPtr, count * 2);
@@ -858,7 +858,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#setDouble(int, double, int)
+     * @see org.jnode.system.resource.MemoryResource#setDouble(int, double, int)
      */
     public void setDouble(int memPtr, double value, int count) {
         testMemPtr(memPtr, count * 8);
@@ -869,7 +869,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#setFloat(int, float, int)
+     * @see org.jnode.system.resource.MemoryResource#setFloat(int, float, int)
      */
     public void setFloat(int memPtr, float value, int count) {
         testMemPtr(memPtr, count * 4);
@@ -880,7 +880,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#setInt24(int, int, int)
+     * @see org.jnode.system.resource.MemoryResource#setInt24(int, int, int)
      */
     public void setInt24(int memPtr, int value, int count) {
         testMemPtr(memPtr, count * 3);
@@ -891,7 +891,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#setInt(int, int, int)
+     * @see org.jnode.system.resource.MemoryResource#setInt(int, int, int)
      */
     public void setInt(int memPtr, int value, int count) {
         testMemPtr(memPtr, count * 4);
@@ -902,7 +902,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#setLong(int, long, int)
+     * @see org.jnode.system.resource.MemoryResource#setLong(int, long, int)
      */
     public void setLong(int memPtr, long value, int count) {
         testMemPtr(memPtr, count * 8);
@@ -913,7 +913,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#setObject(int, java.lang.Object, int)
+     * @see org.jnode.system.resource.MemoryResource#setObject(int, java.lang.Object, int)
      */
     public void setObject(int memPtr, Object value, int count) {
         testMemPtr(memPtr, count * slotSize);
@@ -924,7 +924,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#setShort(int, short, int)
+     * @see org.jnode.system.resource.MemoryResource#setShort(int, short, int)
      */
     public void setShort(int memPtr, short value, int count) {
         testMemPtr(memPtr, count * 2);
@@ -935,7 +935,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#andByte(int, byte, int)
+     * @see org.jnode.system.resource.MemoryResource#andByte(int, byte, int)
      */
     public void andByte(int memPtr, byte value, int count) {
         testMemPtr(memPtr, count);
@@ -946,7 +946,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#andChar(int, char, int)
+     * @see org.jnode.system.resource.MemoryResource#andChar(int, char, int)
      */
     public void andChar(int memPtr, char value, int count) {
         testMemPtr(memPtr, count * 2);
@@ -967,7 +967,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#andInt(int, int, int)
+     * @see org.jnode.system.resource.MemoryResource#andInt(int, int, int)
      */
     public void andInt(int memPtr, int value, int count) {
         testMemPtr(memPtr, count * 4);
@@ -978,7 +978,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#andLong(int, long, int)
+     * @see org.jnode.system.resource.MemoryResource#andLong(int, long, int)
      */
     public void andLong(int memPtr, long value, int count) {
         testMemPtr(memPtr, count * 8);
@@ -989,7 +989,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#andShort(int, short, int)
+     * @see org.jnode.system.resource.MemoryResource#andShort(int, short, int)
      */
     public void andShort(int memPtr, short value, int count) {
         testMemPtr(memPtr, count * 2);
@@ -1000,7 +1000,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#orByte(int, byte, int)
+     * @see org.jnode.system.resource.MemoryResource#orByte(int, byte, int)
      */
     public void orByte(int memPtr, byte value, int count) {
         testMemPtr(memPtr, count);
@@ -1011,7 +1011,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#orChar(int, char, int)
+     * @see org.jnode.system.resource.MemoryResource#orChar(int, char, int)
      */
     public void orChar(int memPtr, char value, int count) {
         testMemPtr(memPtr, count * 2);
@@ -1032,7 +1032,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#orInt(int, int, int)
+     * @see org.jnode.system.resource.MemoryResource#orInt(int, int, int)
      */
     public void orInt(int memPtr, int value, int count) {
         testMemPtr(memPtr, count * 4);
@@ -1043,7 +1043,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#orLong(int, long, int)
+     * @see org.jnode.system.resource.MemoryResource#orLong(int, long, int)
      */
     public void orLong(int memPtr, long value, int count) {
         testMemPtr(memPtr, count * 8);
@@ -1054,7 +1054,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#orShort(int, short, int)
+     * @see org.jnode.system.resource.MemoryResource#orShort(int, short, int)
      */
     public void orShort(int memPtr, short value, int count) {
         testMemPtr(memPtr, count * 2);
@@ -1065,7 +1065,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#xorByte(int, byte, int)
+     * @see org.jnode.system.resource.MemoryResource#xorByte(int, byte, int)
      */
     public void xorByte(int memPtr, byte value, int count) {
         testMemPtr(memPtr, count);
@@ -1076,7 +1076,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#xorChar(int, char, int)
+     * @see org.jnode.system.resource.MemoryResource#xorChar(int, char, int)
      */
     public void xorChar(int memPtr, char value, int count) {
         testMemPtr(memPtr, count * 2);
@@ -1087,7 +1087,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#xorInt(int, int, int)
+     * @see org.jnode.system.resource.MemoryResource#xorInt(int, int, int)
      */
     public void xorInt24(int memPtr, int value, int count) {
         testMemPtr(memPtr, count * 3);
@@ -1098,7 +1098,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#xorInt(int, int, int)
+     * @see org.jnode.system.resource.MemoryResource#xorInt(int, int, int)
      */
     public void xorInt(int memPtr, int value, int count) {
         testMemPtr(memPtr, count * 4);
@@ -1109,7 +1109,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#xorLong(int, long, int)
+     * @see org.jnode.system.resource.MemoryResource#xorLong(int, long, int)
      */
     public void xorLong(int memPtr, long value, int count) {
         testMemPtr(memPtr, count * 8);
@@ -1120,7 +1120,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      * @param memPtr
      * @param value
      * @param count
-     * @see org.jnode.system.MemoryResource#xorShort(int, short, int)
+     * @see org.jnode.system.resource.MemoryResource#xorShort(int, short, int)
      */
     public void xorShort(int memPtr, short value, int count) {
         testMemPtr(memPtr, count * 2);

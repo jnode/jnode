@@ -20,8 +20,8 @@
  
 package org.jnode.driver.block.floppy;
 
-import org.jnode.system.DMAException;
-import org.jnode.system.IRQHandler;
+import org.jnode.system.resource.DMAException;
+import org.jnode.system.resource.IRQHandler;
 import org.jnode.util.TimeoutException;
 
 /**

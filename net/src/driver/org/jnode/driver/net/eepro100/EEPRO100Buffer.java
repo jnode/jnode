@@ -23,7 +23,7 @@ package org.jnode.driver.net.eepro100;
 import org.apache.log4j.Logger;
 import org.jnode.driver.net.NetworkException;
 import org.jnode.net.SocketBuffer;
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.ResourceManager;
 import org.jnode.util.NumberUtils;
 
 /**

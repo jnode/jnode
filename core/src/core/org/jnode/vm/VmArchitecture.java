@@ -23,7 +23,7 @@ package org.jnode.vm;
 import java.nio.ByteOrder;
 
 import org.jnode.permission.JNodePermission;
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.ResourceManager;
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.MagicPermission;

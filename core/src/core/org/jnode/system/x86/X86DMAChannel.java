@@ -20,11 +20,11 @@
  
 package org.jnode.system.x86;
 
-import org.jnode.system.DMAException;
-import org.jnode.system.DMAResource;
-import org.jnode.system.MemoryResource;
-import org.jnode.system.Resource;
-import org.jnode.system.ResourceOwner;
+import org.jnode.system.resource.DMAException;
+import org.jnode.system.resource.DMAResource;
+import org.jnode.system.resource.MemoryResource;
+import org.jnode.system.resource.Resource;
+import org.jnode.system.resource.ResourceOwner;
 
 /**
  * @author epr
@@ -56,7 +56,7 @@ public class X86DMAChannel implements DMAResource, DMAConstants {
      * @param mode
      * @throws IllegalArgumentException
      * @throws DMAException
-     * @see org.jnode.system.DMAResource#setup(MemoryResource, int, int)
+     * @see org.jnode.system.resource.DMAResource#setup(MemoryResource, int, int)
      */
     public void setup(MemoryResource address, int length, int mode)
         throws IllegalArgumentException, DMAException {
@@ -98,14 +98,14 @@ public class X86DMAChannel implements DMAResource, DMAConstants {
 
     /**
      * @return the owner of this resource
-     * @see org.jnode.system.Resource#getOwner()
+     * @see org.jnode.system.resource.Resource#getOwner()
      */
     public ResourceOwner getOwner() {
         return owner;
     }
 
     /**
-     * @see org.jnode.system.Resource#release()
+     * @see org.jnode.system.resource.Resource#release()
      */
     public void release() {
         service.release(this);
@@ -121,7 +121,7 @@ public class X86DMAChannel implements DMAResource, DMAConstants {
     }
 
     /**
-     * @see org.jnode.system.Resource#getParent()
+     * @see org.jnode.system.resource.Resource#getParent()
      */
     public Resource getParent() {
         return null;

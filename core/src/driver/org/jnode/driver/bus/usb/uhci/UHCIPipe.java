@@ -30,7 +30,7 @@ import org.jnode.driver.bus.usb.USBPipe;
 import org.jnode.driver.bus.usb.USBPipeListener;
 import org.jnode.driver.bus.usb.USBRequest;
 import org.jnode.driver.bus.usb.spi.AbstractUSBRequest;
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.ResourceManager;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.Queue;
 

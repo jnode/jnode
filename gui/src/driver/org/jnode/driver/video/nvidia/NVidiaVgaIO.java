@@ -23,7 +23,7 @@ package org.jnode.driver.video.nvidia;
 import org.jnode.driver.video.vgahw.VgaConstants;
 import org.jnode.driver.video.vgahw.VgaIO;
 import org.jnode.driver.video.vgahw.VgaUtils;
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

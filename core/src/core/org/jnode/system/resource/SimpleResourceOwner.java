@@ -18,13 +18,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.system;
+package org.jnode.system.resource;
 
 /**
  * Simple ResourceOwner implementation.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
- * @see org.jnode.system.ResourceOwner
+ * @see org.jnode.system.resource.ResourceOwner
  */
 public class SimpleResourceOwner implements ResourceOwner {
 
@@ -36,7 +36,7 @@ public class SimpleResourceOwner implements ResourceOwner {
 
     /**
      * @return The short description
-     * @see org.jnode.system.ResourceOwner#getShortDescription()
+     * @see org.jnode.system.resource.ResourceOwner#getShortDescription()
      */
     public String getShortDescription() {
         return name;

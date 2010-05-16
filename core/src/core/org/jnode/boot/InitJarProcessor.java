@@ -36,7 +36,7 @@ import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginLoader;
 import org.jnode.plugin.PluginRegistry;
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 import org.jnode.util.JarBuffer;
 
 /**

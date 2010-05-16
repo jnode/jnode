@@ -21,8 +21,9 @@
 package java.nio;
 
 import gnu.classpath.Pointer;
-import org.jnode.system.MemoryResource;
-import org.jnode.system.ResourceNotFreeException;
+
+import org.jnode.system.resource.MemoryResource;
+import org.jnode.system.resource.ResourceNotFreeException;
 import org.vmmagic.unboxed.Offset;
 import org.vmmagic.unboxed.Extent;
 

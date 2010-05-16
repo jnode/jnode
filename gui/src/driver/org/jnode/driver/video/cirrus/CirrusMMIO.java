@@ -22,8 +22,8 @@ package org.jnode.driver.video.cirrus;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.video.ddc.DisplayDataChannelAPI;
-import org.jnode.system.IOResource;
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.IOResource;
+import org.jnode.system.resource.MemoryResource;
 
 /**
  * @author peda

@@ -24,8 +24,8 @@
   </extension>
         
   <extension point="org.jnode.security.permissions">
-    <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
-    <permission class="org.jnode.system.ResourcePermission" name="irq"/>
+    <permission class="org.jnode.system.resource.ResourcePermission" name="ioports"/>
+    <permission class="org.jnode.system.resource.ResourcePermission" name="irq"/>
   </extension>
         
 </plugin>

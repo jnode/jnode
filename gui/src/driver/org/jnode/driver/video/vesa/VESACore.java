@@ -43,9 +43,9 @@ import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.cursor.SoftwareCursor;
 import org.jnode.driver.video.util.AbstractSurface;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.MemoryResource;
-import org.jnode.system.ResourceManager;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.MemoryResource;
+import org.jnode.system.resource.ResourceManager;
+import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.util.NumberUtils;
 import org.vmmagic.unboxed.Address;
 

@@ -18,41 +18,24 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.system;
+package org.jnode.system.resource;
 
 /**
- * Requested resource is not available exception.
+ * Hardware Interrupt Handler interface.
+ * <p/>
+ * An interrupt handler is called from the kernel with interrupts disabled. So keep and handling
+ * here as short as possible!
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class ResourceNotFreeException extends Exception {
+public interface IRQHandler {
 
     /**
+     * Handle a given hardware interrupt. This method is called from the kernel with interrupts
+     * disabled. So keep and handling here as short as possible!
      *
+     * @param irq
      */
-    public ResourceNotFreeException() {
-        super();
-    }
+    public void handleInterrupt(int irq);
 
-    /**
-     * @param message
-     * @param cause
-     */
-    public ResourceNotFreeException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * @param cause
-     */
-    public ResourceNotFreeException(Throwable cause) {
-        super(cause);
-    }
-
-    /**
-     * @param s
-     */
-    public ResourceNotFreeException(String s) {
-        super(s);
-    }
 }

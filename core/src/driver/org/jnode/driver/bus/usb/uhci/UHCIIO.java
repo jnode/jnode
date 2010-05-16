@@ -20,7 +20,7 @@
  
 package org.jnode.driver.bus.usb.uhci;
 
-import org.jnode.system.IOResource;
+import org.jnode.system.resource.IOResource;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

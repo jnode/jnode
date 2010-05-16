@@ -24,7 +24,7 @@ import javax.naming.NamingException;
 import org.jnode.driver.system.cmos.CMOSService;
 import org.jnode.driver.system.cmos.def.RTC;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.util.BCDUtils;
 
 /**

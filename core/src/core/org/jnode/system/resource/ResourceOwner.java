@@ -18,32 +18,22 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.system;
-
+package org.jnode.system.resource;
 
 /**
- * Interface of Manager or Direct Memory Access resources.
+ * Owner of a resource.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public interface DMAManager {
+public interface ResourceOwner {
+
+    public static final ResourceOwner SYSTEM = new SimpleResourceOwner("SYSTEM");
 
     /**
-     * Name used to bind this service into the Initial Namespace
-     */
-    public static final Class<DMAManager> NAME = DMAManager.class; //"system/DMAService";
-
-    /**
-     * Claim a DMA channel identified by the given number.
+     * Gets a short description of this owner.
      *
-     * @param owner
-     * @param dmanr
-     * @return The claimed resource
-     * @throws IllegalArgumentException Invalid dmanr
-     * @throws ResourceNotFreeException Requested DMA channel is in use
+     * @return The short description
      */
-    public DMAResource claimDMAChannel(ResourceOwner owner, int dmanr)
-        throws IllegalArgumentException, ResourceNotFreeException;
-
+    public String getShortDescription();
 
 }

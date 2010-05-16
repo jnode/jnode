@@ -22,7 +22,7 @@ package org.jnode.driver.video.ati.radeon;
 
 import org.jnode.driver.video.vgahw.VgaConstants;
 import org.jnode.driver.video.vgahw.VgaIO;
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

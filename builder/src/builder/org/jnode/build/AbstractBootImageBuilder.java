@@ -1451,7 +1451,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.plugin.manager");
         addCompileHighOptLevel("org.jnode.plugin.model");
         addCompileHighOptLevel("org.jnode.security");
-        addCompileHighOptLevel("org.jnode.system");
+        addCompileHighOptLevel("org.jnode.system.resource");
         addCompileHighOptLevel("org.jnode.system.event");
         addCompileHighOptLevel("org.jnode.util");
         addCompileHighOptLevel("org.jnode.vm");

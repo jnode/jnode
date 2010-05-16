@@ -38,7 +38,7 @@ import org.jnode.driver.block.floppy.FloppyReadSectorCommand;
 import org.jnode.driver.block.floppy.FloppySeekCommand;
 import org.jnode.driver.block.floppy.FloppyWriteSectorCommand;
 import org.jnode.driver.block.floppy.support.FloppyDeviceFactory;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.test.support.MockInitializer;
 import org.jnode.test.support.MockUtils;
 

@@ -23,7 +23,7 @@ package org.jnode.awt.image;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.ColorModel;
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 
 /**
  * Image consumer that copies pixels of 8-bit to the destination.

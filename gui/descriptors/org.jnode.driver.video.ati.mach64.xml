@@ -22,7 +22,7 @@
   </runtime>
 
   <extension point="org.jnode.security.permissions">
-    <permission class="org.jnode.system.ResourcePermission" name="memoryScanner"/>
+    <permission class="org.jnode.system.resource.ResourcePermission" name="memoryScanner"/>
   </extension>
   <extension point="org.jnode.driver.mappers">
     <mapper id="1002:4755" name="3D RAGE II+ (GTB)" driver-class="org.jnode.driver.video.ati.mach64.Mach64Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>

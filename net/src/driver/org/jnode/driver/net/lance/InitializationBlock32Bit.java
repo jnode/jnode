@@ -22,7 +22,7 @@ package org.jnode.driver.net.lance;
 
 import org.apache.log4j.Logger;
 import org.jnode.net.ethernet.EthernetAddress;
-import org.jnode.system.MemoryResource;
+import org.jnode.system.resource.MemoryResource;
 import org.jnode.util.NumberUtils;
 
 /**

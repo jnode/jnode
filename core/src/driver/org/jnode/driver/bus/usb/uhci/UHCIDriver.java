@@ -24,7 +24,7 @@ import org.jnode.driver.DriverException;
 import org.jnode.driver.bus.pci.PCIDevice;
 import org.jnode.driver.bus.usb.AbstractHostControllerDriver;
 import org.jnode.driver.bus.usb.USBHostControllerAPI;
-import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceNotFreeException;
 
 /**
  * UHCI (Universal Host Controller Interface) driver.

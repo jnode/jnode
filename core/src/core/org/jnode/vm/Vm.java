@@ -30,7 +30,7 @@ import java.util.TreeMap;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginRegistry;
-import org.jnode.system.ResourceManager;
+import org.jnode.system.resource.ResourceManager;
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.KernelSpace;

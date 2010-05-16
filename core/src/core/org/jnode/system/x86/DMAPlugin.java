@@ -26,13 +26,13 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
-import org.jnode.system.DMAException;
-import org.jnode.system.DMAManager;
-import org.jnode.system.DMAResource;
-import org.jnode.system.MemoryResource;
-import org.jnode.system.ResourceNotFreeException;
-import org.jnode.system.ResourceOwner;
-import org.jnode.system.SimpleResourceOwner;
+import org.jnode.system.resource.DMAException;
+import org.jnode.system.resource.DMAManager;
+import org.jnode.system.resource.DMAResource;
+import org.jnode.system.resource.MemoryResource;
+import org.jnode.system.resource.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceOwner;
+import org.jnode.system.resource.SimpleResourceOwner;
 import org.jnode.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
@@ -67,7 +67,7 @@ public final class DMAPlugin extends Plugin implements DMAManager {
      * @return The claimed resource
      * @throws IllegalArgumentException
      * @throws ResourceNotFreeException
-     * @see org.jnode.system.DMAManager#claimDMAChannel(ResourceOwner, int)
+     * @see org.jnode.system.resource.DMAManager#claimDMAChannel(ResourceOwner, int)
      */
     public synchronized DMAResource claimDMAChannel(ResourceOwner owner, int dmanr)
         throws IllegalArgumentException, ResourceNotFreeException {

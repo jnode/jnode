@@ -20,7 +20,7 @@
  
 package org.jnode.vm;
 
-import org.jnode.system.ResourceOwner;
+import org.jnode.system.resource.ResourceOwner;
 
 
 /**

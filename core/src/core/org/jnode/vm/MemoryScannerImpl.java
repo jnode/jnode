@@ -20,7 +20,7 @@
  
 package org.jnode.vm;
 
-import org.jnode.system.MemoryScanner;
+import org.jnode.system.resource.MemoryScanner;
 import org.jnode.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Offset;
@@ -33,7 +33,7 @@ import org.vmmagic.unboxed.Offset;
 final class MemoryScannerImpl implements MemoryScanner {
 
     /**
-     * @see org.jnode.system.MemoryScanner#findInt16(org.jnode.vm.Address, int, int, int)
+     * @see org.jnode.system.resource.MemoryScanner#findInt16(org.jnode.vm.Address, int, int, int)
      */
     public Address findInt16(Address start, int size, int match, int stepSize) {
         int offset = 0;
@@ -50,7 +50,7 @@ final class MemoryScannerImpl implements MemoryScanner {
     }
 
     /**
-     * @see org.jnode.system.MemoryScanner#findInt32(org.jnode.vm.Address, int, int, int)
+     * @see org.jnode.system.resource.MemoryScanner#findInt32(org.jnode.vm.Address, int, int, int)
      */
     public Address findInt32(Address start, int size, int match, int stepSize) {
         int offset = 0;
@@ -66,7 +66,7 @@ final class MemoryScannerImpl implements MemoryScanner {
     }
 
     /**
-     * @see org.jnode.system.MemoryScanner#findInt64(org.jnode.vm.Address, int, long, int)
+     * @see org.jnode.system.resource.MemoryScanner#findInt64(org.jnode.vm.Address, int, long, int)
      */
     public Address findInt64(Address start, int size, long match, int stepSize) {
         int offset = 0;
@@ -82,7 +82,7 @@ final class MemoryScannerImpl implements MemoryScanner {
     }
 
     /**
-     * @see org.jnode.system.MemoryScanner#findInt8(org.jnode.vm.Address, int, int, int)
+     * @see org.jnode.system.resource.MemoryScanner#findInt8(org.jnode.vm.Address, int, int, int)
      */
     public Address findInt8(Address start, int size, int match, int stepSize) {
         int offset = 0;
@@ -98,7 +98,7 @@ final class MemoryScannerImpl implements MemoryScanner {
     }
 
     /**
-     * @see org.jnode.system.MemoryScanner#findInt8Array(org.jnode.vm.Address, int, byte[], int, int, int)
+     * @see org.jnode.system.resource.MemoryScanner#findInt8Array(org.jnode.vm.Address, int, byte[], int, int, int)
      */
     public Address findInt8Array(Address start, int size, byte[] match,
                                  int matchOffset, int matchLength, int stepSize) {
@@ -117,7 +117,7 @@ final class MemoryScannerImpl implements MemoryScanner {
     }
 
     /**
-     * @see org.jnode.system.MemoryScanner#findInt16Array(org.jnode.vm.Address, int, char[], int, int, int)
+     * @see org.jnode.system.resource.MemoryScanner#findInt16Array(org.jnode.vm.Address, int, char[], int, int, int)
      */
     public Address findInt16Array(Address start, int size, char[] match,
                                   int matchOffset, int matchLength, int stepSize) {
@@ -136,7 +136,7 @@ final class MemoryScannerImpl implements MemoryScanner {
     }
 
     /**
-     * @see org.jnode.system.MemoryScanner#findInt16Array(org.jnode.vm.Address, int, short[], int, int, int)
+     * @see org.jnode.system.resource.MemoryScanner#findInt16Array(org.jnode.vm.Address, int, short[], int, int, int)
      */
     public Address findInt16Array(Address start, int size, short[] match,
                                   int matchOffset, int matchLength, int stepSize) {
@@ -155,7 +155,7 @@ final class MemoryScannerImpl implements MemoryScanner {
     }
 
     /**
-     * @see org.jnode.system.MemoryScanner#findInt32Array(org.jnode.vm.Address, int, int[], int, int, int)
+     * @see org.jnode.system.resource.MemoryScanner#findInt32Array(org.jnode.vm.Address, int, int[], int, int, int)
      */
     public Address findInt32Array(Address start, int size, int[] match,
                                   int matchOffset, int matchLength, int stepSize) {
@@ -174,7 +174,7 @@ final class MemoryScannerImpl implements MemoryScanner {
     }
 
     /**
-     * @see org.jnode.system.MemoryScanner#findInt64Array(org.jnode.vm.Address, int, long[], int, int, int)
+     * @see org.jnode.system.resource.MemoryScanner#findInt64Array(org.jnode.vm.Address, int, long[], int, int, int)
      */
     public Address findInt64Array(Address start, int size, long[] match,
                                   int matchOffset, int matchLength, int stepSize) {
