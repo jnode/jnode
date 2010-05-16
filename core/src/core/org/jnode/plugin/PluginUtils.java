@@ -24,7 +24,8 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.jnode.system.BootLog;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 
 /**
  * Plugin utility methods.
@@ -72,22 +73,22 @@ public class PluginUtils {
         String message = null;
 
         try {
-            BootLog.debug("messageKey=" + messageKey + ", trying with " + Locale.getDefault());
+            BootLogInstance.get().debug("messageKey=" + messageKey + ", trying with " + Locale.getDefault());
             bundle = ResourceBundle.getBundle(fullName, Locale.getDefault(), loader);
         } catch (MissingResourceException e) {
             try {
-                BootLog.debug("trying with " + Locale.ENGLISH);
+                BootLogInstance.get().debug("trying with " + Locale.ENGLISH);
                 bundle = ResourceBundle.getBundle(fullName, Locale.ENGLISH, loader);
             } catch (MissingResourceException mre) {
                 if (!cleanFallback)
-                    BootLog.error("can't get message", mre);
+                    BootLogInstance.get().error("can't get message", mre);
             }
         }
 
-        BootLog.debug("bundle=" + bundle);
+        BootLogInstance.get().debug("bundle=" + bundle);
         if (bundle != null) {
             try {
-                BootLog.debug("got bundle " + bundleName);
+                BootLogInstance.get().debug("got bundle " + bundleName);
                 message = bundle.getString(messageKey);
             } catch (MissingResourceException mre) {
                 if (!cleanFallback)
@@ -96,7 +97,7 @@ public class PluginUtils {
         }
 
         if (message == null && !cleanFallback) {
-            BootLog.error("can't get message from bundle " + bundleName + " with key " + messageKey);
+            BootLogInstance.get().error("can't get message from bundle " + bundleName + " with key " + messageKey);
         }
 
         return (message == null) ? (cleanFallback ? messageKey : ('?' + messageKey + '?')) : message;

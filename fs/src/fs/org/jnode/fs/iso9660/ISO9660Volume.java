@@ -23,9 +23,9 @@ package org.jnode.fs.iso9660;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.FSBlockDeviceAPI;
-import org.jnode.system.BootLog;
 
 /**
  * @author vali
@@ -65,15 +65,15 @@ public class ISO9660Volume implements ISO9660Constants {
                     done = true;
                     break;
                 case VolumeDescriptorType.BOOTRECORD:
-                    BootLog.debug("Found boot record");
+                	BootLogInstance.get().debug("Found boot record");
                     break;
                 case VolumeDescriptorType.PRIMARY_DESCRIPTOR:
-                    BootLog.debug("Found primary descriptor");
+                	BootLogInstance.get().debug("Found primary descriptor");
                     pVD = new PrimaryVolumeDescriptor(this, buffer);
                     // pVD.dump(System.out);
                     break;
                 case VolumeDescriptorType.SUPPLEMENTARY_DESCRIPTOR:
-                    BootLog.debug("Found supplementatory descriptor");
+                	BootLogInstance.get().debug("Found supplementatory descriptor");
                     final SupplementaryVolumeDescriptor d =
                             new SupplementaryVolumeDescriptor(this, buffer);
                     if (d.isEncodingKnown()) {
@@ -81,10 +81,10 @@ public class ISO9660Volume implements ISO9660Constants {
                     }
                     break;
                 case VolumeDescriptorType.PARTITION_DESCRIPTOR:
-                    BootLog.debug("Found partition descriptor");
+                	BootLogInstance.get().debug("Found partition descriptor");
                     break;
                 default:
-                    BootLog.debug("Found unknown descriptor with type " + type);
+                	BootLogInstance.get().debug("Found unknown descriptor with type " + type);
             }
         }
         if (pVD == null) {

@@ -30,12 +30,12 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetConstants;
-import org.jnode.system.BootLog;
 import org.jnode.util.Queue;
 
 /**
@@ -185,7 +185,7 @@ public abstract class AbstractDatagramSocketImpl extends DatagramSocketImpl impl
     }
 
     protected void doSetOption(int option_id, Object val) throws SocketException {
-        BootLog.error("Unknown option " + option_id);
+        BootLogInstance.get().error("Unknown option " + option_id);
     }
 
     /**

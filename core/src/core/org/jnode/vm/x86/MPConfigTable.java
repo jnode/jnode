@@ -24,10 +24,11 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jnode.system.BootLog;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.annotation.MagicPermission;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.MagicUtils;
 
@@ -195,9 +196,9 @@ final class MPConfigTable {
                 offset += len;
             }
         } catch (ArrayIndexOutOfBoundsException ex) {
-            BootLog.error("Error parsing the MP config table", ex);
+            BootLogInstance.get().error("Error parsing the MP config table", ex);
         } catch (ResourceNotFreeException ex) {
-            BootLog.error("Cannot claim MP entry region");
+            BootLogInstance.get().error("Cannot claim MP entry region");
         }
         return list;
     }

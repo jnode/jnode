@@ -23,7 +23,9 @@ package org.jnode.driver;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
-import org.jnode.system.BootLog;
+
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.StopWatch;
 
@@ -329,7 +331,7 @@ public class Device implements ResourceOwner {
             sw.start();
             l.deviceStarted(this);
             if (sw.isElapsedLongerThen(100)) {
-                BootLog.error("DeviceListener took " + sw + " in deviceStarted: " + l.getClass().getName());
+                BootLogInstance.get().error("DeviceListener took " + sw + " in deviceStarted: " + l.getClass().getName());
             }
         }
         manager.fireStartedEvent(this);
@@ -345,7 +347,7 @@ public class Device implements ResourceOwner {
             sw.start();
             l.deviceStop(this);
             if (sw.isElapsedLongerThen(100)) {
-                BootLog.error("DeviceListener took " + sw + " in deviceStop: " + l.getClass().getName());
+                BootLogInstance.get().error("DeviceListener took " + sw + " in deviceStop: " + l.getClass().getName());
             }
         }
     }

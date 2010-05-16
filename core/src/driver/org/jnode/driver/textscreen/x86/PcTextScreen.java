@@ -22,9 +22,10 @@ package org.jnode.driver.textscreen.x86;
 
 import javax.naming.NameNotFoundException;
 
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.naming.InitialNaming;
-import org.jnode.system.BootLog;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
@@ -79,7 +80,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
                     Unsafe.debug("oops new does not work");
                 }
             } catch (ResourceNotFreeException ex) {
-                BootLog.error("Screen memory not free!");
+                BootLogInstance.get().error("Screen memory not free!");
             }
         }
         return instance;

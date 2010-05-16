@@ -13,7 +13,8 @@
 
 package org.mmtk.vm;
 
-import org.jnode.system.BootLog;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.Unsafe;
 import org.mmtk.utility.options.Option;
 
@@ -45,7 +46,7 @@ public final class Options {
      *            The error message.
      */
     public static void fail(Option o, String message) {
-        BootLog.warn("Option " + o.getName() + ": " + message);
+        BootLogInstance.get().warn("Option " + o.getName() + ": " + message);
         Unsafe.die("Failed option");
     }
 
@@ -58,6 +59,6 @@ public final class Options {
      *            The warning message.
      */
     public static void warn(Option o, String message) {
-        BootLog.warn("Option " + o.getName() + ": " + message);        
+        BootLogInstance.get().warn("Option " + o.getName() + ": " + message);        
     }
 }

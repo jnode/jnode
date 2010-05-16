@@ -25,13 +25,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
 import javax.naming.NamingException;
+
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.ExtensionPointListener;
 import org.jnode.plugin.PluginException;
-import org.jnode.system.BootLog;
 import org.jnode.work.Work;
 import org.jnode.work.WorkUtils;
 
@@ -116,7 +118,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager implements
     protected final void refreshFinders(List<DeviceFinder> finders) {
         finders.clear();
         final Extension[] extensions = findersEP.getExtensions();
-        BootLog.debug("Found " + extensions.length + " device finders");
+        BootLogInstance.get().debug("Found " + extensions.length + " device finders");
 
         for (int i = 0; i < extensions.length; i++) {
             final Extension ext = extensions[i];
@@ -136,7 +138,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager implements
     protected final void refreshMappers(List<DeviceToDriverMapper> mappers) {
         mappers.clear();
         final Extension[] extensions = mappersEP.getExtensions();
-        BootLog.debug("Found " + extensions.length + " mapper extensions");
+        BootLogInstance.get().debug("Found " + extensions.length + " mapper extensions");
 
         // First load all mappers
         for (int i = 0; i < extensions.length; i++) {
@@ -162,25 +164,25 @@ public final class DefaultDeviceManager extends AbstractDeviceManager implements
     private void configureFinder(List<DeviceFinder> finders, ConfigurationElement element) {
         final String elementName = element.getName();
         if (!elementName.equals("finder")) {
-            BootLog.warn("Ignoring unrecognised descriptor element: " + elementName);
+            BootLogInstance.get().warn("Ignoring unrecognised descriptor element: " + elementName);
             return;
         }
 
         final String className = element.getAttribute("class");
         if (className != null) {
             try {
-                BootLog.debug("Configuring finder: " + className);
+                BootLogInstance.get().debug("Configuring finder: " + className);
                 final Class cls = Thread.currentThread().getContextClassLoader().loadClass(className);
                 final DeviceFinder finder = (DeviceFinder) cls.newInstance();
                 finders.add(finder);
             } catch (ClassNotFoundException ex) {
-                BootLog.error("Cannot find finder class " + className);
+                BootLogInstance.get().error("Cannot find finder class " + className);
             } catch (IllegalAccessException ex) {
-                BootLog.error("Cannot access finder class " + className);
+                BootLogInstance.get().error("Cannot access finder class " + className);
             } catch (InstantiationException ex) {
-                BootLog.error("Cannot instantiate finder class " + className);
+                BootLogInstance.get().error("Cannot instantiate finder class " + className);
             } catch (ClassCastException ex) {
-                BootLog.error("Finder class " + className + " does not implement the DeviceFinder interface");
+                BootLogInstance.get().error("Finder class " + className + " does not implement the DeviceFinder interface");
             }
         }
     }
@@ -195,28 +197,28 @@ public final class DefaultDeviceManager extends AbstractDeviceManager implements
     private void configureMapper(List<DeviceToDriverMapper> mappers, ConfigurationElement element) {
         final String elementName = element.getName();
         if (!elementName.equals("mapper")) {
-            BootLog.warn("Ignoring unrecognised descriptor element: " + elementName);
+            BootLogInstance.get().warn("Ignoring unrecognised descriptor element: " + elementName);
             return;
         }
 
         final String className = element.getAttribute("class");
         if (className != null) {
             try {
-                BootLog.debug("Configuring mapper: " + className);
+                BootLogInstance.get().debug("Configuring mapper: " + className);
                 final Class cls = Thread.currentThread().getContextClassLoader().loadClass(className);
                 final DeviceToDriverMapper mapper = newMapperInstance(cls, element);
                 mappers.add(mapper);
             } catch (ClassNotFoundException ex) {
-                BootLog.error("Cannot find mapper class " + className, ex);
+                BootLogInstance.get().error("Cannot find mapper class " + className, ex);
             } catch (IllegalAccessException ex) {
-                BootLog.error("Cannot access mapper class " + className, ex);
+                BootLogInstance.get().error("Cannot access mapper class " + className, ex);
             } catch (InstantiationException ex) {
-                BootLog.error("Cannot instantiate mapper class " + className, ex);
+                BootLogInstance.get().error("Cannot instantiate mapper class " + className, ex);
             } catch (ClassCastException ex) {
-                BootLog.error("Mapper class " + className + " does not implement the DeviceToDriverMapper interface");
+                BootLogInstance.get().error("Mapper class " + className + " does not implement the DeviceToDriverMapper interface");
             }
         } else {
-            BootLog.error("class attribute required in mapper");
+            BootLogInstance.get().error("class attribute required in mapper");
         }
     }
 

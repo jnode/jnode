@@ -28,7 +28,8 @@ import org.jnode.assembler.x86.X86Register.FPU;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
-import org.jnode.system.BootLog;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 
@@ -227,7 +228,7 @@ final class FPCompilerFPU extends FPCompiler {
                                           VirtualStack vstack, int items) {
         final FPUStack fpuStack = vstack.fpuStack;
         if (!fpuStack.hasCapacity(items)) {
-            BootLog.debug("Flush FPU stack;\n  fpuStack=" + fpuStack
+            BootLogInstance.get().debug("Flush FPU stack;\n  fpuStack=" + fpuStack
                 + ",\n  vstack  =" + vstack);
             vstack.push(ec);
             if (Vm.VerifyAssertions)
@@ -407,7 +408,7 @@ final class FPCompilerFPU extends FPCompiler {
         } else if (lOnFpu) {
             // Left operand is on FPU stack, right is not
             right.pushToFPU(ec); // Now right is on top
-            // BootLog.debug("left.kind=" + left.getKind());
+            // BootLogInstance.get().debug("left.kind=" + left.getKind());
             reg = fpuStack.getRegister(left);
             if (!commutative) {
                 FPUHelper.fxch(os, fpuStack, reg);

@@ -24,7 +24,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.prefs.Preferences;
 
-import org.jnode.system.BootLog;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 
 
 /**
@@ -101,7 +102,7 @@ public abstract class Plugin {
         }
         if (!started) {
             if (descriptor.hasCustomPluginClass()) {
-                BootLog.debug("Starting plugin: " + descriptor.getId());
+                BootLogInstance.get().debug("Starting plugin: " + descriptor.getId());
             }
             started = true;
             try {

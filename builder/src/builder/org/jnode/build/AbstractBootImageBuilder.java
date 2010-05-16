@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -47,6 +48,8 @@ import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.NativeStream.ObjectRef;
 import org.jnode.assembler.x86.X86BinaryAssembler;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginRegistry;
@@ -791,14 +794,84 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         throws ClassNotFoundException;
 
     public final void execute() throws BuildException {
-        // Create the image
-        doExecute();
-        // Remove all garbage objects
-        cleanup();
-        System.gc();
-        // Make sure that all finalizers are called, in order to remove tmp
-        // files.
-        Runtime.getRuntime().runFinalization();
+    	try {
+    		BootLogInstance.set(new BootLog() {				
+				@Override
+				public void warn(String msg) {
+					System.out.println(msg);
+				}
+				
+				@Override
+				public void warn(String msg, Throwable ex) {
+					System.out.println(msg);
+					ex.printStackTrace(System.out);
+				}
+				
+				@Override
+				public void setDebugOut(PrintStream out) {
+					// ignore
+				}
+				
+				@Override
+				public void info(String msg, Throwable ex) {
+					System.out.println(msg);
+					ex.printStackTrace(System.out);
+				}
+				
+				@Override
+				public void info(String msg) {
+					System.out.println(msg);
+				}
+				
+				@Override
+				public void fatal(String msg, Throwable ex) {
+					System.out.println(msg);
+					ex.printStackTrace(System.out);
+				}
+				
+				@Override
+				public void fatal(String msg) {
+					System.out.println(msg);
+				}
+				
+				@Override
+				public void error(String msg, Throwable ex) {
+					System.out.println(msg);
+					ex.printStackTrace(System.out);
+				}
+				
+				@Override
+				public void error(String msg) {
+					System.out.println(msg);
+				}
+				
+				@Override
+				public void debug(String msg, Throwable ex) {
+					System.out.println(msg);
+					ex.printStackTrace(System.out);
+				}
+				
+				@Override
+				public void debug(String msg) {
+					System.out.println(msg);
+				}
+			});
+    		
+	        // Create the image
+	        doExecute();
+	        // Remove all garbage objects
+	        cleanup();
+	        System.gc();
+	        // Make sure that all finalizers are called, in order to remove tmp
+	        // files.
+	        Runtime.getRuntime().runFinalization();
+    	} catch (BuildException be) {
+    		be.printStackTrace();
+    		throw be;
+    	} catch (Throwable t) {
+    		t.printStackTrace();
+    		throw new BuildException(t);
+    	}
     }
 
     /**
@@ -1368,6 +1441,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
         addCompileHighOptLevel("org.jnode.assembler");
         addCompileHighOptLevel("org.jnode.boot");
+        addCompileHighOptLevel("org.jnode.bootlog");
         addCompileHighOptLevel("org.jnode.naming");
         addCompileHighOptLevel("org.jnode.plugin");
         addCompileHighOptLevel("org.jnode.plugin.manager");

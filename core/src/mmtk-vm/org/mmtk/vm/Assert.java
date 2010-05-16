@@ -13,7 +13,8 @@
  
 package org.mmtk.vm;
 
-import org.jnode.system.BootLog;
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 
@@ -30,7 +31,7 @@ public class Assert {
      *            A string describing the error condition.
      */
     public static void error(String str) {
-        BootLog.error(str);
+        BootLogInstance.get().error(str);
     }
 
     /**
@@ -40,7 +41,7 @@ public class Assert {
      *            the string to log
      */
     public static void fail(String message) {
-        BootLog.fatal(message);
+        BootLogInstance.get().fatal(message);
         if (Vm.isRunningVm()) {
             Unsafe.die(message);
         } else {

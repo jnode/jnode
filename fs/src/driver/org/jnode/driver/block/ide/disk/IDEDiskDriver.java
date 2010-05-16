@@ -26,9 +26,12 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+
 import org.apache.log4j.Logger;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.driver.Bus;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
@@ -51,7 +54,6 @@ import org.jnode.driver.bus.ide.command.IDEWriteSectorsCommand;
 import org.jnode.naming.InitialNaming;
 import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
-import org.jnode.system.BootLog;
 import org.jnode.util.TimeoutException;
 
 /**
@@ -122,7 +124,7 @@ public class IDEDiskDriver extends Driver
             int i = 0;
             for (IBMPartitionTableEntry pte : pt) {
                 if (pte == null) {
-                    BootLog.warn("PartitionTableEntry #" + i + " is null");
+                	BootLogInstance.get().warn("PartitionTableEntry #" + i + " is null");
                 } else if (pte.isValid()) {
                     if (pte.isExtended()) {
                         // Create partition devices for the extended partition

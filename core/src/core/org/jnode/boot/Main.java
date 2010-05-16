@@ -26,11 +26,11 @@ import java.util.List;
 import org.jnode.annotation.LoadStatics;
 import org.jnode.annotation.SharedStatics;
 import org.jnode.annotation.Uninterruptible;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.manager.DefaultPluginManager;
-import org.jnode.system.BootLog;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmSystem;
 
@@ -66,13 +66,13 @@ public final class Main {
 
             Unsafe.debug("VmSystem.initialize\n");
             VmSystem.initialize();
-
+            
             // Load the plugins from the initjar
-            BootLog.info("Loading initjar plugins");
+            BootLogInstance.get().info("Loading initjar plugins");
             final InitJarProcessor proc = new InitJarProcessor(VmSystem.getInitJar());
             List<PluginDescriptor> descriptors = proc.loadPlugins(pluginRegistry);
 
-            BootLog.info("Starting PluginManager");
+            BootLogInstance.get().info("Starting PluginManager");
             final PluginManager piMgr = new DefaultPluginManager(pluginRegistry);
             piMgr.startSystemPlugins(descriptors);
 
@@ -82,7 +82,7 @@ public final class Main {
             if (mainClassName != null) {
                 mainClass = loader.loadClass(mainClassName);
             } else {
-                BootLog.warn("No Main-Class found");
+                BootLogInstance.get().warn("No Main-Class found");
                 mainClass = null;
             }
             final long end = VmSystem.currentKernelMillis();
@@ -98,12 +98,12 @@ public final class Main {
                     if (insatnce instanceof Runnable) {
                         ((Runnable) insatnce).run();
                     } else {
-                        BootLog.warn("No valid Main-Class found");
+                        BootLogInstance.get().warn("No valid Main-Class found");
                     }
                 }
             }
         } catch (Throwable ex) {
-            BootLog.error("Error in bootstrap", ex);
+            BootLogInstance.get().error("Error in bootstrap", ex);
             Unsafe.debugStackTrace(ex);
             sleepForever();
             return -2;

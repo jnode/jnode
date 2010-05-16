@@ -24,10 +24,11 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.FragmentDescriptor;
 import org.jnode.plugin.PluginException;
-import org.jnode.system.BootLog;
 import org.jnode.vm.ResourceLoader;
 
 /**
@@ -143,7 +144,7 @@ final class FragmentDescriptorModel extends PluginDescriptorModel implements
         if (plugin == null) {
             throw new PluginException("Plugin " + getPluginId() + " not found");
         }
-        BootLog.info("Resolve " + getId());
+        BootLogInstance.get().info("Resolve " + getId());
         plugin.add(this);
     }
 
@@ -155,7 +156,7 @@ final class FragmentDescriptorModel extends PluginDescriptorModel implements
             plugin.remove(this);
             plugin = null;
         }
-        BootLog.info("Unresolve " + getId());
+        BootLogInstance.get().info("Unresolve " + getId());
         super.unresolve(registry);
     }
 

@@ -37,10 +37,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.jnode.bootlog.BootLog;
+import org.jnode.bootlog.BootLogInstance;
 import org.jnode.plugin.PluginClassLoader;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
-import org.jnode.system.BootLog;
 import org.jnode.vm.ResourceLoader;
 import org.jnode.vm.classmgr.VmClassLoader;
 
@@ -198,7 +199,7 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
                     fragment.startPlugin(registry);
                 }
             } catch (PluginException ex) {
-                BootLog.error("Error starting plugin", ex);
+                BootLogInstance.get().error("Error starting plugin", ex);
             }
 
             // Define package (if needed)
@@ -297,7 +298,7 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
                     fragment.startPlugin(registry);
                 }
             } catch (PluginException ex) {
-                BootLog.error("Cannot start plugin", ex);
+                BootLogInstance.get().error("Cannot start plugin", ex);
             }
         }
         return url;
@@ -331,7 +332,7 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
                     startPlugin();
                     fragment.startPlugin(registry);
                 } catch (PluginException ex) {
-                    BootLog.error("Cannot start plugin", ex);
+                    BootLogInstance.get().error("Cannot start plugin", ex);
                 }
                 System.err.println("adding " + url);
                 if (!urls.contains(url))
@@ -347,7 +348,7 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
             try {
                 startPlugin();
             } catch (PluginException ex) {
-                BootLog.error("Cannot start plugin", ex);
+                BootLogInstance.get().error("Cannot start plugin", ex);
             }
             System.err.println("adding " + url);
             if (!urls.contains(url))
