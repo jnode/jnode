@@ -36,7 +36,7 @@ import org.jnode.naming.AbstractNameSpace;
  * 
  * @author crawley@jnode.org
  */
-public final class BasicNameSpace extends AbstractNameSpace {
+public class BasicNameSpace extends AbstractNameSpace {
     protected final Map<Class<?>, Object> namespace = new HashMap<Class<?>, Object>();
 
     public <T> void bind(Class<T> name, T service)

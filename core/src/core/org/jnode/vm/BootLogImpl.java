@@ -22,6 +22,9 @@ package org.jnode.vm;
 
 import java.io.PrintStream;
 
+import javax.naming.NameAlreadyBoundException;
+import javax.naming.NamingException;
+
 import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 
@@ -148,6 +151,14 @@ class BootLogImpl implements BootLog, BootableObject {
 
 	static void initialize() {
         Unsafe.debug("Initialize BootLog\n");		
-		BootLogInstance.set(new BootLogImpl());
+		try {
+			BootLogInstance.set(new BootLogImpl());
+		} catch (NameAlreadyBoundException e) {
+            Unsafe.debug(e.toString());
+            Unsafe.debug("\n");
+		} catch (NamingException e) {
+            Unsafe.debug(e.toString());
+            Unsafe.debug("\n");
+		}
 	}
 }

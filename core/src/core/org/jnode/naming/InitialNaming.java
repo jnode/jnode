@@ -45,7 +45,7 @@ public final class InitialNaming {
     /**
      * All bound names+services
      */
-    private static NameSpace namespace;
+    private static NameSpace NAME_SPACE;
 
     /**
      * Add a {@link NameSpaceListener} to the NameSpace
@@ -54,7 +54,7 @@ public final class InitialNaming {
      * @param l
      */
     public static <T> void addNameSpaceListener(Class<T> name, NameSpaceListener<T> l) {
-        getNameSpace().addNameSpaceListener(name, l);
+    	NAME_SPACE.addNameSpaceListener(name, l);
     }
     
     /**
@@ -64,7 +64,7 @@ public final class InitialNaming {
      * @param l
      */
     public static <T> void removeNameSpaceListener(Class<T> name, NameSpaceListener<T> l) {
-        getNameSpace().removeNameSpaceListener(name, l);        
+    	NAME_SPACE.removeNameSpaceListener(name, l);        
     }
 
     /**
@@ -73,11 +73,11 @@ public final class InitialNaming {
      * @param namespace
      */
     public static void setNameSpace(NameSpace namespace) {
-        if (InitialNaming.namespace != null) {
+        if (NAME_SPACE != null) {
             throw new SecurityException(
                 "namespace can't be modified after first initialization");
         }
-        InitialNaming.namespace = namespace;
+        NAME_SPACE = namespace;
     }
 
     /**
@@ -89,7 +89,7 @@ public final class InitialNaming {
      */
     public static <T, E extends T> void bind(Class<T> name, E service) throws NamingException,
         NameAlreadyBoundException {
-        getNameSpace().bind(name, service);
+    	NAME_SPACE.bind(name, service);
     }
 
     /**
@@ -99,7 +99,7 @@ public final class InitialNaming {
      * @param name
      */
     public static void unbind(Class<?> name) {
-        getNameSpace().unbind(name);
+    	NAME_SPACE.unbind(name);
     }
 
     /**
@@ -109,25 +109,13 @@ public final class InitialNaming {
      * @throws NameNotFoundException if the name was not found in this namespace
      */
     public static <T> T lookup(Class<T> name) throws NameNotFoundException {
-        return getNameSpace().lookup(name);
+        return NAME_SPACE.lookup(name);
     }
 
     /**
      * Gets a set containing all names (Class) of the bound services.
      */
     public static Set<Class<?>> nameSet() {
-        return getNameSpace().nameSet();
-    }
-
-    /**
-     * Get the actual {@link NameSpace} and use a default one 
-     * if none was yet defined.
-     * @return
-     */
-    private static NameSpace getNameSpace() {
-        if (namespace == null) {
-            namespace = new DefaultNameSpace();
-        }
-        return namespace;
+        return NAME_SPACE.nameSet();
     }
 }

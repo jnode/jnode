@@ -119,7 +119,10 @@ public final class VmSystem {
      */
     public static void initialize() {
         if (!inited) {            
-        	// Initialize BootLog
+        	// Initialize Naming
+        	InitialNaming.setNameSpace(new DefaultNameSpace());
+        	
+        	// Initialize BootLog        	
         	BootLogImpl.initialize();
         	
             // Initialize resource manager
