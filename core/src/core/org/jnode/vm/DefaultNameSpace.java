@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.naming;
+package org.jnode.vm;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,9 +30,10 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
 import org.jnode.annotation.PrivilegedActionPragma;
+import org.jnode.naming.AbstractNameSpace;
 import org.jnode.vm.classmgr.VmType;
 
-public class DefaultNameSpace extends AbstractNameSpace {
+class DefaultNameSpace extends AbstractNameSpace {
 
     /**
      * All bound names+services

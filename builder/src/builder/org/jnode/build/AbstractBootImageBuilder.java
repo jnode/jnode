@@ -50,6 +50,8 @@ import org.jnode.assembler.NativeStream.ObjectRef;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
+import org.jnode.emu.naming.BasicNameSpace;
+import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginRegistry;
@@ -795,7 +797,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
     public final void execute() throws BuildException {
     	try {
-    		BootLogInstance.set(new BootLog() {				
+    		InitialNaming.setNameSpace(new BasicNameSpace());
+    		BootLogInstance.set(new BootLog() {
 				@Override
 				public void warn(String msg) {
 					System.out.println(msg);

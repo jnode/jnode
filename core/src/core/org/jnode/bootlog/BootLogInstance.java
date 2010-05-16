@@ -1,19 +1,19 @@
 package org.jnode.bootlog;
 
+import javax.naming.NameAlreadyBoundException;
+import javax.naming.NameNotFoundException;
+import javax.naming.NamingException;
+
+import org.jnode.naming.InitialNaming;
+
 
 /**
- * Class holding the {@link BootLog} instance used by the system.
- * <br/><h1>Implementation note :</h1> The reference to the actual instance of 
- * the BootLog can't be stored in the InitialNaming that use VmType, which is 
- * not fully initialized at build time (but BootLog is used). So, we are always 
- * holding the reference in that class.  
+ * Class holding the {@link BootLog} instance used by the system.  
  * 
  * @author Fabien DUMINY
  *
  */
 public final class BootLogInstance {
-	private static BootLog BOOT_LOG_INSTANCE;
-	
 	private BootLogInstance () {		
 	}
 	
@@ -22,14 +22,20 @@ public final class BootLogInstance {
 	 * @return the system's {@link BootLog}.
 	 */
 	public static BootLog get() {
-		return BOOT_LOG_INSTANCE;
+		try {
+			return InitialNaming.lookup(BootLog.class);
+		} catch (NameNotFoundException e) {
+			throw new Error("unable to find a BootLog instance", e);
+		}
 	}
 
 	/**
 	 * Set the system's {@link BootLog}.
 	 * @param bootLog the system's {@link BootLog}.
+	 * @throws NamingException 
+	 * @throws NameAlreadyBoundException 
 	 */
-	public static void set(BootLog bootLog) {
-		BOOT_LOG_INSTANCE = bootLog;
+	public static void set(BootLog bootLog) throws NameAlreadyBoundException, NamingException {
+		InitialNaming.bind(BootLog.class, bootLog);
 	}
 }
