@@ -20,10 +20,10 @@
  
 package java.lang;
 
+import org.jnode.permission.JNodePermission;
 import org.jnode.vm.scheduler.VmThread;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.Internal;
-import org.jnode.security.JNodePermission;
 
 /**
  *

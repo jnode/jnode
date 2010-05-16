@@ -24,7 +24,7 @@
 	    <permission class="java.lang.RuntimePermission" name="createClassLoader" actions="*" />
 	    <permission class="java.lang.RuntimePermission" name="setIO" actions="*" />
 	    <permission class="java.lang.RuntimePermission" name="exitVM" actions="*" />
-	    <permission class="org.jnode.security.JNodePermission" name="getVmClass" actions="*" />
+	    <permission class="org.jnode.permission.JNodePermission" name="getVmClass" actions="*" />
 	    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>    
 	</extension>
 </plugin>
