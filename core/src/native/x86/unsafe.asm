@@ -171,7 +171,7 @@ GLABEL Q43org5jnode2vm6Unsafe23getMaxAddress2e2829Lorg2fvmmagic2funboxed2fAddres
 	mov AAX,0xFFC00000	; 4Gb - 4Mb
 	ret
 	
-; public static native VmAddress getMinAddress()
+; public static native Address getMinAddress()
 GLABEL Q43org5jnode2vm6Unsafe23getMinAddress2e2829Lorg2fvmmagic2funboxed2fAddress3b
 	mov AAX,free_paddr
 	ret
