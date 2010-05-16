@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.runtime.core" 
-        name="JNode core runtime classes"
+<plugin id="org.jnode.plugin.impl" 
+        name="implementation of JNode plugin framework"
         version="@VERSION@"
         system="true"
         license-name="lgpl"
@@ -11,19 +11,15 @@
   <requires>
     <import plugin="nanoxml"/>
     <import plugin="org.jnode.plugin"/>
-    <import plugin="org.jnode.plugin.impl"/>
-    <import plugin="org.jnode.util"/>
     <import plugin="org.jnode.security"/>
+    <import plugin="org.jnode.util"/>
     <import plugin="org.jnode.vm"/>
   </requires>
         
   <runtime>
     <library name="jnode-core.jar">
-      <export name="org.jnode.boot.*"/>
-      <export name="org.jnode.naming.*"/>
-      <export name="org.jnode.protocol.plugin.*"/>
-      <export name="org.jnode.protocol.system.*"/>
-      <export name="org.jnode.system.event.*"/>
+      <export name="org.jnode.plugin.manager.*"/>
+      <export name="org.jnode.plugin.model.*"/>
     </library>
   </runtime>
         
