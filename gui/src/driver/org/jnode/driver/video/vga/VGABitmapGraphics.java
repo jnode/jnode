@@ -46,14 +46,6 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
         this.vgaIO = vgaIO;
     }
 
-    private int divroundup(int num, int div) {
-        if (num % div == 0) {
-            return num / div;
-        } else {
-            return (num / div) + 1;
-        }
-    }
-
     protected void doCopyArea(int x, int y, int width, int height, int dx, int dy) {
         // TODO Implement me
     }
@@ -63,7 +55,12 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
         vgaIO.setGRAF(1, 0);
         vgaIO.setGRAF(8, 0xFF);
 
-        final int pWidth = divroundup(width, 8);
+        // round up the result of width/8
+        int pWidth = width >> 3; // (width >> 3) == (width / 8)
+        if ((width & 7) != 0) { // (width & 7) == (width % 8)
+        	pWidth++;
+        }
+        
         final byte[] plane0 = new byte[pWidth];
         final byte[] plane1 = new byte[pWidth];
         final byte[] plane2 = new byte[pWidth];
@@ -73,8 +70,8 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
             final int y = dstY + row;
             src.getDataElements(srcX, srcY + row, width, 1, buf);
             for (int col = 0; col < width; col++) {
-                final int bit = 0x80 >> ((dstX + col) & 7);
-                final int pixel = buf[col];
+                final int bit = getBit(dstX + col);
+            	final int pixel = buf[col];
                 final int i = (col >> 3);
                 if ((pixel & 0x01) != 0) {
                     plane0[i] |= bit;
@@ -90,7 +87,7 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
                 }
             }
 
-            final int dstOfs = y * 80 + (dstX >> 3);
+            final int dstOfs = getOffset(dstX, y);
 
             vgaIO.setSEQ(2, 1); // plane 0
             vgaIO.setGRAF(4, 0);
@@ -121,6 +118,7 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
 
     protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width,
             int height, int bgColor) {
+    	//TODO use bgColor parameter
         doDrawImage(src, srcX, srcY, dstX, dstY, width, height);
     }
 
@@ -137,9 +135,8 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
                 lineWidth -= bits;
                 x += bits;
             } else {
-                final int bit = 0x80 >> (x & 7);
                 final int offset = ofsY + (x >> 3);
-                vgaIO.setGRAF(8, bit);
+                vgaIO.setGRAF(8, getBit(x));
                 mem.orByte(offset, (byte) 0xFF, 1);
                 lineWidth--;
                 x++;
@@ -148,18 +145,14 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
     }
 
     protected void doDrawPixels(int x, int y, int count, int color, int mode) {
-        for (int i = 0; i < count; i++) {
-            final int bit = 0x80 >> (x & 7);
-            final int offset = y * 80 + (x >> 3);
-            vgaIO.setGRAF(8, bit);
-            mem.orByte(offset, (byte) 0xFF, 1);
-            x++;
-        }
+    	//TODO (do)DrawLine/(do)doDrawPixels appear to be duplicates at higher level => remove one
+    	doDrawLine(x, y, count, color, mode);
     }
 
     protected void doDrawAlphaRaster(Raster raster, int srcX, int srcY, int dstX, int dstY,
             int width, int height, int color) {
-        // TODO Implement me
+    	//TODO should we support alpha with only a fixed set of 16 colors ?
+    	doDrawImage(raster, srcX, srcY, dstX, dstY, width, height, color);
     }
 
     public int doGetPixel(int x, int y) {
@@ -168,19 +161,29 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
     }
 
     public int[] doGetPixels(Rectangle r) {
-        // TODO Implement me
-        return new int[0];
+    	final int[] result = new int[r.width * r.height];
+    	final int xmax = r.x + r.width;
+    	final int ymax = r.y + r.height;
+    	int i = 0;
+    	for (int y = r.y; y < ymax; y++) {
+        	for (int x = r.x; x < xmax; x++) {
+        		result[i++] = doGetPixel(x, y);
+        	}
+    	}
+        return result;
     }
 
     @Override
     protected int getBytesForWidth(int width) {
-        // TODO Auto-generated method stub
-        return 0;
+        return (width * bytesPerLine) / this.width;
     }
 
     @Override
     protected int getOffset(int x, int y) {
-        // TODO Auto-generated method stub
-        return 0;
+    	return y * 80 + (x >> 3);
+    }
+    
+    private int getBit(int x) {
+    	return 0x80 >> (x & 7);    	
     }
 }

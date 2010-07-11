@@ -20,15 +20,15 @@
  
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.BaseVmArchitecture;
 import org.jnode.vm.VmMagic;
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.facade.ObjectVisitor;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.scheduler.Monitor;
 import org.vmmagic.unboxed.Address;
@@ -44,10 +44,10 @@ final class GCVerifyVisitor extends ObjectVisitor {
 
     private final HeapHelper helper;
     private final DefaultHeapManager heapManager;
-    private final VmArchitecture arch;
+    private final BaseVmArchitecture arch;
     private int errorCount;
 
-    public GCVerifyVisitor(DefaultHeapManager heapManager, VmArchitecture arch) {
+    public GCVerifyVisitor(DefaultHeapManager heapManager, BaseVmArchitecture arch) {
         this.helper = heapManager.getHelper();
         this.heapManager = heapManager;
         this.arch = arch;
@@ -58,7 +58,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
     }
 
     /**
-     * @see org.jnode.vm.ObjectVisitor#visit(java.lang.Object)
+     * @see org.jnode.vm.facade.ObjectVisitor#visit(java.lang.Object)
      */
     public final boolean visit(Object object) {
         final int color = VmMagic.getObjectColor(object);

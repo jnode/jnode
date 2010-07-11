@@ -101,7 +101,7 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
     /**
      * @see org.jnode.vm.classmgr.VmClassLoader#getArchitecture()
      */
-    public final VmArchitecture getArchitecture() {
+    public final BaseVmArchitecture getArchitecture() {
         return systemLoader.getArchitecture();
     }
 

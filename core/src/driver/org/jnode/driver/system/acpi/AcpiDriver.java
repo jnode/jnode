@@ -20,10 +20,14 @@
  
 package org.jnode.driver.system.acpi;
 
+import static org.jnode.vm.VirtualMemoryRegion.ACPI;
+
 import java.io.PrintWriter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+
 import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
@@ -40,10 +44,9 @@ import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.system.resource.ResourceOwner;
 import org.jnode.system.resource.SimpleResourceOwner;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.MemoryMapEntry;
-import static org.jnode.vm.VirtualMemoryRegion.ACPI;
-import org.jnode.vm.Vm;
-import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.facade.MemoryMapEntry;
+import org.jnode.vm.facade.VmArchitecture;
+import org.jnode.vm.facade.VmUtils;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.MagicUtils;
@@ -165,9 +168,9 @@ final class AcpiDriver extends Driver implements AcpiAPI {
      */
     private void mmapAcpiRegion()
         throws DriverException {
-        final VmArchitecture arch = Vm.getArch();
-        final MemoryMapEntry[] mmap = (MemoryMapEntry[]) AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
+        final VmArchitecture arch = VmUtils.getVm().getArch();
+        final MemoryMapEntry[] mmap = AccessController.doPrivileged(new PrivilegedAction<MemoryMapEntry[]>() {
+            public MemoryMapEntry[] run() {
                 return arch.getMemoryMap();
             }
         });

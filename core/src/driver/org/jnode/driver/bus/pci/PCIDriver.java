@@ -24,7 +24,9 @@ import java.io.PrintWriter;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
@@ -40,8 +42,8 @@ import org.jnode.system.resource.ResourceOwner;
 import org.jnode.util.AccessControllerUtils;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.VirtualMemoryRegion;
-import org.jnode.vm.Vm;
-import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.facade.VmArchitecture;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.work.Work;
 import org.jnode.work.WorkUtils;
 import org.vmmagic.unboxed.Address;
@@ -243,7 +245,7 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
      */
     protected void remapDeviceAddresses(List<PCIDevice> devices) {
         log.debug("Remapping pci devices");
-        final VmArchitecture arch = Vm.getArch();
+        final VmArchitecture arch = VmUtils.getVm().getArch();
         final Address start = arch.getStart(VirtualMemoryRegion.DEVICE);
         final Address end = arch.getEnd(VirtualMemoryRegion.DEVICE);
         for (PCIDevice dev : devices) {

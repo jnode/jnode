@@ -46,7 +46,7 @@ import org.jnode.shell.syntax.PluginArgument;
 import org.jnode.shell.syntax.StringArgument;
 import org.jnode.shell.syntax.SyntaxMultiplicityException;
 import org.jnode.shell.syntax.URLArgument;
-import org.jnode.vm.Vm;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * @author epr
@@ -120,7 +120,7 @@ public class PluginCommand extends AbstractCommand {
     private void doRun() 
         throws NameNotFoundException, SyntaxMultiplicityException, PluginException, MalformedURLException {
         mgr = InitialNaming.lookup(PluginManager.NAME);
-        final String version = argVersion.isSet() ? argVersion.getValue() : Vm.getVm().getVersion();
+        final String version = argVersion.isSet() ? argVersion.getValue() : VmUtils.getVm().getVersion();
         final String pluginId = argPluginID.getValue();
         if (argLoaderUrl.isSet()) {
             addPluginLoader(argLoaderUrl.getValue());

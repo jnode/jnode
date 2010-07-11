@@ -20,7 +20,7 @@
  
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.objects.VmSystemObject;
 import org.jnode.annotation.Inline;
 import org.vmmagic.pragma.Uninterruptible;
 

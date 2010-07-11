@@ -20,7 +20,9 @@
  
 package org.jnode.vm;
 
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.objects.BootableHashMap;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  *
@@ -33,7 +35,7 @@ public class InternString extends VmSystemObject {
         if (booted) {
             return instance.intern();
         } else {
-            if (Vm.getVm().isBootstrap()) {
+            if (VmUtils.getVm().isBootstrap()) {
                 if (bootInternTable == null) {
                     bootInternTable = new BootableHashMap<String, String>();
                 }

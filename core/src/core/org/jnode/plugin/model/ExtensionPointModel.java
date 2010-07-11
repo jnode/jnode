@@ -220,7 +220,7 @@ final class ExtensionPointModel extends PluginModelObject implements
     }
 
     /**
-     * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
+     * @see org.jnode.vm.objects.VmSystemObject#verifyBeforeEmit()
      */
     public void verifyBeforeEmit() {
         super.verifyBeforeEmit();

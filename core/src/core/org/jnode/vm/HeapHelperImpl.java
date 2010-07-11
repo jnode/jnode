@@ -25,14 +25,16 @@ import org.jnode.annotation.Uninterruptible;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.facade.ObjectVisitor;
+import org.jnode.vm.facade.VmThread;
+import org.jnode.vm.facade.VmThreadVisitor;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.isolate.VmIsolate;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.scheduler.Monitor;
 import org.jnode.vm.scheduler.MonitorManager;
 import org.jnode.vm.scheduler.VmProcessor;
-import org.jnode.vm.scheduler.VmThread;
-import org.jnode.vm.scheduler.VmThreadVisitor;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
@@ -45,7 +47,7 @@ import org.vmmagic.unboxed.Word;
 @Uninterruptible
 final class HeapHelperImpl extends HeapHelper {
 
-    private static final class ThreadRootVisitor extends VmThreadVisitor {
+    private static final class ThreadRootVisitor implements VmThreadVisitor {
 
         private VmHeapManager heapManager;
 
@@ -58,7 +60,7 @@ final class HeapHelperImpl extends HeapHelper {
         }
 
         public boolean visit(VmThread thread) {
-            return thread.visit(visitor, heapManager);
+            return thread.accept(visitor, heapManager);
         }
     }
 
@@ -71,8 +73,8 @@ final class HeapHelperImpl extends HeapHelper {
      *
      * @param arch
      */
-    public HeapHelperImpl(VmArchitecture arch) {
-        if (Vm.getVm() != null) {
+    public HeapHelperImpl(BaseVmArchitecture arch) {
+        if (VmUtils.getVm() != null) {
             throw new SecurityException(
                 "Cannot instantiate HeapHelpImpl at runtime");
         }
@@ -189,9 +191,9 @@ final class HeapHelperImpl extends HeapHelper {
 
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#getInflatedMonitor(java.lang.Object,
-     *      org.jnode.vm.VmArchitecture)
+     *      org.jnode.vm.BaseVmArchitecture)
      */
-    public final Monitor getInflatedMonitor(Object object, VmArchitecture arch) {
+    public final Monitor getInflatedMonitor(Object object, BaseVmArchitecture arch) {
         return MonitorManager.getInflatedMonitor(object);
     }
 
@@ -246,7 +248,7 @@ final class HeapHelperImpl extends HeapHelper {
      * @param visitor
      */
     public void visitAllRoots(ObjectVisitor visitor, VmHeapManager heapManager) {
-        final Vm vm = Vm.getVm();
+        final org.jnode.vm.facade.Vm vm = VmUtils.getVm();
         if (!vm.getSharedStatics().walk(visitor)) {
             return;
         }
@@ -264,6 +266,6 @@ final class HeapHelperImpl extends HeapHelper {
      * @see org.jnode.vm.memmgr.HeapHelper#bootArchitecture(boolean)
      */
     public final void bootArchitecture(boolean emptyMMap) {
-        Vm.getArch().boot(emptyMMap);
+    	((BaseVmArchitecture) VmUtils.getVm().getArch()).boot(emptyMMap);
     }
 }

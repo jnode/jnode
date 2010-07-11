@@ -27,8 +27,9 @@ import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.EnumArgument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.Vm;
-import org.jnode.vm.memmgr.GCStatistics;
+import org.jnode.vm.VmImpl;
+import org.jnode.vm.facade.GCStatistics;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.memmgr.VmHeapManager;
 
 /**
@@ -100,12 +101,12 @@ public class GcCommand extends AbstractCommand {
     public void execute() throws Exception {
         final PrintWriter out = getOutput().getPrintWriter();
         if (argSet.isSet()) {
-            Vm.getHeapManager().setHeapFlags(getFlags());
+        	VmUtils.getVm().getHeapManager().setHeapFlags(getFlags());
         } else if (argClear.isSet()) {
-            int flags = Vm.getHeapManager().getHeapFlags() ^ getFlags();
-            Vm.getHeapManager().setHeapFlags(flags);
+            int flags = VmUtils.getVm().getHeapManager().getHeapFlags() ^ getFlags();
+            VmUtils.getVm().getHeapManager().setHeapFlags(flags);
         } else if (argShow.isSet()) {
-            showFlags(Vm.getHeapManager().getHeapFlags(), out);
+            showFlags(VmUtils.getVm().getHeapManager().getHeapFlags(), out);
         } else {
             final Runtime rt = Runtime.getRuntime();
             out.format(fmt_out, str_mem_size, NumberUtils.toBinaryByte(rt.totalMemory()));
@@ -114,7 +115,7 @@ public class GcCommand extends AbstractCommand {
             out.println(str_start);
             long start = System.currentTimeMillis();
             rt.gc();
-            GCStatistics stats = Vm.getHeapManager().getStatistics();
+            GCStatistics stats = VmUtils.getVm().getHeapManager().getStatistics();
             Thread.yield();
             long end = System.currentTimeMillis();
             

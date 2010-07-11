@@ -38,9 +38,9 @@ import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmClassLoader;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.VmMagic;
-import org.jnode.vm.Vm;
 import org.jnode.vm.VmReflection;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.SharedStatics;
@@ -385,7 +385,7 @@ class NativeUnsafe {
             //handles the reflective access to static final String fields, which didn't work.
             if(obj instanceof VmConstString){
                 VmConstString cs = (VmConstString) obj;
-                obj = Vm.getVm().getSharedStatics().getStringEntry(cs.getSharedStaticsIndex());
+                obj = VmUtils.getVm().getSharedStatics().getStringEntry(cs.getSharedStaticsIndex());
             }
             return obj;
         }

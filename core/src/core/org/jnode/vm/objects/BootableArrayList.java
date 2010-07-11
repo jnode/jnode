@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.RandomAccess;
 
-import org.jnode.vm.VmSystemObject;
 
 /**
  * A BootableList is a List implementation that can be used in the
@@ -340,7 +339,7 @@ public class BootableArrayList<T> extends VmSystemObject implements List<T>, Ran
     }
 
     /**
-     * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
+     * @see org.jnode.vm.objects.VmSystemObject#verifyBeforeEmit()
      */
     @SuppressWarnings("unchecked")
     public void verifyBeforeEmit() {

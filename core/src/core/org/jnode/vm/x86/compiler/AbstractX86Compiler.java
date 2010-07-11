@@ -30,16 +30,17 @@ import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86TextAssembler;
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.PrivilegedActionPragma;
-import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.jnode.vm.facade.TypeSizeInfo;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.x86.VmX86Architecture;
 import org.jnode.vm.x86.X86CpuID;
@@ -68,7 +69,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler {
      */
     public final void initialize(VmClassLoader loader) {
         if (context == null) {
-            context = new EntryPoints(loader, Vm.getHeapManager(), getMagic());
+            context = new EntryPoints(loader, VmUtils.getVm().getHeapManager(), getMagic());
             mode = ((VmX86Architecture) loader.getArchitecture()).getMode();
             typeSizeInfo = loader.getArchitecture().getTypeSizeInfo();
         }
@@ -114,7 +115,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler {
             // Set the address of the abstract method code
             final Address errorAddr = Unsafe
                 .getJumpTableEntry(X86JumpTable.VM_INVOKE_ABSTRACT_IDX);
-            final VmCompiledCode code = Vm.getCompiledMethods()
+            final VmCompiledCode code = VmUtils.getVm().getCompiledMethods()
                 .createCompiledCode(null, method, this, null,
                     errorAddr.toAddress(), null, 0, null, null, null);
             method.addCompiledCode(code, level);

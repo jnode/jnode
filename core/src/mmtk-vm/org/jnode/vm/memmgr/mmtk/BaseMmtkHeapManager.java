@@ -26,7 +26,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.naming.NameNotFoundException;
 
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.resource.MemoryResource;
@@ -34,19 +33,18 @@ import org.jnode.system.resource.ResourceManager;
 import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.system.resource.ResourceOwner;
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.Vm;
-import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.facade.HeapStatistics;
+import org.jnode.vm.facade.VmArchitecture;
+import org.jnode.vm.facade.VmProcessor;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.memmgr.HeapHelper;
-import org.jnode.vm.memmgr.HeapStatistics;
 import org.jnode.vm.memmgr.VmHeapManager;
-import org.jnode.vm.memmgr.VmWriteBarrier;
-import org.jnode.vm.scheduler.VmProcessor;
 import org.mmtk.plan.BasePlan;
 import org.mmtk.policy.Space;
 import org.mmtk.utility.heap.HeapGrowthManager;
@@ -132,7 +130,7 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
             Unsafe.debug('\n');
         }
         if (false) {
-            VmProcessor.current().getArchitecture().getStackReader()
+        	getCurrentProcessor().getArchitecture().getStackReader()
                     .debugStackTrace();
         }
 
@@ -142,7 +140,7 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
         final Offset flagsOffset = Offset.fromIntSignExtend(this.flagsOffset);
         int allocator = BasePlan.ALLOC_DEFAULT;
 
-        final int refSize = Vm.getArch().getReferenceSize();
+        final int refSize = VmUtils.getVm().getArch().getReferenceSize();
         allocator = checkAllocator(size, align, allocator);
 
         // Allocate the raw space
@@ -192,12 +190,12 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
     protected void initialize() {
         Unsafe.debug("MmtkHeapManager#initialize\n");
         if (initializing) {
-            VmProcessor.current().getArchitecture().getStackReader()
+        	getCurrentProcessor().getArchitecture().getStackReader()
                     .debugStackTrace();
             Unsafe.die("Recursive initialize");
         }
         initializing = true;
-        final VmArchitecture arch = Vm.getArch();
+        final VmArchitecture arch = VmUtils.getVm().getArch();
         helper.bootArchitecture(true);
 
         final Address bootImgStart = helper.getBootImageStart();

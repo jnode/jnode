@@ -22,6 +22,7 @@ package org.jnode.vm;
 
 import org.jnode.util.NumberUtils;
 import org.jnode.annotation.MagicPermission;
+import org.jnode.vm.objects.VmSystemObject;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.vmmagic.unboxed.Address;
 

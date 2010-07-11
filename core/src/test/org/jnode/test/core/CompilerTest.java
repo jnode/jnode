@@ -27,8 +27,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.X86TextAssembler;
-import org.jnode.vm.Vm;
-import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.VmImpl;
+import org.jnode.vm.BaseVmArchitecture;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.BytecodeViewer;
@@ -122,7 +122,7 @@ public class CompilerTest {
             new java.net.URL("jar:" + classlib.toURI().toURL() + "!/"),
         }, arch);
 
-        final Vm vm = new Vm("?", arch, cl.getSharedStatics(), false, cl, null);
+        final VmImpl vm = new VmImpl("?", arch, cl.getSharedStatics(), false, cl, null);
         vm.toString();
         VmType.initializeForBootImage(cl);
         System.out.println("Architecture: " + arch.getFullName());
@@ -161,7 +161,7 @@ public class CompilerTest {
         }
     }
 
-    static void compile(VmMethod method, VmArchitecture arch, NativeCodeCompiler c, X86CpuID cpuId,
+    static void compile(VmMethod method, BaseVmArchitecture arch, NativeCodeCompiler c, X86CpuID cpuId,
                         int level) throws IOException {
         final String cname = method.getDeclaringClass().getName();
         final String mname = method.getName();

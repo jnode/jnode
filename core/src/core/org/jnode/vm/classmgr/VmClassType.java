@@ -266,7 +266,7 @@ public abstract class VmClassType<T> extends VmType<T> {
      * Verify this object before it is written into the bootimage
      * by the bootimage builder.
      *
-     * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
+     * @see org.jnode.vm.objects.VmSystemObject#verifyBeforeEmit()
      */
     public void verifyBeforeEmit() {
         if (tib == null) {

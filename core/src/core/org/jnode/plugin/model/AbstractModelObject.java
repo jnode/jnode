@@ -22,7 +22,7 @@ package org.jnode.plugin.model;
 
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.PluginException;
-import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * @author epr

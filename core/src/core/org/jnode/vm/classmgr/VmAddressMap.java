@@ -24,7 +24,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * This table is a mapping between a program counter and an address of that

@@ -22,16 +22,19 @@ package org.jnode.vm;
 
 import java.nio.ByteOrder;
 
-import org.jnode.permission.JNodePermission;
-import org.jnode.system.resource.ResourceManager;
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.MagicPermission;
-import org.jnode.vm.classmgr.TypeSizeInfo;
+import org.jnode.permission.JNodePermission;
+import org.jnode.system.resource.ResourceManager;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.jnode.vm.facade.MemoryMapEntry;
+import org.jnode.vm.facade.TypeSizeInfo;
+import org.jnode.vm.facade.VmUtils;
+import org.jnode.vm.objects.VmSystemObject;
 import org.jnode.vm.scheduler.IRQManager;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmScheduler;
@@ -46,7 +49,7 @@ import org.vmmagic.unboxed.Word;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
-public abstract class VmArchitecture extends VmSystemObject {
+public abstract class BaseVmArchitecture extends VmSystemObject implements org.jnode.vm.facade.VmArchitecture {
 
     private final JNodePermission MMAP_PERM = new JNodePermission("getMemoryMap");
     private transient MemoryMapEntry[] memoryMap;
@@ -54,17 +57,13 @@ public abstract class VmArchitecture extends VmSystemObject {
     private final int referenceSize;
     private final VmStackReader stackReader;
 
-    protected VmArchitecture(int referenceSize, VmStackReader stackReader) {
+    protected BaseVmArchitecture(int referenceSize, VmStackReader stackReader) {
         this.referenceSize = referenceSize;
         this.stackReader = stackReader;
     }
 
     /**
-     * Gets the name of this architecture.
-     * This name is the programmers name used to identify packages,
-     * class name extensions etc.
-     *
-     * @return the architecture's name
+     * {@inheritDoc}
      */
     public abstract String getName();
 
@@ -76,16 +75,12 @@ public abstract class VmArchitecture extends VmSystemObject {
     public abstract String getFullName();
 
     /**
-     * Gets the byte ordering of this architecture.
-     *
-     * @return the architecture's ByteOrder
+     * {@inheritDoc}
      */
     public abstract ByteOrder getByteOrder();
 
     /**
-     * Gets the size in bytes of an object reference.
-     *
-     * @return the architecture's reference size in bytes; i.e. 4 or 8.
+     * {@inheritDoc}
      */
     @KernelSpace
     public final int getReferenceSize() {
@@ -93,10 +88,7 @@ public abstract class VmArchitecture extends VmSystemObject {
     }
 
     /**
-     * Gets the log base two of the size in bytes of an OS page in a given region
-     *
-     * @param region a {@link VirtualMemoryRegion} value
-     * @return the log base two page size
+     * {@inheritDoc}
      */
     public abstract byte getLogPageSize(int region)
         throws UninterruptiblePragma;
@@ -113,11 +105,9 @@ public abstract class VmArchitecture extends VmSystemObject {
     }
 
     /**
-     * Gets the type size information of this architecture.
-     *
-     * @return the architecture's type size information descriptor
+     * {@inheritDoc}
      */
-    public abstract TypeSizeInfo getTypeSizeInfo();
+	public abstract TypeSizeInfo getTypeSizeInfo();
 
     /**
      * Gets the stackreader for this architecture.
@@ -176,8 +166,8 @@ public abstract class VmArchitecture extends VmSystemObject {
      *
      * @param cpu
      */
-    protected final void addProcessor(VmProcessor cpu) {
-        Vm.getVm().addProcessor(cpu);
+    protected final void addProcessor(VmProcessor cpu) { 
+        ((VmImpl) VmUtils.getVm()).addProcessor(cpu);
     }
 
     /**
@@ -197,10 +187,7 @@ public abstract class VmArchitecture extends VmSystemObject {
     public abstract IRQManager createIRQManager(VmProcessor processor);
 
     /**
-     * Gets the start address of the given space.
-     * 
-     * @param space a {@link VirtualMemoryRegion}.
-     * @return the start address of the region
+     * {@inheritDoc}
      */
     public Address getStart(int space) {
         switch (space) {
@@ -214,10 +201,7 @@ public abstract class VmArchitecture extends VmSystemObject {
     }
 
     /**
-     * Gets the end address of the given space.
-     *
-     * @param space a {@link VirtualMemoryRegion}.
-     * @return the end address of the region
+     * {@inheritDoc}
      */
     public Address getEnd(int space) {
         switch (space) {
@@ -257,27 +241,14 @@ public abstract class VmArchitecture extends VmSystemObject {
     }
 
     /**
-     * Page align a given address (represented as an Address) in a given region.
-     *
-     * @param v an address value
-     * @param region a {@link VirtualMemoryRegion}.
-     * @param up If true, the value will be rounded up, otherwise rounded down.
-     * @return the corresponding page aligned address represented as a Address. 
+     * {@inheritDoc}
      */
     public final Address pageAlign(int region, Address v, boolean up) {
         return pageAlign(region, v.toWord(), up).toAddress();
     }
 
     /**
-     * Map a region of the virtual memory space. Note that you cannot allocate
-     * memory in this memory, because it is used very early in the boot process.
-     *
-     * @param region   Memory region
-     * @param start    The start of the virtual memory region to map
-     * @param size     The size of the virtual memory region to map
-     * @param physAddr The physical address to map the virtual address to. If this is
-     *                 Address.max(), free pages are used instead.
-     * @return true for success, false otherwise.
+     * {@inheritDoc}
      */
     public abstract boolean mmap(int region, Address start, Extent size, Address physAddr)
         throws UninterruptiblePragma;
@@ -297,10 +268,7 @@ public abstract class VmArchitecture extends VmSystemObject {
         throws UninterruptiblePragma;
 
     /**
-     * Gets the memory map of the current system.  If no map has yet been created,
-     * it will be created by calling {@link #createMemoryMap()}.
-     *
-     * @return the architecture's memory map.
+     * {@inheritDoc}
      */
     public final MemoryMapEntry[] getMemoryMap() {
         final SecurityManager sm = System.getSecurityManager();

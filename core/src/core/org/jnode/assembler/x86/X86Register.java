@@ -20,8 +20,8 @@
  
 package org.jnode.assembler.x86;
 
-import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.objects.BootableHashMap;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * Registers of the x86 architecture.

@@ -20,7 +20,7 @@
  
 package org.jnode.plugin.model;
 
-import org.jnode.vm.BootableObject;
+import org.jnode.vm.objects.BootableObject;
 
 /**
  * @author epr

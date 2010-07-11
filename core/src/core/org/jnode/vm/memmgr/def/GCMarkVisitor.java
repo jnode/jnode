@@ -20,9 +20,8 @@
  
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.BaseVmArchitecture;
 import org.jnode.vm.VmMagic;
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.MagicPermission;
@@ -30,6 +29,7 @@ import org.jnode.annotation.NoInline;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.facade.ObjectVisitor;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.scheduler.Monitor;
 import org.vmmagic.pragma.Uninterruptible;
@@ -61,7 +61,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      */
     private boolean rootSet;
 
-    private final VmArchitecture arch;
+    private final BaseVmArchitecture arch;
 
 //    private final int slotSize;
 
@@ -76,7 +76,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      *
      * @param stack
      */
-    public GCMarkVisitor(DefaultHeapManager heapManager, VmArchitecture arch,
+    public GCMarkVisitor(DefaultHeapManager heapManager, BaseVmArchitecture arch,
                          GCStack stack) {
         this.heapManager = heapManager;
         this.stack = stack;
@@ -90,7 +90,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
     /**
      * @param object
      * @return boolean
-     * @see org.jnode.vm.ObjectVisitor#visit(java.lang.Object)
+     * @see org.jnode.vm.facade.ObjectVisitor#visit(java.lang.Object)
      */
     public boolean visit(Object object) {
 

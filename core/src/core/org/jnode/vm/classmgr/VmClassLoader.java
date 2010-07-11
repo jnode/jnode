@@ -24,9 +24,9 @@ import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 
-import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.compiler.CompiledIMT;
+import org.jnode.vm.facade.VmArchitecture;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * Interface for the delegation of loading classes with a given name

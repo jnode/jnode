@@ -20,12 +20,13 @@
  
 package org.jnode.vm.memmgr.mmtk;
 
-import org.jnode.vm.memmgr.GCStatistics;
+import org.jnode.vm.facade.GCStatistics;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public abstract class BaseMmtkGCStatistics extends GCStatistics {
+public abstract class BaseMmtkGCStatistics extends VmSystemObject implements GCStatistics {
 
     public String toString() {
         return "";

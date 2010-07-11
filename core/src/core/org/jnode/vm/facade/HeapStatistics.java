@@ -18,14 +18,38 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.vm.memmgr;
+package org.jnode.vm.facade;
 
-import org.jnode.vm.VmSystemObject;
+import java.io.IOException;
 
 /**
- * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * Heap statistical data collection.
+ *
+ * @author Martin Husted Hartvig (hagar@jnode.org)
  */
-public abstract class GCStatistics extends VmSystemObject {
+public interface HeapStatistics {
 
-    public abstract String toString();
+    /**
+     * Sets the minimum number of instances a class must have before
+     * it is listed in toString.
+     *
+     * @param count
+     */
+    void setMinimumInstanceCount(int count);
+
+    /**
+     * Sets the minimum bytes of occupied memory by all instances of a class
+     * before it is listed in toString.
+     *
+     * @param bytes
+     */
+    void setMinimumTotalSize(long bytes);
+
+    /**
+     * Write the statistical data to an {@link Appendable}.
+     * 
+     * @param a
+     * @throws IOException 
+     */
+    void writeTo(Appendable a) throws IOException;
 }

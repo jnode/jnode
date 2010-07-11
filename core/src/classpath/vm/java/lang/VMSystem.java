@@ -44,8 +44,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.jnode.util.SystemInputStream;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
 import org.jnode.vm.VmSystem;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * VMSystem is a package-private helper class for System that the VM must
@@ -112,7 +113,7 @@ public final class VMSystem {
 	 * @return true if the system is big-endian.
 	 */
 	static boolean isWordsBigEndian() {
-		return (Vm.getArch().getByteOrder() == ByteOrder.BIG_ENDIAN);
+		return (VmUtils.getVm().getArch().getByteOrder() == ByteOrder.BIG_ENDIAN);
 	}
 
 	/**

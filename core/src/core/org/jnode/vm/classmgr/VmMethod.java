@@ -24,11 +24,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
-import org.jnode.vm.LoadCompileService;
-import org.jnode.vm.Vm;
-import org.jnode.vm.VmAddress;
-import org.jnode.vm.InternString;
 import org.jnode.annotation.MagicPermission;
+import org.jnode.vm.InternString;
+import org.jnode.vm.LoadCompileService;
+import org.jnode.vm.VmAddress;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.isolate.VmIsolateLocal;
 import org.vmmagic.unboxed.Address;
 
@@ -255,7 +255,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     public final String getMangledName() {
         if (mangledName == null) {
             mangledName = InternString.internString(declaringClass.getMangledName()
-                + mangle("#" + getName() + '.' + getSignature()));
+                + Mangler.mangle("#" + getName() + '.' + getSignature()));
         }
         return mangledName;
     }
@@ -296,7 +296,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      * @param methodIndex
      */
     static final void recompileMethod(int typeStaticsIndex, int methodIndex) {
-        final VmType<?> type = Vm.getVm().getSharedStatics().getTypeEntry(
+        final VmType<?> type = VmUtils.getVm().getSharedStatics().getTypeEntry(
             typeStaticsIndex);
         type.initialize();
         final VmMethod method = type.getDeclaredMethod(methodIndex);
@@ -499,7 +499,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
                 code.setNext(this.compiledCode);
                 this.compiledCode = code;
                 this.nativeCode = code.getNativeCode();
-                Vm.getVm().getSharedStatics().setMethodCode(
+                VmUtils.getVm().getSharedStatics().setMethodCode(
                     getSharedStaticsIndex(), code.getNativeCode());
                 this.nativeCodeOptLevel = (short) optLevel;
             }
@@ -665,7 +665,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     }
 
     /**
-     * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
+     * @see org.jnode.vm.objects.VmSystemObject#verifyBeforeEmit()
      */
     public void verifyBeforeEmit() {
         super.verifyBeforeEmit();

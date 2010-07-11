@@ -31,7 +31,8 @@ import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -238,8 +239,8 @@ final class FPCompilerFPU extends FPCompiler {
             BootLogInstance.get().debug("Flush FPU stack;\n  fpuStack=" + fpuStack
                 + ",\n  vstack  =" + vstack);
             vstack.push(ec);
-            if (Vm.VerifyAssertions)
-                Vm._assert(fpuStack.hasCapacity(items), "Out of FPU stack");
+            if (VmUtils.verifyAssertions())
+                VmUtils._assert(fpuStack.hasCapacity(items), "Out of FPU stack");
         }
     }
 

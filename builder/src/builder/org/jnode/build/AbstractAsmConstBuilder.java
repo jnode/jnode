@@ -30,13 +30,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-import org.jnode.vm.Vm;
-import org.jnode.vm.VmArchitecture;
+
+import org.jnode.vm.BaseVmArchitecture;
+import org.jnode.vm.VmImpl;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.facade.Vm;
 
 /**
  * TODO describe the class.
@@ -75,14 +77,14 @@ public abstract class AbstractAsmConstBuilder {
     private void doExecute()
         throws BuildException, ClassNotFoundException, IllegalAccessException, IOException, InstantiationException {
 
-        final VmArchitecture arch = getArchitecture();
+        final BaseVmArchitecture arch = getArchitecture();
         String[] urls = classesURL.split(",");
         URL[] urla = new URL[urls.length];
         for (int i = 0; i < urls.length; i++)
             urla[i] = new URL(urls[i].trim());
 
         final VmSystemClassLoader cl = new VmSystemClassLoader(urla, arch);
-        final Vm vm = new Vm("?", arch, cl.getSharedStatics(), false, cl, null);
+        final Vm vm = new VmImpl("?", arch, cl.getSharedStatics(), false, cl, null);
         vm.toString(); // Just to avoid compiler warnings
         VmType.initializeForBootImage(cl);
         long lastModified = 0;
@@ -249,5 +251,5 @@ public abstract class AbstractAsmConstBuilder {
         this.classesURL = classesURL;
     }
 
-    protected abstract VmArchitecture getArchitecture();
+    protected abstract BaseVmArchitecture getArchitecture();
 }

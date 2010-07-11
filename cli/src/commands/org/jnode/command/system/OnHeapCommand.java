@@ -27,8 +27,9 @@ import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.IntegerArgument;
 import org.jnode.shell.syntax.LongArgument;
-import org.jnode.vm.Vm;
-import org.jnode.vm.memmgr.HeapStatistics;
+import org.jnode.vm.VmImpl;
+import org.jnode.vm.facade.HeapStatistics;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
@@ -61,7 +62,7 @@ public class OnHeapCommand extends AbstractCommand {
     public void execute() throws Exception {
         PrintWriter out = getOutput().getPrintWriter();
         out.println(str_on_heap);
-        final HeapStatistics stats = Vm.getHeapManager().getHeapStatistics();
+        final HeapStatistics stats = VmUtils.getVm().getHeapManager().getHeapStatistics();
         
         if (argMinInstanceCount.isSet()) {
             stats.setMinimumInstanceCount(argMinInstanceCount.getValue());

@@ -20,14 +20,14 @@
  
 package org.jnode.vm.x86;
 
-import org.jnode.vm.MemoryMapEntry;
+import org.jnode.vm.facade.MemoryMapEntry;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class X86MemoryMapEntry extends MemoryMapEntry {
+final class X86MemoryMapEntry implements MemoryMapEntry {
 
     private final Address start;
     private final Extent size;
@@ -45,35 +45,35 @@ final class X86MemoryMapEntry extends MemoryMapEntry {
     }
 
     /**
-     * @see org.jnode.vm.MemoryMapEntry#getSize()
+     * @see org.jnode.vm.facade.MemoryMapEntry#getSize()
      */
     public Extent getSize() {
         return size;
     }
 
     /**
-     * @see org.jnode.vm.MemoryMapEntry#getStart()
+     * @see org.jnode.vm.facade.MemoryMapEntry#getStart()
      */
     public Address getStart() {
         return start;
     }
 
     /**
-     * @see org.jnode.vm.MemoryMapEntry#isAcpi()
+     * @see org.jnode.vm.facade.MemoryMapEntry#isAcpi()
      */
     public boolean isAcpi() {
         return (type == VmX86Architecture.MMAP_TYPE_ACPI);
     }
 
     /**
-     * @see org.jnode.vm.MemoryMapEntry#isAcpiNVS()
+     * @see org.jnode.vm.facade.MemoryMapEntry#isAcpiNVS()
      */
     public boolean isAcpiNVS() {
         return (type == VmX86Architecture.MMAP_TYPE_NVS);
     }
 
     /**
-     * @see org.jnode.vm.MemoryMapEntry#isAvailable()
+     * @see org.jnode.vm.facade.MemoryMapEntry#isAvailable()
      */
     public boolean isAvailable() {
         return (type == VmX86Architecture.MMAP_TYPE_MEMORY);

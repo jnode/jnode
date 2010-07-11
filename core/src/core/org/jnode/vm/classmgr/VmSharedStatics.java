@@ -21,7 +21,8 @@
 package org.jnode.vm.classmgr;
 
 import org.jnode.assembler.ObjectResolver;
-import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.facade.VmArchitecture;
+
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

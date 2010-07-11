@@ -18,40 +18,30 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.vm.memmgr;
+package org.jnode.vm.facade;
 
-import java.io.IOException;
-
-import org.jnode.vm.VmSystemObject;
+import java.io.PrintWriter;
 
 /**
- * Heap statistical data collection.
+ * Interface with a processor.
+ * 
+ * @author Fabien DUMINY (fduminy at jnode.org)
  *
- * @author Martin Husted Hartvig (hagar@jnode.org)
  */
-public abstract class HeapStatistics extends VmSystemObject {
+public interface VmProcessor {
 
     /**
-     * Sets the minimum number of instances a class must have before
-     * it is listed in toString.
+     * Gets the identifier of this processor as string.
      *
-     * @param count
+     * @return Returns the id.
      */
-    public abstract void setMinimumInstanceCount(int count);
+	String getIdString();
 
     /**
-     * Sets the minimum bytes of occupied memory by all instances of a class
-     * before it is listed in toString.
+     * Print statistics information on the given stream.
      *
-     * @param bytes
+     * @param out
      */
-    public abstract void setMinimumTotalSize(long bytes);
+	void dumpStatistics(PrintWriter out);
 
-    /**
-     * Write the statistical data to an {@link Appendable}.
-     * 
-     * @param a
-     * @throws IOException 
-     */
-    public abstract void writeTo(Appendable a) throws IOException;
 }

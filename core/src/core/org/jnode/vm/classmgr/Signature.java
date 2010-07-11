@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import org.jnode.vm.JvmType;
 import org.jnode.vm.InternString;
+import org.jnode.vm.facade.TypeSizeInfo;
 
 /**
  * <description>

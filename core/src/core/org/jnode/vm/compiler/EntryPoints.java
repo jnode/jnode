@@ -20,14 +20,14 @@
  
 package org.jnode.vm.compiler;
 
-import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.memmgr.VmHeapManager;
-import org.jnode.vm.memmgr.VmWriteBarrier;
+import org.jnode.vm.facade.VmHeapManager;
+import org.jnode.vm.facade.VmWriteBarrier;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * @author epr

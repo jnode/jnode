@@ -27,6 +27,7 @@ import javax.naming.NamingException;
 
 import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
+import org.jnode.vm.objects.BootableObject;
 
 /**
  * Logging class used during bootstrap.

@@ -26,10 +26,9 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmMagic;
-import org.jnode.vm.VmSystemObject;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.ControlFlowGraph;
@@ -39,6 +38,8 @@ import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmCompiledExceptionHandler;
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.facade.VmUtils;
+import org.jnode.vm.objects.VmSystemObject;
 import org.vmmagic.unboxed.Address;
 
 /**
@@ -117,7 +118,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
             bc = null;
         }
 
-        method.addCompiledCode(Vm.getCompiledMethods().createCompiledCode(cm,
+        method.addCompiledCode(VmUtils.getVm().getCompiledMethods().createCompiledCode(cm,
             method, this, bc, nativeCode, null, end - start, eTable,
             defExHandler, aTable), level);
     }
@@ -200,7 +201,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
                 eTable = null;
             }
 
-            method.addCompiledCode(Vm.getCompiledMethods().createCompiledCode(
+            method.addCompiledCode(VmUtils.getVm().getCompiledMethods().createCompiledCode(
                 cm, method, this, bc, codePtr.toAddress(), code, size,
                 eTable, defExHandler.toAddress(), aTable), level);
 

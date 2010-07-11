@@ -15,7 +15,8 @@ package org.mmtk.vm;
 
 import static org.jnode.vm.VirtualMemoryRegion.AVAILABLE;
 
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * This file is a <b>stub</b> file representing all VM-specific constants. This
@@ -43,7 +44,7 @@ public final class VMConstants {
      * @return The log base two of the size of an address 
      */
     public static final byte LOG_BYTES_IN_ADDRESS() {
-        final int refSize = Vm.getArch().getReferenceSize();
+        final int refSize = VmUtils.getVm().getArch().getReferenceSize();
         if (refSize == 4) {
             return 2;
         } else if (refSize == 8) {
@@ -62,7 +63,7 @@ public final class VMConstants {
 
     /** @return The log base two of the size of an OS page */
     public static final byte LOG_BYTES_IN_PAGE() {
-        return Vm.getArch().getLogPageSize(AVAILABLE);
+        return VmUtils.getVm().getArch().getLogPageSize(AVAILABLE);
     }
 
     /** @return The log base two of the minimum allocation alignment */

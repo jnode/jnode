@@ -18,7 +18,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.vm;
+package org.jnode.vm.facade;
+
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * @author epr

@@ -14,7 +14,8 @@
 package org.mmtk.vm;
 
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
+import org.jnode.vm.facade.VmUtils;
 import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
@@ -46,7 +47,7 @@ public final class Strings {
      *            number of characters in message
      */
     public static void write(char[] c, int len) {
-        if (Vm.isRunningVm()) {
+        if (VmUtils.isRunningVm()) {
             for (int i = 0; i < len; i++) {
                 Unsafe.debug(c[i]);
             }
@@ -66,7 +67,7 @@ public final class Strings {
      *            number of characters in message
      */
     public static void writeThreadId(char[] c, int len) {
-        if (Vm.isRunningVm()) {
+        if (VmUtils.isRunningVm()) {
             Unsafe.debug("Thread "); 
             Unsafe.debug(Thread.currentThread().getId());
             Unsafe.debug(": ");

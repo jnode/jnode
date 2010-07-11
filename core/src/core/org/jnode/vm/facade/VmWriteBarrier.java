@@ -18,15 +18,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.vm.memmgr;
+package org.jnode.vm.facade;
 
-import org.jnode.vm.VmSystemObject;
 import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public abstract class VmWriteBarrier extends VmSystemObject {
+public interface VmWriteBarrier {
 
     /**
      * This method is inlined to implement the write barrier for aastores
@@ -35,7 +34,7 @@ public abstract class VmWriteBarrier extends VmSystemObject {
      * @param index The array index being stored into.  NOTE: This is the "natural" index; a[3] will pass 3.
      * @param value The value being stored
      */
-    public abstract void arrayStoreWriteBarrier(Object ref, int index, Object value)
+    void arrayStoreWriteBarrier(Object ref, int index, Object value)
         throws UninterruptiblePragma;
 
     /**
@@ -45,7 +44,7 @@ public abstract class VmWriteBarrier extends VmSystemObject {
      * @param offset The offset being stored into.  NOTE: This is in bytes.
      * @param value  The value being stored
      */
-    public abstract void putfieldWriteBarrier(Object ref, int offset, Object value)
+    void putfieldWriteBarrier(Object ref, int offset, Object value)
         throws UninterruptiblePragma;
 
     /**
@@ -55,7 +54,7 @@ public abstract class VmWriteBarrier extends VmSystemObject {
      * @param staticsIndex The offset of static field (in VmSharedStatics or VmIsolatedStatics)
      * @param value        The value being stored
      */
-    public abstract void putstaticWriteBarrier(boolean shared, int staticsIndex, Object value)
+    void putstaticWriteBarrier(boolean shared, int staticsIndex, Object value)
         throws UninterruptiblePragma;
 
     /**
@@ -67,6 +66,6 @@ public abstract class VmWriteBarrier extends VmSystemObject {
      *              <code>a[1]</code>, index = 1).
      * @param end   The last "natural" index into the array
      */
-    public abstract void arrayCopyWriteBarrier(Object array, int start, int end)
+    void arrayCopyWriteBarrier(Object array, int start, int end)
         throws UninterruptiblePragma;
 }

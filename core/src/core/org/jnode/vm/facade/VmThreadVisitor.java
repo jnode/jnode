@@ -18,14 +18,18 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.vm;
+package org.jnode.vm.facade;
 
 /**
- * This interface is a marker for those classes that can be safely instantiated
- * during the boot image building process.
- *
- * @author epr
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public interface BootableObject {
+public interface VmThreadVisitor {
 
+    /**
+     * Generic visit method for threads.
+     *
+     * @param thread
+     * @return true to continue with the next thread, false to stop calling this method.
+     */
+    boolean visit(VmThread thread);
 }

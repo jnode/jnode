@@ -59,8 +59,10 @@ import org.jnode.vm.classmgr.VmConstantPool;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.facade.VmArchitecture;
+import org.jnode.vm.facade.VmUtils;
+import org.jnode.vm.facade.VmWriteBarrier;
 import org.jnode.vm.isolate.VmIsolate;
-import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmThread;
 import org.vmmagic.unboxed.Address;
@@ -138,15 +140,15 @@ public final class VmSystem {
             // Initialize VmThread
             VmThread.initialize();
 
-            final Vm vm = Vm.getVm();
+            final org.jnode.vm.facade.Vm vm = VmUtils.getVm();
 
             // Initialize the monitors for the heap manager
-            Vm.getHeapManager().start();
+            vm.getHeapManager().start();
 
             Locale.setDefault(Locale.ENGLISH);
 
             // Find & start all processors
-            vm.initializeProcessors(rm);
+            ((VmImpl) vm).initializeProcessors(rm);
 
             /* We're done initializing */
             inited = true;
@@ -280,8 +282,8 @@ public final class VmSystem {
      */
     public static void insertSystemProperties(Properties res) {
 
-        final Vm vm = Vm.getVm();
-        final VmArchitecture arch = Vm.getArch();
+        final org.jnode.vm.facade.Vm vm = VmUtils.getVm();
+        final VmArchitecture arch = vm.getArch();
 
         // Standard Java properties
         res.put("file.separator", "/");
@@ -415,7 +417,7 @@ public final class VmSystem {
      * @return Object
      */
     public static Object clone(Cloneable obj) {
-        return Vm.getHeapManager().clone(obj);
+        return VmUtils.getVm().getHeapManager().clone(obj);
     }
 
     /**
@@ -530,10 +532,10 @@ public final class VmSystem {
     @Internal
     public static final Object allocStack(int size) {
         try {
-            return Vm.getHeapManager()
+            return VmUtils.getVm().getHeapManager()
                 .newInstance(
                     systemLoader.loadClass(
-                        "org.jnode.vm.VmSystemObject", true), size);
+                        "org.jnode.vm.objects.VmSystemObject", true), size);
         } catch (ClassNotFoundException ex) {
             throw (NoClassDefFoundError) new NoClassDefFoundError()
                 .initCause(ex);
@@ -798,7 +800,7 @@ public final class VmSystem {
         }
 
         if (isObjectArray) {
-            final VmWriteBarrier wb = Vm.getHeapManager().getWriteBarrier();
+            final VmWriteBarrier wb = VmUtils.getVm().getHeapManager().getWriteBarrier();
             if (wb != null) {
                 wb.arrayCopyWriteBarrier(src, srcPos, srcPos + length);
             }
@@ -931,7 +933,7 @@ public final class VmSystem {
      * @return free memory in system ram
      */
     public static long freeMemory() {
-        return Vm.getHeapManager().getFreeMemory();
+        return VmUtils.getVm().getHeapManager().getFreeMemory();
     }
 
     /**
@@ -940,14 +942,14 @@ public final class VmSystem {
      * @return the total amount of system memory
      */
     public static long totalMemory() {
-        return Vm.getHeapManager().getTotalMemory();
+        return VmUtils.getVm().getHeapManager().getTotalMemory();
     }
 
     /**
      * Call the garbage collector
      */
     public static void gc() {
-        Vm.getHeapManager().gc();
+    	VmUtils.getVm().getHeapManager().gc();
     }
 
     static class SystemOutputStream extends OutputStream {

@@ -20,10 +20,10 @@
  
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmMagic;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.ObjectLayout;
+import org.jnode.vm.facade.ObjectVisitor;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;

@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -33,28 +35,28 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.net.URL;
-import java.net.URLClassLoader;
+
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
 import javax.isolate.IsolateStatus;
 import javax.isolate.Link;
 import javax.naming.NameNotFoundException;
-import org.jnode.naming.InitialNaming;
-import org.jnode.plugin.PluginManager;
-import org.jnode.vm.IOContext;
-import org.jnode.vm.ObjectVisitor;
-import org.jnode.vm.Unsafe;
-import org.jnode.vm.Vm;
-import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmIOContext;
-import org.jnode.vm.VmMagic;
-import org.jnode.vm.VmSystem;
+
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.annotation.SharedStatics;
+import org.jnode.naming.InitialNaming;
+import org.jnode.plugin.PluginManager;
+import org.jnode.vm.IOContext;
+import org.jnode.vm.Unsafe;
+import org.jnode.vm.VmIOContext;
+import org.jnode.vm.VmMagic;
+import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.facade.ObjectVisitor;
+import org.jnode.vm.facade.VmArchitecture;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.objects.BootableHashMap;
 import org.jnode.vm.scheduler.VmThread;
 
@@ -311,7 +313,7 @@ public final class VmIsolate {
         this.mainClass = mainClass;
         this.args = args;
         this.bindings = bindings;
-        final VmArchitecture arch = Vm.getArch();
+        final VmArchitecture arch = VmUtils.getVm().getArch();
         this.isolatedStaticsTable = new VmIsolatedStatics(VmMagic.currentProcessor().getIsolatedStatics(),
             arch, new Unsafe.UnsafeObjectResolver());
         this.creator = currentIsolate();

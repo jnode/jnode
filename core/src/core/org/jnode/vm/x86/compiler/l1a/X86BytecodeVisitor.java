@@ -32,14 +32,13 @@ import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
 import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.TypeStack;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.Signature;
 import org.jnode.vm.classmgr.TIBLayout;
-import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
@@ -62,6 +61,8 @@ import org.jnode.vm.compiler.CompileError;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.compiler.InlineBytecodeVisitor;
+import org.jnode.vm.facade.TypeSizeInfo;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.objects.CounterGroup;
 import org.jnode.vm.x86.compiler.AbstractX86StackManager;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
@@ -246,7 +247,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
     /**
      * My counters
      */
-    private final CounterGroup counters = Vm.getVm().getCounterGroup(getClass().getName());
+    private final CounterGroup counters = VmUtils.getVm().getCounterGroup(getClass().getName());
 
     /**
      * It is true while the compilation of a method is in progress.
@@ -776,11 +777,11 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
         final Label notInstanceOfLabel = new Label(curInstrLabel
             + "notInstanceOf");
 
-        if (Vm.VerifyAssertions) {
-            Vm._assert(objectr.getSize() == helper.ADDRSIZE, "objectr size");
-            Vm._assert(typer.getSize() == helper.ADDRSIZE, "typer size");
-            Vm._assert(tmpr.getSize() == helper.ADDRSIZE, "tmpr size");
-            Vm._assert(cntr.getSize() == BITS32, "cntr size");
+        if (VmUtils.verifyAssertions()) {
+            VmUtils._assert(objectr.getSize() == helper.ADDRSIZE, "objectr size");
+            VmUtils._assert(typer.getSize() == helper.ADDRSIZE, "typer size");
+            VmUtils._assert(tmpr.getSize() == helper.ADDRSIZE, "tmpr size");
+            VmUtils._assert(cntr.getSize() == BITS32, "cntr size");
         }
 
         if (!skipNullTest) {

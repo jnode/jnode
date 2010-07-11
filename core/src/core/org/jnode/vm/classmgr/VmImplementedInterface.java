@@ -20,7 +20,7 @@
  
 package org.jnode.vm.classmgr;
 
-import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * Element of a class that represents a single implemented interface.
@@ -115,6 +115,6 @@ public final class VmImplementedInterface extends VmSystemObject {
      * @return String
      */
     public String toString() {
-        return "_I_" + mangleClassName(getResolvedVmClass().getName());
+        return "_I_" + Mangler.mangleClassName(getResolvedVmClass().getName());
     }
 }

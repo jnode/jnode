@@ -217,14 +217,14 @@ abstract class VmMember extends VmAnnotatedElement implements Uninterruptible {
 
     /**
      * @return String
-     * @see org.jnode.vm.VmSystemObject#getExtraInfo()
+     * @see org.jnode.vm.objects.VmSystemObject#getExtraInfo()
      */
     public final String getExtraInfo() {
         return "Modifiers: " + Modifier.toString(modifiers);
     }
 
     /**
-     * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
+     * @see org.jnode.vm.objects.VmSystemObject#verifyBeforeEmit()
      */
     public void verifyBeforeEmit() {
         super.verifyBeforeEmit();

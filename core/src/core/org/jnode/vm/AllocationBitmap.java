@@ -22,6 +22,7 @@ package org.jnode.vm;
 
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.Uninterruptible;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.scheduler.VmThread;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
@@ -91,7 +92,7 @@ public class AllocationBitmap {
      */
     public final void initialize(Address start, Word bits) {
         // Size of the lock (we only use an int)
-        final Extent lockSize = Extent.fromIntZeroExtend(Vm.getArch()
+        final Extent lockSize = Extent.fromIntZeroExtend(VmUtils.getVm().getArch()
             .getReferenceSize());
 
         // Create a lock and actual bitmap

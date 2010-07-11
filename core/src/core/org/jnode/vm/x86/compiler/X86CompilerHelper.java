@@ -30,7 +30,7 @@ import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
 import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmInstanceField;
@@ -41,7 +41,8 @@ import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmTypeState;
 import org.jnode.vm.compiler.EntryPoints;
-import org.jnode.vm.memmgr.VmWriteBarrier;
+import org.jnode.vm.facade.VmUtils;
+import org.jnode.vm.facade.VmWriteBarrier;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.x86.X86CpuID;
 
@@ -115,7 +116,7 @@ public class X86CompilerHelper {
 
     private final Map<Integer, Label> addressLabels = new HashMap<Integer, Label>();
 
-    private final boolean debug = Vm.getVm().isDebugMode();
+    private final boolean debug = VmUtils.getVm().isDebugMode();
 
     private final AbstractX86StackManager stackMgr;
 
@@ -567,7 +568,7 @@ public class X86CompilerHelper {
         final int offset = entryPoints.getVmProcessorIsolatedStaticsTable()
             .getOffset();
         if (os.isCode32()) {
-            Vm.getVm().getCounter("### load " + dst.getName()).inc();
+            VmUtils.getVm().getCounter("### load " + dst.getName()).inc();
             // os.writeXOR(dst, dst);
             os.writePrefix(X86Constants.FS_PREFIX);
             // os.writeMOV(INTSIZE, dst, dst, offset);
@@ -654,10 +655,10 @@ public class X86CompilerHelper {
      */
     public final void writePutstaticWriteBarrier(VmStaticField field,
                                                  GPR valueReg, GPR scratchReg) {
-        if (Vm.VerifyAssertions) {
-            Vm._assert(scratchReg.getSize() == this.ADDRSIZE,
+        if (VmUtils.verifyAssertions()) {
+            VmUtils._assert(scratchReg.getSize() == this.ADDRSIZE,
                 "scratchReg wrong size");
-            Vm._assert(valueReg.getSize() == this.ADDRSIZE,
+            VmUtils._assert(valueReg.getSize() == this.ADDRSIZE,
                 "valueReg wrong size");
         }
         if (field.isObjectRef()) {
@@ -697,8 +698,8 @@ public class X86CompilerHelper {
      */
     public final void writeGetStaticsEntry(Label curInstrLabel, GPR dst,
                                            VmSharedStaticsEntry entry) {
-        if (Vm.VerifyAssertions) {
-            Vm._assert(dst.getSize() == BITS32, "dst wrong size");
+        if (VmUtils.verifyAssertions()) {
+            VmUtils._assert(dst.getSize() == BITS32, "dst wrong size");
         }
         writeLoadSTATICS(curInstrLabel, "gs", true);
         os.writeMOV(INTSIZE, dst, this.STATICS, getSharedStaticsOffset(entry));
@@ -715,8 +716,8 @@ public class X86CompilerHelper {
      */
     public final void writeGetStaticsEntry(Label curInstrLabel, GPR dst,
                                            VmIsolatedStaticsEntry entry, GPR tmp) {
-        if (Vm.VerifyAssertions) {
-            Vm._assert(dst.getSize() == BITS32, "dst wrong size");
+        if (VmUtils.verifyAssertions()) {
+            VmUtils._assert(dst.getSize() == BITS32, "dst wrong size");
         }
         writeLoadIsolatedStatics(curInstrLabel, "gs", tmp);
         os.writeMOV(INTSIZE, dst, tmp, getIsolatedStaticsOffset(entry));

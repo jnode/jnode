@@ -20,7 +20,7 @@
  
 package org.jnode.vm.isolate;
 
-import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * Holder for variables specific to an isolate.

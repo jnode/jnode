@@ -21,8 +21,8 @@
 package org.jnode.vm.compiler;
 
 import org.jnode.assembler.ObjectResolver;
-import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.VmClassLoader;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * Class used to compile an IMT into a jump table suitable for a specific

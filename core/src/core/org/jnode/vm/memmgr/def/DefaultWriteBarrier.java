@@ -23,15 +23,16 @@ package org.jnode.vm.memmgr.def;
 import org.jnode.vm.VmMagic;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.ObjectFlags;
+import org.jnode.vm.facade.VmWriteBarrier;
 import org.jnode.vm.memmgr.HeapHelper;
-import org.jnode.vm.memmgr.VmWriteBarrier;
+import org.jnode.vm.objects.VmSystemObject;
 import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
-final class DefaultWriteBarrier extends VmWriteBarrier {
+final class DefaultWriteBarrier extends VmSystemObject implements VmWriteBarrier {
 
     /**
      * The heap helper
@@ -65,7 +66,7 @@ final class DefaultWriteBarrier extends VmWriteBarrier {
     }
 
     /**
-     * @see org.jnode.vm.memmgr.VmWriteBarrier#arrayCopyWriteBarrier(java.lang.Object[],
+     * @see org.jnode.vm.facade.VmWriteBarrier#arrayCopyWriteBarrier(java.lang.Object[],
      *      int, int)
      */
     public final void arrayCopyWriteBarrier(Object array, int start, int end)
@@ -77,7 +78,7 @@ final class DefaultWriteBarrier extends VmWriteBarrier {
     }
 
     /**
-     * @see org.jnode.vm.memmgr.VmWriteBarrier#arrayStoreWriteBarrier(java.lang.Object,
+     * @see org.jnode.vm.facade.VmWriteBarrier#arrayStoreWriteBarrier(java.lang.Object,
      *      int, java.lang.Object)
      */
     public final void arrayStoreWriteBarrier(Object ref, int index, Object value)
@@ -89,7 +90,7 @@ final class DefaultWriteBarrier extends VmWriteBarrier {
     }
 
     /**
-     * @see org.jnode.vm.memmgr.VmWriteBarrier#putfieldWriteBarrier(java.lang.Object,
+     * @see org.jnode.vm.facade.VmWriteBarrier#putfieldWriteBarrier(java.lang.Object,
      *      int, java.lang.Object)
      */
     public final void putfieldWriteBarrier(Object ref, int offset, Object value)
@@ -101,7 +102,7 @@ final class DefaultWriteBarrier extends VmWriteBarrier {
     }
 
     /**
-     * @see org.jnode.vm.memmgr.VmWriteBarrier#putstaticWriteBarrier(boolean, int,
+     * @see org.jnode.vm.facade.VmWriteBarrier#putstaticWriteBarrier(boolean, int,
      *      java.lang.Object)
      */
     public final void putstaticWriteBarrier(boolean shared, int staticsIndex, Object value)

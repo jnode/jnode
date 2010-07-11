@@ -20,15 +20,15 @@
  
 package org.jnode.vm.scheduler;
 
+import org.jnode.annotation.Internal;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.PrivilegedActionPragma;
+import org.jnode.annotation.Uninterruptible;
 import org.jnode.system.resource.IRQHandler;
 import org.jnode.system.resource.IRQResource;
 import org.jnode.system.resource.Resource;
 import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.system.resource.ResourceOwner;
-import org.jnode.annotation.Internal;
-import org.jnode.annotation.KernelSpace;
-import org.jnode.annotation.PrivilegedActionPragma;
-import org.jnode.annotation.Uninterruptible;
 
 /**
  * IRQ manager implementation.

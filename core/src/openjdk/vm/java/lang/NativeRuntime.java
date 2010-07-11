@@ -20,8 +20,8 @@
  
 package java.lang;
 
-import org.jnode.vm.Vm;
 import org.jnode.vm.VmSystem;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * @author Levente S\u00e1ntha
@@ -31,7 +31,7 @@ public class NativeRuntime {
      * @see Runtime#availableProcessors()
      */
     public static int availableProcessors(Runtime instance){
-        return Vm.getVm().availableProcessors();
+        return VmUtils.getVm().availableProcessors();
     }
 
     /**

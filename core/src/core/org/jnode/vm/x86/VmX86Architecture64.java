@@ -20,12 +20,12 @@
  
 package org.jnode.vm.x86;
 
-import org.jnode.vm.VirtualMemoryRegion;
 import org.jnode.annotation.MagicPermission;
-import org.jnode.vm.classmgr.TypeSizeInfo;
+import org.jnode.vm.VirtualMemoryRegion;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.IMTCompiler;
+import org.jnode.vm.facade.TypeSizeInfo;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmScheduler;
 import org.jnode.vm.x86.compiler.X86IMTCompiler64;

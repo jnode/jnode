@@ -36,10 +36,11 @@ import org.jnode.plugin.PluginException;
 import org.jnode.util.ByteBufferInputStream;
 import org.jnode.util.FileUtils;
 import org.jnode.util.JarBuffer;
-import org.jnode.vm.BootableObject;
 import org.jnode.vm.ResourceLoader;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.objects.BootableHashMap;
+import org.jnode.vm.objects.BootableObject;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -84,7 +85,7 @@ public class PluginJar implements BootableObject, ResourceLoader {
                      URL pluginUrl) throws PluginException {
         try {
             //get a reference to the plugin jar data
-            if (Vm.isWritingImage()) {
+            if (VmUtils.isWritingImage()) {
                 //buildtime
                 initBuffer = pluginIs.array();
             } else {
