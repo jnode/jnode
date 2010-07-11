@@ -31,6 +31,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.CropImageFilter;
+import java.awt.image.DataBuffer;
 import java.awt.image.DirectColorModel;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageObserver;
@@ -40,9 +41,11 @@ import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.text.AttributedCharacterIterator;
+
 import org.jnode.awt.JNodeToolkit;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.util.AbstractSurface;
+
 import sun.awt.image.ToolkitImage;
 
 /**
@@ -1113,18 +1116,16 @@ public class BasicSurfaceGraphics extends BasicGraphics {
         final int h = raster.getHeight();
         final WritableRaster dst_raster = dst_model.createCompatibleWritableRaster(w, h);
 
-        if (dst_model instanceof DirectColorModel)
-            if (model instanceof DirectColorModel) {
-                for (int y = 0; y < h; y++)
-                    for (int x = 0; x < w; x++)
+        if (dst_model instanceof DirectColorModel) {
+            if ((model instanceof DirectColorModel) || (model instanceof ComponentColorModel)) {
+                for (int y = 0; y < h; y++) {
+                    for (int x = 0; x < w; x++) {
                         dst_raster.setPixel(x, y, raster.getPixel(x, y, samples));
-            } else if (model instanceof ComponentColorModel) {
-                for (int y = 0; y < h; y++)
-                    for (int x = 0; x < w; x++)
-                        dst_raster.setPixel(x, y, raster.getPixel(x, y, samples));
+                    }
+                }
             } else if (model instanceof IndexColorModel) {
                 final IndexColorModel icm = (IndexColorModel) model;
-                for (int y = 0; y < h; y++)
+                for (int y = 0; y < h; y++) {
                     for (int x = 0; x < w; x++) {
                         int sample = raster.getSample(x, y, 0);
                         samples[0] = icm.getRed(sample);
@@ -1133,15 +1134,57 @@ public class BasicSurfaceGraphics extends BasicGraphics {
                         samples[3] = icm.getAlpha(sample);
                         dst_raster.setPixel(x, y, samples);
                     }
+                }
             } else {
-                //log.error("Unimplemented raster conversion (required: " + model + " + available: " + dst_model);
-                return raster;
+            	// TODO implement special case of a custom ColorModel not based on jdk concrete classes 
+            	return raster;
             }
-        else {
-            //log.error("Unimplemented raster conversion (required: " + model + " + available: " + dst_model);
-            return raster;
+    	} else if (dst_model instanceof IndexColorModel) {
+    		// remark : the VGA driver is using an IndexColorModel
+    		
+	        final Object srcElements = createArray(model);
+	        final Object dstElements = createArray(dst_model);
+    		
+	        for (int y = 0; y < h; y++) {
+	            for (int x = 0; x < w; x++) {
+	            	// get and convert source pixel to rgb
+	        		raster.getDataElements(x, y, srcElements);
+	        		int rgb = model.getRGB(srcElements);
+	        		
+	        		// convert rgb to destination model
+	        		dst_model.getDataElements(rgb, dstElements);
+	        		
+	        		// set destination pixel
+	        		dst_raster.setDataElements(x, y, dstElements);
+	            }
+	        }    		
         }
 
         return dst_raster;
+    }
+    
+    private Object createArray(ColorModel model) {
+    	final int transferType = model.getTransferType();
+    	final int size = model.getNumComponents();
+    	switch (transferType) {
+    	case DataBuffer.TYPE_BYTE:
+    		return new byte[size];
+    		
+    	case DataBuffer.TYPE_USHORT:
+    	case DataBuffer.TYPE_SHORT:
+    		return new short[size];
+    		
+    	case DataBuffer.TYPE_INT:
+    		return new int[size];
+    		
+    	case DataBuffer.TYPE_FLOAT:
+    		return new float[size];
+    		
+    	case DataBuffer.TYPE_DOUBLE:
+    		return new double[size];
+    		
+    	default:
+    		throw new IllegalArgumentException("Unknown transfer type : " + transferType);
+    	}
     }
 }

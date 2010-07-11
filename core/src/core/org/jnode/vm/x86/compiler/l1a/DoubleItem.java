@@ -26,7 +26,8 @@ import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
+import org.jnode.vm.facade.VmUtils;
 
 import static org.jnode.vm.x86.compiler.X86CompilerConstants.BITS32;
 import static org.jnode.vm.x86.compiler.X86CompilerConstants.LSB;
@@ -87,8 +88,8 @@ final class DoubleItem extends DoubleWordItem {
      * @return
      */
     final double getValue() {
-        if (Vm.VerifyAssertions) {
-            Vm._assert(isConstant(), "kind == Kind.CONSTANT");
+        if (VmUtils.verifyAssertions()) {
+            VmUtils._assert(isConstant(), "kind == Kind.CONSTANT");
         }
         return value;
     }

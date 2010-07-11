@@ -23,6 +23,7 @@ package org.jnode.vm;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * A VmFrame is the execution frame (locals & stack) for a method during

@@ -26,8 +26,8 @@ import java.util.List;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
-import org.jnode.vm.Vm;
-import org.jnode.vm.scheduler.VmProcessor;
+import org.jnode.vm.facade.VmProcessor;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -55,13 +55,13 @@ public class VmInfoCommand extends AbstractCommand {
     
     @Override
     public void execute() {
-        final Vm vm = Vm.getVm();
+        final org.jnode.vm.facade.Vm vm = VmUtils.getVm();
         if (vm != null && !vm.isBootstrap()) {
             PrintWriter out = getOutput().getPrintWriter();
             out.format(fmt_vm, vm.getVersion());
-            vm.dumpStatistics(out);
+            VmUtils.dumpStatistics(out);
             vm.getSharedStatics().dumpStatistics(out);
-            Vm.getHeapManager().dumpStatistics(out);
+            VmUtils.getVm().getHeapManager().dumpStatistics(out);
             final SecurityManager sm = System.getSecurityManager();
             out.format(fmt_sm, sm);
             List<VmProcessor> processors = vm.getProcessors();
@@ -70,7 +70,7 @@ public class VmInfoCommand extends AbstractCommand {
                 cpu.dumpStatistics(out);
             }
             if (argReset.isSet()) {
-                vm.resetCounters();
+                VmUtils.resetCounters();
             }
         }
     }

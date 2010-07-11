@@ -18,18 +18,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.vm.scheduler;
+package org.jnode.vm.facade;
+
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public abstract class VmThreadVisitor {
+public interface GCStatistics {
 
-    /**
-     * Generic visit method for threads.
-     *
-     * @param thread
-     * @return true to continue with the next thread, false to stop calling this method.
-     */
-    public abstract boolean visit(VmThread thread);
+    public abstract String toString();
 }

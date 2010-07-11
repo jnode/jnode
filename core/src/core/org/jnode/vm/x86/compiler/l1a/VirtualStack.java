@@ -22,8 +22,9 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
 import org.jnode.vm.bytecode.TypeStack;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.x86.compiler.AbstractX86StackManager;
 
 /**
@@ -218,11 +219,11 @@ final class VirtualStack {
      * fpuStack.
      */
     void push(Item item) {
-        if (Vm.VerifyAssertions)
-            Vm._assert(item.getKind() > 0, "Kind > 0");
+        if (VmUtils.verifyAssertions())
+            VmUtils._assert(item.getKind() > 0, "Kind > 0");
         if ((item.isStack()) && (tos > 0)) {
-            if (Vm.VerifyAssertions)
-                Vm._assert(stack[tos - 1].isStack(),
+            if (VmUtils.verifyAssertions())
+                VmUtils._assert(stack[tos - 1].isStack(),
                     "stack[ tos - 1].isStack()");
         }
 
@@ -287,8 +288,8 @@ final class VirtualStack {
         int cnt = 0;
         while (i < tos) {
             final Item item = stack[i];
-            if (Vm.VerifyAssertions)
-                Vm._assert(item.getKind() != Item.Kind.STACK,
+            if (VmUtils.verifyAssertions())
+                VmUtils._assert(item.getKind() != Item.Kind.STACK,
                     "item.getKind() != Item.Kind.STACK");
             item.push(ec);
             i++;
@@ -448,8 +449,8 @@ final class VirtualStack {
         public void writePUSH(int jvmType, X86Register.GPR reg) {
             final Item item = ifac.createReg(ec, jvmType, reg);
             final boolean ok = pool.request(reg, item);
-            if (Vm.VerifyAssertions)
-                Vm._assert(ok, "request");
+            if (VmUtils.verifyAssertions())
+                VmUtils._assert(ok, "request");
             push(item);
         }
 
@@ -462,9 +463,9 @@ final class VirtualStack {
             final Item item = ifac.createReg(ec, jvmType, lsbReg, msbReg);
             final boolean lsbOk = pool.request(lsbReg, item);
             final boolean msbOk = pool.request(msbReg, item);
-            if (Vm.VerifyAssertions) {
-                Vm._assert(lsbOk, "request-lsb");
-                Vm._assert(msbOk, "request-msb");
+            if (VmUtils.verifyAssertions()) {
+                VmUtils._assert(lsbOk, "request-lsb");
+                VmUtils._assert(msbOk, "request-msb");
             }
             push(item);
         }
@@ -476,8 +477,8 @@ final class VirtualStack {
         public void writePUSH64(int jvmType, X86Register.GPR64 reg) {
             final Item item = ifac.createReg(ec, jvmType, reg);
             final boolean ok = pool.request(reg, item);
-            if (Vm.VerifyAssertions)
-                Vm._assert(ok, "request");
+            if (VmUtils.verifyAssertions())
+                VmUtils._assert(ok, "request");
             push(item);
         }
 

@@ -60,13 +60,12 @@ import org.jnode.plugin.model.PluginDescriptorModel;
 import org.jnode.plugin.model.PluginJar;
 import org.jnode.plugin.model.PluginRegistryModel;
 import org.jnode.util.NumberUtils;
+import org.jnode.vm.BaseVmArchitecture;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VirtualMemoryRegion;
-import org.jnode.vm.Vm;
-import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.VmImpl;
 import org.jnode.vm.VmSystemClassLoader;
-import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.classmgr.Modifier;
 import org.jnode.vm.classmgr.ObjectLayout;
@@ -83,9 +82,13 @@ import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.jnode.vm.facade.Vm;
+import org.jnode.vm.facade.VmArchitecture;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.objects.BootableHashMap;
+import org.jnode.vm.objects.VmSystemObject;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.vmmagic.unboxed.UnboxedObject;
 
@@ -206,7 +209,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @param arch
      * @throws ClassNotFoundException
      */
-    private final void compileClasses(NativeStream os, VmArchitecture arch)
+    private final void compileClasses(NativeStream os, BaseVmArchitecture arch)
         throws ClassNotFoundException {
         final NativeCodeCompiler[] compilers = arch.getCompilers();
         final int optLevel = compilers.length - 1;
@@ -389,7 +392,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @return The processor
      * @throws BuildException
      */
-    protected abstract VmProcessor createProcessor(Vm vm, VmSharedStatics statics,
+    protected abstract VmProcessor createProcessor(VmImpl vm, VmSharedStatics statics,
                                                    VmIsolatedStatics isolatedStatics) throws BuildException;
 
     private final void doExecute() throws BuildException {
@@ -448,7 +451,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             final Map<String, byte[]> resources = loadSystemResource(piRegistry);
 
             /* Now create the processor */
-            final VmArchitecture arch = getArchitecture();
+            final BaseVmArchitecture arch = getArchitecture();
             final NativeStream os = createNativeStream();
             clsMgr = new VmSystemClassLoader(null/*classesURL*/, arch,
                 new BuildObjectResolver(os, this));
@@ -468,9 +471,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             }
 
             // Create the VM
-            final Vm vm = new Vm(version, arch, clsMgr.getSharedStatics(), debug, clsMgr, piRegistry);
+            final VmImpl vm = new VmImpl(version, arch, clsMgr.getSharedStatics(), debug, clsMgr, piRegistry);
             blockedObjects.add(vm);
-            blockedObjects.add(Vm.getCompiledMethods());
+            blockedObjects.add(VmUtils.getVm().getCompiledMethods());
 
             final VmProcessor proc = createProcessor(vm, clsMgr.getSharedStatics(),
                 clsMgr.getIsolatedStatics());
@@ -504,14 +507,14 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             loadClass(VmType[].class);
             loadClass(Vm.class);
             loadClass(VirtualMemoryRegion.class).link();
-            Vm.getHeapManager().loadClasses(clsMgr);
+            vm.getHeapManager().loadClasses(clsMgr);
             loadClass(VmHeapManager.class);
             loadClass(VmSharedStatics.class);
             loadClass(VmIsolatedStatics.class);
-            loadClass(Vm.getHeapManager().getClass());
+            loadClass(VmUtils.getVm().getHeapManager().getClass());
             loadClass(HeapHelper.class);
             loadClass("org.jnode.vm.HeapHelperImpl");
-            loadClass(Vm.getCompiledMethods().getClass());
+            loadClass(VmUtils.getVm().getCompiledMethods().getClass());
             loadClass(VmCompiledCode[].class);
             loadSystemClasses(resources.keySet());
 
@@ -558,8 +561,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
             // Emit the compiled method list
             log("Emit compiled methods", Project.MSG_VERBOSE);
-            blockedObjects.remove(Vm.getCompiledMethods());
-            final int compiledMethods = Vm.getCompiledMethods().size();
+            blockedObjects.remove(VmUtils.getVm().getCompiledMethods());
+            final int compiledMethods = VmUtils.getVm().getCompiledMethods().size();
             emitObjects(os, arch, blockedObjects, false);
             // Twice, this is intended!
             emitObjects(os, arch, blockedObjects, false);
@@ -595,7 +598,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
             // Verify no methods have been compiled after we wrote the
             // CompiledCodeList.
-            if (Vm.getCompiledMethods().size() != compiledMethods) {
+            if (VmUtils.getVm().getCompiledMethods().size() != compiledMethods) {
                 throw new BuildException(
                     "Method have been compiled after CompiledCodeList was written.");
             }
@@ -638,7 +641,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             clsMgr.getSharedStatics().dumpStatistics(out);
             log("Isolated statics");
             clsMgr.getIsolatedStatics().dumpStatistics(out);
-            vm.dumpStatistics(out);
+            VmUtils.dumpStatistics(out);
 
             logStatistics(os);
 
@@ -670,7 +673,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @param blockObjects
      * @throws BuildException
      */
-    private final void emitObjects(NativeStream os, VmArchitecture arch,
+    private final void emitObjects(NativeStream os, BaseVmArchitecture arch,
                                    Set<Object> blockObjects, boolean skipCopyStatics)
         throws BuildException {
         log("Emitting objects", Project.MSG_DEBUG);
@@ -883,7 +886,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @return The target architecture
      * @throws BuildException
      */
-    protected abstract VmArchitecture getArchitecture() throws BuildException;
+    protected abstract BaseVmArchitecture getArchitecture() throws BuildException;
 
     /**
      * Gets the internal class loader.
@@ -1458,6 +1461,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.vm.bytecode");
         addCompileHighOptLevel("org.jnode.vm.classmgr");
         addCompileHighOptLevel("org.jnode.vm.compiler");
+        addCompileHighOptLevel("org.jnode.vm.facade");
         addCompileHighOptLevel("org.jnode.vm.isolate");
         addCompileHighOptLevel("org.jnode.vm.objects");
         addCompileHighOptLevel("org.jnode.vm.scheduler");

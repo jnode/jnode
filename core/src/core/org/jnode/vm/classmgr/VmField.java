@@ -156,8 +156,8 @@ public abstract class VmField extends VmMember {
     }
 
     public String getMangledName() {
-        return mangleClassName(declaringClass.getName())
-            + mangle("." + getName() + '.' + getSignature());
+        return Mangler.mangleClassName(declaringClass.getName())
+            + Mangler.mangle("." + getName() + '.' + getSignature());
     }
 
     /**

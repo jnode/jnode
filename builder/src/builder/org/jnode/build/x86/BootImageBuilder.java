@@ -43,11 +43,10 @@ import org.jnode.linker.Elf;
 import org.jnode.linker.ElfLinker;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.util.NumberUtils;
+import org.jnode.vm.BaseVmArchitecture;
 import org.jnode.vm.SoftByteCodes;
-import org.jnode.vm.Vm;
-import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.VmImpl;
 import org.jnode.vm.VmSystem;
-import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmClassType;
@@ -58,6 +57,9 @@ import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.facade.Vm;
+import org.jnode.vm.facade.VmUtils;
+import org.jnode.vm.objects.VmSystemObject;
 import org.jnode.vm.scheduler.MonitorManager;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmScheduler;
@@ -155,7 +157,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      * @return The processor
      * @throws BuildException
      */
-    protected VmProcessor createProcessor(Vm vm, VmSharedStatics statics, VmIsolatedStatics isolatedStatics)
+    protected VmProcessor createProcessor(VmImpl vm, VmSharedStatics statics, VmIsolatedStatics isolatedStatics)
         throws BuildException {
         this.sharedStatics = statics;
         VmScheduler scheduler = new VmScheduler(getArchitecture());
@@ -185,7 +187,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      * @return The target architecture
      * @throws BuildException
      */
-    protected final VmArchitecture getArchitecture() throws BuildException {
+    protected final BaseVmArchitecture getArchitecture() throws BuildException {
         if (arch == null) {
             switch (bits) {
                 case 32:
@@ -483,8 +485,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
     protected void initVm(X86BinaryAssembler os, Vm vm) throws BuildException,
         ClassNotFoundException {
         os.setObjectRef(new Label("$$Initialize Vm"));
-        VmType<?> vmClass = loadClass(Vm.class);
-        VmStaticField vmField = (VmStaticField) vmClass.getField("instance");
+        VmType<?> vmClass = loadClass(VmUtils.class);
+        VmStaticField vmField = (VmStaticField) vmClass.getField("VM_INSTANCE");
 
         final GPR abx = os.isCode32() ? (GPR) X86Register.EBX : X86Register.RBX;
         final GPR adi = os.isCode32() ? (GPR) X86Register.EDI : X86Register.RDI;

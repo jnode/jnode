@@ -21,7 +21,7 @@
 package org.jnode.vm.scheduler;
 
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.objects.VmSystemObject;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.Uninterruptible;
 

@@ -48,6 +48,7 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.CompiledIMT;
 import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.isolate.VmIsolate;
 import org.jnode.vm.objects.BootableArrayList;
 import org.jnode.vm.scheduler.VmProcessor;
@@ -84,7 +85,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      */
     private final SelectorMap selectorMap;
 
-    private final VmArchitecture arch;
+    private final BaseVmArchitecture arch;
 
     private boolean requiresCompile = false;
 
@@ -102,7 +103,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @param classesURL
      * @param arch
      */
-    public VmSystemClassLoader(URL classesURL, VmArchitecture arch) {
+    public VmSystemClassLoader(URL classesURL, BaseVmArchitecture arch) {
         this(new URL[]{classesURL}, arch, null);
     }
 
@@ -112,7 +113,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @param classesURL
      * @param arch
      */
-    public VmSystemClassLoader(URL[] classesURL, VmArchitecture arch) {
+    public VmSystemClassLoader(URL[] classesURL, BaseVmArchitecture arch) {
         this(classesURL, arch, null);
     }
 
@@ -123,7 +124,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @param arch
      * @param resolver
      */
-    public VmSystemClassLoader(URL[] classesURL, VmArchitecture arch,
+    public VmSystemClassLoader(URL[] classesURL, BaseVmArchitecture arch,
                                ObjectResolver resolver) {
         this.classesURL = classesURL;
         this.classInfos = new TreeMap<String, ClassInfo>();
@@ -918,7 +919,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      *
      * @return The architecture
      */
-    public final VmArchitecture getArchitecture() {
+    public final BaseVmArchitecture getArchitecture() {
         return arch;
     }
 

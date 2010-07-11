@@ -23,53 +23,31 @@ package org.jnode.plugin;
 import java.util.Collection;
 import java.util.Set;
 
-import org.jnode.vm.classmgr.VmClassLoader;
-
 /**
+ * Interface for plugin {@link ClassLoader}s. They should of course also
+ * inherit from {@link ClassLoader}. 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public abstract class PluginClassLoader extends ClassLoader {
-
-    /**
-     * Default ctor
-     */
-    public PluginClassLoader() {
-        // No code here
-    }
-
-    /**
-     * Wrap this classloader around the given vmClassLoader.
-     * Requires special permission.
-     *
-     * @param parent
-     * @param vmClassLoader
-     */
-    protected PluginClassLoader(ClassLoader parent, VmClassLoader vmClassLoader) {
-        super(parent, vmClassLoader);
-    }
+public interface PluginClassLoader {
 
     /**
      * Gets the descriptor of the plugin in which this element was declared.
      *
      * @return The descriptor
      */
-    public abstract PluginDescriptor getDeclaringPluginDescriptor();
+    PluginDescriptor getDeclaringPluginDescriptor();
 
     /**
      * Gets the names of the classes contained in this plugin.
      *
      * @return the set of contained classnames
      */
-    public abstract Set<String> getClassNames();
+    Set<String> getClassNames();
 
     /**
      * Gets the names of the resources contained in this plugin.
      *
      * @return the set of contained resources
      */
-    public abstract Collection<String> getResources();
-    
-    public String toString() {
-        return getClass().getName() + "(" + getDeclaringPluginDescriptor().getId() + ")";
-    }
+    Collection<String> getResources();
 }

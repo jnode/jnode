@@ -18,10 +18,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.vm.classmgr;
+package org.jnode.vm.facade;
 
 import org.jnode.vm.JvmType;
-import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * This class provides information on the size of the various types for a

@@ -30,8 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.apache.tools.ant.BuildException;
-import org.jnode.vm.VmUtils;
+import org.jnode.vm.facade.VmUtils;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassReader;

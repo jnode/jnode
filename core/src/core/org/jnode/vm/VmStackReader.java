@@ -26,6 +26,8 @@ import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.facade.VmUtils;
+import org.jnode.vm.objects.VmSystemObject;
 import org.jnode.vm.scheduler.VmThread;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Offset;
@@ -66,7 +68,7 @@ public abstract class VmStackReader extends VmSystemObject {
         if (ccid == 0) {
             return null;
         } else {
-            final VmCompiledCode cc = Vm.getCompiledMethods().get(ccid);
+            final VmCompiledCode cc = VmUtils.getVm().getCompiledMethods().get(ccid);
             if (cc == null) {
                 // (This can happen if an exception is thrown while a frame
                 // for a 'native' method call is on the stack.  A panic is not a 
@@ -92,7 +94,7 @@ public abstract class VmStackReader extends VmSystemObject {
         if (ccid == 0) {
             return null;
         } else {
-            return Vm.getCompiledMethods().get(ccid);
+            return VmUtils.getVm().getCompiledMethods().get(ccid);
         }
     }
 

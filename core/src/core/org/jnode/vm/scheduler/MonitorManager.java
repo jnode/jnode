@@ -20,12 +20,12 @@
  
 package org.jnode.vm.scheduler;
 
-import org.jnode.util.NumberUtils;
-import org.jnode.vm.Unsafe;
-import org.jnode.vm.VmMagic;
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.Uninterruptible;
+import org.jnode.util.NumberUtils;
+import org.jnode.vm.Unsafe;
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.vmmagic.unboxed.Address;

@@ -26,8 +26,9 @@ import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
 import org.jnode.vm.classmgr.VmConstString;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
 /**
@@ -76,7 +77,7 @@ final class RefItem extends WordItem {
      * @return
      */
     VmConstString getValue() {
-        if (Vm.VerifyAssertions) Vm._assert(getKind() == Kind.CONSTANT, "kind == Kind.CONSTANT");
+        if (VmUtils.verifyAssertions()) VmUtils._assert(getKind() == Kind.CONSTANT, "kind == Kind.CONSTANT");
         return value;
     }
 
@@ -87,7 +88,7 @@ final class RefItem extends WordItem {
      * @return
      */
     boolean isNull() {
-        if (Vm.VerifyAssertions) Vm._assert(getKind() == Kind.CONSTANT, "kind == Kind.CONSTANT");
+        if (VmUtils.verifyAssertions()) VmUtils._assert(getKind() == Kind.CONSTANT, "kind == Kind.CONSTANT");
         return (value == null);
     }
 

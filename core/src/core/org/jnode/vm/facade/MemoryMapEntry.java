@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.vm;
+package org.jnode.vm.facade;
 
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
@@ -28,40 +28,40 @@ import org.vmmagic.unboxed.Extent;
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public abstract class MemoryMapEntry {
+public interface MemoryMapEntry {
 
     /**
      * Gets the start of this entry.
      *
      * @return the entry's start address.
      */
-    public abstract Address getStart();
+    Address getStart();
 
     /**
      * Gets the size of this entry.
      *
      * @return the entries size
      */
-    public abstract Extent getSize();
+    Extent getSize();
 
     /**
      * Test if a memory region is available to the OS.
      *
      * @return {@code true} if the region is available, otherwise {@code false}.
      */
-    public abstract boolean isAvailable();
+    boolean isAvailable();
 
     /**
      * Is this a memory region containing reclaimable ACPI data.
      *
      * @return {@code true} if the region contains reclaimable ACPI data, otherwise {@code false}.
      */
-    public abstract boolean isAcpi();
+    boolean isAcpi();
 
     /**
      * Is this a memory region containing ACPI NVS data.
      *
      * @return {@code true} if the region contains ACPI NVS data, otherwise {@code false}.
      */
-    public abstract boolean isAcpiNVS();
+    boolean isAcpiNVS();
 }

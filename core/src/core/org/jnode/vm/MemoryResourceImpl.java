@@ -31,6 +31,7 @@ import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.system.resource.ResourceOwner;
 import org.jnode.system.resource.SimpleResourceOwner;
 import org.jnode.annotation.MagicPermission;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
@@ -813,18 +814,17 @@ class MemoryResourceImpl extends Region implements MemoryResource {
 
     /**
      * Compare this region with a given address.
-     *
+     * TODO that method appear unused. remove it ?
      * @param address
      * @return a negative integer, zero, or a positive integer as this region is less than,
      *         overlapping, or greater than the address.
      */
-    public int compareTo(VmAddress address) {
-        final Address addr = Address.fromAddress(address);
-        if (this.end.LE(addr)) {
+    public int compareTo(Address address) {
+        if (this.end.LE(address)) {
             // this < address
             return -1;
         }
-        if (this.start.GE(addr)) {
+        if (this.start.GE(address)) {
             // this > other
             return 1;
         }
@@ -1258,7 +1258,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      */
     public final MultiMediaMemoryResource asMultiMediaMemoryResource() {
         final MultiMediaMemoryResourceImpl child;
-        child = Vm.getArch().createMultiMediaMemoryResource(this);
+        child = ((BaseVmArchitecture) VmUtils.getVm().getArch()).createMultiMediaMemoryResource(this);
         this.children = (MemoryResourceImpl) add(this.children, child);
         return child;
     }

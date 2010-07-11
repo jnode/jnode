@@ -20,9 +20,9 @@
  
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.facade.ObjectVisitor;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**

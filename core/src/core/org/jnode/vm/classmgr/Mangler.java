@@ -18,18 +18,26 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.vm;
+package org.jnode.vm.classmgr;
 
 import java.util.StringTokenizer;
 
-public abstract class VmSystemObject implements BootableObject {
+import org.jnode.vm.InternString;
+
+/**
+ * Class utility that mangle strings for the class manager.
+ * 
+ * @author Fabien DUMINY
+ *
+ */
+class Mangler {
     /**
      * Mangle an identifier into a ASCII C name
      *
      * @param s
      * @return String
      */
-    public static String mangle(String s) {
+    static String mangle(String s) {
         final char[] src = s.toCharArray();
         final int cnt = s.length();
         final StringBuilder res = new StringBuilder(cnt);
@@ -52,7 +60,7 @@ public abstract class VmSystemObject implements BootableObject {
      * @param s
      * @return String
      */
-    public static String mangleClassName(String s) {
+    static String mangleClassName(String s) {
         s = s.replace('/', '.');
         final StringTokenizer tok = new StringTokenizer(s, ".");
         final StringBuilder res = new StringBuilder(32);
@@ -65,22 +73,5 @@ public abstract class VmSystemObject implements BootableObject {
             res.append(v);
         }
         return InternString.internString(res.toString());
-    }
-
-    /**
-     * Verify this object, just before it is written to the boot image during
-     * the build process.
-     */
-    public void verifyBeforeEmit() {
-    }
-
-    /**
-     * This method is called in the build process to get extra information
-     * on this object. This extra information is added to the listing file.
-     *
-     * @return String
-     */
-    public String getExtraInfo() {
-        return null;
     }
 }

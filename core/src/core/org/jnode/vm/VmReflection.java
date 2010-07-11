@@ -30,8 +30,9 @@ import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.memmgr.VmHeapManager;
-import org.jnode.vm.memmgr.VmWriteBarrier;
+import org.jnode.vm.facade.VmHeapManager;
+import org.jnode.vm.facade.VmUtils;
+import org.jnode.vm.facade.VmWriteBarrier;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
@@ -53,7 +54,7 @@ public final class VmReflection {
             if (obj != null && sf.isFinal() && field.getSignature().equals("Ljava/lang/String;")) {
                 if (obj instanceof VmConstString) {
                     VmConstString cs = (VmConstString) obj;
-                    obj = Vm.getVm().getSharedStatics().getStringEntry(cs.getSharedStaticsIndex());
+                    obj = VmUtils.getVm().getSharedStatics().getStringEntry(cs.getSharedStaticsIndex());
                 }
             }
             return obj;
@@ -156,7 +157,7 @@ public final class VmReflection {
             final VmStaticField sf = (VmStaticField) field;
             initialize(sf);
             getStaticFieldAddress(sf).store(ObjectReference.fromObject(value));
-            final VmWriteBarrier wb = Vm.getHeapManager().getWriteBarrier();
+            final VmWriteBarrier wb = VmUtils.getVm().getHeapManager().getWriteBarrier();
             if (wb != null) {
                 if (sf.isShared()) {
                     wb.putstaticWriteBarrier(true, sf.getSharedStaticsIndex(), value);
@@ -168,7 +169,7 @@ public final class VmReflection {
             final VmInstanceField inf = (VmInstanceField) field;
             final int offset = inf.getOffset();
             getInstanceFieldAddress(o, inf).store(ObjectReference.fromObject(value));
-            final VmWriteBarrier wb = Vm.getHeapManager().getWriteBarrier();
+            final VmWriteBarrier wb = VmUtils.getVm().getHeapManager().getWriteBarrier();
             if (wb != null) {
                 wb.putfieldWriteBarrier(o, offset, value);
             }
@@ -547,7 +548,7 @@ public final class VmReflection {
     public static Object newInstance(VmMethod constructor, Object[] args)
         throws InstantiationException, IllegalAccessException,
         InvocationTargetException {
-        final VmHeapManager hm = Vm.getHeapManager();
+        final VmHeapManager hm = VmUtils.getVm().getHeapManager();
         final Object obj = hm.newInstance(constructor.getDeclaringClass());
         invoke(constructor, obj, args);
         return obj;
@@ -565,7 +566,7 @@ public final class VmReflection {
     public static Object newInstance(VmMethod constructor)
         throws InstantiationException, IllegalAccessException,
         InvocationTargetException {
-        final VmHeapManager hm = Vm.getHeapManager();
+        final VmHeapManager hm = VmUtils.getVm().getHeapManager();
         final Object obj = hm.newInstance(constructor.getDeclaringClass());
         Unsafe.pushObject(obj);
         Unsafe.invokeVoid(constructor);

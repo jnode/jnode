@@ -23,14 +23,15 @@ package org.jnode.vm;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.jnode.assembler.ObjectResolver;
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.MagicPermission;
+import org.jnode.assembler.ObjectResolver;
 import org.jnode.permission.JNodePermission;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmThread;
 import org.vmmagic.pragma.UninterruptiblePragma;
@@ -693,7 +694,7 @@ public final class Unsafe {
         if (sm != null) {
             sm.checkPermission(GET_JUMP_TABLE_PERM);
         }
-        final int offset = index * Vm.getArch().getReferenceSize();
+        final int offset = index * VmUtils.getVm().getArch().getReferenceSize();
         return getJumpTable0().loadAddress(Offset.fromIntSignExtend(offset));
     }
 

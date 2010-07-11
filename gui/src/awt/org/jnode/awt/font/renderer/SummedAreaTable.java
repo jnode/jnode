@@ -21,8 +21,9 @@
 package org.jnode.awt.font.renderer;
 
 import java.util.BitSet;
-import org.jnode.vm.Vm;
+
 import org.jnode.annotation.Inline;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -42,7 +43,7 @@ public abstract class SummedAreaTable {
     protected SummedAreaTable(int width, int height) {
         this.width = width;
         this.height = height;
-        Vm.getVm().getCounter(getClass().getName()).inc();
+        VmUtils.getVm().getCounter(getClass().getName()).inc();
     }
 
     /**

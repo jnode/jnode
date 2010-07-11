@@ -20,8 +20,8 @@
  
 package sun.management;
 
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.isolate.VmIsolate;
-import org.jnode.vm.Vm;
 
 /**
  * @see sun.management.VMManagementImpl
@@ -106,7 +106,7 @@ class NativeVMManagementImpl {
      * @see sun.management.VMManagementImpl#getAvailableProcessors()
      */
     private static int getAvailableProcessors(VMManagementImpl instance) {
-        return Vm.getVm().availableProcessors();
+        return VmUtils.getVm().availableProcessors();
     }
     /**
      * @see sun.management.VMManagementImpl#getTotalCompileTime()

@@ -21,14 +21,14 @@
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.Vm;
-import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.BaseVmArchitecture;
 import org.jnode.vm.VmSystem;
-import org.jnode.vm.VmSystemObject;
 import org.jnode.annotation.MagicPermission;
-import org.jnode.vm.memmgr.GCStatistics;
+import org.jnode.vm.facade.GCStatistics;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.jnode.vm.objects.VmSystemObject;
 import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.unboxed.Word;
 
@@ -91,8 +91,8 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
     /**
      * Create a new instance
      */
-    public GCManager(DefaultHeapManager heapManager, VmArchitecture arch) {
-        this.debug = true || Vm.getVm().isDebugMode();
+    public GCManager(DefaultHeapManager heapManager, BaseVmArchitecture arch) {
+        this.debug = true || VmUtils.getVm().isDebugMode();
         this.heapManager = heapManager;
         this.writeBarrier = (DefaultWriteBarrier) heapManager.getWriteBarrier();
         this.helper = heapManager.getHelper();

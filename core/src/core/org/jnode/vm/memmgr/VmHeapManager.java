@@ -22,19 +22,22 @@ package org.jnode.vm.memmgr;
 
 import java.io.PrintWriter;
 
-import org.jnode.vm.Unsafe;
-import org.jnode.vm.VmMagic;
-import org.jnode.vm.VmSystemObject;
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.NoInline;
+import org.jnode.vm.Unsafe;
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.scheduler.VmProcessor;
+import org.jnode.vm.facade.GCStatistics;
+import org.jnode.vm.facade.HeapStatistics;
+import org.jnode.vm.facade.VmProcessor;
+import org.jnode.vm.facade.VmWriteBarrier;
+import org.jnode.vm.objects.VmSystemObject;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
@@ -44,7 +47,7 @@ import org.vmmagic.unboxed.Offset;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
-public abstract class VmHeapManager extends VmSystemObject {
+public abstract class VmHeapManager extends VmSystemObject implements org.jnode.vm.facade.VmHeapManager {
 
     public static final int TRACE_BASIC = 1;   // enable basic debugging of GC phases
     public static final int TRACE_ALLOC = 2;   // enable debugging of GC internal allocation
@@ -89,7 +92,7 @@ public abstract class VmHeapManager extends VmSystemObject {
     protected abstract void initialize();
 
     /**
-     * Start any threads needed by this manager.
+     * {@inheritDoc}
      */
     public abstract void start();
 
@@ -105,12 +108,7 @@ public abstract class VmHeapManager extends VmSystemObject {
     }
 
     /**
-     * Create a new instance of a given class with a given object size (in
-     * bytes)
-     *
-     * @param cls
-     * @param size
-     * @return The new instance
+     * {@inheritDoc}
      */
     @NoInline
     public final Object newInstance(VmType<?> cls, int size) {
@@ -136,11 +134,7 @@ public abstract class VmHeapManager extends VmSystemObject {
     }
 
     /**
-     * Create a new array
-     *
-     * @param arrayCls
-     * @param elements
-     * @return The new instance
+     * {@inheritDoc}
      */
     public final Object newArray(VmArrayClass<?> arrayCls, int elements) {
         testInited();
@@ -154,7 +148,7 @@ public abstract class VmHeapManager extends VmSystemObject {
                     + arrayCls.getName() + "]");
         }
 
-        final int slotSize = VmProcessor.current().getArchitecture()
+        final int slotSize = getCurrentProcessor().getArchitecture()
             .getReferenceSize();
         final int elemSize;
         if (arrayCls.isPrimitiveArray()) {
@@ -195,22 +189,17 @@ public abstract class VmHeapManager extends VmSystemObject {
     }
 
     /**
-     * Is the system low on memory?
-     *
-     * @return boolean
+     * {@inheritDoc}
      */
     public abstract boolean isLowOnMemory();
 
     /**
-     * Start a garbage collection process
+     * {@inheritDoc}
      */
     public abstract void gc();
 
     /**
-     * Create an exact clone of the given object
-     *
-     * @param object
-     * @return Object
+     * {@inheritDoc}
      */
     public final Object clone(Cloneable object) {
         testInited();
@@ -219,7 +208,7 @@ public abstract class VmHeapManager extends VmSystemObject {
             .toAddress();
         final int size;
         if (objectClass.isArray()) {
-            final int slotSize = VmProcessor.current().getArchitecture()
+            final int slotSize = getCurrentProcessor().getArchitecture()
                 .getReferenceSize();
             final VmArrayClass<?> arrayClass = (VmArrayClass<?>) objectClass;
             final int length = objectPtr.loadInt(Offset
@@ -237,16 +226,12 @@ public abstract class VmHeapManager extends VmSystemObject {
     }
 
     /**
-     * Gets the size of free memory in bytes.
-     *
-     * @return long
+     * {@inheritDoc}
      */
     public abstract long getFreeMemory();
 
     /**
-     * Gets the size of all memory in bytes.
-     *
-     * @return the size of all memory in bytes
+     * {@inheritDoc}
      */
     public abstract long getTotalMemory();
 
@@ -284,11 +269,7 @@ public abstract class VmHeapManager extends VmSystemObject {
     }
 
     /**
-     * Is the given address the address of an allocated object on this heap?
-     *
-     * @param ptr The address to examine.
-     * @return True if the given address if a valid starting address of an
-     *         object, false otherwise.
+     * {@inheritDoc}
      */
     public abstract boolean isObject(Address ptr);
 
@@ -311,9 +292,7 @@ public abstract class VmHeapManager extends VmSystemObject {
     }
 
     /**
-     * Gets the write barrier used by this heap manager (if any).
-     *
-     * @return The write barrier, or null if no write barrier is used.
+     * {@inheritDoc}
      */
     public final VmWriteBarrier getWriteBarrier() {
         return writeBarrier;
@@ -330,26 +309,27 @@ public abstract class VmHeapManager extends VmSystemObject {
     }
 
     /**
-     * Print the statics on this object on out.
+     * {@inheritDoc}
      */
     public abstract void dumpStatistics(PrintWriter out);
 
+    /**
+     * {@inheritDoc}
+     */
     public abstract GCStatistics getStatistics();
 
+    /**
+     * {@inheritDoc}
+     */
     public abstract HeapStatistics getHeapStatistics();
 
     /**
-     * Create a per processor data structure for use by the heap manager.
-     *
-     * @param cpu
+     * {@inheritDoc}
      */
     public abstract Object createProcessorHeapData(VmProcessor cpu);
 
     /**
-     * A new type has been resolved by the VM. Create a new MM type to reflect
-     * the VM type, and associate the MM type with the VM type.
-     *
-     * @param vmType The newly resolved type
+     * {@inheritDoc}
      */
     public abstract void notifyClassResolved(VmType<?> vmType);
 
@@ -362,19 +342,14 @@ public abstract class VmHeapManager extends VmSystemObject {
         throws ClassNotFoundException;
 
     /**
-     * Get this heap's current flags
-     *
-     * @return the flags
+     * {@inheritDoc}
      */
     public int getHeapFlags() {
         return heapFlags;
     }
 
     /**
-     * Set this heap's flags
-     *
-     * @param reapFlags the new heap flags
-     * @return the previous heap flags
+     * {@inheritDoc}
      */
     public int setHeapFlags(int reapFlags) {
         int res = this.heapFlags;
@@ -402,5 +377,9 @@ public abstract class VmHeapManager extends VmSystemObject {
         if ((heapFlags & TRACE_FLAGS) != 0) {
             Unsafe.debug(number);
         }
+    }
+    
+    protected static final org.jnode.vm.scheduler.VmProcessor getCurrentProcessor() {
+    	return org.jnode.vm.scheduler.VmProcessor.current();
     }
 }

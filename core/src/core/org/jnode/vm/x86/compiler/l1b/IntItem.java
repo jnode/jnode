@@ -24,7 +24,8 @@ import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
@@ -63,8 +64,8 @@ final class IntItem extends WordItem implements X86CompilerConstants {
     }
 
     final int getValue() {
-        if (Vm.VerifyAssertions) {
-            Vm._assert(isConstant(), "kind == Kind.CONSTANT");
+        if (VmUtils.verifyAssertions()) {
+            VmUtils._assert(isConstant(), "kind == Kind.CONSTANT");
         }
         return value;
     }

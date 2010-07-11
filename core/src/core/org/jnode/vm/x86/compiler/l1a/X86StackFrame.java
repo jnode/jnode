@@ -27,7 +27,6 @@ import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
-import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
 import org.jnode.vm.classmgr.VmMethod;
@@ -35,6 +34,7 @@ import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.compiler.CompiledExceptionHandler;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.EntryPoints;
+import org.jnode.vm.facade.TypeSizeInfo;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 import org.jnode.vm.x86.compiler.X86JumpTable;
 

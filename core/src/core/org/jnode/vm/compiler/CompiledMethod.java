@@ -21,9 +21,10 @@
 package org.jnode.vm.compiler;
 
 import org.jnode.assembler.NativeStream;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
 import org.jnode.vm.classmgr.VmAddressMap;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -146,7 +147,7 @@ public final class CompiledMethod {
      */
     public final int getCompiledCodeId() {
         if (ccId < 0) {
-            ccId = Vm.getCompiledMethods().createId();
+            ccId = VmUtils.getVm().getCompiledMethods().createId();
         }
         return ccId;
     }

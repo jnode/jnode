@@ -26,11 +26,12 @@ import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.Uninterruptible;
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.Vm;
-import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.BaseVmArchitecture;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmStackReader;
 import org.jnode.vm.VmSystem;
+import org.jnode.vm.facade.VmThreadVisitor;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * Thread scheduler. This scheduler is used by all processors in the system, so
@@ -44,7 +45,7 @@ public final class VmScheduler {
     /**
      * Reference to current architecture.
      */
-    private final VmArchitecture architecture;
+    private final BaseVmArchitecture architecture;
 
     /**
      * Lock for the allThreadsQueue.
@@ -74,7 +75,7 @@ public final class VmScheduler {
     /**
      * Default constructor.
      */
-    public VmScheduler(VmArchitecture architecture) {
+    public VmScheduler(BaseVmArchitecture architecture) {
         this.architecture = architecture;
         this.allThreadsLock = new ProcessorLock();
         this.allThreadsQueue = new VmThreadQueue.AllThreadsQueue("scheduler-all");
@@ -108,7 +109,7 @@ public final class VmScheduler {
      * @param thread
      */
     final void registerThread(VmThread thread) {
-        if (Vm.isWritingImage()) {
+        if (VmUtils.isWritingImage()) {
             allThreadsQueue.add(thread, "Vm");
         } else {
             allThreadsLock.lock();

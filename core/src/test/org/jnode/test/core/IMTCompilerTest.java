@@ -23,7 +23,7 @@ package org.jnode.test.core;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.classmgr.TIBLayout;
 import org.jnode.vm.classmgr.VmClassType;
@@ -48,7 +48,7 @@ public class IMTCompilerTest {
         final IMTCompiler cmp = arch.getIMTCompiler();
         cmp.initialize(cl);
         VmType.initializeForBootImage(cl);
-        final Vm vm = new Vm("?", arch, cl.getSharedStatics(), false, cl, null);
+        final VmImpl vm = new VmImpl("?", arch, cl.getSharedStatics(), false, cl, null);
         vm.toString();
 
         //final ObjectResolver resolver = new DummyResolver();

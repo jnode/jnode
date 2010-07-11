@@ -23,7 +23,7 @@ package org.jnode.vm;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.SharedStatics;
 import org.jnode.annotation.Uninterruptible;
-import org.jnode.bootlog.BootLogInstance;
+import org.jnode.vm.objects.VmSystemObject;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmThread;
 import org.vmmagic.unboxed.Address;

@@ -32,8 +32,6 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.bootlog.BootLogInstance;
-import org.jnode.vm.BootableObject;
-import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
@@ -41,6 +39,8 @@ import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.objects.BootableObject;
+import org.jnode.vm.objects.VmSystemObject;
 import org.vmmagic.unboxed.UnboxedObject;
 
 public class ObjectEmitter {

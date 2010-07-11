@@ -33,7 +33,9 @@ import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.memmgr.VmHeapManager;
+import org.jnode.vm.facade.VmHeapManager;
+import org.jnode.vm.facade.VmUtils;
+
 
 /**
  * Class with software implementations of "difficult" java bytecodes.
@@ -188,7 +190,7 @@ public final class SoftByteCodes {
     public static Object allocObject(VmType<?> vmClass, int size) {
         VmHeapManager hm = heapManager;
         if (hm == null) {
-            heapManager = hm = Vm.getHeapManager();
+            heapManager = hm = VmUtils.getVm().getHeapManager();
         }
         final Object result;
         if (size < 0) {
@@ -256,7 +258,7 @@ public final class SoftByteCodes {
         final VmArrayClass<?> arrCls = vmClass.getArrayClass();
         VmHeapManager hm = heapManager;
         if (hm == null) {
-            heapManager = hm = Vm.getHeapManager();
+            heapManager = hm = VmUtils.getVm().getHeapManager();
         }
         final Object result = hm.newArray(arrCls, elements);
 
@@ -277,13 +279,13 @@ public final class SoftByteCodes {
                                              int atype, int elements) {
         VmHeapManager hm = heapManager;
         if (hm == null) {
-            heapManager = hm = Vm.getHeapManager();
+            heapManager = hm = VmUtils.getVm().getHeapManager();
         }
         if (false) {
             if (atype == 5) {
                 if (VmSystem.isInitialized()) {
                     // Trace new char[]
-                    Vm.getVm().getCounter(currentClass.getName()).add(elements);
+                    VmUtils.getVm().getCounter(currentClass.getName()).add(elements);
                 }
             }
         }
@@ -302,7 +304,7 @@ public final class SoftByteCodes {
     public static Object allocArray(VmType vmClass, int elements) {
         VmHeapManager hm = heapManager;
         if (hm == null) {
-            heapManager = hm = Vm.getHeapManager();
+            heapManager = hm = VmUtils.getVm().getHeapManager();
         }
         final Object result = hm.newArray((VmArrayClass) vmClass, elements);
         return result;

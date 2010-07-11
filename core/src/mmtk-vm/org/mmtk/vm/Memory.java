@@ -13,11 +13,11 @@
  
 package org.mmtk.vm;
 
+import org.jnode.annotation.Inline;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VirtualMemoryRegion;
-import org.jnode.vm.Vm;
-import org.jnode.vm.VmArchitecture;
-import org.jnode.annotation.Inline;
+import org.jnode.vm.facade.VmArchitecture;
+import org.jnode.vm.facade.VmUtils;
 import org.mmtk.plan.BasePlan;
 import org.mmtk.policy.ImmortalSpace;
 import org.vmmagic.unboxed.Address;
@@ -41,7 +41,7 @@ public class Memory {
      * @return the start address.
      */
     public static Address HEAP_START() {
-        return Vm.getArch().getStart(VirtualMemoryRegion.HEAP);
+        return VmUtils.getVm().getArch().getStart(VirtualMemoryRegion.HEAP);
     }
 
     /**
@@ -50,7 +50,7 @@ public class Memory {
      * @return the end address.
      */
     public static Address HEAP_END() {
-        return Vm.getArch().getEnd(VirtualMemoryRegion.HEAP);
+        return VmUtils.getVm().getArch().getEnd(VirtualMemoryRegion.HEAP);
     }
 
     /**
@@ -60,7 +60,7 @@ public class Memory {
      * @return the start address.
      */
     public static Address AVAILABLE_START() {
-        return Vm.getArch().getStart(VirtualMemoryRegion.AVAILABLE);
+        return VmUtils.getVm().getArch().getStart(VirtualMemoryRegion.AVAILABLE);
     }
 
     /**
@@ -70,7 +70,7 @@ public class Memory {
      * @return the end address.
      */
     public static Address AVAILABLE_END() {
-        return Vm.getArch().getEnd(VirtualMemoryRegion.AVAILABLE);
+        return VmUtils.getVm().getArch().getEnd(VirtualMemoryRegion.AVAILABLE);
     }
 
     /**
@@ -90,7 +90,7 @@ public class Memory {
      */
     public static ImmortalSpace getVMSpace() {
         if (bootSpace == null) {
-            final VmArchitecture arch = Vm.getArch();
+            final VmArchitecture arch = VmUtils.getVm().getArch();
             final long bootSize = AVAILABLE_START().sub(HEAP_START().toWord())
                     .toLong();
             final int bootSizeMb = (int) (bootSize >>> 20);
@@ -155,7 +155,7 @@ public class Memory {
             Unsafe.debug(size);
         }
 
-        if (Vm.getArch().mmap(VirtualMemoryRegion.HEAP, start,
+        if (VmUtils.getVm().getArch().mmap(VirtualMemoryRegion.HEAP, start,
                 Extent.fromIntZeroExtend(size), Address.max())) {
             return 0;
         } else {

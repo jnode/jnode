@@ -21,8 +21,9 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.vm.JvmType;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
 import org.jnode.vm.bytecode.StackException;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -187,8 +188,8 @@ class ItemStack {
     }
 
     final void push(Item item) {
-        if (Vm.VerifyAssertions)
-            Vm._assert(item.getKind() == expectedKind,
+        if (VmUtils.verifyAssertions())
+            VmUtils._assert(item.getKind() == expectedKind,
                 "item.getKind() == expectedKind");
         if (tos == stack.length) {
             grow();

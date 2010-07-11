@@ -85,11 +85,16 @@ public class AutoUnzipPlugin extends Plugin {
    
             // copy each plugin's resource to the plugin root directory 
             final PluginDescriptor desc = AutoUnzipPlugin.this.getDescriptor();
-            final PluginClassLoader cl = (PluginClassLoader) desc.getPluginClassLoader();
+            final ClassLoader cl = desc.getPluginClassLoader();
             final String pluginRoot = pluginRootFile.getAbsolutePath() + "/";
             final byte[] buffer = new byte[10240];
             
-            for (String resName : cl.getResources()) {
+            if (!(cl instanceof PluginClassLoader)) {
+            	System.err.println("Plugin's ClassLoader doesn't implements PluginClassLoader");
+            	return;
+            }
+            
+            for (String resName : ((PluginClassLoader) cl).getResources()) {
                 final InputStream input = cl.getResourceAsStream(resName);
                 
                 try {

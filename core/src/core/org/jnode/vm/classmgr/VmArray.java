@@ -20,7 +20,7 @@
  
 package org.jnode.vm.classmgr;
 
-import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * <description>

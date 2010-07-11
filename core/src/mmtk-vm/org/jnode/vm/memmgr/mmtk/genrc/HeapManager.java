@@ -22,7 +22,7 @@ package org.jnode.vm.memmgr.mmtk.genrc;
 
 import org.jnode.annotation.Inline;
 import org.jnode.vm.classmgr.VmClassLoader;
-import org.jnode.vm.memmgr.GCStatistics;
+import org.jnode.vm.facade.GCStatistics;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.mmtk.BaseMmtkHeapManager;
 import org.vmmagic.unboxed.Address;

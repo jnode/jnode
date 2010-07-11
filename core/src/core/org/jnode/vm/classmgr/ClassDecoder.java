@@ -25,8 +25,6 @@ import java.lang.annotation.Annotation;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 
-import org.jnode.vm.JvmType;
-import org.jnode.vm.VmUtils;
 import org.jnode.annotation.AllowedPackages;
 import org.jnode.annotation.CheckPermission;
 import org.jnode.annotation.DoPrivileged;
@@ -41,8 +39,9 @@ import org.jnode.annotation.NoWriteBarrier;
 import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.annotation.SharedStatics;
 import org.jnode.annotation.Uninterruptible;
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
+import org.jnode.vm.JvmType;
+import org.jnode.vm.facade.VmUtils;
 import org.vmmagic.pragma.PragmaException;
 import org.vmmagic.pragma.UninterruptiblePragma;
 
@@ -988,7 +987,7 @@ public final class ClassDecoder {
                             }
                         }
                         Object defo = AnnotationParser.parseMemberValue(r_class, data, new VmConstantPool(cls),
-                            org.jnode.vm.Vm.isRunningVm() ? cls.asClass() : cls.asClassDuringBootstrap());
+                            VmUtils.isRunningVm() ? cls.asClass() : cls.asClassDuringBootstrap());
                         mts.setAnnotationDefault(defo);
                     } else {
                         skip(data, length);

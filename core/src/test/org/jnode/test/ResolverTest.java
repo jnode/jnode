@@ -25,7 +25,7 @@ import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.Vm;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.x86.X86CpuID;
 
 /**
@@ -36,7 +36,7 @@ public class ResolverTest {
     public static void main(String[] args) {
 
         final ObjectResolver res = new Unsafe.UnsafeObjectResolver();
-        System.out.println(NumberUtils.hex(res.addressOf32(Vm.getVm())));
+        System.out.println(NumberUtils.hex(res.addressOf32(VmUtils.getVm())));
 
         final X86BinaryAssembler os = new X86BinaryAssembler(X86CpuID.createID(null), X86Constants.Mode.CODE32, 0);
         os.write32(0x12345678);

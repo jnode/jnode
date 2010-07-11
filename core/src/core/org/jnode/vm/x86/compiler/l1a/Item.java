@@ -21,7 +21,8 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Register;
-import org.jnode.vm.Vm;
+import org.jnode.vm.facade.Vm;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * This class is the base of all virtual stack items. To improve performance and
@@ -122,7 +123,7 @@ abstract class Item {
     protected Item(ItemFactory factory) {
         this.factory = factory;
         if (false) {
-            final Vm vm = Vm.getVm();
+            final Vm vm = VmUtils.getVm();
             final String name = getClass().getName();
             vm.getCounterGroup(name).getCounter("new").inc();
         }
@@ -135,8 +136,8 @@ abstract class Item {
      * @param offsetToFP
      * @param xmm
      */
-    protected final void initialize(byte kind, short offsetToFP, X86Register.XMM xmm) {
-        if (Vm.VerifyAssertions) Vm._assert(kind > 0, "Invalid kind");
+    protected final void initialize(byte kind, short offsetToFP, X86Register.XMM xmm) {    	
+        if (VmUtils.verifyAssertions()) VmUtils._assert(kind > 0, "Invalid kind");
         this.kind = kind;
         this.offsetToFP = offsetToFP;
         this.xmm = xmm;
@@ -251,8 +252,8 @@ abstract class Item {
      * @return
      */
     short getOffsetToFP(EmitterContext ec) {
-        if (Vm.VerifyAssertions) {
-            Vm._assert(isLocal(), "kind == Kind.LOCAL");
+        if (VmUtils.verifyAssertions()) {
+        	VmUtils._assert(isLocal(), "kind == Kind.LOCAL");
         }
         return offsetToFP;
     }
@@ -264,8 +265,8 @@ abstract class Item {
      * @return
      */
     final X86Register.XMM getXMM() {
-        if (Vm.VerifyAssertions) {
-            Vm._assert(isXMM(), "kind == Kind.XMM");
+        if (VmUtils.verifyAssertions()) {
+        	VmUtils._assert(isXMM(), "kind == Kind.XMM");
         }
         return xmm;
     }
@@ -277,7 +278,7 @@ abstract class Item {
      * @return
      */
     boolean isAtOffset(int offset) {
-        if (Vm.VerifyAssertions) Vm._assert(kind == Kind.LOCAL, "kind == Kind.LOCAL");
+        if (VmUtils.verifyAssertions()) VmUtils._assert(kind == Kind.LOCAL, "kind == Kind.LOCAL");
         return (offsetToFP == offset);
     }
 

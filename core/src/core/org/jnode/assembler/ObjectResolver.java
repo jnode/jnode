@@ -20,7 +20,7 @@
  
 package org.jnode.assembler;
 
-import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * @author epr

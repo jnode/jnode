@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.jnode.vm.VmSystemObject;
 
 /**
  * @author epr

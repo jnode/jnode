@@ -20,27 +20,25 @@
  
 package org.jnode.vm;
 
-import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.jnode.annotation.Internal;
+import org.jnode.annotation.KernelSpace;
+import org.jnode.annotation.SharedStatics;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.system.resource.ResourceManager;
-import org.jnode.annotation.Inline;
-import org.jnode.annotation.Internal;
-import org.jnode.annotation.KernelSpace;
-import org.jnode.annotation.NoInline;
-import org.jnode.annotation.SharedStatics;
-import org.jnode.annotation.Uninterruptible;
 import org.jnode.vm.classmgr.CompiledCodeList;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmSharedStatics;
-import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.facade.VmProcessor;
+import org.jnode.vm.facade.VmThreadVisitor;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.objects.BootableArrayList;
@@ -48,29 +46,26 @@ import org.jnode.vm.objects.Counter;
 import org.jnode.vm.objects.CounterGroup;
 import org.jnode.vm.objects.Statistic;
 import org.jnode.vm.objects.Statistics;
-import org.jnode.vm.scheduler.VmProcessor;
+import org.jnode.vm.objects.VmSystemObject;
 import org.jnode.vm.scheduler.VmScheduler;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @SharedStatics
-public final class Vm extends VmSystemObject implements Statistics {
-
-    /**
-     * The single instance
-     */
-    private static Vm instance;
+public
+final class VmImpl extends VmSystemObject implements Statistics, org.jnode.vm.facade.Vm {
 
     /**
      * Are will in bootimage building phase?
+     * FIXME it appears always set to true in constructor. but code depends on its (non-constant) value. remove it ?
      */
     private transient boolean bootstrap;
 
     /**
      * The current architecture
      */
-    private final VmArchitecture arch;
+    private final BaseVmArchitecture arch;
 
     /**
      * The heap manager
@@ -110,12 +105,8 @@ public final class Vm extends VmSystemObject implements Statistics {
     private final CompiledCodeList compiledMethods;
 
     /**
-     * Should assertions be verified?
-     */
-    public static final boolean VerifyAssertions = true;
-
-    /**
      * For assertion checking things that should never happen.
+     * TODO it appears unused. remove it ?
      */
     public static final boolean NOT_REACHED = false;
 
@@ -127,7 +118,7 @@ public final class Vm extends VmSystemObject implements Statistics {
      * @param arch
      * @throws InstantiationException
      */
-    public Vm(String version, VmArchitecture arch, VmSharedStatics statics,
+    public VmImpl(String version, BaseVmArchitecture arch, VmSharedStatics statics,
               boolean debugMode, VmClassLoader loader, PluginRegistry pluginReg)
         throws InstantiationException {
         this.version = version;
@@ -135,7 +126,7 @@ public final class Vm extends VmSystemObject implements Statistics {
         this.bootstrap = true;
         this.arch = arch;
         final HeapHelper helper = new HeapHelperImpl(arch);
-        instance = this;
+        VmUtils.setVm(this);
         this.heapManager = createHeapManager(helper, arch, loader, pluginReg);
         this.statics = statics;
         this.processors = new BootableArrayList<VmProcessor>();
@@ -152,7 +143,7 @@ public final class Vm extends VmSystemObject implements Statistics {
      * @throws InstantiationException
      */
     private static VmHeapManager createHeapManager(HeapHelper helper,
-                                                   VmArchitecture arch, VmClassLoader loader, PluginRegistry pluginReg)
+                                                   BaseVmArchitecture arch, VmClassLoader loader, PluginRegistry pluginReg)
         throws InstantiationException {
         if (pluginReg == null) {
             // Use in tests and asm constant construction
@@ -204,63 +195,32 @@ public final class Vm extends VmSystemObject implements Statistics {
     }
 
     /**
-     * Is JNode currently running.
-     *
-     * @return true or false
-     */
-    public static final boolean isRunningVm() {
-        return ((instance != null) && !instance.bootstrap);
-    }
-
-    /**
-     * Is the bootimage being written?
-     *
-     * @return true or false.
-     */
-    public static final boolean isWritingImage() {
-        return ((instance == null) || instance.bootstrap);
-    }
-
-    /**
      * Causes JNode to stop working with a given message.
      *
      * @param msg
      */
     public static final void sysFail(String msg) {
-        if (isRunningVm()) {
+        if (VmUtils.isRunningVm()) {
             Unsafe.die(msg);
         }
     }
 
     /**
-     * @return Returns the arch.
+     * {@inheritDoc}
      */
-    public static final VmArchitecture getArch() {
-        return instance.arch;
+    public final BaseVmArchitecture getArch() {
+        return arch;
     }
 
     /**
-     * @return Returns the instance.
+     * {@inheritDoc}
      */
-    @KernelSpace
-    @Uninterruptible
-    public static final Vm getVm() {
-        return instance;
+    public final VmHeapManager getHeapManager() {
+        return heapManager;
     }
 
     /**
-     * @return Returns the heapManager.
-     */
-    public static final VmHeapManager getHeapManager() {
-        return instance.heapManager;
-    }
-
-    /**
-     * Returns the number of available processors currently available to the
-     * virtual machine. This number may change over time; so a multi-processor
-     * program want to poll this to determine maximal resource usage.
-     *
-     * @return the number of processors available, at least 1
+     * {@inheritDoc}
      */
     public final int availableProcessors() {
         return processors.size();
@@ -293,25 +253,21 @@ public final class Vm extends VmSystemObject implements Statistics {
 //    }
 
     /**
-     * Does this VM run in debug mode.
-     *
-     * @return Returns the debugMode.
+     * {@inheritDoc}
      */
     public final boolean isDebugMode() {
         return this.debugMode;
     }
 
     /**
-     * @return Returns the statics.
+     * {@inheritDoc}
      */
     public final VmSharedStatics getSharedStatics() {
         return this.statics;
     }
 
     /**
-     * Gets the version of the current VM.
-     *
-     * @return Returns the version.
+     * {@inheritDoc}
      */
     public final String getVersion() {
         return this.version;
@@ -322,7 +278,7 @@ public final class Vm extends VmSystemObject implements Statistics {
      */
     final void initializeProcessors(ResourceManager rm) {
         // Add the current (bootstrap) processor
-        addProcessor(VmProcessor.current());
+        addProcessor(org.jnode.vm.scheduler.VmProcessor.current());
         // Let the architecture find the processors
         arch.initializeProcessors(rm);
         // Show some info
@@ -344,10 +300,7 @@ public final class Vm extends VmSystemObject implements Statistics {
     }
 
     /**
-     * Gets or creates a counter with a given name.
-     *
-     * @param name
-     * @return The counter
+     * {@inheritDoc}
      */
     public final Counter getCounter(String name) {
         Counter cnt = (Counter) getStatistic(name);
@@ -364,10 +317,7 @@ public final class Vm extends VmSystemObject implements Statistics {
     }
 
     /**
-     * Gets or creates a counter group with a given name.
-     *
-     * @param name
-     * @return The counter group
+     * {@inheritDoc}
      */
     public final CounterGroup getCounterGroup(String name) {
         CounterGroup cnt = (CounterGroup) getStatistic(name);
@@ -410,102 +360,14 @@ public final class Vm extends VmSystemObject implements Statistics {
         }
     }
 
-    public void dumpStatistics(PrintWriter out) {
-        if (statistics != null) {
-            final Statistic[] stats = getStatistics();
-            for (int i = 0; i < stats.length; i++) {
-                out.println(stats[i]);
-            }
-        }
-    }
-
-    public final void resetCounters() {
-        if (statistics != null) {
-            final Statistic[] stats = getStatistics();
-            for (int i = 0; i < stats.length; i++) {
-                final Statistic s = stats[i];
-                if (s instanceof Counter) {
-                    ((Counter) s).reset();
-                }
-            }
-        }
-    }
-
-    /**
-     * Assert the given value to be true.
-     *
-     * @param value
-     */
-    public static void _assert(boolean value) {
-        if (!value) {
-            assertionFailed(null, null);
-        }
-    }
-
-    /**
-     * Assert the given value to be true.
-     *
-     * @param value
-     */
-    public static void _assert(boolean value, String msg) {
-        if (!value) {
-            assertionFailed(msg, null);
-        }
-    }
-
-    /**
-     * Assert the given value to be true.
-     *
-     * @param value
-     */
-    public static void _assert(boolean value, String msg, String msg2) {
-        if (!value) {
-            assertionFailed(msg, msg2);
-        }
-    }
-
-    /**
-     * Throw an AssertionError with the given messages.
-     *
-     * @param msg
-     * @param msg2
-     * @throws NoInlinePragma
-     */
-    @NoInline
-    private static void assertionFailed(String msg, String msg2) {
-        if ((msg == null) && (msg2 == null)) {
-            msg = "Assertion failed";
-        } else if (msg2 != null) {
-            msg = msg + ": " + msg2;
-        }
-        throw new AssertionError(msg);
-    }
-
     /**
      * Gets the list of compiled methods.
      *
      * @return Returns the compiledMethods.
      */
     @KernelSpace
-    public static final CompiledCodeList getCompiledMethods() {
-        return instance.compiledMethods;
-    }
-
-    /**
-     * A new type has been resolved by the VM. Create a new MM type to reflect
-     * the VM type, and associate the MM type with the VM type.
-     *
-     * @param vmType The newly resolved type
-     */
-    @Inline
-    public static void notifyClassResolved(VmType<?> vmType) {
-        final Vm instance = Vm.instance;
-        if (instance != null) {
-            final VmHeapManager hm = instance.heapManager;
-            if (hm != null) {
-                hm.notifyClassResolved(vmType);
-            }
-        }
+    public final CompiledCodeList getCompiledMethods() {
+        return compiledMethods;
     }
 
     /**
@@ -525,11 +387,16 @@ public final class Vm extends VmSystemObject implements Statistics {
             this.scheduler = scheduler;
         }
     }
-
+    
     /**
-     * @return a copy of the processors list
+     * {@inheritDoc}
      */
     public final List<VmProcessor> getProcessors() {
         return new BootableArrayList<VmProcessor>(processors);
     }
+
+	@Override
+	public void accept(VmThreadVisitor vmThreadVisitor) {
+		scheduler.visitAllThreads(vmThreadVisitor);
+	}
 }

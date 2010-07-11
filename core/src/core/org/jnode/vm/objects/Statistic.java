@@ -20,7 +20,6 @@
  
 package org.jnode.vm.objects;
 
-import org.jnode.vm.VmSystemObject;
 
 /**
  * @author epr

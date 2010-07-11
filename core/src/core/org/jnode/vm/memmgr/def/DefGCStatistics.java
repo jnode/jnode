@@ -20,12 +20,13 @@
  
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.vm.memmgr.GCStatistics;
+import org.jnode.vm.facade.GCStatistics;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class DefGCStatistics extends GCStatistics {
+final class DefGCStatistics extends VmSystemObject implements GCStatistics {
 
     long lastGCTime;
     long lastMarkDuration;

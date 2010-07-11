@@ -20,8 +20,8 @@
  
 package org.jnode.vm.bytecode;
 
-import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.objects.BootableArrayList;
+import org.jnode.vm.objects.VmSystemObject;
 
 import java.util.Set;
 import java.util.HashSet;

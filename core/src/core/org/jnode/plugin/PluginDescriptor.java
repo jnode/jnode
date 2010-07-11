@@ -197,6 +197,8 @@ public interface PluginDescriptor {
 
     /**
      * Gets the classloader of this plugin descriptor.
+     * It's <strong>not mandatory</strong> but the returned {@link ClassLoader} usually
+     * implements {@link PluginClassLoader}. 
      *
      * @return ClassLoader
      */

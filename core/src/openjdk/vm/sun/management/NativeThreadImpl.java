@@ -22,9 +22,10 @@ package sun.management;
 
 import java.lang.management.ThreadInfo;
 import java.util.ArrayList;
-import org.jnode.vm.Vm;
-import org.jnode.vm.scheduler.VmThreadVisitor;
-import org.jnode.vm.scheduler.VmThread;
+
+import org.jnode.vm.facade.VmThread;
+import org.jnode.vm.facade.VmThreadVisitor;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * @see sun.management.ThreadImpl
@@ -35,7 +36,7 @@ class NativeThreadImpl {
      */
     private static Thread[] getThreads() {
         final ArrayList<Thread> tl = new ArrayList<Thread>();
-        Vm.getVm().getScheduler().visitAllThreads(new VmThreadVisitor() {
+        VmUtils.getVm().accept(new VmThreadVisitor() {
             @Override
             public boolean visit(VmThread thread) {
                 tl.add(thread.asThread());

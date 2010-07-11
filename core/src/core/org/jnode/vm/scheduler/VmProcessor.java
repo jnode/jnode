@@ -22,16 +22,6 @@ package org.jnode.vm.scheduler;
 
 import java.io.PrintWriter;
 
-import org.jnode.util.NumberUtils;
-import org.jnode.vm.CpuID;
-import org.jnode.vm.MathSupport;
-import org.jnode.vm.Unsafe;
-import org.jnode.vm.Vm;
-import org.jnode.vm.VmAddress;
-import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmMagic;
-import org.jnode.vm.VmSystem;
-import org.jnode.vm.VmSystemObject;
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.KernelSpace;
@@ -39,10 +29,19 @@ import org.jnode.annotation.LoadStatics;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.NoFieldAlignments;
 import org.jnode.annotation.Uninterruptible;
+import org.jnode.util.NumberUtils;
+import org.jnode.vm.CpuID;
+import org.jnode.vm.MathSupport;
+import org.jnode.vm.Unsafe;
+import org.jnode.vm.BaseVmArchitecture;
+import org.jnode.vm.VmMagic;
+import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.GCMapIterator;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.jnode.vm.facade.VmUtils;
+import org.jnode.vm.objects.VmSystemObject;
 import org.jnode.vm.performance.PerformanceCounters;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
@@ -56,7 +55,7 @@ import org.vmmagic.unboxed.Word;
 @NoFieldAlignments
 @Uninterruptible
 @MagicPermission
-public abstract class VmProcessor extends VmSystemObject {
+public abstract class VmProcessor extends VmSystemObject implements org.jnode.vm.facade.VmProcessor {
 
     /**
      * The thread switch indicator KEEP THIS THE FIRST FIELD!!!
@@ -91,7 +90,7 @@ public abstract class VmProcessor extends VmSystemObject {
     /**
      * Stack end of current thread. This field is used by the native code.
      */
-    protected volatile VmAddress stackEnd;
+    protected volatile Address stackEnd;
 
     /**
      * Stack end of kernel stack. This field is used by the native code.
@@ -131,7 +130,7 @@ public abstract class VmProcessor extends VmSystemObject {
     /**
      * The architecture of this processor.
      */
-    private final VmArchitecture architecture;
+    private final BaseVmArchitecture architecture;
 
     /**
      * The idle thread.
@@ -225,7 +224,7 @@ public abstract class VmProcessor extends VmSystemObject {
      * @param id
      * @param architecture
      */
-    public VmProcessor(int id, VmArchitecture architecture,
+    public VmProcessor(int id, BaseVmArchitecture architecture,
                        VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
                        VmScheduler scheduler) {
         this.id = id;
@@ -238,7 +237,7 @@ public abstract class VmProcessor extends VmSystemObject {
         this.isolatedStatics = isolatedStatics;
         this.isolatedStaticsTable = isolatedStatics.getTable();
         this.currentThread = createThread(isolatedStatics);
-        this.heapData = Vm.getHeapManager().createProcessorHeapData(this);
+        this.heapData = VmUtils.getVm().getHeapManager().createProcessorHeapData(this);
 
         final NativeCodeCompiler[] compilers = architecture.getCompilers();
         final int compilerCount = compilers.length;
@@ -257,7 +256,7 @@ public abstract class VmProcessor extends VmSystemObject {
      */
     @Inline
     @KernelSpace
-    public final VmArchitecture getArchitecture() {
+    public final BaseVmArchitecture getArchitecture() {
         return architecture;
     }
 
@@ -283,9 +282,7 @@ public abstract class VmProcessor extends VmSystemObject {
     }
 
     /**
-     * Gets the identifier of this processor as string.
-     *
-     * @return Returns the id.
+     * {@inheritDoc}
      */
     @Uninterruptible
     @KernelSpace
@@ -648,9 +645,7 @@ public abstract class VmProcessor extends VmSystemObject {
     }
 
     /**
-     * Print statistics information on the given stream.
-     *
-     * @param out
+     * {@inheritDoc}
      */
     public abstract void dumpStatistics(PrintWriter out);
 

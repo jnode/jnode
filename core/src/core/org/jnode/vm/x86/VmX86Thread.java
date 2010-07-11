@@ -20,12 +20,12 @@
  
 package org.jnode.vm.x86;
 
-import org.jnode.vm.ObjectVisitor;
-import org.jnode.vm.VmMagic;
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.MagicPermission;
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
-import org.jnode.vm.memmgr.VmHeapManager;
+import org.jnode.vm.facade.ObjectVisitor;
+import org.jnode.vm.facade.VmHeapManager;
 import org.jnode.vm.scheduler.VmThread;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
@@ -170,7 +170,7 @@ public abstract class VmX86Thread extends VmThread {
      * @param visitor
      * @param heapManager
      */
-    public boolean visit(ObjectVisitor visitor, VmHeapManager heapManager) {
+    public boolean accept(ObjectVisitor visitor, VmHeapManager heapManager) {
         // For now do it stupid, but safe, just scan the whole stack.
         final int stackSize = getStackSize();
         final Object stack = getStack();

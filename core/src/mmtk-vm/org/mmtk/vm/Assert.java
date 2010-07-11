@@ -16,7 +16,8 @@ package org.mmtk.vm;
 import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -42,7 +43,7 @@ public class Assert {
      */
     public static void fail(String message) {
         BootLogInstance.get().fatal(message);
-        if (Vm.isRunningVm()) {
+        if (VmUtils.isRunningVm()) {
             Unsafe.die(message);
         } else {
             throw new Error(message);
@@ -99,7 +100,7 @@ public class Assert {
      * @return <code>true</code> if the virtual machine is running
      */
     public static boolean runningVM() {
-        return Vm.isRunningVm();
+        return VmUtils.isRunningVm();
     }
 
 }

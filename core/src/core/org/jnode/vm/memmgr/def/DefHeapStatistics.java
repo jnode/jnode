@@ -24,13 +24,14 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.memmgr.HeapStatistics;
+import org.jnode.vm.facade.HeapStatistics;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 
-final class DefHeapStatistics extends HeapStatistics {
+final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
 
     private int minInstanceCount = 0;
     private long minTotalSize = 0;

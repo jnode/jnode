@@ -20,8 +20,8 @@
  
 package org.jnode.vm.classmgr;
 
-import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.InternString;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * A VmCP is the runtime representation of a constant pool

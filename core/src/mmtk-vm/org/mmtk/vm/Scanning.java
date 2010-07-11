@@ -13,7 +13,8 @@
  
 package org.mmtk.vm;
 
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.annotation.Inline;
 import org.mmtk.utility.Constants;
 import org.mmtk.utility.deque.AddressDeque;
@@ -55,7 +56,7 @@ public final class Scanning implements Constants {
      */
     public static void scanObject(ObjectReference object) {
         // Should never be reached
-        Vm._assert(false);
+        VmUtils._assert(false);
     }
 
     /**
@@ -70,7 +71,7 @@ public final class Scanning implements Constants {
      */
     public static void enumeratePointers(ObjectReference object, Enumerator e) {
         // Should never be reached
-        Vm._assert(false);
+        VmUtils._assert(false);
     }
 
     /**

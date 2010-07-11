@@ -23,7 +23,8 @@ package java.lang.reflect;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmArrayClass;
-import org.jnode.vm.Vm;
+import org.jnode.vm.facade.VmUtils;
+import org.jnode.vm.VmImpl;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -411,7 +412,7 @@ class NativeArray { //TODO OPTIMIZE IT!
             throw new NoClassDefFoundError(arrClsName);
         }
 
-        return Vm.getHeapManager().newArray((VmArrayClass<?>) arrCls, dim);
+        return VmUtils.getVm().getHeapManager().newArray((VmArrayClass<?>) arrCls, dim);
     }
 
 }

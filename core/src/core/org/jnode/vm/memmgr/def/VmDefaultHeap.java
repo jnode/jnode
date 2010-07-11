@@ -20,7 +20,6 @@
  
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmMagic;
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.MagicPermission;
@@ -29,6 +28,7 @@ import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.facade.ObjectVisitor;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;

@@ -40,8 +40,9 @@ import org.jnode.system.resource.ResourceNotFreeException;
  * @author epr
  */
 public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants {
-
-    static final IndexColorModel COLOR_MODEL = new IndexColorModel(4, 16, REDS, GREENS, BLUES) {
+	private static final int NB_COLORS = 16;
+	
+    static final IndexColorModel COLOR_MODEL = new IndexColorModel(4, NB_COLORS, REDS, GREENS, BLUES) {
         // Typically overridden
         public SampleModel createCompatibleSampleModel(int w, int h) {
             // return new VGASampleModel(w, h);
@@ -81,22 +82,24 @@ public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants
          * @see #getRGB(Object)
          */
         public Object getDataElements(int rgb, Object pixel) {
-            // TODO determin the reight color here
-            byte[] p = new byte[1];
+            final int r2 = (0x00FF0000 & rgb) >> 16;
+            final int g2 = (0x0000FF00 & rgb) >> 8;
+            final int b2 = (0x000000FF & rgb);        	
+            final byte[] p = (pixel == null) ? new byte[1] : (byte[]) pixel;
+            
+            rgb = (0x00FFFFFF & rgb); // remove alpha component
+            
             int min_i = 0;
             int min_rgb = Integer.MAX_VALUE;
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < NB_COLORS; i++) {
                 int c = getRGB(i);
-                if (c == rgb) {
+                if (c == rgb) { // compare without alpha component
                     min_i = i;
                     break;
                 } else {
                     int r1 = (0x00FF0000 & c) >> 16;
                     int g1 = (0x0000FF00 & c) >> 8;
                     int b1 = (0x000000FF & c);
-                    int r2 = (0x00FF0000 & rgb) >> 16;
-                    int g2 = (0x0000FF00 & rgb) >> 8;
-                    int b2 = (0x000000FF & rgb);
                     int dr = r1 - r2;
                     dr = dr < 0 ? -dr : dr;
                     int dg = g1 - g2;
@@ -104,7 +107,7 @@ public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants
                     int db = b1 - b2;
                     db = db < 0 ? -db : db;
                     int v = dr + dg + db;
-                    if (min_rgb < v) {
+                    if (v < min_rgb) {
                         min_rgb = v;
                         min_i = i;
                     }

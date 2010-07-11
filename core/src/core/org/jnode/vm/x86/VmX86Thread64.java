@@ -21,9 +21,9 @@
 package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.ObjectVisitor;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
+import org.jnode.vm.facade.ObjectVisitor;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Word;
@@ -82,10 +82,10 @@ public final class VmX86Thread64 extends VmX86Thread {
     }
 
     /**
-     * @see org.jnode.vm.scheduler.VmThread#visit(org.jnode.vm.ObjectVisitor, org.jnode.vm.memmgr.VmHeapManager)
+     * @see org.jnode.vm.scheduler.VmThread#accept(org.jnode.vm.facade.ObjectVisitor, org.jnode.vm.memmgr.VmHeapManager)
      */
-    public boolean visit(ObjectVisitor visitor, VmHeapManager heapManager) {
-        if (!super.visit(visitor, heapManager)) {
+    public boolean accept(ObjectVisitor visitor, VmHeapManager heapManager) {
+        if (!super.accept(visitor, heapManager)) {
             return false;
         }
         // Scan registers

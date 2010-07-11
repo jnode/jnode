@@ -26,7 +26,8 @@ import java.nio.ByteBuffer;
 import java.lang.reflect.Method;
 import gnu.classpath.jdwp.util.MethodResult;
 import gnu.classpath.jdwp.event.EventRequest;
-import org.jnode.vm.Vm;
+
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.isolate.VmIsolate;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmStaticsIterator;
@@ -71,7 +72,7 @@ class NativeVMVirtualMachine {
      */
     private static Iterator getAllLoadedClasses() {
         return new Iterator() {
-            private VmStaticsIterator iter = new VmStaticsIterator(Vm.getVm().getSharedStatics());
+            private VmStaticsIterator iter = new VmStaticsIterator(VmUtils.getVm().getSharedStatics());
             private Iterator<VmIsolatedStatics> isolated = VmIsolate.staticsIterator();
 
             public boolean hasNext() {

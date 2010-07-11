@@ -20,7 +20,7 @@
  
 package org.jnode.vm.compiler;
 
-import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.objects.VmSystemObject;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

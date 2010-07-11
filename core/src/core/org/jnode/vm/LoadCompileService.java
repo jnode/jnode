@@ -64,7 +64,7 @@ public final class LoadCompileService {
      */
     public LoadCompileService(ObjectResolver resolver) {
         this.resolver = resolver;
-        final VmArchitecture arch = VmMagic.currentProcessor()
+        final BaseVmArchitecture arch = VmMagic.currentProcessor()
             .getArchitecture();
         this.compilers = arch.getCompilers();
         this.testCompilers = arch.getTestCompilers();

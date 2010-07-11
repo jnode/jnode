@@ -22,7 +22,8 @@
 package org.vmmagic.unboxed;
 
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.Vm;
+import org.jnode.vm.VmImpl;
+import org.jnode.vm.facade.VmUtils;
 
 /**
  * Utility class for magic classes.
@@ -87,7 +88,7 @@ public final class MagicUtils {
     
     private static final int getRefSize() {
         if (refSize == 0) {
-            refSize = Vm.getArch().getReferenceSize();
+            refSize = VmUtils.getVm().getArch().getReferenceSize();
         }
         return refSize;
     }

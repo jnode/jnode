@@ -20,9 +20,9 @@
  
 package org.jnode.vm.memmgr;
 
-import org.jnode.vm.ObjectVisitor;
-import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.BaseVmArchitecture;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.facade.ObjectVisitor;
 import org.jnode.vm.scheduler.Monitor;
 import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.unboxed.Address;
@@ -95,7 +95,7 @@ public abstract class HeapHelper implements Uninterruptible {
      * @return The inflated monitor of the given object, or null if the given object has no
      *         inflated monitor.
      */
-    public abstract Monitor getInflatedMonitor(Object object, VmArchitecture arch);
+    public abstract Monitor getInflatedMonitor(Object object, BaseVmArchitecture arch);
 
     /**
      * Stop and block all threads (on all processors) on a GC safe point.

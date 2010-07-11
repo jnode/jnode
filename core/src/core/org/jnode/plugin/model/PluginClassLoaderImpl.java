@@ -48,7 +48,7 @@ import org.jnode.vm.classmgr.VmClassLoader;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class PluginClassLoaderImpl extends PluginClassLoader {
+final class PluginClassLoaderImpl extends ClassLoader implements PluginClassLoader {
 
     /**
      * The registry
@@ -85,9 +85,14 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
     }
 
     /**
-     * Initialize this instance.
-     *
+     * Wrap this {@link ClassLoader} around the given vmClassLoader.
+     * Requires special permission.
+     * 
+     * @param vmClassLoader
+     * @param registry
+     * @param descr
      * @param jar
+     * @param prerequisiteLoaders
      */
     protected PluginClassLoaderImpl(VmClassLoader vmClassLoader, PluginRegistryModel registry,
                                     PluginDescriptorModel descr, PluginJar jar,
@@ -100,7 +105,7 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
     }
 
     /**
-     * Gets the names of the classes contained in this plugin
+     * Gets the names of the classes contained in this plugin.
      *
      * @return
      */
@@ -393,4 +398,8 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
     public PluginDescriptor getDeclaringPluginDescriptor() {
         return descriptor;
     }
+        
+    public String toString() {
+        return getClass().getName() + "(" + getDeclaringPluginDescriptor().getId() + ")";
+    }    
 }
