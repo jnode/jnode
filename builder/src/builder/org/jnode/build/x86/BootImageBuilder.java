@@ -20,6 +20,7 @@
  
 package org.jnode.build.x86;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -83,6 +84,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
     public static final int INITIAL_OBJREFS_CAPACITY = 750000;
 
     public static final int INITIAL_SIZE = 64 * 1024 * 1024;
+    
+    private File archClassListFile;
 
     private VmX86Processor processor;
 
@@ -690,13 +693,13 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
     }
 
     /**
+     * Include x86 class files.
+     * 
      * @see org.jnode.build.AbstractBootImageBuilder#setupCompileHighOptLevelPackages()
      */
     protected void setupCompileHighOptLevelPackages() {
         super.setupCompileHighOptLevelPackages();
-        addCompileHighOptLevel("org.jnode.assembler.x86");
-        addCompileHighOptLevel("org.jnode.system.x86");
-        addCompileHighOptLevel("org.jnode.vm.x86");
+        addCompileHighOptLevel(loadClassList(archClassListFile));
     }
 
     /**
@@ -764,4 +767,22 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
             throw new BuildException(e);
         }
     }
+
+    /**
+     * Gets the architecture specific class list file.
+     *
+     * @return The archClassListFile to set
+     */
+	public File getArchClassListFile() {
+		return archClassListFile;
+	}
+
+	/**
+     * Sets the architecture specific class list file.
+     *
+     * @param archClassListFile The archClassListFile to set
+     */
+	public void setArchClassListFile(File archClassListFile) {
+		this.archClassListFile = archClassListFile;
+	}
 }

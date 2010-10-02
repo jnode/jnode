@@ -1,0 +1,10 @@
+# The classes and packages listed in this file will be compiled to optimized native code by
+# the boot image builder.  Entries can be a package name, a fully qualified class
+# name or a fully qualified classname with a trailing wildcard in the classname part.
+#
+# This file supplements core-classes.txt with classes / packages that are specific
+# to the x86 architecture
+
+org.jnode.assembler.x86
+org.jnode.system.x86
+org.jnode.vm.x86

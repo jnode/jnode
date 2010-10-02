@@ -20,8 +20,10 @@
  
 package org.jnode.build;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -36,6 +38,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -83,7 +86,6 @@ import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.facade.Vm;
-import org.jnode.vm.facade.VmArchitecture;
 import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
@@ -119,7 +121,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     private static final String zero16 = zero8 + zero8;
 
     /**
-     * Set of jbects that should not yet be emitted.
+     * Set of objects that should not yet be emitted.
      */
     private final Set<Object> blockedObjects = new HashSet<Object>();
 
@@ -146,6 +148,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     private Set<String> legalInstanceClasses;
 
     private File listFile;
+
+    private File coreClassListFile;
 
     private int totalHighMethods;
 
@@ -1372,203 +1376,62 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     public void setListFile(File listFile) {
         this.listFile = listFile;
     }
+    
+    /**
+     * Sets the core class list file.
+     *
+     * @param coreClassListFile The coreClassListFile to set
+     */
+    public void setCoreClassListFile(File coreClassListFile) {
+        this.coreClassListFile = coreClassListFile;
+    }
 
     protected void setupCompileHighOptLevelPackages() {
-        addCompileHighOptLevel("java.io.Data*");
-        addCompileHighOptLevel("java.io.String*");
-        addCompileHighOptLevel("java.io.ByteArray*");
-        addCompileHighOptLevel("java.io.CharArray*");
-        addCompileHighOptLevel("java.io.Print*");
-        addCompileHighOptLevel("java.io.Reader");
-        addCompileHighOptLevel("java.io.Input*");
-        addCompileHighOptLevel("java.io.Buffered*");
-        addCompileHighOptLevel("java.io.Writer");
-        addCompileHighOptLevel("java.io.Output*");
-        addCompileHighOptLevel("java.io.Filter*");
-        addCompileHighOptLevel("java.io.IOException");
-        addCompileHighOptLevel("java.io.ObjectStreamField");
-        addCompileHighOptLevel("java.io.ObjectStreamClass");
-
-        addCompileHighOptLevel("java.lang");
-        addCompileHighOptLevel("java.lang.ref");
-//        addCompileHighOptLevel("java.lang.reflect");   //<- produces inconsistent bootimage
-        
-        addCompileHighOptLevel("java.net.URL");
-
-        addCompileHighOptLevel("java.nio.Buffer");
-        addCompileHighOptLevel("java.nio.ByteBuffer*");
-        addCompileHighOptLevel("java.nio.DirectByteBuffer*");
-        addCompileHighOptLevel("java.nio.ByteOrder");
-        addCompileHighOptLevel("java.nio.Char*");
-        addCompileHighOptLevel("java.nio.charset.spi");
-        addCompileHighOptLevel("java.nio.charset");
-
-        addCompileHighOptLevel("java.security.ProtectionDomain");
-        addCompileHighOptLevel("java.security.AccessController");
-        addCompileHighOptLevel("java.security.AccessControlContext");
-        addCompileHighOptLevel("java.security.AccessControlException");
-        addCompileHighOptLevel("java.security.Permission");
-        addCompileHighOptLevel("java.security.PrivilegedAction");
-        addCompileHighOptLevel("java.security.PrivilegedActionException");
-        addCompileHighOptLevel("java.security.PrivilegedExceptionAction");
-        addCompileHighOptLevel("java.security.PermissionCollection");
-        addCompileHighOptLevel("java.security.CodeSource");
-        addCompileHighOptLevel("java.security.Policy");
-        addCompileHighOptLevel("java.security.AllPermission");
-        addCompileHighOptLevel("java.security.Permissions");
-        addCompileHighOptLevel("java.security.Security");
-        addCompileHighOptLevel("java.security.SecurityPermission");
-        addCompileHighOptLevel("java.security.BasicPermission");
-        
-        addCompileHighOptLevel("java.util.Collection*");
-        addCompileHighOptLevel("java.util.Map*");
-        addCompileHighOptLevel("java.util.List*");
-        addCompileHighOptLevel("java.util.Set*");
-        addCompileHighOptLevel("java.util.Iterator*");
-        addCompileHighOptLevel("java.util.Array*");
-        addCompileHighOptLevel("java.util.Abstract*");
-        addCompileHighOptLevel("java.util.Hash*");
-        addCompileHighOptLevel("java.util.TreeMap*");
-        addCompileHighOptLevel("java.util.TreeSet*");
-        addCompileHighOptLevel("java.util.Linked*");
-        addCompileHighOptLevel("java.util.Vector*");
-        addCompileHighOptLevel("java.util.Locale*");
-        addCompileHighOptLevel("java.util.WeakHashMap*");
-        addCompileHighOptLevel("java.util.Properties*");
-        addCompileHighOptLevel("java.util.Dictionary*");
-        addCompileHighOptLevel("java.util.StringTokenizer*");
-        addCompileHighOptLevel("java.util.Property*");
-        addCompileHighOptLevel("java.util.Enum*");
-
-        addCompileHighOptLevel("java.util.jar");
-        addCompileHighOptLevel("java.util.zip");
-
-        addCompileHighOptLevel("gnu.classpath");
-
-        addCompileHighOptLevel("org.jnode.assembler");
-        addCompileHighOptLevel("org.jnode.boot");
-        addCompileHighOptLevel("org.jnode.bootlog");
-        addCompileHighOptLevel("org.jnode.naming");
-        addCompileHighOptLevel("org.jnode.permission");
-        addCompileHighOptLevel("org.jnode.plugin");
-        addCompileHighOptLevel("org.jnode.plugin.manager");
-        addCompileHighOptLevel("org.jnode.plugin.model");
-        addCompileHighOptLevel("org.jnode.security");
-        addCompileHighOptLevel("org.jnode.system.resource");
-        addCompileHighOptLevel("org.jnode.system.event");
-        addCompileHighOptLevel("org.jnode.util");
-        addCompileHighOptLevel("org.jnode.vm");
-        addCompileHighOptLevel("org.jnode.vm.bytecode");
-        addCompileHighOptLevel("org.jnode.vm.classmgr");
-        addCompileHighOptLevel("org.jnode.vm.compiler");
-        addCompileHighOptLevel("org.jnode.vm.facade");
-        addCompileHighOptLevel("org.jnode.vm.isolate");
-        addCompileHighOptLevel("org.jnode.vm.objects");
-        addCompileHighOptLevel("org.jnode.vm.scheduler");
+    	addCompileHighOptLevel(loadClassList(coreClassListFile));
         for (NativeCodeCompiler compiler : getArchitecture().getCompilers()) {
             for (String packageName : compiler.getCompilerPackages()) {
                 addCompileHighOptLevel(packageName);
             }
         }
-
-        addCompileHighOptLevel("org.jnode.vm.memmgr");
-        addCompileHighOptLevel("org.jnode.vm.memmgr.def");
-//        addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk");
-//        addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.genrc");
-//        addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.nogc");
-//        addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.ms");
-
-        //todo review for boot image size reduction
-//        addCompileHighOptLevel("sun.misc");
-//        addCompileHighOptLevel("sun.reflect");  <-- // this kills jnode while booting, maybe Reflection static{...}
-//        addCompileHighOptLevel("sun.reflect.annotation");
-//        addCompileHighOptLevel("sun.reflect.generics");
-//        addCompileHighOptLevel("sun.reflect.generics.factory");
-//        addCompileHighOptLevel("sun.reflect.generics.parser");
-//        addCompileHighOptLevel("sun.reflect.generics.reflectiveObjects");
-//        addCompileHighOptLevel("sun.reflect.generics.repository");
-//        addCompileHighOptLevel("sun.reflect.generics.scope");
-//        addCompileHighOptLevel("sun.reflect.generics.tree");
-//        addCompileHighOptLevel("sun.reflect.generics.visitor");
-//        addCompileHighOptLevel("sun.reflect.misc");
-        addCompileHighOptLevel("sun.misc.VM");
-        addCompileHighOptLevel("sun.nio");
-        addCompileHighOptLevel("sun.nio.cs.US_ASCII");
-        addCompileHighOptLevel("sun.nio.cs.ISO_8859_1*");
-        addCompileHighOptLevel("sun.nio.cs.Surrogate*");
-        addCompileHighOptLevel("sun.nio.cs.StreamEncoder");
-        addCompileHighOptLevel("sun.nio.cs.SingleByteDecoder");
-        addCompileHighOptLevel("sun.nio.cs.SingleByteEncoder");
-        addCompileHighOptLevel("sun.nio.cs.FastCharsetProvider");
-        addCompileHighOptLevel("sun.nio.cs.StandardCharsets");
-        addCompileHighOptLevel("sun.nio.cs.HistoricallyNamedCharset");
-        addCompileHighOptLevel("sun.nio.cs.StreamDecoder");
-        addCompileHighOptLevel("sun.nio.cs.ThreadLocalCoders");
-        addCompileHighOptLevel("sun.nio.cs.Unicode*");
-        addCompileHighOptLevel("sun.nio.cs.UTF*");
-
-        if (false) {
-            addCompileHighOptLevel("org.mmtk.plan");
-            addCompileHighOptLevel("org.mmtk.policy");
-            addCompileHighOptLevel("org.mmtk.utility");
-            addCompileHighOptLevel("org.mmtk.utility.alloc");
-            addCompileHighOptLevel("org.mmtk.utility.deque");
-            addCompileHighOptLevel("org.mmtk.utility.gcspy");
-            addCompileHighOptLevel("org.mmtk.utility.gcspy.drivers");
-            addCompileHighOptLevel("org.mmtk.utility.heap");
-            addCompileHighOptLevel("org.mmtk.utility.options");
-            addCompileHighOptLevel("org.mmtk.utility.scan");
-            addCompileHighOptLevel("org.mmtk.utility.statistics");
-            addCompileHighOptLevel("org.mmtk.vm");
-            addCompileHighOptLevel("org.mmtk.vm.gcspy");
-
-            addCompileHighOptLevel("java.awt");
-            addCompileHighOptLevel("java.awt.event");
-            addCompileHighOptLevel("java.awt.peer");
-            addCompileHighOptLevel("java.awt.font");
-            addCompileHighOptLevel("java.awt.geom");
-
-            addCompileHighOptLevel("gnu.javax.swing.text.html.parser");
-            addCompileHighOptLevel("gnu.javax.swing.text.html.parser.models");
-            addCompileHighOptLevel("gnu.javax.swing.text.html.parser.support");
-            addCompileHighOptLevel("gnu.javax.swing.text.html.parser.support.low");
-
-            addCompileHighOptLevel("javax.swing");
-            addCompileHighOptLevel("javax.swing.border");
-            addCompileHighOptLevel("javax.swing.event");
-            addCompileHighOptLevel("javax.swing.plaf");
-            addCompileHighOptLevel("javax.swing.plaf.basic");
-            addCompileHighOptLevel("javax.swing.plaf.metal");
-            addCompileHighOptLevel("javax.swing.text");
-            addCompileHighOptLevel("javax.swing.text.html");
-            addCompileHighOptLevel("javax.swing.text.html.parser");
-            addCompileHighOptLevel("javax.swing.text.rtf");
-            addCompileHighOptLevel("javax.swing.table");
-            addCompileHighOptLevel("javax.swing.tree");
-            addCompileHighOptLevel("javax.swing.colorchooser");
-            addCompileHighOptLevel("javax.swing.filechooser");
-            addCompileHighOptLevel("javax.swing.undo");
-
-            addCompileHighOptLevel("org.jnode.awt");
-            addCompileHighOptLevel("org.jnode.awt.swingpeers");
-
-            addCompileHighOptLevel("gnu.java.locale");
-
-            addCompileHighOptLevel("javax.net");
-            addCompileHighOptLevel("javax.net.ssl");
-
-            addCompileHighOptLevel("javax.security");
-            addCompileHighOptLevel("javax.security.auth");
-            addCompileHighOptLevel("javax.security.auth.callback");
-            addCompileHighOptLevel("javax.security.auth.login");
-            addCompileHighOptLevel("javax.security.auth.spi");
-            addCompileHighOptLevel("javax.security.cert");
-            addCompileHighOptLevel("javax.security.sasl");
-
-            addCompileHighOptLevel("org.ietf.jgss");
-
-        }
     }
+    
+    protected void addCompileHighOptLevel(List<String> classNames) {
+    	for (String className : classNames) {
+    		addCompileHighOptLevel(className);
+    	}
+    }
+
+	protected List<String> loadClassList(File file) {
+		ArrayList<String> classNames = new ArrayList<String>();
+		FileReader fr;
+    	try {
+    		fr = new FileReader(file);
+    	} catch (IOException ex) {
+    		throw new BuildException("Cannot open '" + file + "'", ex);
+    	}
+    	try {
+    		BufferedReader br = new BufferedReader(fr);
+    		String line;
+    		while ((line = br.readLine()) != null) {
+    			line = line.trim();
+    			if (line.isEmpty() || line.startsWith("#") || line.startsWith("/")) {
+    				continue;
+    			}
+    			classNames.add(line);
+    		}
+    	} catch (IOException ex) {
+    		throw new BuildException("Error reading '" + file + "'", ex);
+    	} finally {
+    		try {
+    			fr.close();
+    		} catch (IOException ex) {
+    			// ignore
+    		}
+    	}
+    	return classNames;
+	}
+    
+    
 
     /**
      * Create a set of the names of those classes that can be safely
