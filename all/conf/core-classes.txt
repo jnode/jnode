@@ -1,0 +1,191 @@
+# The classes and packages listed in this file will be compiled to optimized native code by
+# the boot image builder.  Entries can be a package name, a fully qualified class
+# name or a fully qualified classname with a trailing wildcard in the classname part.
+
+java.io.Data*
+java.io.String*
+java.io.ByteArray*
+java.io.CharArray*
+java.io.Print*
+java.io.Reader
+java.io.Input*
+java.io.Buffered*
+java.io.Writer
+java.io.Output*
+java.io.Filter*
+java.io.IOException
+java.io.ObjectStreamField
+java.io.ObjectStreamClass
+
+java.lang
+java.lang.ref
+//java.lang.reflect   //<- produces inconsistent bootimage
+        
+java.net.URL
+
+java.nio.Buffer
+java.nio.ByteBuffer*
+java.nio.DirectByteBuffer*
+java.nio.ByteOrder
+java.nio.Char*
+java.nio.charset.spi
+java.nio.charset
+
+java.security.ProtectionDomain
+java.security.AccessController
+java.security.AccessControlContext
+java.security.AccessControlException
+java.security.Permission
+java.security.PrivilegedAction
+java.security.PrivilegedActionException
+java.security.PrivilegedExceptionAction
+java.security.PermissionCollection
+java.security.CodeSource
+java.security.Policy
+java.security.AllPermission
+java.security.Permissions
+java.security.Security
+java.security.SecurityPermission
+java.security.BasicPermission
+        
+java.util.Collection*
+java.util.Map*
+java.util.List*
+java.util.Set*
+java.util.Iterator*
+java.util.Array*
+java.util.Abstract*
+java.util.Hash*
+java.util.TreeMap*
+java.util.TreeSet*
+java.util.Linked*
+java.util.Vector*
+java.util.Locale*
+java.util.WeakHashMap*
+java.util.Properties*
+java.util.Dictionary*
+java.util.StringTokenizer*
+java.util.Property*
+java.util.Enum*
+
+java.util.jar
+java.util.zip
+
+gnu.classpath
+
+org.jnode.assembler
+org.jnode.boot
+org.jnode.bootlog
+org.jnode.naming
+org.jnode.permission
+org.jnode.plugin
+org.jnode.plugin.manager
+org.jnode.plugin.model
+org.jnode.security
+org.jnode.system.resource
+org.jnode.system.event
+org.jnode.util
+org.jnode.vm
+org.jnode.vm.bytecode
+org.jnode.vm.classmgr
+org.jnode.vm.compiler
+org.jnode.vm.facade
+org.jnode.vm.isolate
+org.jnode.vm.objects
+org.jnode.vm.scheduler
+        
+org.jnode.vm.memmgr
+org.jnode.vm.memmgr.def
+
+//org.jnode.vm.memmgr.mmtk
+//org.jnode.vm.memmgr.mmtk.genrc
+//org.jnode.vm.memmgr.mmtk.nogc
+//org.jnode.vm.memmgr.mmtk.ms
+
+//todo review for boot image size reduction
+//sun.misc
+//sun.reflect  <-- // this kills jnode while booting, maybe Reflection static{...}
+//sun.reflect.annotation
+//sun.reflect.generics
+//sun.reflect.generics.factory
+//sun.reflect.generics.parser
+//sun.reflect.generics.reflectiveObjects
+//sun.reflect.generics.repository
+//sun.reflect.generics.scope
+//sun.reflect.generics.tree
+//sun.reflect.generics.visitor
+//sun.reflect.misc
+sun.misc.VM
+sun.nio
+sun.nio.cs.US_ASCII
+sun.nio.cs.ISO_8859_1*
+sun.nio.cs.Surrogate*
+sun.nio.cs.StreamEncoder
+sun.nio.cs.SingleByteDecoder
+sun.nio.cs.SingleByteEncoder
+sun.nio.cs.FastCharsetProvider
+sun.nio.cs.StandardCharsets
+sun.nio.cs.HistoricallyNamedCharset
+sun.nio.cs.StreamDecoder
+sun.nio.cs.ThreadLocalCoders
+sun.nio.cs.Unicode*
+sun.nio.cs.UTF*
+
+// org.mmtk.plan
+// org.mmtk.policy
+// org.mmtk.utility
+// org.mmtk.utility.alloc
+// org.mmtk.utility.deque
+// org.mmtk.utility.gcspy
+// org.mmtk.utility.gcspy.drivers
+// org.mmtk.utility.heap
+// org.mmtk.utility.options
+// org.mmtk.utility.scan
+// org.mmtk.utility.statistics
+// org.mmtk.vm
+// org.mmtk.vm.gcspy
+// 
+// java.awt
+// java.awt.event
+// java.awt.peer
+// java.awt.font
+// java.awt.geom
+// 
+// gnu.javax.swing.text.html.parser
+// gnu.javax.swing.text.html.parser.models
+// gnu.javax.swing.text.html.parser.support
+// gnu.javax.swing.text.html.parser.support.low
+// 
+// javax.swing
+// javax.swing.border
+// javax.swing.event
+// javax.swing.plaf
+// javax.swing.plaf.basic
+// javax.swing.plaf.metal
+// javax.swing.text
+// javax.swing.text.html
+// javax.swing.text.html.parser
+// javax.swing.text.rtf
+// javax.swing.table
+// javax.swing.tree
+// javax.swing.colorchooser
+// javax.swing.filechooser
+// javax.swing.undo
+// 
+// org.jnode.awt
+// org.jnode.awt.swingpeers
+// 
+// gnu.java.locale
+// 
+// javax.net
+// javax.net.ssl
+// 
+// javax.security
+// javax.security.auth
+// javax.security.auth.callback
+// javax.security.auth.login
+// javax.security.auth.spi
+// javax.security.cert
+// javax.security.sasl
+// 
+// org.ietf.jgss

@@ -102,6 +102,11 @@
     <property name="jnode-x86.iso" value="${cdroms.dir}/jnode-x86.iso"/>
     <property name="jnode-x86-lite.iso" value="${cdroms.dir}/jnode-x86-lite.iso"/>
     <property name="jnode-x86_64-lite.iso" value="${cdroms.dir}/jnode-x86_64-lite.iso"/>
+	
+	<!-- list of classes and packages that should to be compiled to native code 
+	     in the boot image.  -->
+	<property name="jnode-core-class-list" value="${root.dir}/all/conf/core-classes.txt"/>
+	<property name="jnode-x86-class-list" value="${root.dir}/all/conf/x86-classes.txt"/>
 
     <path id="cp">
         <pathelement location="${classlib.jar}"/>
