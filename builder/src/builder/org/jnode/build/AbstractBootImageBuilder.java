@@ -995,18 +995,16 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @return {@code true} if it should, {@code false} if not.
      */
     protected boolean isCompileHighOptLevel(VmType<?> vmClass) {
-        if (vmClass.isArray()) {
-            return true;
-        }
-
-        final String name = vmClass.getName();
+        return vmClass.isArray() || isCompileHighOptLevel(vmClass.getName());
+    }
+    
+    private boolean isCompileHighOptLevel(String name) {
         if (compileHighOptLevelPackages.contains(name)) {
             return true;
         }
 
         final int lastDotIdx = name.lastIndexOf('.');
-        final String pkg = (lastDotIdx > 0) ? name.substring(0, lastDotIdx)
-            : "";
+        final String pkg = (lastDotIdx > 0) ? name.substring(0, lastDotIdx) : "";
 
         if (compileHighOptLevelPackages.contains(pkg)) {
             return true;
@@ -1022,6 +1020,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
         return false;
     }
+    
+    
 
     /**
      * Link all undefined symbols from the kernel native code.
@@ -1110,39 +1110,14 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             if (eName.endsWith(".class")) {
                 final String cName = eName.substring(0,
                     eName.length() - ".class".length()).replace('/', '.');
-                boolean load = false;
-
-                if (compileHighOptLevelPackages.contains(cName)) {
-                    load = true;
-                } else if (preloadPackages.contains(cName)) {
-                    load = true;
-                }
-
                 final int lastDotIdx = cName.lastIndexOf('.');
-                final String pkg = (lastDotIdx > 0) ? cName.substring(0,
-                    lastDotIdx) : "";
-
-                if (compileHighOptLevelPackages.contains(pkg)) {
-                    load = true;
-                } else if (preloadPackages.contains(pkg)) {
-                    load = true;
-                } else {
-                    for (String s : compileHighOptLevelPackages) {
-                        if (s.endsWith("*")) {
-                            if (cName.startsWith(s.substring(0, s.length() - 1))) {
-                                load = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (load) {
+                final String pkg = (lastDotIdx > 0) ? cName.substring(0, lastDotIdx) : "";
+                if (isCompileHighOptLevel(cName) || 
+                	preloadPackages.contains(cName) || preloadPackages.contains(pkg)) {
                     loadClass(cName, true);
                 }
             }
         }
-
     }
 
     protected abstract void logStatistics(NativeStream os);
