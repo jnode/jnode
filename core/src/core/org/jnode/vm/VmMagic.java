@@ -34,11 +34,12 @@ import org.vmmagic.unboxed.Word;
  * bodies are not used.
  * <p/>
  * Methods in this class can also be called from inside JNode.
+ * <p/>
+ * See {@link org.jnode.vm.classmgr.VmType VmType} to get the list of "magic" classes and
+ * {@link org.jnode.vm.compiler.BaseMagicHelper.MagicMethod MagicMethod}
+ * to get the list of "magic" methods.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
- * @see {@link org.jnode.classmgr.VmType VmType} to get the list of "magic" classes
- * @see {@link org.jnode.vm.compiler.BaseMagicHelper.MagicMethod MagicMethod}
- * to get the list of "magic" methods
  */
 @MagicPermission
 public final class VmMagic {

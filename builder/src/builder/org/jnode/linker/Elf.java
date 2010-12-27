@@ -282,7 +282,7 @@ public class Elf {
     /**
      * Does this elf file contain 32-bit objects.
      *
-     * @return
+     * @return true is the file contains 32-bit objects
      */
     public boolean isClass32() {
         return (e_ident[EI_CLASS] == ELFCLASS32);
@@ -291,7 +291,7 @@ public class Elf {
     /**
      * Does this elf file contain 64-bit objects.
      *
-     * @return
+     * @return true is the file contains 64-bit objects
      */
     public boolean isClass64() {
         return (e_ident[EI_CLASS] == ELFCLASS64);
@@ -300,7 +300,7 @@ public class Elf {
     /**
      * Gets the entry point address.
      *
-     * @return
+     * @return the address
      */
     public long getEntry() {
         return e_entry;
