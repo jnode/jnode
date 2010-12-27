@@ -22,7 +22,6 @@ package org.jnode.vm.bytecode;
 
 import java.util.TreeMap;
 
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.classmgr.VmByteCode;

@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.facade;
 
 import java.util.List;
@@ -30,29 +30,28 @@ import org.jnode.vm.objects.Statistic;
 
 /**
  * Interface with the Virtual Machine.
- * 
- * @author Fabien DUMINY (fduminy at jnode.org)
  *
+ * @author Fabien DUMINY (fduminy at jnode.org)
  */
 public interface Vm {
 
     /**
      * @return Returns the statics.
      */
-	VmSharedStatics getSharedStatics();
+    VmSharedStatics getSharedStatics();
 
     /**
      * @see org.jnode.vm.objects.Statistics#getStatistics()
      */
-	Statistic[] getStatistics();
-	
+    Statistic[] getStatistics();
+
     /**
      * Gets or creates a counter with a given name.
      *
      * @param name
      * @return The counter
      */
-	Counter getCounter(String string);
+    Counter getCounter(String string);
 
     /**
      * Gets or creates a counter group with a given name.
@@ -60,23 +59,23 @@ public interface Vm {
      * @param name
      * @return The counter group
      */
-	CounterGroup getCounterGroup(String name);
+    CounterGroup getCounterGroup(String name);
 
     /**
      * @return Returns the architecture.
      */
-	VmArchitecture getArch();
+    VmArchitecture getArch();
 
     /**
      * @return Returns the heapManager.
      */
-	VmHeapManager getHeapManager();
+    VmHeapManager getHeapManager();
 
     /**
      * @return Returns the bootstrap.
      */
-	boolean isBootstrap();
-	
+    boolean isBootstrap();
+
     /**
      * Gets the list of compiled methods.
      *
@@ -89,14 +88,14 @@ public interface Vm {
      *
      * @return Returns the version.
      */
-	String getVersion();
+    String getVersion();
 
     /**
      * Does this VM run in debug mode.
      *
      * @return Returns the debugMode.
      */
-	boolean isDebugMode();
+    boolean isDebugMode();
 
     /**
      * Returns the number of available processors currently available to the
@@ -110,11 +109,10 @@ public interface Vm {
     /**
      * @return a copy of the processors list
      */
-	List<VmProcessor> getProcessors();
+    List<VmProcessor> getProcessors();
 
-	/**
-	 * 
-	 * @param vmThreadVisitor
-	 */
-	void accept(VmThreadVisitor vmThreadVisitor);
+    /**
+     * @param vmThreadVisitor
+     */
+    void accept(VmThreadVisitor vmThreadVisitor);
 }

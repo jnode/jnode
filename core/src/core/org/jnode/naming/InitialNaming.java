@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.naming;
 
 import java.util.Set;
@@ -49,27 +49,30 @@ public final class InitialNaming {
 
     /**
      * Add a {@link NameSpaceListener} to the NameSpace
+     *
      * @param <T>
      * @param name
      * @param l
      */
     public static <T> void addNameSpaceListener(Class<T> name, NameSpaceListener<T> l) {
-    	NAME_SPACE.addNameSpaceListener(name, l);
+        NAME_SPACE.addNameSpaceListener(name, l);
     }
-    
+
     /**
      * Remove a {@link NameSpaceListener} from the NameSpace
+     *
      * @param <T>
      * @param name
      * @param l
      */
     public static <T> void removeNameSpaceListener(Class<T> name, NameSpaceListener<T> l) {
-    	NAME_SPACE.removeNameSpaceListener(name, l);        
+        NAME_SPACE.removeNameSpaceListener(name, l);
     }
 
     /**
      * Define the {@link NameSpace} used for storing services.
      * If a {@link NameSpace} is already defined, then a {@link SecurityException} is thrown.
+     *
      * @param namespace
      */
     public static void setNameSpace(NameSpace namespace) {
@@ -89,7 +92,7 @@ public final class InitialNaming {
      */
     public static <T, E extends T> void bind(Class<T> name, E service) throws NamingException,
         NameAlreadyBoundException {
-    	NAME_SPACE.bind(name, service);
+        NAME_SPACE.bind(name, service);
     }
 
     /**
@@ -99,7 +102,7 @@ public final class InitialNaming {
      * @param name
      */
     public static void unbind(Class<?> name) {
-    	NAME_SPACE.unbind(name);
+        NAME_SPACE.unbind(name);
     }
 
     /**

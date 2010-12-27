@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
@@ -60,6 +60,7 @@ abstract class X86RegisterPool {
 
     /**
      * Initialize this instance.
+     *
      * @param lastFirst
      * @param minimumRequestIndex
      */
@@ -75,6 +76,7 @@ abstract class X86RegisterPool {
      * Initialize register pool The order of this array determines the cost of
      * using the register. The cost of a register is lower when its index in
      * this array is higher.
+     *
      * @return
      */
     protected abstract RegisterGroupUsage[] initialize();
@@ -93,8 +95,8 @@ abstract class X86RegisterPool {
     /**
      * require a register from the pool
      *
-     * @param type  the register type (from Operand)
-     * @param owner the register owner
+     * @param type         the register type (from Operand)
+     * @param owner        the register owner
      * @param supportBits8
      * @return the allocated register or null
      */
@@ -124,8 +126,8 @@ abstract class X86RegisterPool {
 
     /**
      * @param type
-     * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
      * @return
+     * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
      */
     public final X86Register request(int type) {
         return request(type, null, false);
@@ -134,8 +136,8 @@ abstract class X86RegisterPool {
     /**
      * @param type
      * @param supportsBits8
-     * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
      * @return
+     * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
      */
     public final X86Register request(int type, boolean supportsBits8) {
         return request(type, null, supportsBits8);
@@ -713,6 +715,7 @@ abstract class X86RegisterPool {
 
         /**
          * Sets the current owner of this register.
+         *
          * @param owner
          */
         public void setOwner(Item owner) {

@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.Label;
@@ -29,10 +29,8 @@ import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.VmImpl;
 import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.TypeStack;
@@ -70,10 +68,10 @@ import org.jnode.vm.x86.compiler.X86IMTCompiler32;
 import org.jnode.vm.x86.compiler.X86IMTCompiler64;
 import org.jnode.vm.x86.compiler.X86JumpTable;
 
-import static org.jnode.vm.x86.compiler.X86CompilerConstants.BITS8;
 import static org.jnode.vm.x86.compiler.X86CompilerConstants.BITS16;
 import static org.jnode.vm.x86.compiler.X86CompilerConstants.BITS32;
 import static org.jnode.vm.x86.compiler.X86CompilerConstants.BITS64;
+import static org.jnode.vm.x86.compiler.X86CompilerConstants.BITS8;
 import static org.jnode.vm.x86.compiler.X86CompilerConstants.BYTESIZE;
 import static org.jnode.vm.x86.compiler.X86CompilerConstants.INTSIZE;
 import static org.jnode.vm.x86.compiler.X86CompilerConstants.LSB;
@@ -317,7 +315,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
     }
 
     private void assertCondition(boolean cond, String message,
-                                       Object param) {
+                                 Object param) {
         if (!cond)
             throw new Error("assert failed at addresss " + curAddress + ": "
                 + message + param);
@@ -417,7 +415,6 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
 
     /**
      * Pop a word item of the stack and return it to the caller
-     *
      */
     private void dwreturn(int jvmType, boolean callVisitReturn) {
         final DoubleWordItem val = (DoubleWordItem) vstack.pop(jvmType);
@@ -707,7 +704,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
      *                  destroyed.
      */
     private void instanceOfClass(GPR objectr, VmClassType<?> type, GPR tmpr,
-                                       GPR resultr, Label trueLabel, boolean skipNullTest) {
+                                 GPR resultr, Label trueLabel, boolean skipNullTest) {
 
         final int depth = type.getSuperClassDepth();
         final int staticsOfs = helper.getSharedStaticsOffset(type);
@@ -771,7 +768,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
      *                  destroyed.
      */
     private void instanceOf(GPR objectr, GPR typer, GPR tmpr, GPR cntr,
-                                  Label trueLabel, boolean skipNullTest) {
+                            Label trueLabel, boolean skipNullTest) {
         final Label curInstrLabel = getCurInstrLabel();
         final Label loopLabel = new Label(curInstrLabel + "loop");
         final Label notInstanceOfLabel = new Label(curInstrLabel
@@ -4122,9 +4119,9 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
             case JvmType.BYTE:
                 os.writeMOVSX(resultr, resultr, BYTESIZE);
                 break;
-                // case JvmType.CHAR:
-                // os.writeMOVZX(resultr, resultr, WORDSIZE);
-                // break;
+            // case JvmType.CHAR:
+            // os.writeMOVZX(resultr, resultr, WORDSIZE);
+            // break;
             case JvmType.SHORT:
                 os.writeMOVSX(resultr, resultr, WORDSIZE);
                 break;
@@ -4240,7 +4237,6 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
 
     /**
      * Pop a word item of the stack and return it to the caller
-     *
      */
     private void wreturn(int jvmType, boolean callVisitReturn) {
         final WordItem val = (WordItem) vstack.pop(jvmType);
@@ -4320,7 +4316,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
      * @param classRef
      */
     private void writeResolveAndLoadClassToReg(VmConstClass classRef,
-                                                     GPR dst) {
+                                               GPR dst) {
         // Resolve the class
         classRef.resolve(loader);
         final VmType type = classRef.getResolvedVmClass();
@@ -4440,13 +4436,13 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
         }
         return _curInstrLabel;
     }
-    
+
     private void pushFloat(Item floatItem) {
         // TODO should we do the same check for all calls to vstack.fpuStack.push(Item) ? 
         if (!vstack.fpuStack.hasCapacity(1)) {
             vstack.push(eContext);
         }
-        
+
         vstack.fpuStack.push(floatItem);
     }
 }

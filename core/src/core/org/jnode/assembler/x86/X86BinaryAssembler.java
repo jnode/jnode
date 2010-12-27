@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.assembler.x86;
 
 import static org.jnode.assembler.x86.X86Register.CS;
@@ -76,12 +76,12 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
          * of equality depend on what the 'key' is.  If it is a {@link Label}, then two
          * Keys are equal if the Label values are equal.  Otherwise, two keys are equal if
          * the 'key' values refer to the same object.
-         * 
+         *
          * @param obj the object to test for equality.
          * @return Return {@code true} if obj is 'equal to' this, {@code false} otherwise.
          */
         public final boolean equals(Object obj) {
-            if(obj==null || !(obj instanceof Key)){
+            if (obj == null || !(obj instanceof Key)) {
                 return false;
             }
             obj = ((Key) obj).key;
@@ -94,7 +94,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
         /**
          * The hashcode is the hashcode for the Key's 'key' object.
-         * 
+         *
          * @return This Key instance's hashcode.
          */
         public final int hashCode() {
@@ -2200,6 +2200,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
     //TODO this method does not handle the forward jumps correctly, needs further work.
     //Also the general purpose version of the method writeJCC(Lable lebal, int jumpcode)
     //for handling byte sized target for the jump would renders this method unnecessary.
+
     /**
      * Create a LOOP label instruction. The given label must have be resolved
      * before!
@@ -3299,6 +3300,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
     }
 
     //todo 64 bits support
+
     /**
      * @param operandSize
      * @param dstMmx
@@ -3321,6 +3323,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
     }
 
     //todo 64 bits support
+
     /**
      * @param operandSize
      * @param dstReg
@@ -3343,6 +3346,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
     }
 
     //todo 64 bits support
+
     /**
      * @param dstMmx
      * @param srcMmx
@@ -3352,6 +3356,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
     }
 
     //todo 64 bits support
+
     /**
      * @param operandSize
      * @param dstMmx
@@ -3376,6 +3381,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
     }
 
     //todo 64 bits support
+
     /**
      * @param operandSize
      * @param dstMmx

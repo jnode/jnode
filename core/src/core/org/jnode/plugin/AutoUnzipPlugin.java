@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin;
 
 import java.io.File;
@@ -28,16 +28,15 @@ import java.io.InputStream;
 
 
 /**
- * This is a special implementation of {@link Plugin} for plugins that want 
- * to automatically unzip their content to a given directory 
+ * This is a special implementation of {@link Plugin} for plugins that want
+ * to automatically unzip their content to a given directory
  * while they are started.
- *  
- * @author fabien
  *
+ * @author fabien
  */
 public class AutoUnzipPlugin extends Plugin {
     private boolean startFinished = false;
-    
+
     public AutoUnzipPlugin(PluginDescriptor descriptor) {
         super(descriptor);
     }
@@ -45,14 +44,14 @@ public class AutoUnzipPlugin extends Plugin {
     @Override
     protected void startPlugin() throws PluginException {
         startFinished = false;
-        new Thread() {
+        (new Thread() {
             @Override
             public void run() {
                 copyResources();
             }
-        } .start();
+        }).start();
     }
-    
+
     public boolean isStartFinished() {
         return startFinished;
     }
@@ -62,14 +61,14 @@ public class AutoUnzipPlugin extends Plugin {
         // do nothing for now
         // TODO should we remove the copied files ?
     }
-    
+
     private void copyResources() {
         System.out.println("auto unzipping plugin " + getDescriptor().getId());
-        
-        try {            
+
+        try {
             //FIXME shouldn't be hard coded but use java.home system property instead
             final File jnodeHome = new File("/jnode");
-            
+
             // wait the jnode home directory is created
             while (!jnodeHome.exists()) {
                 try {
@@ -78,25 +77,25 @@ public class AutoUnzipPlugin extends Plugin {
                     e.printStackTrace();
                 }
             }
-            
+
             // create the plugin root directory
             final File pluginRootFile = new File(jnodeHome, getDescriptor().getId());
             pluginRootFile.mkdir();
-   
+
             // copy each plugin's resource to the plugin root directory 
             final PluginDescriptor desc = AutoUnzipPlugin.this.getDescriptor();
             final ClassLoader cl = desc.getPluginClassLoader();
             final String pluginRoot = pluginRootFile.getAbsolutePath() + "/";
             final byte[] buffer = new byte[10240];
-            
+
             if (!(cl instanceof PluginClassLoader)) {
-            	System.err.println("Plugin's ClassLoader doesn't implements PluginClassLoader");
-            	return;
+                System.err.println("Plugin's ClassLoader doesn't implements PluginClassLoader");
+                return;
             }
-            
+
             for (String resName : ((PluginClassLoader) cl).getResources()) {
                 final InputStream input = cl.getResourceAsStream(resName);
-                
+
                 try {
                     copy(input, pluginRoot, resName, buffer);
                 } catch (SecurityException e) {
@@ -113,20 +112,20 @@ public class AutoUnzipPlugin extends Plugin {
             System.out.print("plugin " + getDescriptor().getId());
             System.out.println(" has been unzipped to " + pluginRootFile.getAbsolutePath());
         } finally {
-            startFinished = true;                
-        }        
+            startFinished = true;
+        }
     }
-    
-    private void copy(InputStream input, String pluginRoot, String name, byte[] buffer) 
+
+    private void copy(InputStream input, String pluginRoot, String name, byte[] buffer)
         throws SecurityException, IOException {
         File output = new File(pluginRoot + name);
         output.getParentFile().mkdirs();
-        
-        FileOutputStream fos = null; 
+
+        FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(output);
             int nbRead;
-            
+
             while ((nbRead = input.read(buffer)) > 0) {
                 fos.write(buffer, 0, nbRead);
             }
@@ -134,7 +133,7 @@ public class AutoUnzipPlugin extends Plugin {
             if (fos != null) {
                 fos.close();
             }
-            
+
             if (input != null) {
                 input.close();
             }

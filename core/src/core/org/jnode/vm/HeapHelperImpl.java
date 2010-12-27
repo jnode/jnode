@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.annotation.MagicPermission;
@@ -266,6 +266,6 @@ final class HeapHelperImpl extends HeapHelper {
      * @see org.jnode.vm.memmgr.HeapHelper#bootArchitecture(boolean)
      */
     public final void bootArchitecture(boolean emptyMMap) {
-    	((BaseVmArchitecture) VmUtils.getVm().getArch()).boot(emptyMMap);
+        ((BaseVmArchitecture) VmUtils.getVm().getArch()).boot(emptyMMap);
     }
 }

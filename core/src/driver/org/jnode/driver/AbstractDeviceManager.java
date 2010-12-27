@@ -31,7 +31,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginException;

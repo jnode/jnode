@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import java.io.PrintStream;
@@ -150,16 +150,16 @@ class BootLogImpl implements BootLog, BootableObject {
         }
     }
 
-	static void initialize() {
-        Unsafe.debug("Initialize BootLog\n");		
-		try {
-			BootLogInstance.set(new BootLogImpl());
-		} catch (NameAlreadyBoundException e) {
+    static void initialize() {
+        Unsafe.debug("Initialize BootLog\n");
+        try {
+            BootLogInstance.set(new BootLogImpl());
+        } catch (NameAlreadyBoundException e) {
             Unsafe.debug(e.toString());
             Unsafe.debug("\n");
-		} catch (NamingException e) {
+        } catch (NamingException e) {
             Unsafe.debug(e.toString());
             Unsafe.debug("\n");
-		}
-	}
+        }
+    }
 }

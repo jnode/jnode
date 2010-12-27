@@ -22,7 +22,6 @@ package org.jnode.driver.textscreen.x86;
 
 import javax.naming.NameNotFoundException;
 
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.naming.InitialNaming;

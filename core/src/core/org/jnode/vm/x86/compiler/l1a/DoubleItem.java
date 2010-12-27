@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
@@ -26,7 +26,6 @@ import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.VmImpl;
 import org.jnode.vm.facade.VmUtils;
 
 import static org.jnode.vm.x86.compiler.X86CompilerConstants.BITS32;
@@ -154,8 +153,8 @@ final class DoubleItem extends DoubleWordItem {
     /**
      * Push the given memory location on the FPU stack.
      *
-     * @param os the assembler
-     * @param reg the
+     * @param os   the assembler
+     * @param reg  the
      * @param disp
      */
     protected void pushToFPU(X86Assembler os, GPR reg, int disp) {

@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
@@ -26,7 +26,6 @@ import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.VmImpl;
 import org.jnode.vm.bytecode.StackException;
 import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
@@ -279,7 +278,7 @@ public abstract class WordItem extends Item {
      *
      * @param ec
      * @param mask
-     * @param t0 the destination register
+     * @param t0   the destination register
      */
     final void loadToIf(EmitterContext ec, int mask, X86Register.GPR t0) {
         if ((getKind() & mask) > 0)
@@ -394,7 +393,7 @@ public abstract class WordItem extends Item {
                 stack.fpuStack.pop(this);
                 stack.fpuStack.push(this);
                 return;
-                // break;
+            // break;
 
             case Kind.STACK:
                 if (VirtualStack.checkOperandStack) {

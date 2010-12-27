@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import java.io.IOException;
@@ -120,16 +120,16 @@ public final class VmSystem {
      * Initialize the Virtual Machine
      */
     public static void initialize() {
-        if (!inited) {            
-        	// Initialize Naming
-        	InitialNaming.setNameSpace(new DefaultNameSpace());
-        	
-        	// Initialize BootLog        	
-        	BootLogImpl.initialize();
-        	
+        if (!inited) {
+            // Initialize Naming
+            InitialNaming.setNameSpace(new DefaultNameSpace());
+
+            // Initialize BootLog
+            BootLogImpl.initialize();
+
             // Initialize resource manager
             final ResourceManager rm = ResourceManagerImpl.initialize();
-            
+
             /* Initialize the system classloader */
             VmSystemClassLoader loader = (VmSystemClassLoader) (getVmClass(VmProcessor.current()).getLoader());
             systemLoader = loader;
@@ -206,7 +206,7 @@ public final class VmSystem {
                 throw new UnsupportedOperationException();
             }
         });
-        
+
         // Trigger initialization of the global environment variables.
         System.getenv();
     }
@@ -239,7 +239,7 @@ public final class VmSystem {
         } else if (VmIsolate.isRoot()) {
             return bootOutStream;
         } else {
-            return  VmIOContext.getGlobalOutStream();
+            return VmIOContext.getGlobalOutStream();
         }
     }
 
@@ -870,10 +870,10 @@ public final class VmSystem {
      * @return the time of a system timer in nanoseconds.
      * @since 1.5
      */
-    public static long nanoTime() {        
+    public static long nanoTime() {
         if (ghz == -1) {
             final long measureDuration = 1000; // in milliseconds
-            
+
             long start = Unsafe.getCpuCycles();
             long ms_start = currentTimeMillis();
             long ms_end;
@@ -892,15 +892,15 @@ public final class VmSystem {
 
             ghz = (end - start) / (ms * 1000000L);
             if (ghz <= 0) {
-                ghz = 0;   
-            }         
+                ghz = 0;
+            }
         }
-        
+
         if (ghz == 0) {
             //todo these are CPUs under 1GHz, improve this case
             return currentTimeMillis() * 1000000L;
         }
-        
+
         return Unsafe.getCpuCycles() / ghz;
     }
 
@@ -949,7 +949,7 @@ public final class VmSystem {
      * Call the garbage collector
      */
     public static void gc() {
-    	VmUtils.getVm().getHeapManager().gc();
+        VmUtils.getVm().getHeapManager().gc();
     }
 
     static class SystemOutputStream extends OutputStream {
@@ -1197,18 +1197,18 @@ public final class VmSystem {
         }
     }
 
-	/**
-	 * Wait for ms milliseconds in a busy waiting loop.
-	 * This method is very CPU intensive, so be carefull.
-	 *
-	 * @param ms
-	 */
-	public static void loop(long ms) {
-	    final long start = currentKernelMillis();
-	    while (true) {
-	        if ((start + ms) <= currentKernelMillis()) {
-	            break;
-	        }
-	    }
-	}
+    /**
+     * Wait for ms milliseconds in a busy waiting loop.
+     * This method is very CPU intensive, so be carefull.
+     *
+     * @param ms
+     */
+    public static void loop(long ms) {
+        final long start = currentKernelMillis();
+        while (true) {
+            if ((start + ms) <= currentKernelMillis()) {
+                break;
+            }
+        }
+    }
 }

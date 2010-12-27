@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.facade;
 
 import java.io.PrintWriter;
@@ -28,9 +28,8 @@ import org.vmmagic.unboxed.Address;
 
 /**
  * Interface with the heap manager.
- * 
- * @author Fabien DUMINY (fduminy at jnode.org)
  *
+ * @author Fabien DUMINY (fduminy at jnode.org)
  */
 public interface VmHeapManager {
 
@@ -40,7 +39,7 @@ public interface VmHeapManager {
      *
      * @param vmType The newly resolved type
      */
-	void notifyClassResolved(VmType<?> vmType);
+    void notifyClassResolved(VmType<?> vmType);
 
     /**
      * Is the given address the address of an allocated object on this heap?
@@ -49,101 +48,103 @@ public interface VmHeapManager {
      * @return True if the given address if a valid starting address of an
      *         object, false otherwise.
      */
-	boolean isObject(Address child);
+    boolean isObject(Address ptr);
 
     /**
      * Create a new array
      *
      * @param arrayCls
-     * @param elements
+     * @param dim
      * @return The new instance
      */
-	Object newArray(VmArrayClass<?> arrCls, int dim);
+    Object newArray(VmArrayClass<?> arrayCls, int dim);
 
     /**
      * Create a new instance of a given class with a given object size (in
      * bytes)
      *
-     * @param cls
+     * @param loadClass
      * @param size
      * @return The new instance
      */
-	Object newInstance(VmType<?> loadClass, int size);
+    Object newInstance(VmType<?> loadClass, int size);
 
     /**
      * Create a new instance of a given class
      *
-     * @param cls
+     * @param vmClass
      * @return The new instance
      */
-	Object newInstance(VmType<?> vmClass);
+    Object newInstance(VmType<?> vmClass);
 
     /**
      * Print the statistics on this object on out.
      */
-	void dumpStatistics(PrintWriter out);
+    void dumpStatistics(PrintWriter out);
 
     /**
      * Get this heap's current flags
      *
      * @return the flags
      */
-	int getHeapFlags();
+    int getHeapFlags();
 
-	/**
-	 * Get this heap's statistics.
-	 * @return
-	 */
-	HeapStatistics getHeapStatistics();
+    /**
+     * Get this heap's statistics.
+     *
+     * @return
+     */
+    HeapStatistics getHeapStatistics();
 
-	/**
-	 * Get this heap GC's statistics.
-	 * @return
-	 */
-	GCStatistics getStatistics();
+    /**
+     * Get this heap GC's statistics.
+     *
+     * @return
+     */
+    GCStatistics getStatistics();
 
     /**
      * Set this heap's flags
      *
-     * @param reapFlags the new heap flags
+     * @param flags the new heap flags
      * @return the previous heap flags
      */
-	int setHeapFlags(int flags);
+    int setHeapFlags(int flags);
 
     /**
      * Create an exact clone of the given object
      *
-     * @param object
+     * @param obj
      * @return Object
      */
-	Object clone(Cloneable obj);
+    Object clone(Cloneable obj);
 
     /**
      * Start a garbage collection process.
      */
-	void gc();
+    void gc();
 
     /**
      * Gets the size of all memory in bytes.
      *
      * @return the size of all memory in bytes
      */
-	long getTotalMemory();
+    long getTotalMemory();
 
     /**
      * Gets the size of free memory in bytes.
      *
      * @return long
      */
-	long getFreeMemory();
+    long getFreeMemory();
 
     /**
      * Is the system low on memory?
      *
      * @return boolean
-     */	
-	boolean isLowOnMemory();
-	
+     */
+    boolean isLowOnMemory();
+
     /**
      * Start this heap manager.
      */
@@ -154,12 +155,12 @@ public interface VmHeapManager {
      *
      * @return The write barrier, or null if no write barrier is used.
      */
-	VmWriteBarrier getWriteBarrier();
+    VmWriteBarrier getWriteBarrier();
 
     /**
      * Create a per processor data structure for use by the heap manager.
      *
-     * @param cpu
+     * @param vmProcessor
      */
-	Object createProcessorHeapData(VmProcessor vmProcessor);	
+    Object createProcessorHeapData(VmProcessor vmProcessor);
 }

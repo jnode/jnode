@@ -24,7 +24,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.prefs.Preferences;
 
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 
 

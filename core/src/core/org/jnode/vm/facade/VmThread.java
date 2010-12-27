@@ -17,14 +17,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.facade;
 
 /**
  * Interface with a VM's thread.
- * 
- * @author Fabien DUMINY (fduminy at jnode.org)
  *
+ * @author Fabien DUMINY (fduminy at jnode.org)
  */
 public interface VmThread {
 
@@ -34,15 +33,15 @@ public interface VmThread {
      * @param visitor
      * @param heapManager
      * @return {@code true} if the last visit returned {@code true} or no visit was
-     * made, {@code false} otherwise.
+     *         made, {@code false} otherwise.
      */
-	boolean accept(ObjectVisitor visitor, VmHeapManager heapManager);
+    boolean accept(ObjectVisitor visitor, VmHeapManager heapManager);
 
     /**
      * Get the Thread to which this VmThread belongs.
      *
      * @return The java thread
      */
-	Thread asThread();
+    Thread asThread();
 
 }

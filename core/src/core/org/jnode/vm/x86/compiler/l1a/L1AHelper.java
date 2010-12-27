@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
@@ -67,6 +67,7 @@ final class L1AHelper {
 
     /**
      * Request two register for a 8-byte item.
+     *
      * @param eContext
      * @param jvmType
      * @return
@@ -94,6 +95,7 @@ final class L1AHelper {
 
     /**
      * Request two register for a 8-byte item.
+     *
      * @param eContext
      * @param jvmType
      * @param lsb
@@ -118,6 +120,7 @@ final class L1AHelper {
 
     /**
      * Request a 64-bit register for a 8-byte item.
+     *
      * @param eContext
      * @param jvmType
      * @param reg
@@ -157,13 +160,14 @@ final class L1AHelper {
     /**
      * Request a register of a given type, not tied to an item. Make sure to
      * release the register afterwards.
+     *
      * @param eContext
      * @param type
      * @param supportsBits8
      * @return
      */
     static X86Register requestRegister(EmitterContext eContext, int type,
-                                             boolean supportsBits8) {
+                                       boolean supportsBits8) {
         final X86RegisterPool pool = eContext.getGPRPool();
         X86Register r = pool.request(type, supportsBits8);
         if (r == null) {
@@ -179,11 +183,11 @@ final class L1AHelper {
      * The register is spilled if another item holds it.
      *
      * @param eContext
-     * @param reg the register to reserve
-     * @param it  the item requiring the register
+     * @param reg      the register to reserve
+     * @param it       the item requiring the register
      */
     static void requestRegister(EmitterContext eContext, X86Register reg,
-                                      Item it) {
+                                Item it) {
         final X86RegisterPool pool = eContext.getGPRPool();
 
         // check item doesn't already use register
@@ -202,13 +206,14 @@ final class L1AHelper {
 
     /**
      * Request one register for a single word item.
+     *
      * @param eContext
      * @param jvmType
      * @param supportsBits8
      * @return
      */
     static WordItem requestWordRegister(EmitterContext eContext,
-                                              int jvmType, boolean supportsBits8) {
+                                        int jvmType, boolean supportsBits8) {
         final X86RegisterPool pool = eContext.getGPRPool();
         final ItemFactory ifac = eContext.getItemFactory();
         final X86Register reg = requestRegister(eContext, jvmType,
@@ -220,13 +225,14 @@ final class L1AHelper {
 
     /**
      * Request specific one register for a single word item.
+     *
      * @param eContext
      * @param jvmType
      * @param reg
      * @return
      */
     static WordItem requestWordRegister(EmitterContext eContext,
-                                              int jvmType, X86Register reg) {
+                                        int jvmType, X86Register reg) {
         final X86RegisterPool pool = eContext.getGPRPool();
         final ItemFactory ifac = eContext.getItemFactory();
         assertCondition(pool.request(reg), "Request of register failed: ", reg);

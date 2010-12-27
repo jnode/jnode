@@ -21,7 +21,6 @@
 package org.jnode.plugin.model;
 
 import java.net.URL;
-
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;

@@ -21,7 +21,6 @@
 package org.jnode.plugin.model;
 
 import gnu.java.security.action.GetPolicyAction;
-
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.AccessController;
@@ -36,8 +35,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.plugin.PluginClassLoader;
 import org.jnode.plugin.PluginDescriptor;

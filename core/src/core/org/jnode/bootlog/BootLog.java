@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.bootlog;
 
 import java.io.PrintStream;
@@ -26,15 +26,14 @@ import java.io.PrintStream;
  * Logging class used during bootstrap.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
- * 
  */
-public interface BootLog {	
+public interface BootLog {
     public static final int DEBUG = 1;
     public static final int INFO = 2;
     public static final int WARN = 3;
     public static final int ERROR = 4;
     public static final int FATAL = 5;
-    
+
     /**
      * Log a debug message
      *

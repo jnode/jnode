@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.jnode.vm.VmImpl;
 import org.jnode.vm.facade.VmUtils;
 
 /**

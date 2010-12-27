@@ -27,7 +27,6 @@ import java.util.List;
 import org.jnode.system.resource.MemoryResource;
 import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.annotation.MagicPermission;
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.MagicUtils;

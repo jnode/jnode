@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import gnu.java.lang.VMClassHelper;
@@ -1612,7 +1612,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
                 // arrayClass.link();
             }
             if (mmType == null) {
-            	VmUtils.notifyClassResolved(this);
+                VmUtils.notifyClassResolved(this);
             }
             this.state |= VmTypeState.ST_LINKED;
         }
@@ -2433,6 +2433,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      */
     private static final JNodePermission GETVMCLASS = new JNodePermission("getVmClass");
     private static int FIELD_OFFSET = -1;
+
     public static <V> VmType<V> fromClass(Class<V> clazz) {
         if (FIELD_OFFSET == -1) {
             FIELD_OFFSET = ((VmInstanceField) ClassClass.getDeclaredField("vmClass")).getOffset();
@@ -2441,7 +2442,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 //        final SecurityManager sm = System.getSecurityManager();
 //        if (sm != null) { //todo: misplaced securty check -> stack overflow in gnu.testlet.
 //                          //todo:                            TestSecurityManager.checkPermission
-                            //todo secure this method
+        //todo secure this method
 //            sm.checkPermission(GETVMCLASS);
 //        }
 

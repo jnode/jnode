@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import java.io.IOException;
@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.PluginDescriptor;
@@ -137,11 +136,11 @@ public final class PluginRegistryModel extends VmSystemObject implements
     }
 
     /**
-     * Resolve the plugins corresponding to a collection of supplied descriptors.  
-     * 
+     * Resolve the plugins corresponding to a collection of supplied descriptors.
+     *
      * @param descriptors the collection of descriptors to be resolved.
      */
-    public void resolveDescriptors(Collection<PluginDescriptorModel> descriptors) 
+    public void resolveDescriptors(Collection<PluginDescriptorModel> descriptors)
         throws PluginException {
         // This method uses the brute-force approach of repeatedly checking the descriptors 
         // in order until if finds one that will resolve.  This gives O(N**2) calls to
@@ -164,7 +163,7 @@ public final class PluginRegistryModel extends VmSystemObject implements
 
     /**
      * Check to see if a plugin is resolvable given the current (simulated) registry state.
-     * 
+     *
      * @param descr the descriptor for the plugin at issue.
      * @return <code>true</code> if the plugin is resolvable.
      */
@@ -290,7 +289,8 @@ public final class PluginRegistryModel extends VmSystemObject implements
     /**
      * {@inheritDoc}
      */
-    public PluginDescriptor loadPlugin(final PluginLoader loader, final String pluginId, final String pluginVersion, boolean resolve)
+    public PluginDescriptor loadPlugin(final PluginLoader loader, final String pluginId, final String pluginVersion,
+                                       boolean resolve)
         throws PluginException {
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
@@ -298,17 +298,17 @@ public final class PluginRegistryModel extends VmSystemObject implements
         }
         // Load the requested plugin
         final PluginDescriptorModel descr = loadPluginImpl(loader, pluginId, pluginVersion);
-        
+
         if (resolve) {
-	        final HashMap<String, PluginDescriptorModel> descriptors = new HashMap<String, PluginDescriptorModel>();
-	        descriptors.put(descr.getId(), descr);
-	        // Load the dependent plugins
-	        loadDependencies(loader, descr, descriptors);
-	
-	        // Resolve the loaded descriptors.
-	        resolveDescriptors(descriptors.values());
+            final HashMap<String, PluginDescriptorModel> descriptors = new HashMap<String, PluginDescriptorModel>();
+            descriptors.put(descr.getId(), descr);
+            // Load the dependent plugins
+            loadDependencies(loader, descr, descriptors);
+
+            // Resolve the loaded descriptors.
+            resolveDescriptors(descriptors.values());
         }
-        
+
         return descr;
     }
 
@@ -356,7 +356,7 @@ public final class PluginRegistryModel extends VmSystemObject implements
      * @throws PluginException
      */
     private final PluginDescriptorModel loadPluginImpl(final PluginLoader loader, final String pluginId,
-                                            final String pluginVersion) throws PluginException {
+                                                       final String pluginVersion) throws PluginException {
         final PluginRegistryModel registry = this;
         final PluginJar pluginJar;
         try {

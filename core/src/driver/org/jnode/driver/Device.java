@@ -17,14 +17,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.system.resource.ResourceOwner;
 import org.jnode.util.StopWatch;
@@ -331,7 +330,8 @@ public class Device implements ResourceOwner {
             sw.start();
             l.deviceStarted(this);
             if (sw.isElapsedLongerThen(100)) {
-                BootLogInstance.get().error("DeviceListener took " + sw + " in deviceStarted: " + l.getClass().getName());
+                BootLogInstance.get()
+                    .error("DeviceListener took " + sw + " in deviceStarted: " + l.getClass().getName());
             }
         }
         manager.fireStartedEvent(this);
