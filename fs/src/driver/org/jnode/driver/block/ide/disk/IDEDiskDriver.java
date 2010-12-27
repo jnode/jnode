@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.ide.disk;
 
 import java.io.IOException;
@@ -68,18 +68,18 @@ public class IDEDiskDriver extends Driver
      * My logger
      */
     private static final Logger log = Logger.getLogger(IDEDiskDriver.class);
-    
+
     /**
      * Number of addressable sectors
      */
     private long maxSector;
-    
+
     /** Has LBA support? */
     //private boolean lba;
-    
+
     /** Has DMA support? */
     //private boolean dma;
-    
+
     /**
      * Support 48-bit addressing?
      */
@@ -124,7 +124,7 @@ public class IDEDiskDriver extends Driver
             int i = 0;
             for (IBMPartitionTableEntry pte : pt) {
                 if (pte == null) {
-                	BootLogInstance.get().warn("PartitionTableEntry #" + i + " is null");
+                    BootLogInstance.get().warn("PartitionTableEntry #" + i + " is null");
                 } else if (pte.isValid()) {
                     if (pte.isExtended()) {
                         // Create partition devices for the extended partition
@@ -299,9 +299,10 @@ public class IDEDiskDriver extends Driver
      * @param partIndex the first partition index to use
      * @return the next partition index
      * @throws DeviceAlreadyRegisteredException
+     *
      * @throws DriverException
      */
-    private int registerExtendedPartition(DeviceManager devMan, IDEDevice dev, int partIndex) 
+    private int registerExtendedPartition(DeviceManager devMan, IDEDevice dev, int partIndex)
         throws DeviceAlreadyRegisteredException, DriverException {
         //now we should have an filled vector in the pt
         final List<IBMPartitionTableEntry> extendedPartitions = pt.getExtendedPartitions();

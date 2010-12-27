@@ -27,7 +27,6 @@ import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.IntegerArgument;
 import org.jnode.shell.syntax.LongArgument;
-import org.jnode.vm.VmImpl;
 import org.jnode.vm.facade.HeapStatistics;
 import org.jnode.vm.facade.VmUtils;
 

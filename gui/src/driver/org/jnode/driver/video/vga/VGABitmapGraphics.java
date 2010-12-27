@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.video.vga;
 
 import java.awt.Rectangle;
@@ -41,7 +41,7 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
      * @param bytesPerLine
      */
     public VGABitmapGraphics(StandardVGA vga, StandardVGAIO vgaIO, int width, int height,
-            int offset, int bytesPerLine) {
+                             int offset, int bytesPerLine) {
         super(vga.getVgaMem(), width, height, offset, bytesPerLine);
         this.vgaIO = vgaIO;
     }
@@ -51,16 +51,16 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
     }
 
     protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width,
-            int height) {
+                               int height) {
         vgaIO.setGRAF(1, 0);
         vgaIO.setGRAF(8, 0xFF);
 
         // round up the result of width/8
         int pWidth = width >> 3; // (width >> 3) == (width / 8)
         if ((width & 7) != 0) { // (width & 7) == (width % 8)
-        	pWidth++;
+            pWidth++;
         }
-        
+
         final byte[] plane0 = new byte[pWidth];
         final byte[] plane1 = new byte[pWidth];
         final byte[] plane2 = new byte[pWidth];
@@ -71,7 +71,7 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
             src.getDataElements(srcX, srcY + row, width, 1, buf);
             for (int col = 0; col < width; col++) {
                 final int bit = getBit(dstX + col);
-            	final int pixel = buf[col];
+                final int pixel = buf[col];
                 final int i = (col >> 3);
                 if ((pixel & 0x01) != 0) {
                     plane0[i] |= bit;
@@ -117,8 +117,8 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
     }
 
     protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width,
-            int height, int bgColor) {
-    	//TODO use bgColor parameter
+                               int height, int bgColor) {
+        //TODO use bgColor parameter
         doDrawImage(src, srcX, srcY, dstX, dstY, width, height);
     }
 
@@ -145,14 +145,14 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
     }
 
     protected void doDrawPixels(int x, int y, int count, int color, int mode) {
-    	//TODO (do)DrawLine/(do)doDrawPixels appear to be duplicates at higher level => remove one
-    	doDrawLine(x, y, count, color, mode);
+        //TODO (do)DrawLine/(do)doDrawPixels appear to be duplicates at higher level => remove one
+        doDrawLine(x, y, count, color, mode);
     }
 
     protected void doDrawAlphaRaster(Raster raster, int srcX, int srcY, int dstX, int dstY,
-            int width, int height, int color) {
-    	//TODO should we support alpha with only a fixed set of 16 colors ?
-    	doDrawImage(raster, srcX, srcY, dstX, dstY, width, height, color);
+                                     int width, int height, int color) {
+        //TODO should we support alpha with only a fixed set of 16 colors ?
+        doDrawImage(raster, srcX, srcY, dstX, dstY, width, height, color);
     }
 
     public int doGetPixel(int x, int y) {
@@ -161,15 +161,15 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
     }
 
     public int[] doGetPixels(Rectangle r) {
-    	final int[] result = new int[r.width * r.height];
-    	final int xmax = r.x + r.width;
-    	final int ymax = r.y + r.height;
-    	int i = 0;
-    	for (int y = r.y; y < ymax; y++) {
-        	for (int x = r.x; x < xmax; x++) {
-        		result[i++] = doGetPixel(x, y);
-        	}
-    	}
+        final int[] result = new int[r.width * r.height];
+        final int xmax = r.x + r.width;
+        final int ymax = r.y + r.height;
+        int i = 0;
+        for (int y = r.y; y < ymax; y++) {
+            for (int x = r.x; x < xmax; x++) {
+                result[i++] = doGetPixel(x, y);
+            }
+        }
         return result;
     }
 
@@ -180,10 +180,10 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
 
     @Override
     protected int getOffset(int x, int y) {
-    	return y * 80 + (x >> 3);
+        return y * 80 + (x >> 3);
     }
-    
+
     private int getBit(int x) {
-    	return 0x80 >> (x & 7);    	
+        return 0x80 >> (x & 7);
     }
 }

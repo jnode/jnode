@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build.x86;
 
 import java.io.File;
@@ -84,7 +84,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
     public static final int INITIAL_OBJREFS_CAPACITY = 750000;
 
     public static final int INITIAL_SIZE = 64 * 1024 * 1024;
-    
+
     private File archClassListFile;
 
     private VmX86Processor processor;
@@ -351,9 +351,9 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
         refJava = os
             .getObjectRef(vmSystemClass
                 .getMethod(
-                "findThrowableHandler",
-                "(Ljava/lang/Throwable;Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Address;)" +
-                    "Lorg/vmmagic/unboxed/Address;"));
+                    "findThrowableHandler",
+                    "(Ljava/lang/Throwable;Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Address;)" +
+                        "Lorg/vmmagic/unboxed/Address;"));
         os.getObjectRef(vmFindThrowableHandler).link(refJava);
 
         // Link Luser_esp
@@ -694,7 +694,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
 
     /**
      * Include x86 class files.
-     * 
+     *
      * @see org.jnode.build.AbstractBootImageBuilder#setupCompileHighOptLevelPackages()
      */
     protected void setupCompileHighOptLevelPackages() {
@@ -773,16 +773,16 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      *
      * @return The archClassListFile to set
      */
-	public File getArchClassListFile() {
-		return archClassListFile;
-	}
+    public File getArchClassListFile() {
+        return archClassListFile;
+    }
 
-	/**
+    /**
      * Sets the architecture specific class list file.
      *
      * @param archClassListFile The archClassListFile to set
      */
-	public void setArchClassListFile(File archClassListFile) {
-		this.archClassListFile = archClassListFile;
-	}
+    public void setArchClassListFile(File archClassListFile) {
+        this.archClassListFile = archClassListFile;
+    }
 }

@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build;
 
 import java.io.BufferedReader;
@@ -611,7 +611,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             emitStaticInitializerCalls(os, bootClasses, clInitCaller);
 
             // This is the end of the image
-            X86BinaryAssembler.ObjectInfo dummyObjectAtEnd = 
+            X86BinaryAssembler.ObjectInfo dummyObjectAtEnd =
                 os.startObject(loadClass(VmMethodCode.class));
             pageAlign(os);
             dummyObjectAtEnd.markEnd();
@@ -756,7 +756,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                                 }
                                 if (!ref.isResolved()) {
                                     throw new RuntimeException("Unresolved reference to object " + ((obj == null) ?
-                                        "null" : obj.getClass() .getName()));
+                                        "null" : obj.getClass().getName()));
                                 }
                             }
                         }
@@ -803,85 +803,85 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         throws ClassNotFoundException;
 
     public final void execute() throws BuildException {
-    	try {
-    		InitialNaming.setNameSpace(new BasicNameSpace());
-    		BootLogInstance.set(new BootLog() {
-				@Override
-				public void warn(String msg) {
-					System.out.println(msg);
-				}
-				
-				@Override
-				public void warn(String msg, Throwable ex) {
-					System.out.println(msg);
-					ex.printStackTrace(System.out);
-				}
-				
-				@Override
-				public void setDebugOut(PrintStream out) {
-					// ignore
-				}
-				
-				@Override
-				public void info(String msg, Throwable ex) {
-					System.out.println(msg);
-					ex.printStackTrace(System.out);
-				}
-				
-				@Override
-				public void info(String msg) {
-					System.out.println(msg);
-				}
-				
-				@Override
-				public void fatal(String msg, Throwable ex) {
-					System.out.println(msg);
-					ex.printStackTrace(System.out);
-				}
-				
-				@Override
-				public void fatal(String msg) {
-					System.out.println(msg);
-				}
-				
-				@Override
-				public void error(String msg, Throwable ex) {
-					System.out.println(msg);
-					ex.printStackTrace(System.out);
-				}
-				
-				@Override
-				public void error(String msg) {
-					System.out.println(msg);
-				}
-				
-				@Override
-				public void debug(String msg, Throwable ex) {
-					System.out.println(msg);
-					ex.printStackTrace(System.out);
-				}
-				
-				@Override
-				public void debug(String msg) {
-					System.out.println(msg);
-				}
-			});
-    		
-	        // Create the image
-	        doExecute();
-	        // Remove all garbage objects
-	        cleanup();
-	        System.gc();
-	        // Make sure that all finalizers are called, in order to remove tmp
-	        // files.
-	        Runtime.getRuntime().runFinalization();
-    	} catch (BuildException be) {
-    		be.printStackTrace();
-    		throw be;
-    	} catch (Throwable t) {
-    		t.printStackTrace();
-    		throw new BuildException(t);
-    	}
+        try {
+            InitialNaming.setNameSpace(new BasicNameSpace());
+            BootLogInstance.set(new BootLog() {
+                @Override
+                public void warn(String msg) {
+                    System.out.println(msg);
+                }
+
+                @Override
+                public void warn(String msg, Throwable ex) {
+                    System.out.println(msg);
+                    ex.printStackTrace(System.out);
+                }
+
+                @Override
+                public void setDebugOut(PrintStream out) {
+                    // ignore
+                }
+
+                @Override
+                public void info(String msg, Throwable ex) {
+                    System.out.println(msg);
+                    ex.printStackTrace(System.out);
+                }
+
+                @Override
+                public void info(String msg) {
+                    System.out.println(msg);
+                }
+
+                @Override
+                public void fatal(String msg, Throwable ex) {
+                    System.out.println(msg);
+                    ex.printStackTrace(System.out);
+                }
+
+                @Override
+                public void fatal(String msg) {
+                    System.out.println(msg);
+                }
+
+                @Override
+                public void error(String msg, Throwable ex) {
+                    System.out.println(msg);
+                    ex.printStackTrace(System.out);
+                }
+
+                @Override
+                public void error(String msg) {
+                    System.out.println(msg);
+                }
+
+                @Override
+                public void debug(String msg, Throwable ex) {
+                    System.out.println(msg);
+                    ex.printStackTrace(System.out);
+                }
+
+                @Override
+                public void debug(String msg) {
+                    System.out.println(msg);
+                }
+            });
+
+            // Create the image
+            doExecute();
+            // Remove all garbage objects
+            cleanup();
+            System.gc();
+            // Make sure that all finalizers are called, in order to remove tmp
+            // files.
+            Runtime.getRuntime().runFinalization();
+        } catch (BuildException be) {
+            be.printStackTrace();
+            throw be;
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw new BuildException(t);
+        }
     }
 
     /**
@@ -997,7 +997,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     protected boolean isCompileHighOptLevel(VmType<?> vmClass) {
         return vmClass.isArray() || isCompileHighOptLevel(vmClass.getName());
     }
-    
+
     private boolean isCompileHighOptLevel(String name) {
         if (compileHighOptLevelPackages.contains(name)) {
             return true;
@@ -1020,8 +1020,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
         return false;
     }
-    
-    
+
 
     /**
      * Link all undefined symbols from the kernel native code.
@@ -1112,8 +1111,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                     eName.length() - ".class".length()).replace('/', '.');
                 final int lastDotIdx = cName.lastIndexOf('.');
                 final String pkg = (lastDotIdx > 0) ? cName.substring(0, lastDotIdx) : "";
-                if (isCompileHighOptLevel(cName) || 
-                	preloadPackages.contains(cName) || preloadPackages.contains(pkg)) {
+                if (isCompileHighOptLevel(cName) ||
+                    preloadPackages.contains(cName) || preloadPackages.contains(pkg)) {
                     loadClass(cName, true);
                 }
             }
@@ -1351,7 +1350,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     public void setListFile(File listFile) {
         this.listFile = listFile;
     }
-    
+
     /**
      * Sets the core class list file.
      *
@@ -1362,51 +1361,50 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     }
 
     protected void setupCompileHighOptLevelPackages() {
-    	addCompileHighOptLevel(loadClassList(coreClassListFile));
+        addCompileHighOptLevel(loadClassList(coreClassListFile));
         for (NativeCodeCompiler compiler : getArchitecture().getCompilers()) {
             for (String packageName : compiler.getCompilerPackages()) {
                 addCompileHighOptLevel(packageName);
             }
         }
     }
-    
+
     protected void addCompileHighOptLevel(List<String> classNames) {
-    	for (String className : classNames) {
-    		addCompileHighOptLevel(className);
-    	}
+        for (String className : classNames) {
+            addCompileHighOptLevel(className);
+        }
     }
 
-	protected List<String> loadClassList(File file) {
-		ArrayList<String> classNames = new ArrayList<String>();
-		FileReader fr;
-    	try {
-    		fr = new FileReader(file);
-    	} catch (IOException ex) {
-    		throw new BuildException("Cannot open '" + file + "'", ex);
-    	}
-    	try {
-    		BufferedReader br = new BufferedReader(fr);
-    		String line;
-    		while ((line = br.readLine()) != null) {
-    			line = line.trim();
-    			if (line.isEmpty() || line.startsWith("#") || line.startsWith("/")) {
-    				continue;
-    			}
-    			classNames.add(line);
-    		}
-    	} catch (IOException ex) {
-    		throw new BuildException("Error reading '" + file + "'", ex);
-    	} finally {
-    		try {
-    			fr.close();
-    		} catch (IOException ex) {
-    			// ignore
-    		}
-    	}
-    	return classNames;
-	}
-    
-    
+    protected List<String> loadClassList(File file) {
+        ArrayList<String> classNames = new ArrayList<String>();
+        FileReader fr;
+        try {
+            fr = new FileReader(file);
+        } catch (IOException ex) {
+            throw new BuildException("Cannot open '" + file + "'", ex);
+        }
+        try {
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#") || line.startsWith("/")) {
+                    continue;
+                }
+                classNames.add(line);
+            }
+        } catch (IOException ex) {
+            throw new BuildException("Error reading '" + file + "'", ex);
+        } finally {
+            try {
+                fr.close();
+            } catch (IOException ex) {
+                // ignore
+            }
+        }
+        return classNames;
+    }
+
 
     /**
      * Create a set of the names of those classes that can be safely
