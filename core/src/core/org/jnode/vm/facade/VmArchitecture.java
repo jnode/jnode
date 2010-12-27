@@ -17,20 +17,18 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.facade;
 
 import java.nio.ByteOrder;
 
-import org.jnode.vm.VirtualMemoryRegion;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 
 /**
  * Interface with the system architecture.
- * 
- * @author Fabien DUMINY (fduminy at jnode.org)
  *
+ * @author Fabien DUMINY (fduminy at jnode.org)
  */
 public interface VmArchitecture {
 
@@ -39,38 +37,37 @@ public interface VmArchitecture {
      *
      * @return the architecture's ByteOrder
      */
-	ByteOrder getByteOrder();
+    ByteOrder getByteOrder();
 
     /**
      * Gets the size in bytes of an object reference.
      *
      * @return the architecture's reference size in bytes; i.e. 4 or 8.
      */
-	int getReferenceSize();
+    int getReferenceSize();
 
     /**
      * Gets the start address of the given space.
-     * 
-     * @param space a {@link VirtualMemoryRegion}.
+     *
+     * @param space a {@link org.jnode.vm.VirtualMemoryRegion}.
      * @return the start address of the region
      */
-	Address getStart(int space);
+    Address getStart(int space);
 
     /**
      * Gets the end address of the given space.
      *
-     * @param space a {@link VirtualMemoryRegion}.
+     * @param space a {@link org.jnode.vm.VirtualMemoryRegion}.
      * @return the end address of the region
      */
-	Address getEnd(int space);
+    Address getEnd(int space);
 
     /**
-     * Gets the memory map of the current system.  If no map has yet been created,
-     * it will be created by calling {@link #createMemoryMap()}.
+     * Gets the memory map of the current system.
      *
      * @return the architecture's memory map.
      */
-	MemoryMapEntry[] getMemoryMap();
+    MemoryMapEntry[] getMemoryMap();
 
     /**
      * Map a region of the virtual memory space. Note that you cannot allocate
@@ -83,15 +80,15 @@ public interface VmArchitecture {
      *                 Address.max(), free pages are used instead.
      * @return true for success, false otherwise.
      */
-	boolean mmap(int region, Address start, Extent size, Address physAddr);
+    boolean mmap(int region, Address start, Extent size, Address physAddr);
 
     /**
      * Gets the log base two of the size in bytes of an OS page in a given region
      *
-     * @param region a {@link VirtualMemoryRegion} value
+     * @param region a {@link org.jnode.vm.VirtualMemoryRegion} value
      * @return the log base two page size
      */
-	byte getLogPageSize(int region);
+    byte getLogPageSize(int region);
 
     /**
      * Unmap a region of the virtual memory space. Note that you cannot allocate
@@ -104,17 +101,17 @@ public interface VmArchitecture {
      *               aligned up on pagesize.
      * @return true for success, false otherwise.
      */
-	boolean munmap(int region, Address start, Extent size);
+    boolean munmap(int region, Address start, Extent size);
 
     /**
      * Page align a given address (represented as an Address) in a given region.
      *
-     * @param region a {@link VirtualMemoryRegion}.
-     * @param start an address value
-     * @param up If true, the value will be rounded up, otherwise rounded down.
-     * @return the corresponding page aligned address represented as a Address. 
+     * @param region a {@link org.jnode.vm.VirtualMemoryRegion}.
+     * @param start  an address value
+     * @param up     If true, the value will be rounded up, otherwise rounded down.
+     * @return the corresponding page aligned address represented as a Address.
      */
-	Address pageAlign(int region, Address start, boolean up);
+    Address pageAlign(int region, Address start, boolean up);
 
     /**
      * Gets the name of this architecture.
@@ -123,12 +120,12 @@ public interface VmArchitecture {
      *
      * @return the architecture's name
      */
-	String getName();
+    String getName();
 
-	/**
-	 * Gets the type size information of this architecture.
-	 * 
-	 * @return the architecture's type size information descriptor
-	 */
-	TypeSizeInfo getTypeSizeInfo();
+    /**
+     * Gets the type size information of this architecture.
+     *
+     * @return the architecture's type size information descriptor
+     */
+    TypeSizeInfo getTypeSizeInfo();
 }

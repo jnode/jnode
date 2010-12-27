@@ -22,7 +22,6 @@ package org.jnode.plugin;
 
 import java.util.List;
 
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 
 /**

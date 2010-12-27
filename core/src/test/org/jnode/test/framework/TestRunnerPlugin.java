@@ -21,7 +21,6 @@
 package org.jnode.test.framework;
 
 import org.apache.log4j.Logger;
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;

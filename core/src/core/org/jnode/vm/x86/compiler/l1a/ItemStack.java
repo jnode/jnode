@@ -17,11 +17,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.vm.JvmType;
-import org.jnode.vm.VmImpl;
 import org.jnode.vm.bytecode.StackException;
 import org.jnode.vm.facade.VmUtils;
 
@@ -53,6 +52,7 @@ class ItemStack {
 
     /**
      * Constructor; create and initialize stack with default size
+     *
      * @param expectedKind
      * @param maxSize
      */
@@ -199,13 +199,14 @@ class ItemStack {
 
     /**
      * Reset this stack. The stack will be empty afterwards.
+     *
      * @param ec
      */
     final void reset(EmitterContext ec) {
         while (tos != 0) {
             pop(ec);
         }
-        
+
         tos = 0;
     }
 

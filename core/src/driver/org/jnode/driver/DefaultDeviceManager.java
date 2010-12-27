@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver;
 
 import java.lang.reflect.Constructor;
@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import javax.naming.NamingException;
 
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.ConfigurationElement;
@@ -182,7 +181,8 @@ public final class DefaultDeviceManager extends AbstractDeviceManager implements
             } catch (InstantiationException ex) {
                 BootLogInstance.get().error("Cannot instantiate finder class " + className);
             } catch (ClassCastException ex) {
-                BootLogInstance.get().error("Finder class " + className + " does not implement the DeviceFinder interface");
+                BootLogInstance.get()
+                    .error("Finder class " + className + " does not implement the DeviceFinder interface");
             }
         }
     }
@@ -215,7 +215,8 @@ public final class DefaultDeviceManager extends AbstractDeviceManager implements
             } catch (InstantiationException ex) {
                 BootLogInstance.get().error("Cannot instantiate mapper class " + className, ex);
             } catch (ClassCastException ex) {
-                BootLogInstance.get().error("Mapper class " + className + " does not implement the DeviceToDriverMapper interface");
+                BootLogInstance.get()
+                    .error("Mapper class " + className + " does not implement the DeviceToDriverMapper interface");
             }
         } else {
             BootLogInstance.get().error("class attribute required in mapper");

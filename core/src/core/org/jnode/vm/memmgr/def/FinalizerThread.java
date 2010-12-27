@@ -21,7 +21,6 @@
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.annotation.MagicPermission;
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.scheduler.Monitor;

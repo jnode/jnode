@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr;
 
 import java.io.PrintWriter;
@@ -378,8 +378,8 @@ public abstract class VmHeapManager extends VmSystemObject implements org.jnode.
             Unsafe.debug(number);
         }
     }
-    
+
     protected static final org.jnode.vm.scheduler.VmProcessor getCurrentProcessor() {
-    	return org.jnode.vm.scheduler.VmProcessor.current();
+        return org.jnode.vm.scheduler.VmProcessor.current();
     }
 }

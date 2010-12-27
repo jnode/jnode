@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import java.lang.reflect.Constructor;
@@ -119,7 +119,7 @@ final class VmImpl extends VmSystemObject implements Statistics, org.jnode.vm.fa
      * @throws InstantiationException
      */
     public VmImpl(String version, BaseVmArchitecture arch, VmSharedStatics statics,
-              boolean debugMode, VmClassLoader loader, PluginRegistry pluginReg)
+                  boolean debugMode, VmClassLoader loader, PluginRegistry pluginReg)
         throws InstantiationException {
         this.version = version;
         this.debugMode = debugMode;
@@ -143,7 +143,8 @@ final class VmImpl extends VmSystemObject implements Statistics, org.jnode.vm.fa
      * @throws InstantiationException
      */
     private static VmHeapManager createHeapManager(HeapHelper helper,
-                                                   BaseVmArchitecture arch, VmClassLoader loader, PluginRegistry pluginReg)
+                                                   BaseVmArchitecture arch, VmClassLoader loader,
+                                                   PluginRegistry pluginReg)
         throws InstantiationException {
         if (pluginReg == null) {
             // Use in tests and asm constant construction
@@ -387,7 +388,7 @@ final class VmImpl extends VmSystemObject implements Statistics, org.jnode.vm.fa
             this.scheduler = scheduler;
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -395,8 +396,8 @@ final class VmImpl extends VmSystemObject implements Statistics, org.jnode.vm.fa
         return new BootableArrayList<VmProcessor>(processors);
     }
 
-	@Override
-	public void accept(VmThreadVisitor vmThreadVisitor) {
-		scheduler.visitAllThreads(vmThreadVisitor);
-	}
+    @Override
+    public void accept(VmThreadVisitor vmThreadVisitor) {
+        scheduler.visitAllThreads(vmThreadVisitor);
+    }
 }

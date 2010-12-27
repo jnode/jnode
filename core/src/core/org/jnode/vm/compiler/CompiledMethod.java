@@ -21,7 +21,6 @@
 package org.jnode.vm.compiler;
 
 import org.jnode.assembler.NativeStream;
-import org.jnode.vm.VmImpl;
 import org.jnode.vm.classmgr.VmAddressMap;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.facade.VmUtils;

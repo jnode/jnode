@@ -17,12 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.VmImpl;
 import org.jnode.vm.bytecode.TypeStack;
 import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.x86.compiler.AbstractX86StackManager;
@@ -349,7 +348,6 @@ final class VirtualStack {
     //
 
     /**
-     *
      * @param reg
      * @return
      */
@@ -444,7 +442,7 @@ final class VirtualStack {
 
         /**
          * @see org.jnode.vm.x86.compiler.AbstractX86StackManager#writePUSH(int,
-         * org.jnode.assembler.x86.X86Register.GPR)
+         *      org.jnode.assembler.x86.X86Register.GPR)
          */
         public void writePUSH(int jvmType, X86Register.GPR reg) {
             final Item item = ifac.createReg(ec, jvmType, reg);
@@ -456,7 +454,7 @@ final class VirtualStack {
 
         /**
          * @see org.jnode.vm.x86.compiler.AbstractX86StackManager#writePUSH64(int,
-         * org.jnode.assembler.x86.X86Register.GPR, org.jnode.assembler.x86.X86Register.GPR)
+         *      org.jnode.assembler.x86.X86Register.GPR, org.jnode.assembler.x86.X86Register.GPR)
          */
         public void writePUSH64(int jvmType, X86Register.GPR lsbReg,
                                 X86Register.GPR msbReg) {
@@ -472,7 +470,7 @@ final class VirtualStack {
 
         /**
          * @see org.jnode.vm.x86.compiler.AbstractX86StackManager#writePUSH64(int,
-         * org.jnode.assembler.x86.X86Register.GPR64)
+         *      org.jnode.assembler.x86.X86Register.GPR64)
          */
         public void writePUSH64(int jvmType, X86Register.GPR64 reg) {
             final Item item = ifac.createReg(ec, jvmType, reg);

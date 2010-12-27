@@ -24,7 +24,6 @@ import java.io.IOException;
 
 import javax.naming.NameNotFoundException;
 
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;

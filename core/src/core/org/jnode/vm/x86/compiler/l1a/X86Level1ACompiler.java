@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.NativeStream;
@@ -115,7 +115,7 @@ public final class X86Level1ACompiler extends AbstractX86Compiler {
                 getTypeSizeInfo());
         } else {
             byteCodeVisitorHolder.remove();
-            byteCodeVisitor.reset(os, cm, isBootstrap, entryPoints, getMagicHelper(), getTypeSizeInfo());            
+            byteCodeVisitor.reset(os, cm, isBootstrap, entryPoints, getMagicHelper(), getTypeSizeInfo());
         }
         cbv = byteCodeVisitor;
         if (inlineMethods) {

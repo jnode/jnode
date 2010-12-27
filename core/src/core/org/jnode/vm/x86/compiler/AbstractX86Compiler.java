@@ -30,7 +30,6 @@ import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86TextAssembler;
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.VmImpl;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.VmClassLoader;

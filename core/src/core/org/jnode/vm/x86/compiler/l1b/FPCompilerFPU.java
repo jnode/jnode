@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1b;
 
 import org.jnode.assembler.Label;
@@ -28,10 +28,8 @@ import org.jnode.assembler.x86.X86Register.FPU;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.VmImpl;
 import org.jnode.vm.facade.VmUtils;
 
 /**
@@ -326,8 +324,8 @@ final class FPCompilerFPU extends FPCompiler {
      * Make sure that the given operand is on the top on the FPU stack.
      */
     private static void prepareForOperation(X86Assembler os,
-                                                  EmitterContext ec, VirtualStack vstack, FPUStack fpuStack,
-                                                  Item left) {
+                                            EmitterContext ec, VirtualStack vstack, FPUStack fpuStack,
+                                            Item left) {
         final boolean onFpu = left.isFPUStack();
 
         // If the FPU stack will be full in this operation, we flush the vstack
@@ -361,8 +359,8 @@ final class FPCompilerFPU extends FPCompiler {
      * @param right
      */
     private static FPU prepareForOperation(X86Assembler os,
-                                                 EmitterContext ec, VirtualStack vstack, FPUStack fpuStack,
-                                                 Item left, Item right, boolean commutative) {
+                                           EmitterContext ec, VirtualStack vstack, FPUStack fpuStack,
+                                           Item left, Item right, boolean commutative) {
         final boolean lOnFpu = left.isFPUStack();
         final boolean rOnFpu = right.isFPUStack();
         final FPU reg;

@@ -17,12 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1b;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.x86.X86Assembler;
@@ -32,10 +31,8 @@ import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.VmImpl;
 import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.TypeStack;
@@ -5106,9 +5103,9 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             case JvmType.BYTE:
                 os.writeMOVSX(resultr, resultr, BYTESIZE);
                 break;
-                // case JvmType.CHAR:
-                // os.writeMOVZX(resultr, resultr, WORDSIZE);
-                // break;
+            // case JvmType.CHAR:
+            // os.writeMOVZX(resultr, resultr, WORDSIZE);
+            // break;
             case JvmType.SHORT:
                 os.writeMOVSX(resultr, resultr, WORDSIZE);
                 break;

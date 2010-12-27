@@ -27,7 +27,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;

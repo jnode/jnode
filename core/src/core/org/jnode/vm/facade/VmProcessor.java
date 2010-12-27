@@ -17,16 +17,15 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.facade;
 
 import java.io.PrintWriter;
 
 /**
  * Interface with a processor.
- * 
- * @author Fabien DUMINY (fduminy at jnode.org)
  *
+ * @author Fabien DUMINY (fduminy at jnode.org)
  */
 public interface VmProcessor {
 
@@ -35,13 +34,13 @@ public interface VmProcessor {
      *
      * @return Returns the id.
      */
-	String getIdString();
+    String getIdString();
 
     /**
      * Print statistics information on the given stream.
      *
      * @param out
      */
-	void dumpStatistics(PrintWriter out);
+    void dumpStatistics(PrintWriter out);
 
 }

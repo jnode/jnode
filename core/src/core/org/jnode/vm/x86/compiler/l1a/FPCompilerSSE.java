@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.Label;
@@ -139,7 +139,7 @@ final class FPCompilerSSE extends FPCompiler {
      *         is always returned.
      */
     private boolean prepareForOperation(Item destAndSource, Item source,
-                                              boolean commutative) {
+                                        boolean commutative) {
         // WARNING: source was on top of the virtual stack (thus higher than
         // destAndSource)
         // x86 can only deal with one complex argument

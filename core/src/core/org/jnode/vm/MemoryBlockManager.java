@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.annotation.MagicPermission;
@@ -245,7 +245,7 @@ public final class MemoryBlockManager extends VmSystemObject {
     /**
      * Initialize this manager.
      */
-    private static void initialize() {    	
+    private static void initialize() {
         Unsafe.debug("Initialize MemoryBlockManager\n");
         startPtr = blockAlign(Unsafe.getMemoryStart().toWord(), true).toAddress();
         endPtr = blockAlign(Unsafe.getMemoryEnd().toWord(), false).toAddress();

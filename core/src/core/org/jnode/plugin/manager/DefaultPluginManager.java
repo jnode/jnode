@@ -35,7 +35,6 @@ import java.util.Set;
 
 import javax.naming.NamingException;
 
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.naming.InitialNaming;
 import org.jnode.permission.JNodePermission;

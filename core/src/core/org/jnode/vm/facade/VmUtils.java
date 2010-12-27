@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.facade;
 
 import gnu.java.lang.VMClassHelper;
@@ -41,13 +41,13 @@ import org.jnode.vm.objects.Statistic;
  */
 @SharedStatics
 public class VmUtils {
-	private static Vm VM_INSTANCE;
+    private static Vm VM_INSTANCE;
 
     /**
      * Should assertions be verified?
      */
     private static final boolean VERIFY_ASSERTIONS = true;
-	
+
     private static final String NATIVE_CLASSNAME_PREFIX = "Native";
 
     public static boolean couldImplementNativeMethods(String className) {
@@ -72,66 +72,66 @@ public class VmUtils {
         allowNatives |= className.indexOf("org.jnode.vm.") > -1 && className.indexOf(".Unsafe") > -1;
         return allowNatives;
     }
-    
-	/**
-	 * @return Returns the {@link org.jnode.vm.facade.Vm} instance.
-	 */
-	@KernelSpace
-	@Uninterruptible
-	public static final Vm getVm() {
-	    return VM_INSTANCE;
-	}
-	
-	/**
-	 * 
-	 */
-	@KernelSpace
-	@Uninterruptible
-	public static final void setVm(Vm vm) {
-		if (VM_INSTANCE != null) {
-			throw new SecurityException("Vm instance already set");
-		}
-	    VM_INSTANCE = vm;
-	}
 
-	/**
-	 * Is JNode currently running.
-	 *
-	 * @return true or false
-	 */
-	public static final boolean isRunningVm() {
-	    return ((VM_INSTANCE != null) && !VM_INSTANCE.isBootstrap());
-	}
+    /**
+     * @return Returns the {@link org.jnode.vm.facade.Vm} instance.
+     */
+    @KernelSpace
+    @Uninterruptible
+    public static final Vm getVm() {
+        return VM_INSTANCE;
+    }
 
-	/**
-	 * Is the bootimage being written?
-	 *
-	 * @return true or false.
-	 */
-	public static final boolean isWritingImage() {
-	    return ((VM_INSTANCE == null) || VM_INSTANCE.isBootstrap());
-	}
+    /**
+     *
+     */
+    @KernelSpace
+    @Uninterruptible
+    public static final void setVm(Vm vm) {
+        if (VM_INSTANCE != null) {
+            throw new SecurityException("Vm instance already set");
+        }
+        VM_INSTANCE = vm;
+    }
 
-	/**
-	 * A new type has been resolved by the VM. Create a new MM type to reflect
-	 * the VM type, and associate the MM type with the VM type.
-	 *
-	 * @param vmType The newly resolved type
-	 */
-	@Inline
-	public static void notifyClassResolved(VmType<?> vmType) {
-	    if (VM_INSTANCE != null) {
-	        final VmHeapManager hm = VM_INSTANCE.getHeapManager();
-	        if (hm != null) {
-	            hm.notifyClassResolved(vmType);
-	        }
-	    }
-	}
+    /**
+     * Is JNode currently running.
+     *
+     * @return true or false
+     */
+    public static final boolean isRunningVm() {
+        return ((VM_INSTANCE != null) && !VM_INSTANCE.isBootstrap());
+    }
 
-	public static boolean verifyAssertions() {
-		return VERIFY_ASSERTIONS;
-	}
-	
+    /**
+     * Is the bootimage being written?
+     *
+     * @return true or false.
+     */
+    public static final boolean isWritingImage() {
+        return ((VM_INSTANCE == null) || VM_INSTANCE.isBootstrap());
+    }
+
+    /**
+     * A new type has been resolved by the VM. Create a new MM type to reflect
+     * the VM type, and associate the MM type with the VM type.
+     *
+     * @param vmType The newly resolved type
+     */
+    @Inline
+    public static void notifyClassResolved(VmType<?> vmType) {
+        if (VM_INSTANCE != null) {
+            final VmHeapManager hm = VM_INSTANCE.getHeapManager();
+            if (hm != null) {
+                hm.notifyClassResolved(vmType);
+            }
+        }
+    }
+
+    public static boolean verifyAssertions() {
+        return VERIFY_ASSERTIONS;
+    }
+
     /**
      * Assert the given value to be true.
      *
@@ -180,9 +180,10 @@ public class VmUtils {
         }
         throw new AssertionError(msg);
     }
-    
+
     /**
      * Dump VM's statistics to the given {@link PrintWriter}.
+     *
      * @param out
      */
     public static void dumpStatistics(PrintWriter out) {
@@ -203,5 +204,5 @@ public class VmUtils {
                 ((Counter) s).reset();
             }
         }
-    }    
+    }
 }

@@ -23,7 +23,6 @@ package org.jnode.test.core;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.VmImpl;
 import org.jnode.vm.classmgr.Signature;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;

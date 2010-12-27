@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.Label;
@@ -26,7 +26,6 @@ import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.VmImpl;
 import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
@@ -44,6 +43,7 @@ final class RefItem extends WordItem {
 
     /**
      * Initialize a blank item
+     *
      * @param factory
      */
     RefItem(ItemFactory factory) {

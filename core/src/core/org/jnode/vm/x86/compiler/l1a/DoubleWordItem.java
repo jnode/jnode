@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
@@ -26,11 +26,10 @@ import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.VmImpl;
 import org.jnode.vm.facade.VmUtils;
 
-import static org.jnode.vm.x86.compiler.X86CompilerConstants.INTSIZE;
 import static org.jnode.vm.x86.compiler.X86CompilerConstants.BITS64;
+import static org.jnode.vm.x86.compiler.X86CompilerConstants.INTSIZE;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -54,6 +53,7 @@ public abstract class DoubleWordItem extends Item {
 
     /**
      * Initialize a blank item.
+     *
      * @param factory
      */
     protected DoubleWordItem(ItemFactory factory) {
@@ -230,7 +230,7 @@ public abstract class DoubleWordItem extends Item {
      * valid if this item has a LOCAL kind.
      *
      * @return In 32-bit mode, use {@link #getLsbOffsetToFP(EmitterContext)} or
-     * {@link #getMsbOffsetToFP(EmitterContext)} instead.
+     *         {@link #getMsbOffsetToFP(EmitterContext)} instead.
      */
     final short getOffsetToFP(EmitterContext ec) {
         if (ec.getStream().isCode32()) {
@@ -665,7 +665,7 @@ public abstract class DoubleWordItem extends Item {
                 stack.fpuStack.pop(this);
                 stack.fpuStack.push(this);
                 return;
-                // break;
+            // break;
 
             case Kind.STACK:
                 if (VirtualStack.checkOperandStack) {

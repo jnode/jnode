@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import java.nio.ByteOrder;
@@ -107,7 +107,7 @@ public abstract class BaseVmArchitecture extends VmSystemObject implements org.j
     /**
      * {@inheritDoc}
      */
-	public abstract TypeSizeInfo getTypeSizeInfo();
+    public abstract TypeSizeInfo getTypeSizeInfo();
 
     /**
      * Gets the stackreader for this architecture.
@@ -122,8 +122,8 @@ public abstract class BaseVmArchitecture extends VmSystemObject implements org.j
     /**
      * Gets all compilers for this architecture.
      *
-     * @return The architecture's compilers, sorted by optimization level, from 
-     * least optimizing to most optimizing.
+     * @return The architecture's compilers, sorted by optimization level, from
+     *         least optimizing to most optimizing.
      */
     public abstract NativeCodeCompiler[] getCompilers();
 
@@ -131,9 +131,9 @@ public abstract class BaseVmArchitecture extends VmSystemObject implements org.j
      * Gets all test compilers for this architecture.
      * This can be used to test new compilers in a running system.
      *
-     * @return The architecture's test compilers, sorted by optimization level, from 
-     * least optimizing to most optimizing.  If there are no configured test compilers,
-     * {@code null} will be returned.
+     * @return The architecture's test compilers, sorted by optimization level, from
+     *         least optimizing to most optimizing.  If there are no configured test compilers,
+     *         {@code null} will be returned.
      */
     public abstract NativeCodeCompiler[] getTestCompilers();
 
@@ -166,7 +166,7 @@ public abstract class BaseVmArchitecture extends VmSystemObject implements org.j
      *
      * @param cpu
      */
-    protected final void addProcessor(VmProcessor cpu) { 
+    protected final void addProcessor(VmProcessor cpu) {
         ((VmImpl) VmUtils.getVm()).addProcessor(cpu);
     }
 
@@ -227,10 +227,10 @@ public abstract class BaseVmArchitecture extends VmSystemObject implements org.j
     /**
      * Page align a given address (represented as a Word) in a given region.
      *
-     * @param v an address value
+     * @param v      an address value
      * @param region a {@link VirtualMemoryRegion}.
-     * @param up If true, the value will be rounded up, otherwise rounded down.
-     * @return the corresponding page aligned address represented as a Word. 
+     * @param up     If true, the value will be rounded up, otherwise rounded down.
+     * @return the corresponding page aligned address represented as a Word.
      */
     public final Word pageAlign(int region, Word v, boolean up) {
         final int logPageSize = getLogPageSize(region);
@@ -268,7 +268,10 @@ public abstract class BaseVmArchitecture extends VmSystemObject implements org.j
         throws UninterruptiblePragma;
 
     /**
-     * {@inheritDoc}
+     * Gets the memory map of the current system.  If no map has yet been created,
+     * it will be created by calling {@link #createMemoryMap()}.
+     *
+     * @return the architecture's memory map.
      */
     public final MemoryMapEntry[] getMemoryMap() {
         final SecurityManager sm = System.getSecurityManager();
@@ -303,8 +306,9 @@ public abstract class BaseVmArchitecture extends VmSystemObject implements org.j
 
     /**
      * Creates a multi-media support instance.  The default implementation returns a
-     * generic support instance.  This method may be overriden to provide an architecture 
+     * generic support instance.  This method may be overriden to provide an architecture
      * optimized {@link VmMultiMediaSupport} implementation.
+     *
      * @return a multi-media support instance.
      */
     protected VmMultiMediaSupport createMultiMediaSupport() {

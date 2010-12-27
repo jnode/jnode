@@ -20,7 +20,6 @@
  
 package org.jnode.util;
 
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 
 /**

@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
@@ -53,7 +53,7 @@ final class FPUHelper {
      * @param fpuReg
      */
     static void fxch(X86Assembler os, FPUStack fpuStack,
-                           FPU fpuReg) {
+                     FPU fpuReg) {
         if (fpuReg == X86Register.ST0) {
             throw new StackException("Cannot fxch ST0");
         }

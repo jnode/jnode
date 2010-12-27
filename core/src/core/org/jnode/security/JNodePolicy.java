@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.security;
 
 import gnu.java.security.PolicyFile;
@@ -36,7 +36,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
@@ -176,7 +175,7 @@ final class JNodePolicy extends Policy {
                         final Permission p = (Permission) perm;
                         perms.add(p);
                     } catch (ClassNotFoundException ex) {
-                    	BootLogInstance.get()
+                        BootLogInstance.get()
                             .error("Permission class " + type
                                 + " not found");
                     } catch (InstantiationException ex) {
@@ -186,7 +185,7 @@ final class JNodePolicy extends Policy {
                         BootLogInstance.get().error("Illegal access to permission class "
                             + type);
                     } catch (NoSuchMethodException ex) {
-                    	BootLogInstance.get()
+                        BootLogInstance.get()
                             .error("Constructor not found on permission class "
                                 + type + " in plugin " + id);
                     } catch (InvocationTargetException ex) {

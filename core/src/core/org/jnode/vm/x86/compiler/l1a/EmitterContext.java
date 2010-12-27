@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
@@ -68,6 +68,7 @@ final class EmitterContext {
 
     /**
      * Create a new context
+     *
      * @param os
      * @param helper
      * @param vstack
@@ -93,7 +94,7 @@ final class EmitterContext {
         this.os = os;
         this.context = entryPoints;
         gprPool.reset(os);
-        xmmPool.reset(os);        
+        xmmPool.reset(os);
     }
 
     /**

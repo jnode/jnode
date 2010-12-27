@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.Label;
@@ -145,6 +145,7 @@ final class X86StackFrame {
 
     /**
      * Write code to test the alignment of the stack pointer.
+     *
      * @param curInstrLabel
      */
     public void writeStackAlignmentTest(Label curInstrLabel) {
@@ -163,6 +164,7 @@ final class X86StackFrame {
 
     /**
      * Emit code to end the stack frame
+     *
      * @param typeSizeInfo
      * @param maxLocals
      */

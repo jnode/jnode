@@ -23,8 +23,6 @@ package org.jnode.plugin.model;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
-
-import org.jnode.bootlog.BootLog;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.FragmentDescriptor;

@@ -20,10 +20,6 @@
  
 package org.jnode.plugin;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
 /**
  * Descriptor of a Plugin.
  *

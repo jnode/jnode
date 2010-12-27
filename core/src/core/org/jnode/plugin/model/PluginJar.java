@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
-
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -37,7 +36,6 @@ import org.jnode.util.ByteBufferInputStream;
 import org.jnode.util.FileUtils;
 import org.jnode.util.JarBuffer;
 import org.jnode.vm.ResourceLoader;
-import org.jnode.vm.VmImpl;
 import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.objects.BootableHashMap;
 import org.jnode.vm.objects.BootableObject;
