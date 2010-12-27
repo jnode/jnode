@@ -727,6 +727,7 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/openjdk/vm"/>
                 <pathelement location="${root.dir}/core/src/core"/>
                 <pathelement location="${root.dir}/core/src/driver"/>
+                <pathelement location="${root.dir}/core/src/emu"/>
                 <pathelement location="${root.dir}/core/src/mmtk-vm"/>
                 <pathelement location="${root.dir}/core/src/endorsed/nanoxml"/>
                 <pathelement location="${root.dir}/core/src/test"/>
