@@ -45,7 +45,7 @@ public class SupplementaryVolumeDescriptor extends VolumeDescriptor {
      * @param buffer
      */
     public SupplementaryVolumeDescriptor(ISO9660Volume volume, byte[] buffer)
-            throws UnsupportedEncodingException {
+        throws UnsupportedEncodingException {
         super(volume, buffer);
         this.flags = getUInt8(buffer, 8);
         this.escapeSequences = getDChars(buffer, 89, 121 - 89);
@@ -115,7 +115,7 @@ public class SupplementaryVolumeDescriptor extends VolumeDescriptor {
 
     /**
      * Gets a derived encoding name from the given escape sequences.
-     * 
+     *
      * @param escapeSequences
      * @return the encoding name
      */
@@ -137,7 +137,7 @@ public class SupplementaryVolumeDescriptor extends VolumeDescriptor {
 
     /**
      * Is the used encoding known to this system.
-     * 
+     *
      * @return {@code true} if the encoding known, otherwise {@code false}.
      */
     public final boolean isEncodingKnown() {

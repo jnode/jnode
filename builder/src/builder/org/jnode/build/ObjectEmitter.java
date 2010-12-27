@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build;
 
 import java.io.PrintWriter;
@@ -334,7 +334,7 @@ public class ObjectEmitter {
 
     /**
      * Allocate and write and object of a given type.
-     * 
+     *
      * @param cls
      * @param obj
      * @param vmType
@@ -461,7 +461,7 @@ public class ObjectEmitter {
                             + jdkField.getName() + " of class "
                             + cls.getName(), ex);
                     } catch (JNodeClassNotFoundException ex) {
-                    	BootLogInstance.get()
+                        BootLogInstance.get()
                             .warn("JNode class not found "
                                 + ex.getMessage());
                         value = null;

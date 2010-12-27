@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.util;
 
 import java.awt.Color;
@@ -433,6 +433,7 @@ public class BasicSurfaceGraphics extends BasicGraphics {
         }
     }
      */
+
     /**
      * Draws as much of the specified image as is currently available.
      * The image is drawn with its top-left corner at
@@ -1136,55 +1137,55 @@ public class BasicSurfaceGraphics extends BasicGraphics {
                     }
                 }
             } else {
-            	// TODO implement special case of a custom ColorModel not based on jdk concrete classes 
-            	return raster;
+                // TODO implement special case of a custom ColorModel not based on jdk concrete classes
+                return raster;
             }
-    	} else if (dst_model instanceof IndexColorModel) {
-    		// remark : the VGA driver is using an IndexColorModel
-    		
-	        final Object srcElements = createArray(model);
-	        final Object dstElements = createArray(dst_model);
-    		
-	        for (int y = 0; y < h; y++) {
-	            for (int x = 0; x < w; x++) {
-	            	// get and convert source pixel to rgb
-	        		raster.getDataElements(x, y, srcElements);
-	        		int rgb = model.getRGB(srcElements);
-	        		
-	        		// convert rgb to destination model
-	        		dst_model.getDataElements(rgb, dstElements);
-	        		
-	        		// set destination pixel
-	        		dst_raster.setDataElements(x, y, dstElements);
-	            }
-	        }    		
+        } else if (dst_model instanceof IndexColorModel) {
+            // remark : the VGA driver is using an IndexColorModel
+
+            final Object srcElements = createArray(model);
+            final Object dstElements = createArray(dst_model);
+
+            for (int y = 0; y < h; y++) {
+                for (int x = 0; x < w; x++) {
+                    // get and convert source pixel to rgb
+                    raster.getDataElements(x, y, srcElements);
+                    int rgb = model.getRGB(srcElements);
+
+                    // convert rgb to destination model
+                    dst_model.getDataElements(rgb, dstElements);
+
+                    // set destination pixel
+                    dst_raster.setDataElements(x, y, dstElements);
+                }
+            }
         }
 
         return dst_raster;
     }
-    
+
     private Object createArray(ColorModel model) {
-    	final int transferType = model.getTransferType();
-    	final int size = model.getNumComponents();
-    	switch (transferType) {
-    	case DataBuffer.TYPE_BYTE:
-    		return new byte[size];
-    		
-    	case DataBuffer.TYPE_USHORT:
-    	case DataBuffer.TYPE_SHORT:
-    		return new short[size];
-    		
-    	case DataBuffer.TYPE_INT:
-    		return new int[size];
-    		
-    	case DataBuffer.TYPE_FLOAT:
-    		return new float[size];
-    		
-    	case DataBuffer.TYPE_DOUBLE:
-    		return new double[size];
-    		
-    	default:
-    		throw new IllegalArgumentException("Unknown transfer type : " + transferType);
-    	}
+        final int transferType = model.getTransferType();
+        final int size = model.getNumComponents();
+        switch (transferType) {
+            case DataBuffer.TYPE_BYTE:
+                return new byte[size];
+
+            case DataBuffer.TYPE_USHORT:
+            case DataBuffer.TYPE_SHORT:
+                return new short[size];
+
+            case DataBuffer.TYPE_INT:
+                return new int[size];
+
+            case DataBuffer.TYPE_FLOAT:
+                return new float[size];
+
+            case DataBuffer.TYPE_DOUBLE:
+                return new double[size];
+
+            default:
+                throw new IllegalArgumentException("Unknown transfer type : " + transferType);
+        }
     }
 }

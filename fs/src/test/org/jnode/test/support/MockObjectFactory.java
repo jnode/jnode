@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.support;
 
 import javax.naming.NameAlreadyBoundException;
@@ -68,7 +68,7 @@ public class MockObjectFactory {
         final MockObjectTestCase mockTestCase = (MockObjectTestCase) testCase;
         MockInitializer initializer = new MockInitializer() {
             public void init(Mock mockDesc) {
-            	BootLogInstance.get().debug("devSize=" + deviceSize);
+                BootLogInstance.get().debug("devSize=" + deviceSize);
                 Boolean bSupp48bitsAddr = Boolean.valueOf(supp48bitsAddr);
                 mockDesc.expects(mockTestCase.atLeastOnce()).
                     method("supports48bitAddressing").
