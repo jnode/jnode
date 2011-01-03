@@ -51,7 +51,7 @@ public interface Vm {
      * @param name
      * @return The counter
      */
-    Counter getCounter(String string);
+    Counter getCounter(String name);
 
     /**
      * Gets or creates a counter group with a given name.

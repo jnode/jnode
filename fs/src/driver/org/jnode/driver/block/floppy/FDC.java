@@ -82,7 +82,7 @@ public interface FDC extends IRQHandler, FloppyConstants {
 
     /**
      * @param irq
-     * @see org.jnode.system.IRQHandler#handleInterrupt(int)
+     * @see org.jnode.system.resource.IRQHandler#handleInterrupt(int)
      */
     public void handleInterrupt(int irq);
 

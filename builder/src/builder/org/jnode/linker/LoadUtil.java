@@ -193,7 +193,7 @@ public class LoadUtil {
     /**
      * Load a program address.
      *
-     * @param out
+     * @param in
      * @param e_ident
      * @return
      * @throws IOException
@@ -210,7 +210,7 @@ public class LoadUtil {
     /**
      * Load a program address.
      *
-     * @param out
+     * @param in
      * @param e_ident
      * @return
      * @throws IOException
@@ -227,7 +227,7 @@ public class LoadUtil {
     /**
      * Load a file offset.
      *
-     * @param out
+     * @param in
      * @param e_ident
      * @return
      * @throws IOException
@@ -244,7 +244,7 @@ public class LoadUtil {
     /**
      * Load a file offset.
      *
-     * @param out
+     * @param in
      * @param e_ident
      * @return
      * @throws IOException
@@ -261,7 +261,7 @@ public class LoadUtil {
     /**
      * Load an Xword.
      *
-     * @param out
+     * @param in
      * @param e_ident
      * @return
      * @throws IOException
@@ -278,7 +278,7 @@ public class LoadUtil {
     /**
      * Load an Xword.
      *
-     * @param out
+     * @param in
      * @param e_ident
      * @return
      * @throws IOException

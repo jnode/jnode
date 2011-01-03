@@ -468,7 +468,7 @@ public final class DefaultHeapManager extends VmHeapManager {
     }
     
     /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#createProcessorHeapData(org.jnode.vm.scheduler.VmProcessor)
+     * @see org.jnode.vm.memmgr.VmHeapManager#createProcessorHeapData(org.jnode.vm.facade.VmProcessor)
      */
     public Object createProcessorHeapData(VmProcessor cpu) {
         // No need here, so return null.

@@ -136,7 +136,7 @@ public class StoreUtil {
      *
      * @param out
      * @param e_ident
-     * @param address
+     * @param off
      * @return
      * @throws IOException
      */
@@ -154,7 +154,7 @@ public class StoreUtil {
      *
      * @param out
      * @param e_ident
-     * @param address
+     * @param xword
      * @return
      * @throws IOException
      */

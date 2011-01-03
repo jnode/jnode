@@ -321,7 +321,7 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
     }
 
     /**
-     * @see org.jnode.system.IRQHandler#handleInterrupt(int)
+     * @see org.jnode.system.resource.IRQHandler#handleInterrupt(int)
      */
     public synchronized void handleInterrupt(int irq) {
 

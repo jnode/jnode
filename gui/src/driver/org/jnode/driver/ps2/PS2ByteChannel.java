@@ -41,7 +41,7 @@ public class PS2ByteChannel implements ByteChannel {
     }
 
     /**
-     * @see org.jnode.system.IRQHandler#handleInterrupt(int)
+     * @see org.jnode.system.resource.IRQHandler#handleInterrupt(int)
      */
     public void handleScancode(int b) {
         queue.enQueue((byte) b);
