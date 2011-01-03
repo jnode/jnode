@@ -160,7 +160,7 @@ public class Catalog {
      * @param parentId
      * @param nodeId
      * @param nodeType
-     * @return
+     * @return the new node instance
      */
     public LeafRecord createNode(String filename, CatalogNodeId parentId, CatalogNodeId nodeId,
             int nodeType) throws IOException {

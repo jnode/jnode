@@ -34,7 +34,7 @@ public class BaseX86MagicHelper extends BaseMagicHelper implements X86Constants 
      * Convert a method code into an X86 condition code.
      *
      * @param mcode
-     * @return
+     * @return the x86 condition code
      */
     protected final int methodToCC(MagicMethod mcode) {
         switch (mcode) {
@@ -65,10 +65,10 @@ public class BaseX86MagicHelper extends BaseMagicHelper implements X86Constants 
     }
 
     /**
-     * Convert a method code into an X86 condition code.
+     * Convert a method code into an x86 shift code.
      *
      * @param mcode
-     * @return
+     * @return the x86 shift code
      */
     protected final int methodToShift(MagicMethod mcode) {
         switch (mcode) {

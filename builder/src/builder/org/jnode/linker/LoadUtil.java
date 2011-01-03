@@ -195,7 +195,7 @@ public class LoadUtil {
      *
      * @param in
      * @param e_ident
-     * @return
+     * @return the address
      * @throws IOException
      */
     public static long loadAddr(RandomAccessFile in, byte[] e_ident)
@@ -212,7 +212,7 @@ public class LoadUtil {
      *
      * @param in
      * @param e_ident
-     * @return
+     * @return the address
      * @throws IOException
      */
     public static long loadAddr(InputStream in, byte[] e_ident)
@@ -229,7 +229,7 @@ public class LoadUtil {
      *
      * @param in
      * @param e_ident
-     * @return
+     * @return the offset
      * @throws IOException
      */
     public static long loadOff(RandomAccessFile in, byte[] e_ident)
@@ -246,7 +246,7 @@ public class LoadUtil {
      *
      * @param in
      * @param e_ident
-     * @return
+     * @return the offset
      * @throws IOException
      */
     public static long loadOff(InputStream in, byte[] e_ident)
@@ -263,7 +263,7 @@ public class LoadUtil {
      *
      * @param in
      * @param e_ident
-     * @return
+     * @return the xword
      * @throws IOException
      */
     public static long loadXword(RandomAccessFile in, byte[] e_ident)
@@ -275,12 +275,12 @@ public class LoadUtil {
         }
     }
 
-    /**
+    /**                                                                         Sc
      * Load an Xword.
      *
      * @param in
      * @param e_ident
-     * @return
+     * @return the xword
      * @throws IOException
      */
     public static long loadXword(InputStream in, byte[] e_ident)

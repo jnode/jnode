@@ -92,14 +92,14 @@ public interface VmHeapManager {
     /**
      * Get this heap's statistics.
      *
-     * @return
+     * @return the heap statistics
      */
     HeapStatistics getHeapStatistics();
 
     /**
      * Get this heap GC's statistics.
      *
-     * @return
+     * @return the heap GC statistics
      */
     GCStatistics getStatistics();
 

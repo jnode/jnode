@@ -181,7 +181,7 @@ public class Section {
     /**
      * Gets the name of this section.
      *
-     * @return
+     * @return the name of this section
      */
     public String getName() {
         return elf.getSHString(sh_name);

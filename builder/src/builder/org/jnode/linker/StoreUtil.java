@@ -119,7 +119,7 @@ public class StoreUtil {
      * @param out
      * @param e_ident
      * @param address
-     * @return
+     * @return the number of bytes stored
      * @throws IOException
      */
     public static int storeAddr(OutputStream out, byte[] e_ident,
@@ -137,7 +137,7 @@ public class StoreUtil {
      * @param out
      * @param e_ident
      * @param off
-     * @return
+     * @return the number of bytes stored
      * @throws IOException
      */
     public static int storeOff(OutputStream out, byte[] e_ident,
@@ -155,7 +155,7 @@ public class StoreUtil {
      * @param out
      * @param e_ident
      * @param xword
-     * @return
+     * @return the number of bytes stored
      * @throws IOException
      */
     public static int storeXword(OutputStream out, byte[] e_ident,

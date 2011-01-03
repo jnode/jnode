@@ -82,7 +82,7 @@ public final class VmX86Thread64 extends VmX86Thread {
     }
 
     /**
-     * @see org.jnode.vm.scheduler.VmThread#accept(org.jnode.vm.facade.ObjectVisitor, org.jnode.vm.memmgr.VmHeapManager)
+     * @see org.jnode.vm.scheduler.VmThread#accept(org.jnode.vm.facade.ObjectVisitor, org.jnode.vm.facade.VmHeapManager)
      */
     public boolean accept(ObjectVisitor visitor, VmHeapManager heapManager) {
         if (!super.accept(visitor, heapManager)) {
