@@ -29,7 +29,7 @@ import org.jnode.configure.PropertySet.Value;
  * This class represents a property type defined by a regex. The constructor
  * allows you to provide an "emptyToken" value. If provided, this value defines
  * a special token that will be mapped to the empty string by the
- * {@link fromToken} method.
+ * {@link #fromValue(String)} method.
  * 
  * @author crawley@jnode.org
  */

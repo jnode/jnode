@@ -283,7 +283,7 @@ public class LanceCore extends AbstractDeviceCore implements IRQHandler, LanceCo
     }
 
     /**
-     * @see org.jnode.system.IRQHandler#handleInterrupt(int)
+     * @see org.jnode.system.resource.IRQHandler#handleInterrupt(int)
      */
     public void handleInterrupt(int irq) {
         while ((io.getCSR(0) & CSR0_INTR) != 0) {

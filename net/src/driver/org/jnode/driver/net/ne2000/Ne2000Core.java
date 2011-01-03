@@ -287,7 +287,7 @@ public abstract class Ne2000Core extends AbstractDeviceCore implements IRQHandle
     }
 
     /**
-     * @see org.jnode.system.IRQHandler#handleInterrupt(int)
+     * @see org.jnode.system.resource.IRQHandler#handleInterrupt(int)
      */
     public synchronized void handleInterrupt(int irq) {
 

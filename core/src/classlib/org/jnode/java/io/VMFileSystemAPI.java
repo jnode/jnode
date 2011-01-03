@@ -29,7 +29,8 @@ import java.io.VMOpenMode;
  * filesystem services.
  * The file paths given to the various methods are absolute and canonical.
  * 
- * @modif  add mkDir mkFile   Yves Galante (yves.galante@jmob.net) 01.04.2004
+ * Modified:  add mkDir mkFile   Yves Galante (yves.galante@jmob.net) 01.04.2004
+ *
  * @author epr
  */
 public interface VMFileSystemAPI {
