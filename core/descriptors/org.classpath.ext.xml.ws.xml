@@ -105,6 +105,7 @@
       <export name="com.sun.xml.internal.ws.api.addressing.*"/>
       <export name="com.sun.xml.internal.ws.api.client.*"/>
       <export name="com.sun.xml.internal.ws.api.fastinfoset.*"/>
+      <export name="com.sun.xml.internal.ws.api.handler.*"/>
       <export name="com.sun.xml.internal.ws.api.message.*"/>
       <export name="com.sun.xml.internal.ws.api.message.stream.*"/>
       <export name="com.sun.xml.internal.ws.api.model.*"/>
