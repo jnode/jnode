@@ -34,6 +34,7 @@
       <export name="com.sun.tools.javac.api.*"/>
       <export name="com.sun.tools.javac.code.*"/>
       <export name="com.sun.tools.javac.comp.*"/>
+      <export name="com.sun.tools.javac.file.*"/>
       <export name="com.sun.tools.javac.jvm.*"/>
       <export name="com.sun.tools.javac.main.*"/>
       <export name="com.sun.tools.javac.model.*"/>
