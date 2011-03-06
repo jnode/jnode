@@ -53,6 +53,7 @@
       <export name="sun.misc.ServiceConfigurationError"/>
       <export name="sun.misc.VM"/>
 
+      <export name="sun.net.ApplicationProxy*"/>
       <export name="sun.nio.cs.*"/>
 
       <export name="sun.text.*"/>

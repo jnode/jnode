@@ -116,6 +116,7 @@ org.jnode.vm.memmgr.def
 //sun.reflect.generics.visitor
 //sun.reflect.misc
 sun.misc.VM
+sun.net.ApplicationProxy
 sun.nio
 sun.nio.cs.US_ASCII
 sun.nio.cs.ISO_8859_1*
