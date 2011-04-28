@@ -46,12 +46,27 @@
       <export name="com.sun.tools.javac.tree.*"/>
       <export name="com.sun.tools.javac.util.*"/>
       <export name="com.sun.tools.javac.zip.*"/>
+      <export name="com.sun.javadoc.*"/>
+      <export name="com.sun.tools.doclets.*"/>
+      <export name="com.sun.tools.doclets.formats.html.*"/>
+      <export name="com.sun.tools.doclets.formats.html.markup.*"/>
+      <export name="com.sun.tools.doclets.formats.html.resources.*"/>
+      <export name="com.sun.tools.doclets.internal.toolkit.*"/>
+      <export name="com.sun.tools.doclets.internal.toolkit.builders.*"/>
+      <export name="com.sun.tools.doclets.internal.toolkit.resources.*"/>
+      <export name="com.sun.tools.doclets.internal.toolkit.taglets.*"/>
+      <export name="com.sun.tools.doclets.internal.toolkit.util.*"/>
+      <export name="com.sun.tools.doclets.internal.toolkit.util.links.*"/>
+      <export name="com.sun.tools.doclets.standard.*"/>
+      <export name="com.sun.tools.javadoc.*"/>
+      <export name="com.sun.tools.javadoc.resources.*"/>
     </library>
   </runtime>
 
   <extension point="org.jnode.shell.aliases">
-    <alias name="javac" class="com.sun.tools.javac.Main"/>
     <alias name="apt" class="com.sun.tools.apt.Main"/>
+    <alias name="javac" class="com.sun.tools.javac.Main"/>
+    <alias name="javadoc" class="com.sun.tools.javadoc.Main"/>
   </extension>
   
   <extension point="org.jnode.security.permissions">
@@ -59,8 +74,9 @@
       <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
       <permission class="java.util.PropertyPermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
       <permission class="java.util.PropertyPermission" name="*" actions="read"/>
+      <permission class="java.util.PropertyPermission" name="user.language" actions="write"/>
+      <permission class="java.lang.RuntimePermission" name="accessDeclaredMembers"/>
 
-      
       <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
       <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
       <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
