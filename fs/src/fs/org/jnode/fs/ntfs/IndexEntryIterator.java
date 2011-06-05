@@ -64,7 +64,16 @@ final class IndexEntryIterator implements Iterator<IndexEntry> {
             throw new NoSuchElementException();
         } else {
             final IndexEntry result = nextEntry;
-            final int size = nextEntry.getSize(); 
+            final int size = nextEntry.getSize();
+
+            // Prevents an infinite loop.  Seen on images where the size of the index entry has been zeroed out.
+            if (size <= 0) {
+                throw new IllegalStateException(String.format(
+                    "Index entry size is 0, filesystem is corrupt.  Parent directory: '%s', reference number '%d'",
+                    nextEntry.getParentFileRecord().getFileName(),
+                    nextEntry.getParentFileRecord().getReferenceNumber()));
+            }
+
             offset += size;
             // Now read the next next entry
             readNext();
