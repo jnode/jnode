@@ -20,8 +20,6 @@
  
 package gnu.classpath.jdwp.transport;
 
-import gnu.classpath.jdwp.JNodeSocketTransport;
-
 /**
  *
  */
