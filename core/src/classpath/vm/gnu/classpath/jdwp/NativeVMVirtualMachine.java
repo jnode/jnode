@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import gnu.classpath.jdwp.util.MethodResult;
 import gnu.classpath.jdwp.event.EventRequest;
 
+import org.jnode.annotation.NoInline;
 import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.isolate.VmIsolate;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
@@ -41,23 +42,34 @@ import org.jnode.vm.classmgr.VmMethod;
  * @author Levente S\u00e1ntha
  */
 class NativeVMVirtualMachine {
+    @NoInline
+//    public static boolean debug() {
+//        return true;
+//    }
+
     /**
      * @see gnu.classpath.jdwp.VMVirtualMachine#suspendThread(java.lang.Thread)
      */
     private static void suspendThread(Thread arg1) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.suspendThread()");
     }
     /**
      * @see gnu.classpath.jdwp.VMVirtualMachine#resumeThread(java.lang.Thread)
      */
     private static void resumeThread(Thread arg1) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.resumeThread()");
     }
     /**
      * @see gnu.classpath.jdwp.VMVirtualMachine#getSuspendCount(java.lang.Thread)
      */
     private static int getSuspendCount(Thread arg1) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.getSuspendCount()");
         return 0;
     }
     /**
@@ -65,12 +77,16 @@ class NativeVMVirtualMachine {
      */
     private static int getAllLoadedClassesCount() {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.getAllLoadedClassesCount()");
         return 0;
     }
     /**
      * @see gnu.classpath.jdwp.VMVirtualMachine#getAllLoadedClasses()
      */
     private static Iterator getAllLoadedClasses() {
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.getAllLoadedClasses()");
         return new Iterator() {
             private VmStaticsIterator iter = new VmStaticsIterator(VmUtils.getVm().getSharedStatics());
             private Iterator<VmIsolatedStatics> isolated = VmIsolate.staticsIterator();
@@ -102,6 +118,8 @@ class NativeVMVirtualMachine {
      */
     private static int getClassStatus(Class arg1) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.getClassStatus()");
         return 0;
     }
     /**
@@ -109,6 +127,8 @@ class NativeVMVirtualMachine {
      */
     private static VMMethod[] getAllClassMethods(Class arg1) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.getAllClassMethods()");
         return null;
     }
     /**
@@ -116,6 +136,8 @@ class NativeVMVirtualMachine {
      */
     private static VMMethod getClassMethod(Class arg1, long arg2) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.getClassMethod()");
         return null;
     }
     /**
@@ -123,6 +145,8 @@ class NativeVMVirtualMachine {
      */
     private static ArrayList getFrames(Thread arg1, int arg2, int arg3) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.getFrame()");
         return null;
     }
     /**
@@ -130,6 +154,8 @@ class NativeVMVirtualMachine {
      */
     private static VMFrame getFrame(Thread arg1, ByteBuffer arg2) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.getFrame()");
         return null;
     }
     /**
@@ -137,6 +163,8 @@ class NativeVMVirtualMachine {
      */
     private static int getFrameCount(Thread arg1) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.getFrameCount()");
         return 0;
     }
     /**
@@ -144,6 +172,8 @@ class NativeVMVirtualMachine {
      */
     private static int getThreadStatus(Thread arg1) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.getThreadStatus()");
         return 0;
     }
     /**
@@ -151,6 +181,8 @@ class NativeVMVirtualMachine {
      */
     private static ArrayList getLoadRequests(ClassLoader arg1) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.getLoadRequest()");
         return null;
     }
     /**
@@ -158,6 +190,8 @@ class NativeVMVirtualMachine {
      */
     private static MethodResult executeMethod(Object arg1, Thread arg2, Class arg3, Method arg4, Object[] arg5, boolean arg6) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.executeMethod()");
         return null;
     }
     /**
@@ -165,6 +199,8 @@ class NativeVMVirtualMachine {
      */
     private static String getSourceFile(Class arg1) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.getSourceFile()");
         return null;
     }
     /**
@@ -172,21 +208,30 @@ class NativeVMVirtualMachine {
      */
     private static void registerEvent(EventRequest arg1) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.registerEvent() " + arg1.getId() + " " + arg1.getEventKind() +
+                " " + arg1.getSuspendPolicy() +  " " + arg1.getFilters());
     }
     /**
      * @see gnu.classpath.jdwp.VMVirtualMachine#unregisterEvent(gnu.classpath.jdwp.event.EventRequest)
      */
     private static void unregisterEvent(EventRequest arg1) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.unregisterEvent()");
     }
     /**
      * @see gnu.classpath.jdwp.VMVirtualMachine#clearEvents(byte)
      */
     private static void clearEvents(byte arg1) {
         //todo implement it
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.clearEvents()");
     }
 
     public static void redefineClass(Class oldClass, byte[] classData){
+//        if(debug())
+            System.out.println("NativeVMVirtualMachine.redefineClass()");
         VmType old_type = VmType.fromClass(oldClass);
         VmType new_type = ClassDecoder.defineClass(oldClass.getName(),
                 ByteBuffer.wrap(classData), false,
