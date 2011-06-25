@@ -20,7 +20,7 @@
  
 package org.jnode.command.dev;
 
-import gnu.classpath.jdwp.JNodeSocketTransport;
+import gnu.classpath.jdwp.transport.JNodeSocketTransport;
 import gnu.classpath.jdwp.Jdwp;
 
 import java.io.PrintWriter;
