@@ -1329,7 +1329,7 @@ public class BoxWorld extends JComponent implements WindowListener, KeyListener,
     public static void main(String[] argv) {
         BoxWorld bw = new BoxWorld();
         bw.init();
-        Frame frame = new JFrame("Boxworld");
+        Frame frame = new JFrame("BoxWorld");
         frame.setResizable(false);
         frame.add(bw);
         frame.addWindowListener(bw);
