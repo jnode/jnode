@@ -798,21 +798,9 @@ clean             Remove all intermediate build results.
         <delete dir="${build.dir}/classpath-compare"/>
         <cp-compare destdir="${build.dir}/classpath-compare" type="classpath">
             <vmsources>
-                <fileset dir="${root.dir}/core/src/classpath/gnu">
+                <fileset dir="${root.dir}/core/src/classpath/ext">
                     <patternset refid="cp-includes-pattern"/>
                 </fileset>
-                <fileset dir="${root.dir}/core/src/classpath/java">
-                    <patternset refid="cp-includes-pattern"/>
-                </fileset>
-                <fileset dir="${root.dir}/core/src/classpath/javax">
-	                <patternset refid="cp-includes-pattern"/>
-				</fileset>
-                <fileset dir="${root.dir}/core/src/classpath/tools">
-                    <patternset refid="cp-includes-pattern"/>
-               	</fileset>
-                <fileset dir="${root.dir}/core/src/classpath/sun">
-                    <patternset refid="cp-includes-pattern"/>
-               	</fileset>
             </vmsources>
             <vmspecificsources>
                 <fileset dir="${root.dir}/core/src/classpath/vm">
