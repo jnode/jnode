@@ -151,6 +151,15 @@ public class TaskBar extends JPanel {
             }
         }
 
+        //todo fix nimbus startup
+//        JMenuItem nimbus = new JMenuItem("Nimbus");
+//        lfMenu.add(nimbus);
+//        nimbus.addActionListener(new SetLFAction("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel") {
+//            public void actionPerformed(ActionEvent e) {
+//                super.actionPerformed(e);
+//            }
+//        });
+
         JMenuItem metal_theme = new JMenuItem("Metal Default");
         lfMenu.add(metal_theme);
         metal_theme.addActionListener(new SetLFAction("javax.swing.plaf.metal.MetalLookAndFeel") {
