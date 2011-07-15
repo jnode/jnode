@@ -43,6 +43,8 @@
 
       <export name="com.sun.java.swing.plaf.windows.DesktopProperty"/>
       <export name="com.sun.java.swing.plaf.motif.*"/>
+      <export name="com.sun.java.swing.plaf.nimbus.*"/>
+      <export name="com.sun.java.swing.plaf.*"/>
       <export name="com.sun.java.swing.plaf.motif.icons.*"/>
       <export name="com.sun.swing.internal.plaf.basic.resources.*"/>
       <export name="com.sun.swing.internal.plaf.metal.resources.*"/>
@@ -65,6 +67,7 @@
       <export name="sun.print.*"/>
       <export name="sun.swing.*"/>
       <export name="sun.swing.icon.*"/>
+      <export name="sun.swing.plaf.*"/>
       <export name="sun.swing.plaf.synth.*"/>
       <export name="sun.swing.plaf.windows.*"/>
       <export name="sun.swing.table.*"/>
