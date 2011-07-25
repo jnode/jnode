@@ -328,11 +328,17 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
      * @param length
      */
     public final void readData(byte[] dst, int ofs, int length) {
+        final int srcLen = dst.length - ofs;
+        int len = Math.min(length, srcLen);
         //waitUntilNotBusy();
-        for (; length > 0; length -= 2) {
+        for (; len > 0; len -= 2, length -= 2) {
             final int v = io.getDataReg();
             dst[ofs++] = (byte) (v & 0xFF);
             dst[ofs++] = (byte) ((v >> 8) & 0xFF);
+        }
+        // Recieve padding
+        for (; length > 0; length -= 2) {
+            io.getDataReg();
         }
     }
 

@@ -33,43 +33,69 @@ import org.jnode.util.TimeoutException;
 public abstract class IDERWSectorsCommand extends IDECommand {
     protected final long lbaStart;
     protected final int sectors;
+    protected final boolean is48bit;
 
     public IDERWSectorsCommand(
         boolean primary,
         boolean master,
+            boolean is48bit,
         long lbaStart,
         int sectors) {
         super(primary, master);
+        this.is48bit = is48bit;
         this.lbaStart = lbaStart;
         this.sectors = sectors;
-        if ((sectors < 1) || (sectors > 256)) {
-            throw new IllegalArgumentException("Sectors must be between 1 and 256, not " + sectors);
+        if (lbaStart < 0L) {
+            throw new IllegalArgumentException(String.format("LBA must be between 0 and {0}, not {1}", maxSector() - 1,
+                lbaStart));
+        }
+        if ((sectors < 1) || (sectors > maxSectorCount())) {
+            throw new IllegalArgumentException(String.format("Sectors must be between 1 and {0}, not {1}",
+                maxSectorCount(), sectors));
+        }
+        if ((lbaStart + sectors) >= maxSector()) {
+            throw new IllegalArgumentException(String.format("The maximum sector must be between 0 and {0}, not {1}",
+                maxSector(), lbaStart + sectors));
         }
     }
 
+    protected long maxSector() {
+        return is48bit ? MAX_SECTOR_48 : MAX_SECTOR_28;
+    }
+
+    protected int maxSectorCount() {
+        return is48bit ? MAX_SECTOR_COUNT_48 : MAX_SECTOR_COUNT_28;
+    }
+
     protected void setup(IDEBus ide, IDEIO io) throws TimeoutException {
-        final int select;
-        final int sectors;
-        final int lbaLow = (int) (lbaStart & 0xFF);
-        final int lbaMid = (int) ((lbaStart >> 8) & 0xFF);
-        final int lbaHigh = (int) ((lbaStart >> 16) & 0xFF);
-        final int lbaRem = (int) ((lbaStart >> 24) & 0x0F);
-        if (master) {
-            select = lbaRem | SEL_BLANK | SEL_LBA | SEL_DRIVE_MASTER;
-        } else {
-            select = lbaRem | SEL_BLANK | SEL_LBA | SEL_DRIVE_SLAVE;
-        }
-        if (this.sectors == 256) {
-            sectors = 0;
-        } else {
-            sectors = this.sectors;
-        }
+        int select = SEL_LBA | getSelect();
 
-        io.setSectorCountReg(sectors);
-        io.setLbaLowReg(lbaLow);
-        io.setLbaMidReg(lbaMid);
-        io.setLbaHighReg(lbaHigh);
+        final int scCurrent = sectors & 0xFF;
+        final int lbaLowCurrent = (int) (lbaStart & 0xFF);
+        final int lbaMidCurrent = (int) ((lbaStart >> 8) & 0xFF);
+        final int lbaHighCurrent = (int) ((lbaStart >> 16) & 0xFF);
+
+        io.waitUntilNotBusy(IDE_TIMEOUT);
+        if (is48bit) {
+            final int scPrevious = (sectors & 0xFF00) >> 8;
+            final int lbaLowPrevious = (int) ((lbaStart >> 24) & 0xFF);
+            final int lbaMidPrevious = (int) ((lbaStart >> 32) & 0xFF);
+            final int lbaHighPrevious = (int) ((lbaStart >> 40) & 0xFF);
+
+            io.setSectorCountReg(scPrevious);
+            io.setLbaLowReg(lbaLowPrevious);
+            io.setLbaMidReg(lbaMidPrevious);
+            io.setLbaHighReg(lbaHighPrevious);
+        }
+        io.setSectorCountReg(scCurrent);
+        io.setLbaLowReg(lbaLowCurrent);
+        io.setLbaMidReg(lbaMidCurrent);
+        io.setLbaHighReg(lbaHighCurrent);
+        if (!is48bit) {
+            final int lbaRem = (int) ((lbaStart >> 24) & 0xF);
+
+            select |= lbaRem;
+        }
         io.setSelectReg(select);
-
     }
 }

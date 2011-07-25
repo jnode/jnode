@@ -166,7 +166,7 @@ public class FdiskCommand extends AbstractCommand {
         int sectorSize = IDEConstants.SECTOR_SIZE;
         if (ideDev != null) {
             out.println("IDE Disk : " + ideDev.getId() + ": " +
-                descriptor.getSectorsIn28bitAddressing() * 512 + " bytes");
+                descriptor.getSectorsAddressable() * 512 + " bytes");
         }
         out.println("Device Boot    Start       End    Blocks   System");
         IBMPartitionTable partitionTable = helper.getPartitionTable();
@@ -206,7 +206,7 @@ public class FdiskCommand extends AbstractCommand {
                 IDEDriveDescriptor desc = ideDevice.getDescriptor();
                 if (desc.isDisk()) {
                     out.println("    IDE Disk : " + ideDevice.getId() + "(" + desc.getModel() +
-                        " " + desc.getSectorsIn28bitAddressing() * IDEConstants.SECTOR_SIZE +
+                        " " + desc.getSectorsAddressable() * IDEConstants.SECTOR_SIZE +
                         ")");
                 }
             }

@@ -34,25 +34,18 @@ import org.jnode.util.TimeoutException;
 public class IDEWriteSectorsCommand extends IDERWSectorsCommand {
 
     private final ByteBuffer buf;
-    private final int offset;
-    private final int length;
-    private int currentPosition;
 
-    //private int readSectors;
+    private int readSectors = 0;
 
     public IDEWriteSectorsCommand(
         boolean primary,
         boolean master,
+            boolean is48bit,
         long lbaStart,
         int sectors,
-        ByteBuffer src,
-        int srcOffset,
-        int length) {
-        super(primary, master, lbaStart, sectors);
+            ByteBuffer src) {
+        super(primary, master, is48bit, lbaStart, sectors);
         this.buf = src;
-        this.offset = srcOffset;
-        this.currentPosition = srcOffset;
-        this.length = length;
     }
 
     /**
@@ -61,17 +54,18 @@ public class IDEWriteSectorsCommand extends IDERWSectorsCommand {
     protected void setup(IDEBus ide, IDEIO io)
         throws TimeoutException {
         super.setup(ide, io);
-        io.setCommandReg(CMD_WRITE);
-        transfertASector(ide, io);
+        io.setCommandReg(is48bit ? CMD_WRITE_EXT : CMD_WRITE);
+        io.waitUntilNotBusy(IDE_TIMEOUT);
+        transferASector(ide, io);
     }
 
-    private void transfertASector(IDEBus ide, IDEIO io) throws TimeoutException {
-        io.waitUntilNotBusy(IDE_TIMEOUT);
+    private void transferASector(IDEBus ide, IDEIO io) throws TimeoutException {
+//        io.waitUntilNotBusy(IDE_TIMEOUT);
         for (int i = 0; i < 256; i++) {
             int v = ((buf.get() & 0xFF) + ((buf.get() & 0xFF) << 8));
             io.setDataReg(v);
-            currentPosition += 2;
         }
+        readSectors++;
     }
 
     /**
@@ -83,8 +77,8 @@ public class IDEWriteSectorsCommand extends IDERWSectorsCommand {
             setError(io.getErrorReg());
         } else {
             if ((state & (ST_BUSY | ST_DEVICE_READY)) == ST_DEVICE_READY) {
-                if (currentPosition < offset + length) {
-                    transfertASector(ide, io);
+                if (readSectors < sectors) {
+                    transferASector(ide, io);
                 } else {
                     notifyFinished();
                 }
