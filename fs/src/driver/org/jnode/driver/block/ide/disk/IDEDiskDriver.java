@@ -49,6 +49,7 @@ import org.jnode.driver.bus.ide.IDEDeviceAPI;
 import org.jnode.driver.bus.ide.IDEDeviceFactory;
 import org.jnode.driver.bus.ide.IDEDriveDescriptor;
 import org.jnode.driver.bus.ide.IDEDriverUtils;
+import org.jnode.driver.bus.ide.command.IDERWSectorsCommand;
 import org.jnode.driver.bus.ide.command.IDEReadSectorsCommand;
 import org.jnode.driver.bus.ide.command.IDEWriteSectorsCommand;
 import org.jnode.naming.InitialNaming;
@@ -83,7 +84,7 @@ public class IDEDiskDriver extends Driver
     /**
      * Support 48-bit addressing?
      */
-    private boolean s48bit;
+    private boolean is48bit;
     private IDEDiskBus diskBus;
     private IBMPartitionTable pt;
 
@@ -97,12 +98,8 @@ public class IDEDiskDriver extends Driver
         final IDEDriveDescriptor descr = dev.getDescriptor();
         //lba = descr.supportsLBA();
         //dma = descr.supportsDMA();
-        s48bit = descr.supports48bitAddressing();
-        if (s48bit) {
-            maxSector = descr.getSectorsIn48bitAddressing();
-        } else {
-            maxSector = descr.getSectorsIn28bitAddressing();
-        }
+        is48bit = descr.supports48bitAddressing();
+        maxSector = descr.getSectorsAddressable();
 
         // Look for partitions
         try {
@@ -126,16 +123,15 @@ public class IDEDiskDriver extends Driver
                 if (pte == null) {
                     BootLogInstance.get().warn("PartitionTableEntry #" + i + " is null");
                 } else if (pte.isValid()) {
-                    if (pte.isExtended()) {
-                        // Create partition devices for the extended partition
-                        partIndex = registerExtendedPartition(devMan, dev, partIndex);
-                    } else {
-                        // Create a partition device.
-                        registerPartition(devMan, dev, pte, partIndex);
-                    }
+                    registerPartition(devMan, dev, pte, partIndex);
                 }
                 partIndex++;
                 i++;
+            }
+            if (!pt.getExtendedPartitions().isEmpty()) {
+                // Create partition devices for the extended partition
+                log.debug("Extended");
+                partIndex = registerExtendedPartition(devMan, dev, partIndex);
             }
         } catch (DeviceAlreadyRegisteredException ex) {
             throw new DriverException("Partition device is already known???? Probably a bug", ex);
@@ -184,8 +180,16 @@ public class IDEDiskDriver extends Driver
     }
 
     public void read(long devOffset, ByteBuffer destBuf) throws IOException {
-        int destOffset = 0;
-        int length = destBuf.remaining();
+        transfer(devOffset, destBuf, false);
+    }
+
+    public void write(long devOffset, ByteBuffer srcBuf) throws IOException {
+        transfer(devOffset, srcBuf, true);
+    }
+
+    protected void transfer(long devOffset, ByteBuffer buf, boolean isWrite) throws IOException {
+//        int bufOffset = 0;
+        int length = buf.remaining();
 
         BlockDeviceAPIHelper.checkBounds(this, devOffset, length);
         BlockDeviceAPIHelper.checkAlignment(SECTOR_SIZE, this, devOffset, length);
@@ -193,75 +197,46 @@ public class IDEDiskDriver extends Driver
         final long lbaStart = devOffset / SECTOR_SIZE;
         final int sectors = length / SECTOR_SIZE;
 
+        final String errorSource = isWrite ? "write" : "read";
         if (lbaStart + sectors > this.maxSector) {
-            throw new IOException("read beyond device sectors");
+            throw new IOException(errorSource + " beyond device sectors");
         }
 
         final IDEDevice dev = (IDEDevice) getDevice();
         final IDEBus bus = (IDEBus) dev.getBus();
+        final int maxSectorCount = is48bit ? MAX_SECTOR_COUNT_48 : MAX_SECTOR_COUNT_28;
 
         while (length > 0) {
             final long partLbaStart = devOffset / SECTOR_SIZE;
-            final int partSectors = Math.min(length / SECTOR_SIZE, 256);
+            final int partSectors = Math.min(length / SECTOR_SIZE, maxSectorCount);
             final int partLength = partSectors * SECTOR_SIZE;
 
-            final IDEReadSectorsCommand cmd;
-            cmd = new IDEReadSectorsCommand(dev.isPrimary(), dev.isMaster(), partLbaStart, partSectors, destBuf);
+            final IDERWSectorsCommand cmd = isWrite ? new IDEWriteSectorsCommand(
+                dev.isPrimary(),
+                dev.isMaster(),
+                is48bit,
+                partLbaStart,
+                partSectors,
+                buf) : new IDEReadSectorsCommand(
+                    dev.isPrimary(),
+                    dev.isMaster(),
+                    is48bit,
+                    partLbaStart,
+                    partSectors,
+                    buf);
             try {
                 bus.executeAndWait(cmd, IDE_DATA_XFER_TIMEOUT);
             } catch (InterruptedException ex) {
-                final IOException ioe = new IOException("IDE read interrupted");
-                ioe.initCause(ex);
-                throw ioe;
+                throw new IOException("IDE " + errorSource + " interrupted", ex);
             } catch (TimeoutException ex) {
                 throw new InterruptedIOException("IDE timeout: " + ex.getMessage());
             }
             if (cmd.hasError()) {
-                throw new IOException("IDE read error:" + cmd.getError());
+                throw new IOException("IDE " + errorSource + " error:" + cmd.getError());
             }
 
             length -= partLength;
-            destOffset += partLength;
             devOffset += partLength;
-        }
-    }
-
-    public void write(long devOffset, ByteBuffer srcBuf) throws IOException {
-        int srcOffset = 0;
-        int length = srcBuf.remaining();
-
-        BlockDeviceAPIHelper.checkBounds(this, devOffset, length);
-        BlockDeviceAPIHelper.checkAlignment(SECTOR_SIZE, this, devOffset, length);
-        final long lbaStart = devOffset / SECTOR_SIZE;
-        final int sectors = length / SECTOR_SIZE;
-
-        if (lbaStart + sectors > this.maxSector) {
-            throw new IOException("write beyond device sectors");
-        }
-
-        final IDEDevice dev = (IDEDevice) getDevice();
-        final IDEBus bus = (IDEBus) dev.getBus();
-        final IDEWriteSectorsCommand cmd;
-        cmd =
-            new IDEWriteSectorsCommand(
-                dev.isPrimary(),
-                dev.isMaster(),
-                lbaStart,
-                sectors,
-                srcBuf,
-                srcOffset,
-                length);
-        try {
-            bus.executeAndWait(cmd, IDE_DATA_XFER_TIMEOUT);
-        } catch (InterruptedException ex) {
-            final IOException ioe = new IOException("IDE write interrupted");
-            ioe.initCause(ex);
-            throw ioe;
-        } catch (TimeoutException ex) {
-            throw new InterruptedIOException("IDE timeout: " + ex.getMessage());
-        }
-        if (cmd.hasError()) {
-            throw new IOException("IDE write error:" + cmd.getError());
         }
     }
 

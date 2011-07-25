@@ -192,6 +192,32 @@ public interface IDEConstants {
     public static final long IDE_DATA_XFER_TIMEOUT = 10000; /* ms */
 
     // --------------------------------
+    // IDE sector maximum addresses
+
+    /**
+     * Maximum sector for 28 bit addresses
+     */
+    public static final int MAX_SECTOR_COUNT_28 = 256;
+
+    /**
+     * Maximum sector for 48 bit addresses
+     */
+    public static final int MAX_SECTOR_COUNT_48 = 65536;
+
+    // --------------------------------
+    // IDE sector maximum addresses
+
+    /**
+     * Maximum sector for 28 bit addresses
+     */
+    public static final long MAX_SECTOR_28 = 0xfffffffL;
+
+    /**
+     * Maximum sector for 48 bit addresses
+     */
+    public static final long MAX_SECTOR_48 = 0xfffffffffffffL;
+
+    // --------------------------------
     // ATA/ATAPI Commands pre T13 Spec
     public static final int CMD_NOP = 0x00;
     public static final int CFA_REQ_EXT_ERROR_CODE = 0x03; /* CFA Request Extended Error Code */

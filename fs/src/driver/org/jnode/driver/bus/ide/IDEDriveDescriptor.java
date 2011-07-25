@@ -193,7 +193,14 @@ public class IDEDriveDescriptor {
      * @return True if this device supports 48-bit addressing, false otherwise
      */
     public boolean supports48bitAddressing() {
-        return ((data[83] & 0x40) != 0);
+        return ((data[83] & 0x400) != 0);
+    }
+
+    /**
+     * Gets the number of addressable sectors
+     */
+    public long getSectorsAddressable() {
+        return supports48bitAddressing() ? getSectorsIn48bitAddressing() : getSectorsIn28bitAddressing();
     }
 
     /**
@@ -201,7 +208,7 @@ public class IDEDriveDescriptor {
      *
      * @return the number of addressable sectors
      */
-    public long getSectorsIn28bitAddressing() {
+    private long getSectorsIn28bitAddressing() {
         final long h = data[61];
         final long l = data[60];
         return ((h << 16) & 0xFFFF0000) | (l & 0xFFFF);
@@ -212,12 +219,11 @@ public class IDEDriveDescriptor {
      *
      * @return the number of addressable sectors
      */
-    public long getSectorsIn48bitAddressing() {
+    private long getSectorsIn48bitAddressing() {
         final long v3 = data[103] & 0xFFFF;
         final long v2 = data[102] & 0xFFFF;
         final long v1 = data[101] & 0xFFFF;
         final long v0 = data[100] & 0xFFFF;
-        return (v3 << 48) | (v2 << 16) | (v1 << 16) | v0;
+        return (v3 << 48) | (v2 << 32) | (v1 << 16) | v0;
     }
-
 }
