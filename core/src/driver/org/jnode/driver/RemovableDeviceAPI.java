@@ -75,7 +75,7 @@ public interface RemovableDeviceAPI extends DeviceAPI {
         throws IOException;
 
     /**
-     * Eject this device.
+     * Load this device.
      *
      * @throws IOException
      */
