@@ -290,6 +290,11 @@ public class FloppyDriver extends Driver implements FSBlockDeviceAPI, RemovableD
         throw new IOException("Unsupported operation");
     }
 
+    @Override
+    public void load() throws IOException {
+        throw new IOException("Unsupported operation");
+    }
+
     /**
      * Test if the disk has been changed and/or the format of the loaded floppy
      * is known. If the floppy has been changed or the format of the floppy is

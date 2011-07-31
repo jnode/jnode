@@ -239,6 +239,31 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
     }
 
     /**
+     * Load this device.
+     *
+     * @throws IOException
+     */
+    public void load() throws IOException {
+        if (locked) {
+            throw new IOException("Device is locked");
+        }
+        final SCSIDevice dev = (SCSIDevice) getDevice();
+        try {
+            MMCUtils.startStopUnit(dev, CDBStartStopUnit.Action.LOAD, false);
+        } catch (SCSIException ex) {
+            final IOException ioe = new IOException();
+            ioe.initCause(ex);
+            throw ioe;
+        } catch (TimeoutException ex) {
+            final IOException ioe = new IOException();
+            ioe.initCause(ex);
+            throw ioe;
+        } catch (InterruptedException ex) {
+            throw new InterruptedIOException();
+        }
+    }
+
+    /**
      * Process the changed flag.
      *
      * @throws IOException

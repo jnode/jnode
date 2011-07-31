@@ -217,4 +217,9 @@ public class USBStorageSCSIDriver extends Driver
         // TODO Auto-generated method stub
 
     }
+
+    @Override
+    public void load() throws IOException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }
