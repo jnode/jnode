@@ -27,7 +27,10 @@
 
   <extension point="org.jnode.shell.syntaxes">
     <syntax alias="eject">
-      <argument argLabel="device" description="eject a device with a removable medium"/>
+      <sequence>
+        <optional><option argLabel="t" shortName="t" description="load a device with a removable medium"/></optional>
+        <optional><argument argLabel="device" description="eject a device with a removable medium"/></optional>
+      </sequence>
     </syntax>
     <syntax alias="mount">
       <empty description="list all mounted filesystems"/>
