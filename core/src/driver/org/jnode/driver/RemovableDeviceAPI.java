@@ -73,4 +73,12 @@ public interface RemovableDeviceAPI extends DeviceAPI {
      */
     public void eject()
         throws IOException;
+
+    /**
+     * Eject this device.
+     *
+     * @throws IOException
+     */
+    public void load()
+        throws IOException;
 }
