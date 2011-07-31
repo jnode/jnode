@@ -35,7 +35,7 @@ public interface SCSIConstants {
     /**
      * Group1 timeout, do not retry
      */
-    public static final long GROUP1_TIMEOUT = 5000;
+    public static final long GROUP1_TIMEOUT = 10000;
     /**
      * Group2 timeout, you can retry
      */
