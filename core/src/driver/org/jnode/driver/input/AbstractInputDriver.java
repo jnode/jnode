@@ -34,16 +34,17 @@ public abstract class AbstractInputDriver<E extends SystemEvent> extends Driver 
     private final ArrayList<SystemListener> listeners = new ArrayList<SystemListener>();
 
     private QueueProcessorThread<E> eventQueueThread;
-    private final Queue<E> eventQueue = new Queue<E>();
+    private Queue<E> eventQueue = new Queue<E>();
     private InputDaemon daemon;
 
     protected final void startDispatcher(String id) {
+        this.eventQueue = new Queue<E>();
         this.daemon = new InputDaemon(id + "-daemon");
-        daemon.start();
+        this.daemon.start();
 
         this.eventQueueThread = new QueueProcessorThread<E>(id + "-dispatcher",
             eventQueue, new SystemEventDispatcher());
-        eventQueueThread.start();
+        this.eventQueueThread.start();
     }
 
     protected final void stopDispatcher() {
