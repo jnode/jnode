@@ -17,75 +17,56 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.catalog;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.jnode.fs.hfsplus.tree.AbstractNode;
 import org.jnode.fs.hfsplus.tree.IndexRecord;
 import org.jnode.fs.hfsplus.tree.Key;
-import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
-import org.jnode.fs.hfsplus.tree.NodeRecord;
-import org.jnode.util.BigEndian;
 
-public class CatalogNode extends AbstractNode {
-    
+public class CatalogIndexNode extends AbstractNode<IndexRecord> {
+
     /**
      * Create a new node.
+     * 
      * @param descriptor
      * @param nodeSize
      */
-    public CatalogNode(NodeDescriptor descriptor, final int nodeSize) {
-        this.descriptor = descriptor;
-        this.size = nodeSize;
-        this.records = new ArrayList<NodeRecord>(descriptor.getNumRecords());
-        this.offsets = new ArrayList<Integer>(descriptor.getNumRecords() + 1);
-        this.offsets.add(Integer.valueOf(NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH));
+    public CatalogIndexNode(NodeDescriptor descriptor, final int nodeSize) {
+        super(descriptor, nodeSize);
     }
 
     /**
      * Create node from existing data.
+     * 
      * @param nodeData
      * @param nodeSize
      */
-    public CatalogNode(final byte[] nodeData, final int nodeSize) {
-        this.descriptor = new NodeDescriptor(nodeData, 0);
-        this.size = nodeSize;
-        this.records = new ArrayList<NodeRecord>(this.descriptor.getNumRecords());
-        this.offsets = new ArrayList<Integer>(this.descriptor.getNumRecords() + 1);
-        int offset;
-        for (int i = 0; i < this.descriptor.getNumRecords() + 1; i++) {
-            offset = BigEndian.getInt16(nodeData, size - ((i + 1) * 2));
-            offsets.add(Integer.valueOf(offset));
-        }
-        CatalogKey key;
-        for (int i = 0; i < this.descriptor.getNumRecords(); i++) {
-            offset = offsets.get(i);
-            key = new CatalogKey(nodeData, offset);
-            if (isIndexNode()) {
-                records.add(new IndexRecord(key, nodeData, offset));
-            } else {
-                int recordSize = offsets.get(i + 1) - offset;
-                records.add(new LeafRecord(key, nodeData, offset, recordSize));
-            }
-        }
+    public CatalogIndexNode(final byte[] nodeData, final int nodeSize) {
+        super(nodeData, nodeSize);
+
     }
 
     @Override
-    public NodeRecord getNodeRecord(int index) {
-        return records.get(index);
+    protected void loadRecords(final byte[] nodeData) {
+        CatalogKey key;
+        int offset;
+        for (int i = 0; i < this.descriptor.getNumRecords(); i++) {
+            offset = offsets.get(i);
+            key = new CatalogKey(nodeData, offset);
+            records.add(new IndexRecord(key, nodeData, offset));
+        }
     }
 
     /**
      * @param parentId
      * @return a NodeRecord or {@code null}
      */
-    public final NodeRecord find(final CatalogNodeId parentId) {
-        for (NodeRecord record : records) {
+    public final IndexRecord find(final CatalogNodeId parentId) {
+        for (IndexRecord record : records) {
             Key key = record.getKey();
             if (key instanceof CatalogKey) {
                 if (((CatalogKey) key).getParentId().getId() == parentId.getId()) {
@@ -102,10 +83,10 @@ public class CatalogNode extends AbstractNode {
      * @param key The key to search.
      * @return a NodeRecord or {@code null}
      */
-    public NodeRecord find(final CatalogKey key) {
-        NodeRecord largestMatchingRecord = null;
+    public IndexRecord find(final CatalogKey key) {
+        IndexRecord largestMatchingRecord = null;
         for (int index = 0; index < this.getNodeDescriptor().getNumRecords(); index++) {
-            NodeRecord record = this.getNodeRecord(index);
+            IndexRecord record = this.getNodeRecord(index);
             if ((record.getKey().compareTo(key) <= 0)) {
                 if (largestMatchingRecord != null &&
                         record.getKey().compareTo(largestMatchingRecord.getKey()) > 0) {
@@ -120,14 +101,14 @@ public class CatalogNode extends AbstractNode {
      * @param parentId
      * @return an array of NodeRecords
      */
-    public final NodeRecord[] findChildren(final CatalogNodeId parentId) {
-        LinkedList<NodeRecord> result = new LinkedList<NodeRecord>();
-        NodeRecord largestMatchingRecord = null;
+    public final IndexRecord[] findAll(final CatalogNodeId parentId) {
+        LinkedList<IndexRecord> result = new LinkedList<IndexRecord>();
+        IndexRecord largestMatchingRecord = null;
         CatalogKey largestMatchingKey = null;
-        for (NodeRecord record : records) {
+        for (IndexRecord record : records) {
             CatalogKey key = (CatalogKey) record.getKey();
-            if (key.getParentId().getId() < parentId.getId()
-                && (largestMatchingKey == null || key.compareTo(largestMatchingKey) > 0)) {
+            if (key.getParentId().getId() < parentId.getId() &&
+                    (largestMatchingKey == null || key.compareTo(largestMatchingKey) > 0)) {
                 largestMatchingKey = key;
                 largestMatchingRecord = record;
             } else if (key.getParentId().getId() == parentId.getId()) {
@@ -138,23 +119,7 @@ public class CatalogNode extends AbstractNode {
         if (largestMatchingKey != null) {
             result.addFirst(largestMatchingRecord);
         }
-        return result.toArray(new NodeRecord[result.size()]);
-    }
-
-    /**
-     * @param parentId
-     * @return an array of NodeRecords
-     */
-    public final NodeRecord[] findAll(final CatalogNodeId parentId) {
-        List<NodeRecord> list = new LinkedList<NodeRecord>();
-        for (int index = 0; index < this.getNodeDescriptor().getNumRecords(); index++) {
-            NodeRecord record = this.getNodeRecord(index);
-            Key key = record.getKey();
-            if (key instanceof CatalogKey && ((CatalogKey) key).getParentId().getId() == parentId.getId()) {
-                list.add(record);
-            }
-        }
-        return list.toArray(new NodeRecord[list.size()]);
+        return result.toArray(new IndexRecord[result.size()]);
     }
 
 }

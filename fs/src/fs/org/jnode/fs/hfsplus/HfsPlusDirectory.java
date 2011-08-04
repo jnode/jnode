@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import java.io.FileNotFoundException;
@@ -127,6 +127,7 @@ public class HfsPlusDirectory extends HfsPlusEntry implements FSDirectory {
 
     @Override
     public Iterator<? extends FSEntry> iterator() throws IOException {
+        checkEntriesLoaded();
         return entries.iterator();
     }
 
@@ -161,6 +162,7 @@ public class HfsPlusDirectory extends HfsPlusEntry implements FSDirectory {
             try {
                 if (rights.canRead()) {
                     entries = readEntries();
+                    log.debug("Load " + entries.size() + " entrie(s).");
                 } else {
                     // the next time, we will call checkEntriesLoaded()
                     // we will retry to load entries
@@ -226,8 +228,9 @@ public class HfsPlusDirectory extends HfsPlusEntry implements FSDirectory {
         Catalog catalog = fs.getCatalog();
         Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
         LeafRecord folderRecord =
-                catalog.createNode(name, this.folder.getFolderId(), new CatalogNodeId(volumeHeader
-                        .getNextCatalogId()), CatalogFolder.RECORD_TYPE_FOLDER_THREAD);
+                catalog.createNode(name, this.folder.getFolderId(),
+                        new CatalogNodeId(volumeHeader.getNextCatalogId()),
+                        CatalogFolder.RECORD_TYPE_FOLDER_THREAD);
         folder.setValence(folder.getValence() + 1);
 
         HfsPlusEntry newEntry = new HfsPlusDirectory(fs, this, name, folderRecord);
