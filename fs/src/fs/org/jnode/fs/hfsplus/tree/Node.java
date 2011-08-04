@@ -17,22 +17,18 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.tree;
 
-public interface Node {
+public interface Node<T extends NodeRecord> {
 
     public static final int OFFSET_SIZE = 2;
 
     public NodeDescriptor getNodeDescriptor();
 
-    public boolean isIndexNode();
-
-    public boolean isLeafNode();
-
     public int getRecordOffset(int index);
 
-    public NodeRecord getNodeRecord(int index);
+    public T getNodeRecord(int index);
 
     /**
      * Insert a record in the node.
@@ -41,5 +37,5 @@ public interface Node {
      * @return True if record is correctly inserted, false if there is not
      *         enough place to insert the record.
      */
-    public boolean addNodeRecord(NodeRecord record);
+    public boolean addNodeRecord(T record);
 }

@@ -17,29 +17,33 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.extent;
 
 import org.jnode.fs.hfsplus.tree.AbstractNode;
+import org.jnode.fs.hfsplus.tree.IndexRecord;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
-import org.jnode.fs.hfsplus.tree.NodeRecord;
 
-public class ExtentNode extends AbstractNode {
-    
+public class ExtentNode extends AbstractNode<IndexRecord> {
+
     public ExtentNode(NodeDescriptor descriptor, final int nodeSize) {
-        this.descriptor = descriptor;
-        this.size = nodeSize;
+        super(descriptor, nodeSize);
     }
-    
+
     public ExtentNode(final byte[] nodeData, final int nodeSize) {
-        this.descriptor = new NodeDescriptor(nodeData, 0);
-        this.size = nodeSize;
+        super(nodeData, nodeSize);
     }
 
     @Override
-    public NodeRecord getNodeRecord(int index) {
+    public IndexRecord getNodeRecord(int index) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    protected void loadRecords(byte[] nodeData) {
+        // TODO Auto-generated method stub
+
     }
 
 }
