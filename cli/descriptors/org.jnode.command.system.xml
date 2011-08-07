@@ -288,6 +288,9 @@
       <optional description="Display all extant JNode Threads">
         <option argLabel="groupDump" shortName="g" longName="groupDump"/>
       </optional>
+      <optional description="Display all threads in thread groups">
+        <option argLabel="verbose" shortName="v"/>
+      </optional>
       <argument argLabel="threadName" description="Display the named Thread"/>
     </syntax>
     <syntax alias="vminfo">
