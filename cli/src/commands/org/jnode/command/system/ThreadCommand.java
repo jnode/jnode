@@ -24,6 +24,8 @@ import java.io.PrintWriter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import java.util.Comparator;
+import java.util.TreeSet;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -36,11 +38,13 @@ import org.jnode.vm.scheduler.VmThread;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Martin Husted Hartvig (hagar@jnode.org)
  * @author crawley@jnode.org
+ * @author Levente S\u00e1ntha
  */
 public class ThreadCommand extends AbstractCommand {
     
     private static final String help_name = "the name of a specific thread to be printed";
-    private static final String help_group = "if set, output a ThreadGroup dump";
+    private static final String help_group = "output a ThreadGroup dump";
+    private static final String help_verbose = "show all threads in thread groups";
     private static final String help_super = "View info about all threads, or a specific thread";
     
     private static final String SEPARATOR = ", ";
@@ -50,12 +54,14 @@ public class ThreadCommand extends AbstractCommand {
 
     private final ThreadNameArgument argName;
     private final FlagArgument argDump;
+    private final FlagArgument argVerbose;
 
     public ThreadCommand() {
         super(help_super);
         argName = new ThreadNameArgument("threadName", Argument.OPTIONAL, help_name);
         argDump = new FlagArgument("groupDump", Argument.OPTIONAL, help_group);
-        registerArguments(argName, argDump);
+        argVerbose = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
+        registerArguments(argName, argVerbose, argDump);
     }
 
     public static void main(String[] args) throws Exception {
@@ -82,8 +88,54 @@ public class ThreadCommand extends AbstractCommand {
             // standard API.
             grp.list();
         } else {
-            // Show the threads in the ThreadGroup tree.
-            showThreads(grp, getOutput().getPrintWriter(), threadName);
+            if(!argVerbose.isSet() && !argName.isSet()) {
+                showDefaultInfo(grp);
+            } else {
+                // Show the threads in the ThreadGroup tree.
+                showThreads(grp, getOutput().getPrintWriter(), threadName);
+            }
+        }
+    }
+
+    private void showDefaultInfo(ThreadGroup grp) {
+        TreeSet<Thread> threadSet = new TreeSet<Thread>(new Comparator<Thread>() {
+            @Override
+            public int compare(Thread t1, Thread t2) {
+                return Long.valueOf(t1.getId()).compareTo(t2.getId());
+            }
+        });
+        findThreads(grp, threadSet);
+
+        PrintWriter out = getOutput().getPrintWriter();
+        for(final Thread thread : threadSet) {
+            VmThread vmThread = AccessController.doPrivileged(new PrivilegedAction<VmThread>() {
+                public VmThread run() {
+                    return ThreadHelper.getVmThread(thread);
+                }
+            });
+            out.println(" " + thread.getId() + SEPARATOR + thread.getName() + SEPARATOR + thread.getPriority() +
+                SEPARATOR + vmThread.getThreadStateName());
+        }
+    }
+
+    private void findThreads(ThreadGroup grp, TreeSet<Thread> threadSet) {
+        final int max = grp.activeCount() * 2;
+        final Thread[] ts = new Thread[max];
+        grp.enumerate(ts);
+        for (int i = 0; i < max; i++) {
+            final Thread t = ts[i];
+            if (t != null) {
+                threadSet.add(t);
+            }
+        }
+        final int gmax = grp.activeGroupCount() * 2;
+        final ThreadGroup[] tgs = new ThreadGroup[gmax];
+        grp.enumerate(tgs);
+        for (int i = 0; i < gmax; i++) {
+            final ThreadGroup tg = tgs[i];
+            if (tg != null) {
+                findThreads(tg, threadSet);
+            }
         }
     }
 
