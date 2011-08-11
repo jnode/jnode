@@ -47,6 +47,8 @@ public abstract class AbstractFSFile extends AbstractFSObject implements FSFile 
      */
     public abstract long getLength();
 
+    public abstract void setLength(long length) throws IOException;
+
     /**
      * Read some data from the file
      * 

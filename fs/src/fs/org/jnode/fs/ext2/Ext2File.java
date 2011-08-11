@@ -45,32 +45,13 @@ public class Ext2File extends AbstractFSFile {
         log.setLevel(Level.DEBUG);
     }
 
-    /**
-     * @see org.jnode.fs.FSFile#getLength()
-     */
+    @Override
     public long getLength() {
         //log.debug("getLength(): "+iNode.getSize());
         return iNode.getSize();
     }
 
-    private long getLengthInBlocks() {
-        return iNode.getSizeInBlocks();
-    }
-
-    private void rereadInode() throws IOException {
-        int iNodeNr = iNode.getINodeNr();
-        try {
-            iNode = ((Ext2FileSystem) getFileSystem()).getINode(iNodeNr);
-        } catch (FileSystemException ex) {
-            final IOException ioe = new IOException();
-            ioe.initCause(ex);
-            throw ioe;
-        }
-    }
-
-    /**
-     * @see org.jnode.fs.FSFile#setLength(long)
-     */
+    @Override
     public void setLength(long length) throws IOException {
         if (!canWrite())
             throw new ReadOnlyFileSystemException("FileSystem or File is readonly");
@@ -163,9 +144,9 @@ public class Ext2File extends AbstractFSFile {
         } // synchronized(inode)
     }
 
-    /**
-     * @see org.jnode.fs.FSFile#read(long, ByteBuffer)
-     */
+
+
+    @Override
     public void read(long fileOffset, ByteBuffer destBuf) throws IOException {
         final int len = destBuf.remaining();
         final int off = 0;
@@ -174,8 +155,7 @@ public class Ext2File extends AbstractFSFile {
         final byte[] dest = destBA.toArray();
 
         //synchronize to the inode cache to make sure that the inode does not
-        // get
-        //flushed between reading it and locking it
+        // get flushed between reading it and locking it
         synchronized (((Ext2FileSystem) getFileSystem()).getInodeCache()) {
             //reread the inode before synchronizing to it to make sure
             //all threads use the same instance
@@ -228,13 +208,7 @@ public class Ext2File extends AbstractFSFile {
         destBA.refreshByteBuffer();
     }
 
-    /**
-     * Write into the file. fileOffset is between 0 and getLength() (see the
-     * methods write(byte[], int, int), setPosition(long), setLength(long) in
-     * org.jnode.fs.service.def.FileHandleImpl)
-     * 
-     * @see org.jnode.fs.FSFile#write(long, ByteBuffer)
-     */
+    @Override
     public void write(long fileOffset, ByteBuffer srcBuf) throws IOException {
         final int len = srcBuf.remaining();
         final int off = 0;
@@ -331,16 +305,27 @@ public class Ext2File extends AbstractFSFile {
         }
     }
 
-    /**
-     * Flush any cached data to the disk.
-     * 
-     * @throws IOException
-     */
+    @Override
     public void flush() throws IOException {
         log.debug("Ext2File.flush()");
         iNode.update();
         //update the group descriptors and superblock: needed if blocks have
         //been allocated or deallocated
         iNode.getExt2FileSystem().updateFS();
+    }
+
+    private long getLengthInBlocks() {
+        return iNode.getSizeInBlocks();
+    }
+
+    private void rereadInode() throws IOException {
+        int iNodeNr = iNode.getINodeNr();
+        try {
+            iNode = ((Ext2FileSystem) getFileSystem()).getINode(iNodeNr);
+        } catch (FileSystemException ex) {
+            final IOException ioe = new IOException();
+            ioe.initCause(ex);
+            throw ioe;
+        }
     }
 }

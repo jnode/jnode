@@ -60,8 +60,8 @@ public class HfsPlusFileSystemTest extends TestCase {
         params.setJournaled(false);
         params.setJournalSize(HFSPlusParams.DEFAULT_JOURNAL_SIZE);
         fs.create(params);
-        Superblock vh = fs.getVolumeHeader();
-        assertEquals(Superblock.HFSPLUS_SUPER_MAGIC, vh.getMagic());
+        SuperBlock vh = fs.getVolumeHeader();
+        assertEquals(SuperBlock.HFSPLUS_SUPER_MAGIC, vh.getMagic());
         assertEquals(4096, vh.getBlockSize());
 
     }

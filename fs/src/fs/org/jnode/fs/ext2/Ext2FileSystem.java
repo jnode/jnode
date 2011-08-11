@@ -91,7 +91,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
             // skip the first 1024 bytes (bootsector) and read the superblock
             // TODO: the superblock should read itself
             getApi().read(1024, data);
-            // superblock = new Superblock(data, this);
+            // superblock = new SuperBlock(data, this);
             superblock = new Superblock();
             superblock.read(data.array(), this);
 

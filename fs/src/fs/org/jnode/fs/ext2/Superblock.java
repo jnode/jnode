@@ -157,7 +157,7 @@ public class Superblock {
         setPreallocBlocks(8);
         setPreallocDirBlocks(0);
 
-        log.debug("Superblock.create(): getBlockSize(): " + getBlockSize());
+        log.debug("SuperBlock.create(): getBlockSize(): " + getBlockSize());
     }
 
     /**
@@ -693,7 +693,7 @@ public class Superblock {
     }
 
     /**
-     * @return the Superblock's dirty flag
+     * @return the SuperBlock's dirty flag
      */
     public boolean isDirty() {
         return dirty;

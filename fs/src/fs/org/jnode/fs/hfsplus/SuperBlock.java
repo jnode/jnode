@@ -39,7 +39,7 @@ import org.jnode.util.NumberUtils;
  * @author Fabien Lesire
  * 
  */
-public class Superblock extends HfsPlusObject {
+public class SuperBlock extends HfsPlusObject {
 
     public static final int HFSPLUS_SUPER_MAGIC = 0x482b;
 
@@ -72,7 +72,7 @@ public class Superblock extends HfsPlusObject {
      * @throws FileSystemException If magic number (0X482B) is incorrect or not
      *             available.
      */
-    public Superblock(final HfsPlusFileSystem fs, boolean create) throws FileSystemException {
+    public SuperBlock(final HfsPlusFileSystem fs, boolean create) throws FileSystemException {
         super(fs);
         log.setLevel(Level.INFO);
         data = new byte[SUPERBLOCK_LENGTH];
@@ -99,11 +99,8 @@ public class Superblock extends HfsPlusObject {
     /**
      * Create a new volume header.
      * 
-     * @param params
-     * 
+     * @param params File system format parameters.
      * @throws IOException
-     * @throws ApiNotFoundException
-     * @throws FileSystemException
      */
     public void create(HFSPlusParams params) throws IOException {
         log.info("Create new HFS+ volume header (" + params.getVolumeName() +

@@ -63,7 +63,7 @@ public class HfsPlusFileSystemType implements BlockDeviceFileSystemType<HfsPlusF
             return false;
         }
         int magicNumber = BigEndian.getInt16(magic.array(), 0);
-        return (magicNumber == Superblock.HFSPLUS_SUPER_MAGIC);
+        return (magicNumber == SuperBlock.HFSPLUS_SUPER_MAGIC);
     }
 
 }
