@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.jnode.fs.hfsplus.HFSPlusParams;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
 import org.jnode.fs.hfsplus.HfsUnicodeString;
-import org.jnode.fs.hfsplus.Superblock;
+import org.jnode.fs.hfsplus.SuperBlock;
 import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
 import org.jnode.fs.hfsplus.tree.BTHeaderRecord;
 import org.jnode.fs.hfsplus.tree.IndexRecord;
@@ -65,7 +65,7 @@ public class Catalog {
     public Catalog(final HfsPlusFileSystem fs) throws IOException {
         log.info("Load B-Tree catalog file.");
         this.fs = fs;
-        Superblock sb = fs.getVolumeHeader();
+        SuperBlock sb = fs.getVolumeHeader();
         ExtentDescriptor firstExtent = sb.getCatalogFile().getExtent(0);
         catalogHeaderNodeOffset = firstExtent.getStartOffset(sb.getBlockSize());
         if (!firstExtent.isEmpty()) {
@@ -149,7 +149,7 @@ public class Catalog {
      * @throws IOException
      */
     public void update() throws IOException {
-        Superblock vh = fs.getVolumeHeader();
+        SuperBlock vh = fs.getVolumeHeader();
         int offset = vh.getCatalogFile().getExtent(0).getStartOffset(vh.getBlockSize());
         fs.getApi().write(offset, this.getBytes());
     }

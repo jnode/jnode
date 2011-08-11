@@ -26,6 +26,7 @@ import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
+import org.jnode.fs.FSObject;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.hfsplus.catalog.CatalogFile;
 import org.jnode.fs.hfsplus.catalog.CatalogFolder;
@@ -87,7 +88,7 @@ public class HfsPlusEntry implements FSEntry {
         if (!isDirectory()) {
             throw new IOException("It is not a Directory");
         }
-        return (HfsPlusDirectory) this;
+        return new HfsPlusDirectory(this);
     }
 
     @Override
@@ -95,7 +96,7 @@ public class HfsPlusEntry implements FSEntry {
         if (!isFile()) {
             throw new IOException("It is not a file");
         }
-        return (HfsPlusFile) this;
+        return new HfsPlusFile(this);
     }
 
     @Override
@@ -162,6 +163,10 @@ public class HfsPlusEntry implements FSEntry {
     @Override
     public boolean isValid() {
         return valid;
+    }
+
+    public byte[] getData(){
+        return this.record.getData();
     }
 
 }

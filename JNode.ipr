@@ -17,11 +17,11 @@
   <component name="CheckStyle-IDEA">
     <option name="configuration">
       <map>
-        <entry key="active-configuration" value="FILE:$PROJECT_DIR$/all/jnode_checks.xml:JNode" />
+        <entry key="active-configuration" value="FILE:/home/flesire/developement/sources/jnode/jnode.orig/all/jnode_checks.xml:JNode" />
         <entry key="check-test-classes" value="true" />
         <entry key="config-file" value="$PROJECT_DIR$/all/jnode_checks.xml" />
         <entry key="location-0" value="CLASSPATH:/sun_checks.xml:The default CheckStyle rules." />
-        <entry key="location-1" value="FILE:$PROJECT_DIR$/all/jnode_checks.xml:JNode" />
+        <entry key="location-1" value="FILE:/home/flesire/developement/sources/jnode/jnode.orig/all/jnode_checks.xml:JNode" />
         <entry key="thirdparty-classpath" value="" />
       </map>
     </option>
@@ -214,12 +214,13 @@
   </component>
   <component name="IdProvider" IDEtalkID="435AAC2234C36B0F2257FA7F02C447FB" />
   <component name="InspectionProjectProfileManager">
-    <list size="5">
+    <list size="6">
       <item index="0" class="java.lang.String" itemvalue="SERVER PROBLEM" />
-      <item index="1" class="java.lang.String" itemvalue="INFO" />
-      <item index="2" class="java.lang.String" itemvalue="TYPO" />
-      <item index="3" class="java.lang.String" itemvalue="WARNING" />
-      <item index="4" class="java.lang.String" itemvalue="ERROR" />
+      <item index="1" class="java.lang.String" itemvalue="WEAK WARNING" />
+      <item index="2" class="java.lang.String" itemvalue="INFO" />
+      <item index="3" class="java.lang.String" itemvalue="TYPO" />
+      <item index="4" class="java.lang.String" itemvalue="WARNING" />
+      <item index="5" class="java.lang.String" itemvalue="ERROR" />
     </list>
   </component>
   <component name="JavacSettings">
