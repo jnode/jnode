@@ -40,8 +40,6 @@ import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.BlockDeviceAPIHelper;
-import org.jnode.driver.block.PartitionableBlockAlignmentSupport;
-import org.jnode.driver.block.PartitionableBlockDeviceAPI;
 import org.jnode.driver.bus.ide.IDEBus;
 import org.jnode.driver.bus.ide.IDEConstants;
 import org.jnode.driver.bus.ide.IDEDevice;

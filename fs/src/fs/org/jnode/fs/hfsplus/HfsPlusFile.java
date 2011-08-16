@@ -27,7 +27,6 @@ import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.hfsplus.catalog.CatalogFile;
 import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
-import org.jnode.fs.hfsplus.tree.LeafRecord;
 
 public class HfsPlusFile implements FSFile {
 
@@ -74,7 +73,7 @@ public class HfsPlusFile implements FSFile {
 
     @Override
     public boolean isValid() {
-       return entry.isValid();
+        return entry.isValid();
     }
 
     @Override

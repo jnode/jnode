@@ -88,7 +88,7 @@ public class ThreadCommand extends AbstractCommand {
             // standard API.
             grp.list();
         } else {
-            if(!argVerbose.isSet() && !argName.isSet()) {
+            if (!argVerbose.isSet() && !argName.isSet()) {
                 showDefaultInfo(grp);
             } else {
                 // Show the threads in the ThreadGroup tree.
@@ -107,7 +107,7 @@ public class ThreadCommand extends AbstractCommand {
         findThreads(grp, threadSet);
 
         PrintWriter out = getOutput().getPrintWriter();
-        for(final Thread thread : threadSet) {
+        for (final Thread thread : threadSet) {
             VmThread vmThread = AccessController.doPrivileged(new PrivilegedAction<VmThread>() {
                 public VmThread run() {
                     return ThreadHelper.getVmThread(thread);

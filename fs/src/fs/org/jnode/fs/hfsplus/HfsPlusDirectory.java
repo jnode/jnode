@@ -229,7 +229,7 @@ public class HfsPlusDirectory implements FSDirectory {
         if (getFileSystem().isReadOnly()) {
             throw new ReadOnlyFileSystemException();
         }
-        Catalog catalog = ((HfsPlusFileSystem)getFileSystem()).getCatalog();
+        Catalog catalog = ((HfsPlusFileSystem) getFileSystem()).getCatalog();
         SuperBlock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
         LeafRecord folderRecord =
                 catalog.createNode(name, this.folder.getFolderId(),
@@ -237,7 +237,7 @@ public class HfsPlusDirectory implements FSDirectory {
                         CatalogFolder.RECORD_TYPE_FOLDER_THREAD);
         folder.setValence(folder.getValence() + 1);
 
-        HfsPlusEntry newEntry = new HfsPlusEntry((HfsPlusFileSystem)getFileSystem(), this, name, folderRecord);
+        HfsPlusEntry newEntry = new HfsPlusEntry((HfsPlusFileSystem) getFileSystem(), this, name, folderRecord);
         newEntry.setDirty();
         volumeHeader.setFolderCount(volumeHeader.getFolderCount() + 1);
         log.debug("New volume header :\n" + volumeHeader.toString());
