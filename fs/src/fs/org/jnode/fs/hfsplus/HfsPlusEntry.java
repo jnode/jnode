@@ -26,7 +26,6 @@ import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
-import org.jnode.fs.FSObject;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.hfsplus.catalog.CatalogFile;
 import org.jnode.fs.hfsplus.catalog.CatalogFolder;
@@ -165,7 +164,7 @@ public class HfsPlusEntry implements FSEntry {
         return valid;
     }
 
-    public byte[] getData(){
+    public byte[] getData() {
         return this.record.getData();
     }
 
