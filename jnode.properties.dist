@@ -10,6 +10,9 @@
 # if you have custom initjars to build.
 # custom.plugin-list.dir = ${root.dir}/local/plugin-lists/
 
+# Custom GRUB menu for JNode CD image
+#grub.menu.cdrom=${root.dir}/local/menu-cdrom.lst
+
 # Uncomment this property if you do not want the default initjars to be build.
 # no.default.initjars = 1
 
