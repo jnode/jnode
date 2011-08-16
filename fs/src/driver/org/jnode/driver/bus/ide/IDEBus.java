@@ -278,7 +278,7 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
             | (master ? SEL_DRIVE_MASTER : SEL_DRIVE_SLAVE);
         io.setSelectReg(select);
         // Wait a while
-        TimeUtils.sleep(50);
+        TimeUtils.sleep(200);
         return (io.getSelectReg() == select);
     }
 
