@@ -32,6 +32,7 @@ import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.bus.ide.IDEConstants;
 import org.jnode.driver.bus.ide.IDEDevice;
+import org.jnode.driver.bus.ide.IDEDeviceAPI;
 import org.jnode.driver.bus.ide.IDEDriveDescriptor;
 import org.jnode.naming.InitialNaming;
 import org.jnode.partitions.ibm.IBMPartitionTable;
@@ -83,8 +84,9 @@ public class FdiskCommand extends AbstractCommand {
     private final IBMPartitionTypeArgument ARG_TYPE =
         new IBMPartitionTypeArgument("type", Argument.OPTIONAL, "IBM partition type code");
 
+    //todo add support for more BlockDeviceAPI types
     private final DeviceArgument ARG_DEVICE =
-        new DeviceArgument("deviceId", Argument.OPTIONAL, "Target device", BlockDeviceAPI.class);
+        new DeviceArgument("deviceId", Argument.OPTIONAL, "Target device", IDEDeviceAPI.class);
 
     public FdiskCommand() {
         super("perform disk partition management tasks");
@@ -200,14 +202,13 @@ public class FdiskCommand extends AbstractCommand {
     private void listAvailableDevices(DeviceManager dm, PrintWriter out) {
         final Collection<Device> allDevices = dm.getDevicesByAPI(BlockDeviceAPI.class);
         for (Device dev : allDevices) {
-            out.println("Found device : " + dev.getId() + "[" + dev.getClass() + "]");
+            //out.println("Found device : " + dev.getId() + "[" + dev.getClass() + "]");
             if (dev instanceof IDEDevice) {
                 IDEDevice ideDevice = (IDEDevice) dev;
                 IDEDriveDescriptor desc = ideDevice.getDescriptor();
                 if (desc.isDisk()) {
-                    out.println("    IDE Disk : " + ideDevice.getId() + "(" + desc.getModel() +
-                        " " + desc.getSectorsAddressable() * IDEConstants.SECTOR_SIZE +
-                        ")");
+                    out.println("IDE Disk: " + ideDevice.getId() + "('" + desc.getModel() + "' " +
+                        desc.getSectorsAddressable() * IDEConstants.SECTOR_SIZE + " bytes)");
                 }
             }
         }
