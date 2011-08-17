@@ -26,6 +26,7 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="cat"     class="org.jnode.command.file.CatCommand"/>
     <alias name="cd"      class="org.jnode.command.file.CdCommand" internal="yes"/>
+    <alias name="cmp"     class="org.jnode.command.file.CmpCommand"/>
     <alias name="cp"      class="org.jnode.command.file.CpCommand"/>
     <alias name="cut"     class="org.jnode.command.file.CutCommand"/>
     <alias name="del"     class="org.jnode.command.file.DeleteCommand"/>
@@ -73,6 +74,12 @@
     <syntax alias="cd">
       <empty description="change the current directory to the 'user.home' directory"/>
       <argument argLabel="directory" description="change the current directory to 'directory'"/>
+    </syntax>
+    <syntax alias="cmp">
+      <sequence description="compare two files">
+        <argument argLabel="file1"/>
+        <argument argLabel="file2"/>
+      </sequence>
     </syntax>
     <syntax alias="cp">
       <sequence description="copy files or directories">
