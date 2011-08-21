@@ -86,6 +86,7 @@ public class PCSpeakerDriver extends Driver implements SpeakerAPI {
 
     /** A routine that releases all the resources back to the operating system. * */
     public void stopDevice() throws DriverException {
+        noSound();
         getDevice().unregisterAPI(SpeakerAPI.class);
         pitIO.release();
         speakIO.release();
@@ -140,6 +141,11 @@ public class PCSpeakerDriver extends Driver implements SpeakerAPI {
 
         // restore the speaker port
         speakIO.outPortByte(SPEAKER_PORT, oldPort);
+    }
+
+    public void noSound() {
+        int val = speakIO.inPortByte(SPEAKER_PORT);
+        speakIO.outPortByte(SPEAKER_PORT, val & 0xFC);
     }
 
     private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner,
