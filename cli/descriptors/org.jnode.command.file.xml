@@ -154,8 +154,16 @@
       </sequence>
     </syntax>
     <syntax alias="dir">
-      <empty description="list the current directory"/>
-      <argument argLabel="path" description="list a file or directory"/>
+      <sequence description="list files or directories">
+        <optional>
+            <option argLabel="humanReadable" shortName="l"/>
+        </optional>
+        <optional>
+            <repeat>
+                <argument argLabel="path" description="list a file or directory"/>
+            </repeat>
+        </optional>
+      </sequence>
     </syntax>
     <syntax alias="du">
       <sequence description="Disk Usage - report the amount of disk space used by the specified directory and for each subdirectory.">
@@ -284,11 +292,16 @@
       <option argLabel="url" shortName="u" longName="url" description="print a hex dump of a URL"/>
     </syntax>
     <syntax alias="ls">
-      <empty description="with -l, print sizes in human readable format (e.g., 1K 234M 2G)"/>
-      <option argLabel="humanReadable" shortName="h" longName="human-readable"/>
-      <repeat>
-        <argument argLabel="path" description="list files or directories"/>
-      </repeat>
+      <sequence description="list files or directories">
+        <optional>
+            <option argLabel="humanReadable" shortName="l"/>
+        </optional>
+        <optional>
+            <repeat>
+                <argument argLabel="path" description="list a file or directory"/>
+            </repeat>
+        </optional>
+      </sequence>
     </syntax>
     <syntax alias="md5sum">
       <empty description="Calculates the MD5 digest for standard input"/>
