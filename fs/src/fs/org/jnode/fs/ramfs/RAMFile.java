@@ -21,8 +21,11 @@
 package org.jnode.fs.ramfs;
 
 import java.io.IOException;
+import java.nio.BufferOverflowException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
+import java.util.ArrayList;
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -34,6 +37,7 @@ import org.jnode.fs.FileSystemFullException;
  * A File implementation in the system RAM
  * 
  * @author peda
+ * @author Levente S\u00e1ntha
  */
 public class RAMFile implements FSEntry, FSFile {
 
@@ -41,7 +45,7 @@ public class RAMFile implements FSEntry, FSFile {
     private RAMDirectory parent;
 
     private String filename;
-    private ByteBuffer buffer;
+    private BufferList bufferList;
 
     private long created;
     private long lastModified;
@@ -63,42 +67,36 @@ public class RAMFile implements FSEntry, FSFile {
 
         // TODO accessRights
 
-        buffer = ByteBuffer.allocate(128);
-        buffer.limit(0);
+        bufferList = new BufferList();
 
         fileSystem = (RAMFileSystem) parent.getFileSystem();
 
-        fileSystem.addSummmedBufferSize(128);
+        fileSystem.addSummmedBufferSize(bufferList.capacity());
     }
 
     private void enlargeBuffer() throws FileSystemFullException {
 
-        int oldCapacity = buffer.capacity();
+        int oldCapacity = bufferList.capacity();
 
         if (oldCapacity > fileSystem.getFreeSpace())
             throw new FileSystemFullException("RAMFileSystem reached maxSize");
 
-        ByteBuffer temp = ByteBuffer.allocate(oldCapacity * 2);
-        buffer.position(0);
-        temp.put(buffer);
-        buffer = temp;
-        buffer.position(0);
+        bufferList.enlarge();
+        int newCapacity = bufferList.capacity();
 
         // update fileSystem values
-        fileSystem.addSummmedBufferSize(oldCapacity);
+        fileSystem.addSummmedBufferSize(newCapacity - oldCapacity);
     }
 
     private void shrinkBuffer() {
 
-        int toShrink = buffer.capacity() / 2;
+        int oldCapacity = bufferList.capacity();
 
-        ByteBuffer temp = ByteBuffer.allocate(toShrink);
-        temp.put(buffer.array(), 0, toShrink);
-        buffer = temp;
-        buffer.position(0);
+        bufferList.shrink();
+        int newCapacity = bufferList.capacity();
 
         // update fileSystem counter
-        fileSystem.addSummmedBufferSize(-toShrink);
+        fileSystem.addSummmedBufferSize(newCapacity - oldCapacity);
     }
 
     /**
@@ -232,7 +230,7 @@ public class RAMFile implements FSEntry, FSFile {
      * @see org.jnode.fs.FSFile#getLength()
      */
     public long getLength() {
-        return buffer.limit();
+        return bufferList.limit();
     }
 
     /**
@@ -245,15 +243,15 @@ public class RAMFile implements FSEntry, FSFile {
         if (length > Integer.MAX_VALUE)
             throw new IOException("Filesize too large");
 
-        while (buffer.capacity() < length)
+        while (bufferList.capacity() < length)
             enlargeBuffer();
 
-        long toEnlarge = length - buffer.limit();
+        long toEnlarge = length - bufferList.limit();
 
-        while (length < buffer.capacity() / 2)
+        while (length < bufferList.capacity() / 2)
             shrinkBuffer();
 
-        buffer.limit((int) length);
+        bufferList.limit((int) length);
 
         // update fileSystem counters
         fileSystem.addSummedFileSize(toEnlarge);
@@ -267,14 +265,14 @@ public class RAMFile implements FSEntry, FSFile {
      */
     public void read(long fileOffset, ByteBuffer dest) throws IOException {
 
-        long currentSize = buffer.limit();
+        long currentSize = bufferList.limit();
         long toRead = dest.limit();
 
         if (fileOffset + toRead > currentSize)
             throw new IOException("FileOffest outside file");
 
-        buffer.position((int) fileOffset);
-        buffer.get(dest.array(), 0, dest.limit());
+        bufferList.position((int) fileOffset);
+        bufferList.get(dest.array(), 0, dest.limit());
     }
 
     /**
@@ -284,14 +282,14 @@ public class RAMFile implements FSEntry, FSFile {
      */
     public void write(long fileOffset, ByteBuffer src) throws IOException {
 
-        long currentSize = buffer.limit();
+        long currentSize = bufferList.limit();
         long toWrite = src.limit();
 
         if (fileOffset + toWrite >= currentSize)
             setLength(fileOffset + toWrite);
 
-        buffer.position((int) fileOffset);
-        buffer.put(src);
+        bufferList.position((int) fileOffset);
+        bufferList.put(src);
         setLastModified(System.currentTimeMillis());
     }
 
@@ -305,13 +303,184 @@ public class RAMFile implements FSEntry, FSFile {
 
     void remove() throws IOException {
 
-        long capacity = buffer.capacity();
+        long capacity = bufferList.capacity();
         long filesize = getLength();
 
         this.parent = null;
-        this.buffer = null;
+        this.bufferList = null;
 
         fileSystem.addSummedFileSize(-filesize);
         fileSystem.addSummmedBufferSize(-capacity);
+    }
+
+    /**
+     * A resizing Buffer-like structure combining a set of NIO Buffers into one entity.
+     *
+     * @author Levente S\u00e1ntha
+     */
+    private static class BufferList {
+        private static final int MAX_BUFFER_SIZE = 12 * 1024 * 1024;
+        private final ArrayList<ByteBuffer> bufferList;
+
+        BufferList() {
+            bufferList = new ArrayList<ByteBuffer>();
+            ByteBuffer buffer = ByteBuffer.allocate(128);
+            buffer.limit(0);
+            bufferList.add(buffer);
+        }
+
+        private void enlarge() {
+            int oldCapacity = capacity();
+            if (bufferList.size() == 1) {
+                final ByteBuffer oldBuffer = bufferList.get(0);
+                final int newCapacity = oldCapacity * 2;
+                bufferList.clear();
+                if (newCapacity > MAX_BUFFER_SIZE) {
+                    final ByteBuffer newBuffer = ByteBuffer.allocate(MAX_BUFFER_SIZE);
+                    oldBuffer.position(0);
+                    newBuffer.put(oldBuffer);
+                    newBuffer.position(0);
+
+                    bufferList.add(newBuffer);
+                    bufferList.add(ByteBuffer.allocate(newCapacity - MAX_BUFFER_SIZE));
+                } else {
+                    ByteBuffer buffer2 = ByteBuffer.allocate(newCapacity);
+                    oldBuffer.position(0);
+                    buffer2.put(oldBuffer);
+                    buffer2.position(0);
+
+                    bufferList.add(buffer2);
+                }
+            } else {
+                bufferList.add(ByteBuffer.allocate(MAX_BUFFER_SIZE));
+            }
+        }
+
+        private void shrink() {
+            final int oldCapacity = capacity();
+            if (bufferList.size() == 1) {
+                final ByteBuffer oldBuffer = bufferList.get(0);
+                final int newCapacity = oldCapacity / 2;
+                bufferList.clear();
+
+                final ByteBuffer newBuffer = ByteBuffer.allocate(newCapacity);
+                oldBuffer.position(0);
+                oldBuffer.limit(newCapacity);
+                newBuffer.put(oldBuffer);
+                newBuffer.position(0);
+
+                bufferList.add(newBuffer);
+            } else {
+                bufferList.remove(bufferList.size() - 1);
+            }
+        }
+
+        private int capacity() {
+            int capacity = 0;
+            for (ByteBuffer buffer : bufferList) {
+                capacity += buffer.capacity();
+            }
+            return capacity;
+        }
+
+        private int limit() {
+            int limit = 0;
+            for (ByteBuffer buffer : bufferList) {
+                limit += buffer.limit();
+            }
+            return limit;
+        }
+
+        private void limit(int limit) {
+            for (ByteBuffer buffer : bufferList) {
+                if (limit < 0) {
+                    buffer.limit(0);
+                } else {
+                    int capacity = buffer.capacity();
+                    if (limit <= capacity) {
+                        buffer.limit(limit);
+                    } else {
+                        buffer.limit(capacity);
+                    }
+                    limit -= capacity;
+                }
+            }
+        }
+
+        private int position() {
+            int position = 0;
+            for (ByteBuffer buffer : bufferList) {
+                position += buffer.position();
+            }
+            return position;
+        }
+
+        public void position(int position) {
+            for (ByteBuffer buffer : bufferList) {
+                if (position < 0) {
+                    buffer.position(0);
+                } else {
+                    int limit = buffer.limit();
+                    if (position <= limit) {
+                        buffer.position(position);
+                    } else {
+                        buffer.position(limit);
+                    }
+                    position -= limit;
+                }
+            }
+        }
+
+        public int remaining() {
+            int remaining = 0;
+            for (ByteBuffer buffer : bufferList) {
+                remaining += buffer.remaining();
+            }
+            return remaining;
+        }
+
+        public void get(byte[] array, int offset, int length) {
+
+            if ((offset | length | (offset + length) | (array.length - (offset + length))) < 0)
+                throw new IndexOutOfBoundsException();
+
+            if (length > remaining())
+                throw new BufferUnderflowException();
+
+            for (ByteBuffer buffer : bufferList) {
+                int remaining = buffer.remaining();
+                if (remaining > 0) {
+                    if (length > remaining) {
+                        buffer.get(array, offset, remaining);
+                        offset += remaining;
+                        length -= remaining;
+                    } else {
+                        buffer.get(array, offset, length);
+                        return;
+                    }
+                }
+            }
+        }
+
+        public void put(ByteBuffer src) {
+            int length = src.remaining();
+            if (length > remaining())
+                throw new BufferOverflowException();
+
+            for (ByteBuffer buffer : bufferList) {
+                int remaining = buffer.remaining();
+                if (remaining > 0) {
+                    if (length > remaining) {
+                        src.limit(src.position() + remaining);
+                        buffer.put(src);
+                        length -= remaining;
+                    } else {
+                        src.limit(src.position() + length);
+                        buffer.put(src);
+                        return;
+                    }
+                }
+            }
+        }
     }
 }
