@@ -42,13 +42,16 @@ import org.jnode.shell.syntax.FlagArgument;
  * @author crawley@jnode.org
  */
 public class DirCommand extends AbstractCommand {
+    private static final String SEPARATOR = "  ";
+    private static final int SEPARATOR_SIZE = SEPARATOR.length();
     private static final int LEFT_MARGIN = 14;
-    private static final SimpleDateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm");
-
     private static final String help_path = "the file or directory to list";
-    private static final String help_humanReadable = "with -l, print sizes in human readable format (e.g., 1K 234M 2G)";
+    private static final String help_humanReadable = "print sizes in human readable format (e.g. 1K, 234M, 2G)";
     private static final String help_super = "List files or directories";
     private static final String fmt_no_path = "No such path: %s%n";
+
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm");
+    private final DecimalFormat decimalFormat = new DecimalFormat("###0.00");
 
     private final FileArgument argPath;
     private final FlagArgument humanReadableArg;
@@ -101,8 +104,7 @@ public class DirCommand extends AbstractCommand {
             });
             StringBuilder sb = new StringBuilder();
             Date lastModified = new Date();
-            for (int i = 0; i < list.length; i++) {
-                File f = list[i];
+            for (File f : list) {
                 if (f.exists()) {
                     sb.setLength(0);
                     lastModified.setTime(f.lastModified());
@@ -111,15 +113,15 @@ public class DirCommand extends AbstractCommand {
                         int cnt = LEFT_MARGIN - ln.length();
                         for (int j = 0; j < cnt; j++) sb.append(' ');
                         sb.append(ln);
-                        sb.append("   ");
-                        sb.append(df.format(lastModified));
-                        sb.append("   ");
+                        sb.append(SEPARATOR);
+                        sb.append(dateFormat.format(lastModified));
+                        sb.append(SEPARATOR);
                         sb.append(f.getName());
                     } else {
-                        for (int j = 0; j < LEFT_MARGIN + 3; j++, sb.append(' '))
-                            ;
-                        sb.append(df.format(lastModified));
-                        sb.append("   [");
+                        for (int j = 0; j < LEFT_MARGIN + SEPARATOR_SIZE; j++) sb.append(' ');
+                        sb.append(dateFormat.format(lastModified));
+                        sb.append(SEPARATOR);
+                        sb.append("[");
                         sb.append(f.getName());
                         sb.append(']');
                     }
@@ -132,13 +134,19 @@ public class DirCommand extends AbstractCommand {
 
     private static final String[] units = {"B", "K", "M", "G", "T", "P", "E", "Z", "Y"};
 
-    protected String formatSize(double bytes) {
+
+    protected String formatSize(long bytes) {
         if (humanReadableArg.isSet()) {
-            int index;
-            for (index = 0; bytes >= 1024; index++) bytes = bytes / 1024;
-            DecimalFormat df = new DecimalFormat("###0.0");
-            return df.format(bytes) + units[index];
-        } else
+            if (bytes >= 1024) {
+                double dbytes = (double) bytes;
+                int index;
+                for (index = 0; dbytes >= 1024; index++) dbytes = dbytes / 1024;
+                return decimalFormat.format(dbytes) + units[index];
+            } else {
+                return bytes + "B";
+            }
+        } else {
             return bytes + "B";
+        }
     }
 }
