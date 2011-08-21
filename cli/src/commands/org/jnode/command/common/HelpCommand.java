@@ -50,7 +50,7 @@ public class HelpCommand extends AbstractCommand {
     private static final String err_no_help = "No help information is available for '%s'%n";
     private static final String err_help_ex = "Error getting help for '%s': %s%n";
     private static final String err_sec_ex = "Security exception while loading the class for '%s'%nReason: %s%n";
-    private static final String fmt_other_alias = "Other aliases %s";
+    private static final String fmt_other_alias = "Other aliases: %s%n";
     
     private final AliasArgument argAlias;
 
