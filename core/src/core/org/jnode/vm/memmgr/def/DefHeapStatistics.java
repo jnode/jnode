@@ -43,6 +43,9 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
     private static final char NEWLINE = '\n';
     private static final String USAGE = " memory usage=";
     private static final String NO_MATCHING_OBJECT = "No object is matching criteria";
+    private static final String SUMMARY = "Summary : ";
+    private static final String CLASSES = " classe(s) ";
+    private static final String INSTANCES = " instances(s) ";
     
     public boolean contains(String classname) {
     	// If we don't accept this class, we pretend to have it already to (maybe) avoid unnecessary work
@@ -101,6 +104,10 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
         if (countData.isEmpty()) {
             a.append(NO_MATCHING_OBJECT);
         } else {
+            int nbClasses = 0;
+            int nbInstances = 0;
+            int totalSize = 0;
+            
             for (HeapCounter c : countData.values()) {
                 if ((c.getInstanceCount() >= minInstanceCount) && (c.getTotalSize() >= minTotalSize)) {
                     if (first) {
@@ -109,10 +116,34 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
                         a.append(NEWLINE);
                     }
                     c.append(a);
+                    
+                    nbClasses++;
+                    nbInstances += c.getInstanceCount();
+                    totalSize += c.getTotalSize();
                 }
+            }
+            
+            if (nbClasses == 0) {
+                a.append(NO_MATCHING_OBJECT);                
+            } else {
+                a.append(NEWLINE);
+                a.append(SUMMARY).append(Integer.toString(nbClasses)).append(CLASSES);
+                a.append(Integer.toString(nbInstances)).append(INSTANCES);
+                appendUsage(a, totalSize);
             }
         }
         a.append(NEWLINE);
+    }
+    
+    private static void appendUsage(Appendable a, long size) throws IOException {
+        a.append(USAGE);
+        if (size >= 1024) {
+            a.append(NumberUtils.toBinaryByte(size)).append(" (");
+            a.append(Long.toString(size)).append("b)");
+        } else {
+            a.append(Long.toString(size)).append('b');
+        }
+
     }
     
     /**
@@ -163,14 +194,7 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
             a.append(Integer.toString(instanceCount));
 
             if (objectSize != 0) {
-                a.append(USAGE);
-                long size = getTotalSize();
-                if (size >= 1024) {
-                    a.append(NumberUtils.toBinaryByte(size)).append(" (");
-                    a.append(Long.toString(size)).append("b)");
-                } else {
-                    a.append(Long.toString(size)).append('b');
-                }
+                appendUsage(a, getTotalSize());
             }
         }
     }
