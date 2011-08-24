@@ -93,6 +93,7 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
                 c.append(a);
             }
         }
+        a.append(newline);
     }
     
     /**
