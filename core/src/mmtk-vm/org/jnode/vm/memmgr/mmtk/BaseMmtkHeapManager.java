@@ -40,6 +40,7 @@ import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.facade.HeapStatistics;
+import org.jnode.vm.facade.ObjectFilter;
 import org.jnode.vm.facade.VmArchitecture;
 import org.jnode.vm.facade.VmProcessor;
 import org.jnode.vm.facade.VmUtils;
@@ -179,7 +180,10 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
         return BasePlan.freeMemory().toLong();
     }
 
-    public HeapStatistics getHeapStatistics() {
+    /**
+     * {@inheritDoc}
+     */
+    public HeapStatistics getHeapStatistics(ObjectFilter objectFilter) {
         return null;
     }
 

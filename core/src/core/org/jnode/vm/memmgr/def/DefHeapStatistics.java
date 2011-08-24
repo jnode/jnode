@@ -25,6 +25,8 @@ import java.util.TreeMap;
 
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.facade.HeapStatistics;
+import org.jnode.vm.facade.NoObjectFilter;
+import org.jnode.vm.facade.ObjectFilter;
 import org.jnode.vm.objects.VmSystemObject;
 
 /**
@@ -35,25 +37,28 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
 
     private int minInstanceCount = 0;
     private long minTotalSize = 0;
+    private ObjectFilter objectFilter = NoObjectFilter.INSTANCE;
     private final TreeMap<String, HeapCounter> countData = new TreeMap<String, HeapCounter>();
 
     private static final char newline = '\n';
 
     public boolean contains(String classname) {
-        return countData.containsKey(classname);
+    	// If we don't accept this class, we pretend to have it already to (maybe) avoid unnecessary work
+    	// and memory allocation (we also hope to avoid a call to add(String, int)).
+        return !objectFilter.accept(classname) || countData.containsKey(classname);
     }
 
     public void add(String className, int size) {
-        HeapCounter count = (HeapCounter) countData.get(className);
-
-        if (count == null) {
-            count = new HeapCounter(className, size);
-            countData.put(className, count);
-        }
-
-        count.inc();
-
-        count = null;
+    	if (objectFilter.accept(className)) {	    	
+	        HeapCounter count = (HeapCounter) countData.get(className);
+	
+	        if (count == null) {
+	            count = new HeapCounter(className, size);
+	            countData.put(className, count);
+	        }
+	
+	        count.inc();
+    	}
     }
 
     /**
@@ -75,7 +80,15 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
     public void setMinimumTotalSize(long bytes) {
         this.minTotalSize = bytes;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setObjectFilter(ObjectFilter objectFilter) {
+        this.objectFilter = (objectFilter == null) ? NoObjectFilter.INSTANCE : objectFilter;
+    }
+    
     /**
      * {@inheritDoc}
      * @throws IOException 
@@ -83,14 +96,18 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
     public void writeTo(Appendable a) throws IOException {
         boolean first = true;
 
-        for (HeapCounter c : countData.values()) {
-            if ((c.getInstanceCount() >= minInstanceCount) && (c.getTotalSize() >= minTotalSize)) {
-                if (first) {
-                    first = false;
-                } else {
-                    a.append(newline);
+        if (countData.isEmpty()) {
+            a.append("No object is matching criteria");
+        } else {
+            for (HeapCounter c : countData.values()) {
+                if ((c.getInstanceCount() >= minInstanceCount) && (c.getTotalSize() >= minTotalSize)) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        a.append(newline);
+                    }
+                    c.append(a);
                 }
-                c.append(a);
             }
         }
         a.append(newline);

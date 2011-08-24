@@ -220,6 +220,7 @@
       <optionSet>
         <option argLabel="minCount"     longName="minCount"/>
         <option argLabel="minTotalSize" longName="minTotalSize"/>
+        <option argLabel="className"    longName="className"/>
       </optionSet>
     </syntax> 
     <syntax alias="page">
