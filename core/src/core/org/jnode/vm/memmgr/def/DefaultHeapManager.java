@@ -35,6 +35,7 @@ import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.facade.GCStatistics;
 import org.jnode.vm.facade.HeapStatistics;
+import org.jnode.vm.facade.ObjectFilter;
 import org.jnode.vm.facade.ObjectVisitor;
 import org.jnode.vm.facade.VmProcessor;
 import org.jnode.vm.memmgr.HeapHelper;
@@ -447,8 +448,12 @@ public final class DefaultHeapManager extends VmHeapManager {
         return gcManager.getStatistics();
     }
 
-    public HeapStatistics getHeapStatistics() {
+    /**
+     * {@inheritDoc}
+     */
+    public HeapStatistics getHeapStatistics(ObjectFilter objectFilter) {
         final DefHeapStatistics heapStatistics = new DefHeapStatistics();
+        heapStatistics.setObjectFilter(objectFilter);
         final HeapStatisticsVisitor heapStatisticsVisitor = new HeapStatisticsVisitor(
             heapStatistics);
 

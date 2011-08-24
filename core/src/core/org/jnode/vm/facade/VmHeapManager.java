@@ -91,10 +91,10 @@ public interface VmHeapManager {
 
     /**
      * Get this heap's statistics.
-     *
+     * @param objectFilter The optional filter to apply to objects found on heap. 
      * @return the heap statistics
      */
-    HeapStatistics getHeapStatistics();
+    HeapStatistics getHeapStatistics(ObjectFilter objectFilter);
 
     /**
      * Get this heap GC's statistics.

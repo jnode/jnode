@@ -46,6 +46,14 @@ public interface HeapStatistics {
     void setMinimumTotalSize(long bytes);
 
     /**
+     * Sets the object filter. If the filter accept the object, 
+     * then it will be added to statistics.
+     * @param objectFilter
+     * 
+     */
+    void setObjectFilter(ObjectFilter objectFilter);
+
+    /**
      * Write the statistical data to an {@link Appendable}.
      * 
      * @param a
