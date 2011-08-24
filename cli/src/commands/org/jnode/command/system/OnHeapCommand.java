@@ -38,20 +38,20 @@ import org.jnode.vm.facade.VmUtils;
  */
 public class OnHeapCommand extends AbstractCommand {
     
-    private static final String help_inst = "the minimum instance count to show";
-    private static final String help_size = "the minimum total size to show";
+    private static final String HELP_INST = "the minimum instance count to show";
+    private static final String HELP_SIZE = "the minimum total size to show";
     private static final String HELP_CLASSNAME = "the classname filter";
-    private static final String help_super = "Show the number of instances on the heap with memory usage";
-    private static final String str_on_heap = "On Heap:";
+    private static final String HELP_SUPER = "Show the number of instances on the heap with memory usage";
+    private static final String STR_ON_HEAP = "On Heap:";
     
     private final IntegerArgument argMinInstanceCount;
     private final LongArgument argMinTotalSize;
     private final StringArgument className;
 
     public OnHeapCommand() {
-        super(help_super);
-        argMinInstanceCount = new IntegerArgument("minCount", Argument.OPTIONAL, 1, Integer.MAX_VALUE, help_inst);
-        argMinTotalSize     = new LongArgument("minTotalSize", Argument.OPTIONAL, 1L, Long.MAX_VALUE, help_size);
+        super(HELP_SUPER);
+        argMinInstanceCount = new IntegerArgument("minCount", Argument.OPTIONAL, 1, Integer.MAX_VALUE, HELP_INST);
+        argMinTotalSize     = new LongArgument("minTotalSize", Argument.OPTIONAL, 1L, Long.MAX_VALUE, HELP_SIZE);
         className           = new StringArgument("className", Argument.OPTIONAL | Argument.MULTIPLE, HELP_CLASSNAME);
         registerArguments(argMinInstanceCount, argMinTotalSize, className);
     }
@@ -66,7 +66,7 @@ public class OnHeapCommand extends AbstractCommand {
     @Override
     public void execute() throws Exception {
         PrintWriter out = getOutput().getPrintWriter();
-        out.println(str_on_heap);
+        out.println(STR_ON_HEAP);
         
         ObjectFilter filter = null;
         if (className.isSet()) {

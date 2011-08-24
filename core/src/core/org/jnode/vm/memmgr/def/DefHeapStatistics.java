@@ -40,8 +40,10 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
     private ObjectFilter objectFilter = NoObjectFilter.INSTANCE;
     private final TreeMap<String, HeapCounter> countData = new TreeMap<String, HeapCounter>();
 
-    private static final char newline = '\n';
-
+    private static final char NEWLINE = '\n';
+    private static final String USAGE = " memory usage=";
+    private static final String NO_MATCHING_OBJECT = "No object is matching criteria";
+    
     public boolean contains(String classname) {
     	// If we don't accept this class, we pretend to have it already to (maybe) avoid unnecessary work
     	// and memory allocation (we also hope to avoid a call to add(String, int)).
@@ -97,20 +99,20 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
         boolean first = true;
 
         if (countData.isEmpty()) {
-            a.append("No object is matching criteria");
+            a.append(NO_MATCHING_OBJECT);
         } else {
             for (HeapCounter c : countData.values()) {
                 if ((c.getInstanceCount() >= minInstanceCount) && (c.getTotalSize() >= minTotalSize)) {
                     if (first) {
                         first = false;
                     } else {
-                        a.append(newline);
+                        a.append(NEWLINE);
                     }
                     c.append(a);
                 }
             }
         }
-        a.append(newline);
+        a.append(NEWLINE);
     }
     
     /**
@@ -132,8 +134,6 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
         private final String name;
         private int instanceCount;
         private int objectSize = 0;
-
-        private static final String usage = " memory usage=";
 
         public HeapCounter(String objectName, int objectSize) {
             this.name = objectName;
@@ -163,7 +163,7 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
             a.append(Integer.toString(instanceCount));
 
             if (objectSize != 0) {
-                a.append(usage);
+                a.append(USAGE);
                 long size = getTotalSize();
                 if (size >= 1024) {
                     a.append(NumberUtils.toBinaryByte(size)).append(" (");
