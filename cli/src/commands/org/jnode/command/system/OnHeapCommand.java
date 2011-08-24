@@ -70,7 +70,12 @@ public class OnHeapCommand extends AbstractCommand {
             stats.setMinimumTotalSize(argMinTotalSize.getValue());
         }
 
-        stats.writeTo(new BufferedWriter(getOutput().getWriter(), 2048));
+        BufferedWriter writer = new BufferedWriter(getOutput().getWriter(), 2048);
+        try {
+            stats.writeTo(writer);
+        } finally {
+            writer.flush();
+        }
     }
 
 }
