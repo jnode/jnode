@@ -37,7 +37,8 @@ import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 import org.jnode.test.support.Context;
 import org.jnode.test.support.TestConfig;
 
-public abstract class BlockDeviceAPIContext extends Context {
+public class BlockDeviceAPIContext implements Context {
+
     protected static final Logger log = Logger
         .getLogger(BlockDeviceAPIContext.class);
 
