@@ -27,8 +27,10 @@ import org.jnode.test.fs.filesystem.config.FSTestConfig;
 import org.jnode.test.support.Context;
 import org.jnode.test.support.TestConfig;
 
-public class FSContext extends Context {
+public class FSContext implements Context {
+
     private Device workDevice;
+
     private DeviceParam deviceParam;
 
     public void init(TestConfig config, MockObjectTestCase testCase) throws Exception {
