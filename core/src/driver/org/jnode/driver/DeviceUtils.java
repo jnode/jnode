@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver;
 
 import java.util.Collection;
@@ -27,39 +27,37 @@ import org.jnode.naming.InitialNaming;
 
 /**
  * Class with utility methods for the device framework.
- *
+ * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class DeviceUtils {
 
     /**
-     * Cached devicemanager reference
+     * Cached device manager reference
      */
-    private static DeviceManager dm;
+    private static DeviceManager deviceManager;
 
     /**
      * Gets the device manager
-     *
+     * 
      * @return The device manager
      * @throws NameNotFoundException
      */
-    public static DeviceManager getDeviceManager()
-        throws NameNotFoundException {
-        if (dm == null) {
-            dm = InitialNaming.lookup(DeviceManager.NAME);
+    public static DeviceManager getDeviceManager() throws NameNotFoundException {
+        if (deviceManager == null) {
+            deviceManager = InitialNaming.lookup(DeviceManager.NAME);
         }
-        return dm;
+        return deviceManager;
     }
 
     /**
      * Gets a device by name
-     *
+     * 
      * @param deviceID
      * @return The device
      * @throws DeviceNotFoundException
      */
-    public static Device getDevice(String deviceID)
-        throws DeviceNotFoundException {
+    public static Device getDevice(final String deviceID) throws DeviceNotFoundException {
         try {
             return getDeviceManager().getDevice(deviceID);
         } catch (NameNotFoundException ex) {
@@ -69,14 +67,14 @@ public class DeviceUtils {
 
     /**
      * Gets a specific API from a device.
-     *
+     * 
      * @param deviceID the ame of the requested device
-     * @param api      the API class to use
+     * @param api the API class to use
      * @return The api implementation
      * @throws DeviceNotFoundException
      * @throws ApiNotFoundException
      */
-    public static <T extends DeviceAPI> T getAPI(String deviceID, Class<T> api)
+    public static <T extends DeviceAPI> T getAPI(final String deviceID, final Class<T> api)
         throws DeviceNotFoundException, ApiNotFoundException {
         try {
             return getDeviceManager().getDevice(deviceID).getAPI(api);
@@ -85,20 +83,21 @@ public class DeviceUtils {
         }
     }
 
-
     /**
      * Returns a collection of all known devices that implement the given api..
-     * The collection is not modifiable, but the underlying collection
-     * can change, so be aware of exceptions in iterators.
-     *
+     * The collection is not modifiable, but the underlying collection can
+     * change, so be aware of exceptions in iterators.
+     * 
      * @param apiClass
      * @return All known devices the implement the given api.
      */
-    public static Collection<Device> getDevicesByAPI(Class<? extends DeviceAPI> apiClass) {
+    public static Collection<Device> getDevicesByAPI(final Class<? extends DeviceAPI> apiClass) {
+        Collection<Device> deviceList;
         try {
-            return getDeviceManager().getDevicesByAPI(apiClass);
+            deviceList = getDeviceManager().getDevicesByAPI(apiClass);
         } catch (NameNotFoundException ex) {
-            return Collections.emptyList();
+            deviceList = Collections.emptyList();
         }
+        return deviceList;
     }
 }
