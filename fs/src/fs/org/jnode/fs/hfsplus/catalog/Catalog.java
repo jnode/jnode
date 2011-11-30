@@ -249,9 +249,10 @@ public class Catalog {
             int nodeSize = getBTHeaderRecord().getNodeSize();
             ByteBuffer nodeData = ByteBuffer.allocate(nodeSize);
             fs.getApi().read(catalogHeaderNodeOffset + (currentNodeNumber * nodeSize), nodeData);
-            NodeDescriptor nd = new NodeDescriptor(nodeData.array(), 0);
+            byte[] datas = nodeData.array();
+            NodeDescriptor nd = new NodeDescriptor(datas, 0);
             if (nd.isIndexNode()) {
-                CatalogIndexNode node = new CatalogIndexNode(nodeData.array(), nodeSize);
+                CatalogIndexNode node = new CatalogIndexNode(datas, nodeSize);
                 IndexRecord[] records = (IndexRecord[]) node.findAll(parentID);
                 List<LeafRecord> lfList = new LinkedList<LeafRecord>();
                 for (IndexRecord rec : records) {
@@ -291,7 +292,7 @@ public class Catalog {
         CatalogKey cKey = new CatalogKey(parentID, nodeName);
         while (nd.isIndexNode()) {
             CatalogIndexNode node = new CatalogIndexNode(nodeData.array(), nodeSize);
-            IndexRecord record = (IndexRecord) node.find(cKey);
+            IndexRecord record = node.find(cKey);
             currentNodeNumber = record.getIndex();
             currentOffset = catalogHeaderNodeOffset + record.getIndex() * nodeSize;
             nodeData = ByteBuffer.allocate(nodeSize);
@@ -301,7 +302,7 @@ public class Catalog {
         LeafRecord lr = null;
         if (nd.isLeafNode()) {
             CatalogLeafNode node = new CatalogLeafNode(nodeData.array(), nodeSize);
-            lr = (LeafRecord) node.find(parentID);
+            lr = node.find(parentID);
         }
         return lr;
     }
