@@ -44,11 +44,12 @@ public class CatalogKey extends AbstractKey {
      * @param src
      * @param offset
      */
+    
     public CatalogKey(final byte[] src, final int offset) {
         int currentOffset = offset;
         byte[] ck = new byte[2];
         System.arraycopy(src, currentOffset, ck, 0, 2);
-        keyLength = BigEndian.getInt16(ck, 0);
+        keyLength = BigEndian.getInt16(ck, 0) + 2; // Key length doesn't seem to include itself in the size
         currentOffset += 2;
         ck = new byte[4];
         System.arraycopy(src, currentOffset, ck, 0, 4);
