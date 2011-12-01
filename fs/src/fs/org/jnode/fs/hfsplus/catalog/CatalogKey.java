@@ -49,7 +49,7 @@ public class CatalogKey extends AbstractKey {
         int currentOffset = offset;
         byte[] ck = new byte[2];
         System.arraycopy(src, currentOffset, ck, 0, 2);
-        keyLength = BigEndian.getInt16(ck, 0) + 2; // Key length doesn't seem to include itself in the size
+        keyLength = BigEndian.getInt16(ck, 0);
         currentOffset += 2;
         ck = new byte[4];
         System.arraycopy(src, currentOffset, ck, 0, 4);
@@ -71,7 +71,7 @@ public class CatalogKey extends AbstractKey {
     public CatalogKey(final CatalogNodeId parentID, final HfsUnicodeString name) {
         this.parentId = parentID;
         this.nodeName = name;
-        this.keyLength = MINIMUM_KEY_LENGTH + name.getLength();
+        this.keyLength = MINIMUM_KEY_LENGTH + (name.getLength() * 2) + 2;
     }
 
     public final CatalogNodeId getParentId() {
@@ -109,10 +109,11 @@ public class CatalogKey extends AbstractKey {
      * @see org.jnode.fs.hfsplus.tree.AbstractKey#getBytes()
      */
     public byte[] getBytes() {
-        byte[] data = new byte[this.getKeyLength()];
-        BigEndian.setInt16(data, 0, this.getKeyLength());
+    	int length = this.getKeyLength();
+        byte[] data = new byte[length];
+        BigEndian.setInt16(data, 0, length);
         System.arraycopy(parentId.getBytes(), 0, data, 2, 4);
-        System.arraycopy(nodeName.getBytes(), 0, data, 6, nodeName.getLength());
+        System.arraycopy(nodeName.getBytes(), 0, data, 6, (nodeName.getLength() *2) + 2);
         return data;
     }
 

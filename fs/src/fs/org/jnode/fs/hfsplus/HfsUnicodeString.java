@@ -31,6 +31,7 @@ public class HfsUnicodeString {
     /**
      * Create HFSUnicodeString from existing data.
      * 
+     * 
      * @param src byte array contains data.
      * @param offset start of data in the array.
      */
