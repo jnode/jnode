@@ -127,7 +127,7 @@ final class CompressedDataRun implements DataRunInterface {
         final byte[] tempUncompressed = new byte[compressionUnitSize * clusterSize];
         // XXX: We could potentially reduce the overhead by modifying the compression
         //      routine such that it's capable of skipping chunks that aren't needed.
-        uncompressUnit(tempCompressed, tempUncompressed);
+        unCompressUnit(tempCompressed, tempUncompressed);
 
         System.arraycopy(tempUncompressed, vcnOffsetWithinUnit * clusterSize,
                          dst, dstOffset + (int) (actFirstVcn - vcn) * clusterSize,
@@ -141,10 +141,9 @@ final class CompressedDataRun implements DataRunInterface {
      *
      * @param compressed the compressed data (in.)
      * @param uncompressed the uncompressed data (out.)
-     * @param requiredBytes the number of bytes needed before the read can stop.
      * @throws IOException if the decompression fails.
      */
-    private static void uncompressUnit(final byte[] compressed,
+    private static void unCompressUnit(final byte[] compressed,
                                        final byte[] uncompressed) throws IOException {
 
         // This is just a convenient way to simulate the original code's pointer arithmetic.
