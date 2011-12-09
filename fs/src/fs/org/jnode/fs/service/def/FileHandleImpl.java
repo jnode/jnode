@@ -142,8 +142,6 @@ final class FileHandleImpl implements VMFileHandle {
      * stored in <code>dest</code> starting at offset <code>ofs</code>.
      * 
      * @param dest
-     * @param off
-     * @param len
      * @throws IOException
      */
     public synchronized int read(ByteBuffer dest) throws IOException {
@@ -171,8 +169,6 @@ final class FileHandleImpl implements VMFileHandle {
      * to this file starting at offset <code>fileOffset</code>.
      * 
      * @param src
-     * @param off
-     * @param len
      * @throws IOException
      */
     // public synchronized void write(byte[] src, int off, int len) throws
