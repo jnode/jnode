@@ -193,7 +193,7 @@ class Stage1_5 {
      * 
      * @arch i386
      * @param stage1_5
-     * @param installPartition2
+     * @param installPartition
      */
     private void setLittleEnd_InstallPartition(byte[] stage1_5, int installPartition) {
         LittleEndian.setInt32(stage1_5, 512 + 0x08, installPartition);

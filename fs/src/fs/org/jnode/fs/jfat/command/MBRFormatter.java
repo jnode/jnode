@@ -73,10 +73,8 @@ class MBRFormatter {
 
     /**
      * 
-     * @param device
-     * @param bsize
-     * @throws FileSystemException
-     * @throws IOException
+     * @param devApi
+     * @throws GrubException
      */
     public void format(BlockDeviceAPI devApi) throws GrubException {
 
