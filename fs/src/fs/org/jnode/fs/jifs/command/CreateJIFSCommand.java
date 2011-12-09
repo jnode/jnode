@@ -40,7 +40,7 @@ import org.jnode.shell.syntax.EnumArgument;
 public class CreateJIFSCommand extends AbstractCommand {
 
     private static enum Action {
-        start, stop, restart;
+        start, stop, restart
     }
 
     private static class ActionArgument extends EnumArgument<Action> {
