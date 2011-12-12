@@ -54,7 +54,7 @@ public class IDEDriveDescriptorTest {
 		IDEDriveDescriptor wrongIdeDescriptor = new IDEDriveDescriptor(data, true);
 	}
 
-	//@Test TODO return value is incorrect
+	@Test
 	public void testGetSerialNumber() {
 		String result = ideDescriptor.getSerialNumber();
 		assertEquals("5LS9K7CF",result);
@@ -66,7 +66,7 @@ public class IDEDriveDescriptorTest {
 		assertEquals("ST3160812AS",result);
 	}
 	
-	//@Test TODO return value is incorrect
+	@Test
 	public void testGetFirmware() {
 		String result = ideDescriptor.getFirmware();
 		assertEquals("3.ADJ",result);
