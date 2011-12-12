@@ -57,7 +57,7 @@ public class IDEDriveDescriptor {
         char[] str = new char[20];
         for (int i = 0; i < 10; i++) {
             int v = data[10 + i];
-            str[i + 2 + 0] = (char) ((v >> 8) & 0xFF);
+            str[i * 2] = (char) ((v >> 8) & 0xFF);
             str[i * 2 + 1] = (char) (v & 0xFF);
         }
         return String.valueOf(str).trim();
@@ -72,7 +72,7 @@ public class IDEDriveDescriptor {
         char[] str = new char[8];
         for (int i = 0; i < 4; i++) {
             int v = data[23 + i];
-            str[i + 2 + 0] = (char) ((v >> 8) & 0xFF);
+            str[i * 2] = (char) ((v >> 8) & 0xFF);
             str[i * 2 + 1] = (char) (v & 0xFF);
         }
         return String.valueOf(str).trim();
@@ -87,7 +87,7 @@ public class IDEDriveDescriptor {
         char[] str = new char[40];
         for (int i = 0; i < 20; i++) {
             int v = data[27 + i];
-            str[i * 2 + 0] = (char) ((v >> 8) & 0xFF);
+            str[i * 2] = (char) ((v >> 8) & 0xFF);
             str[i * 2 + 1] = (char) (v & 0xFF);
         }
         return String.valueOf(str).trim();
