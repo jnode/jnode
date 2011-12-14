@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.catalog;
 
 import org.jnode.fs.hfsplus.HfsUnicodeString;
@@ -25,6 +25,17 @@ import org.jnode.fs.hfsplus.tree.AbstractKey;
 import org.jnode.fs.hfsplus.tree.Key;
 import org.jnode.util.BigEndian;
 
+/**
+ * Implementation of catalog file key. The catalog file key is defined as following :
+ * <ul>
+ * <li>The length of the key</li>
+ * <li>The node identifier of the parent folder</li>
+ * <li>The name of the file or folder</li>
+ * </ul>
+ * 
+ * The minimal length for a key is 6 bytes. 2 bytes for the length and 4 bytes for the catalog node id.
+ *
+ */
 public class CatalogKey extends AbstractKey {
 
     public static final int MINIMUM_KEY_LENGTH = 6;
@@ -44,7 +55,7 @@ public class CatalogKey extends AbstractKey {
      * @param src
      * @param offset
      */
-    
+
     public CatalogKey(final byte[] src, final int offset) {
         int currentOffset = offset;
         byte[] ck = new byte[2];
@@ -96,8 +107,8 @@ public class CatalogKey extends AbstractKey {
             res = this.getParentId().compareTo(ck.getParentId());
             if (res == 0) {
                 res =
-                        this.getNodeName().getUnicodeString().compareTo(
-                                ck.getNodeName().getUnicodeString());
+                        this.getNodeName().getUnicodeString()
+                                .compareTo(ck.getNodeName().getUnicodeString());
             }
         }
         return res;
@@ -109,11 +120,11 @@ public class CatalogKey extends AbstractKey {
      * @see org.jnode.fs.hfsplus.tree.AbstractKey#getBytes()
      */
     public byte[] getBytes() {
-    	int length = this.getKeyLength();
+        int length = this.getKeyLength();
         byte[] data = new byte[length];
         BigEndian.setInt16(data, 0, length);
         System.arraycopy(parentId.getBytes(), 0, data, 2, 4);
-        System.arraycopy(nodeName.getBytes(), 0, data, 6, (nodeName.getLength() *2) + 2);
+        System.arraycopy(nodeName.getBytes(), 0, data, 6, (nodeName.getLength() * 2) + 2);
         return data;
     }
 
@@ -124,9 +135,9 @@ public class CatalogKey extends AbstractKey {
      */
     public final String toString() {
         StringBuffer s = new StringBuffer();
-        s.append("[length, Parent ID, Node name]:").append(getKeyLength()).append(",").append(
-                getParentId().getId()).append(",").append(
-                (getNodeName() != null) ? getNodeName().getUnicodeString() : "");
+        s.append("[length, Parent ID, Node name]:").append(getKeyLength()).append(",")
+                .append(getParentId().getId()).append(",")
+                .append((getNodeName() != null) ? getNodeName().getUnicodeString() : "");
         return s.toString();
     }
 
