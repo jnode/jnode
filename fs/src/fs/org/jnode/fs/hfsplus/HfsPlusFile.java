@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import java.io.IOException;
@@ -35,6 +35,7 @@ public class HfsPlusFile implements FSFile {
     private CatalogFile file;
 
     public HfsPlusFile(HfsPlusEntry entry) {
+        this.entry = entry;
         this.file = new CatalogFile(entry.getData());
     }
 
@@ -69,7 +70,6 @@ public class HfsPlusFile implements FSFile {
         // TODO Auto-generated method stub
 
     }
-
 
     @Override
     public boolean isValid() {
