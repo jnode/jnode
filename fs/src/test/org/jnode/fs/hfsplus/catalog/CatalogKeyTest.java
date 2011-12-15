@@ -13,7 +13,7 @@ public class CatalogKeyTest {
 	public void testKeyFromBytesArray(){
 		CatalogKey key = new CatalogKey(KEY_AS_BYTES_ARRAY,0);
 		assertEquals(NODE_NAME_AS_STRING,key.getNodeName().getUnicodeString());
-		assertEquals(24,key.getKeyLength());
+		assertEquals(26,key.getKeyLength());
 		assertEquals(7,key.getParentId().getId());
 	}
 	
