@@ -89,8 +89,8 @@ public class ExtentDescriptor {
      * @param nodeSize the size of a node.
      * @return offset of the extent.
      */
-    public int getStartOffset(int nodeSize) {
-        return startBlock * nodeSize;
+    public long getStartOffset(int nodeSize) {
+        return (long)startBlock * nodeSize;
     }
 
     /**
@@ -108,8 +108,8 @@ public class ExtentDescriptor {
      * @param nodeSize the size of a node.
      * @return size of the extent.
      */
-    public int getSize(int nodeSize) {
-        return blockCount * nodeSize;
+    public long getSize(int nodeSize) {
+        return (long)blockCount * nodeSize;
     }
 
     /**

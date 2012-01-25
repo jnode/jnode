@@ -24,13 +24,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.jnode.fs.hfsplus.HFSPlusParams;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
+import org.jnode.fs.hfsplus.HfsPlusForkData;
 import org.jnode.fs.hfsplus.HfsUnicodeString;
 import org.jnode.fs.hfsplus.SuperBlock;
-import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
 import org.jnode.fs.hfsplus.tree.BTHeaderRecord;
 import org.jnode.fs.hfsplus.tree.IndexRecord;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
@@ -52,7 +51,7 @@ public class Catalog {
      */
     private BTHeaderRecord bthr;
 
-    private int catalogHeaderNodeOffset;
+    private HfsPlusForkData catalogFile;
 
     private ByteBuffer buffer;
 
@@ -66,13 +65,12 @@ public class Catalog {
         log.info("Load B-Tree catalog file.");
         this.fs = fs;
         SuperBlock sb = fs.getVolumeHeader();
-        ExtentDescriptor firstExtent = sb.getCatalogFile().getExtent(0);
-        catalogHeaderNodeOffset = firstExtent.getStartOffset(sb.getBlockSize());
-        if (!firstExtent.isEmpty()) {
-            buffer =
-                    ByteBuffer.allocate(NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH +
+        catalogFile = sb.getCatalogFile();
+        
+        if(!catalogFile.getExtent(0).isEmpty()) {
+            buffer = ByteBuffer.allocate(NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH +
                             BTHeaderRecord.BT_HEADER_RECORD_LENGTH);
-            fs.getApi().read(catalogHeaderNodeOffset, buffer);
+            catalogFile.read(fs, 0, buffer);
             buffer.rewind();
             byte[] data = ByteBufferUtils.toArray(buffer);
             log.info("Load catalog node descriptor.");
@@ -150,7 +148,7 @@ public class Catalog {
      */
     public void update() throws IOException {
         SuperBlock vh = fs.getVolumeHeader();
-        int offset = vh.getCatalogFile().getExtent(0).getStartOffset(vh.getBlockSize());
+        long offset = vh.getCatalogFile().getExtent(0).getStartOffset(vh.getBlockSize());
         fs.getApi().write(offset, this.getBytes());
     }
 
@@ -197,8 +195,7 @@ public class Catalog {
         LeafRecord lr = null;
         int nodeSize = bthr.getNodeSize();
         ByteBuffer nodeData = ByteBuffer.allocate(nodeSize);
-        fs.getApi().read(catalogHeaderNodeOffset + (getBTHeaderRecord().getRootNode() * nodeSize),
-                nodeData);
+        catalogFile.read(fs, (bthr.getRootNode()*nodeSize), nodeData);
         nodeData.rewind();
         byte[] data = ByteBufferUtils.toArray(nodeData);
         NodeDescriptor nd = new NodeDescriptor(nodeData.array(), 0);
@@ -206,9 +203,9 @@ public class Catalog {
         while (nd.isIndexNode()) {
             CatalogIndexNode node = new CatalogIndexNode(data, nodeSize);
             IndexRecord record = (IndexRecord) node.find(parentID);
-            currentOffset = catalogHeaderNodeOffset + (record.getIndex() * nodeSize);
+            currentOffset = record.getIndex() * nodeSize;
             nodeData = ByteBuffer.allocate(nodeSize);
-            fs.getApi().read(currentOffset, nodeData);
+            catalogFile.read(fs, currentOffset, nodeData);
             nodeData.rewind();
             data = ByteBufferUtils.toArray(nodeData);
             nd = new NodeDescriptor(nodeData.array(), 0);
@@ -248,7 +245,7 @@ public class Catalog {
             int currentNodeNumber = nodeNumber;
             int nodeSize = getBTHeaderRecord().getNodeSize();
             ByteBuffer nodeData = ByteBuffer.allocate(nodeSize);
-            fs.getApi().read(catalogHeaderNodeOffset + (currentNodeNumber * nodeSize), nodeData);
+            catalogFile.read(fs, (currentNodeNumber * nodeSize), nodeData);
             byte[] datas = nodeData.array();
             NodeDescriptor nd = new NodeDescriptor(datas, 0);
             if (nd.isIndexNode()) {
@@ -286,7 +283,7 @@ public class Catalog {
         int currentNodeNumber = getBTHeaderRecord().getRootNode();
         int nodeSize = getBTHeaderRecord().getNodeSize();
         ByteBuffer nodeData = ByteBuffer.allocate(nodeSize);
-        fs.getApi().read(catalogHeaderNodeOffset + (currentNodeNumber * nodeSize), nodeData);
+        catalogFile.read(fs, (currentNodeNumber * nodeSize), nodeData);
         NodeDescriptor nd = new NodeDescriptor(nodeData.array(), 0);
         int currentOffset = 0;
         CatalogKey cKey = new CatalogKey(parentID, nodeName);
@@ -294,9 +291,9 @@ public class Catalog {
             CatalogIndexNode node = new CatalogIndexNode(nodeData.array(), nodeSize);
             IndexRecord record = node.find(cKey);
             currentNodeNumber = record.getIndex();
-            currentOffset = catalogHeaderNodeOffset + record.getIndex() * nodeSize;
+            currentOffset = record.getIndex() * nodeSize;
             nodeData = ByteBuffer.allocate(nodeSize);
-            fs.getApi().read(currentOffset, buffer);
+            catalogFile.read(fs, currentOffset, buffer);
             node = new CatalogIndexNode(nodeData.array(), nodeSize);
         }
         LeafRecord lr = null;

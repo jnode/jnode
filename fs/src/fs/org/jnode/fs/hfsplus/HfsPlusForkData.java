@@ -20,6 +20,8 @@
  
 package org.jnode.fs.hfsplus;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
 import org.jnode.util.BigEndian;
 
@@ -110,6 +112,31 @@ public class HfsPlusForkData {
 
     public ExtentDescriptor getExtent(int index) {
         return extents[index];
+    }
+    /**
+     * Read a block of data
+     *
+     * @param fileSystem the associated file system.
+     * @param offset the offset to read from.
+     * @param buffer the buffer to read into.
+     * @throws java.io.IOException if an error occurs.
+     */
+    public void read(HfsPlusFileSystem fileSystem, long offset, ByteBuffer buffer) throws IOException {
+        for (ExtentDescriptor extentDescriptor : extents) {
+            if (buffer.remaining() > 0 && !extentDescriptor.isEmpty()) {
+                long length = extentDescriptor.getSize(fileSystem.getVolumeHeader().getBlockSize());
+
+                if (offset != 0 && length < offset) {
+                    offset -= length;
+                } else {
+
+                    long firstOffset = extentDescriptor.getStartOffset(fileSystem.getVolumeHeader().getBlockSize());
+                    fileSystem.getApi().read(firstOffset + offset, buffer);
+
+                    offset = 0;
+                }
+            }
+        }
     }
 
     /**
