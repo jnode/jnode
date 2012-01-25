@@ -97,7 +97,7 @@ public class BTHeaderRecord {
         freeNodes = BigEndian.getInt32(data, 26);
         clumpSize = BigEndian.getInt32(data, 32);
         treeType = BigEndian.getInt8(data,36);
-        keyCompareType = BigEndian.getInt8(data,36);
+        keyCompareType = BigEndian.getInt8(data,37);
         attributes = BigEndian.getInt32(data, 38);
     }
 
