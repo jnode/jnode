@@ -22,11 +22,9 @@ package org.jnode.fs.hfsplus;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.hfsplus.catalog.CatalogFile;
-import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
 
 public class HfsPlusFile implements FSFile {
 
@@ -57,12 +55,7 @@ public class HfsPlusFile implements FSFile {
     @Override
     public final void read(final long fileOffset, final ByteBuffer dest) throws IOException {
         HfsPlusFileSystem fs = (HfsPlusFileSystem) getFileSystem();
-        for (ExtentDescriptor d : file.getDatas().getExtents()) {
-            if (!d.isEmpty()) {
-                long firstOffset = (long) d.getStartOffset(fs.getVolumeHeader().getBlockSize());
-                fs.getApi().read(firstOffset, dest);
-            }
-        }
+        file.getDatas().read(fs,fileOffset,dest);
     }
 
     @Override
