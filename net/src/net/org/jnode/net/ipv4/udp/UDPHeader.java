@@ -36,17 +36,21 @@ public class UDPHeader implements TransportLayerHeader, UDPConstants {
 
     /** My logger */
     private static final Logger log = Logger.getLogger(UDPHeader.class);
+    /** The port of the sending process or 0 if not used. */
     private final int srcPort;
+    /** The destination port within the context of a particular internet address */
     private final int dstPort;
+    /** The length in octet. It include the header and the data. Minimum value of the length is 8 */
     private final int udpLength;
+    
     private final boolean checksumOk;
 
     /**
      * Create a new instance
      * 
-     * @param srcPort
-     * @param dstPort
-     * @param dataLength
+     * @param srcPort The port of the sending process.
+     * @param dstPort The destination port.
+     * @param dataLength The length of the data.
      */
     public UDPHeader(int srcPort, int dstPort, int dataLength) {
         this.srcPort = srcPort;
@@ -58,7 +62,7 @@ public class UDPHeader implements TransportLayerHeader, UDPConstants {
     /**
      * Create a new instance and read the contents from the given buffer
      * 
-     * @param skbuf
+     * @param skbuf The socket buffer.
      */
     public UDPHeader(SocketBuffer skbuf) {
         this.srcPort = skbuf.get16(0);
