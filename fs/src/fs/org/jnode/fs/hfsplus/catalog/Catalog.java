@@ -126,7 +126,7 @@ public class Catalog {
         LeafRecord record = new LeafRecord(ck, folder.getBytes());
         rootNode.addNodeRecord(record);
         // Second record (thread)
-        CatalogKey tck = new CatalogKey(CatalogNodeId.HFSPLUS_ROOT_CNID, name);
+        CatalogKey tck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID, name);
         CatalogThread ct =
                 new CatalogThread(CatalogFolder.RECORD_TYPE_FOLDER_THREAD,
                         CatalogNodeId.HFSPLUS_ROOT_CNID, new HfsUnicodeString(""));
@@ -161,28 +161,40 @@ public class Catalog {
      * @param nodeType
      * @return the new node instance
      */
-    public LeafRecord createNode(String filename, CatalogNodeId parentId, CatalogNodeId nodeId,
+    public CatalogLeafNode createNode(String filename, CatalogNodeId parentId, CatalogNodeId nodeId,
             int nodeType) throws IOException {
+    	CatalogLeafNode node;
         HfsUnicodeString name = new HfsUnicodeString(filename);
         LeafRecord record = this.getRecord(parentId, name);
         if (record == null) {
             NodeDescriptor nd = new NodeDescriptor(0, 0, NodeDescriptor.BT_LEAF_NODE, 1, 2);
-            CatalogLeafNode node = new CatalogLeafNode(nd, 8192);
+            node = new CatalogLeafNode(nd, 8192);
+            // Normal record
             CatalogKey key = new CatalogKey(parentId, name);
-            CatalogThread thread = new CatalogThread(nodeType, parentId, name);
-            record = new LeafRecord(key, thread.getBytes());
-            node.addNodeRecord(record);
             if (nodeType == CatalogFolder.RECORD_TYPE_FOLDER) {
-                CatalogFolder folder = new CatalogFolder(0, nodeId);
+                CatalogFolder folder = new CatalogFolder(0, parentId);
                 key = new CatalogKey(parentId, name);
                 record = new LeafRecord(key, folder.getBytes());
+                node.addNodeRecord(record);
             } else {
-                // TODO
+                // Catalog file
             }
+            // Thread record
+            key = new CatalogKey(parentId, name);
+            int threadType;
+            if (nodeType == CatalogFolder.RECORD_TYPE_FOLDER) {
+            	threadType = CatalogFolder.RECORD_TYPE_FOLDER_THREAD;
+            } else {
+            	threadType = CatalogFile.RECORD_TYPE_FILE_THREAD;
+            }
+            CatalogThread thread = new CatalogThread(threadType, nodeId, name);
+            record = new LeafRecord(key, thread.getBytes());
+            node.addNodeRecord(record);
+            
         } else {
-            // TODO
+            throw new IOException("Leaf record for parent (" + parentId.getId() + ") doesn't exist.");
         }
-        return record;
+        return node;
     }
 
     /**
