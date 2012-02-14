@@ -80,7 +80,16 @@ public class HfsPlusFileSystemTest extends TestCase {
         fs.read();
         fs.createRootEntry();
         FSDirectory root = fs.getRootEntry().getDirectory();
+        assertFalse("Must be empty", root.iterator().hasNext());
         root.addDirectory("test");
+        fs.flush();
+        fs.close();
+        fs = new HfsPlusFileSystemType().create(device, false);
+        fs.read();
+        assertEquals(1,fs.getVolumeHeader().getFolderCount());
+        fs.createRootEntry();
+        root = fs.getRootEntry().getDirectory();
+        assertTrue("Must contains one directory", root.iterator().hasNext());
     }
 
     private Device createTestDisk(boolean formatted) throws IOException {

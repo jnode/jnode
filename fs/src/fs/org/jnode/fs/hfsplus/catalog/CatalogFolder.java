@@ -148,4 +148,8 @@ public class CatalogFolder {
         this.attrModDate = attrModDate;
     }
     
+    public void incrementValence(){
+    	this.setValence(this.getValence() + 1);
+    }
+    
 }

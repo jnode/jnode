@@ -426,6 +426,11 @@ public class SuperBlock extends HfsPlusObject {
     public final boolean isAttribute(final int maskBit) {
         return (((getAttributes() >> maskBit) & 0x1) != 0);
     }
+    
+    public void incrementFolderCount(){
+    	this.setFolderCount(this.getFolderCount() + 1);
+    }
+    		
 
     public byte[] getBytes() {
         return data;
