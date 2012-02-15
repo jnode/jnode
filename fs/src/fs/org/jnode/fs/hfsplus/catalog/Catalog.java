@@ -110,29 +110,11 @@ public class Catalog {
                                 BTHeaderRecord.BT_BIG_KEYS_MASK);
         log.debug(bthr.toString());
         bufferLength += BTHeaderRecord.BT_HEADER_RECORD_LENGTH;
+        
         log.info("Create root node.");
         int rootNodePosition = bthr.getRootNode() * nodeSize;
         bufferLength += (rootNodePosition - bufferLength);
-        // Create node descriptor
-        NodeDescriptor nd =
-                new NodeDescriptor(0, 0, NodeDescriptor.BT_LEAF_NODE, 1,
-                        params.getInitializeNumRecords());
-        CatalogLeafNode rootNode = new CatalogLeafNode(nd, nodeSize);
-        // First record (folder)
-        HfsUnicodeString name = new HfsUnicodeString(params.getVolumeName());
-        CatalogKey ck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID, name);
-        CatalogFolder folder =
-                new CatalogFolder(params.isJournaled() ? 2 : 0, CatalogNodeId.HFSPLUS_ROOT_CNID);
-        LeafRecord record = new LeafRecord(ck, folder.getBytes());
-        rootNode.addNodeRecord(record);
-        // Second record (thread)
-        CatalogKey tck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID, name);
-        CatalogThread ct =
-                new CatalogThread(CatalogFolder.RECORD_TYPE_FOLDER_THREAD,
-                        CatalogNodeId.HFSPLUS_ROOT_CNID, new HfsUnicodeString(""));
-        record = new LeafRecord(tck, ct.getBytes());
-        rootNode.addNodeRecord(record);
-        log.debug(rootNode.toString());
+        CatalogLeafNode rootNode = createRootNode(params);
         buffer = ByteBuffer.allocate(bufferLength + bthr.getNodeSize());
         buffer.put(btnd.getBytes());
         buffer.put(bthr.getBytes());
@@ -151,6 +133,30 @@ public class Catalog {
         long offset = vh.getCatalogFile().getExtent(0).getStartOffset(vh.getBlockSize());
         fs.getApi().write(offset, this.getBytes());
     }
+    
+    private CatalogLeafNode createRootNode(HFSPlusParams params){
+    	int nodeSize = params.getCatalogNodeSize();
+    	NodeDescriptor nd =
+                new NodeDescriptor(0, 0, NodeDescriptor.BT_LEAF_NODE, 1,
+                        params.getInitializeNumRecords());
+        CatalogLeafNode rootNode = new CatalogLeafNode(nd, nodeSize);
+        // First record (folder)
+        HfsUnicodeString name = new HfsUnicodeString(params.getVolumeName());
+        CatalogKey ck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID, name);
+        CatalogFolder folder =
+                new CatalogFolder(params.isJournaled() ? 2 : 0, CatalogNodeId.HFSPLUS_ROOT_CNID);
+        LeafRecord record = new LeafRecord(ck, folder.getBytes());
+        rootNode.addNodeRecord(record);
+        // Second record (thread)
+        CatalogKey tck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID, name);
+        CatalogThread ct =
+                new CatalogThread(CatalogFolder.RECORD_TYPE_FOLDER_THREAD,
+                        CatalogNodeId.HFSPLUS_ROOT_CNID, new HfsUnicodeString(""));
+        record = new LeafRecord(tck, ct.getBytes());
+        rootNode.addNodeRecord(record);
+        log.debug(rootNode.toString());
+        return rootNode;
+    }
 
     /**
      * Create a new node in the catalog B-Tree.
@@ -165,6 +171,7 @@ public class Catalog {
             int nodeType) throws IOException {
     	CatalogLeafNode node;
         HfsUnicodeString name = new HfsUnicodeString(filename);
+        // find parent leaf record.
         LeafRecord record = this.getRecord(parentId, name);
         if (record == null) {
             NodeDescriptor nd = new NodeDescriptor(0, 0, NodeDescriptor.BT_LEAF_NODE, 1, 2);
