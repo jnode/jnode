@@ -76,7 +76,6 @@ public class HfsPlusDirectory implements FSDirectory {
 
     @Override
     public FSEntry addFile(String name) throws IOException {
-        log.debug("<<< BEGIN addFile " + name + " >>>");
         if (getFileSystem().isReadOnly()) {
             throw new ReadOnlyFileSystemException();
         }
@@ -86,7 +85,6 @@ public class HfsPlusDirectory implements FSDirectory {
         FSEntry newEntry = createFileEntry(name);
         setFreeEntry(newEntry);
 
-        log.debug("<<< END addFile " + name + " >>>");
         return newEntry;
     }
 
@@ -111,7 +109,6 @@ public class HfsPlusDirectory implements FSDirectory {
 
     @Override
     public void flush() throws IOException {
-        log.debug("<<< BEGIN flush >>>");
         if (getFileSystem().isReadOnly()) {
             throw new ReadOnlyFileSystemException();
         }
@@ -121,7 +118,7 @@ public class HfsPlusDirectory implements FSDirectory {
             // entries.resetDirty();
             entry.resetDirty();
         }
-        log.debug("<<< END flush >>>");
+        log.debug("Directory flushed.");
     }
 
     @Override
@@ -181,7 +178,6 @@ public class HfsPlusDirectory implements FSDirectory {
                 entries = FSEntryTable.EMPTY_TABLE;
             }
         }
-        log.debug("<<< END checkEntriesLoaded >>>");
     }
 
     /**
