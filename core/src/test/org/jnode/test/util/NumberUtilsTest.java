@@ -1,5 +1,6 @@
-package org.jnode.util;
+package org.jnode.test.util;
 
+import org.jnode.util.NumberUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
