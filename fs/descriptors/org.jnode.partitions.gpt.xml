@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.partitions.gpt"
+        name="JNode GPT partition table classes"
+        version="0.2.9-dev"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.partitions"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.partitions.gpt.*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.partitions.types">
+    <type class="org.jnode.partitions.gpt.GptPartitionTableType"/>
+  </extension>
+        
+</plugin>
