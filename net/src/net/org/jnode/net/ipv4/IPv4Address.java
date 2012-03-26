@@ -212,8 +212,8 @@ public class IPv4Address implements ProtocolAddress, Serializable {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return String.valueOf(address[0] & 0xFF) + '.' + address[1] & 0xFF + '.' + address[2] &
-            0xFF + '.' + address[3] & 0xFF;
+        return "" + (address[0] & 0xFF) + '.' + (address[1] & 0xFF) + '.' + (address[2] & 0xFF) +
+            '.' + (address[3] & 0xFF);
     }
 
     /**
