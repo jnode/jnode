@@ -127,9 +127,9 @@ public class UsbBluetoothDriver extends Driver implements USBPipeListener, UsbNe
     public void requestCompleted(USBRequest request) {
         // log.debug("Bluetooth Completed");
         final byte[] data = intData.getData();
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("Data received : ");
-        for (int i = 0; i < data.length; i++) {
+        for (byte aData : data) {
             buffer.append(NumberUtils.hex(data[0], 2)).append(" ");
         }
         log.debug(buffer.toString());

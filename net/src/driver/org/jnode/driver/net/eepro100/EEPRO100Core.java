@@ -21,9 +21,7 @@
 package org.jnode.driver.net.eepro100;
 
 import java.security.PrivilegedExceptionAction;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.bus.pci.PCIBaseAddress;
@@ -248,7 +246,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         // disable
         regs.setReg32(SCBPort, 2);
         Counter count = new Counter("chrono");
-        while (((Integer) count.getValue()).intValue() <= 20)
+        while ((Integer) count.getValue() <= 20)
             count.inc();
         regs.setReg16(SCBCmd, SCBMaskAll);
         int intr_status = regs.getReg16(SCBStatus);

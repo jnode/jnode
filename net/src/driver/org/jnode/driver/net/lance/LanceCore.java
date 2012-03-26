@@ -21,9 +21,7 @@
 package org.jnode.driver.net.lance;
 
 import java.security.PrivilegedExceptionAction;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.DriverException;
 import org.jnode.driver.bus.pci.PCIBaseAddress;
 import org.jnode.driver.bus.pci.PCIConstants;
@@ -441,25 +439,12 @@ public class LanceCore extends AbstractDeviceCore implements IRQHandler, LanceCo
             0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 24, 25, 30, 31, 58, 76, 77, 80,
             82, 88, 89, 112, 124};
 
-        for (int i = 0; i < validVMWareLanceRegs.length; i++) {
-            int csr_val = io.getCSR(validVMWareLanceRegs[i]);
-            log.debug("CSR" + validVMWareLanceRegs[i] + " : " + NumberUtils.hex(csr_val, 4));
+        for (int validVMWareLanceReg : validVMWareLanceRegs) {
+            int csr_val = io.getCSR(validVMWareLanceReg);
+            log.debug("CSR" + validVMWareLanceReg + " : " + NumberUtils.hex(csr_val, 4));
         }
 
         // try to start again, not sure if this works?
         io.setCSR(0, CSR0_STRT);
-
-        /*
-          for (int k = 0; k <= 22; k++) {
-              int bcr_val = io.getBCR(k);
-              log.debug("BCR" + k + " : " + NumberUtils.hex(bcr_val));
-          }
-
-                  for (int j = 0; j <= 0x3F; j++) {
-              int pci_val = device.readConfigByte(j);
-              log.debug(
-                  "PCI" + NumberUtils.hex(j) + " : " + NumberUtils.hex(pci_val));
-          }
-         */
     }
 }

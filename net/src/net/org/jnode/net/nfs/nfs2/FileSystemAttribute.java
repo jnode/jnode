@@ -75,7 +75,7 @@ public class FileSystemAttribute {
     @Override
     public String toString() {
 
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("FileSystemAttribute ");
         buffer.append("transferSize:");
         buffer.append(transferSize);

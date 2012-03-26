@@ -34,7 +34,7 @@ public class URLTest {
         final InputStream is = url.openConnection().getInputStream();
         try {
             int ch;
-            final StringBuffer buf = new StringBuffer();
+            final StringBuilder buf = new StringBuilder();
             while ((ch = is.read()) >= 0) {
                 buf.append((char) ch);
             }

@@ -25,7 +25,6 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
-
 import org.acplt.oncrpc.OncRpcException;
 import org.acplt.oncrpc.OncRpcPortmapClient;
 import org.acplt.oncrpc.OncRpcProtocols;
@@ -47,8 +46,7 @@ public class Handler extends URLStreamHandler {
             client = new OncRpcPortmapClient(
                     InetAddress.getByName(url.getHost()), OncRpcProtocols.ONCRPC_TCP);
             OncRpcServerIdent[] servers = client.listServers();
-            for (int i = 0; i < servers.length; i++) {
-                OncRpcServerIdent server = servers[i];
+            for (OncRpcServerIdent server : servers) {
                 if (server.program == 100003 && server.version > version) {
                     version = server.version;
                 }

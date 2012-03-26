@@ -29,7 +29,6 @@ import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceNotFoundException;
@@ -115,19 +114,19 @@ public abstract class AbstractDatagramSocketImpl extends DatagramSocketImpl impl
         }
         switch (option_id) {
             case IP_TOS:
-                return Integer.valueOf(tos);
+                return tos;
             case SO_BINDADDR:
                 return laddr;
             case SO_BROADCAST:
-                return Boolean.valueOf(broadcast);
+                return broadcast;
             case SO_RCVBUF:
-                return Integer.valueOf(EthernetConstants.ETH_FRAME_LEN);
+                return EthernetConstants.ETH_FRAME_LEN;
             case SO_SNDBUF:
-                return Integer.valueOf(EthernetConstants.ETH_FRAME_LEN);
+                return EthernetConstants.ETH_FRAME_LEN;
             case SO_TRANSMIT_IF:
                 return (device == null) ? null : NetworkInterface.getByName(device.getId());
             case SO_TIMEOUT:
-                return Integer.valueOf(timeout);
+                return timeout;
             default:
                 return doGetOption(option_id);
         }
@@ -147,12 +146,12 @@ public abstract class AbstractDatagramSocketImpl extends DatagramSocketImpl impl
         try {
             switch (option_id) {
                 case IP_TOS:
-                    tos = ((Integer) val).intValue();
+                    tos = (Integer) val;
                     break;
                 case SO_BINDADDR:
                     throw new SocketException("Get only option: SO_BINDADDR");
                 case SO_BROADCAST:
-                    broadcast = ((Boolean) val).booleanValue();
+                    broadcast = (Boolean) val;
                     break;
                 case SO_RCVBUF: /* ignore */
                     break;
@@ -171,7 +170,7 @@ public abstract class AbstractDatagramSocketImpl extends DatagramSocketImpl impl
                     }
                     break;
                 case SO_TIMEOUT:
-                    timeout = ((Integer) val).intValue();
+                    timeout = (Integer) val;
                     break;
                 case SO_REUSEADDR:
                     // Ignored for now

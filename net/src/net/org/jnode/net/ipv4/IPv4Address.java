@@ -21,11 +21,10 @@
 package org.jnode.net.ipv4;
 
 import java.io.Serializable;
-import java.net.InetAddress;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.StringTokenizer;
-
 import org.jnode.net.ProtocolAddress;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetConstants;
@@ -213,8 +212,8 @@ public class IPv4Address implements ProtocolAddress, Serializable {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return "" + (address[0] & 0xFF) + '.' + (address[1] & 0xFF) + '.' + (address[2] & 0xFF) +
-                '.' + (address[3] & 0xFF);
+        return String.valueOf(address[0] & 0xFF) + '.' + address[1] & 0xFF + '.' + address[2] &
+            0xFF + '.' + address[3] & 0xFF;
     }
 
     /**
