@@ -143,8 +143,7 @@ public class TCPOutChannel {
      */
     public void timeout() throws SocketException {
         //allocation free looping
-        for (int i = 0; i < unackedSegments.size(); i++) {
-            TCPOutSegment seg = unackedSegments.get(i);
+        for (TCPOutSegment seg : unackedSegments) {
             seg.timeout(tcp);
         }
     }

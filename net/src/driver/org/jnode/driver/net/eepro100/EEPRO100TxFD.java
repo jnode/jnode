@@ -153,7 +153,7 @@ public class EEPRO100TxFD {
     }
 
     public String toString() {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         str.append("Status  : ");
         str.append(NumberUtils.hex(this.getStatus()));
         str.append("\n");

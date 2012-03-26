@@ -25,7 +25,6 @@ import java.net.DatagramPacket;
 import java.net.Inet4Address;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.ipv4.bootp.BOOTPHeader;
 
@@ -217,7 +216,7 @@ public class DHCPMessage {
         if (code == MESSAGE_TYPE_OPTION) {
             messageType = value[0];
         } else {
-            options.put(Integer.valueOf(code), value);
+            options.put(code, value);
         }
     }
 
@@ -254,7 +253,7 @@ public class DHCPMessage {
         if (code == MESSAGE_TYPE_OPTION)
             return new byte[] {(byte) messageType};
         else
-            return (byte[]) options.get(Integer.valueOf(code));
+            return (byte[]) options.get(code);
     }
 
     /**

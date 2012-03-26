@@ -26,7 +26,6 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import org.jnode.net.nfs.Protocol;
 import org.jnode.net.nfs.nfs2.FileAttribute;
 import org.jnode.net.nfs.nfs2.LookupResult;
@@ -85,8 +84,7 @@ public class NFS2InputStream extends InputStream {
         }
 
         ExportEntry exportEntry = null;
-        for (int i = 0; i < exportList.size(); i++) {
-            ExportEntry e = exportList.get(i);
+        for (ExportEntry e : exportList) {
             if (path.startsWith(e.getDirectory())) {
                 if (exportEntry == null) {
                     exportEntry = e;

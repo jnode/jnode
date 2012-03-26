@@ -31,10 +31,8 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.jnode.nanoxml.XMLElement;
-
 import org.apache.log4j.Logger;
+import org.jnode.nanoxml.XMLElement;
 import org.jnode.net.ipv4.IPv4Address;
 
 /**
@@ -83,11 +81,11 @@ public class BOOTPServer {
             XMLElement xml = new XMLElement();
             xml.parseFromReader(reader);
             List<XMLElement> children = xml.getChildren();
-            for (int i = 0; i < children.size(); i++) {
-                XMLElement child = (XMLElement) children.get(i);
+            for (XMLElement aChildren : children) {
+                XMLElement child = (XMLElement) aChildren;
                 try {
                     table.put(child.getStringAttribute("ethernetAddress").toUpperCase(),
-                            new TableEntry(child));
+                        new TableEntry(child));
                 } catch (IllegalArgumentException ex) {
                     log.debug("Invalid IP address", ex);
                 }

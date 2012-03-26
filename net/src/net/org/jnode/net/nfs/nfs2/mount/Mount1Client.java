@@ -25,7 +25,6 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.acplt.oncrpc.OncRpcClient;
 import org.acplt.oncrpc.OncRpcClientAuthUnix;
 import org.acplt.oncrpc.OncRpcException;
@@ -326,8 +325,7 @@ public class Mount1Client {
     public synchronized void close() throws IOException {
         closed = true;
         List<OncRpcException> exceptionList = new ArrayList<OncRpcException>();
-        for (int i = 0; i < rpcClientPool.size(); i++) {
-            OncRpcClient client = rpcClientPool.get(i);
+        for (OncRpcClient client : rpcClientPool) {
             try {
                 client.close();
             } catch (OncRpcException e) {
@@ -338,8 +336,8 @@ public class Mount1Client {
         if (exceptionList.size() != 0) {
             StringBuilder builder = new StringBuilder();
             builder.append("An error occurs when the mount client close connections. Reason:");
-            for (int i = 0; i < exceptionList.size(); i++) {
-                builder.append(exceptionList.get(i).getMessage());
+            for (OncRpcException anExceptionList : exceptionList) {
+                builder.append(anExceptionList.getMessage());
                 builder.append(".");
             }
             throw new IOException(builder.toString());
