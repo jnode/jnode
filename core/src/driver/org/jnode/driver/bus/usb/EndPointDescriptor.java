@@ -137,6 +137,6 @@ public final class EndPointDescriptor extends AbstractDescriptor {
             ", dir:" + (isDirIn() ? "IN" : "OUT") +
             ", xfertype:" + USB_ENDPOINT_XFER_NAMES[getTransferType()] +
             ", mpsize:" + getMaxPacketSize() +
-            ", intval:" + getInterval() + "]";
+            ", intval:" + getInterval() + ']';
     }
 }

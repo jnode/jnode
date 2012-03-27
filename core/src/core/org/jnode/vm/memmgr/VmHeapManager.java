@@ -21,7 +21,6 @@
 package org.jnode.vm.memmgr;
 
 import java.io.PrintWriter;
-
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.NoInline;
@@ -146,7 +145,7 @@ public abstract class VmHeapManager extends VmSystemObject implements org.jnode.
         if (!arrayCls.isArray()) {
             throw new IllegalArgumentException(
                 "Cannot instantiate a non-array like this ["
-                    + arrayCls.getName() + "]");
+                    + arrayCls.getName() + ']');
         }
 
         final int slotSize = getCurrentProcessor().getArchitecture()

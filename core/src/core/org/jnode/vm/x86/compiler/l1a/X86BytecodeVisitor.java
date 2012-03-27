@@ -1100,7 +1100,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
             os.log("<inline name=\"" + inlinedMethod.getName() + "\">Start of inlined method code");
         }
         if (debug) {
-            BootLogInstance.get().debug("startInlinedMethodCode(" + inlinedMethod + ")");
+            BootLogInstance.get().debug("startInlinedMethodCode(" + inlinedMethod + ')');
         }
         // TODO: check whether this is really needed
         // For now yes, because a new basic block resets the registerpool
@@ -1120,7 +1120,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
             os.log("Start of inlined method header " + inlinedMethod.getName());
         }
         if (debug) {
-            BootLogInstance.get().debug("startInlinedMethodHeader(" + inlinedMethod + ")");
+            BootLogInstance.get().debug("startInlinedMethodHeader(" + inlinedMethod + ')');
         }
         maxLocals = newMaxLocals;
         final Label curInstrLabel = getCurInstrLabel();
@@ -1139,7 +1139,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
      */
     public void startInstruction(int address) {
         if (debug) {
-            BootLogInstance.get().debug("#" + address + "\t" + vstack);
+            BootLogInstance.get().debug("#" + address + '\t' + vstack);
         }
         if (log) {
             if (debug) {
@@ -1166,7 +1166,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
     public synchronized void startMethod(VmMethod method) {
         working = true;
         if (debug) {
-            BootLogInstance.get().debug("setMethod(" + method + ")");
+            BootLogInstance.get().debug("setMethod(" + method + ')');
         }
         this.currentMethod = method;
         this.maxLocals = method.getBytecode().getNoLocals();
@@ -2610,7 +2610,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
      */
     public void visit_inlinedReturn(int jvmType) {
         if (debug) {
-            BootLogInstance.get().debug("inlinedReturn [type " + jvmType + "]");
+            BootLogInstance.get().debug("inlinedReturn [type " + jvmType + ']');
         }
 
         // Pop the return value
@@ -2774,7 +2774,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
             // Result is already on the stack.
         } catch (ClassCastException ex) {
             BootLogInstance.get().error(methodRef.getResolvedVmMethod().getClass().getName()
-                + "#" + methodRef.getName());
+                + '#' + methodRef.getName());
             throw ex;
         }
     }

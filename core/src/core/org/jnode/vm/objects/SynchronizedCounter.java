@@ -62,6 +62,6 @@ public final class SynchronizedCounter extends Statistic {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return getName() + "=" + counter;
+        return getName() + '=' + counter;
     }
 }

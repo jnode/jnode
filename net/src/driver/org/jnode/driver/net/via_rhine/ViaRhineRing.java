@@ -28,7 +28,7 @@ import org.jnode.system.resource.ResourceManager;
 abstract class ViaRhineRing<T extends ViaRhineDesc> {
     final int RING_SIZE;
     T[] ring;
-    int ringAddr;
+    int ringAddr = 0;
     int current;
 
     @SuppressWarnings("unchecked")

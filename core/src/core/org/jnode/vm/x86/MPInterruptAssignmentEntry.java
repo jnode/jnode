@@ -70,6 +70,6 @@ public abstract class MPInterruptAssignmentEntry extends MPEntry {
             ", src bus:0x" + NumberUtils.hex(getSourceBusID(), 2) +
             ",irq:" + getSourceBusIRQ() +
             "), dst ID:0x" + NumberUtils.hex(getDestinationApicID(), 2) +
-            ",INTN:" + getDestinationApicINTN() + ")";
+            ",INTN:" + getDestinationApicINTN() + ')';
     }
 }

@@ -425,6 +425,6 @@ abstract class Item {
 
     public String toString() {
         return getType() + "," + getKind() + " ("
-            + System.identityHashCode(this) + ")";
+            + System.identityHashCode(this) + ')';
     }
 }

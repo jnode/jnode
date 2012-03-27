@@ -35,13 +35,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
 import javax.isolate.IsolateStatus;
 import javax.isolate.Link;
 import javax.naming.NameNotFoundException;
-
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.annotation.SharedStatics;
@@ -851,8 +849,8 @@ public final class VmIsolate {
             if (t == null)
                 return false;
 
-            org.jnode.vm.Unsafe.debug("isEDT edt=" + t + "\n");
-            org.jnode.vm.Unsafe.debug("isEDT currenThread=" + Thread.currentThread() + "\n");
+            org.jnode.vm.Unsafe.debug("isEDT edt=" + t + '\n');
+            org.jnode.vm.Unsafe.debug("isEDT currenThread=" + Thread.currentThread() + '\n');
 
             return t == Thread.currentThread();
         } catch (Exception x) {
@@ -894,7 +892,7 @@ public final class VmIsolate {
         }
         org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 000\n");
         org.jnode.vm.Unsafe.debugStackTrace();
-        org.jnode.vm.Unsafe.debug("disposeAppContextCalled  - 000 " + intraIsolate + "\n");
+        org.jnode.vm.Unsafe.debug("disposeAppContextCalled  - 000 " + intraIsolate + '\n');
         if (appContext != null) {
             org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 0001\n");
             org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 0002\n");
@@ -926,11 +924,11 @@ public final class VmIsolate {
                     public void run() {
                         try {
                             org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 1\n");
-                            org.jnode.vm.Unsafe.debug("disposeAppContextCalled appcontext: " + appContext + "\n");
+                            org.jnode.vm.Unsafe.debug("disposeAppContextCalled appcontext: " + appContext + '\n');
                             org.jnode.vm.Unsafe.debug(
-                                "disposeAppContextCalled appcontext.getClass(): " + appContext.getClass() + "\n");
+                                "disposeAppContextCalled appcontext.getClass(): " + appContext.getClass() + '\n');
                             org.jnode.vm.Unsafe.debug("disposeAppContextCalled appcontext.getClass().dispose: " +
-                                appContext.getClass().getMethod("dispose") + "\n");
+                                appContext.getClass().getMethod("dispose") + '\n');
                             appContext.getClass().getMethod("dispose").invoke(appContext);
                             org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 2\n");
                         } catch (Exception x) {

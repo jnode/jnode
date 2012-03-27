@@ -21,7 +21,6 @@
 package org.jnode.vm.x86;
 
 import java.io.PrintWriter;
-
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.LoadStatics;
 import org.jnode.annotation.MagicPermission;
@@ -214,7 +213,7 @@ public abstract class VmX86Processor extends VmProcessor {
         this.rm = rm;
         final VmProcessor me = current();
         Unsafe.debug("Starting up CPU " + getIdString() + " from "
-            + me.getIdString() + "\n");
+            + me.getIdString() + '\n');
 
         // Setup kernel structures
         setupStructures();
@@ -224,19 +223,19 @@ public abstract class VmX86Processor extends VmProcessor {
 
         // Make sure Local APIC is enabled (the local apic of the current CPU!)
         Unsafe.debug("Enabling Local APIC: current state="
-            + (localAPIC.isEnabled() ? "enabled" : "disabled") + "\n");
+            + (localAPIC.isEnabled() ? "enabled" : "disabled") + '\n');
         localAPIC.setEnabled(true);
         localAPIC.clearErrors();
         // TimeUtils.loop(5000);
 
         // Send INIT IPI
-        Unsafe.debug("Sending INIT IPI to " + getIdString() + "\n");
+        Unsafe.debug("Sending INIT IPI to " + getIdString() + '\n');
         localAPIC.sendInitIPI(getId(), true);
         localAPIC.loopUntilNotBusy();
         VmSystem.loop(10);
 
         // Send INIT-DeAssert IPI
-        Unsafe.debug("Sending INIT-DeAssert IPI to " + getIdString() + "\n");
+        Unsafe.debug("Sending INIT-DeAssert IPI to " + getIdString() + '\n');
         localAPIC.sendInitIPI(getId(), false);
         localAPIC.loopUntilNotBusy();
         VmSystem.loop(10);
@@ -244,7 +243,7 @@ public abstract class VmX86Processor extends VmProcessor {
         final int numStarts = 2;
         for (int i = 0; i < numStarts; i++) {
             // Send STARTUP IPI
-            Unsafe.debug("Sending STARTUP IPI to " + getIdString() + "\n");
+            Unsafe.debug("Sending STARTUP IPI to " + getIdString() + '\n');
             localAPIC.clearErrors();
             localAPIC.sendStartupIPI(getId(), bootCode);
             localAPIC.loopUntilNotBusy();
@@ -253,7 +252,7 @@ public abstract class VmX86Processor extends VmProcessor {
             localAPIC.clearErrors();
         }
 
-        Unsafe.debug("Started up " + getIdString() + "\n");
+        Unsafe.debug("Started up " + getIdString() + '\n');
     }
 
     /**
@@ -313,7 +312,7 @@ public abstract class VmX86Processor extends VmProcessor {
     static final void applicationProcessorMain() {
         final VmX86Processor cpu = (VmX86Processor) current();
         Unsafe.debug("Starting Application Processor " + cpu.getIdString()
-            + "\n");
+            + '\n');
 
         // First force a load of CPUID
         cpu.getCPUID();
@@ -330,7 +329,7 @@ public abstract class VmX86Processor extends VmProcessor {
 
         // Run idle thread.
         // The scheduler will fetch other work
-        Unsafe.debug("Running normal threads on " + cpu.getIdString() + "\n");
+        Unsafe.debug("Running normal threads on " + cpu.getIdString() + '\n');
         cpu.getIdleThread().run();
     }
 
@@ -389,8 +388,8 @@ public abstract class VmX86Processor extends VmProcessor {
     public void dumpStatistics(PrintWriter out) {
         out.println("Type       : " + (bootProcessor ? "BSP" : (logical ? "AP-logical" : "AP")));
         out.println("CPUID      : " + getCPUID());
-        out.println("fxSave/Res : " + fxSaveCounter + "/" + fxRestoreCounter
-            + "/" + deviceNaCounter);
+        out.println("fxSave/Res : " + fxSaveCounter + '/' + fxRestoreCounter
+            + '/' + deviceNaCounter);
         out.println("Local APIC : " + ((localAPIC == null) ? "not present" :
             ((localAPIC.isEnabled() ? "enabled" : "disabled") + NumberUtils.hex(localAPIC.getErrors(), 4))));
         out.println("TimeSliceBC: " + (sendTimeSliceInterrupt.isZero() ? "disabled" : "enabled"));

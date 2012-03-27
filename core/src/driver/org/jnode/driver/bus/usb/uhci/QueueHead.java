@@ -200,6 +200,6 @@ public class QueueHead extends AbstractTreeStructure {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return "QH[" + NumberUtils.hex(getInt(0)) + ", " + NumberUtils.hex(getInt(4)) + "]";
+        return "QH[" + NumberUtils.hex(getInt(0)) + ", " + NumberUtils.hex(getInt(4)) + ']';
     }
 }

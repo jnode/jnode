@@ -21,7 +21,6 @@
 package org.jnode.vm.bytecode;
 
 import java.io.PrintStream;
-
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmConstFieldRef;
 import org.jnode.vm.classmgr.VmConstIMethodRef;
@@ -1187,7 +1186,7 @@ public class BytecodeViewer extends BytecodeVisitor {
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_multianewarray(org.jnode.vm.classmgr.VmConstClass, int)
      */
     public void visit_multianewarray(VmConstClass clazz, int dimensions) {
-        out("multianewarray " + clazz + " " + dimensions);
+        out("multianewarray " + clazz + ' ' + dimensions);
     }
 
     /**

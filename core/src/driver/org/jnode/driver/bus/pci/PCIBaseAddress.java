@@ -233,14 +233,14 @@ public final class PCIBaseAddress {
         if (!isValid()) {
             return "Invalid";
         } else if (isIO) {
-            return "IO:" + NumberUtils.hex(ioAddress) + "-" + NumberUtils.hex(ioAddress + size - 1);
+            return "IO:" + NumberUtils.hex(ioAddress) + '-' + NumberUtils.hex(ioAddress + size - 1);
         } else if (b64) {
-            return "MEM64:" + NumberUtils.hex(memAddress) + "-" + NumberUtils.hex(memAddress + size - 1);
+            return "MEM64:" + NumberUtils.hex(memAddress) + '-' + NumberUtils.hex(memAddress + size - 1);
         } else if (below1Mb) {
-            return "MEM32-BELOW1Mb:" + NumberUtils.hex((int) memAddress) + "-" +
+            return "MEM32-BELOW1Mb:" + NumberUtils.hex((int) memAddress) + '-' +
                 NumberUtils.hex((int) (memAddress + size - 1));
         } else {
-            return "MEM32:" + NumberUtils.hex((int) memAddress) + "-" + NumberUtils.hex((int) (memAddress + size - 1));
+            return "MEM32:" + NumberUtils.hex((int) memAddress) + '-' + NumberUtils.hex((int) (memAddress + size - 1));
         }
     }
 }

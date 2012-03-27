@@ -64,7 +64,7 @@ public class PCIDescriptors {
         VendorDescriptor result;
         result = (VendorDescriptor) vendors.get(new Integer(vendorId));
         if (result == null) {
-            result = new VendorDescriptor(vendorId, "? (" + vendorId + ")");
+            result = new VendorDescriptor(vendorId, "? (" + vendorId + ')');
         }
         return result;
     }

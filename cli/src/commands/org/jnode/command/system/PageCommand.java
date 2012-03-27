@@ -33,9 +33,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
@@ -498,25 +496,28 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
     /**
      * Prepare lines for output by painting them to our private buffer in the forward
      * direction starting at a given line number and (rendered) subline number.
-     * 
+     *
      * @param startLineNo
      */
     private ScreenBuffer prepare(int startLineNo, int startSublineNo) {
-        ScreenBuffer buffer = new ScreenBuffer(true);
-        int lineNo = startLineNo;
-        boolean more;
-        do {
-            String line = lineStore.getLine(lineNo);
-            if (line == null) {
-                break;
+        while (true) {
+            ScreenBuffer buffer = new ScreenBuffer(true);
+            int lineNo = startLineNo;
+            boolean more;
+            do {
+                String line = lineStore.getLine(lineNo);
+                if (line == null) {
+                    break;
+                }
+                more = prepareLine(line, lineNo, buffer);
+                lineNo++;
+            } while (more);
+            if (buffer.adjust(startLineNo, startSublineNo) || startLineNo == 0) {
+                return buffer;
+            } else {
+                startLineNo -= 1;
+                startSublineNo = LAST_SUBLINE;
             }
-            more = prepareLine(line, lineNo, buffer);
-            lineNo++;
-        } while (more);
-        if (buffer.adjust(startLineNo, startSublineNo) || startLineNo == 0) {
-            return buffer;
-        } else {
-            return prepare(startLineNo - 1, LAST_SUBLINE);
         }
     }
 

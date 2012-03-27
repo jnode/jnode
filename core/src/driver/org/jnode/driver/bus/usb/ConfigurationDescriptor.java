@@ -101,7 +101,7 @@ public final class ConfigurationDescriptor extends AbstractDescriptor {
         return "CONF[totlen:" + getTotalLength() +
             ", #intf:" + getNumInterfaces() +
             ", cnfval:" + getConfigurationValue() +
-            ", name:" + ((configurationName != null) ? configurationName : ("%" + getConfigurationStringIndex())) + "]";
+            ", name:" + ((configurationName != null) ? configurationName : ("%" + getConfigurationStringIndex())) + ']';
     }
 
 }

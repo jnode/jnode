@@ -102,7 +102,7 @@ abstract class VmConstMemberRef extends VmResolvableConstObject {
     public final String toString() {
         String type = getClass().getName();
         type = type.substring(type.lastIndexOf('.') + 1 + 2);
-        return type + ": " + getClassName() + "." + getName() + " [" + getSignature() + "]";
+        return type + ": " + getClassName() + '.' + getName() + " [" + getSignature() + ']';
     }
 
     /**

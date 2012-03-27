@@ -21,7 +21,6 @@
 package org.jnode.vm.bytecode;
 
 import java.nio.ByteBuffer;
-
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmCP;
 import org.jnode.vm.classmgr.VmConstClass;
@@ -718,7 +717,7 @@ public class BytecodeParser {
                     if (highValue < lowValue) {
                         throw new ClassFormatError(
                             "tableSwitch high < low! (high=" + highValue
-                                + ", low=" + lowValue + ")");
+                                + ", low=" + lowValue + ')');
                     }
                     int cnt = highValue - lowValue + 1;
                     int addresses[] = new int[cnt];

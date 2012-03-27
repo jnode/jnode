@@ -142,7 +142,7 @@ public class USBInterface extends AbstractDeviceItem {
             }
             b.append(endPoints[i]);
         }
-        b.append("}");
+        b.append('}');
         return b.toString();
     }
 }

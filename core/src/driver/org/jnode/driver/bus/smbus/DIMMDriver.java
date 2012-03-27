@@ -70,7 +70,7 @@ public class DIMMDriver extends Driver {
             if (!DIMMDriver.canExist(bus, address))
                 throw new DriverException("Device doesn't exist");
 
-            log.debug("Getting SPD Table from " + dimmDevice.getId() + ":");
+            log.debug("Getting SPD Table from " + dimmDevice.getId() + ':');
             spdTableLength = (bus.readByte(address, (byte) 0)) & 0xff;
             log.debug(" length=" + spdTableLength);
 

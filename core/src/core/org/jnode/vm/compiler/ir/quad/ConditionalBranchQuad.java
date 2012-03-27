@@ -20,14 +20,6 @@
  
 package org.jnode.vm.compiler.ir.quad;
 
-import static org.jnode.vm.compiler.ir.AddressingMode.CONSTANT;
-import static org.jnode.vm.compiler.ir.AddressingMode.REGISTER;
-import static org.jnode.vm.compiler.ir.AddressingMode.STACK;
-import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ACMPEQ;
-import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ACMPNE;
-import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ICMPEQ;
-import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ICMPNE;
-
 import org.jnode.vm.compiler.ir.AddressingMode;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.Constant;
@@ -37,6 +29,14 @@ import org.jnode.vm.compiler.ir.Operand;
 import org.jnode.vm.compiler.ir.RegisterLocation;
 import org.jnode.vm.compiler.ir.StackLocation;
 import org.jnode.vm.compiler.ir.Variable;
+
+import static org.jnode.vm.compiler.ir.AddressingMode.CONSTANT;
+import static org.jnode.vm.compiler.ir.AddressingMode.REGISTER;
+import static org.jnode.vm.compiler.ir.AddressingMode.STACK;
+import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ACMPEQ;
+import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ACMPNE;
+import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ICMPEQ;
+import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ICMPNE;
 
 /**
  * @author Madhu Siddalingaiah
@@ -143,11 +143,11 @@ public class ConditionalBranchQuad<T> extends BranchQuad<T> {
 
     public String toString() {
         if (condition.isBinary()) {
-            return getAddress() + ": if " + refs[0].toString() + " "
-                + condition.getCondition() + " " + refs[1].toString()
+            return getAddress() + ": if " + refs[0].toString() + ' '
+                + condition.getCondition() + ' ' + refs[1].toString()
                 + " goto " + getTargetBlock();
         } else {
-            return getAddress() + ": if " + refs[0].toString() + " "
+            return getAddress() + ": if " + refs[0].toString() + ' '
                 + condition.getCondition() + " goto " + getTargetBlock();
         }
     }

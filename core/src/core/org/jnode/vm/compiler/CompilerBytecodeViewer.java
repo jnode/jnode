@@ -1193,6 +1193,6 @@ public class CompilerBytecodeViewer extends InlineBytecodeVisitor {
     }
 
     public void visit_inlinedReturn(int jvmType) {
-        viewer.out("inlinedReturn [type " + jvmType + "]");
+        viewer.out("inlinedReturn [type " + jvmType + ']');
     }
 }

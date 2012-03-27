@@ -100,7 +100,7 @@ public class UHCIControlRequest extends AbstractUSBControlRequest implements UHC
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return "setup[" + getSetupPacket() + "]";
+        return "setup[" + getSetupPacket() + ']';
     }
 
 }

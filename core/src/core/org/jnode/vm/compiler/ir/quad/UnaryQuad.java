@@ -71,7 +71,7 @@ public class UnaryQuad<T> extends AssignQuad<T> {
 
     public String toString() {
         return getAddress() + ": " + getLHS().toString() + " = " +
-            operation.name() + " " + refs[0].toString();
+            operation.name() + ' ' + refs[0].toString();
     }
 
     public Operand<T> propagate(Variable<T> operand) {

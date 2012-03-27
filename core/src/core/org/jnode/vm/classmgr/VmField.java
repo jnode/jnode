@@ -21,7 +21,6 @@
 package org.jnode.vm.classmgr;
 
 import java.lang.reflect.Field;
-
 import org.jnode.vm.isolate.VmIsolateLocal;
 
 public abstract class VmField extends VmMember {
@@ -157,7 +156,7 @@ public abstract class VmField extends VmMember {
 
     public String getMangledName() {
         return Mangler.mangleClassName(declaringClass.getName())
-            + Mangler.mangle("." + getName() + '.' + getSignature());
+            + Mangler.mangle('.' + getName() + '.' + getSignature());
     }
 
     /**

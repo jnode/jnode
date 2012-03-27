@@ -74,7 +74,7 @@ public class GenericAddress {
                 int device = (int) ((address & 0xff00000000L) >> 24);
                 int offset = (int) ((address & 0xffffL));
                 int function = (int) ((address & 0xffff0000L) >> 16);
-                add = "Bus(0)Device(" + device + ")Function(" + function + ")Offset(" + offset + ")";
+                add = "Bus(0)Device(" + device + ")Function(" + function + ")Offset(" + offset + ')';
                 break;
             case EMBEDED_CONTROLER:
                 space = "Controler";
@@ -94,6 +94,6 @@ public class GenericAddress {
                 break;
         }
 
-        return "<" + space + ":" + add + "/" + width + "," + offset + ">";
+        return '<' + space + ':' + add + '/' + width + ',' + offset + '>';
     }
 }

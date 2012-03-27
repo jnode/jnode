@@ -511,7 +511,8 @@ public class ParseNode {
             }
         } else
             opcodeName = opc.name;
-        result.append(prefix + opcodeName);
+        result.append(prefix);
+        result.append(opcodeName);
 
         String nameString = "";
         if (this.name == null) {
@@ -520,7 +521,8 @@ public class ParseNode {
             }
         } else
             nameString = name.toString();
-        result.append(" " + nameString);
+        result.append(" ");
+        result.append(nameString);
 
         if (value != null) {
             result.append(" = ");
@@ -552,17 +554,27 @@ public class ParseNode {
                         return prefix + "currentName=Name(\"" + name.toString() + "\");\n";
                 case Aml.AML_PACKAGE:
                     result.setLength(0);
-                    result.append(prefix + "currentPackage=Package(" + this.args.get(0).value + ");\n");
-                    result.append(prefix + "currentName.add(currentPackage);\n");
+                    result.append(prefix + "currentPackage=Package(");
+                    result.append(this.args.get(0).value);
+                    result.append(");\n");
+                    result.append(prefix);
+                    result.append("currentName.add(currentPackage);\n");
                     return result.toString();
                 case Aml.AML_BUFFER:
                     result.setLength(0);
-                    result.append(prefix + "currentBuffer=Buffer(" + this.args.get(0).value + ");\n");
-                    result.append(prefix + "currentName.add(currentBuffer);\n");
+                    result.append(prefix);
+                    result.append("currentBuffer=Buffer(");
+                    result.append(this.args.get(0).value);
+                    result.append(");\n");
+                    result.append(prefix);
+                    result.append("currentName.add(currentBuffer);\n");
                     return result.toString();
                 case Aml.AML_STRING:
                     result.setLength(0);
-                    result.append(prefix + "currentPackage.add(\"" + value + "\");\n");
+                    result.append(prefix);
+                    result.append("currentPackage.add(\"");
+                    result.append(value);
+                    result.append("\");\n");
                     return result.toString();
             }
         }

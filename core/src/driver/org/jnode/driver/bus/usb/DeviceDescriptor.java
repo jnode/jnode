@@ -182,7 +182,7 @@ public final class DeviceDescriptor extends AbstractDescriptor {
             ", manu:" + ((manufacturer != null) ? manufacturer : ("%" + getManufacturerStringIndex())) +
             ", prod:" + ((product != null) ? product : ("%" + getProductStringIndex())) +
             ", sernr:" + ((serialNumber != null) ? serialNumber : ("%" + getSerialNumberStringIndex())) +
-            ", #cnf:" + getNumConfigurations() + "]";
+            ", #cnf:" + getNumConfigurations() + ']';
     }
 
 }

@@ -186,7 +186,7 @@ public class JarBuffer implements JarConstants {
         for (Map.Entry<String, ByteBuffer> entry : jb.entries().entrySet()) {
             final ByteBuffer ebuf = entry.getValue();
             if (ebuf.limit() > 0) {
-                System.out.println(entry.getKey() + " " + ebuf.limit() + " 0x"
+                System.out.println(entry.getKey() + ' ' + ebuf.limit() + " 0x"
                     + NumberUtils.hex(ebuf.getInt(0)));
             }
         }

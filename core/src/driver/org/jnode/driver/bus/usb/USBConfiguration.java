@@ -85,7 +85,7 @@ public class USBConfiguration extends AbstractDeviceItem {
             }
             b.append(interfaces[i]);
         }
-        b.append("}");
+        b.append('}');
         return b.toString();
     }
 

@@ -22,7 +22,6 @@ package org.jnode.debugger;
 
 import java.io.PrintStream;
 import java.util.Map;
-
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.vm.scheduler.VmThread;
 
@@ -46,7 +45,7 @@ public class ThreadState extends DebugState {
 
     public void print(PrintStream out) {
         final int max = ((ThreadListState) getParent()).size();
-        out.println("[Thread " + index + "/" + max + "]");
+        out.println("[Thread " + index + '/' + max + ']');
         showThread(out, thread);
     }
 

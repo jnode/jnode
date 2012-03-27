@@ -21,7 +21,6 @@
 package org.jnode.plugin;
 
 import java.nio.ByteBuffer;
-
 import org.jnode.permission.JNodePermission;
 
 
@@ -63,6 +62,6 @@ public abstract class PluginLoader {
      * @return the filename of the plugin
      */
     public static String getPluginFileName(String pluginId, String pluginVersion) {
-        return pluginId + "_" + pluginVersion + ".jar";
+        return pluginId + '_' + pluginVersion + ".jar";
     }
 }

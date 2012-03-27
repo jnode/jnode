@@ -35,7 +35,7 @@ public class FireWireDevice extends Device implements DeviceInfoAPI {
      * @param bus
      */
     public FireWireDevice(FireWireBus bus) {
-        super(bus, "firewire(" + bus.getBus() + ")");
+        super(bus, "firewire(" + bus.getBus() + ')');
     }
 
     /**

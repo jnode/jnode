@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Collection;
-
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
@@ -308,7 +307,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
      
     public ObjectRef setObjectRef(Object label) {
-        println(label(label) + ":");
+        println(label(label) + ':');
         return new ObjectRefImpl(label);
     }
 
@@ -364,11 +363,11 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeADC(GPR dstReg, int imm32) {
-        println("\tadc " + dstReg + "," + imm32);
+        println("\tadc " + dstReg + ',' + imm32);
     }
 
     public void writeADC(int operandSize, GPR dstReg, int dstDisp, int imm32) {
-        println("\tadc " + size(operandSize) + "[" + dstReg + disp(dstDisp)
+        println("\tadc " + size(operandSize) + '[' + dstReg + disp(dstDisp)
             + "]," + imm32);
     }
 
@@ -383,7 +382,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcReg
      */
     public void writeADC(GPR dstReg, GPR srcReg) {
-        println("\tadc " + dstReg + "," + srcReg);
+        println("\tadc " + dstReg + ',' + srcReg);
     }
 
     /**
@@ -394,7 +393,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcDisp
      */
     public void writeADC(GPR dstReg, GPR srcReg, int srcDisp) {
-        println("\tadc " + dstReg + ",[" + srcReg + disp(srcDisp) + "]");
+        println("\tadc " + dstReg + ",[" + srcReg + disp(srcDisp) + ']');
     }
 
     // LS
@@ -407,7 +406,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeADD(int operandSize, int dstDisp, int imm32) {
-        println("\tadd " + size(operandSize) + "[" + disp(dstDisp)
+        println("\tadd " + size(operandSize) + '[' + disp(dstDisp)
             + "],0x" + NumberUtils.hex(imm32));
     }
 
@@ -419,17 +418,17 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeADD(int operandSize, GPR dstReg, int dstDisp, int imm32) {
-        println("\tadd " + size(operandSize) + "[" + dstReg + disp(dstDisp)
+        println("\tadd " + size(operandSize) + '[' + dstReg + disp(dstDisp)
             + "],0x" + NumberUtils.hex(imm32));
     }
 
     public void writeADD(int operandSize, SR dstReg, int dstDisp, int imm32) {
-        println("\tadd " + size(operandSize) + "[" + dstReg + ":0x"
+        println("\tadd " + size(operandSize) + '[' + dstReg + ":0x"
             + NumberUtils.hex(dstDisp) + "],0x" + NumberUtils.hex(imm32));
     }
 
     public void writeADD_MEM(X86Register.GPR reg, int memPtr32) {
-        println("\tadd " + reg + ",[0x" + NumberUtils.hex(memPtr32) + "]");
+        println("\tadd " + reg + ",[0x" + NumberUtils.hex(memPtr32) + ']');
     }
 
     public void writeADD(GPR dstReg, int dstDisp, GPR srcReg) {
@@ -437,7 +436,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeADD(GPR dstReg, GPR srcReg) {
-        println("\tadd " + dstReg + "," + srcReg);
+        println("\tadd " + dstReg + ',' + srcReg);
     }
 
     /**
@@ -448,7 +447,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcDisp
      */
     public void writeADD(GPR dstReg, GPR srcReg, int srcDisp) {
-        println("\tadd " + dstReg + ",[" + srcReg + disp(srcDisp) + "]");
+        println("\tadd " + dstReg + ",[" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeAND(GPR reg, int imm32) {
@@ -456,7 +455,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeAND(int operandSize, int dstDisp, int imm32) {
-        println("\tand " + size(operandSize) + "[" + disp(dstDisp)
+        println("\tand " + size(operandSize) + '[' + disp(dstDisp)
             + "],0x" + NumberUtils.hex(imm32));
     }
 
@@ -466,7 +465,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeAND(int operandSize, GPR dstReg, int dstDisp, int imm32) {
-        println("\tand " + size(operandSize) + "[" + dstReg + disp(dstDisp)
+        println("\tand " + size(operandSize) + '[' + dstReg + disp(dstDisp)
             + "],0x" + NumberUtils.hex(imm32));
     }
 
@@ -481,12 +480,12 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeAND(int operandSize, X86Register.SR dstReg, int dstDisp, int imm32) {
-        println("\tand " + size(operandSize) + "[" + dstReg + ":0x" + NumberUtils.hex(dstDisp)
+        println("\tand " + size(operandSize) + '[' + dstReg + ":0x" + NumberUtils.hex(dstDisp)
             + "],0x" + NumberUtils.hex(imm32));
     }
 
     public void writeAND(GPR dstReg, GPR srcReg) {
-        println("\tand " + dstReg + "," + srcReg);
+        println("\tand " + dstReg + ',' + srcReg);
     }
 
     /**
@@ -495,31 +494,31 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcDisp
      */
     public void writeAND(GPR dstReg, GPR srcReg, int srcDisp) {
-        println("\tand " + dstReg + ",[" + srcReg + disp(srcDisp) + "]");
+        println("\tand " + dstReg + ",[" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeArithSSEDOp(int operation, XMM dst, GPR src, int srcDisp) {
         final String op = getSSEOperationName(operation);
-        println("\t" + op + "D" + dst + ", qword [" + src + disp(srcDisp) + "]");
+        println('\t' + op + 'D' + dst + ", qword [" + src + disp(srcDisp) + ']');
     }
 
     public void writeArithSSEDOp(int operation, XMM dst, XMM src) {
         final String op = getSSEOperationName(operation);
-        println("\t" + op + "D" + dst + ", " + src);
+        println('\t' + op + 'D' + dst + ", " + src);
     }
 
     public void writeArithSSESOp(int operation, XMM dst, GPR src, int srcDisp) {
         final String op = getSSEOperationName(operation);
-        println("\t" + op + "S" + dst + ", dword [" + src + disp(srcDisp) + "]");
+        println('\t' + op + 'S' + dst + ", dword [" + src + disp(srcDisp) + ']');
     }
 
     public void writeArithSSESOp(int operation, XMM dst, XMM src) {
         final String op = getSSEOperationName(operation);
-        println("\t" + op + "S" + dst + ", " + src);
+        println('\t' + op + 'S' + dst + ", " + src);
     }
 
     public void writeBOUND(GPR lReg, GPR rReg, int rDisp) {
-        println("\tbound " + lReg + ",[" + rReg + disp(rDisp) + "]");
+        println("\tbound " + lReg + ",[" + rReg + disp(rDisp) + ']');
     }
 
     public void writeBreakPoint() {
@@ -540,7 +539,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param rawAddress If true, tablePtr is a raw address
      */
     public void writeCALL(Object tablePtr, int offset, boolean rawAddress) {
-        println("\tcall [" + tablePtr + disp(offset) + "]");
+        println("\tcall [" + tablePtr + disp(offset) + ']');
     }
 
     public void writeCALL(GPR reg) {
@@ -554,16 +553,16 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param offset
      */
     public void writeCALL(GPR reg, int offset) {
-        println("\tcall [" + reg + disp(offset) + "]");
+        println("\tcall [" + reg + disp(offset) + ']');
     }
 
     public void writeCALL(GPR regBase, GPR regIndex, int scale, int disp) {
-        println("\tcall [" + regBase + "+" + regIndex + "*" + scale
-            + disp(disp) + "]");
+        println("\tcall [" + regBase + '+' + regIndex + '*' + scale
+            + disp(disp) + ']');
     }
 
     public void writeCALL(GPR regIndex, int scale, int disp) {
-        println("\tcall [" + regIndex + "*" + scale + disp(disp) + "]");
+        println("\tcall [" + regIndex + '*' + scale + disp(disp) + ']');
     }
 
     public void writeCDQ(int operandSize) {
@@ -611,7 +610,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param src
      */
     public void writeCMOVcc(int ccOpcode, GPR dst, GPR src) {
-        println("\tCMOV" + ccName(ccOpcode) + " " + dst + "," + src);
+        println("\tCMOV" + ccName(ccOpcode) + ' ' + dst + ',' + src);
     }
 
     /**
@@ -622,8 +621,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcDisp
      */
     public void writeCMOVcc(int ccOpcode, GPR dst, GPR src, int srcDisp) {
-        println("\tCMOV" + ccName(ccOpcode) + " " + dst + ",[" + src
-            + disp(srcDisp) + "]");
+        println("\tCMOV" + ccName(ccOpcode) + ' ' + dst + ",[" + src
+            + disp(srcDisp) + ']');
     }
 
     /**
@@ -638,7 +637,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeCMP(GPR reg1, GPR reg2) {
-        println("\tcmp " + reg1 + "," + reg2);
+        println("\tcmp " + reg1 + ',' + reg2);
     }
 
     /**
@@ -649,7 +648,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param disp
      */
     public void writeCMP(GPR reg1, SR reg2, int disp) {
-        println("\tcmp " + reg1 + ",[" + reg2 + ":0x" + NumberUtils.hex(disp) + "]");
+        println("\tcmp " + reg1 + ",[" + reg2 + ":0x" + NumberUtils.hex(disp) + ']');
     }
 
     /**
@@ -660,7 +659,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param disp
      */
     public void writeCMP(GPR reg1, GPR reg2, int disp) {
-        println("\tcmp " + reg1 + ",[" + reg2 + disp(disp) + "]");
+        println("\tcmp " + reg1 + ",[" + reg2 + disp(disp) + ']');
     }
 
     public void writeCMP_Const(GPR reg, int imm32) {
@@ -675,7 +674,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeCMP_Const(int operandSize, GPR reg, int disp, int imm32) {
-        println("\tcmp " + size(operandSize) + "[" + reg + disp(disp) + "],0x"
+        println("\tcmp " + size(operandSize) + '[' + reg + disp(disp) + "],0x"
             + NumberUtils.hex(imm32));
     }
 
@@ -688,7 +687,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeCMP_Const(int operandSize, X86Register.SR dstReg, int dstDisp, int imm32) {
-        println("\tcmp " + size(operandSize) + "[" + dstReg + ":0x" + NumberUtils.hex(dstDisp) + "],0x"
+        println("\tcmp " + size(operandSize) + '[' + dstReg + ":0x" + NumberUtils.hex(dstDisp) + "],0x"
             + NumberUtils.hex(imm32));
     }
 
@@ -702,7 +701,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeCMP_MEM(int operandSize, int memPtr, int imm32) {
-        println("\tcmp " + size(operandSize) + "[" + memPtr + "],0x"
+        println("\tcmp " + size(operandSize) + '[' + memPtr + "],0x"
             + NumberUtils.hex(imm32));
     }
 
@@ -713,7 +712,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param memPtr
      */
     public void writeCMP_MEM(GPR reg, int memPtr) {
-        println("\tcmp " + reg + ", [" + memPtr + "]");
+        println("\tcmp " + reg + ", [" + memPtr + ']');
     }
 
     public void writeCMPXCHG_EAX(GPR dstReg, int dstDisp, GPR srcReg,
@@ -730,8 +729,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeDEC(int operandSize, GPR dstReg, int dstDisp) {
-        println("\tdec " + size(operandSize) + "[" + dstReg + disp(dstDisp)
-            + "]");
+        println("\tdec " + size(operandSize) + '[' + dstReg + disp(dstDisp)
+            + ']');
     }
 
     public void writeDIV_EAX(GPR srcReg) {
@@ -744,11 +743,11 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeFADD32(GPR srcReg, int srcDisp) {
-        println("\tfadd dword [" + srcReg + disp(srcDisp) + "]");
+        println("\tfadd dword [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFADD64(GPR srcReg, int srcDisp) {
-        println("\tfadd qword [" + srcReg + disp(srcDisp) + "]");
+        println("\tfadd qword [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFADDP(X86Register fpuReg) {
@@ -760,11 +759,11 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeFDIV32(GPR srcReg, int srcDisp) {
-        println("\tfdiv dword [" + srcReg + disp(srcDisp) + "]");
+        println("\tfdiv dword [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFDIV64(GPR srcReg, int srcDisp) {
-        println("\tfdiv qword [" + srcReg + disp(srcDisp) + "]");
+        println("\tfdiv qword [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFDIVP(X86Register fpuReg) {
@@ -776,51 +775,51 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeFILD32(GPR dstReg, int dstDisp) {
-        println("\tfild dword [" + dstReg + disp(dstDisp) + "]");
+        println("\tfild dword [" + dstReg + disp(dstDisp) + ']');
     }
 
     public void writeFILD64(GPR dstReg, int dstDisp) {
-        println("\tfild qword [" + dstReg + disp(dstDisp) + "]");
+        println("\tfild qword [" + dstReg + disp(dstDisp) + ']');
     }
 
     public void writeFISTP32(GPR dstReg, int dstDisp) {
-        println("\tfistp dword [" + dstReg + disp(dstDisp) + "]");
+        println("\tfistp dword [" + dstReg + disp(dstDisp) + ']');
     }
 
     public void writeFISTP64(GPR dstReg, int dstDisp) {
-        println("\tfistp qword [" + dstReg + disp(dstDisp) + "]");
+        println("\tfistp qword [" + dstReg + disp(dstDisp) + ']');
     }
 
     public void writeFLD32(GPR srcReg, int srcDisp) {
-        println("\tfld dword [" + srcReg + disp(srcDisp) + "]");
+        println("\tfld dword [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFLD32(GPR srcBaseReg, GPR srcIndexReg, int srcScale,
                            int srcDisp) {
         println("\tfld dword [" + srcBaseReg + '+' + srcIndexReg + '*'
-            + srcScale + disp(srcDisp) + "]");
+            + srcScale + disp(srcDisp) + ']');
     }
 
     public void writeFLD64(GPR srcReg, int srcDisp) {
-        println("\tfld qword [" + srcReg + disp(srcDisp) + "]");
+        println("\tfld qword [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFLD64(GPR srcBaseReg, GPR srcIndexReg, int srcScale,
                            int srcDisp) {
         println("\tfld qword [" + srcBaseReg + '+' + srcIndexReg + '*'
-            + srcScale + disp(srcDisp) + "]");
+            + srcScale + disp(srcDisp) + ']');
     }
 
     public void writeFLDCW(GPR srcReg, int srcDisp) {
-        println("\tfldcw word [" + srcReg + disp(srcDisp) + "]");
+        println("\tfldcw word [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFMUL32(GPR srcReg, int srcDisp) {
-        println("\tfmul dword [" + srcReg + disp(srcDisp) + "]");
+        println("\tfmul dword [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFMUL64(GPR srcReg, int srcDisp) {
-        println("\tfmul qword [" + srcReg + disp(srcDisp) + "]");
+        println("\tfmul qword [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFMULP(X86Register fpuReg) {
@@ -832,7 +831,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeFNSAVE(GPR srcReg, int srcDisp) {
-        println("\tfnsave [" + srcReg + disp(srcDisp) + "]");
+        println("\tfnsave [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFNSTSW_AX() {
@@ -844,11 +843,11 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeFRSTOR(GPR srcReg, int srcDisp) {
-        println("\tfrstor [" + srcReg + disp(srcDisp) + "]");
+        println("\tfrstor [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFSTCW(GPR srcReg, int srcDisp) {
-        println("\tfstcw word [" + srcReg + disp(srcDisp) + "]");
+        println("\tfstcw word [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFSTP(X86Register fpuReg) {
@@ -856,19 +855,19 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeFSTP32(GPR dstReg, int dstDisp) {
-        println("\tfstp dword [" + dstReg + disp(dstDisp) + "]");
+        println("\tfstp dword [" + dstReg + disp(dstDisp) + ']');
     }
 
     public void writeFSTP64(GPR dstReg, int dstDisp) {
-        println("\tfstp qword [" + dstReg + disp(dstDisp) + "]");
+        println("\tfstp qword [" + dstReg + disp(dstDisp) + ']');
     }
 
     public void writeFSUB32(GPR srcReg, int srcDisp) {
-        println("\tfsub32 dword [" + srcReg + disp(srcDisp) + "]");
+        println("\tfsub32 dword [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFSUB64(GPR srcReg, int srcDisp) {
-        println("\tfsub64 qword [" + srcReg + disp(srcDisp) + "]");
+        println("\tfsub64 qword [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFSUBP(X86Register fpuReg) {
@@ -884,11 +883,11 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeFXRSTOR(GPR srcReg, int srcDisp) {
-        println("\tfxrstor [" + srcReg + disp(srcDisp) + "]");
+        println("\tfxrstor [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeFXSAVE(GPR srcReg, int srcDisp) {
-        println("\tfxsave [" + srcReg + disp(srcDisp) + "]");
+        println("\tfxsave [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeHLT() {
@@ -900,12 +899,12 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeIDIV_EAX(int operandSize, GPR srcReg, int srcDisp) {
-        println("\tidiv " + size(operandSize) + "[" + srcReg + disp(srcDisp)
-            + "]");
+        println("\tidiv " + size(operandSize) + '[' + srcReg + disp(srcDisp)
+            + ']');
     }
 
     public void writeIMUL(GPR dstReg, GPR srcReg) {
-        println("\timul " + dstReg + "," + srcReg);
+        println("\timul " + dstReg + ',' + srcReg);
     }
 
     /**
@@ -914,7 +913,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcDisp
      */
     public void writeIMUL(GPR dstReg, GPR srcReg, int srcDisp) {
-        println("\timul " + dstReg + ",[" + srcReg + disp(srcDisp) + "]");
+        println("\timul " + dstReg + ",[" + srcReg + disp(srcDisp) + ']');
     }
 
     /**
@@ -923,7 +922,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeIMUL_3(GPR dstReg, GPR srcReg, int imm32) {
-        println("\timul " + dstReg + "," + srcReg + ",0x"
+        println("\timul " + dstReg + ',' + srcReg + ",0x"
             + NumberUtils.hex(imm32));
     }
 
@@ -945,11 +944,11 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 
     public void writeIN(int operandSize) {
         if (operandSize == X86Constants.BITS8) {
-            println("\tin " + X86Register.AL + "," + X86Register.DX);
+            println("\tin " + X86Register.AL + ',' + X86Register.DX);
         } else if (operandSize == X86Constants.BITS16) {
-            println("\tin " + X86Register.AX + "," + X86Register.DX);
+            println("\tin " + X86Register.AX + ',' + X86Register.DX);
         } else if (operandSize == X86Constants.BITS32) {
-            println("\tin " + X86Register.EAX + "," + X86Register.DX);
+            println("\tin " + X86Register.EAX + ',' + X86Register.DX);
         } else {
             throw new IllegalArgumentException("Invalid operand size for IN: " + operandSize);
         }
@@ -957,11 +956,11 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 
     public void writeIN(int operandSize, int imm8) {
         if (operandSize == X86Constants.BITS8) {
-            println("\tin " + X86Register.AL + "," + imm8);
+            println("\tin " + X86Register.AL + ',' + imm8);
         } else if (operandSize == X86Constants.BITS16) {
-            println("\tin " + X86Register.AX + "," + imm8);
+            println("\tin " + X86Register.AX + ',' + imm8);
         } else if (operandSize == X86Constants.BITS32) {
-            println("\tin " + X86Register.EAX + "," + imm8);
+            println("\tin " + X86Register.EAX + ',' + imm8);
         } else {
             throw new IllegalArgumentException("Invalid operand size for IN: " + operandSize);
         }
@@ -972,7 +971,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeINC(int operandSize, X86Register.SR dstReg, int disp) {
-        println("\tinc " + size(operandSize) + "[" + dstReg + ":0x" + NumberUtils.hex(disp) + "]");
+        println("\tinc " + size(operandSize) + '[' + dstReg + ":0x" + NumberUtils.hex(disp) + ']');
     }
 
     /**
@@ -981,11 +980,11 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param dstReg
      */
     public void writeINC(int operandSize, GPR dstReg, int disp) {
-        println("\tinc " + size(operandSize) + "[" + dstReg + disp(disp) + "]");
+        println("\tinc " + size(operandSize) + '[' + dstReg + disp(disp) + ']');
     }
 
     public void writeINC(int operandSize, GPR dstReg, GPR dstIdxReg, int scale, int disp) {
-        println("\tinc [" + dstReg + disp(disp) + "+" + dstIdxReg + "*" + scale + "]");
+        println("\tinc [" + dstReg + disp(disp) + '+' + dstIdxReg + '*' + scale + ']');
     }
 
     /**
@@ -994,7 +993,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param dstDisp
      */
     public void writeINC(int operandSize, int dstDisp) {
-        println("\tinc " + size(operandSize) + "[" + dstDisp + "]");
+        println("\tinc " + size(operandSize) + '[' + dstDisp + ']');
     }
 
     public void writeINT(int vector) {
@@ -1006,7 +1005,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeJCC(Label label, int jumpOpcode) {
-        println("\tj" + ccName(jumpOpcode) + " " + label(label));
+        println("\tj" + ccName(jumpOpcode) + ' ' + label(label));
     }
 
     public void writeJECXZ(Label label) {
@@ -1048,7 +1047,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param offsetReg
      */
     public void writeJMP(Object tablePtr, GPR offsetReg) {
-        println("\tjmp [" + tablePtr + "+" + offsetReg + "]");
+        println("\tjmp [" + tablePtr + '+' + offsetReg + ']');
     }
 
     public void writeJMP(GPR reg32) {
@@ -1061,33 +1060,33 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param reg32
      */
     public final void writeJMP(GPR reg32, int disp) {
-        println("\tjmp [" + reg32 + disp(disp) + "]");
+        println("\tjmp [" + reg32 + disp(disp) + ']');
     }
 
     public void writeLDMXCSR(GPR srcReg, int disp) {
-        println("\tldmxcsr dword [" + srcReg + disp(disp) + "]");
+        println("\tldmxcsr dword [" + srcReg + disp(disp) + ']');
     }
 
     public void writeLEA(GPR dstReg, GPR srcReg, int disp) {
-        println("\tlea " + dstReg + ",[" + srcReg + disp(disp) + "]");
+        println("\tlea " + dstReg + ",[" + srcReg + disp(disp) + ']');
     }
 
     public void writeLEA(X86Register.GPR dstReg, X86Register.GPR srcIdxReg, int scale, int disp) {
-        println("\tlea " + dstReg + ",[" + srcIdxReg + "*" + scale + disp(disp) + "]");
+        println("\tlea " + dstReg + ",[" + srcIdxReg + '*' + scale + disp(disp) + ']');
     }
 
     public void writeLGDT(int disp) {
-        println("\tlgdt [" + disp(disp) + "]");
+        println("\tlgdt [" + disp(disp) + ']');
     }
 
     public void writeLIDT(int disp) {
-        println("\tlidt [" + disp(disp) + "]");
+        println("\tlidt [" + disp(disp) + ']');
     }
 
     public void writeLEA(GPR dstReg, GPR srcReg, GPR srcIdxReg, int scale,
                          int disp) {
-        println("\tlea " + dstReg + ",[" + srcReg + disp(disp) + "+"
-            + srcIdxReg + "*" + scale + "]");
+        println("\tlea " + dstReg + ",[" + srcReg + disp(disp) + '+'
+            + srcIdxReg + '*' + scale + ']');
     }
 
     public void writeLMSW(GPR srcReg) {
@@ -1111,7 +1110,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeMOV(int operandSize, GPR dstReg, int dstDisp, GPR srcReg) {
-        println("\tmov " + size(operandSize) + "[" + dstReg + disp(dstDisp)
+        println("\tmov " + size(operandSize) + '[' + dstReg + disp(dstDisp)
             + "]," + srcReg);
     }
 
@@ -1121,44 +1120,44 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcReg
      */
     public void writeMOV(X86Register.SR dstReg, int dstDisp, X86Register.GPR srcReg) {
-        println("\tmov " + "[" + dstReg + ":0x" + NumberUtils.hex(dstDisp) + "]," + srcReg);
+        println("\tmov " + '[' + dstReg + ":0x" + NumberUtils.hex(dstDisp) + "]," + srcReg);
     }
 
     public void writeMOV(CRX dstReg, GPR srcReg) {
-        println("\tmov " + dstReg + "," + size(BITS32) + " " + srcReg);
+        println("\tmov " + dstReg + ',' + size(BITS32) + ' ' + srcReg);
     }
 
     public void writeMOV(GPR dstReg, CRX srcReg) {
-        println("\tmov " + dstReg + "," + size(BITS32) + " " + srcReg);
+        println("\tmov " + dstReg + ',' + size(BITS32) + ' ' + srcReg);
     }
 
     public void writeMOV(SR dstReg, GPR srcReg) {
-        println("\tmov " + dstReg + "," + size(BITS16) + " " + srcReg);
+        println("\tmov " + dstReg + ',' + size(BITS16) + ' ' + srcReg);
     }
 
     public void writeMOV(GPR dstReg, SR srcReg) {
-        println("\tmov " + dstReg + "," + size(BITS16) + " " + srcReg);
+        println("\tmov " + dstReg + ',' + size(BITS16) + ' ' + srcReg);
     }
 
     public void writeMOV(int operandSize, GPR dstReg, GPR srcReg) {
-        println("\tmov " + dstReg + "," + size(operandSize) + " " + srcReg);
+        println("\tmov " + dstReg + ',' + size(operandSize) + ' ' + srcReg);
     }
 
     public void writeMOV(int operandSize, GPR dstReg, GPR srcReg, int srcDisp) {
-        println("\tmov " + dstReg + "," + size(operandSize) + "[" + srcReg
-            + disp(srcDisp) + "]");
+        println("\tmov " + dstReg + ',' + size(operandSize) + '[' + srcReg
+            + disp(srcDisp) + ']');
     }
 
     public void writeMOV(int operandSize, GPR dstReg, GPR dstIdxReg, int scale,
                          int dstDisp, GPR srcReg) {
-        println("\tmov " + size(operandSize) + "[" + dstReg + disp(dstDisp)
-            + "+" + dstIdxReg + "*" + scale + "]," + srcReg);
+        println("\tmov " + size(operandSize) + '[' + dstReg + disp(dstDisp)
+            + '+' + dstIdxReg + '*' + scale + "]," + srcReg);
     }
 
     public void writeMOV(int operandSize, GPR dstReg, GPR srcReg,
                          GPR srcIdxReg, int scale, int srcDisp) {
-        println("\tmov " + dstReg + "," + size(operandSize) + "[" + srcReg
-            + disp(srcDisp) + "+" + srcIdxReg + "*" + scale + "]");
+        println("\tmov " + dstReg + ',' + size(operandSize) + '[' + srcReg
+            + disp(srcDisp) + '+' + srcIdxReg + '*' + scale + ']');
     }
 
     /**
@@ -1169,11 +1168,11 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcDisp
      */
     public void writeMOV(X86Register.GPR dstReg, X86Register.SR srcReg, int srcDisp) {
-        println("\tmov " + dstReg + ",[" + srcReg + ":0x" + NumberUtils.hex(srcDisp) + "]");
+        println("\tmov " + dstReg + ",[" + srcReg + ":0x" + NumberUtils.hex(srcDisp) + ']');
     }
 
     public void writeMOV(GPR dstReg, int srcDisp) {
-        println("\tmov " + dstReg + ",[" + disp(srcDisp) + "]");
+        println("\tmov " + dstReg + ",[" + disp(srcDisp) + ']');
     }
 
     public void writeMOV(int dstDisp, X86Register.GPR srcReg) {
@@ -1181,7 +1180,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeMOV_Const(int operandSize, int dstDisp, int imm32) {
-        println("\tmov " + size(operandSize) + "[" + disp(dstDisp)
+        println("\tmov " + size(operandSize) + '[' + disp(dstDisp)
             + "],0x" + NumberUtils.hex(imm32));
     }
 
@@ -1205,7 +1204,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeMOV_Const(int operandSize, X86Register.SR dstReg, int dstDisp, int imm32) {
-        println("\tmov " + size(operandSize) + "[" + dstReg + ":0x" + NumberUtils.hex(dstDisp)
+        println("\tmov " + size(operandSize) + '[' + dstReg + ":0x" + NumberUtils.hex(dstDisp)
             + "],0x" + NumberUtils.hex(imm32));
     }
 
@@ -1218,12 +1217,12 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      */
     public void writeMOV_Const(int operandSize, GPR dstReg, int dstDisp,
                                int imm32) {
-        println("\tmov " + size(operandSize) + "[" + dstReg + disp(dstDisp)
+        println("\tmov " + size(operandSize) + '[' + dstReg + disp(dstDisp)
             + "],0x" + NumberUtils.hex(imm32));
     }
 
     public void writeMOV_Const(GPR dstReg, Object label) {
-        println("\tmov " + dstReg + "," + label);
+        println("\tmov " + dstReg + ',' + label);
     }
 
     /**
@@ -1235,28 +1234,28 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      */
     public void writeMOV_Const(int operandSize, GPR dstReg, GPR dstIdxReg,
                                int scale, int dstDisp, int imm32) {
-        println("\tmov " + size(operandSize) + "[" + dstReg + "+" + dstIdxReg
-            + "*" + scale + disp(dstDisp) + "],0x" + NumberUtils.hex(imm32));
+        println("\tmov " + size(operandSize) + '[' + dstReg + '+' + dstIdxReg
+            + '*' + scale + disp(dstDisp) + "],0x" + NumberUtils.hex(imm32));
     }
 
     public void writeMOVD(int operandSize, X86Register.MMX mmx, X86Register.GPR reg, int disp) {
-        println("\tmovd " + mmx + "," + size(operandSize) + "[" + reg + disp(disp) + "]");
+        println("\tmovd " + mmx + ',' + size(operandSize) + '[' + reg + disp(disp) + ']');
     }
 
     public void writeMOVD(int operandSize, X86Register.GPR dstReg, int dstDisp, X86Register.MMX srcMmx) {
-        println("\tmovd " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "]," + srcMmx);
+        println("\tmovd " + size(operandSize) + '[' + dstReg + disp(dstDisp) + "]," + srcMmx);
     }
 
     public void writeMOVQ(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
-        println("\tmovd " + dstMmx + "," + srcMmx);
+        println("\tmovd " + dstMmx + ',' + srcMmx);
     }
 
     public void writeMOVQ(int operandSize, X86Register.MMX dstMmx, X86Register.GPR srcGpr, int srcDisp) {
-        println("\tmovq " + dstMmx + "," + size(operandSize) + "[" + srcGpr + disp(srcDisp) + "]");
+        println("\tmovq " + dstMmx + ',' + size(operandSize) + '[' + srcGpr + disp(srcDisp) + ']');
     }
 
     public void writeMOVQ(int operandSize, X86Register.MMX dstMmx, int srcDisp) {
-        println("\tmovq " + dstMmx + "," + size(operandSize) + "[" + disp(srcDisp) + "]");
+        println("\tmovq " + dstMmx + ',' + size(operandSize) + '[' + disp(srcDisp) + ']');
     }
 
     public void writeMOVSB() {
@@ -1272,11 +1271,11 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeMOVSD(XMM dst, GPR src, int srcDisp) {
-        println("\tmovsd " + dst + ",qword [" + src + disp(srcDisp) + "]");
+        println("\tmovsd " + dst + ",qword [" + src + disp(srcDisp) + ']');
     }
 
     public void writeMOVSD(XMM dst, XMM src) {
-        println("\tmovsd " + dst + "," + src);
+        println("\tmovsd " + dst + ',' + src);
     }
 
     public void writeMOVSS(GPR dst, int dstDisp, XMM src) {
@@ -1284,20 +1283,20 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeMOVSS(XMM dst, GPR src, int srcDisp) {
-        println("\tmovss " + dst + ",dword [" + src + disp(srcDisp) + "]");
+        println("\tmovss " + dst + ",dword [" + src + disp(srcDisp) + ']');
     }
 
     public void writeMOVSS(XMM dst, XMM src) {
-        println("\tmovss " + dst + "," + src);
+        println("\tmovss " + dst + ',' + src);
     }
     
     public void writeMOVSX(GPR dstReg, GPR srcReg, int srcSize) {
-        println("\tmovsx " + dstReg + "," + size(srcSize) + " " + srcReg);
+        println("\tmovsx " + dstReg + ',' + size(srcSize) + ' ' + srcReg);
     }
 
     public void writeMOVSX(GPR dstReg, GPR srcReg, int srcDisp, int srcSize) {
-        println("\tmovsx " + dstReg + "," + size(srcSize) + " " + "[" + srcReg
-            + disp(srcDisp) + "]");
+        println("\tmovsx " + dstReg + ',' + size(srcSize) + ' ' + '[' + srcReg
+            + disp(srcDisp) + ']');
     }
 
     /**
@@ -1312,7 +1311,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         if (!code64) {
             throw new InvalidOpcodeException();
         }
-        println("\tmovsxd " + dstReg + "," + srcReg);
+        println("\tmovsxd " + dstReg + ',' + srcReg);
     }
 
     public void writeMOVSW() {
@@ -1320,12 +1319,12 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeMOVZX(GPR dstReg, GPR srcReg, int srcSize) {
-        println("\tmovzx " + dstReg + "," + size(srcSize) + " " + srcReg);
+        println("\tmovzx " + dstReg + ',' + size(srcSize) + ' ' + srcReg);
     }
 
     public void writeMOVZX(GPR dstReg, GPR srcReg, int srcDisp, int srcSize) {
-        println("\tmovzx " + dstReg + "," + size(srcSize) + " " + "[" + srcReg
-            + disp(srcDisp) + "]");
+        println("\tmovzx " + dstReg + ',' + size(srcSize) + ' ' + '[' + srcReg
+            + disp(srcDisp) + ']');
     }
 
     public void writeMUL_EAX(GPR srcReg) {
@@ -1337,8 +1336,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeNEG(int operandSize, GPR dstReg, int dstDisp) {
-        println("\tneg " + size(operandSize) + "[" + dstReg + disp(dstDisp)
-            + "]");
+        println("\tneg " + size(operandSize) + '[' + dstReg + disp(dstDisp)
+            + ']');
     }
 
     public void writeNOP() {
@@ -1350,8 +1349,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeNOT(int operandSize, GPR dstReg, int dstDisp) {
-        println("\tnot " + size(operandSize) + "[" + dstReg + disp(dstDisp)
-            + "]");
+        println("\tnot " + size(operandSize) + '[' + dstReg + disp(dstDisp)
+            + ']');
     }
 
     // LS
@@ -1369,7 +1368,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeOR(int operandSize, GPR dstReg, int dstDisp, int imm32) {
-        println("\tor " + size(operandSize) + "[" + dstReg + disp(dstDisp)
+        println("\tor " + size(operandSize) + '[' + dstReg + disp(dstDisp)
             + "],0x" + NumberUtils.hex(imm32));
     }
 
@@ -1384,7 +1383,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeOR(int operandSize, X86Register.SR dstReg, int dstDisp, int imm32) {
-        println("\tor " + size(operandSize) + "[" + dstReg + ":0x" + NumberUtils.hex(dstDisp)
+        println("\tor " + size(operandSize) + '[' + dstReg + ":0x" + NumberUtils.hex(dstDisp)
             + "],0x" + NumberUtils.hex(imm32));
     }
 
@@ -1394,12 +1393,12 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeOR(int operandSize, int dstDisp, int imm32) {
-        println("\tor " + size(operandSize) + "[" + disp(dstDisp)
+        println("\tor " + size(operandSize) + '[' + disp(dstDisp)
             + "],0x" + NumberUtils.hex(imm32));
     }
 
     public void writeOR(GPR dstReg, GPR srcReg) {
-        println("\tor " + dstReg + "," + srcReg);
+        println("\tor " + dstReg + ',' + srcReg);
     }
 
     /**
@@ -1408,16 +1407,16 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcDisp
      */
     public void writeOR(GPR dstReg, GPR srcReg, int srcDisp) {
-        println("\tor " + dstReg + ",[" + srcReg + disp(srcDisp) + "]");
+        println("\tor " + dstReg + ",[" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeOUT(int operandSize) {
         if (operandSize == X86Constants.BITS8) {
-            println("\tout " + X86Register.DX + "," + X86Register.AL);
+            println("\tout " + X86Register.DX + ',' + X86Register.AL);
         } else if (operandSize == X86Constants.BITS16) {
-            println("\tout " + X86Register.DX + "," + X86Register.AX);
+            println("\tout " + X86Register.DX + ',' + X86Register.AX);
         } else if (operandSize == X86Constants.BITS32) {
-            println("\tout " + X86Register.DX + "," + X86Register.EAX);
+            println("\tout " + X86Register.DX + ',' + X86Register.EAX);
         } else {
             throw new IllegalArgumentException("Invalid operand size for OUT: " + operandSize);
         }
@@ -1425,34 +1424,34 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 
     public void writeOUT(int operandSize, int imm8) {
         if (operandSize == X86Constants.BITS8) {
-            println("\tout " + imm8 + "," + X86Register.AL);
+            println("\tout " + imm8 + ',' + X86Register.AL);
         } else if (operandSize == X86Constants.BITS16) {
-            println("\tout " + imm8 + "," + X86Register.AX);
+            println("\tout " + imm8 + ',' + X86Register.AX);
         } else if (operandSize == X86Constants.BITS32) {
-            println("\tout " + imm8 + "," + X86Register.EAX);
+            println("\tout " + imm8 + ',' + X86Register.EAX);
         } else {
             throw new IllegalArgumentException("Invalid operand size for OUT: " + operandSize);
         }
     }
 
     public void writePACKUSWB(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
-        println("\tpackuswb " + dstMmx + "," + srcMmx);
+        println("\tpackuswb " + dstMmx + ',' + srcMmx);
     }
 
     public void writePADDW(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
-        println("\tpaddw " + dstMmx + "," + srcMmx);
+        println("\tpaddw " + dstMmx + ',' + srcMmx);
     }
 
     public void writePAND(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
-        println("\tpand " + dstMmx + "," + srcMmx);
+        println("\tpand " + dstMmx + ',' + srcMmx);
     }
 
     public void writePCMPGTW(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
-        println("\tpcmpgtw " + dstMmx + "," + srcMmx);
+        println("\tpcmpgtw " + dstMmx + ',' + srcMmx);
     }
 
     public void writePMULLW(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
-        println("\tpmullw " + dstMmx + "," + srcMmx);
+        println("\tpmullw " + dstMmx + ',' + srcMmx);
     }
 
     public void writePOP(GPR dstReg) {
@@ -1464,7 +1463,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writePOP(GPR dstReg, int dstDisp) {
-        println("\tpop [" + dstReg + disp(dstDisp) + "]");
+        println("\tpop [" + dstReg + disp(dstDisp) + ']');
     }
 
     public void writePOPA() {
@@ -1494,7 +1493,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writePSHUFW(X86Register.MMX dstMmx, X86Register.MMX srcMmx, int imm8) {
-        println("\tpshufw " + dstMmx + "," + srcMmx + ",0x" + NumberUtils.hex(imm8));
+        println("\tpshufw " + dstMmx + ',' + srcMmx + ",0x" + NumberUtils.hex(imm8));
     }
 
     public void writePSRLW(X86Register.MMX mmx, int imm8) {
@@ -1502,11 +1501,11 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writePSUBW(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
-        println("\tpsubw " + dstMmx + "," + srcMmx);
+        println("\tpsubw " + dstMmx + ',' + srcMmx);
     }
 
     public void writePUNPCKLBW(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
-        println("\tpsunpcklbw " + dstMmx + "," + srcMmx);
+        println("\tpsunpcklbw " + dstMmx + ',' + srcMmx);
     }
 
     /**
@@ -1534,14 +1533,14 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @return The offset of the start of the instruction.
      */
     public int writePUSH(GPR srcReg, int srcDisp) {
-        return println("\tpush [" + srcReg + disp(srcDisp) + "]");
+        return println("\tpush [" + srcReg + disp(srcDisp) + ']');
     }
 
     /**
      * @return The offset of the start of the instruction.
      */
     public int writePUSH(SR srcReg, int srcDisp) {
-        return println("\tpush [" + srcReg + ":" + srcDisp + "]");
+        return println("\tpush [" + srcReg + ':' + srcDisp + ']');
     }
 
     /**
@@ -1549,8 +1548,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      */
     public int writePUSH(GPR srcBaseReg, GPR srcIndexReg, int srcScale,
                          int srcDisp) {
-        return println("\tpush [" + srcBaseReg + disp(srcDisp) + "+"
-            + srcIndexReg + "*" + srcScale + "]");
+        return println("\tpush [" + srcBaseReg + disp(srcDisp) + '+'
+            + srcIndexReg + '*' + srcScale + ']');
     }
 
     // PR
@@ -1570,7 +1569,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writePXOR(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
-        println("\tpxor " + dstMmx + "," + srcMmx);
+        println("\tpxor " + dstMmx + ',' + srcMmx);
     }
 
     public void writeRDTSC() {
@@ -1599,7 +1598,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeSAL(GPR dstReg, int imm8) {
-        println("\tsal " + dstReg + "," + imm8);
+        println("\tsal " + dstReg + ',' + imm8);
     }
 
     /**
@@ -1608,7 +1607,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm8
      */
     public void writeSAL(int operandSize, GPR srcReg, int srcDisp, int imm8) {
-        println("\tsal " + size(operandSize) + "[" + srcReg + disp(srcDisp)
+        println("\tsal " + size(operandSize) + '[' + srcReg + disp(srcDisp)
             + "]," + imm8);
     }
 
@@ -1621,12 +1620,12 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcDisp
      */
     public void writeSAL_CL(int operandSize, GPR srcReg, int srcDisp) {
-        println("\tsal " + size(operandSize) + "[" + srcReg + disp(srcDisp)
+        println("\tsal " + size(operandSize) + '[' + srcReg + disp(srcDisp)
             + "],cl");
     }
 
     public void writeSAR(GPR dstReg, int imm8) {
-        println("\tsar " + dstReg + "," + imm8);
+        println("\tsar " + dstReg + ',' + imm8);
     }
 
     /**
@@ -1635,7 +1634,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm8
      */
     public void writeSAR(int operandSize, GPR srcReg, int srcDisp, int imm8) {
-        println("\tsar " + size(operandSize) + "[" + srcReg + disp(srcDisp)
+        println("\tsar " + size(operandSize) + '[' + srcReg + disp(srcDisp)
             + "]," + imm8);
     }
 
@@ -1648,7 +1647,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcDisp
      */
     public void writeSAR_CL(int operandSize, GPR srcReg, int srcDisp) {
-        println("\tsar " + size(operandSize) + "[" + srcReg + disp(srcDisp)
+        println("\tsar " + size(operandSize) + '[' + srcReg + disp(srcDisp)
             + "],cl");
     }
 
@@ -1663,7 +1662,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeSBB(int operandSize, GPR dstReg, int dstDisp, int imm32) {
-        println("\tsbb " + size(operandSize) + "[" + dstReg + disp(dstDisp)
+        println("\tsbb " + size(operandSize) + '[' + dstReg + disp(dstDisp)
             + "],0x" + NumberUtils.hex(imm32));
     }
 
@@ -1672,7 +1671,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeSBB(GPR dstReg, GPR srcReg) {
-        println("\tsbb " + dstReg + "," + srcReg);
+        println("\tsbb " + dstReg + ',' + srcReg);
     }
 
     /**
@@ -1681,7 +1680,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcDisp
      */
     public void writeSBB(GPR dstReg, GPR srcReg, int srcDisp) {
-        println("\tsbb " + dstReg + ",[" + srcReg + disp(srcDisp) + "]");
+        println("\tsbb " + dstReg + ",[" + srcReg + disp(srcDisp) + ']');
     }
 
     /**
@@ -1691,15 +1690,15 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param cc
      */
     public void writeSETCC(GPR dstReg, int cc) {
-        println("\tset" + ccName(cc) + " " + dstReg);
+        println("\tset" + ccName(cc) + ' ' + dstReg);
     }
 
     public void writeSHL(GPR dstReg, int imm8) {
-        println("\tshl " + dstReg + "," + imm8);
+        println("\tshl " + dstReg + ',' + imm8);
     }
 
     public void writeSHL(int operandSize, GPR dstReg, int dstDisp, int imm8) {
-        println("\tshl " + size(operandSize) + "[" + dstReg + disp(dstDisp)
+        println("\tshl " + size(operandSize) + '[' + dstReg + disp(dstDisp)
             + "]," + imm8);
     }
 
@@ -1708,16 +1707,16 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeSHL_CL(int operandSize, GPR dstReg, int dstDisp) {
-        println("\tshl " + size(operandSize) + "[" + dstReg + disp(dstDisp)
+        println("\tshl " + size(operandSize) + '[' + dstReg + disp(dstDisp)
             + "],CL");
     }
 
     public void writeSHLD_CL(GPR dstReg, GPR srcReg) {
-        println("\tshld " + dstReg + "," + srcReg + ",cl");
+        println("\tshld " + dstReg + ',' + srcReg + ",cl");
     }
 
     public void writeSHR(GPR dstReg, int imm8) {
-        println("\tshr " + dstReg + "," + imm8);
+        println("\tshr " + dstReg + ',' + imm8);
     }
 
     /**
@@ -1726,7 +1725,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm8
      */
     public void writeSHR(int operandSize, GPR srcReg, int srcDisp, int imm8) {
-        println("\tshr " + size(operandSize) + "[" + srcReg + disp(srcDisp)
+        println("\tshr " + size(operandSize) + '[' + srcReg + disp(srcDisp)
             + "]," + imm8);
     }
 
@@ -1739,12 +1738,12 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcDisp
      */
     public void writeSHR_CL(int operandSize, GPR srcReg, int srcDisp) {
-        println("\tshr " + size(operandSize) + "[" + srcReg + disp(srcDisp)
+        println("\tshr " + size(operandSize) + '[' + srcReg + disp(srcDisp)
             + "],cl");
     }
 
     public void writeSHRD_CL(GPR dstReg, GPR srcReg) {
-        println("\tshrd " + dstReg + "," + srcReg + ",cl");
+        println("\tshrd " + dstReg + ',' + srcReg + ",cl");
     }
 
     public void writeSTD() {
@@ -1756,7 +1755,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeSTMXCSR(GPR srcReg, int disp) {
-        println("\tstmxcsr dword [" + srcReg + disp(disp) + "]");
+        println("\tstmxcsr dword [" + srcReg + disp(disp) + ']');
     }
 
     public void writeSTOSB() {
@@ -1778,7 +1777,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public final void writeSUB(GPR reg, int imm32) {
-        println("\tsub " + reg + "," + imm32);
+        println("\tsub " + reg + ',' + imm32);
     }
 
     /**
@@ -1795,7 +1794,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeSUB(int operandSize, GPR dstReg, int dstDisp, int imm32) {
-        println("\tsub " + size(operandSize) + "[" + dstReg + disp(dstDisp)
+        println("\tsub " + size(operandSize) + '[' + dstReg + disp(dstDisp)
             + "],0x" + NumberUtils.hex(imm32));
     }
 
@@ -1804,7 +1803,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeSUB(GPR dstReg, GPR srcReg) {
-        println("\tsub " + dstReg + "," + srcReg);
+        println("\tsub " + dstReg + ',' + srcReg);
     }
 
 
@@ -1814,7 +1813,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcDisp
      */
     public void writeSUB(GPR dstReg, GPR srcReg, int srcDisp) {
-        println("\tsub " + dstReg + ", [" + srcReg + disp(srcDisp) + "]");
+        println("\tsub " + dstReg + ", [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeTEST(GPR reg, int imm32) {
@@ -1829,7 +1828,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeTEST(int operandSize, GPR reg, int disp, int imm32) {
-        println("\ttest " + size(operandSize) + "[" + reg + disp(disp) + "],0x"
+        println("\ttest " + size(operandSize) + '[' + reg + disp(disp) + "],0x"
             + NumberUtils.hex(imm32));
     }
 
@@ -1840,7 +1839,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeTEST(int operandSize, SR reg, int disp, int imm32) {
-        println("\ttest " + size(operandSize) + "[" + reg + ":0x"
+        println("\ttest " + size(operandSize) + '[' + reg + ":0x"
             + NumberUtils.hex(disp) + "],0x" + NumberUtils.hex(imm32));
     }
 
@@ -1851,7 +1850,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param reg2
      */
     public void writeTEST(GPR reg1, GPR reg2) {
-        println("\ttest " + reg1 + "," + reg2);
+        println("\ttest " + reg1 + ',' + reg2);
     }
 
     public void writeTEST_AL(int value) {
@@ -1868,7 +1867,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeTEST(int operandSize, int destDisp, int imm32) {
-        println("\ttest " + size(operandSize) + "[" + disp(destDisp) + "],0x" + NumberUtils.hex(imm32));
+        println("\ttest " + size(operandSize) + '[' + disp(destDisp) + "],0x" + NumberUtils.hex(imm32));
     }
 
     public void writeTo(OutputStream os) throws IOException {
@@ -1913,7 +1912,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param imm32
      */
     public void writeXOR(int operandSize, GPR dstReg, int dstDisp, int imm32) {
-        println("\txor " + size(operandSize) + "[" + dstReg + disp(dstDisp)
+        println("\txor " + size(operandSize) + '[' + dstReg + disp(dstDisp)
             + "],0x" + NumberUtils.hex(imm32));
     }
 
@@ -1922,7 +1921,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     public void writeXOR(GPR dstReg, GPR srcReg) {
-        println("\txor " + dstReg + "," + srcReg);
+        println("\txor " + dstReg + ',' + srcReg);
     }
 
     /**
@@ -1931,7 +1930,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      * @param srcDisp
      */
     public void writeXOR(GPR dstReg, GPR srcReg, int srcDisp) {
-        println("\txor " + dstReg + ", [" + srcReg + disp(srcDisp) + "]");
+        println("\txor " + dstReg + ", [" + srcReg + disp(srcDisp) + ']');
     }
 
     public void writeObjectRef(Object object) {

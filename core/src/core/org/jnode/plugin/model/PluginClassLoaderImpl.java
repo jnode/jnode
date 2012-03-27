@@ -397,6 +397,6 @@ final class PluginClassLoaderImpl extends ClassLoader implements PluginClassLoad
     }
         
     public String toString() {
-        return getClass().getName() + "(" + getDeclaringPluginDescriptor().getId() + ")";
+        return getClass().getName() + '(' + getDeclaringPluginDescriptor().getId() + ')';
     }    
 }

@@ -182,7 +182,7 @@ class ItemStack {
 
             throw new StackException("OperandStack[" + tos + "](" + item
                 + ") is not the expected element (found at " + i + ", "
-                + this + ")");
+                + this + ')');
         }
         stack[tos] = null;
     }

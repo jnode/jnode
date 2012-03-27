@@ -52,7 +52,7 @@ public abstract class AcpiSystemTable extends AcpiTable {
     }
 
     public String toString() {
-        return super.toString() + "/{" + oemId + ", " + creatorId + "}";
+        return super.toString() + "/{" + oemId + ", " + creatorId + '}';
     }
 
     /**

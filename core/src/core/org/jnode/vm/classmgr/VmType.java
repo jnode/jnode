@@ -21,7 +21,6 @@
 package org.jnode.vm.classmgr;
 
 import gnu.java.lang.VMClassHelper;
-
 import java.io.Serializable;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
@@ -29,7 +28,6 @@ import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
-
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.LoadStatics;
@@ -1474,44 +1472,49 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      */
     final VmMethod getMethod(String name, VmType[] argTypes,
                              boolean declaredOnly) {
+        VmType other = this;
+        while (true) {
 
-        /* Search in my own method table */
-        final VmMethod[] mt = this.methodTable;
-        if (mt != null) {
-            final int count = mt.length;
-            for (int i = 0; i < count; i++) {
-                final VmMethod mts = mt[i];
-                if (mts.nameEquals(name)) {
-                    if (mts.matchArgumentTypes(argTypes)) {
-                        return mts;
-                    }
-                }
-            }
-        }
-
-        if (isInterface() && (!declaredOnly)) {
-            // Look in the super interfaces
-            final VmImplementedInterface[] it = interfaceTable;
-            if (it != null) {
-                int count = it.length;
+            /* Search in my own method table */
+            final VmMethod[] mt = other.methodTable;
+            if (mt != null) {
+                final int count = mt.length;
                 for (int i = 0; i < count; i++) {
-                    VmImplementedInterface intf = it[i];
-                    VmMethod method = intf.getResolvedVmClass().getMethod(name,
-                        argTypes, false);
-                    if (method != null) {
-                        return method;
+                    final VmMethod mts = mt[i];
+                    if (mts.nameEquals(name)) {
+                        if (mts.matchArgumentTypes(argTypes)) {
+                            return mts;
+                        }
                     }
                 }
             }
-        }
 
-        if ((superClass != null) && (!declaredOnly)) {
-            // Look in the superclass
-            return superClass.getMethod(name, argTypes, false);
-        }
+            if (other.isInterface() && (!declaredOnly)) {
+                // Look in the super interfaces
+                final VmImplementedInterface[] it = other.interfaceTable;
+                if (it != null) {
+                    int count = it.length;
+                    for (int i = 0; i < count; i++) {
+                        VmImplementedInterface intf = it[i];
+                        VmMethod method = intf.getResolvedVmClass().getMethod(name,
+                            argTypes, false);
+                        if (method != null) {
+                            return method;
+                        }
+                    }
+                }
+            }
 
-        // Not found
-        return null;
+            if ((other.superClass != null) && (!declaredOnly)) {
+                // Look in the superclass
+                declaredOnly = false;
+                other = other.superClass;
+                continue;
+            }
+
+            // Not found
+            return null;
+        }
     }
 
     /**
@@ -2067,7 +2070,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
             final int count = mt.length;
             for (int i = 0; i < count; i++) {
                 final VmMethod method = mt[i];
-                if (methodName == null || "".equals(methodName.trim())) {
+                if (methodName == null || methodName.trim().isEmpty()) {
                     loader.disassemble(method, optLevel, enableTestCompilers,
                         writer);
                     disasmCount++;

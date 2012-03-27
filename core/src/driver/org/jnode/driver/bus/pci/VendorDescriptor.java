@@ -61,7 +61,7 @@ public class VendorDescriptor {
         DeviceDescriptor result;
         result = (DeviceDescriptor) devices.get(deviceId);
         if (result == null) {
-            result = new DeviceDescriptor(deviceId, "? (" + deviceId + ")");
+            result = new DeviceDescriptor(deviceId, "? (" + deviceId + ')');
         }
         return result;
     }

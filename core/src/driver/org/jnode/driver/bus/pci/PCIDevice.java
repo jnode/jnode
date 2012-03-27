@@ -58,7 +58,7 @@ public class PCIDevice extends Device implements DeviceInfoAPI {
      * @param function
      */
     public PCIDevice(PCIBus bus, int unit, int function) {
-        super(bus, "pci(" + bus.getBus() + "," + unit + "," + function + ")");
+        super(bus, "pci(" + bus.getBus() + ',' + unit + ',' + function + ')');
         this.pci = bus.getPCI();
         this.bus = bus.getBus();
         this.unit = unit;
@@ -180,7 +180,7 @@ public class PCIDevice extends Device implements DeviceInfoAPI {
     public String toString() {
         String cname = getClass().getName();
         cname = cname.substring(cname.lastIndexOf('.') + 1);
-        return cname + "[" + getId() + ": " + getConfig().toString() + "]";
+        return cname + '[' + getId() + ": " + getConfig().toString() + ']';
     }
 
     /**

@@ -284,6 +284,6 @@ public class Key {
             ", lowerVirtuelKey=" + lowerVirtuelKey +
             ", upperVirtuelKey=" + upperVirtuelKey +
             ", altGrVirtuelKey=" + altGrVirtuelKey +
-            "}";
+            '}';
     }
 }

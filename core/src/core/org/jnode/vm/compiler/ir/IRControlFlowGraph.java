@@ -22,7 +22,6 @@ package org.jnode.vm.compiler.ir;
 
 import java.util.Iterator;
 import java.util.List;
-
 import org.jnode.util.ObjectArrayIterator;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.classmgr.VmByteCode;
@@ -425,7 +424,7 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
             sb.append(bb.getIDominator());
             sb.append("\n  DF:");
             for (IRBasicBlock<T> dfb : bb.getDominanceFrontier()) {
-                sb.append(" ");
+                sb.append(' ');
                 sb.append(dfb);
             }
             sb.append("\n\n");
