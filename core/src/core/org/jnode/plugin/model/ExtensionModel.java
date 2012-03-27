@@ -59,7 +59,7 @@ final class ExtensionModel extends PluginModelObject implements Extension {
             if (id.indexOf('.') >= 0) {
                 throw new PluginException("id cannot contain an '.' character");
             }
-            uniqueId = plugin.getId() + "." + id;
+            uniqueId = plugin.getId() + '.' + id;
         } else {
             uniqueId = null;
         }

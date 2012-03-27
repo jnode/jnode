@@ -27,9 +27,7 @@ import java.io.PrintStream;
 import java.nio.ByteOrder;
 import java.util.Locale;
 import java.util.Properties;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -69,7 +67,6 @@ import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
-
 import sun.nio.ch.Interruptible;
 import sun.reflect.annotation.AnnotationType;
 
@@ -259,7 +256,7 @@ public final class VmSystem {
             BootLogInstance.get().info("No initial jarfile found");
             return null;
         } else {
-            BootLogInstance.get().info("Found initial jarfile of " + size.toInt() + "b");
+            BootLogInstance.get().info("Found initial jarfile of " + size.toInt() + 'b');
             try {
                 final ResourceOwner owner = new SimpleResourceOwner("System");
                 return rm.claimMemoryResource(owner, start, size,
@@ -723,7 +720,7 @@ public final class VmSystem {
 
         if ((srcEnd > srcLen) || (srcEnd < 0)) {
             throw new IndexOutOfBoundsException("srcPos+length > src.length ("
-                + srcPos + "+" + length + " > " + srcLen + ")");
+                + srcPos + '+' + length + " > " + srcLen + ')');
         }
         if ((dstEnd > dstLen) || (dstEnd < 0)) {
             throw new IndexOutOfBoundsException("dstPos+length > dst.length");

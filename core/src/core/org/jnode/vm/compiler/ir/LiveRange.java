@@ -49,12 +49,12 @@ public class LiveRange<T> implements Comparable<LiveRange<T>> {
 
     public String toString() {
         String leader = variable.toString() + ": " +
-            assignAddress + "-" + lastUseAddress;
+            assignAddress + '-' + lastUseAddress;
         Location loc = getLocation();
         if (loc == null) {
             return leader;
         }
-        return leader + " (" + loc + ")";
+        return leader + " (" + loc + ')';
     }
 
     /**

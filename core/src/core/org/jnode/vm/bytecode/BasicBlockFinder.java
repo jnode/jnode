@@ -22,7 +22,6 @@ package org.jnode.vm.bytecode;
 
 import java.util.Comparator;
 import java.util.TreeMap;
-
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.classmgr.VmByteCode;
@@ -435,7 +434,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport implements Bytecode
      */
     public void startInstruction(int address) {
         if (debug) {
-            BootLogInstance.get().debug("#" + address + "\t" + tstack);
+            BootLogInstance.get().debug("#" + address + '\t' + tstack);
         }
         curAddress = address;
         super.startInstruction(address);
@@ -462,7 +461,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport implements Bytecode
             }
         }
         if (debug) {
-            BootLogInstance.get().debug("#" + address + "\t" + tstack);
+            BootLogInstance.get().debug("#" + address + '\t' + tstack);
         }
     }
 
@@ -488,7 +487,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport implements Bytecode
                 bb.setStartStack(tstack);
             } else if (!tstack.equals(bbTStack)) {
                 if (debug) {
-                    BootLogInstance.get().warn("TypeStack is different in " + method + ";" + tstack + " vs. " +
+                    BootLogInstance.get().warn("TypeStack is different in " + method + ';' + tstack + " vs. " +
                         bbTStack + " in " + bb + " at address " + this.curAddress);
                 }
                 //throw new VerifyError("TypeStack is different; " + tstack + " vs. " + bbTStack + " in " + bb);

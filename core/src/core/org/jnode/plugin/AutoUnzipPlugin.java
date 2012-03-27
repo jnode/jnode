@@ -85,7 +85,7 @@ public class AutoUnzipPlugin extends Plugin {
             // copy each plugin's resource to the plugin root directory 
             final PluginDescriptor desc = AutoUnzipPlugin.this.getDescriptor();
             final ClassLoader cl = desc.getPluginClassLoader();
-            final String pluginRoot = pluginRootFile.getAbsolutePath() + "/";
+            final String pluginRoot = pluginRootFile.getAbsolutePath() + '/';
             final byte[] buffer = new byte[10240];
 
             if (!(cl instanceof PluginClassLoader)) {

@@ -34,9 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.driver.ApiNotFoundException;
@@ -221,7 +219,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         list.addAll(stackMap.keySet());
         Collections.sort(list);
         for (Integer key : list) {
-            pw.println("Screen of " + KeyEvent.getKeyText(key) + ":");
+            pw.println("Screen of " + KeyEvent.getKeyText(key) + ':');
             Stack<Console> stack = stackMap.get(key);
             int t_ind = stack.size();
             for (int i = t_ind; i-- > 0;) {
@@ -272,7 +270,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
      * @param console
      */
     public void unregisterConsole(Console console) {
-        log.debug("unregisterConsole(" + console.getConsoleName() + ")");
+        log.debug("unregisterConsole(" + console.getConsoleName() + ')');
         if (contextConsole.get() == console) {
             contextConsole.set(null);
         }

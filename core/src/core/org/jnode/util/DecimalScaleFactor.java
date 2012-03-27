@@ -79,6 +79,6 @@ public enum DecimalScaleFactor implements ScaleFactor {
         }
         unit = (unit == null) ? MAX : unit;
         float dv = ((float) value) / unit.getMultiplier();
-        return NumberUtils.toString(dv, nbDecimals) + " " + unit.getUnit();
+        return NumberUtils.toString(dv, nbDecimals) + ' ' + unit.getUnit();
     }
 }

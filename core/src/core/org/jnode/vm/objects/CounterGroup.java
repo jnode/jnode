@@ -68,7 +68,7 @@ public class CounterGroup extends Statistic {
                 sb.append(s);
             }
         }
-        sb.append("}");
+        sb.append('}');
         return sb.toString();
     }
 

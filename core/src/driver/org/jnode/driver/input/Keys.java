@@ -69,7 +69,7 @@ public class Keys {
     public String toString() {
         return "Keys{" +
             "keys=" + (keys == null ? null : Arrays.asList(keys)) +
-            "}";
+            '}';
     }
 
     public static void main(String[] args) {

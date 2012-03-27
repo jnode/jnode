@@ -22,7 +22,7 @@ package org.jnode.vm.x86.compiler;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Constants;
@@ -30,7 +30,6 @@ import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
-import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmIsolatedStaticsEntry;
@@ -187,7 +186,7 @@ public class X86CompilerHelper {
      */
     public final void setMethod(VmMethod method) {
         this.method = method;
-        setLabelPrefix(method.toString() + "_");
+        setLabelPrefix(method.toString() + '_');
     }
 
     /**
@@ -208,7 +207,7 @@ public class X86CompilerHelper {
     /**
      */
     public void startInlinedMethod(VmMethod inlinedMethod, Label curInstrLabel) {
-        setLabelPrefix(curInstrLabel + "_" + inlinedMethod.getName() + "_");
+        setLabelPrefix(curInstrLabel + "_" + inlinedMethod.getName() + '_');
     }
 
     /**

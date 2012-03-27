@@ -76,9 +76,7 @@ public final class PCIHeaderType0 extends PCIDeviceConfig {
         }
         if (idx < 6) {
             PCIBaseAddress[] result = new PCIBaseAddress[idx];
-            for (int i = 0; i < idx; i++) {
-                result[i] = addresses[i];
-            }
+            System.arraycopy(addresses, 0, result, 0, idx);
             return result;
         } else {
             return addresses;

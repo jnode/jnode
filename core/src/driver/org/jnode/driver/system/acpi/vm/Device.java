@@ -76,7 +76,7 @@ public class Device extends NameSpace {
             }
             buffer.append(address);
         }
-        buffer.append(")");
+        buffer.append(')');
         return buffer.toString();
     }
 

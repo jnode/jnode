@@ -21,7 +21,6 @@
 package org.jnode.vm.compiler.ir;
 
 import java.util.List;
-
 import org.jnode.vm.compiler.ir.quad.BranchQuad;
 import org.jnode.vm.compiler.ir.quad.PhiAssignQuad;
 import org.jnode.vm.compiler.ir.quad.Quad;
@@ -278,7 +277,7 @@ public class IRBasicBlock<T> {
         System.out.print(getName() + " doms:");
         IRBasicBlock<T> d = getIDominator();
         while (d != null) {
-            System.out.print(" " + d.getName());
+            System.out.print(' ' + d.getName());
             d = d.getIDominator();
         }
         System.out.println();
@@ -287,7 +286,7 @@ public class IRBasicBlock<T> {
     public void printPredecessors() {
         System.out.print(getName() + " preds:");
         for (IRBasicBlock b : predecessors) {
-            System.out.print(" " + b.getName());
+            System.out.print(' ' + b.getName());
         }
         System.out.println();
     }

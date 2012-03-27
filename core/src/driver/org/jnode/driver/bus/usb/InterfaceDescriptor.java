@@ -125,6 +125,6 @@ public final class InterfaceDescriptor extends AbstractDescriptor {
             ", iclass:" + getInterfaceClass() +
             ", isubcls:" + getInterfaceSubClass() +
             ", iprot:" + getInterfaceProtocol() +
-            ", name:" + ((intfName != null) ? intfName : ("%" + getInterfaceStringIndex())) + "]";
+            ", name:" + ((intfName != null) ? intfName : ("%" + getInterfaceStringIndex())) + ']';
     }
 }

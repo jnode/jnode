@@ -530,12 +530,12 @@ public class Parser {
 
                 case Aml.AML_ASCIICHARLIST_ARG:
                     arg.opcode = Aml.AML_STRING;
-                    String tmp = new String();
+                    StringBuilder tmp = new StringBuilder();
                     char c = 0;
                     while ((c = (char) getByte()) != '\0') {
-                        tmp += c;
+                        tmp.append(c);
                     }
-                    arg.value = tmp;
+                    arg.value = tmp.toString();
                     break;
 
                 case Aml.AML_NAMESTRING_ARG:
@@ -678,7 +678,7 @@ public class Parser {
                                 state.buffer.position(state.pkg_end);
                             } catch (Exception ex) {
                                 System.err.println(
-                                    state.buffer.position() + "," + state.buffer.limit() + ":" + state.pkg_end);
+                                    state.buffer.position() + "," + state.buffer.limit() + ':' + state.pkg_end);
                             }
                             arg_count.set(0);
                         }

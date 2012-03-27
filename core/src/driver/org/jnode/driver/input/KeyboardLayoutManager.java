@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
@@ -138,7 +137,7 @@ public class KeyboardLayoutManager implements ExtensionPointListener {
      */
     public KeyboardInterpreter createKeyboardInterpreter(String id) 
         throws KeyboardInterpreterException {
-        log.debug("Looking for interpreter for keyboard layout '" + id + "'");
+        log.debug("Looking for interpreter for keyboard layout '" + id + '\'');
         KeyboardInterpreter.Factory factory = null;
         synchronized (this) {
             factory = map.get(id);
@@ -155,7 +154,7 @@ public class KeyboardLayoutManager implements ExtensionPointListener {
                 // We tried and failed the fall-back, so report original problem:
                 // that 'id' is not a registered keyboard interpreter.
                 throw new KeyboardInterpreterException(
-                        "No keyboard interpreter registered with id '" + id + "'");
+                        "No keyboard interpreter registered with id '" + id + '\'');
             } 
         }
     }
@@ -193,12 +192,12 @@ public class KeyboardLayoutManager implements ExtensionPointListener {
         if (language != null) {
             language = language.toLowerCase();
             if (variant == null) {
-                id = country + "_" + language;
+                id = country + '_' + language;
             } else {
-                id = country + "_" + language + "_" + variant;
+                id = country + '_' + language + '_' + variant;
             }
         } else if (variant != null) {
-            id = country + "_" + variant;
+            id = country + '_' + variant;
         } else {
             id = country;
         }

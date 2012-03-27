@@ -311,6 +311,6 @@ public final class TransferDescriptor extends AbstractTreeStructure implements U
      */
     public String toString() {
         return "TD[" + NumberUtils.hex(getInt(0)) + ", " + NumberUtils.hex(getInt(4)) + ", " +
-            NumberUtils.hex(getInt(8)) + ", " + NumberUtils.hex(getInt(12)) + "->" + linkPointer + "]";
+            NumberUtils.hex(getInt(8)) + ", " + NumberUtils.hex(getInt(12)) + "->" + linkPointer + ']';
     }
 }

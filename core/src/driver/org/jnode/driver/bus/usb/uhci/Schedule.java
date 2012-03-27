@@ -196,7 +196,7 @@ public class Schedule implements USBConstants {
     }
 
     public String toString() {
-        return "Schedule{lowQH:" + lowSpeedControlQH + ", highQH:" + highSpeedControlQH + "}";
+        return "Schedule{lowQH:" + lowSpeedControlQH + ", highQH:" + highSpeedControlQH + '}';
     }
 
     /**

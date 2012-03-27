@@ -81,22 +81,20 @@ public class DIMM extends SMBusDevice {
 
     public byte[] getManufacturerCode() {
         byte[] info = new byte[8];
-        for (int i = 0; i < 8; i++)
-            info[i] = rawSPDTable[64 + i];
+        System.arraycopy(rawSPDTable, 64, info, 0, 8);
         return info;
     }
 
     public byte[] getManufacturerData() {
         byte[] info = new byte[27];
-        for (int i = 0; i < 27; i++)
-            info[i] = rawSPDTable[99 + i];
+        System.arraycopy(rawSPDTable, 99, info, 0, 27);
         return info;
     }
 
     public String toString() {
         if (rawSPDTable == null)
             return "SPDTable not filled";
-        String tmp = "Device: " + super.getId() + " type=" + getType() + "(" + type2String(getType()) + ")";
+        String tmp = "Device: " + super.getId() + " type=" + getType() + '(' + type2String(getType()) + ')';
         return tmp;
     }
 }

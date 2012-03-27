@@ -45,7 +45,7 @@ public class CardBusDevice extends Device implements DeviceInfoAPI {
      * @param function
      */
     public CardBusDevice(CardBusBus bus, int function) {
-        super(bus, "cardbus(" + bus.getBus() + "," + function + ")");
+        super(bus, "cardbus(" + bus.getBus() + ',' + function + ')');
         this.bus = bus.getBus();
         this.function = function;
     }

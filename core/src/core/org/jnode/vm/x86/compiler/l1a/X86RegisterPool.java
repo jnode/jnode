@@ -290,7 +290,7 @@ abstract class X86RegisterPool {
         final StringBuilder buf = new StringBuilder();
         for (int i = 0; i < regCount; i++) {
             buf.append(registers[i].toString());
-            buf.append("\n");
+            buf.append('\n');
         }
         return buf.toString();
     }

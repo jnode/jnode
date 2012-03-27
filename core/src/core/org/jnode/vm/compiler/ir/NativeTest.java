@@ -26,7 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
-
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
@@ -100,7 +99,7 @@ public class NativeTest {
 
             int a0 = 199;
             int a1 = 100;
-            System.out.println("result: " + execIntIntInt(a0, a1, b, b.length) + " " + PrimitiveTest.const1(a0, a1));
+            System.out.println("result: " + execIntIntInt(a0, a1, b, b.length) + ' ' + PrimitiveTest.const1(a0, a1));
 //                System.out.println("result: " + execFloatFloatFloat(5, 3, b, b.length)
 // + " " + PrimitiveTest.terniary(5, 3));
 

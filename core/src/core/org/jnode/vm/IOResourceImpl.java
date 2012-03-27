@@ -82,7 +82,7 @@ final class IOResourceImpl extends Region implements IOResource {
             return res;
         } else {
             final Object curOwner = get(resources, res).getOwner();
-            throw new ResourceNotFreeException("port " + NumberUtils.hex(startPort) + "-" +
+            throw new ResourceNotFreeException("port " + NumberUtils.hex(startPort) + '-' +
                 NumberUtils.hex(startPort + length - 1) + " is owned by " + curOwner);
         }
     }

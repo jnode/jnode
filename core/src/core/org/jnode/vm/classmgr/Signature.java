@@ -21,9 +21,8 @@
 package org.jnode.vm.classmgr;
 
 import java.util.ArrayList;
-
-import org.jnode.vm.JvmType;
 import org.jnode.vm.InternString;
+import org.jnode.vm.JvmType;
 import org.jnode.vm.facade.TypeSizeInfo;
 
 /**
@@ -293,7 +292,7 @@ public class Signature {
         }
 
         if (cls.isArray()) {
-            return "[" + toSignature(cls.getComponentType());
+            return '[' + toSignature(cls.getComponentType());
         } else if (cls.isPrimitive()) {
             if (cls == Boolean.TYPE) {
                 return "Z";
@@ -316,7 +315,7 @@ public class Signature {
             }
             return cls.getName();
         } else {
-            return "L" + cls.getName().replace('.', '/') + ";";
+            return 'L' + cls.getName().replace('.', '/') + ';';
         }
     }
 
@@ -356,7 +355,7 @@ public class Signature {
         }
 
         if (cls.isArray()) {
-            return "[" + toSignature(((VmArrayClass) cls).getComponentType());
+            return '[' + toSignature(((VmArrayClass) cls).getComponentType());
         } else if (cls.isPrimitive()) {
             if (cls == VmType.getPrimitiveClass('Z')) {
                 return "Z";
@@ -379,7 +378,7 @@ public class Signature {
             }
             return cls.getName();
         } else {
-            return "L" + cls.getName().replace('.', '/') + ";";
+            return 'L' + cls.getName().replace('.', '/') + ';';
         }
     }
 

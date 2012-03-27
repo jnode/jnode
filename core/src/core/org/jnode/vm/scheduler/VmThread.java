@@ -1060,10 +1060,10 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      */
     public String toString() {
         if (javaThread != null) {
-            return "%" + javaThread.getName() + ", st"
-                + STATE_NAMES[threadState] + "%";
+            return '%' + javaThread.getName() + ", st"
+                + STATE_NAMES[threadState] + '%';
         } else {
-            return "%@null@, st" + threadState + "%";
+            return "%@null@, st" + threadState + '%';
         }
     }
 

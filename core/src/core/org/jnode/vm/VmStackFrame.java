@@ -94,6 +94,6 @@ public final class VmStackFrame extends VmSystemObject {
         final String mname = (method == null) ? "<unknown method>" : method.getName();
         final String location = getLocationInfo();
 
-        return cname + "!" + mname + " (" + location + ")";
+        return cname + '!' + mname + " (" + location + ')';
     }
 }

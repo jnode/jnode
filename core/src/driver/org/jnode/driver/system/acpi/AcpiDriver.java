@@ -20,14 +20,10 @@
  
 package org.jnode.driver.system.acpi;
 
-import static org.jnode.vm.VirtualMemoryRegion.ACPI;
-
 import java.io.PrintWriter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
@@ -51,6 +47,8 @@ import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.MagicUtils;
 import org.vmmagic.unboxed.Word;
+
+import static org.jnode.vm.VirtualMemoryRegion.ACPI;
 
 /**
  * AcpiDriver.
@@ -294,7 +292,7 @@ final class AcpiDriver extends Driver implements AcpiAPI {
         buffer.append(Integer.toHexString(facp.getGeneralPurposeEvent1()));
         buffer.append("), Flags(");
         buffer.append(Integer.toHexString(facp.getFlags()));
-        buffer.append(")");
+        buffer.append(')');
         return buffer.toString();
     }
 }

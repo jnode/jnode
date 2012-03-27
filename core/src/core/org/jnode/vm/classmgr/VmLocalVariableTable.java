@@ -76,7 +76,7 @@ public final class VmLocalVariableTable extends VmSystemObject {
         StringBuilder sb = new StringBuilder();
         for (VmLocalVariable var : table) {
             sb.append(var);
-            sb.append(" ");
+            sb.append(' ');
         }
         return sb.toString();
     }

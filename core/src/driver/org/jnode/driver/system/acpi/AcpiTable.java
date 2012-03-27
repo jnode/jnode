@@ -21,11 +21,11 @@
 package org.jnode.driver.system.acpi;
 
 import org.apache.log4j.Logger;
+import org.jnode.annotation.MagicPermission;
 import org.jnode.system.resource.MemoryResource;
 import org.jnode.system.resource.ResourceManager;
 import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.system.resource.ResourceOwner;
-import org.jnode.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.MagicUtils;
 import org.vmmagic.unboxed.Offset;
@@ -164,7 +164,7 @@ public abstract class AcpiTable {
     public String toString() {
         final String start = MagicUtils.toString(tableResource.getAddress());
         final int size = getSize();
-        return getSignature() + " [0x" + start + ":len " + size + "]";
+        return getSignature() + " [0x" + start + ":len " + size + ']';
     }
 
     /**

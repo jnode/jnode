@@ -116,7 +116,7 @@ public final class PCIRomAddress {
 
     public String toString() {
         final int base = getRomBase();
-        return NumberUtils.hex(getRomBase()) + "-" + NumberUtils.hex(base + size - 1) +
+        return NumberUtils.hex(getRomBase()) + '-' + NumberUtils.hex(base + size - 1) +
             (isEnabled() ? " enabled" : " disabled");
     }
 }

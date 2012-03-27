@@ -38,13 +38,13 @@ final class DefGCStatistics extends VmSystemObject implements GCStatistics {
     long lastMarkedObjects;
 
     public String toString() {
-        return "lastGCTime          " + lastGCTime + "\n" +
-            "lastMarkIterations  " + lastMarkIterations + "\n" +
-            "lastMarkDuration    " + lastMarkDuration + "\n" +
-            "lastSweepDuration   " + lastSweepDuration + "\n" +
-            "lastCleanupDuration " + lastCleanupDuration + "\n" +
-            "lastVerifyDuration  " + lastVerifyDuration + "\n" +
-            "lastMarkedObjects   " + lastMarkedObjects + "\n" +
+        return "lastGCTime          " + lastGCTime + '\n' +
+            "lastMarkIterations  " + lastMarkIterations + '\n' +
+            "lastMarkDuration    " + lastMarkDuration + '\n' +
+            "lastSweepDuration   " + lastSweepDuration + '\n' +
+            "lastCleanupDuration " + lastCleanupDuration + '\n' +
+            "lastVerifyDuration  " + lastVerifyDuration + '\n' +
+            "lastMarkedObjects   " + lastMarkedObjects + '\n' +
             "lastFreedBytes      " + lastFreedBytes;
     }
 

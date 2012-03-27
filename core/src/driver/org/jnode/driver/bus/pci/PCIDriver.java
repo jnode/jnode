@@ -24,9 +24,7 @@ import java.io.PrintWriter;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
@@ -191,12 +189,12 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
         // List all devices
         for (PCIDevice dev : devices) {
             final PCIDeviceConfig cfg = dev.getConfig();
-            log.debug("PCI " + dev.getPCIName() + "\t"
-                + NumberUtils.hex(cfg.getVendorID(), 4) + ":"
-                + NumberUtils.hex(cfg.getDeviceID(), 4) + ":"
-                + NumberUtils.hex(cfg.getRevision(), 2) + " "
-                + NumberUtils.hex(cfg.getBaseClass(), 2) + ":"
-                + NumberUtils.hex(cfg.getSubClass(), 2) + ":"
+            log.debug("PCI " + dev.getPCIName() + '\t'
+                + NumberUtils.hex(cfg.getVendorID(), 4) + ':'
+                + NumberUtils.hex(cfg.getDeviceID(), 4) + ':'
+                + NumberUtils.hex(cfg.getRevision(), 2) + ' '
+                + NumberUtils.hex(cfg.getBaseClass(), 2) + ':'
+                + NumberUtils.hex(cfg.getSubClass(), 2) + ':'
                 + NumberUtils.hex(cfg.getMinorClass(), 2)
 //                    + "\tIRQ" + cfg.getInterruptLine() + ":" + cfg.getInterruptPin()
                 + "\tCMD " + NumberUtils.hex(cfg.getCommand(), 4));
@@ -507,12 +505,12 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
         // List all devices
         for (PCIDevice dev : devices) {
             final PCIDeviceConfig cfg = dev.getConfig();
-            out.println("PCI " + dev.getPCIName() + "\t"
-                + NumberUtils.hex(cfg.getVendorID(), 4) + ":"
-                + NumberUtils.hex(cfg.getDeviceID(), 4) + ":"
-                + NumberUtils.hex(cfg.getRevision(), 2) + " "
-                + NumberUtils.hex(cfg.getBaseClass(), 2) + ":"
-                + NumberUtils.hex(cfg.getSubClass(), 2) + ":"
+            out.println("PCI " + dev.getPCIName() + '\t'
+                + NumberUtils.hex(cfg.getVendorID(), 4) + ':'
+                + NumberUtils.hex(cfg.getDeviceID(), 4) + ':'
+                + NumberUtils.hex(cfg.getRevision(), 2) + ' '
+                + NumberUtils.hex(cfg.getBaseClass(), 2) + ':'
+                + NumberUtils.hex(cfg.getSubClass(), 2) + ':'
                 + NumberUtils.hex(cfg.getMinorClass(), 2)
 //                    + "\tIRQ"
 //                    + cfg.getInterruptLine() + ":" + cfg.getInterruptPin()

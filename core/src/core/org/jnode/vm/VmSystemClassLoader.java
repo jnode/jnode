@@ -29,15 +29,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
+import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.util.ByteBufferInputStream;
-import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.ClassDecoder;
 import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
@@ -175,9 +175,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             final ArrayList<VmType> list = new ArrayList<VmType>();
             final VmType[] arr = bootClasses;
             final int count = arr.length;
-            for (int i = 0; i < count; i++) {
-                list.add(arr[i]);
-            }
+            list.addAll(Arrays.asList(arr).subList(0, count));
             return list;
         }
     }
@@ -261,7 +259,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      */
     public synchronized void addLoadedClass(String name, VmType cls) {
         if (failOnNewLoad) {
-            throw new RuntimeException("Cannot load a new class when failOnNewLoad is set (" + name + ")");
+            throw new RuntimeException("Cannot load a new class when failOnNewLoad is set (" + name + ')');
         }
         if (classInfos != null) {
             classInfos.put(name, new ClassInfo(cls));
@@ -346,7 +344,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
                     ci.setVmClass(loadNormalClass(name));
                 }
                 if (failOnNewLoad) {
-                    throw new RuntimeException("Cannot load a new class when failOnNewLoad is set (" + name + ")");
+                    throw new RuntimeException("Cannot load a new class when failOnNewLoad is set (" + name + ')');
                 }
             } catch (ClassNotFoundException ex) {
                 ci.setLoadError(ex.toString());
@@ -411,7 +409,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         final ByteBuffer image = getClassData(name);
 
         if (failOnNewLoad) {
-            throw new RuntimeException("Cannot load a new class when failOnNewLoad is set (" + name + ")");
+            throw new RuntimeException("Cannot load a new class when failOnNewLoad is set (" + name + ')');
         }
 
         return ClassDecoder.defineClass(name, image, !allowNatives, this, null);
@@ -514,7 +512,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     public URL findResource(String name) {
         if (verbose) {
-            System.out.println("VmSystemClassLoader.findResource(" + name + ")");
+            System.out.println("VmSystemClassLoader.findResource(" + name + ')');
         }
         if (name.startsWith("/")) {
             name = name.substring(1);

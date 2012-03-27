@@ -23,13 +23,12 @@ package org.jnode.vm.x86;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.jnode.annotation.MagicPermission;
 import org.jnode.system.resource.MemoryResource;
 import org.jnode.system.resource.ResourceManager;
 import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.system.resource.ResourceOwner;
 import org.jnode.util.NumberUtils;
-import org.jnode.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 
@@ -130,7 +129,7 @@ final class IOAPIC {
             NumberUtils.hex(getArbitrationId(), 2));
         int idx = 0;
         for (IOAPICRedirectionEntry entry : getRedirectionEntries()) {
-            out.println("REDIR" + (idx++) + " " + entry);
+            out.println("REDIR" + (idx++) + ' ' + entry);
         }
     }
 

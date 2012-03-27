@@ -21,9 +21,7 @@
 package org.jnode.log4j.config;
 
 import java.io.Writer;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Layout;
 import org.apache.log4j.WriterAppender;
 import org.jnode.driver.console.ConsoleManager;
@@ -71,7 +69,7 @@ public class VirtualConsoleAppender extends WriterAppender {
         try {
             TextConsole res = (TextConsole) mgr.getConsole(name);
             if (res == null) {
-                throw new IllegalArgumentException("Unknown console: '" + name + "'");
+                throw new IllegalArgumentException("Unknown console: '" + name + '\'');
             }
             return res;
         } catch (ClassCastException ex) {

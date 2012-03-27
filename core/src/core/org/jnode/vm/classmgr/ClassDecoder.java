@@ -24,7 +24,6 @@ import java.io.UTFDataFormatException;
 import java.lang.annotation.Annotation;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
-
 import org.jnode.annotation.AllowedPackages;
 import org.jnode.annotation.CheckPermission;
 import org.jnode.annotation.DoPrivileged;
@@ -44,7 +43,6 @@ import org.jnode.vm.JvmType;
 import org.jnode.vm.facade.VmUtils;
 import org.vmmagic.pragma.PragmaException;
 import org.vmmagic.pragma.UninterruptiblePragma;
-
 import sun.reflect.annotation.AnnotationParser;
 import sun.reflect.annotation.ExceptionProxy;
 
@@ -243,7 +241,7 @@ public final class ClassDecoder {
         final int maj_version = data.getChar();
 
         if (false) {
-            BootLogInstance.get().debug("Class file version " + maj_version + ";"
+            BootLogInstance.get().debug("Class file version " + maj_version + ';'
                 + min_version);
         }
 
@@ -505,7 +503,7 @@ public final class ClassDecoder {
 
         String signature = method.getSignature();
         if (!method.isStatic()) {
-            signature = "(" + Signature.toSignature(method.getDeclaringClass()) + signature.substring(1);
+            signature = '(' + Signature.toSignature(method.getDeclaringClass()) + signature.substring(1);
         }
 
         final VmMethod nativeMethod = nativeType.getNativeMethodReplacement(method.getName(), signature);
@@ -1243,7 +1241,7 @@ public final class ClassDecoder {
 
                     if (defo instanceof ExceptionProxy)
                         throw new RuntimeException("Error parsing annotation parameter value (annotation= " +
-                            annType.getName() + ", parameter=" + mts.getName() + ")");
+                            annType.getName() + ", parameter=" + mts.getName() + ')');
 
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -1314,7 +1312,7 @@ public final class ClassDecoder {
             }
             default:
                 throw new ClassFormatError("Unknown element_value tag '"
-                    + (char) tag + "'");
+                    + (char) tag + '\'');
         }
     }
 
@@ -1358,7 +1356,7 @@ public final class ClassDecoder {
             }
             default:
                 throw new ClassFormatError("Unknown element_value tag '"
-                    + (char) tag + "'");
+                    + (char) tag + '\'');
         }
     }
 
@@ -1436,7 +1434,7 @@ public final class ClassDecoder {
         private String[] allowedPackages;
 
         public PragmaAnnotation(Class<? extends Annotation> cls, char flags) {
-            this.typeDescr = "L" + cls.getName().replace('.', '/') + ";";
+            this.typeDescr = 'L' + cls.getName().replace('.', '/') + ';';
             this.flags = flags;
         }
 
