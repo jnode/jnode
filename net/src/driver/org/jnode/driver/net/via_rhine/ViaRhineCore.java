@@ -32,6 +32,19 @@ import org.jnode.driver.bus.pci.PCIDevice;
 import org.jnode.driver.bus.pci.PCIHeaderType0;
 import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
+import org.jnode.naming.InitialNaming;
+import org.jnode.net.HardwareAddress;
+import org.jnode.net.SocketBuffer;
+import org.jnode.net.ethernet.EthernetAddress;
+import org.jnode.system.resource.IOResource;
+import org.jnode.system.resource.IRQHandler;
+import org.jnode.system.resource.IRQResource;
+import org.jnode.system.resource.ResourceManager;
+import org.jnode.system.resource.ResourceNotFreeException;
+import org.jnode.system.resource.ResourceOwner;
+import org.jnode.util.NumberUtils;
+import org.jnode.util.TimeoutException;
+
 import static org.jnode.driver.net.via_rhine.ViaRhineConstants.CFGD_CFDX;
 import static org.jnode.driver.net.via_rhine.ViaRhineConstants.CR1_SFRST;
 import static org.jnode.driver.net.via_rhine.ViaRhineConstants.CR1_TDMD1;
@@ -83,19 +96,7 @@ import static org.jnode.driver.net.via_rhine.ViaRhineConstants.byTCR;
 import static org.jnode.driver.net.via_rhine.ViaRhineConstants.dwCurrentRxDescAddr;
 import static org.jnode.driver.net.via_rhine.ViaRhineConstants.dwCurrentTxDescAddr;
 import static org.jnode.driver.net.via_rhine.ViaRhineConstants.wMIIDATA;
-import org.jnode.naming.InitialNaming;
-import org.jnode.net.HardwareAddress;
-import org.jnode.net.SocketBuffer;
-import org.jnode.net.ethernet.EthernetAddress;
 import static org.jnode.net.ethernet.EthernetConstants.ETH_ALEN;
-import org.jnode.system.resource.IOResource;
-import org.jnode.system.resource.IRQHandler;
-import org.jnode.system.resource.IRQResource;
-import org.jnode.system.resource.ResourceManager;
-import org.jnode.system.resource.ResourceNotFreeException;
-import org.jnode.system.resource.ResourceOwner;
-import org.jnode.util.NumberUtils;
-import org.jnode.util.TimeoutException;
 
 /**
  * @author Levente S\u00e1ntha
@@ -225,7 +226,7 @@ class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
                     log.debug("New packet");
                     log.debug(packet.getLinkLayerHeader().getSourceAddress());
                     log.debug(packet.getLinkLayerHeader().getDestinationAddress());
-                    log.debug("\n" + hexDump(packet.toByteArray()) + "\n");
+                    log.debug('\n' + hexDump(packet.toByteArray()) + '\n');
                     rxRing.currentDesc().setOwnBit();
                     rxRing.next();
                 }
@@ -676,7 +677,7 @@ class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
 //        hwAddress.writeTo(buf, 6);        
         txRing.currentDesc().setOwnBit();
         txRing.currentDesc().setPacket(buf);
-        log.debug("\n" + hexDump(buf.toByteArray()) + "\n");
+        log.debug('\n' + hexDump(buf.toByteArray()) + '\n');
 
         int CR1bak = getReg8(byCR1);
 
@@ -763,9 +764,9 @@ class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
                         else
                             sb.append("  ");
                         if ((i + 1) < rowlen)
-                            sb.append(" ");
+                            sb.append(' ');
                         if ((i + 1) == rowlen / 2)
-                            sb.append(" ");
+                            sb.append(' ');
                     }
 
                     sb.append("  |");
@@ -776,12 +777,12 @@ class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
                             if ((c >= ' ') && (c < (char) 0x7f))
                                 sb.append(c);
                             else
-                                sb.append(".");
+                                sb.append('.');
                         } else
-                            sb.append(" ");
+                            sb.append(' ');
                     }
 
-                    sb.append("|");
+                    sb.append('|');
 
                     left -= sz;
                     ofs += sz;

@@ -156,16 +156,16 @@ public class EEPRO100TxFD {
         StringBuilder str = new StringBuilder();
         str.append("Status  : ");
         str.append(NumberUtils.hex(this.getStatus()));
-        str.append("\n");
+        str.append('\n');
         str.append("Command : ");
         str.append(NumberUtils.hex(this.getCommand()));
-        str.append("\n");
+        str.append('\n');
         str.append("Link    : ");
         str.append(NumberUtils.hex(this.getLink()));
-        str.append("\n");
+        str.append('\n');
         str.append("Count   : ");
         str.append(NumberUtils.hex(this.getCount()));
-        str.append("\n");
+        str.append('\n');
         return str.toString();
     }
 }

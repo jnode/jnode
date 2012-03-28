@@ -45,7 +45,7 @@ public class LsIRQCommand extends AbstractCommand {
         final IRQManager irqMgr = proc.getIRQManager();
         final int max = irqMgr.getNumIRQs();
         for (int i = 0; i < max; i++) {
-            getOutput().getPrintWriter().println("IRQ" + i + "\t" + irqMgr.getIrqCount(i) + "\t"
+            getOutput().getPrintWriter().println("IRQ" + i + '\t' + irqMgr.getIrqCount(i) + '\t'
                     + irqMgr.getHandlerInfo(i));
         }
     }

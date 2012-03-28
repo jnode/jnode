@@ -96,7 +96,7 @@ public class TFTPClient extends org.apache.commons.net.tftp.TFTPClient {
                     serverAddress.getHostName(); // do DNS lookup
                     success = true;
                 } catch (UnknownHostException ex) {
-                    out.println("Unknown host " + args[1] + ".");
+                    out.println("Unknown host " + args[1] + '.');
                 }
             }
         } else if (cmd.equals(GET_CMD)) { // get
@@ -179,7 +179,7 @@ public class TFTPClient extends org.apache.commons.net.tftp.TFTPClient {
             }
         } else if (cmd.equals(STATUS_CMD)) { // status
             if (serverAddress != null) {
-                out.println("Connected to " + serverAddress.getHostName() + ".");
+                out.println("Connected to " + serverAddress.getHostName() + '.');
             } else {
                 out.println("Not connected.");
             }

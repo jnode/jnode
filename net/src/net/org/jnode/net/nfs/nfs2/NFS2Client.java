@@ -253,7 +253,7 @@ public class NFS2Client {
             builder.append("An error occurs when the mount client close connections. Reason:");
             for (OncRpcException anExceptionList : exceptionList) {
                 builder.append(anExceptionList.getMessage());
-                builder.append(".");
+                builder.append('.');
             }
             throw new IOException(builder.toString());
         }

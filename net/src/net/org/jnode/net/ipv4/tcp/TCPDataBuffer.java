@@ -54,7 +54,7 @@ public class TCPDataBuffer {
             throw new IndexOutOfBoundsException("offset " + offset);
         }
         if ((length < 0) || (offset + length > used)) {
-            throw new IndexOutOfBoundsException("offset + length" + offset + "+" + length);
+            throw new IndexOutOfBoundsException("offset + length" + offset + '+' + length);
         }
         return new SocketBuffer(data, offset, length);
     }

@@ -22,21 +22,20 @@ package org.jnode.net.ipv4.tftp;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
-
-import org.apache.log4j.Logger;
 import org.apache.commons.net.tftp.TFTP;
-import org.apache.commons.net.tftp.TFTPPacket;
 import org.apache.commons.net.tftp.TFTPAckPacket;
 import org.apache.commons.net.tftp.TFTPDataPacket;
+import org.apache.commons.net.tftp.TFTPErrorPacket;
+import org.apache.commons.net.tftp.TFTPPacket;
+import org.apache.commons.net.tftp.TFTPPacketException;
 import org.apache.commons.net.tftp.TFTPReadRequestPacket;
 import org.apache.commons.net.tftp.TFTPWriteRequestPacket;
-import org.apache.commons.net.tftp.TFTPErrorPacket;
-import org.apache.commons.net.tftp.TFTPPacketException;
+import org.apache.log4j.Logger;
 
 /**
  * TFTP server. Currently only supports one client at a time.
@@ -95,7 +94,7 @@ public class TFTPServer extends TFTP {
 
     private void processRequest(TFTPPacket packet) throws IOException {
         if (log.isDebugEnabled())
-            log.debug("Received packet: " + packet.getAddress() + ":" + packet.getPort());
+            log.debug("Received packet: " + packet.getAddress() + ':' + packet.getPort());
         final int type = packet.getType();
         switch (type) {
             case TFTPPacket.WRITE_REQUEST:
@@ -104,7 +103,7 @@ public class TFTPServer extends TFTP {
                     File file = new File(".", wreqPacket.getFilename());
                     log.info("Request to write file " + wreqPacket.getFilename() + " (" +
                             file.getAbsolutePath() + ") received from " + packet.getAddress() +
-                            ":" + packet.getPort());
+                        ':' + packet.getPort());
                     fileOut = new FileOutputStream(file);
                     blockNumber = 0;
                     bufferedSend(new TFTPAckPacket(packet.getAddress(), packet.getPort(), blockNumber));
@@ -139,7 +138,7 @@ public class TFTPServer extends TFTP {
                         File file = new File(".", rreqPacket.getFilename());
                         log.info("Request to read file " + rreqPacket.getFilename() + " (" +
                                 file.getAbsolutePath() + ") received from " + packet.getAddress() +
-                                ":" + packet.getPort());
+                            ':' + packet.getPort());
                         fileIn = new FileInputStream(file);
                         blockNumber = 1;
                         byte[] data = new byte[TFTPDataPacket.MAX_DATA_LENGTH];

@@ -21,7 +21,6 @@
 package org.jnode.command.net;
 
 import java.io.PrintWriter;
-
 import org.jnode.driver.net.NetworkException;
 import org.jnode.net.NetworkLayer;
 import org.jnode.net.NetworkLayerManager;
@@ -83,7 +82,7 @@ public class NetstatCommand extends AbstractCommand {
             int width = 0;
             for (int i = 0; i < list.length; i++) {
                 final Statistic st = list[i];
-                String msg = st.getName() + " " + st.getValue();
+                String msg = st.getName() + ' ' + st.getValue();
                 if (i + 1 < list.length) {
                     msg = msg + ", ";
                 }

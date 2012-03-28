@@ -28,7 +28,6 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
@@ -121,7 +120,7 @@ public class DirCommand extends AbstractCommand {
                         for (int j = 0; j < LEFT_MARGIN + SEPARATOR_SIZE; j++) sb.append(' ');
                         sb.append(dateFormat.format(lastModified));
                         sb.append(SEPARATOR);
-                        sb.append("[");
+                        sb.append('[');
                         sb.append(f.getName());
                         sb.append(']');
                     }

@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -111,7 +110,7 @@ public class Log4jCommand extends AbstractCommand {
             while (en.hasMoreElements()) {
                 Logger logger = (Logger) en.nextElement();
                 String level = (logger.getLevel() == null) ? 
-                        ("(" + logger.getEffectiveLevel().toString() + ")") :
+                        ('(' + logger.getEffectiveLevel().toString() + ')') :
                             logger.getLevel().toString();
                 getOutput().getPrintWriter().println(logger.getName() + ": " + level);
             }

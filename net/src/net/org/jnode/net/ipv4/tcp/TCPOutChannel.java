@@ -181,7 +181,7 @@ public class TCPOutChannel {
     public synchronized void send(IPv4Header ipHdr, TCPHeader hdr, byte[] data, int offset,
                                   int length) throws SocketException {
         if (DEBUG) {
-            log.debug("outChannel.send(ipHdr,hdr,data," + offset + ", " + length + ")");
+            log.debug("outChannel.send(ipHdr,hdr,data," + offset + ", " + length + ')');
         }
         // Check for maximum datalength
         if (length > mss) {

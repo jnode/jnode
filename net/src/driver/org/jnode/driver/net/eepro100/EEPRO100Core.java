@@ -468,7 +468,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         int status;
 
         if ((buffers.getCurRx() - buffers.getDirtyRx()) > 15) {
-            log.debug("curRx > dirtyRx " + buffers.getCurRx() + " " + buffers.getDirtyRx()); 
+            log.debug("curRx > dirtyRx " + buffers.getCurRx() + ' ' + buffers.getDirtyRx());
         }
 
         do {

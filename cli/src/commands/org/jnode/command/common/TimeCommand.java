@@ -63,7 +63,7 @@ public class TimeCommand extends AbstractCommand {
 
         StringBuilder sb = new StringBuilder(Alias.getValue());
         for (String arg : Args.getValues()) {
-            sb.append(" ");
+            sb.append(' ');
             sb.append(arg);
         }
         

@@ -119,7 +119,7 @@ public class BOOTPServer {
     }
 
     private void processRequest(DatagramPacket packet) throws IOException {
-        log.debug("Received packet: " + packet.getAddress() + ":" + packet.getPort() + " " +
+        log.debug("Received packet: " + packet.getAddress() + ':' + packet.getPort() + ' ' +
                 new String(packet.getData(), packet.getOffset(), packet.getLength()));
         BOOTPHeader hdr = new BOOTPHeader(packet);
         if (hdr.getOpcode() != BOOTPHeader.BOOTREQUEST) {

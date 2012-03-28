@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
 import org.acplt.oncrpc.OncRpcException;
 import org.acplt.oncrpc.OncRpcPortmapClient;
 import org.acplt.oncrpc.OncRpcProtocols;
@@ -87,11 +86,10 @@ public class RpcInfoCommand extends AbstractCommand {
             out.printf(fmt_list_serv, str_program, str_version, str_protocol, str_port, str_name);
             out.println();
 
-            for (int i = 0; i < servers.length; i++) {
-                OncRpcServerIdent server = servers[i];
-                out.printf(fmt_list_serv, server.program, server.version, 
-                        server.protocol == 6 ? str_tcp : str_udp,
-                                server.port, getName(server.program));
+            for (OncRpcServerIdent server : servers) {
+                out.printf(fmt_list_serv, server.program, server.version,
+                    server.protocol == 6 ? str_tcp : str_udp,
+                    server.port, getName(server.program));
                 out.println();
             }
         } catch (OncRpcException e) {

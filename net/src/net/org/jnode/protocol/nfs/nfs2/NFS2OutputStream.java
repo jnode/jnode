@@ -117,7 +117,7 @@ public class NFS2OutputStream extends OutputStream {
                 String t = tokenList.get(i);
                 LookupResult lookup = nfsClient.lookup(tempFileHandle, t);
                 if (lookup.getFileAttribute().getType() == FileAttribute.FILE) {
-                    throw new IOException("The path contains a file : " + t + ".");
+                    throw new IOException("The path contains a file : " + t + '.');
                 } else if (lookup.getFileAttribute().getType() == FileAttribute.DIRECTORY) {
                     tempFileHandle = lookup.getFileHandle();
                 } else {

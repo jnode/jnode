@@ -162,8 +162,8 @@ public class JavaCommand extends AbstractCommand {
         private byte[] loadClassData(String name) throws ClassNotFoundException {
             String fn = name.replace('.', '/');
             File f = null;
-            for (int i = 0; i < dirs.length; i++) {
-                f = new File(dirs[i] + fn + ".class");
+            for (String dir : dirs) {
+                f = new File(dir + fn + ".class");
                 if (f.exists()) {
                     break;
                 }

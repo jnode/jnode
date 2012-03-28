@@ -225,7 +225,7 @@ public class UDPProtocol implements IPv4Protocol, IPv4Constants {
         Integer lport = socket.getLocalPort();
 
         if (lport.compareTo(zero) != 0 && sockets.containsKey(lport)) {
-            throw new SocketException("Port already bound (" + lport + ")");
+            throw new SocketException("Port already bound (" + lport + ')');
         } else {
             Integer ran;
 

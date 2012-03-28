@@ -24,7 +24,6 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.jnode.shell.AbstractCommand;
 
 
@@ -319,7 +318,7 @@ public class ExprCommand extends AbstractCommand {
     
     private int asInteger(Object obj) throws ExprException {
         if (obj instanceof Integer) {
-            return ((Integer) obj).intValue();
+            return (Integer) obj;
         } else {
             try {
                 return Integer.parseInt(obj.toString());
