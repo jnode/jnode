@@ -291,13 +291,13 @@ public class TCPHeader implements TransportLayerHeader, TCPConstants {
         b.append(dstPort);
         b.append(": ");
         b.append(getFlagsAsString());
-        b.append(" ");
+        b.append(' ');
         b.append(sequenceNr & 0xFFFFFFFFL);
-        b.append(":");
+        b.append(':');
         b.append((sequenceNr + tcpLength) & 0xFFFFFFFFL);
-        b.append("(");
+        b.append('(');
         b.append(tcpLength);
-        b.append(")");
+        b.append(')');
         if (isFlagAcknowledgeSet()) {
             b.append(", ack ");
             b.append(ackNr & 0xFFFFFFFFL);

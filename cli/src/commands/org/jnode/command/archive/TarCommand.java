@@ -21,19 +21,19 @@
 package org.jnode.command.archive;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import org.apache.tools.bzip2.CBZip2InputStream;
+import org.apache.tools.bzip2.CBZip2OutputStream;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
 import org.apache.tools.tar.TarOutputStream;
-import org.apache.tools.bzip2.CBZip2InputStream;
-import org.apache.tools.bzip2.CBZip2OutputStream;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -524,7 +524,7 @@ public class TarCommand extends ArchiveCommand {
         ArrayList<File> list = new ArrayList<File>();
         for (File file : files) {
             if (entries.containsKey(file.getPath())) {
-                etime = entries.get(file.getPath()).longValue();
+                etime = entries.get(file.getPath());
                 ftime = file.lastModified();
                 if (etime >= ftime) {
                     continue;

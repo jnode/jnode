@@ -21,15 +21,14 @@
 package org.jnode.command.file;
 
 import java.io.File;
-import java.io.PrintWriter;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.LinkedList;
-
+import java.util.List;
 import org.jnode.command.util.IOUtils;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
@@ -39,6 +38,7 @@ import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.IntegerArgument;
 import org.jnode.shell.syntax.StringArgument;
+
 import static org.jnode.shell.syntax.Argument.EXISTING;
 import static org.jnode.shell.syntax.Argument.MULTIPLE;
 import static org.jnode.shell.syntax.Argument.NONEXISTENT;
@@ -106,7 +106,7 @@ public class SortCommand extends AbstractCommand {
         protected FieldRange doAccept(CommandLine.Token token, int flags) throws CommandSyntaxException {
             String text = token.text;
             FieldRange range = new FieldRange();
-            int i = text.indexOf(",");
+            int i = text.indexOf(',');
             if (i == -1) {
                 range.start = parseField(text, false);
                 range.end   = new Field();
@@ -165,7 +165,7 @@ public class SortCommand extends AbstractCommand {
                 i--;
             }
             text = text.substring(0, i + 1);
-            i = text.indexOf(".");
+            i = text.indexOf('.');
             if (i == 0) {
                 throw new CommandSyntaxException("Field offset cannot be empty");
             }

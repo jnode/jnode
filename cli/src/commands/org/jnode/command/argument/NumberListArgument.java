@@ -21,12 +21,12 @@
 package org.jnode.command.argument;
 
 import java.util.Arrays;
-
 import org.jnode.command.util.NumberRange;
-//import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
-import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.CommandSyntaxException;
+
+//import org.jnode.driver.console.CompletionInfo;
 
 /**
  * Captures a list of multiple number ranges.
@@ -93,9 +93,7 @@ public class NumberListArgument extends Argument<NumberRange> {
                 i++;
             }
         }
-        for (int i = 0; i < (ranges.length - 1); i++) {
-            values.add(ranges[i]);
-        }
+        values.addAll(Arrays.asList(ranges).subList(0, ranges.length - 1));
         return ranges[ranges.length - 1];
     }
     

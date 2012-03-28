@@ -28,7 +28,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
@@ -126,13 +125,13 @@ public class WcCommand extends AbstractCommand {
 
     private void checkFile(File file) {
         if (!file.exists()) {
-            getError().getPrintWriter().println(STR_ERROR_NOT_EXIST + " " + file.getAbsolutePath());
+            getError().getPrintWriter().println(STR_ERROR_NOT_EXIST + ' ' + file.getAbsolutePath());
             exit(1);
         } else if (file.isDirectory()) {
-            getError().getPrintWriter().println(STR_ERROR_DIR + " " + file.getAbsolutePath());
+            getError().getPrintWriter().println(STR_ERROR_DIR + ' ' + file.getAbsolutePath());
             exit(1);
         } else if (!file.canRead()) {
-            getError().getPrintWriter().println(STR_ERROR_CANT_READ + " " + file.getAbsolutePath());
+            getError().getPrintWriter().println(STR_ERROR_CANT_READ + ' ' + file.getAbsolutePath());
             exit(1);
         }
     }
@@ -191,7 +190,7 @@ public class WcCommand extends AbstractCommand {
             printLine(printWriter, paddingSize, wc.getLinesCount(), wc.getWordsCount(), wc.getCharsCount(), wc
                     .getBytesRead(), wc.getMaxCharsInLine());
             if (wc.getFileName() != null) {
-                printWriter.print(" " + wc.getFileName());
+                printWriter.print(' ' + wc.getFileName());
             }
             printWriter.println();
         }
@@ -199,7 +198,7 @@ public class WcCommand extends AbstractCommand {
         if (listWc.size() > 1) {
             printLine(printWriter, paddingSize, totalLinesCount, totalWordsCount, totalCharsCount, totalBytesRead,
                     maxCharsInLine);
-            printWriter.println(" " + STR_TOTAL);
+            printWriter.println(' ' + STR_TOTAL);
         }
         printWriter.flush();
     }
@@ -253,10 +252,10 @@ public class WcCommand extends AbstractCommand {
 
         sValue.append(value);
         while (sValue.length() < paddingSize) {
-            sValue.insert(0, " ");
+            sValue.insert(0, ' ');
         }
         if (!first) {
-            sValue.insert(0, " ");
+            sValue.insert(0, ' ');
         }
         printWriter.print(sValue);
     }

@@ -222,7 +222,7 @@ public class IPv4ControlBlock {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return "local " + lAddr + ":" + lPort + ", foreign " + fAddr + ":" + fPort;
+        return "local " + lAddr + ':' + lPort + ", foreign " + fAddr + ':' + fPort;
     }
 
 }

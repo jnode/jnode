@@ -21,22 +21,26 @@
 package org.jnode.command.file;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.InputStream;
+import java.io.Flushable;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
-
-import java.util.regex.Matcher;
+import java.io.Writer;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.jnode.command.util.AbstractDirectoryWalker;
 import org.jnode.command.util.AbstractDirectoryWalker.PathnamePatternFilter;
@@ -47,13 +51,6 @@ import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.IntegerArgument;
 import org.jnode.shell.syntax.StringArgument;
-
-import java.io.Closeable;
-import java.io.Flushable;
-import java.io.Writer;
-import java.io.InputStreamReader;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * TODO implement Fixed/Basic/Ext matchers
@@ -680,20 +677,20 @@ public class GrepCommand extends AbstractCommand {
             if ((prefix & PREFIX_FILE) != 0) {
                 sb.append(name);
                 if ((prefix & (PREFIX_LINE | PREFIX_BYTE)) == 0) {
-                    sb.append("\t");
+                    sb.append('\t');
                 }
                 sb.append(fieldSep);
             }
             if ((prefix & PREFIX_LINE) != 0) {
                 sb.append(padNumber(lineCount, 4));
                 if ((prefix & PREFIX_BYTE) == 0) {
-                    sb.append("\t");
+                    sb.append('\t');
                 }
                 sb.append(fieldSep);
             }
             if ((prefix & PREFIX_BYTE) != 0) {
                 sb.append(padNumber(byteCount, 9));
-                sb.append("\t");
+                sb.append('\t');
                 sb.append(fieldSep);
             }
         } else {
@@ -756,7 +753,7 @@ public class GrepCommand extends AbstractCommand {
     }
     
     private String padNumber(int n, int size) {
-        return String.format("%" + size + "d", n);
+        return String.format("%" + size + 'd', n);
     }
     
     /**

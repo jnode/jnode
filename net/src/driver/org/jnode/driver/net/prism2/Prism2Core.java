@@ -20,30 +20,7 @@
  
 package org.jnode.driver.net.prism2;
 
-import static org.jnode.driver.net.prism2.Prism2Constants.Command.ACCESS;
-import static org.jnode.driver.net.prism2.Prism2Constants.Command.ALLOC;
-import static org.jnode.driver.net.prism2.Prism2Constants.Command.DISABLE;
-import static org.jnode.driver.net.prism2.Prism2Constants.Command.ENABLE;
-import static org.jnode.driver.net.prism2.Prism2Constants.Command.INIT;
-import static org.jnode.driver.net.prism2.Prism2Constants.Command.TX;
-import static org.jnode.driver.net.prism2.Prism2Constants.LinkStatus.CONNECTED;
-import static org.jnode.driver.net.prism2.Prism2Constants.LinkStatus.NOTCONNECTED;
-import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CNFAUTHENTICATION;
-import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CNFMAXDATALEN;
-import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CNFOWNMACADDR;
-import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CNFPORTTYPE;
-import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CURRENTBSSID;
-import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CURRENTSSID;
-import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.TXRATECNTL;
-import static org.jnode.driver.net.prism2.Prism2Constants.Register.ALLOCFID;
-import static org.jnode.driver.net.prism2.Prism2Constants.Register.EVACK;
-import static org.jnode.driver.net.prism2.Prism2Constants.Register.EVSTAT;
-import static org.jnode.driver.net.prism2.Prism2Constants.Register.INFOFID;
-import static org.jnode.driver.net.prism2.Prism2Constants.Register.INTEN;
-import static org.jnode.driver.net.prism2.Prism2Constants.Register.RXFID;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.bus.pci.PCIBaseAddress;
@@ -72,6 +49,28 @@ import org.jnode.util.TimeoutException;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.MagicUtils;
+
+import static org.jnode.driver.net.prism2.Prism2Constants.Command.ACCESS;
+import static org.jnode.driver.net.prism2.Prism2Constants.Command.ALLOC;
+import static org.jnode.driver.net.prism2.Prism2Constants.Command.DISABLE;
+import static org.jnode.driver.net.prism2.Prism2Constants.Command.ENABLE;
+import static org.jnode.driver.net.prism2.Prism2Constants.Command.INIT;
+import static org.jnode.driver.net.prism2.Prism2Constants.Command.TX;
+import static org.jnode.driver.net.prism2.Prism2Constants.LinkStatus.CONNECTED;
+import static org.jnode.driver.net.prism2.Prism2Constants.LinkStatus.NOTCONNECTED;
+import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CNFAUTHENTICATION;
+import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CNFMAXDATALEN;
+import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CNFOWNMACADDR;
+import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CNFPORTTYPE;
+import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CURRENTBSSID;
+import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CURRENTSSID;
+import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.TXRATECNTL;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.ALLOCFID;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.EVACK;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.EVSTAT;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.INFOFID;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.INTEN;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.RXFID;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -317,7 +316,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
 
         // Validate the record length
         if ((Prism2Record.getRecordLength(hdr, 0) - 1) * 2 != len) {
-            throw new DriverException("Mismatch in record length. " + len + "/"
+            throw new DriverException("Mismatch in record length. " + len + '/'
                 + Prism2Record.getRecordLength(hdr, 0));
         }
 
@@ -394,7 +393,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
         final byte[] macAddr = new byte[CNFOWNMACADDR.getRecordLength()];
         getConfig(CNFOWNMACADDR, macAddr, 0, CNFOWNMACADDR.getRecordLength());
         this.hwAddress = new EthernetAddress(macAddr, 0);
-        log.info("MAC-address for " + flags.getName() + " " + hwAddress);
+        log.info("MAC-address for " + flags.getName() + ' ' + hwAddress);
 
         // Set maximum data length
         setConfig16(CNFMAXDATALEN, WLAN_DATA_MAXLEN);

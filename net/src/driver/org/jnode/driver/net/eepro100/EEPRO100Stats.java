@@ -97,7 +97,7 @@ public class EEPRO100Stats implements EEPRO100Constants {
             rx_fifo_errors += mem.getInt(52);
             rx_length_errors += mem.getInt(60);
             mem.setInt(64, 0);
-            EEPRO100Utils.waitForCmdDone(regs);
+            regs.waitForCmdDone();
             regs.setReg8(SCBCmd, CUDumpStats);
         }
     }

@@ -130,7 +130,7 @@ public class UsbBluetoothDriver extends Driver implements USBPipeListener, UsbNe
         StringBuilder buffer = new StringBuilder();
         buffer.append("Data received : ");
         for (byte aData : data) {
-            buffer.append(NumberUtils.hex(data[0], 2)).append(" ");
+            buffer.append(NumberUtils.hex(data[0], 2)).append(' ');
         }
         log.debug(buffer.toString());
     }

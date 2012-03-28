@@ -246,7 +246,7 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
         throws SocketException {
         if (DEBUG) {
             if (log.isDebugEnabled()) {
-                log.debug("send(ipHdr, " + tcpHdr + ")");
+                log.debug("send(ipHdr, " + tcpHdr + ')');
             }
         }
         skbuf.setTransportLayerHeader(tcpHdr);

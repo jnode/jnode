@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
@@ -112,10 +111,10 @@ public class HexdumpCommand extends AbstractCommand {
                             sb.append("  ");
                         }
                         if ((i + 1) < rowlen) {
-                            sb.append(" ");
+                            sb.append(' ');
                         }
                         if ((i + 1) == rowlen / 2) {
-                            sb.append(" ");
+                            sb.append(' ');
                         }
                     }
 
@@ -127,14 +126,14 @@ public class HexdumpCommand extends AbstractCommand {
                             if ((c >= ' ') && (c < (char) 0x7f)) {
                                 sb.append(c);
                             } else {
-                                sb.append(".");
+                                sb.append('.');
                             }
                         } else {
-                            sb.append(" ");
+                            sb.append(' ');
                         }
                     }
 
-                    sb.append("|");
+                    sb.append('|');
 
                     left -= sz;
                     ofs += sz;

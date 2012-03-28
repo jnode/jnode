@@ -22,7 +22,6 @@ package org.jnode.net.ipv4;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import org.jnode.net.SocketBuffer;
 
@@ -107,8 +106,8 @@ public class IPv4FragmentList implements IPv4Constants {
                 return;
             } else if (myFrOfs < (fOfs + fSize)) {
                 // Fragment offset in the middle of an existing fragment: this is an error!
-                log.debug("Fragment offset(" + myFrOfs + mySize + "," +
-                        ") falls in another fragment (" + fOfs + "," + fSize + ").");
+                log.debug("Fragment offset(" + myFrOfs + mySize + ',' +
+                        ") falls in another fragment (" + fOfs + ',' + fSize + ").");
                 return;
             }
         }

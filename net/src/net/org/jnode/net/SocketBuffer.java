@@ -171,9 +171,7 @@ public class SocketBuffer {
             size += count;
         } else {
             setSize(size + count);
-            for (int i = size - 1; i >= count; i--) {
-                data[start + i] = data[start + i - count];
-            }
+            System.arraycopy(data, start + count - count, data, start + count, size - 1 - count);
         }
         for (int i = 0; i < count; i++) {
             data[start + i] = 0;
@@ -196,7 +194,7 @@ public class SocketBuffer {
                 next.pull(count);
             } else {
                 throw new IllegalArgumentException("Cannot pull " + count + " bytes (" + start +
-                        "," + size + ")");
+                    ',' + size + ')');
             }
         } else {
             start += count;
@@ -227,7 +225,7 @@ public class SocketBuffer {
                 next.unpull(remaining);
             } else {
                 throw new IllegalArgumentException("Cannot unpull " + count + " bytes (" + start +
-                        "," + size + ")");
+                    ',' + size + ')');
             }
         }
         testBuffer();
@@ -624,7 +622,7 @@ public class SocketBuffer {
             }
             if (start + size > data.length) {
                 throw new RuntimeException("start(" + start + ")+size(" + size +
-                        ") must be <= data.length(" + data.length + ")");
+                        ") must be <= data.length(" + data.length + ')');
             }
         }
     }

@@ -21,7 +21,6 @@
 package org.jnode.command.system;
 
 import java.io.PrintWriter;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.vm.isolate.VmIsolate;
 
@@ -38,14 +37,14 @@ public class IsolateCommand extends AbstractCommand {
         out.println(str_header);
         VmIsolate root = VmIsolate.getRoot();
         if (root != null) {
-            out.println(format(String.valueOf(root.getId()), 8, false) + " " +
-                format("0", 8, false) + " "  +
+            out.println(format(String.valueOf(root.getId()), 8, false) + ' ' +
+                format("0", 8, false) + ' ' +
                 format(String.valueOf(root.getState()), 8, true));
         }
         for (VmIsolate iso : VmIsolate.getVmIsolates()) {
-            out.println(format(String.valueOf(iso.getId()), 8, false) + " " +
-                format(String.valueOf(iso.getCreator().getId()), 8, false) + " " +
-                format(String.valueOf(iso.getState()), 8, true) + " " +
+            out.println(format(String.valueOf(iso.getId()), 8, false) + ' ' +
+                format(String.valueOf(iso.getCreator().getId()), 8, false) + ' ' +
+                format(String.valueOf(iso.getState()), 8, true) + ' ' +
                 iso.getMainClassName());
         }
     }

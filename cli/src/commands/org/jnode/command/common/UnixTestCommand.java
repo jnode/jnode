@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Stack;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.CommandSyntaxException;
@@ -144,7 +143,7 @@ public class UnixTestCommand extends AbstractCommand {
                     if (obj instanceof Boolean) {
                         res = obj == Boolean.TRUE;
                     } else if (obj instanceof Long) {
-                        res = ((Long) obj).longValue() != 0;
+                        res = (Long) obj != 0;
                     } else {
                         res = obj.toString().length() > 0;
                     }
@@ -329,7 +328,7 @@ public class UnixTestCommand extends AbstractCommand {
             } else if (option.equals("--version")) {
                 err.println("JNode test 0.0");
             } else {
-                throw new CommandSyntaxException("unknown option '" + option + "'");
+                throw new CommandSyntaxException("unknown option '" + option + '\'');
             }
         }
     }
@@ -343,7 +342,7 @@ public class UnixTestCommand extends AbstractCommand {
     }
 
     private void pushOperand(long value) {
-        operandStack.push(new Long(value));
+        operandStack.push(value);
     }
 
     private Object popOperand() throws CommandSyntaxException {
@@ -355,13 +354,13 @@ public class UnixTestCommand extends AbstractCommand {
 
     private long toNumber(Object obj) throws CommandSyntaxException {
         if (obj instanceof Long) {
-            return ((Long) obj).longValue();
+            return (Long) obj;
         } else if (obj instanceof String) {
             try {
                 return Long.parseLong((String) obj);
             } catch (NumberFormatException ex) {
                 throw new CommandSyntaxException(
-                        "operand is not a number: '" + obj.toString() + "'");
+                        "operand is not a number: '" + obj.toString() + '\'');
             }
         } else {
             throw new CommandSyntaxException("subexpression is not an INTEGER");

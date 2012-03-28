@@ -21,7 +21,6 @@
 package org.jnode.net.arp;
 
 import java.net.SocketException;
-
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.NetworkLayerHeader;
 import org.jnode.net.ProtocolAddress;
@@ -83,7 +82,7 @@ public class ARPHeader implements NetworkLayerHeader {
             targetHWAddress = new EthernetAddress(skbuf, 18);
             targetPAddress = new IPv4Address(skbuf, 24);
         } else {
-            throw new SocketException("Unknown hw,ptype: " + hwtype + "," + ptype);
+            throw new SocketException("Unknown hw,ptype: " + hwtype + ',' + ptype);
         }
     }
 

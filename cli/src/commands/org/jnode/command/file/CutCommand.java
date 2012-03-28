@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-
 import org.jnode.command.argument.NumberListArgument;
 import org.jnode.command.util.IOUtils;
 import org.jnode.command.util.NumberRange;
@@ -157,7 +156,7 @@ public class CutCommand extends AbstractCommand {
         boolean first;
         int limit, start, end;
         for (String line : lines) {
-            if (line.indexOf(inDelim) == -1) {
+            if (!line.contains(inDelim)) {
                 if (!suppress) {
                     out.write(line);
                     out.newLine();

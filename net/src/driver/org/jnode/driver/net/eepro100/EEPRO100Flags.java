@@ -45,6 +45,7 @@ public class EEPRO100Flags implements Flags {
     /* (non-Javadoc)
     * @see org.jnode.driver.net.ethernet.Flags#getName()
     */
+    @Override
     public String getName() {
         return this.name;
     }

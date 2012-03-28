@@ -98,6 +98,6 @@ public class ARPCacheEntry {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return pAddress + " " + hwAddress + " " + ((dynamic) ? "dynamic" : "static");
+        return pAddress + " " + hwAddress + ' ' + ((dynamic) ? "dynamic" : "static");
     }
 }

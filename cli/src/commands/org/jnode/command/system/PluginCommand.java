@@ -29,9 +29,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -140,7 +138,7 @@ public class PluginCommand extends AbstractCommand {
     private void addPluginLoader(URL url) throws PluginException, MalformedURLException {
         final String ext = url.toExternalForm();
         if (!ext.endsWith("/")) {
-            url = new URL(ext + "/");
+            url = new URL(ext + '/');
         }
         mgr.getLoaderManager().addPluginLoader(new URLPluginLoader(url));
         out.format(fmt_add_loader, url);
@@ -171,7 +169,7 @@ public class PluginCommand extends AbstractCommand {
     }
     
     private void listPlugins() throws PluginException {
-        final ArrayList<String> rows = new ArrayList<String>();
+        final List<String> rows = new ArrayList<String>();
         for (PluginDescriptor descr : mgr.getRegistry()) {
             String row = String.format(fmt_list,
                 descr.getId(),

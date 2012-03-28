@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.jnode.command.util.AbstractDirectoryWalker;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
@@ -47,7 +46,7 @@ public class FindCommand extends AbstractCommand {
 
         @Override
         protected void handleRestrictedFile(File file) throws IOException {
-            err.println("Permission denied for \"" + file + "\"");
+            err.println("Permission denied for \"" + file + '"');
         }
 
         @Override

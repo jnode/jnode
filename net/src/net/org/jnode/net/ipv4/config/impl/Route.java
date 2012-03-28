@@ -21,7 +21,6 @@
 package org.jnode.net.ipv4.config.impl;
 
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
@@ -138,7 +137,7 @@ final class Route {
                 // Should not happen, but if it happens anyway, just ignore it.
             }
         }
-        throw new NetworkException("No device found for " + target + "/" + mask);
+        throw new NetworkException("No device found for " + target + '/' + mask);
     }
 
 }

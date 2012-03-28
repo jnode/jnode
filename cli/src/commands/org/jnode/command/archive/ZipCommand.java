@@ -21,9 +21,10 @@
 package org.jnode.command.archive;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.StringArgument;
 
 /**
@@ -104,15 +105,11 @@ public class ZipCommand extends Zip {
         }
         if (Exclude.isSet()) {
             excludes = new ArrayList<String>(Exclude.getValues().length);
-            for (String pattern : Exclude.getValues()) {
-                excludes.add(pattern);
-            }
+            Collections.addAll(excludes, Exclude.getValues());
         }
         if (Include.isSet()) {
             includes = new ArrayList<String>(Include.getValues().length);
-            for (String pattern : Include.getValues()) {
-                includes.add(pattern);
-            }
+            Collections.addAll(includes, Include.getValues());
         }
         super.execute("zip");
     }

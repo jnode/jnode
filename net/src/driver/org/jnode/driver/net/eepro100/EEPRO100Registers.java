@@ -20,12 +20,16 @@
  
 package org.jnode.driver.net.eepro100;
 
+import org.apache.log4j.Logger;
 import org.jnode.system.resource.IOResource;
+import org.jnode.util.NumberUtils;
 
 /**
  * @author flesire
  */
-public class EEPRO100Registers {
+public class EEPRO100Registers implements EEPRO100Constants {
+
+    protected static final Logger log = Logger.getLogger(EEPRO100Registers.class);
 
     /**
      * Start of IO address space
@@ -53,7 +57,7 @@ public class EEPRO100Registers {
      * @param value
      */
 
-    public final void setReg8(int reg, int value) {
+    public void setReg8(int reg, int value) {
         io.outPortByte(iobase + reg, value);
     }
 
@@ -64,7 +68,7 @@ public class EEPRO100Registers {
      * @param value
      */
 
-    public final void setReg16(int reg, int value) {
+    public void setReg16(int reg, int value) {
         io.outPortWord(iobase + reg, value);
     }
 
@@ -75,7 +79,7 @@ public class EEPRO100Registers {
      * @param value
      */
 
-    public final void setReg32(int reg, int value) {
+    public void setReg32(int reg, int value) {
         io.outPortDword(iobase + reg, value);
     }
 
@@ -84,7 +88,7 @@ public class EEPRO100Registers {
      *
      * @param reg
      */
-    public final int getReg16(int reg) {
+    public int getReg16(int reg) {
         return io.inPortWord(iobase + reg);
     }
 
@@ -105,6 +109,25 @@ public class EEPRO100Registers {
      */
     public final int getReg8(int reg) {
         return io.inPortByte(iobase + reg);
+    }
+
+    /**
+     * Wait for the command unit to accept a command.
+     */
+    public void waitForCmdDone() {
+        int wait = 0;
+        int delayed_cmd;
+        do {
+            if (getReg8(SCBCmd) == 0)
+                return;
+        } while (++wait <= 100);
+        delayed_cmd = getReg8(SCBCmd);
+        do {
+            if (getReg8(SCBCmd) == 0)
+                break;
+        } while (++wait <= 10000);
+        log.debug("Command " + NumberUtils.hex(delayed_cmd) + " was not immediately accepted, " +
+            wait + " ticks!");
     }
 
 }
