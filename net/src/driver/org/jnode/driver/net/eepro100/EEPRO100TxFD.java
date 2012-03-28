@@ -64,17 +64,15 @@ public class EEPRO100TxFD {
         this.mem = rm.asMemoryResource(data);
 
         final Address memAddr = mem.getAddress();
-        // int addr = Address.as32bit(memAddr);
-        int offset = 0;
 
-        this.firstDPDOffset = offset;
+        this.firstDPDOffset = 0;
         this.firstDPDAddress = memAddr.add(firstDPDOffset);
     }
 
     /**
      * Initialize this ring to its default (empty) state
      */
-    public void initialize(SocketBuffer src) throws IllegalArgumentException {
+    public void initialize(SocketBuffer src) {
         // Setup the DPD
 
         // Copy the data from the buffer

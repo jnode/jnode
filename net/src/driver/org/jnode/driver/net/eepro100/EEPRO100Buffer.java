@@ -30,11 +30,6 @@ import org.jnode.util.NumberUtils;
  * @author flesire
  */
 public class EEPRO100Buffer implements EEPRO100Constants {
-    //--- Constants
-//    private static final int FRAME_SIZE = EthernetConstants.ETH_FRAME_LEN;
-//    private static final int PKT_BUF_SZ = 1536;
-//    private static final int DATA_BUFFER_SIZE = 1536;
-//    private static final int PacketReceived = 0xc000;
 
     //---
     protected final Logger log = Logger.getLogger(getClass());
@@ -48,12 +43,6 @@ public class EEPRO100Buffer implements EEPRO100Constants {
     private int curRx;
     private int dirtyRx;
     public EEPRO100RxFD[] rxRing = new EEPRO100RxFD[RX_RING_SIZE];
-//    private EEPRO100RxFD[] rxPackets = new EEPRO100RxFD[128];
-//    private int rx_packets;
-//    private int rxErrors;
-//    private EEPRO100RxFD last_rxf;
-//    private int rxPacketIndex;
-//    private int lastRxTime;
 
     // --- Tx Variables
     private int txThreshold = 0x01200000;
@@ -62,10 +51,6 @@ public class EEPRO100Buffer implements EEPRO100Constants {
     public EEPRO100TxFD[] txRing = new EEPRO100TxFD[TX_RING_SIZE];
     @SuppressWarnings("unused")
     private EEPRO100TxFD lastCmd;
-//    private int lastCmdTime;
-
-    // --- Others variables
-//    private int jiffies;
 
     public EEPRO100Buffer(EEPRO100Registers regs, ResourceManager rm) {
         this.regs = regs;
