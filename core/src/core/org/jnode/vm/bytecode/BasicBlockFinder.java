@@ -296,9 +296,9 @@ public class BasicBlockFinder extends BytecodeVisitorSupport implements Bytecode
      */
     public void visit_tableswitch(int defValue, int lowValue, int highValue, int[] addresses) {
         tstack.pop(JvmType.INT);
-        for (int i = 0; i < addresses.length; i++) {
-            addBranch(addresses[i], true);
-            condYieldPoint(addresses[i]);
+        for (int address : addresses) {
+            addBranch(address, true);
+            condYieldPoint(address);
         }
         addBranch(defValue, false);
         condYieldPoint(defValue);
@@ -312,9 +312,9 @@ public class BasicBlockFinder extends BytecodeVisitorSupport implements Bytecode
      */
     public void visit_lookupswitch(int defValue, int[] matchValues, int[] addresses) {
         tstack.pop(JvmType.INT);
-        for (int i = 0; i < addresses.length; i++) {
-            addBranch(addresses[i], true);
-            condYieldPoint(addresses[i]);
+        for (int address : addresses) {
+            addBranch(address, true);
+            condYieldPoint(address);
         }
         addBranch(defValue, false);
         condYieldPoint(defValue);

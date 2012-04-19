@@ -37,4 +37,6 @@ public interface NetworkLayerHeader extends LayerHeader {
      * Gets the source address of the packet described in this header
      */
     public ProtocolAddress getDestinationAddress();
+
+    public int getDataLength();
 }

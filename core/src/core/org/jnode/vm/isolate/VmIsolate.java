@@ -508,7 +508,7 @@ public final class VmIsolate {
             this.exitCode = status;
         }
 
-        if (vmThread.getName().indexOf("-AWT-stopper") > -1) {
+        if (vmThread.getName().contains("-AWT-stopper")) {
             doExit();
         } else {
             disposeAppContext(true);
@@ -1008,8 +1008,7 @@ public final class VmIsolate {
                 StackTraceElement[] trace = ex.getStackTrace();
                 if (trace != null) {
                     Unsafe.debug("getStackTrace() != null\n");
-                    for (int i = 0; i < trace.length; i++) {
-                        StackTraceElement element = trace[i];
+                    for (StackTraceElement element : trace) {
                         Unsafe.debug(element.getClassName());
                         Unsafe.debug('#');
                         Unsafe.debug(element.getMethodName());

@@ -243,8 +243,8 @@ public class NativeTest {
         System.out.print(" ");
         Variable[] vars = quad.getBasicBlock().getVariables();
         System.out.print("[");
-        for (int j = 0; j < vars.length; j += 1) {
-            System.out.print(vars[j]);
+        for (Variable var : vars) {
+            System.out.print(var);
             System.out.print(",");
         }
         System.out.print("] ");

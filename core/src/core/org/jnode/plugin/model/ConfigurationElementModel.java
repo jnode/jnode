@@ -22,7 +22,6 @@ package org.jnode.plugin.model;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.ConfigurationElement;
@@ -64,8 +63,7 @@ final class ConfigurationElementModel extends PluginModelObject implements Confi
         }
 
         final ArrayList<ConfigurationElementModel> list = new ArrayList<ConfigurationElementModel>();
-        for (Iterator<?> i = e.getChildren().iterator(); i.hasNext();) {
-            final XMLElement ce = (XMLElement) i.next();
+        for (final XMLElement ce : e.getChildren()) {
             list.add(new ConfigurationElementModel(plugin, ce));
         }
         elements = (ConfigurationElement[]) list.toArray(new ConfigurationElement[list.size()]);

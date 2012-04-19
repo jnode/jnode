@@ -27,7 +27,6 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.nanoxml.XMLElement;
@@ -143,8 +142,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
         initializeRequiresList(reqList, e);
 
-        for (Iterator<?> ci = e.getChildren().iterator(); ci.hasNext();) {
-            final XMLElement childE = (XMLElement) ci.next();
+        for (final XMLElement childE : e.getChildren()) {
             final String tag = childE.getName();
             if (tag.equals("extension-point")) {
                 final ExtensionPointModel ep = new ExtensionPointModel(this,
@@ -154,9 +152,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
                 // registry.registerExtensionPoint(ep);
                 // }
             } else if (tag.equals("requires")) {
-                for (Iterator<?> i = childE.getChildren().iterator(); i
-                    .hasNext();) {
-                    final XMLElement impE = (XMLElement) i.next();
+                for (final XMLElement impE : childE.getChildren()) {
                     if (impE.getName().equals("import")) {
                         reqList.add(new PluginPrerequisiteModel(this, impE));
                     } else {
@@ -631,18 +627,18 @@ public class PluginDescriptorModel extends AbstractModelObject implements
             // BootLogInstance.get().info("Resolve " + id);
             this.registry = registry;
             registry.registerPlugin(this);
-            for (int i = 0; i < extensionPoints.length; i++) {
-                extensionPoints[i].resolve(registry);
+            for (ExtensionPointModel extensionPoint : extensionPoints) {
+                extensionPoint.resolve(registry);
             }
-            for (int i = 0; i < requires.length; i++) {
-                requires[i].resolve(registry);
+            for (PluginPrerequisiteModel require : requires) {
+                require.resolve(registry);
             }
             if (runtime != null) {
                 runtime.resolve(registry);
             }
             resolved = true;
-            for (int i = 0; i < extensions.length; i++) {
-                extensions[i].resolve(registry);
+            for (ExtensionModel extension : extensions) {
+                extension.resolve(registry);
             }
         }
     }
@@ -742,14 +738,14 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         if (runtime != null) {
             runtime.unresolve(registry);
         }
-        for (int i = 0; i < requires.length; i++) {
-            requires[i].unresolve(registry);
+        for (PluginPrerequisiteModel require : requires) {
+            require.unresolve(registry);
         }
-        for (int i = 0; i < extensionPoints.length; i++) {
-            extensionPoints[i].unresolve(registry);
+        for (ExtensionPointModel extensionPoint : extensionPoints) {
+            extensionPoint.unresolve(registry);
         }
-        for (int i = 0; i < extensions.length; i++) {
-            extensions[i].unresolve(registry);
+        for (ExtensionModel extension : extensions) {
+            extension.unresolve(registry);
         }
         registry.unregisterPlugin(this);
         resolved = false;
