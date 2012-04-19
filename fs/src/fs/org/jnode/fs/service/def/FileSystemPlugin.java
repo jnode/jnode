@@ -22,17 +22,14 @@ package org.jnode.fs.service.def;
 
 import java.io.IOException;
 import java.io.VMFile;
-import org.jnode.java.io.VMFileSystemAPI;
 import java.io.VMIOUtils;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
-
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
@@ -42,6 +39,7 @@ import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
 import org.jnode.fs.service.FileSystemService;
+import org.jnode.java.io.VMFileSystemAPI;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
@@ -160,9 +158,9 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
     public Map<String, String> getDeviceMountPoints() {
         Map<String, FileSystem<?>> mounts = api.getMountPoints();
         Map<String, String> result = new TreeMap<String, String>();
-        for (String path : mounts.keySet()) {
-            FileSystem<?> fs = (FileSystem<?>) mounts.get(path);
-            result.put(fs.getDevice().getId(), path);
+        for (Map.Entry<String, FileSystem<?>> stringFileSystemEntry : mounts.entrySet()) {
+            FileSystem<?> fs = (FileSystem<?>) stringFileSystemEntry.getValue();
+            result.put(fs.getDevice().getId(), stringFileSystemEntry.getKey());
         }
         return result;
     }

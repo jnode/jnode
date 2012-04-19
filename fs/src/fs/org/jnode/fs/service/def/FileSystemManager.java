@@ -22,9 +22,9 @@ package org.jnode.fs.service.def;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;
 
@@ -33,7 +33,8 @@ import org.jnode.fs.FileSystem;
  */
 final class FileSystemManager {
     /** All registed filesystems (device, fs) */
-    private final Map<Device, FileSystem<?>> filesystems = new HashMap<Device, FileSystem<?>>();
+
+    private Map<Device, FileSystem<?>> filesystems = Collections.synchronizedMap(new HashMap<Device, FileSystem<?>>());
 
     /**
      * Register a mounted filesystem
@@ -42,9 +43,7 @@ final class FileSystemManager {
      */
     public void registerFileSystem(FileSystem<?> fs) {
         final Device device = fs.getDevice();
-        synchronized (this) {
-            filesystems.put(device, fs);
-        }
+        filesystems.put(device, fs);
     }
 
     /**
@@ -52,7 +51,7 @@ final class FileSystemManager {
      * 
      * @param device
      */
-    public synchronized FileSystem<?> unregisterFileSystem(Device device) {
+    public FileSystem<?> unregisterFileSystem(Device device) {
         return filesystems.remove(device);
     }
 
@@ -62,7 +61,7 @@ final class FileSystemManager {
      * @param device
      * @return null if no filesystem was found.
      */
-    public synchronized FileSystem<?> getFileSystem(Device device) {
+    public FileSystem<?> getFileSystem(Device device) {
         return filesystems.get(device);
     }
 
@@ -70,7 +69,7 @@ final class FileSystemManager {
      * Gets all registered filesystems. All instances of the returned collection
      * are instanceof FileSystem.
      */
-    public synchronized Collection<FileSystem<?>> fileSystems() {
+    public Collection<FileSystem<?>> fileSystems() {
         return new ArrayList<FileSystem<?>>(filesystems.values());
     }
 }
