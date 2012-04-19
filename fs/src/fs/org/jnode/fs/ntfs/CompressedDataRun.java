@@ -22,7 +22,6 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.jnode.util.LittleEndian;
 
@@ -311,9 +310,7 @@ final class CompressedDataRun implements DataRunInterface {
                 (realSrcOffset < realDestOffset && realSrcOffset + length > realDestOffset ||
                  realDestOffset < realSrcOffset && realDestOffset + length > realSrcOffset)) {
 
-                for (int i = 0; i < length; i++) {
-                    destArray[realDestOffset + i] = srcArray[realSrcOffset + i];
-                }
+                System.arraycopy(srcArray, realSrcOffset + 0, destArray, realDestOffset + 0, length);
 
                 return;
             }

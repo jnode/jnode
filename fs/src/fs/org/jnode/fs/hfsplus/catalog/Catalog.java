@@ -22,6 +22,7 @@ package org.jnode.fs.hfsplus.catalog;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -273,9 +274,7 @@ public class Catalog {
                 List<LeafRecord> lfList = new LinkedList<LeafRecord>();
                 for (IndexRecord rec : records) {
                     LeafRecord[] lfr = getRecords(parentID, rec.getIndex());
-                    for (LeafRecord lr : lfr) {
-                        lfList.add(lr);
-                    }
+                    Collections.addAll(lfList, lfr);
                 }
                 return lfList.toArray(new LeafRecord[lfList.size()]);
             } else if (nd.isLeafNode()) {

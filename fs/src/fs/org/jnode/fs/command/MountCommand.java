@@ -23,7 +23,6 @@ package org.jnode.fs.command;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Map;
-
 import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.FileSystem;
@@ -68,12 +67,12 @@ public class MountCommand extends AbstractCommand {
         if (!argDevice.isSet()) {
             // List all mounted file systems
             Map<String, FileSystem<?>> filesystems = fss.getMountPoints();
-            for (String mountPoint : filesystems.keySet()) {
-                FileSystem<?> fs = filesystems.get(mountPoint);
+            for (Map.Entry<String, FileSystem<?>> stringFileSystemEntry : filesystems.entrySet()) {
+                FileSystem<?> fs = stringFileSystemEntry.getValue();
                 Device device = fs.getDevice();
                 String mode = fs.isReadOnly() ? "ro" : "rw";
                 String type = fs.getType().getName();
-                out.format(fmt_mount, device.getId(), mountPoint, type, mode);
+                out.format(fmt_mount, device.getId(), stringFileSystemEntry.getKey(), type, mode);
             }
         } else {
             // Get the parameters
