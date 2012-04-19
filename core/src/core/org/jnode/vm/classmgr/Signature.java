@@ -330,8 +330,8 @@ public class Signature {
         StringBuilder b = new StringBuilder();
         b.append('(');
         if (argTypes != null) {
-            for (int i = 0; i < argTypes.length; i++) {
-                b.append(toSignature(argTypes[i]));
+            for (Class argType : argTypes) {
+                b.append(toSignature(argType));
             }
         }
         b.append(')');
@@ -393,8 +393,8 @@ public class Signature {
         StringBuilder b = new StringBuilder();
         b.append('(');
         if (argTypes != null) {
-            for (int i = 0; i < argTypes.length; i++) {
-                b.append(toSignature(argTypes[i]));
+            for (VmType argType : argTypes) {
+                b.append(toSignature(argType));
             }
         }
         b.append(')');

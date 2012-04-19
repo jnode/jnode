@@ -33,6 +33,8 @@ import org.jnode.net.ipv4.IPv4Address;
  * @author epr
  */
 public class ARPHeader implements NetworkLayerHeader {
+    
+    private final static int ARP_DATA_LENGTH = 28;
 
     private HardwareAddress srcHWAddress;
     private ProtocolAddress srcPAddress;
@@ -141,6 +143,10 @@ public class ARPHeader implements NetworkLayerHeader {
      */
     public ProtocolAddress getDestinationAddress() {
         return targetPAddress;
+    }
+
+    public int getDataLength() {
+        return ARP_DATA_LENGTH;
     }
 
     /**

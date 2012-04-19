@@ -21,9 +21,7 @@
 package org.jnode.vm.facade;
 
 import gnu.java.lang.VMClassHelper;
-
 import java.io.PrintWriter;
-
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.NoInline;
@@ -69,7 +67,7 @@ public class VmUtils {
         allowNatives |= className.equals("org.jnode.vm." + architectureName + ".Unsafe"
                 + architectureName.toUpperCase());
           */
-        allowNatives |= className.indexOf("org.jnode.vm.") > -1 && className.indexOf(".Unsafe") > -1;
+        allowNatives |= className.contains("org.jnode.vm.") && className.contains(".Unsafe");
         return allowNatives;
     }
 
@@ -188,8 +186,8 @@ public class VmUtils {
      */
     public static void dumpStatistics(PrintWriter out) {
         final Statistic[] stats = VM_INSTANCE.getStatistics();
-        for (int i = 0; i < stats.length; i++) {
-            out.println(stats[i]);
+        for (Statistic stat : stats) {
+            out.println(stat);
         }
     }
 
@@ -198,8 +196,7 @@ public class VmUtils {
      */
     public static void resetCounters() {
         final Statistic[] stats = VM_INSTANCE.getStatistics();
-        for (int i = 0; i < stats.length; i++) {
-            final Statistic s = stats[i];
+        for (final Statistic s : stats) {
             if (s instanceof Counter) {
                 ((Counter) s).reset();
             }

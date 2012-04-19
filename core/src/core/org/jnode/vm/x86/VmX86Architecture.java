@@ -22,7 +22,6 @@ package org.jnode.vm.x86;
 
 import java.nio.ByteOrder;
 import java.util.HashMap;
-
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.assembler.x86.X86Constants;
@@ -30,8 +29,8 @@ import org.jnode.bootlog.BootLogInstance;
 import org.jnode.system.resource.ResourceManager;
 import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.system.resource.ResourceOwner;
-import org.jnode.vm.Unsafe;
 import org.jnode.vm.BaseVmArchitecture;
+import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmMultiMediaSupport;
 import org.jnode.vm.VmSystem;
@@ -247,7 +246,7 @@ public abstract class VmX86Architecture extends BaseVmArchitecture {
         bootCpu.setBootProcessor(true);
 
         final String cmdLine = VmSystem.getCmdLine();
-        if (cmdLine.indexOf("mp=no") >= 0) {
+        if (cmdLine.contains("mp=no")) {
             return;
         }
         //

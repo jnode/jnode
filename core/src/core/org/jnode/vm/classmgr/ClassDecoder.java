@@ -1271,9 +1271,9 @@ public final class ClassDecoder {
         final int tag = data.get() & 0xFF;
         switch (tag) {
             case 'B':
-                return Byte.valueOf((byte) cp.getInt(data.getChar()));
+                return (byte) cp.getInt(data.getChar());
             case 'C':
-                return Character.valueOf((char) cp.getInt(data.getChar()));
+                return (char) cp.getInt(data.getChar());
             case 'D':
                 return cp.getDouble(data.getChar());
             case 'F':
@@ -1283,9 +1283,9 @@ public final class ClassDecoder {
             case 'J':
                 return cp.getLong(data.getChar());
             case 'S':
-                return Short.valueOf((short) cp.getInt(data.getChar()));
+                return (short) cp.getInt(data.getChar());
             case 'Z':
-                return Boolean.valueOf(cp.getInt(data.getChar()) != 0);
+                return cp.getInt(data.getChar()) != 0;
             case 's':
                 return cp.getAny(data.getChar());
             case 'e': // enum

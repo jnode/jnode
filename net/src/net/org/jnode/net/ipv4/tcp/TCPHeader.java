@@ -109,10 +109,6 @@ public class TCPHeader implements TransportLayerHeader, TCPConstants {
             phdr.set16(10, tcpLength + headerLength);
             phdr.append(skbuf);
 
-            /*
-             * final int ccs1 = IPv4Utils.calcChecksum(phdr, 0, 12); final int
-             * ccs2 = IPv4Utils.calcChecksum(skbuf, 0, udpLength, ccs1);
-             */
             final int ccs2 = IPv4Utils.calcChecksum(phdr, 0, headerLength + tcpLength + 12);
             this.checksumOk = (ccs2 == 0);
             if (!checksumOk) {

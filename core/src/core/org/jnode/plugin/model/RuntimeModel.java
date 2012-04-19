@@ -21,7 +21,6 @@
 package org.jnode.plugin.model;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.Library;
 import org.jnode.plugin.PluginException;
@@ -41,8 +40,7 @@ final class RuntimeModel extends PluginModelObject implements Runtime {
         super(plugin);
 
         final ArrayList<LibraryModel> list = new ArrayList<LibraryModel>();
-        for (Iterator<?> i = e.getChildren().iterator(); i.hasNext();) {
-            final XMLElement lE = (XMLElement) i.next();
+        for (final XMLElement lE : e.getChildren()) {
             if (lE.getName().equals("library")) {
                 list.add(new LibraryModel(plugin, lE));
             }
@@ -65,8 +63,8 @@ final class RuntimeModel extends PluginModelObject implements Runtime {
      * @throws PluginException
      */
     protected void resolve(PluginRegistryModel registry) throws PluginException {
-        for (int i = 0; i < libraries.length; i++) {
-            libraries[i].resolve(registry);
+        for (LibraryModel library : libraries) {
+            library.resolve(registry);
         }
     }
 
@@ -76,8 +74,8 @@ final class RuntimeModel extends PluginModelObject implements Runtime {
      * @throws PluginException
      */
     protected void unresolve(PluginRegistryModel registry) throws PluginException {
-        for (int i = 0; i < libraries.length; i++) {
-            libraries[i].unresolve(registry);
+        for (LibraryModel library : libraries) {
+            library.unresolve(registry);
         }
     }
 }

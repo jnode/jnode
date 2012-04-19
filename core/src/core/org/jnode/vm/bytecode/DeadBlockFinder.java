@@ -21,7 +21,6 @@
 package org.jnode.vm.bytecode;
 
 import java.util.TreeMap;
-
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.classmgr.VmByteCode;
@@ -334,9 +333,9 @@ public class DeadBlockFinder extends BytecodeVisitorSupport implements BytecodeF
      * @see BytecodeVisitor#visit_tableswitch(int, int, int, int[])
      */
     public void visit_tableswitch(int defValue, int lowValue, int highValue, int[] addresses) {
-        for (int i = 0; i < addresses.length; i++) {
-            addBranch(addresses[i], true);
-            condYieldPoint(addresses[i]);
+        for (int address : addresses) {
+            addBranch(address, true);
+            condYieldPoint(address);
         }
         addBranch(defValue, false);
         condYieldPoint(defValue);
@@ -349,9 +348,9 @@ public class DeadBlockFinder extends BytecodeVisitorSupport implements BytecodeF
      * @see BytecodeVisitor#visit_lookupswitch(int, int[], int[])
      */
     public void visit_lookupswitch(int defValue, int[] matchValues, int[] addresses) {
-        for (int i = 0; i < addresses.length; i++) {
-            addBranch(addresses[i], true);
-            condYieldPoint(addresses[i]);
+        for (int address : addresses) {
+            addBranch(address, true);
+            condYieldPoint(address);
         }
         addBranch(defValue, false);
         condYieldPoint(defValue);

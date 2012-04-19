@@ -20,9 +20,9 @@
  
 package org.jnode.vm.classmgr;
 
+import gnu.java.lang.VMClassHelper;
 import java.util.ArrayList;
 import java.util.HashMap;
-import gnu.java.lang.VMClassHelper;
 
 /**
  * @author epr
@@ -137,7 +137,7 @@ public final class TIBBuilder implements TIBLayout {
         // skip index 0
         final Object idx = nameSignature2Index.get(getNameSignature(name, signature));
         if (idx != null) {
-            return ((Integer) idx).intValue();
+            return (Integer) idx;
         } else {
             return -1;
         }

@@ -250,8 +250,7 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
 
     public void deconstrucSSA() {
         final List<PhiAssignQuad<T>> phiQuads = new BootableArrayList<PhiAssignQuad<T>>();
-        for (int i = 0; i < bblocks.length; i += 1) {
-            IRBasicBlock<T> b = bblocks[i];
+        for (IRBasicBlock<T> b : bblocks) {
             for (Quad<T> q : b.getQuads()) {
                 if (q instanceof PhiAssignQuad) {
                     phiQuads.add((PhiAssignQuad<T>) q);
@@ -261,8 +260,7 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
             }
         }
         int n = phiQuads.size();
-        for (int i = 0; i < n; i += 1) {
-            PhiAssignQuad<T> paq = phiQuads.get(i);
+        for (PhiAssignQuad<T> paq : phiQuads) {
             Variable<T> lhs = paq.getLHS();
             IRBasicBlock<T> firstBlock = null;
             VariableRefAssignQuad<T> firstPhiMove = null;
@@ -411,9 +409,9 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
             sb.append(bb.toString());
             sb.append(":\n  predecessors:");
             final List<IRBasicBlock<T>> pred = bb.getPredecessors();
-            for (int i = 0; i < pred.size(); i += 1) {
+            for (IRBasicBlock<T> aPred : pred) {
                 sb.append("\n    ");
-                sb.append(pred.get(i).toString());
+                sb.append(aPred.toString());
             }
             sb.append("\n  successors:");
             for (IRBasicBlock<T> succ : bb.getSuccessors()) {

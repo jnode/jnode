@@ -21,7 +21,6 @@
 package org.jnode.plugin.manager;
 
 import gnu.java.security.action.GetPropertyAction;
-
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,9 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.naming.NamingException;
-
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.naming.InitialNaming;
 import org.jnode.permission.JNodePermission;
@@ -294,8 +291,7 @@ public final class DefaultPluginManager extends PluginManager {
             }
         }
         final PluginPrerequisite[] prereq = descr.getPrerequisites();
-        for (int i = 0; i < prereq.length; i++) {
-            final PluginPrerequisite pr = prereq[i];
+        for (final PluginPrerequisite pr : prereq) {
             if (!nameSet.contains(pr.getPluginId())) {
                 //Syslog.debug("Not in set: " + pr.getPluginId());
                 return false;
@@ -312,8 +308,7 @@ public final class DefaultPluginManager extends PluginManager {
      */
     private boolean prerequisitesExist(PluginDescriptor descr, Map<String, PluginDescriptor> all) {
         final PluginPrerequisite[] prereq = descr.getPrerequisites();
-        for (int i = 0; i < prereq.length; i++) {
-            final PluginPrerequisite pr = prereq[i];
+        for (final PluginPrerequisite pr : prereq) {
             if (!all.containsKey(pr.getPluginId())) {
                 return false;
             }

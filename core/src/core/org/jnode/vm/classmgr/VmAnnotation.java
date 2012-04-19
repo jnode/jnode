@@ -27,9 +27,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import org.jnode.vm.objects.VmSystemObject;
-
 import sun.reflect.annotation.AnnotationParser;
 
 /**
@@ -114,8 +112,8 @@ public final class VmAnnotation extends VmSystemObject {
                 }
 
 
-                for (int i = 0; i < values.length; i++) {
-                    vmap.put(values[i].name, values[i].value);
+                for (ElementValue value1 : values) {
+                    vmap.put(value1.name, value1.value);
                 }
 
                 Set<Map.Entry> set = vmap.entrySet();

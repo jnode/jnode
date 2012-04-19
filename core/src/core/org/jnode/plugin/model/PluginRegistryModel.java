@@ -128,9 +128,8 @@ public final class PluginRegistryModel extends VmSystemObject implements
      * Resolve all plugin descriptors.
      */
     public void resolveDescriptors() throws PluginException {
-        for (Iterator<PluginDescriptor> i = descriptorMap.values().iterator(); i.hasNext();) {
-            final PluginDescriptorModel descr = (PluginDescriptorModel) i
-                .next();
+        for (PluginDescriptor pluginDescriptor : descriptorMap.values()) {
+            final PluginDescriptorModel descr = (PluginDescriptorModel) pluginDescriptor;
             descr.resolve(this);
         }
     }
