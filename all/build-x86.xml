@@ -267,11 +267,15 @@
 		<attribute name="destfile" />
 		<sequential>
 			<mkdir dir="@{dir}/boot/grub" />
+			<mkdir dir="@{dir}/licenses" />
 			<copy todir="@{dir}">
 				<fileset dir="${jnode.kernel.dir}" includes="jnode*.gz"/>
 			</copy>
 			<copy todir="@{dir}">
 				<fileset dir="${initjars.dir}" />
+			</copy>
+			<copy todir="@{dir}/licenses">
+				<fileset dir="${root.dir}/licenses"/>
 			</copy>
 			<copy file="${my-lib.dir}/eltorito.s2" todir="@{dir}/boot/grub" />
             <copy file="${my-lib.dir}/fat.s15" todir="@{dir}/boot/grub" />
