@@ -21,8 +21,8 @@
 package org.jnode.partitions.gpt;
 
 import java.nio.charset.Charset;
+import org.jnode.partitions.PartitionTable;
 import org.jnode.partitions.PartitionTableEntry;
-import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.util.LittleEndian;
 import org.jnode.util.NumberUtils;
 
@@ -63,7 +63,7 @@ public class GptPartitionTableEntry implements PartitionTableEntry {
     /**
      * @see org.jnode.partitions.PartitionTableEntry#getChildPartitionTable()
      */
-    public IBMPartitionTable getChildPartitionTable() {
+    public PartitionTable<?> getChildPartitionTable() {
         throw new UnsupportedOperationException("No child partitions.");
     }
 
