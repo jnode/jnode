@@ -41,7 +41,8 @@ import org.jnode.util.NumberUtils;
  */
 public class SuperBlock extends HfsPlusObject {
 
-    public static final int HFSPLUS_SUPER_MAGIC = 0x482b;
+    public static final int HFSPLUS_SUPER_MAGIC = 0x482b; // H+
+    public static final int HFSX_SUPER_MAGIC = 0x4858; // HX
 
     public static final int HFSPLUS_MIN_VERSION = 0x0004; /* HFS+ */
     public static final int HFSPLUS_CURRENT_VERSION = 5; /* HFSX */
@@ -85,7 +86,7 @@ public class SuperBlock extends HfsPlusObject {
                 fs.getApi().read(1024, b);
                 data = new byte[SUPERBLOCK_LENGTH];
                 System.arraycopy(b.array(), 0, data, 0, SUPERBLOCK_LENGTH);
-                if (getMagic() != HFSPLUS_SUPER_MAGIC) {
+                if (getMagic() != HFSPLUS_SUPER_MAGIC && getMagic() != HFSX_SUPER_MAGIC) {
                     throw new FileSystemException("Not hfs+ volume header (" + getMagic() +
                             ": bad magic)");
                 }
@@ -151,7 +152,7 @@ public class SuperBlock extends HfsPlusObject {
         forkdata.addDescriptor(0, desc);
         forkdata.write(data, 112);
         // Journal creation
-        int nextBlock = 0;
+        long nextBlock = 0;
         if (params.isJournaled()) {
             this.setFileCount(2);
             this.setAttribute(HFSPLUS_VOL_JOURNALED_BIT);
@@ -248,8 +249,8 @@ public class SuperBlock extends HfsPlusObject {
         return BigEndian.getInt32(data, 12);
     }
 
-    public final void setJournalInfoBlock(final int value) {
-        BigEndian.setInt32(data, 12, value);
+    public final void setJournalInfoBlock(final long value) {
+        BigEndian.setInt32(data, 12, (int) value);
     }
 
     //

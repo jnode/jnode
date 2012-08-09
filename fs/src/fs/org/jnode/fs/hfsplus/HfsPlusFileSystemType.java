@@ -22,14 +22,11 @@ package org.jnode.fs.hfsplus;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.fs.FileSystemException;
 import org.jnode.partitions.PartitionTableEntry;
-import org.jnode.partitions.ibm.IBMPartitionTableEntry;
-import org.jnode.partitions.ibm.IBMPartitionTypes;
 import org.jnode.util.BigEndian;
 
 public class HfsPlusFileSystemType implements BlockDeviceFileSystemType<HfsPlusFileSystem> {
@@ -48,13 +45,13 @@ public class HfsPlusFileSystemType implements BlockDeviceFileSystemType<HfsPlusF
 
     public final boolean supports(final PartitionTableEntry pte, final byte[] firstSector,
             final FSBlockDeviceAPI devApi) {
-        if (pte != null) {
+        /*if (pte != null) {
             if (pte instanceof IBMPartitionTableEntry) {
                 if (((IBMPartitionTableEntry) pte).getSystemIndicator() != IBMPartitionTypes.PARTTYPE_LINUXNATIVE) {
                     return false;
                 }
             }
-        }
+        } */
         // need to check the magic
         ByteBuffer magic = ByteBuffer.allocate(2);
         try {
@@ -63,7 +60,7 @@ public class HfsPlusFileSystemType implements BlockDeviceFileSystemType<HfsPlusF
             return false;
         }
         int magicNumber = BigEndian.getInt16(magic.array(), 0);
-        return (magicNumber == SuperBlock.HFSPLUS_SUPER_MAGIC);
+        return (magicNumber == SuperBlock.HFSPLUS_SUPER_MAGIC || magicNumber == SuperBlock.HFSX_SUPER_MAGIC);
     }
 
 }
