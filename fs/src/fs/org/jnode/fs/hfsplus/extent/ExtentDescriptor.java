@@ -27,10 +27,10 @@ public class ExtentDescriptor {
     public static final int EXTENT_DESCRIPTOR_LENGTH = 8;
     
     /** The first allocation block. */
-    private int startBlock;
+    private long startBlock;
     
     /** The length in allocation blocks of the extent. */
-    private int blockCount;
+    private long blockCount;
 
     public ExtentDescriptor() {
         this.startBlock = 0;
@@ -43,7 +43,7 @@ public class ExtentDescriptor {
      * @param startBlock first allocation block.
      * @param blockCount number of blocks in the extent.
      */
-    public ExtentDescriptor(int startBlock, int blockCount) {
+    public ExtentDescriptor(long startBlock, long blockCount) {
         this.startBlock = startBlock;
         this.blockCount = blockCount;
     }
@@ -57,8 +57,8 @@ public class ExtentDescriptor {
     public ExtentDescriptor(final byte[] src, final int offset) {
         byte[] data = new byte[EXTENT_DESCRIPTOR_LENGTH];
         System.arraycopy(src, offset, data, 0, EXTENT_DESCRIPTOR_LENGTH);
-        startBlock = BigEndian.getInt32(data, 0);
-        blockCount = BigEndian.getInt32(data, 4);
+        startBlock = BigEndian.getUInt32(data, 0);
+        blockCount = BigEndian.getUInt32(data, 4);
     }
 
     /**
@@ -66,15 +66,15 @@ public class ExtentDescriptor {
      */
     public final byte[] getBytes() {
         byte[] data = new byte[EXTENT_DESCRIPTOR_LENGTH];
-        BigEndian.setInt32(data, 0, startBlock);
-        BigEndian.setInt32(data, 4, blockCount);
+        BigEndian.setInt32(data, 0, (int) startBlock);
+        BigEndian.setInt32(data, 4, (int) blockCount);
         return data;
     }
 
     public byte[] write(byte[] dest, int destOffSet) {
         byte[] data = new byte[EXTENT_DESCRIPTOR_LENGTH];
-        BigEndian.setInt32(data, 0, startBlock);
-        BigEndian.setInt32(data, 4, blockCount);
+        BigEndian.setInt32(data, 0, (int) startBlock);
+        BigEndian.setInt32(data, 4, (int) blockCount);
         System.arraycopy(data, 0, dest, destOffSet, EXTENT_DESCRIPTOR_LENGTH);
         return dest;
     }
@@ -90,7 +90,7 @@ public class ExtentDescriptor {
      * @return offset of the extent.
      */
     public long getStartOffset(int nodeSize) {
-        return (long)startBlock * nodeSize;
+        return startBlock * nodeSize;
     }
 
     /**
@@ -98,7 +98,7 @@ public class ExtentDescriptor {
      * 
      * @return block number of the next extent.
      */
-    public int getNext() {
+    public long getNext() {
         return startBlock + blockCount;
     }
 
@@ -109,7 +109,7 @@ public class ExtentDescriptor {
      * @return size of the extent.
      */
     public long getSize(int nodeSize) {
-        return (long)blockCount * nodeSize;
+        return blockCount * nodeSize;
     }
 
     /**
