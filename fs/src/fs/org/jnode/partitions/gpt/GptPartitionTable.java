@@ -85,7 +85,7 @@ public class GptPartitionTable implements PartitionTable<GptPartitionTableEntry>
      * @return the detected block size or {@code -1} if no GPT partition is found.
      */
     private static int detectBlockSize(byte[] first16KiB) {
-        int[] detectionSizes = new int[] { 0x200, 0x1000 };
+        int[] detectionSizes = new int[] { 0x200, 0x1000, 0x2000 };
 
         for (int blockSize : detectionSizes) {
             if (first16KiB.length < blockSize + 8) {
