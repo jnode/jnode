@@ -103,33 +103,74 @@ public class ExtentHeader {
         return extentEntries;
     }
 
-    public long getBlockNumber(long index) {
+    public long getBlockNumber(Ext2FileSystem fs, long index) throws IOException {
         if (getDepth() > 0) {
-            ExtentIndex[] indexes = getIndexEntries();
+            ExtentIndex extentIndex = binarySearchIndexes(index, getIndexEntries());
+            byte[] indexData = fs.getBlock(extentIndex.getLeafLow());
 
-            throw new UnsupportedOperationException();
+            ExtentHeader indexHeader = new ExtentHeader(indexData);
+            return indexHeader.getBlockNumber(fs, index);
         }
         else {
-            Extent[] extents = getExtentEntries();
-
-            int lowIndex = 0;
-            int highIndex = extents.length - 1;
-            Extent extent = null;
-
-            while (lowIndex <= highIndex) {
-                int middle = lowIndex + (highIndex - lowIndex) / 2;
-                extent = extents[middle];
-
-                if (index < extent.getBlockIndex()) {
-                    highIndex = middle - 1;
-                }
-                else {
-                    lowIndex = middle + 1;
-                }
-            }
-
+            Extent extent = binarySearchExtents(index, getExtentEntries());
             return index - extent.getBlockIndex() + extent.getStartLow();
         }
+    }
+
+    /**
+     * Performs a binary search in the extent indexes.
+     *
+     * @param index the index of the block to match.
+     * @param indexes the indexes to search in.
+     * @return the matching index.
+     */
+    private ExtentIndex binarySearchIndexes(long index, ExtentIndex[] indexes)
+    {
+        int lowIndex = 0;
+        int highIndex = indexes.length - 1;
+        ExtentIndex extentIndex = null;
+
+        while (lowIndex <= highIndex) {
+            int middle = lowIndex + (highIndex - lowIndex) / 2;
+            extentIndex = indexes[middle];
+
+            if (index < extentIndex.getBlockIndex()) {
+                highIndex = middle - 1;
+            }
+            else {
+                lowIndex = middle + 1;
+            }
+        }
+
+        return indexes[Math.max(0, lowIndex - 1)];
+    }
+
+    /**
+     * Performs a binary search in the extents.
+     *
+     * @param index the index of the block to match.
+     * @param extents the extents to search in.
+     * @return the matching extent.
+     */
+    private Extent binarySearchExtents(long index, Extent[] extents)
+    {
+        int lowIndex = 0;
+        int highIndex = extents.length - 1;
+        Extent extent = null;
+
+        while (lowIndex <= highIndex) {
+            int middle = lowIndex + (highIndex - lowIndex) / 2;
+            extent = extents[middle];
+
+            if (index < extent.getBlockIndex()) {
+                highIndex = middle - 1;
+            }
+            else {
+                lowIndex = middle + 1;
+            }
+        }
+
+        return extents[Math.max(0, lowIndex - 1)];
     }
 
     @Override
