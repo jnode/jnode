@@ -137,12 +137,12 @@ public class CatalogFile {
         return fileId;
     }
 
-    public int getCreateDate() {
-        return createDate;
+    public long getCreateDate() {
+        return HfsUtils.getDate(createDate & 0xffffffffL, false) * 1000L;
     }
 
-    public int getContentModDate() {
-        return contentModDate;
+    public long getContentModDate() {
+        return HfsUtils.getDate(contentModDate & 0xffffffffL, false) * 1000L;
     }
 
     public int getAttrModDate() {

@@ -112,12 +112,12 @@ public class CatalogFolder {
         return folderId;
     }
 
-    public int getCreateDate() {
-        return createDate;
+    public long getCreateDate() {
+        return HfsUtils.getDate(createDate & 0xffffffffL, false) * 1000L;
     }
 
-    public int getContentModDate() {
-        return contentModDate;
+    public long getContentModDate() {
+        return HfsUtils.getDate(contentModDate & 0xffffffffL, false) * 1000L;
     }
 
     public int getAttrModDate() {
@@ -136,12 +136,12 @@ public class CatalogFolder {
         this.folderId = folderId;
     }
 
-    public void setCreateDate(int createDate) {
-        this.createDate = createDate;
+    public void setCreateDate(long createDate) {
+        this.createDate = (int) HfsUtils.getDate(createDate / 1000L, true);
     }
 
-    public void setContentModDate(int contentModDate) {
-        this.contentModDate = contentModDate;
+    public void setContentModDate(long contentModDate) {
+        this.contentModDate = (int) HfsUtils.getDate(contentModDate / 1000L, true);
     }
 
     public void setAttrModDate(int attrModDate) {
