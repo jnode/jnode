@@ -141,6 +141,22 @@ public class HfsPlusEntry implements FSEntry, FSEntryCreated {
         return (type == AbstractFSEntry.FILE_ENTRY);
     }
 
+    public CatalogFile createCatalogFile() {
+        if (!isFile()) {
+            throw new IllegalStateException("Attempted to create a catalog file but this entry is not a file!");
+        }
+
+        return new CatalogFile(getData());
+    }
+
+    public CatalogFolder createCatalogFolder() {
+        if (isFile()) {
+            throw new IllegalStateException("Attempted to create a catalog folder but this entry is not a directory!");
+        }
+
+        return new CatalogFolder(getData());
+    }
+
     @Override
     public void setLastModified(long lastModified) throws IOException {
         if (isFile()) {
@@ -189,6 +205,17 @@ public class HfsPlusEntry implements FSEntry, FSEntryCreated {
         else {
             CatalogFolder catalogFolder = new CatalogFolder(getData());
             return catalogFolder.getCreateDate();
+        }
+    }
+
+    public long getLastAccessed() throws IOException {
+        if (isFile()) {
+            CatalogFile catalogFile = new CatalogFile(getData());
+            return catalogFile.getAccessDate();
+        }
+        else {
+            CatalogFolder catalogFolder = new CatalogFolder(getData());
+            return catalogFolder.getAccessDate();
         }
     }
 }
