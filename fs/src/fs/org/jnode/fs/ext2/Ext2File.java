@@ -22,7 +22,6 @@ package org.jnode.fs.ext2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
@@ -180,20 +179,27 @@ public class Ext2File extends AbstractFSFile {
             try {
                 if (len + off > getLength())
                     throw new IOException("Can't read past the file!");
-                long blockSize = iNode.getExt2FileSystem().getBlockSize();
-                long bytesRead = 0;
-                while (bytesRead < len) {
-                    long blockNr = (fileOffset + bytesRead) / blockSize;
-                    long blockOffset = (fileOffset + bytesRead) % blockSize;
-                    long copyLength = Math.min(len - bytesRead, blockSize - blockOffset);
 
-                    log.debug("blockNr: " + blockNr + ", blockOffset: " + blockOffset + ", copyLength: " + copyLength +
-                            ", bytesRead: " + bytesRead);
+                if ((iNode.getMode() & Ext2Constants.EXT2_S_IFLNK) == Ext2Constants.EXT2_S_IFLNK) {
+                    // Sym-links are a special case: the data seems to be stored inline in the iNode
+                    System.arraycopy(iNode.getINodeBlockData(), 0, dest, 0, Math.min(64, dest.length));
+                }
+                else {
+                    long blockSize = iNode.getExt2FileSystem().getBlockSize();
+                    long bytesRead = 0;
+                    while (bytesRead < len) {
+                        long blockNr = (fileOffset + bytesRead) / blockSize;
+                        long blockOffset = (fileOffset + bytesRead) % blockSize;
+                        long copyLength = Math.min(len - bytesRead, blockSize - blockOffset);
 
-                    System.arraycopy(iNode.getDataBlock(blockNr), (int) blockOffset, dest, off + (int) bytesRead,
-                            (int) copyLength);
+                        log.debug("blockNr: " + blockNr + ", blockOffset: " + blockOffset + ", copyLength: " + copyLength +
+                                ", bytesRead: " + bytesRead);
 
-                    bytesRead += copyLength;
+                        System.arraycopy(iNode.getDataBlock(blockNr), (int) blockOffset, dest, off + (int) bytesRead,
+                                (int) copyLength);
+
+                        bytesRead += copyLength;
+                    }
                 }
             } catch (Throwable ex) {
                 final IOException ioe = new IOException();

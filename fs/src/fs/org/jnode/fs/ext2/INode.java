@@ -270,6 +270,17 @@ public class INode {
     }
 
     /**
+     * Gets the data stored inline in the inode's i_block element.
+     *
+     * @return the inode block data.
+     */
+    public byte[] getINodeBlockData() {
+        byte[] buffer = new byte[64];
+        System.arraycopy(data, 40, buffer, 0, buffer.length);
+        return buffer;
+    }
+
+    /**
      * Return the number of the block in the filesystem that stores the ith
      * block of the inode (i is a sequential index from the beginning of the
      * file)
@@ -286,10 +297,7 @@ public class INode {
     private long getDataBlockNr(long i) throws IOException {
         if ((getFlags() & Ext2Constants.EXT4_INODE_EXTENTS_FLAG) != 0) {
             if (extentHeader == null) {
-                byte[] headerBuffer = new byte[64];
-                System.arraycopy(data, 40, headerBuffer, 0, headerBuffer.length);
-
-                extentHeader = new ExtentHeader(headerBuffer);
+                extentHeader = new ExtentHeader(getINodeBlockData());
             }
 
             return extentHeader.getBlockNumber(i);
