@@ -24,7 +24,6 @@ import java.nio.charset.Charset;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.util.BigEndian;
-import org.jnode.util.LittleEndian;
 import org.jnode.util.NumberUtils;
 
 /**
@@ -53,7 +52,7 @@ public class ApmPartitionTableEntry implements PartitionTableEntry {
     }
 
     public boolean isValid() {
-        return first16KiB.length > offset + 128 && !isEmpty();
+        return first16KiB.length > offset + 128;
     }
 
     /**
@@ -68,10 +67,6 @@ public class ApmPartitionTableEntry implements PartitionTableEntry {
      */
     public boolean hasChildPartitionTable() {
         return false;
-    }
-
-    public boolean isEmpty() {
-        return "Apple_Scratch".equals(getType());
     }
 
     public long getStartOffset() {
@@ -97,7 +92,7 @@ public class ApmPartitionTableEntry implements PartitionTableEntry {
     public String dump() {
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < 128; i++) {
-            b.append(NumberUtils.hex(LittleEndian.getUInt8(first16KiB, offset + i), 2));
+            b.append(NumberUtils.hex(BigEndian.getUInt8(first16KiB, offset + i), 2));
             b.append(' ');
         }
         return b.toString();
