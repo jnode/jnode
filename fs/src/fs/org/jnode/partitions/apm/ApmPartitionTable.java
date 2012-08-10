@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.partitions.PartitionTable;
 import org.jnode.partitions.PartitionTableType;
-import org.jnode.util.LittleEndian;
+import org.jnode.util.BigEndian;
 
 /**
  * The main Apple Partition Map (APM) partition table class.
@@ -56,7 +56,7 @@ public class ApmPartitionTable implements PartitionTable<ApmPartitionTableEntry>
     public ApmPartitionTable(ApmPartitionTableType tableType, byte[] first16KiB, Device device) {
         this.tableType = tableType;
 
-        long entries = LittleEndian.getUInt32(first16KiB, 0x204);
+        long entries = BigEndian.getUInt32(first16KiB, 0x204);
 
         for (int partitionNumber = 0; partitionNumber < entries; partitionNumber++) {
             log.debug("try part " + partitionNumber);
