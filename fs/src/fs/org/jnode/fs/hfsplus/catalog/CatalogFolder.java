@@ -20,6 +20,7 @@
  
 package org.jnode.fs.hfsplus.catalog;
 
+import org.jnode.fs.hfsplus.HfsPlusBSDInfo;
 import org.jnode.fs.hfsplus.HfsUtils;
 import org.jnode.util.BigEndian;
 
@@ -36,6 +37,9 @@ public class CatalogFolder {
     private int createDate;
     private int contentModDate;
     private int attrModDate;
+    private int accessDate;
+    private int backupDate;
+    private HfsPlusBSDInfo permissions;
 
     /**
      * 
@@ -50,6 +54,9 @@ public class CatalogFolder {
         createDate = BigEndian.getInt32(data, 12);
         contentModDate = BigEndian.getInt32(data, 16);
         attrModDate = BigEndian.getInt32(data, 20);
+        accessDate = BigEndian.getInt32(data, 24);
+        backupDate = BigEndian.getInt32(data, 28);
+        permissions = new HfsPlusBSDInfo(data, 32);
     }
 
     /**
@@ -120,8 +127,20 @@ public class CatalogFolder {
         return HfsUtils.getDate(contentModDate & 0xffffffffL, false) * 1000L;
     }
 
-    public int getAttrModDate() {
-        return attrModDate;
+    public long getAttrModDate() {
+        return HfsUtils.getDate(attrModDate & 0xffffffffL, false) * 1000L;
+    }
+
+    public long getAccessDate() {
+        return HfsUtils.getDate(accessDate & 0xffffffffL, false) * 1000L;
+    }
+
+    public long getBackupDate() {
+        return HfsUtils.getDate(backupDate & 0xffffffffL, false) * 1000L;
+    }
+
+    public HfsPlusBSDInfo getPermissions() {
+        return permissions;
     }
 
     public void setRecordType(int recordType) {
@@ -144,8 +163,8 @@ public class CatalogFolder {
         this.contentModDate = (int) HfsUtils.getDate(contentModDate / 1000L, true);
     }
 
-    public void setAttrModDate(int attrModDate) {
-        this.attrModDate = attrModDate;
+    public void setAttrModDate(long attrModDate) {
+        this.attrModDate = (int) HfsUtils.getDate(attrModDate / 1000L, true);
     }
     
     public void incrementValence(){
