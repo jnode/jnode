@@ -22,7 +22,6 @@ package org.jnode.fs.ext2;
 
 import java.io.IOException;
 import java.util.Arrays;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
@@ -58,6 +57,11 @@ public class INode {
     INodeDescriptor desc = null;
 
     private Ext2FileSystem fs;
+
+    /**
+     * The cached extent header.
+     */
+    private ExtentHeader extentHeader;
 
     /**
      * Create an INode object from an existing inode on the disk.
@@ -280,6 +284,36 @@ public class INode {
      * @throws IOException
      */
     private long getDataBlockNr(long i) throws IOException {
+        if ((getFlags() & Ext2Constants.EXT4_INODE_EXTENTS_FLAG) != 0) {
+            if (extentHeader == null) {
+                byte[] headerBuffer = new byte[64];
+                System.arraycopy(data, 40, headerBuffer, 0, headerBuffer.length);
+
+                extentHeader = new ExtentHeader(headerBuffer);
+            }
+
+            return extentHeader.getBlockNumber(i);
+        }
+        else {
+            return getDataBlockNrIndirect(i);
+        }
+    }
+
+    /**
+     * Return the number of the block in the filesystem that stores the ith
+     * block of the inode (i is a sequential index from the beginning of the
+     * file) using an indirect (ext2 / ext3) lookup.
+     *
+     * [Naming convention used: in the code, a <code>...BlockNr</code> always
+     * means an absolute block nr (of the filesystem), while a
+     * <code>...BlockIndex</code> means an index relative to the beginning of
+     * a block]
+     *
+     * @param i
+     * @return the block number
+     * @throws IOException
+     */
+     private long getDataBlockNrIndirect(long i) throws IOException {
         final long blockCount = getAllocatedBlockCount();
         final int indirectCount = getIndirectCount();
         if (i > blockCount - 1) {
@@ -910,6 +944,10 @@ public class INode {
 
     public void setDirty(boolean b) {
         dirty = b;
+
+        if (dirty) {
+            extentHeader = null;
+        }
     }
 
     public synchronized boolean isLocked() {
