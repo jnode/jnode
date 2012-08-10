@@ -94,10 +94,10 @@ public class Ext2Constants {
     public static final long EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER = 0x0001;
     public static final long EXT2_FEATURE_RO_COMPAT_LARGE_FILE = 0x0002;
     public static final long EXT2_FEATURE_RO_COMPAT_BTREE_DIR = 0x0004;
-    public static final long EXT4_FEATURE_ROCOMPAT_HUGE_FILE = 0x0008;
-    public static final long EXT4_FEATURE_ROCOMPAT_GDT_CSUM = 0x0010;
-    public static final long EXT4_FEATURE_ROCOMPAT_DIR_NLINK = 0x0020;
-    public static final long EXT4_FEATURE_ROCOMPAT_EXTRA_ISIZE = 0x0040;
+    public static final long EXT4_FEATURE_RO_COMPAT_HUGE_FILE = 0x0008;
+    public static final long EXT4_FEATURE_RO_COMPAT_GDT_CSUM = 0x0010;
+    public static final long EXT4_FEATURE_RO_COMPAT_DIR_NLINK = 0x0020;
+    public static final long EXT4_FEATURE_RO_COMPAT_EXTRA_ISIZE = 0x0040;
 
     // S_FEATURE_INCOMPAT constants
     public static final long EXT2_FEATURE_INCOMPAT_COMPRESSION = 0x0001;

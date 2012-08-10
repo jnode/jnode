@@ -1,6 +1,8 @@
-package org.jnode.fs.ext2;
+package org.jnode.fs.ext4;
 
 import java.io.IOException;
+import org.jnode.fs.ext2.Ext2FileSystem;
+import org.jnode.fs.ext2.Ext2Utils;
 
 /**
  * An ext4 extent header.
@@ -21,7 +23,7 @@ public class ExtentHeader {
     /**
      * The data for the header.
      */
-    private byte[] data;
+    private final byte[] data;
 
     /**
      * The cache copy of the index entries.
