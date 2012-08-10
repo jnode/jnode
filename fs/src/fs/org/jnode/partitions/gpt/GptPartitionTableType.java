@@ -33,14 +33,17 @@ import org.jnode.partitions.PartitionTableType;
  */
 public class GptPartitionTableType implements PartitionTableType {
 
+    @Override
     public PartitionTable<?> create(byte[] firstSector, Device device) throws PartitionTableException {
         return new GptPartitionTable(this, firstSector, device);
     }
 
+    @Override
     public String getName() {
         return "EFI PART";
     }
 
+    @Override
     public boolean supports(byte[] first16KiB, BlockDeviceAPI devApi) {
         return GptPartitionTable.containsPartitionTable(first16KiB);
     }
