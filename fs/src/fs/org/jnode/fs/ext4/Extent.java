@@ -1,4 +1,6 @@
-package org.jnode.fs.ext2;
+package org.jnode.fs.ext4;
+
+import org.jnode.fs.ext2.Ext2Utils;
 
 /**
  * An ext4 extent object.

@@ -151,19 +151,19 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
             log.info(getDevice().getId() + " Unsupported filesystem feature (BTREE_DIR) forces readonly mode");
             setReadOnly(true);
         }
-        if (hasROFeature(Ext2Constants.EXT4_FEATURE_ROCOMPAT_HUGE_FILE)) {
+        if (hasROFeature(Ext2Constants.EXT4_FEATURE_RO_COMPAT_HUGE_FILE)) {
             log.info(getDevice().getId() + " Unsupported filesystem feature (HUGE_FILE) forces readonly mode");
             setReadOnly(true);
         }
-        if (hasROFeature(Ext2Constants.EXT4_FEATURE_ROCOMPAT_GDT_CSUM)) {
+        if (hasROFeature(Ext2Constants.EXT4_FEATURE_RO_COMPAT_GDT_CSUM)) {
             log.info(getDevice().getId() + " Unsupported filesystem feature (GDT_CSUM) forces readonly mode");
             setReadOnly(true);
         }
-        if (hasROFeature(Ext2Constants.EXT4_FEATURE_ROCOMPAT_DIR_NLINK)) {
+        if (hasROFeature(Ext2Constants.EXT4_FEATURE_RO_COMPAT_DIR_NLINK)) {
             log.info(getDevice().getId() + " Unsupported filesystem feature (DIR_NLINK) forces readonly mode");
             setReadOnly(true);
         }
-        if (hasROFeature(Ext2Constants.EXT4_FEATURE_ROCOMPAT_EXTRA_ISIZE)) {
+        if (hasROFeature(Ext2Constants.EXT4_FEATURE_RO_COMPAT_EXTRA_ISIZE)) {
             log.info(getDevice().getId() + " Unsupported filesystem feature (EXTRA_ISIZE) forces readonly mode");
             setReadOnly(true);
         }
@@ -348,7 +348,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
      * 
      * @return data block nr
      */
-    protected byte[] getBlock(long nr) throws IOException {
+    public byte[] getBlock(long nr) throws IOException {
         if (isClosed())
             throw new IOException("FS closed (fs instance: " + this + ")");
         // log.debug("blockCache size: "+blockCache.size());

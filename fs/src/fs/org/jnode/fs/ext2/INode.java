@@ -26,6 +26,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.ext2.exception.UnallocatedBlockException;
+import org.jnode.fs.ext4.ExtentHeader;
 
 /**
  * This class represents an inode. Once they are allocated, inodes are read and

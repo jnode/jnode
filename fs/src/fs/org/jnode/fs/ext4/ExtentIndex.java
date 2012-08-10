@@ -1,4 +1,6 @@
-package org.jnode.fs.ext2;
+package org.jnode.fs.ext4;
+
+import org.jnode.fs.ext2.Ext2Utils;
 
 /**
  * An ext4 extent index.
@@ -14,7 +16,7 @@ public class ExtentIndex {
     /**
      * The data for the index.
      */
-    private byte[] data;
+    private final byte[] data;
 
     /**
      * Create an extent index object.
