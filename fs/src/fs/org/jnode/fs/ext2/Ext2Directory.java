@@ -61,6 +61,8 @@ public class Ext2Directory extends AbstractFSDirectory {
 
             if ((iNode.getFlags() & Ext2Constants.EXT4_INODE_EXTENTS_FLAG) != 0)
                 log.info("inode uses extents: " + entry);
+            if ((iNode.getFlags() & Ext2Constants.EXT2_INDEX_FL) != 0)
+                log.info("inode uses index: " + entry);
         }
         else {
             readOnly = fs.isReadOnly();
