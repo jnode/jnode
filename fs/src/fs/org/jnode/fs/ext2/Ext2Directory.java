@@ -227,10 +227,10 @@ public class Ext2Directory extends AbstractFSDirectory {
         //so synchronize to the inode.
         synchronized (iNode) {
             try {
-                Ext2File dir = new Ext2File(iNode); //read itself as a file
+                Ext2File dir = new Ext2File(entry); //read itself as a file
 
                 //find the last directory record (if any)
-                Ext2FSEntryIterator iterator = new Ext2FSEntryIterator(iNode);
+                Ext2FSEntryIterator iterator = new Ext2FSEntryIterator(entry);
                 Ext2DirectoryRecord rec = null;
                 while (iterator.hasNext()) {
                     rec = iterator.nextDirectoryRecord();
@@ -337,9 +337,9 @@ public class Ext2Directory extends AbstractFSDirectory {
 
         Ext2DirectoryRecord current;
 
-        public Ext2FSEntryIterator(INode iNode) throws IOException {
+        public Ext2FSEntryIterator(Ext2Entry entry) throws IOException {
             //read itself as a file
-            Ext2File directoryFile = new Ext2File(iNode);
+            Ext2File directoryFile = new Ext2File(entry);
             //read the whole directory
 
             data = ByteBuffer.allocate((int) directoryFile.getLength());
@@ -424,7 +424,7 @@ public class Ext2Directory extends AbstractFSDirectory {
      * @return the FSEntryTable containing the directory's entries.
      */
     protected FSEntryTable readEntries() throws IOException {
-        Ext2FSEntryIterator it = new Ext2FSEntryIterator(iNode);
+        Ext2FSEntryIterator it = new Ext2FSEntryIterator(entry);
         ArrayList<FSEntry> entries = new ArrayList<FSEntry>();
 
         while (it.hasNext()) {
