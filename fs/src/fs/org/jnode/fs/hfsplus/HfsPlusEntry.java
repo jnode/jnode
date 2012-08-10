@@ -25,6 +25,7 @@ import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSEntryCreated;
+import org.jnode.fs.FSEntryLastAccessed;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.hfsplus.catalog.CatalogFile;
@@ -33,7 +34,7 @@ import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.AbstractFSEntry;
 import org.jnode.fs.spi.UnixFSAccessRights;
 
-public class HfsPlusEntry implements FSEntry, FSEntryCreated {
+public class HfsPlusEntry implements FSEntry, FSEntryCreated, FSEntryLastAccessed {
 
     protected HfsPlusFileSystem fs;
     protected HfsPlusDirectory parent;
@@ -208,6 +209,7 @@ public class HfsPlusEntry implements FSEntry, FSEntryCreated {
         }
     }
 
+    @Override
     public long getLastAccessed() throws IOException {
         if (isFile()) {
             CatalogFile catalogFile = new CatalogFile(getData());
