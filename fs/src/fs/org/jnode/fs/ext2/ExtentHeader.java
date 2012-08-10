@@ -128,7 +128,12 @@ public class ExtentHeader {
                 }
             }
 
-            return extent.getStartLow();
+            return index - extent.getBlockIndex() + extent.getStartLow();
         }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("ExtentHeader: depth:%d entries:%d/%d", getDepth(), getEntryCount(), getMaximumEntryCount());
     }
 }
