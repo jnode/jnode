@@ -21,7 +21,6 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
@@ -97,7 +96,9 @@ public class Ext2Entry extends AbstractFSEntry {
             return AbstractFSEntry.ROOT_ENTRY;
         else if (mode == Ext2Constants.EXT2_S_IFDIR)
             return AbstractFSEntry.DIR_ENTRY;
-        else if (mode == Ext2Constants.EXT2_S_IFREG || mode == Ext2Constants.EXT2_FT_SYMLINK)
+        else if (mode == Ext2Constants.EXT2_S_IFREG || mode == Ext2Constants.EXT2_S_IFLNK ||
+                 mode == Ext2Constants.EXT2_S_IFIFO || mode == Ext2Constants.EXT2_S_IFCHR ||
+                 mode == Ext2Constants.EXT2_S_IFBLK)
             return AbstractFSEntry.FILE_ENTRY;
         else
             return AbstractFSEntry.OTHER_ENTRY;
