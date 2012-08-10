@@ -78,6 +78,7 @@ public class Ext2Constants {
 
     // behaviour control flags in the inode
     public static final long EXT2_INDEX_FL = 0x00010000; // hash indexed directory
+    public static final long EXT4_INODE_EXTENTS_FLAG = 0x00080000;
 
     // Filesystem state constants
     public static final int EXT2_VALID_FS = 0x0001; // cleanly unmounted
