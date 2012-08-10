@@ -25,8 +25,6 @@ import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.fs.FileSystemException;
 import org.jnode.partitions.PartitionTableEntry;
-import org.jnode.partitions.ibm.IBMPartitionTableEntry;
-import org.jnode.partitions.ibm.IBMPartitionTypes;
 
 
 /**
@@ -41,6 +39,7 @@ public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSyste
     }
 
     public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
+/*
         if (pte != null) {
             if (!pte.isValid())
                 return false;
@@ -58,8 +57,14 @@ public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSyste
                 return false;
             }
         }
+*/
 
-        return false;
+        // Only supports FAT-32 for now, don't want any false results
+        // for FAT-16 or FAT-12.
+        return (firstSector[66] == 0x29 &&
+                firstSector[82] == 'F' &&
+                firstSector[83] == 'A' &&
+                firstSector[84] == 'T');
     }
 
     public FatFileSystem create(Device device, boolean readOnly) throws FileSystemException {

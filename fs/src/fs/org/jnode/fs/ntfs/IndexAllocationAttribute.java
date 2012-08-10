@@ -28,11 +28,22 @@ import java.io.IOException;
 final class IndexAllocationAttribute extends NTFSNonResidentAttribute {
 
     /**
-     * @param fileRecord
-     * @param offset
+     * Creates the index allocation attribute.
+     *
+     * @param fileRecord the file record.
+     * @param offset the offset of this attribute into the file record.
      */
     public IndexAllocationAttribute(FileRecord fileRecord, int offset) {
         super(fileRecord, offset);
+    }
+
+    /**
+     * Gets the magic value of this record.
+     *
+     * @return the magic value.
+     */
+    public int getMagic() {
+        return getUInt32AsInt(0x00);
     }
 
     /**

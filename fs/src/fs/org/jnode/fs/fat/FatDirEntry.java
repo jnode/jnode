@@ -22,10 +22,11 @@ package org.jnode.fs.fat;
 
 import java.io.IOException;
 import java.util.Date;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSEntryCreated;
+import org.jnode.fs.FSEntryLastAccessed;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.spi.UnixFSAccessRights;
 import org.jnode.fs.util.DosUtils;
@@ -35,7 +36,7 @@ import org.jnode.util.NumberUtils;
 /**
  * @author epr
  */
-public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
+public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCreated, FSEntryLastAccessed {
 
     /** Name of this entry */
     private String name;

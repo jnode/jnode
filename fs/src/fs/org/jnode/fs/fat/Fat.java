@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.FileSystemFullException;
 
@@ -198,6 +197,7 @@ public class Fat {
         while (!isEofCluster(entries[(int) cluster])) {
             count++;
             cluster = entries[(int) cluster];
+            testCluster(cluster); // prevent infinite loop in common case where it hits a 0
         }
         // Now create the chain
         long[] chain = new long[count];
@@ -377,7 +377,7 @@ public class Fat {
 
     protected void testCluster(long cluster) throws IllegalArgumentException {
         if ((cluster < 2) || (cluster >= entries.length)) {
-            throw new IllegalArgumentException("Invalid cluster value");
+            throw new IllegalArgumentException("Invalid cluster value: 0x" + Long.toHexString(cluster));
         }
     }
 
