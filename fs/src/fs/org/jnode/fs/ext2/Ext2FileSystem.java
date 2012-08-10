@@ -898,7 +898,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
      */
     protected FSFile createFile(FSEntry entry) throws IOException {
         Ext2Entry e = (Ext2Entry) entry;
-        return new Ext2File(e.getINode());
+        return new Ext2File(e);
     }
 
     /**

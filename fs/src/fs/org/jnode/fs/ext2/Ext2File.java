@@ -34,13 +34,15 @@ import org.jnode.util.ByteBufferUtils;
  */
 public class Ext2File extends AbstractFSFile {
 
+    Ext2Entry entry;
     INode iNode;
 
     private final Logger log = Logger.getLogger(getClass());
 
-    public Ext2File(INode iNode) {
-        super(iNode.getExt2FileSystem());
-        this.iNode = iNode;
+    public Ext2File(Ext2Entry entry) {
+        super(entry.getINode().getExt2FileSystem());
+        this.iNode = entry.getINode();
+        this.entry = entry;
         log.setLevel(Level.DEBUG);
     }
 
@@ -170,6 +172,12 @@ public class Ext2File extends AbstractFSFile {
             // different INode instances)
             iNode.incLocked();
         }
+
+        if (log.isDebugEnabled()) {
+            log.info("File:"  + entry.getName() + " size:" + getLength() + " read offset: " + fileOffset + " len: " +
+                dest.length);
+        }
+
         //a single inode may be represented by more than one Ext2Directory
         // instances,
         //but each will use the same instance of the underlying inode (see
