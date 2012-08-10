@@ -87,7 +87,7 @@ public class Ext2Entry extends AbstractFSEntry implements FSEntryLastChanged, FS
         return type;
     }
 
-    INode getINode() {
+    public INode getINode() {
         return iNode;
     }
 
