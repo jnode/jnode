@@ -24,6 +24,7 @@ import java.io.IOException;
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSEntryCreated;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.hfsplus.catalog.CatalogFile;
@@ -32,7 +33,7 @@ import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.AbstractFSEntry;
 import org.jnode.fs.spi.UnixFSAccessRights;
 
-public class HfsPlusEntry implements FSEntry {
+public class HfsPlusEntry implements FSEntry, FSEntryCreated {
 
     protected HfsPlusFileSystem fs;
     protected HfsPlusDirectory parent;
@@ -179,6 +180,7 @@ public class HfsPlusEntry implements FSEntry {
         return this.record.getData();
     }
 
+    @Override
     public long getCreated() throws IOException {
         if (isFile()) {
             CatalogFile catalogFile = new CatalogFile(getData());
