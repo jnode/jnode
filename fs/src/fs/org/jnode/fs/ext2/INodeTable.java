@@ -21,7 +21,6 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
-
 import org.jnode.fs.FileSystemException;
 
 /**
@@ -46,15 +45,13 @@ public class INodeTable {
         blockSize = fs.getBlockSize();
         blockCount =
                 (int) Ext2Utils.ceilDiv(
-                        fs.getSuperblock().getINodesPerGroup() * INode.INODE_LENGTH, blockSize);
+                        fs.getSuperblock().getINodesPerGroup() * fs.getSuperblock().getINodeSize(), blockSize);
     }
 
     public static int getSizeInBlocks(Ext2FileSystem fs) {
-        int count =
-                (int) Ext2Utils.ceilDiv(
-                        fs.getSuperblock().getINodesPerGroup() * INode.INODE_LENGTH, 
-                        fs.getBlockSize());
-        return count;
+        return (int) Ext2Utils.ceilDiv(
+                fs.getSuperblock().getINodesPerGroup() * fs.getSuperblock().getINodeSize(),
+                fs.getBlockSize());
     }
 
     /**
@@ -100,13 +97,14 @@ public class INodeTable {
      * safe to synchronize to it
      */
     public synchronized byte[] getInodeData(int index) throws IOException, FileSystemException {
-        byte data[] = new byte[INode.INODE_LENGTH];
+        int iNodeSize = (int) fs.getSuperblock().getINodeSize();
+        byte data[] = new byte[iNodeSize];
 
         int indexCopied = 0;
-        while (indexCopied < INode.INODE_LENGTH) {
-            int blockNo = (index * INode.INODE_LENGTH + indexCopied) / blockSize;
-            int blockOffset = (index * INode.INODE_LENGTH + indexCopied) % blockSize;
-            int copyLength = Math.min(blockSize - blockOffset, INode.INODE_LENGTH);
+        while (indexCopied < iNodeSize) {
+            int blockNo = (index * iNodeSize + indexCopied) / blockSize;
+            int blockOffset = (index * iNodeSize + indexCopied) % blockSize;
+            int copyLength = Math.min(blockSize - blockOffset, iNodeSize);
             System.arraycopy(getINodeTableBlock(blockNo), blockOffset, data, indexCopied,
                     copyLength);
             indexCopied += copyLength;
