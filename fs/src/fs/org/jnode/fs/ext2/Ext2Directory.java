@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSEntry;
@@ -56,10 +55,16 @@ public class Ext2Directory extends AbstractFSDirectory {
         this.entry = entry;
         log.setLevel(Level.DEBUG);
         boolean readOnly;
-        if ((iNode.getFlags() & Ext2Constants.EXT2_INDEX_FL) == 1)
+        if ((iNode.getFlags() & Ext2Constants.EXT2_INDEX_FL) != 0 ||
+            (iNode.getFlags() & Ext2Constants.EXT4_INODE_EXTENTS_FLAG) != 0) {
             readOnly = true; //force readonly
-        else
+
+            if ((iNode.getFlags() & Ext2Constants.EXT4_INODE_EXTENTS_FLAG) != 0)
+                log.info("inode uses extents: " + entry);
+        }
+        else {
             readOnly = fs.isReadOnly();
+        }
         setRights(true, !readOnly);
 
         log.debug("directory size: " + iNode.getSize());
