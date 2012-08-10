@@ -174,7 +174,7 @@ public class Ext2File extends AbstractFSFile {
         }
 
         if (log.isDebugEnabled()) {
-            log.info("File:"  + entry.getName() + " size:" + getLength() + " read offset: " + fileOffset + " len: " +
+            log.debug("File:"  + entry.getName() + " size:" + getLength() + " read offset: " + fileOffset + " len: " +
                 dest.length);
         }
 
