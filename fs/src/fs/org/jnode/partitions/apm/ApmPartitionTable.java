@@ -65,8 +65,7 @@ public class ApmPartitionTable implements PartitionTable<ApmPartitionTableEntry>
 
             ApmPartitionTableEntry entry = new ApmPartitionTableEntry(this, first16KiB, offset);
 
-            if (entry.isValid())
-            {
+            if (entry.isValid()) {
                 partitions.add(entry);
             }
         }
@@ -88,6 +87,7 @@ public class ApmPartitionTable implements PartitionTable<ApmPartitionTableEntry>
         return true;
     }
 
+    @Override
     public Iterator<ApmPartitionTableEntry> iterator() {
         return Collections.unmodifiableList(partitions).iterator();
     }
@@ -95,6 +95,7 @@ public class ApmPartitionTable implements PartitionTable<ApmPartitionTableEntry>
     /**
      * @see org.jnode.partitions.PartitionTable#getType()
      */
+    @Override
     public PartitionTableType getType() {
         return tableType;
     }

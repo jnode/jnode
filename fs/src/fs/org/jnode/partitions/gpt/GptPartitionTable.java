@@ -70,8 +70,7 @@ public class GptPartitionTable implements PartitionTable<GptPartitionTableEntry>
 
                 GptPartitionTableEntry entry = new GptPartitionTableEntry(this, first16KiB, offset, blockSize);
 
-                if (entry.isValid())
-                {
+                if (entry.isValid()) {
                     partitions.add(entry);
                 }
             }
@@ -115,6 +114,7 @@ public class GptPartitionTable implements PartitionTable<GptPartitionTableEntry>
         return detectBlockSize(first16KiB) != -1;
     }
 
+    @Override
     public Iterator<GptPartitionTableEntry> iterator() {
         return Collections.unmodifiableList(partitions).iterator();
     }
@@ -122,6 +122,7 @@ public class GptPartitionTable implements PartitionTable<GptPartitionTableEntry>
     /**
      * @see org.jnode.partitions.PartitionTable#getType()
      */
+    @Override
     public PartitionTableType getType() {
         return tableType;
     }

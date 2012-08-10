@@ -33,14 +33,17 @@ import org.jnode.partitions.PartitionTableType;
  */
 public class ApmPartitionTableType implements PartitionTableType {
 
+    @Override
     public PartitionTable<?> create(byte[] firstSector, Device device) throws PartitionTableException {
         return new ApmPartitionTable(this, firstSector, device);
     }
 
+    @Override
     public String getName() {
         return "APM";
     }
 
+    @Override
     public boolean supports(byte[] first16KiB, BlockDeviceAPI devApi) {
         return ApmPartitionTable.containsPartitionTable(first16KiB);
     }

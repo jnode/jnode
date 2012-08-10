@@ -56,6 +56,7 @@ public class GptPartitionTableEntry implements PartitionTableEntry {
         this.offset = offset;
     }
 
+    @Override
     public boolean isValid() {
         return first16KiB.length > offset + 128 && !isEmpty();
     }
@@ -63,6 +64,7 @@ public class GptPartitionTableEntry implements PartitionTableEntry {
     /**
      * @see org.jnode.partitions.PartitionTableEntry#getChildPartitionTable()
      */
+    @Override
     public PartitionTable<?> getChildPartitionTable() {
         throw new UnsupportedOperationException("No child partitions.");
     }
@@ -70,6 +72,7 @@ public class GptPartitionTableEntry implements PartitionTableEntry {
     /**
      * @see org.jnode.partitions.PartitionTableEntry#hasChildPartitionTable()
      */
+    @Override
     public boolean hasChildPartitionTable() {
         return false;
     }
@@ -117,9 +120,7 @@ public class GptPartitionTableEntry implements PartitionTableEntry {
         return b.toString();
     }
 
-    /**
-     * @see java.lang.Object#toString()
-     */
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder(32);
         builder.append('[').append(getName()).append(' ');

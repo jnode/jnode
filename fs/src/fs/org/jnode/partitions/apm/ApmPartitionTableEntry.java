@@ -51,6 +51,7 @@ public class ApmPartitionTableEntry implements PartitionTableEntry {
         this.offset = offset;
     }
 
+    @Override
     public boolean isValid() {
         return first16KiB.length > offset + 128;
     }
@@ -58,6 +59,7 @@ public class ApmPartitionTableEntry implements PartitionTableEntry {
     /**
      * @see org.jnode.partitions.PartitionTableEntry#getChildPartitionTable()
      */
+    @Override
     public IBMPartitionTable getChildPartitionTable() {
         throw new UnsupportedOperationException("No child partitions.");
     }
@@ -65,6 +67,7 @@ public class ApmPartitionTableEntry implements PartitionTableEntry {
     /**
      * @see org.jnode.partitions.PartitionTableEntry#hasChildPartitionTable()
      */
+    @Override
     public boolean hasChildPartitionTable() {
         return false;
     }
@@ -98,9 +101,7 @@ public class ApmPartitionTableEntry implements PartitionTableEntry {
         return b.toString();
     }
 
-    /**
-     * @see Object#toString()
-     */
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder(32);
         builder.append('[').append(getName()).append(' ');
