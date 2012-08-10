@@ -82,6 +82,10 @@ public class CatalogFile {
         createDate = BigEndian.getInt32(data, 12);
         contentModDate = BigEndian.getInt32(data, 16);
         attrModDate = BigEndian.getInt32(data, 20);
+        accessDate = BigEndian.getInt32(data, 24);
+        backupDate = BigEndian.getInt32(data, 28);
+        permissions = new HfsPlusBSDInfo(data, 32);
+        userInfo = new FileInfo(data, 48);
         datas = new HfsPlusForkData(data, 88);
         resources = new HfsPlusForkData(data, 168);
     }
@@ -145,8 +149,8 @@ public class CatalogFile {
         return HfsUtils.getDate(contentModDate & 0xffffffffL, false) * 1000L;
     }
 
-    public int getAttrModDate() {
-        return attrModDate;
+    public long getAttrModDate() {
+        return HfsUtils.getDate(attrModDate & 0xffffffffL, false) * 1000L;
     }
 
     public HfsPlusForkData getDatas() {
@@ -157,12 +161,12 @@ public class CatalogFile {
         return resources;
     }
 
-    public int getAccessDate() {
-        return accessDate;
+    public long getAccessDate() {
+        return HfsUtils.getDate(accessDate & 0xffffffffL, false) * 1000L;
     }
 
-    public int getBackupDate() {
-        return backupDate;
+    public long getBackupDate() {
+        return HfsUtils.getDate(backupDate & 0xffffffffL, false) * 1000L;
     }
 
     public HfsPlusBSDInfo getPermissions() {
