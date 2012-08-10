@@ -20,6 +20,7 @@
  
 package org.jnode.partitions.ibm;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.block.CHS;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.util.LittleEndian;
@@ -29,6 +30,7 @@ import org.jnode.util.NumberUtils;
  * @author epr
  */
 public class IBMPartitionTableEntry implements PartitionTableEntry {
+    private final Logger log = Logger.getLogger(getClass());
 
     private final byte[] bs;
     private final int ofs;
@@ -98,7 +100,13 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
     }
 
     public IBMPartitionTypes getSystemIndicator() {
-        return IBMPartitionTypes.valueOf(LittleEndian.getUInt8(bs, ofs + 4));
+        int code = LittleEndian.getUInt8(bs, ofs + 4);
+        try {
+            return IBMPartitionTypes.valueOf(code);
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid system indicator code: 0x" + Integer.toHexString(code));
+            return IBMPartitionTypes.PARTTYPE_EMPTY;
+        }
     }
 
     public void setSystemIndicator(IBMPartitionTypes type) {

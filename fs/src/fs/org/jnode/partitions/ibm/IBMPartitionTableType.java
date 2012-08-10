@@ -42,7 +42,6 @@ public class IBMPartitionTableType implements PartitionTableType {
     }
 
     public boolean supports(byte[] firstSector, BlockDeviceAPI devApi) {
-        // TODO Make a suitable implementation
-        return true;
+        return IBMPartitionTable.containsPartitionTable(firstSector);
     }
 }

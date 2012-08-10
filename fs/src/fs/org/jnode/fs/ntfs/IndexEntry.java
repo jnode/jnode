@@ -20,6 +20,7 @@
  
 package org.jnode.fs.ntfs;
 
+import java.io.UnsupportedEncodingException;
 
 /**
  * Structure accessor of an Index Entry.
@@ -91,7 +92,12 @@ final class IndexEntry extends NTFSStructure {
     }
 
     public String getFileName() {
-        return new String(this.getFileNameAsCharArray());
+        try {
+            //XXX: For Java 6, should use the version that accepts a Charset.
+            return new String(this.getFileNameAsByteArray(), "UTF-16LE");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("UTF-16LE charset missing from JRE", e);
+        }
     }
 
     public long getFileReferenceNumber() {
@@ -114,16 +120,15 @@ final class IndexEntry extends NTFSStructure {
     }
 
     public long getSubnodeVCN() {
-        return getUInt32(getSize() - 8);
+        return getInt64(getSize() - 8); // TODO: getUInt64AsInt
+        //return getUInt32(getSize() - 8);
     }
 
-    private char[] getFileNameAsCharArray() {
+    private byte[] getFileNameAsByteArray() {
         final int len = getUInt8(0x50);
-        final char[] name = new char[len];
-        for (int i = 0; i < len; i++) {
-            name[i] = getChar16(0x52 + (i * 2));
-        }
-        return name;
+        final byte[] bytes = new byte[len * 2];
+        getData(0x52, bytes, 0, bytes.length);
+        return bytes;
     }
 
     @Override

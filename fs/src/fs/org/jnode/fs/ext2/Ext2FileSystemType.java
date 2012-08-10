@@ -22,14 +22,11 @@ package org.jnode.fs.ext2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.fs.FileSystemException;
 import org.jnode.partitions.PartitionTableEntry;
-import org.jnode.partitions.ibm.IBMPartitionTableEntry;
-import org.jnode.partitions.ibm.IBMPartitionTypes;
 
 /**
  * @author Andras Nagy
@@ -57,6 +54,7 @@ public class Ext2FileSystemType implements BlockDeviceFileSystemType<Ext2FileSys
      * @see org.jnode.fs.BlockDeviceFileSystemType#supports(PartitionTableEntry, byte[], FSBlockDeviceAPI)
      */
     public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
+/*
         if (pte != null) {
             if (pte instanceof IBMPartitionTableEntry) {
                 if (((IBMPartitionTableEntry) pte).getSystemIndicator() != IBMPartitionTypes.PARTTYPE_LINUXNATIVE) {
@@ -64,14 +62,19 @@ public class Ext2FileSystemType implements BlockDeviceFileSystemType<Ext2FileSys
                 }
             }
         }
+*/
 
         //need to check the magic
         ByteBuffer magic = ByteBuffer.allocate(2);
+        ByteBuffer revLevel = ByteBuffer.allocate(4);
         try {
             devApi.read(1024 + 56, magic);
+            devApi.read(1024 + 78, revLevel);
         } catch (IOException e) {
             return false;
         }
-        return (Ext2Utils.get16(magic.array(), 0) == 0xEF53);
+        return
+            (Ext2Utils.get16(magic.array(), 0) == 0xEF53) &&
+            (Ext2Utils.get32(revLevel.array(), 0) == 0 || Ext2Utils.get32(revLevel.array(), 0) == 1);
     }
 }

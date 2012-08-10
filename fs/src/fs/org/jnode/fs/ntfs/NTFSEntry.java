@@ -21,10 +21,12 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSEntryCreated;
+import org.jnode.fs.FSEntryLastAccessed;
+import org.jnode.fs.FSEntryLastChanged;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FSObject;
 import org.jnode.fs.FileSystem;
@@ -33,7 +35,7 @@ import org.jnode.fs.FileSystem;
  * @author vali
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class NTFSEntry implements FSEntry {
+public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, FSEntryLastAccessed {
 
     private FSObject cachedFSObject;
 

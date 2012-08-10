@@ -21,7 +21,6 @@
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -63,6 +62,10 @@ public final class ISO9660Entry implements FSEntry {
         return entryRecord.getRecordingTime().toJavaMillis();
     }
 
+    public long getLastAccessed() {
+        return 0;
+    }
+
     /**
      * @see org.jnode.fs.FSEntry#isFile()
      */
@@ -90,6 +93,10 @@ public final class ISO9660Entry implements FSEntry {
     public void setLastModified(long lastModified) throws IOException {
         throw new UnsupportedOperationException("not yet implemented");
     }
+
+	public void setLastAccessed(long lastAccessed) {
+	    throw new UnsupportedOperationException("Filesystem is read-only");
+	}
 
     /**
      * @see org.jnode.fs.FSEntry#getFile()
