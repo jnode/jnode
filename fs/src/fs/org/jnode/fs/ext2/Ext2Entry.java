@@ -24,6 +24,8 @@ import java.io.IOException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSEntryLastAccessed;
+import org.jnode.fs.FSEntryLastChanged;
 import org.jnode.fs.spi.AbstractFSEntry;
 
 /**
@@ -36,7 +38,7 @@ import org.jnode.fs.spi.AbstractFSEntry;
  *         TODO: besides getFile() and getDirectory(), we will need
  *         getBlockDevice() getCharacterDevice(), etc.
  */
-public class Ext2Entry extends AbstractFSEntry {
+public class Ext2Entry extends AbstractFSEntry implements FSEntryLastChanged, FSEntryLastAccessed {
 
     private final Logger log = Logger.getLogger(getClass());
     private INode iNode = null;
