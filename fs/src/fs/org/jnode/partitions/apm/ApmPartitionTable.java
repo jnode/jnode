@@ -20,6 +20,7 @@
 
 package org.jnode.partitions.apm;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -84,6 +85,16 @@ public class ApmPartitionTable implements PartitionTable<ApmPartitionTableEntry>
         if ((first16KiB[0x201] & 0xFF) != 0x4d) {
             return false;
         }
+
+        byte[] typeBytes = new byte[31];
+        System.arraycopy(first16KiB, 0x230, typeBytes, 0, typeBytes.length);
+        String type = new String(typeBytes, Charset.forName("ASCII")).replace("\u0000", "");
+
+        if (!"Apple_partition_map".equalsIgnoreCase(type))
+        {
+            return false;
+        }
+
         return true;
     }
 
