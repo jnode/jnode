@@ -171,7 +171,9 @@ public class SocketBuffer {
             size += count;
         } else {
             setSize(size + count);
-            System.arraycopy(data, start + count - count, data, start + count, size - 1 - count);
+            for (int i = size - 1; i >= count; i--) {
+                data[start + i] = data[start + i - count];
+            }
         }
         for (int i = 0; i < count; i++) {
             data[start + i] = 0;
