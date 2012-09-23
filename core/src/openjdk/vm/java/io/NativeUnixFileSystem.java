@@ -80,7 +80,7 @@ public class NativeUnixFileSystem {
 		return success;
     }
 
-    private static boolean createFileExclusively(UnixFileSystem ufs, String path) {
+    private static boolean createFileExclusively(UnixFileSystem ufs, String path, boolean restrictive) {
         try {
             return VMFile.create(path);
         } catch(IOException ioe){
