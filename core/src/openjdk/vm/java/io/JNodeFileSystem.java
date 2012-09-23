@@ -75,8 +75,12 @@ class JNodeFileSystem extends FileSystem {
 		return VMFile.mkdir(f.getPath());
 	}
 
+    /**
+     * The resulting temporary file may have more restrictive access permission
+     * on some platforms, if restrictive is true.
+     */
 	@Override
-	public boolean createFileExclusively(String pathname) throws IOException {
+	public boolean createFileExclusively(String pathname, boolean restrictive) throws IOException {
 		return VMFile.create(pathname);
 	}
 
