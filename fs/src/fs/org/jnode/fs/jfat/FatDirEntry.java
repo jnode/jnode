@@ -32,6 +32,7 @@ public class FatDirEntry {
 
     protected static final int EOD = 0x00;
     protected static final int FREE = 0xE5;
+    protected static final int INVALID = 0xFF;
     protected static final int KANJI = 0x05;
 
     protected static final int NO_INDEX = -1;
@@ -73,7 +74,8 @@ public class FatDirEntry {
             case FREE:
             case EOD:
                 return new FatDirEntry(fs, entry, index, flag);
-
+            case INVALID:
+            	throw new IOException("Invalid entry for index: " + index);
             default:
                 if (attr.isLong())
                     return new FatLongDirEntry(fs, entry, index);
