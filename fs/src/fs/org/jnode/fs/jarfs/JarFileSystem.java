@@ -17,12 +17,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jarfs;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.jar.JarFile;
-
 import org.jnode.driver.block.JarFileDevice;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -31,56 +31,59 @@ import org.jnode.fs.FileSystemException;
 import org.jnode.fs.spi.AbstractFileSystem;
 
 /**
- * 
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
- * 
  */
 public class JarFileSystem extends AbstractFileSystem<JarFSEntry> {
 
-    private JarFile jarFile;
-    private JarFSCache cache;
-    private JarFSEntry rootEntry;
+	private JarFile jarFile;
+	private JarFSCache cache;
+	private JarFSEntry rootEntry;
 
-    /**
-     * @see org.jnode.fs.FileSystem#getDevice()
-     */
-    public JarFileSystem(JarFileDevice device, JarFileSystemType type) throws FileSystemException {
-        super(device, true, type); // jar file systems are always readOnly
+	/**
+	 * @see org.jnode.fs.FileSystem#getDevice()
+	 */
+	public JarFileSystem(JarFileDevice device, JarFileSystemType type) throws FileSystemException {
+		super(device, true, type); // jar file systems are always readOnly
 
-        jarFile = device.getJarFile();
-        cache = new JarFSCache();
-        rootEntry = FSTreeBuilder.build(this, jarFile, cache);
-    }
+		jarFile = device.getJarFile();
+		cache = new JarFSCache();
+		rootEntry = FSTreeBuilder.build(this, jarFile, cache);
+	}
 
-    public JarFile getJarFile() {
-        return jarFile;
-    }
+	public JarFile getJarFile() {
+		return jarFile;
+	}
 
-    protected FSFile createFile(FSEntry entry) {
-        return new JarFSFile((JarFSEntry) entry);
-    }
+	protected FSFile createFile(FSEntry entry) {
+		return new JarFSFile((JarFSEntry) entry);
+	}
 
-    protected FSDirectory createDirectory(FSEntry entry) {
-        Map<String, JarFSEntry> entries = cache.getChildEntries((JarFSEntry) entry);
-        return new JarFSDirectory((JarFSEntry) entry, entries);
-    }
+	protected FSDirectory createDirectory(FSEntry entry) {
+		Map<String, JarFSEntry> entries = cache.getChildEntries((JarFSEntry) entry);
+		return new JarFSDirectory((JarFSEntry) entry, entries);
+	}
 
-    protected JarFSEntry createRootEntry() {
-        return rootEntry;
-    }
+	protected JarFSEntry createRootEntry() {
+		return rootEntry;
+	}
 
-    public long getFreeSpace() {
-        // TODO implement me
-        return -1;
-    }
+	public long getFreeSpace() {
+		// TODO implement me
+		return -1;
+	}
 
-    public long getTotalSpace() {
-        // TODO implement me
-        return -1;
-    }
+	public long getTotalSpace() {
+		// TODO implement me
+		return -1;
+	}
 
-    public long getUsableSpace() {
-        // TODO implement me
-        return -1;
-    }
+	public long getUsableSpace() {
+		// TODO implement me
+		return -1;
+	}
+
+	@Override
+	public String getVolumeName() throws IOException {
+		return jarFile.getName();
+	}
 }

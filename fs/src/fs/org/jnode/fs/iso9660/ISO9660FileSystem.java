@@ -17,11 +17,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
-
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.fs.FSDirectory;
@@ -36,86 +35,90 @@ import org.jnode.fs.spi.AbstractFileSystem;
  */
 public class ISO9660FileSystem extends AbstractFileSystem<ISO9660Entry> {
 
-    private final ISO9660Volume volume;
-    private ISO9660Entry rootEntry;
+	private final ISO9660Volume volume;
+	private ISO9660Entry rootEntry;
 
-    /**
-     * @see org.jnode.fs.FileSystem#getDevice()
-     */
-    public ISO9660FileSystem(Device device, boolean readOnly, ISO9660FileSystemType type)
-        throws FileSystemException {
-        super(device, readOnly, type);
+	/**
+	 * @see org.jnode.fs.FileSystem#getDevice()
+	 */
+	public ISO9660FileSystem(Device device, boolean readOnly, ISO9660FileSystemType type) throws FileSystemException {
+		super(device, readOnly, type);
 
-        try {
-            volume = new ISO9660Volume(getFSApi());
-        } catch (IOException e) {
-            throw new FileSystemException(e);
-        } catch (ApiNotFoundException ex) {
-            throw new FileSystemException("Need FSBlockDeviceAPI for ISO9660 filesystem");
-        }
-    }
+		try {
+			volume = new ISO9660Volume(getFSApi());
+		} catch (IOException e) {
+			throw new FileSystemException(e);
+		} catch (ApiNotFoundException ex) {
+			throw new FileSystemException("Need FSBlockDeviceAPI for ISO9660 filesystem");
+		}
+	}
 
-    /**
-     * @see org.jnode.fs.FileSystem#getRootEntry()
-     */
-    public ISO9660Entry getRootEntry() throws IOException {
-        if (rootEntry == null) {
-            rootEntry = new ISO9660Entry(this, volume.getRootDirectoryEntry());
-        }
-        return rootEntry;
-    }
+	/**
+	 * @see org.jnode.fs.FileSystem#getRootEntry()
+	 */
+	public ISO9660Entry getRootEntry() throws IOException {
+		if (rootEntry == null) {
+			rootEntry = new ISO9660Entry(this, volume.getRootDirectoryEntry());
+		}
+		return rootEntry;
+	}
 
-    /**
-     * @return Returns the volume.
-     */
-    public ISO9660Volume getVolume() {
-        return this.volume;
-    }
+	/**
+	 * @return Returns the volume.
+	 */
+	public ISO9660Volume getVolume() {
+		return this.volume;
+	}
 
-    /**
-     * @see org.jnode.fs.spi.AbstractFileSystem#flush()
-     */
-    public void flush() throws IOException {
-        if (isReadOnly()) {
-            // Do nothing, since readonly
-        } else {
-            // TODO not implemented yet
-        }
-    }
+	/**
+	 * @see org.jnode.fs.spi.AbstractFileSystem#flush()
+	 */
+	public void flush() throws IOException {
+		if (isReadOnly()) {
+			// Do nothing, since readonly
+		} else {
+			// TODO not implemented yet
+		}
+	}
 
-    /**
+	/**
      *
      */
-    protected FSFile createFile(FSEntry entry) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	protected FSFile createFile(FSEntry entry) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    /**
+	/**
      *
      */
-    protected FSDirectory createDirectory(FSEntry entry) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	protected FSDirectory createDirectory(FSEntry entry) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    /**
+	/**
      *
      */
-    protected ISO9660Entry createRootEntry() throws IOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	protected ISO9660Entry createRootEntry() throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    public long getFreeSpace() {
-        return 0;
-    }
+	public long getFreeSpace() {
+		return 0;
+	}
 
-    public long getTotalSpace() {
-        return volume.getSize();
-    }
+	public long getTotalSpace() {
+		return volume.getSize();
+	}
 
-    public long getUsableSpace() {
-        return volume.getSize();
-    }
+	public long getUsableSpace() {
+		return volume.getSize();
+	}
+
+	@Override
+	public String getVolumeName() throws IOException {
+		return getVolume().getPrimaryVolumeDescriptor().getVolumeIdentifier();
+	}
 }

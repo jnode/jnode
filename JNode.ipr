@@ -181,7 +181,11 @@
       <entry name="?*.jpeg" />
       <entry name="?*.jpg" />
     </wildcardResourcePatterns>
-    <annotationProcessing enabled="false" useClasspath="true" />
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="false">
+        <processorPath useClasspath="true" />
+      </profile>
+    </annotationProcessing>
   </component>
   <component name="CopyrightManager" default="">
     <module2copyright />
@@ -192,6 +196,15 @@
   </component>
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
+  </component>
+  <component name="EclipseCodeFormatter">
+    <option name="defaultSettings" value="true" />
+    <option name="formatter" value="ECLIPSE" />
+    <option name="id" value="1355311468141" />
+    <option name="name" value="default" />
+    <option name="optimizeImports" value="false" />
+    <option name="pathToConfigFileJava" value="$PROJECT_DIR$/../../../../documentation/others/isabel_codingFormat.xml" />
+    <option name="selectedJavaProfile" value="isabel" />
   </component>
   <component name="EclipseCompilerSettings">
     <option name="GENERATE_NO_WARNINGS" value="true" />
@@ -223,6 +236,14 @@
       <item index="4" class="java.lang.String" itemvalue="WARNING" />
       <item index="5" class="java.lang.String" itemvalue="ERROR" />
     </list>
+  </component>
+  <component name="IvyIDEA.ProjectSettings">
+    <option name="artifactTypeSettings">
+      <ArtifactTypeSettings />
+    </option>
+    <option name="propertiesSettings">
+      <PropertiesSettings />
+    </option>
   </component>
   <component name="JavacSettings">
     <option name="MAXIMUM_HEAP_SIZE" value="1024" />
