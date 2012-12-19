@@ -17,81 +17,78 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ntfs;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-
 /**
- * Iterator used to iterate over all IndexEntry's in an index block
- * or index_root attribute.
- * 
+ * Iterator used to iterate over all IndexEntry's in an index block or index_root attribute.
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class IndexEntryIterator implements Iterator<IndexEntry> { 
-    private int offset;
-    private IndexEntry nextEntry;
-    private final NTFSStructure parent;
-    private final FileRecord parentFileRecord;
+public final class IndexEntryIterator implements Iterator<IndexEntry> {
+	private int offset;
+	private IndexEntry nextEntry;
+	private final NTFSStructure parent;
+	private final FileRecord parentFileRecord;
 
-    /**
-     * Initialize this instance.
-     */
-    public IndexEntryIterator(FileRecord parentFileRecord, NTFSStructure parent, int firstOffset) {
-        this.offset = firstOffset;
-        this.parentFileRecord = parentFileRecord;
-        this.parent = parent;
-        readNext();
-    }
+	/**
+	 * Initialize this instance.
+	 */
+	public IndexEntryIterator(FileRecord parentFileRecord, NTFSStructure parent, int firstOffset) {
+		this.offset = firstOffset;
+		this.parentFileRecord = parentFileRecord;
+		this.parent = parent;
+		readNext();
+	}
 
-    /**
-     * @see java.util.Iterator#hasNext()
-     */
-    public boolean hasNext() {
-        if (nextEntry == null) {
-            return false;
-        }
-        return !nextEntry.isLastIndexEntryInSubnode() || nextEntry.hasSubNodes();
-    }
+	/**
+	 * @see java.util.Iterator#hasNext()
+	 */
+	public boolean hasNext() {
+		if (nextEntry == null) {
+			return false;
+		}
+		return !nextEntry.isLastIndexEntryInSubnode() || nextEntry.hasSubNodes();
+	}
 
-    /**
-     * @see java.util.Iterator#next()
-     */
-    public IndexEntry next() { 
-        if (nextEntry == null) { 
-            throw new NoSuchElementException();
-        } else {
-            final IndexEntry result = nextEntry;
-            final int size = nextEntry.getSize();
+	/**
+	 * @see java.util.Iterator#next()
+	 */
+	public IndexEntry next() {
+		if (nextEntry == null) {
+			throw new NoSuchElementException();
+		} else {
+			final IndexEntry result = nextEntry;
+			final int size = nextEntry.getSize();
 
-            // Prevents an infinite loop.  Seen on images where the size of the index entry has been zeroed out.
-            if (size <= 0) {
-                throw new IllegalStateException(String.format(
-                    "Index entry size is 0, filesystem is corrupt.  Parent directory: '%s', reference number '%d'",
-                    nextEntry.getParentFileRecord().getFileName(),
-                    nextEntry.getParentFileRecord().getReferenceNumber()));
-            }
+			// Prevents an infinite loop. Seen on images where the size of the index entry has been zeroed out.
+			if (size <= 0) {
+				throw new IllegalStateException(String.format(
+						"Index entry size is 0, filesystem is corrupt.  Parent directory: '%s', reference number '%d'",
+						nextEntry.getParentFileRecord().getFileName(),
+						nextEntry.getParentFileRecord().getReferenceNumber()));
+			}
 
-            offset += size;
-            // Now read the next next entry
-            readNext();
-            return result;
-        }
-    }
+			offset += size;
+			// Now read the next next entry
+			readNext();
+			return result;
+		}
+	}
 
-    /**
-     * @see java.util.Iterator#remove()
-     */
-    public void remove() {
-        throw new UnsupportedOperationException();
-    }
+	/**
+	 * @see java.util.Iterator#remove()
+	 */
+	public void remove() {
+		throw new UnsupportedOperationException();
+	}
 
-    private void readNext() {
-        nextEntry = new IndexEntry(parentFileRecord, parent, offset);
-        if (nextEntry.isLastIndexEntryInSubnode() && !nextEntry.hasSubNodes()) {
-            nextEntry = null;
-        }
-    }
+	private void readNext() {
+		nextEntry = new IndexEntry(parentFileRecord, parent, offset);
+		if (nextEntry.isLastIndexEntryInSubnode() && !nextEntry.hasSubNodes()) {
+			nextEntry = null;
+		}
+	}
 }

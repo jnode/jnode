@@ -17,60 +17,77 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import org.jnode.fs.FSFile;
+import org.jnode.fs.FSFileSlackSpace;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.hfsplus.catalog.CatalogFile;
 
-public class HfsPlusFile implements FSFile {
+public class HfsPlusFile implements FSFile, FSFileSlackSpace {
 
-    private HfsPlusEntry entry;
+	private HfsPlusEntry entry;
 
-    private CatalogFile file;
+	private CatalogFile file;
 
-    public HfsPlusFile(HfsPlusEntry entry) {
-        this.entry = entry;
-        this.file = new CatalogFile(entry.getData());
-    }
+	public HfsPlusFile(HfsPlusEntry entry) {
+		this.entry = entry;
+		this.file = new CatalogFile(entry.getData());
+	}
 
-    @Override
-    public void flush() throws IOException {
+	@Override
+	public void flush() throws IOException {
 
-    }
+	}
 
-    @Override
-    public final long getLength() {
-        return file.getDatas().getTotalSize();
-    }
+	@Override
+	public final long getLength() {
+		return file.getDatas().getTotalSize();
+	}
 
-    @Override
-    public void setLength(final long length) throws IOException {
-        // TODO Auto-generated method stub
-    }
+	@Override
+	public void setLength(final long length) throws IOException {
+		// TODO Auto-generated method stub
+	}
 
-    @Override
-    public final void read(final long fileOffset, final ByteBuffer dest) throws IOException {
-        HfsPlusFileSystem fs = (HfsPlusFileSystem) getFileSystem();
-        file.getDatas().read(fs,fileOffset,dest);
-    }
+	@Override
+	public final void read(final long fileOffset, final ByteBuffer dest) throws IOException {
+		HfsPlusFileSystem fs = (HfsPlusFileSystem) getFileSystem();
+		file.getDatas().read(fs, fileOffset, dest);
+	}
 
-    @Override
-    public void write(final long fileOffset, final ByteBuffer src) throws IOException {
-        // TODO Auto-generated method stub
+	@Override
+	public void write(final long fileOffset, final ByteBuffer src) throws IOException {
+		// TODO Auto-generated method stub
 
-    }
+	}
 
-    @Override
-    public boolean isValid() {
-        return entry.isValid();
-    }
+	@Override
+	public boolean isValid() {
+		return entry.isValid();
+	}
 
-    @Override
-    public FileSystem<?> getFileSystem() {
-        return entry.getFileSystem();
-    }
+	@Override
+	public FileSystem<?> getFileSystem() {
+		return entry.getFileSystem();
+	}
+
+	@Override
+	public byte[] getSlackSpace() throws IOException {
+		int blockSize = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader().getBlockSize();
+
+		int slackSpaceSize = blockSize - (int) (getLength() % blockSize);
+
+		if (slackSpaceSize == blockSize) {
+			slackSpaceSize = 0;
+		}
+
+		byte[] slackSpace = new byte[slackSpaceSize];
+		read(getLength(), ByteBuffer.wrap(slackSpace));
+
+		return slackSpace;
+	}
 }

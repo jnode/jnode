@@ -17,11 +17,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.service.def;
 
 import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;
@@ -31,84 +30,87 @@ import org.jnode.fs.FileSystemType;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class VirtualFS implements FileSystem<VirtualDirEntry> {
-    static final Logger log = Logger.getLogger(VirtualFS.class);
-    private final Device dev;
-    private final VirtualDirEntry root;
+	static final Logger log = Logger.getLogger(VirtualFS.class);
+	private final Device dev;
+	private final VirtualDirEntry root;
 
-    public final FileSystemType<FileSystem<VirtualDirEntry>> getType() {
-        throw new UnsupportedOperationException("should not be called");
-    }
+	public final FileSystemType<FileSystem<VirtualDirEntry>> getType() {
+		throw new UnsupportedOperationException("should not be called");
+	}
 
-    /**
-     * Initialize this instance.
-     * 
-     * @throws IOException
-     */
-    VirtualFS(Device dev) {
-        this.dev = dev;
-        try {
-            this.root = new VirtualDirEntry(this, "/", null);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
+	/**
+	 * Initialize this instance.
+	 * @throws IOException
+	 */
+	VirtualFS(Device dev) {
+		this.dev = dev;
+		try {
+			this.root = new VirtualDirEntry(this, "/", null);
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
 
-    /**
-     * @see org.jnode.fs.FileSystem#close()
-     */
-    public void close() throws IOException {
-        // TODO Auto-generated method stub
-    }
+	/**
+	 * @see org.jnode.fs.FileSystem#close()
+	 */
+	public void close() throws IOException {
+		// TODO Auto-generated method stub
+	}
 
-    /**
-     * @see org.jnode.fs.FileSystem#getDevice()
-     */
-    public Device getDevice() {
-        return dev;
-    }
+	/**
+	 * @see org.jnode.fs.FileSystem#getDevice()
+	 */
+	public Device getDevice() {
+		return dev;
+	}
 
-    /**
-     * @see org.jnode.fs.FileSystem#getRootEntry()
-     */
-    public VirtualDirEntry getRootEntry() {
-        return root;
-    }
+	/**
+	 * @see org.jnode.fs.FileSystem#getRootEntry()
+	 */
+	public VirtualDirEntry getRootEntry() {
+		return root;
+	}
 
-    /**
-     * @see org.jnode.fs.FileSystem#isReadOnly()
-     */
-    public boolean isReadOnly() {
-        return false;
-    }
+	/**
+	 * @see org.jnode.fs.FileSystem#isReadOnly()
+	 */
+	public boolean isReadOnly() {
+		return false;
+	}
 
-    /**
-     * @see org.jnode.fs.FileSystem#isClosed()
-     */
-    public boolean isClosed() {
-        return false;
-    }
+	/**
+	 * @see org.jnode.fs.FileSystem#isClosed()
+	 */
+	public boolean isClosed() {
+		return false;
+	}
 
-    /**
-     * The filesystem on the given device will be removed.
-     * 
-     * @param dev
-     */
-    final void unregisterFileSystem(Device dev) {
-        root.unregisterFileSystem(dev);
-    }
+	/**
+	 * The filesystem on the given device will be removed.
+	 * @param dev
+	 */
+	final void unregisterFileSystem(Device dev) {
+		root.unregisterFileSystem(dev);
+	}
 
-    public long getFreeSpace() {
-        // TODO implement me
-        return -1;
-    }
+	public long getFreeSpace() {
+		// TODO implement me
+		return -1;
+	}
 
-    public long getTotalSpace() {
-        // TODO implement me
-        return -1;
-    }
+	public long getTotalSpace() {
+		// TODO implement me
+		return -1;
+	}
 
-    public long getUsableSpace() {
-        // TODO implement me
-        return -1;
-    }
+	public long getUsableSpace() {
+		// TODO implement me
+		return -1;
+	}
+
+	@Override
+	public String getVolumeName() throws IOException {
+		return dev.getShortDescription();
+	}
 }

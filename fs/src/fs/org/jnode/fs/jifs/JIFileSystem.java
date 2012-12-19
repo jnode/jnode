@@ -17,9 +17,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jifs;
 
+import java.io.IOException;
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
@@ -30,66 +31,68 @@ import org.jnode.fs.jifs.directories.JIFSDrootDir;
  */
 public class JIFileSystem implements FileSystem<JIFSDirectory> {
 
-    private JIFSDirectory rootDir = null;
-    private Device device;
-    private final JIFileSystemType type;
+	private JIFSDirectory rootDir = null;
+	private Device device;
+	private final JIFileSystemType type;
 
-    /**
-     * Constructor for JIFileSystem in specified readOnly mode
-     */
-    public JIFileSystem(Device device, boolean readOnly, JIFileSystemType type)
-        throws FileSystemException {
-        if (readOnly == false) {
-            throw new FileSystemException("JIFS can not be created as writable...");
-        }
-        this.device = device;
-        this.type = type;
-        rootDir = new JIFSDrootDir(device.getId());
-    }
+	/**
+	 * Constructor for JIFileSystem in specified readOnly mode
+	 */
+	public JIFileSystem(Device device, boolean readOnly, JIFileSystemType type) throws FileSystemException {
+		if (readOnly == false) {
+			throw new FileSystemException("JIFS can not be created as writable...");
+		}
+		this.device = device;
+		this.type = type;
+		rootDir = new JIFSDrootDir(device.getId());
+	}
 
-    public final JIFileSystemType getType() {
-        return type;
-    }
+	public final JIFileSystemType getType() {
+		return type;
+	}
 
-    /**
-     * Is the filesystem mounted in readonly mode ?
-     */
-    public boolean isReadOnly() {
-        // always readOnly
-        return true;
-    }
+	/**
+	 * Is the filesystem mounted in readonly mode ?
+	 */
+	public boolean isReadOnly() {
+		// always readOnly
+		return true;
+	}
 
-    public void close() {
-        //nothing to do
-    }
+	public void close() {
+		// nothing to do
+	}
 
-    public boolean isClosed() {
-        return false;
-    }
+	public boolean isClosed() {
+		return false;
+	}
 
-    public Device getDevice() {
-        return device;
-    }
+	public Device getDevice() {
+		return device;
+	}
 
-    /**
-     * Gets the root entry of this filesystem. This is usually a director, but
-     * this is not required.
-     * 
-     * @return rootDir
-     */
-    public JIFSDirectory getRootEntry() {
-        return rootDir;
-    }
+	/**
+	 * Gets the root entry of this filesystem. This is usually a director, but this is not required.
+	 * @return rootDir
+	 */
+	public JIFSDirectory getRootEntry() {
+		return rootDir;
+	}
 
-    public long getFreeSpace() {
-        return -1;
-    }
+	public long getFreeSpace() {
+		return -1;
+	}
 
-    public long getTotalSpace() {
-        return -1;
-    }
+	public long getTotalSpace() {
+		return -1;
+	}
 
-    public long getUsableSpace() {
-        return -1;
-    }
+	public long getUsableSpace() {
+		return -1;
+	}
+
+	@Override
+	public String getVolumeName() throws IOException {
+		return device.getShortDescription();
+	}
 }

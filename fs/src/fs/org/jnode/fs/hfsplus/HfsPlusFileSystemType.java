@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import java.io.IOException;
@@ -30,37 +30,36 @@ import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.util.BigEndian;
 
 public class HfsPlusFileSystemType implements BlockDeviceFileSystemType<HfsPlusFileSystem> {
-    public static final Class<HfsPlusFileSystemType> ID = HfsPlusFileSystemType.class;
+	public static final Class<HfsPlusFileSystemType> ID = HfsPlusFileSystemType.class;
 
-    public final HfsPlusFileSystem create(final Device device, final boolean readOnly)
-        throws FileSystemException {
-        HfsPlusFileSystem fs = new HfsPlusFileSystem(device, readOnly, this);
-        fs.read();
-        return fs;
-    }
+	public final HfsPlusFileSystem create(final Device device, final boolean readOnly) throws FileSystemException {
+		HfsPlusFileSystem fs = new HfsPlusFileSystem(device, readOnly, this);
+		fs.read();
+		return fs;
+	}
 
-    public final String getName() {
-        return "HFS+";
-    }
+	public final String getName() {
+		return "HFS+";
+	}
 
-    public final boolean supports(final PartitionTableEntry pte, final byte[] firstSector,
-            final FSBlockDeviceAPI devApi) {
-        /*if (pte != null) {
-            if (pte instanceof IBMPartitionTableEntry) {
-                if (((IBMPartitionTableEntry) pte).getSystemIndicator() != IBMPartitionTypes.PARTTYPE_LINUXNATIVE) {
-                    return false;
-                }
-            }
-        } */
-        // need to check the magic
-        ByteBuffer magic = ByteBuffer.allocate(2);
-        try {
-            devApi.read(1024, magic);
-        } catch (IOException e) {
-            return false;
-        }
-        int magicNumber = BigEndian.getInt16(magic.array(), 0);
-        return (magicNumber == SuperBlock.HFSPLUS_SUPER_MAGIC || magicNumber == SuperBlock.HFSX_SUPER_MAGIC);
-    }
+	public final boolean supports(final PartitionTableEntry pte, final byte[] firstSector, final FSBlockDeviceAPI devApi) {
+		/*
+		 * if (pte != null) { if (pte instanceof IBMPartitionTableEntry) { if (((IBMPartitionTableEntry)
+		 * pte).getSystemIndicator() != IBMPartitionTypes.PARTTYPE_LINUXNATIVE) { return false; } } }
+		 */
+		// need to check the magic
+		ByteBuffer magic = ByteBuffer.allocate(4);
+		try {
+			devApi.read(1024, magic);
+		} catch (IOException e) {
+			return false;
+		}
+
+		int magicNumber = BigEndian.getInt16(magic.array(), 0);
+		int version = BigEndian.getInt16(magic.array(), 2);
+
+		return (magicNumber == SuperBlock.HFSPLUS_SUPER_MAGIC && version == 4)
+				|| (magicNumber == SuperBlock.HFSX_SUPER_MAGIC && version == 5);
+	}
 
 }
