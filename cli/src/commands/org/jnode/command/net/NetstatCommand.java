@@ -73,6 +73,7 @@ public class NetstatCommand extends AbstractCommand {
         throws NetworkException {
         final Statistic[] statistics = stat.getStatistics();
         if (statistics.length == 0) {
+        	padOutput(out, padSize);
             out.print(str_none);
         } else {
         	StringBuffer buffer = new StringBuffer();
