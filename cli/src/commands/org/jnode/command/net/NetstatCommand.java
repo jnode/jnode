@@ -36,7 +36,7 @@ import org.jnode.vm.objects.Statistics;
 public class NetstatCommand extends AbstractCommand {
 
     private static final String help_super = "Print statistics for all network devices";
-    private static final String fmt_stat = "%s: ID %s";
+    private static final String fmt_stat = "%s: ID %s\n";
     private static final String str_none = "none";
     
     public NetstatCommand() {
@@ -60,42 +60,36 @@ public class NetstatCommand extends AbstractCommand {
     
     private void showStats(PrintWriter out, NetworkLayer nl, int maxWidth) throws NetworkException {
         out.format(fmt_stat, nl.getName(), nl.getProtocolID());
-        final String prefix = "    ";
-        out.print(prefix);
-        showStats(out, nl.getStatistics(), maxWidth - prefix.length(), prefix);
+        padOutput(out, 4);
+        showStats(out, nl.getStatistics(), 4);
         for (TransportLayer tl : nl.getTransportLayers()) {
-            out.print(prefix);
+            padOutput(out, 4);
             out.format(fmt_stat, tl.getName(), tl.getProtocolID());
-            final String prefix2 = prefix + prefix;
-            out.print(prefix2);
-            showStats(out, tl.getStatistics(), maxWidth - prefix2.length(), prefix2);
+            showStats(out, tl.getStatistics(),8);
         }
         out.println();
     }
     
-    private void showStats(PrintWriter out, Statistics stat, int maxWidth, String prefix)
+    private void showStats(PrintWriter out, Statistics stat, int padSize)
         throws NetworkException {
-        final Statistic[] list = stat.getStatistics();
-        if (list.length == 0) {
+    	padOutput(out, padSize);
+        final Statistic[] statistics = stat.getStatistics();
+        if (statistics.length == 0) {
             out.print(str_none);
         } else {
-            int width = 0;
-            for (int i = 0; i < list.length; i++) {
-                final Statistic st = list[i];
-                String msg = st.getName() + ' ' + st.getValue();
-                if (i + 1 < list.length) {
-                    msg = msg + ", ";
-                }
-                if (width + msg.length() > maxWidth) {
-                    out.println();
-                    out.print(prefix);
-                    width = 0;
-                }
-                out.print(msg);
-                width += msg.length();
-            }
+        	StringBuffer buffer = new StringBuffer();
+        	for(Statistic statistic : statistics){
+        		buffer.append(statistic.getName()).append(' ').append(statistic.getValue()).append("\n");
+        	}
+        	out.print(buffer.toString());
         }
         out.println();
     }
+    
+	private void padOutput(PrintWriter out, int size) {
+		for(int i = 0; i < size; i++){
+			out.print(" ");	
+		}
+	}
 
 }
