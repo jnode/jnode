@@ -36,13 +36,15 @@ public class ARPHeader implements NetworkLayerHeader {
     
     private final static int ARP_DATA_LENGTH = 28;
 
-    private HardwareAddress srcHWAddress;
-    private ProtocolAddress srcPAddress;
-    private HardwareAddress targetHWAddress;
-    private ProtocolAddress targetPAddress;
-    private int op;
-    private final int hwtype;
-    private final int ptype;
+    private HardwareAddress sourceHardwareAddress;
+    private ProtocolAddress sourceProtocolAddress;
+    private HardwareAddress destinationHardwareAddress;
+    private ProtocolAddress destinationProtocolAddress;
+    private ARPOperation operation;
+    private final int hardwareType;
+    private final int protocolType;
+    private int hardwareAddressSize;
+    private int protocolAddressSize;
 
     /**
      * Create a new instance
@@ -56,15 +58,17 @@ public class ARPHeader implements NetworkLayerHeader {
      * @param ptype
      */
     public ARPHeader(HardwareAddress srcHWAddress, ProtocolAddress srcPAddress,
-            HardwareAddress targetHWAddress, ProtocolAddress targetPAddress, int op, int hwtype,
-            int ptype) {
-        this.srcHWAddress = srcHWAddress;
-        this.srcPAddress = srcPAddress;
-        this.targetHWAddress = targetHWAddress;
-        this.targetPAddress = targetPAddress;
-        this.op = op;
-        this.hwtype = hwtype;
-        this.ptype = ptype;
+            HardwareAddress targetHWAddress, ProtocolAddress targetPAddress, ARPOperation op, int hwtype,
+            int ptype, int hwSize, int pSize) {
+        this.sourceHardwareAddress = srcHWAddress;
+        this.sourceProtocolAddress = srcPAddress;
+        this.destinationHardwareAddress = targetHWAddress;
+        this.destinationProtocolAddress = targetPAddress;
+        this.operation = op;
+        this.hardwareType = hwtype;
+        this.protocolType = ptype;
+        this.hardwareAddressSize = hwSize;
+        this.protocolAddressSize = pSize;
     }
 
     /**
@@ -73,18 +77,18 @@ public class ARPHeader implements NetworkLayerHeader {
      * @param skbuf
      */
     public ARPHeader(SocketBuffer skbuf) throws SocketException {
-        hwtype = skbuf.get16(0);
-        ptype = skbuf.get16(2);
-        // int hwsize = skbuf.get(4);
-        // int psize = skbuf.get(5);
-        op = skbuf.get16(6);
-        if ((hwtype == 1) && (ptype == EthernetConstants.ETH_P_IP)) {
-            srcHWAddress = new EthernetAddress(skbuf, 8);
-            srcPAddress = new IPv4Address(skbuf, 14);
-            targetHWAddress = new EthernetAddress(skbuf, 18);
-            targetPAddress = new IPv4Address(skbuf, 24);
+        hardwareType = skbuf.get16(0);
+        protocolType = skbuf.get16(2);
+        hardwareAddressSize = skbuf.get(4);
+        protocolAddressSize = skbuf.get(5);
+        operation = ARPOperation.getType(skbuf.get16(6));
+        if ((hardwareType == 1) && (protocolType == EthernetConstants.ETH_P_IP)) {
+            sourceHardwareAddress = new EthernetAddress(skbuf, 8);
+            sourceProtocolAddress = new IPv4Address(skbuf, 14);
+            destinationHardwareAddress = new EthernetAddress(skbuf, 18);
+            destinationProtocolAddress = new IPv4Address(skbuf, 24);
         } else {
-            throw new SocketException("Unknown hw,ptype: " + hwtype + ',' + ptype);
+            throw new SocketException("Unknown hw,ptype: " + hardwareType + ',' + protocolType);
         }
     }
 
@@ -92,7 +96,7 @@ public class ARPHeader implements NetworkLayerHeader {
      * Gets the length of this header in bytes
      */
     public int getLength() {
-        return (8 + (srcHWAddress.getLength() + srcPAddress.getLength()) * 2);
+        return (8 + (sourceHardwareAddress.getLength() + sourceProtocolAddress.getLength()) * 2);
     }
 
     /**
@@ -101,21 +105,21 @@ public class ARPHeader implements NetworkLayerHeader {
      * @param skbuf
      */
     public void prefixTo(SocketBuffer skbuf) {
-        skbuf.insert(8 + (srcHWAddress.getLength() + srcPAddress.getLength()) * 2);
+        skbuf.insert(8 + (sourceHardwareAddress.getLength() + sourceProtocolAddress.getLength()) * 2);
         int ofs = 0;
-        skbuf.set16(ofs + 0, hwtype);
-        skbuf.set16(ofs + 2, ptype);
-        skbuf.set(ofs + 4, srcHWAddress.getLength());
-        skbuf.set(ofs + 5, srcPAddress.getLength());
-        skbuf.set16(ofs + 6, op);
+        skbuf.set16(ofs + 0, hardwareType);
+        skbuf.set16(ofs + 2, protocolType);
+        skbuf.set(ofs + 4, sourceHardwareAddress.getLength());
+        skbuf.set(ofs + 5, sourceProtocolAddress.getLength());
+        skbuf.set16(ofs + 6, operation.getId());
         ofs += 8;
-        srcHWAddress.writeTo(skbuf, ofs);
-        ofs += srcHWAddress.getLength();
-        srcPAddress.writeTo(skbuf, ofs);
-        ofs += srcPAddress.getLength();
-        targetHWAddress.writeTo(skbuf, ofs);
-        ofs += targetHWAddress.getLength();
-        targetPAddress.writeTo(skbuf, ofs);
+        sourceHardwareAddress.writeTo(skbuf, ofs);
+        ofs += sourceHardwareAddress.getLength();
+        sourceProtocolAddress.writeTo(skbuf, ofs);
+        ofs += sourceProtocolAddress.getLength();
+        destinationHardwareAddress.writeTo(skbuf, ofs);
+        ofs += destinationHardwareAddress.getLength();
+        destinationProtocolAddress.writeTo(skbuf, ofs);
     }
 
     /**
@@ -135,14 +139,14 @@ public class ARPHeader implements NetworkLayerHeader {
      * Gets the source address of the packet described in this header
      */
     public ProtocolAddress getSourceAddress() {
-        return srcPAddress;
+        return sourceProtocolAddress;
     }
 
     /**
      * Gets the source address of the packet described in this header
      */
     public ProtocolAddress getDestinationAddress() {
-        return targetPAddress;
+        return destinationProtocolAddress;
     }
 
     public int getDataLength() {
@@ -153,83 +157,93 @@ public class ARPHeader implements NetworkLayerHeader {
      * Gets the hardware type
      */
     public int getHType() {
-        return hwtype;
+        return hardwareType;
     }
 
     /**
      * Gets the operation
      */
-    public int getOperation() {
-        return op;
+    public ARPOperation getOperation() {
+        return operation;
     }
 
     /**
      * Gets the protocol type
      */
     public int getPType() {
-        return ptype;
+        return protocolType;
     }
 
     /**
      * Gets the source hardware address
      */
     public HardwareAddress getSrcHWAddress() {
-        return srcHWAddress;
+        return sourceHardwareAddress;
     }
 
     /**
      * Gets the source protocol address
      */
     public ProtocolAddress getSrcPAddress() {
-        return srcPAddress;
+        return sourceProtocolAddress;
     }
 
     /**
      * Gets the target hardware address
      */
     public HardwareAddress getTargetHWAddress() {
-        return targetHWAddress;
+        return destinationHardwareAddress;
     }
 
     /**
      * Gets the target protocol address
      */
     public ProtocolAddress getTargetPAddress() {
-        return targetPAddress;
+        return destinationProtocolAddress;
     }
+    
+    public int getHardwareAddressSize() {
+		return hardwareAddressSize;
+	}
+    
+    public int getProtocolAddressSize() {
+		return protocolAddressSize;
+	}
 
     /**
      * Swap the two src and target addresses
      * 
      */
     public void swapAddresses() {
-        final HardwareAddress hwTmp = targetHWAddress;
-        final ProtocolAddress pTmp = targetPAddress;
-        targetHWAddress = srcHWAddress;
-        targetPAddress = srcPAddress;
-        srcHWAddress = hwTmp;
-        srcPAddress = pTmp;
+        final HardwareAddress hwTmp = destinationHardwareAddress;
+        final ProtocolAddress pTmp = destinationProtocolAddress;
+        destinationHardwareAddress = sourceHardwareAddress;
+        destinationProtocolAddress = sourceProtocolAddress;
+        sourceHardwareAddress = hwTmp;
+        sourceProtocolAddress = pTmp;
     }
 
+
     /**
-     * @param i
+     *
+     * @param operation
      */
-    public void setOperation(int i) {
-        op = i;
+    public void setOperation(ARPOperation operation) {
+        this.operation = operation;
     }
 
     /**
      * @param address
      */
     public void setSrcHWAddress(HardwareAddress address) {
-        srcHWAddress = address;
+        sourceHardwareAddress = address;
     }
 
     /**
      * @param address
      */
     public void setSrcPAddress(ProtocolAddress address) {
-        srcPAddress = address;
+        sourceProtocolAddress = address;
     }
 
 }

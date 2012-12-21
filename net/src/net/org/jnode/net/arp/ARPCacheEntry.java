@@ -30,22 +30,27 @@ import org.jnode.net.ProtocolAddress;
  */
 public class ARPCacheEntry {
 
-    private final long creationTime;
-    private final HardwareAddress hwAddress;
-    private final ProtocolAddress pAddress;
+    private static final long ARP_CACHE_LIFETIME = 10 * 60 * 1000;
+    
+	private final long creationTime;
+	private long lifeTime;
+    private final HardwareAddress hardwareAddress;
+    private final ProtocolAddress protocolAddress;
     private final boolean dynamic;
 
     /**
      * Create a new instance
      * 
-     * @param hwAddress
-     * @param pAddress
+     * @param hardwareAddress
+     * @param protocolAddress
      * @param dynamic
      */
-    public ARPCacheEntry(HardwareAddress hwAddress, ProtocolAddress pAddress, boolean dynamic) {
-        this.hwAddress = hwAddress;
-        this.pAddress = pAddress;
+    public ARPCacheEntry(HardwareAddress hardwareAddress, ProtocolAddress protocolAddress, boolean dynamic) {
+        this.hardwareAddress = hardwareAddress;
+        this.protocolAddress = protocolAddress;
         this.creationTime = System.currentTimeMillis();
+        // TODO make ARP cache lifetime configurable
+        this.lifeTime = ARP_CACHE_LIFETIME;
         this.dynamic = dynamic;
     }
 
@@ -60,23 +65,21 @@ public class ARPCacheEntry {
      * Is this entry expired?
      */
     public boolean isExpired() {
-        final long age = (System.currentTimeMillis() - creationTime);
-        // TODO make ARP cache lifetime configurable
-        return (age >= 10 * 60 * 1000);
+        return ((System.currentTimeMillis() - creationTime) >= lifeTime);
     }
 
     /**
      * Gets the network address of this entry
      */
     public HardwareAddress getHwAddress() {
-        return hwAddress;
+        return hardwareAddress;
     }
 
     /**
      * Gets the protocol address of this entry
      */
     public ProtocolAddress getPAddress() {
-        return pAddress;
+        return protocolAddress;
     }
 
     /**
@@ -98,6 +101,6 @@ public class ARPCacheEntry {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return pAddress + " " + hwAddress + ' ' + ((dynamic) ? "dynamic" : "static");
+        return protocolAddress + " " + hardwareAddress + ' ' + ((dynamic) ? "dynamic" : "static");
     }
 }
