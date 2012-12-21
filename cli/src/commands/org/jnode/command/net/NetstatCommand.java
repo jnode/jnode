@@ -60,7 +60,6 @@ public class NetstatCommand extends AbstractCommand {
     
     private void showStats(PrintWriter out, NetworkLayer nl, int maxWidth) throws NetworkException {
         out.format(fmt_stat, nl.getName(), nl.getProtocolID());
-        padOutput(out, 4);
         showStats(out, nl.getStatistics(), 4);
         for (TransportLayer tl : nl.getTransportLayers()) {
             padOutput(out, 4);
@@ -72,18 +71,25 @@ public class NetstatCommand extends AbstractCommand {
     
     private void showStats(PrintWriter out, Statistics stat, int padSize)
         throws NetworkException {
-    	padOutput(out, padSize);
         final Statistic[] statistics = stat.getStatistics();
         if (statistics.length == 0) {
             out.print(str_none);
         } else {
         	StringBuffer buffer = new StringBuffer();
         	for(Statistic statistic : statistics){
-        		buffer.append(statistic.getName()).append(' ').append(statistic.getValue()).append("\n");
+        		buffer.append(paddedString(padSize)).append(statistic.getName()).append(' ').append(statistic.getValue()).append("\n");
         	}
         	out.print(buffer.toString());
         }
         out.println();
+    }
+    
+    private String paddedString(int padSize) {
+    	String result = "";
+    	for(int i = 0; i < padSize; i++){
+			result += " ";	
+		}
+    	return result;
     }
     
 	private void padOutput(PrintWriter out, int size) {
