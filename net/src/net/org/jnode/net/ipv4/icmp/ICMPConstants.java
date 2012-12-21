@@ -25,22 +25,6 @@ package org.jnode.net.ipv4.icmp;
      */
 public interface ICMPConstants {
 
-    public static final int ICMP_ECHOREPLY      = 0; /* Echo Reply */
-    public static final int ICMP_DEST_UNREACH   = 3; /* Destination Unreachable */
-    public static final int ICMP_SOURCE_QUENCH  = 4; /* Source Quench */
-    public static final int ICMP_REDIRECT       = 5; /* Redirect (change route) */
-    public static final int ICMP_ECHO           = 8;  /* Echo Request */
-    public static final int ICMP_TIME_EXCEEDED  = 11; /* Time Exceeded */
-    public static final int ICMP_PARAMETERPROB  = 12; /* Parameter Problem */
-    public static final int ICMP_TIMESTAMP      = 13; /* Timestamp Request */
-    public static final int ICMP_TIMESTAMPREPLY = 14; /* Timestamp Reply */
-    public static final int ICMP_INFO_REQUEST   = 15; /* Information Request */
-    public static final int ICMP_INFO_REPLY     = 16; /* Information Reply */
-    public static final int ICMP_ADDRESS        = 17; /* Address Mask Request */
-    public static final int ICMP_ADDRESSREPLY   = 18; /* Address Mask Reply */
-    public static final int NR_ICMP_TYPES       = 18;
-
-
     /* Codes for UNREACH. */
     public static final int ICMP_NET_UNREACH    = 0;  /* Network Unreachable */
     public static final int ICMP_HOST_UNREACH   = 1;  /* Host Unreachable */

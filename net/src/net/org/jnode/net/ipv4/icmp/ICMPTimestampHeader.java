@@ -39,10 +39,10 @@ public class ICMPTimestampHeader extends ICMPExHeader {
      * @param receiveTimestamp
      * @param transmitTimestamp
      */
-    public ICMPTimestampHeader(int type, int identifier, int seqNumber, int originateTimestamp,
+    public ICMPTimestampHeader(ICMPType type, int identifier, int seqNumber, int originateTimestamp,
             int receiveTimestamp, int transmitTimestamp) {
         super(type, 0, identifier, seqNumber);
-        if ((type != ICMP_TIMESTAMP) && (type != ICMP_TIMESTAMPREPLY)) {
+        if ((type != ICMPType.ICMP_TIMESTAMP) && (type != ICMPType.ICMP_TIMESTAMPREPLY)) {
             throw new IllegalArgumentException("Invalid type " + type);
         }
         this.originateTimestamp = originateTimestamp;
@@ -55,8 +55,8 @@ public class ICMPTimestampHeader extends ICMPExHeader {
      */
     public ICMPTimestampHeader(SocketBuffer skbuf) {
         super(skbuf);
-        final int type = getType();
-        if ((type != ICMP_TIMESTAMP) && (type != ICMP_TIMESTAMPREPLY)) {
+        final ICMPType type = getType();
+        if ((type != ICMPType.ICMP_TIMESTAMP) && (type != ICMPType.ICMP_TIMESTAMPREPLY)) {
             throw new IllegalArgumentException("Invalid type " + type);
         }
         this.originateTimestamp = skbuf.get32(8);
