@@ -110,7 +110,7 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
 
                 SocketBuffer packet = new SocketBuffer();
                 packet.insert(this.size);
-                ICMPEchoHeader transportHeader = new ICMPEchoHeader(8, id_count, seq_count);
+                ICMPEchoHeader transportHeader = new ICMPEchoHeader(id_count, seq_count);
                 transportHeader.prefixTo(packet);
 
                 Request r =
