@@ -46,13 +46,19 @@ import org.jnode.vm.objects.Statistics;
  * @author epr
  */
 @SharedStatics
-public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
-    private static final boolean DEBUG = false;
+public class ARPNetworkLayer implements NetworkLayer {
+	
+	private static final int IPv4_PROTOCOL_SIZE = 4;
+
+	/** Delay between ARP requests in millisecond */
+    public static final int ARP_REQUEST_DELAY = 1500;
 
     /**
      * My logger
      */
     private static final Logger log = Logger.getLogger(ARPNetworkLayer.class);
+    
+    private static final boolean DEBUG = false;
     
     /**
      * My statistics
@@ -149,7 +155,7 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
             stat.opackets.inc();
             hdr.swapAddresses();
             hdr.setSrcHWAddress(deviceAPI.getAddress());
-            hdr.setOperation(ARP_REPLY);
+            hdr.setOperation(ARPOperation.ARP_REPLY);
             skbuf.clear();
             skbuf.setProtocolID(getProtocolID());
             hdr.prefixTo(skbuf);
@@ -315,11 +321,11 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
         final NetDeviceAPI api = getAPI(device);
         final HardwareAddress srcHwAddr = api.getAddress();
         final HardwareAddress trgHwAddr = srcHwAddr.getDefaultBroadcastAddress();
-        final int op = ARP_REQUEST;
+        final ARPOperation op = ARPOperation.ARP_REQUEST;
         final int hwtype = srcHwAddr.getType();
         final int ptype = address.getType();
 
-        final ARPHeader hdr = new ARPHeader(srcHwAddr, myAddress, trgHwAddr, address, op, hwtype, ptype);
+        final ARPHeader hdr = new ARPHeader(srcHwAddr, myAddress, trgHwAddr, address, op, hwtype, ptype,EthernetConstants.ETH_ALEN,IPv4_PROTOCOL_SIZE);
         final SocketBuffer skbuf = new SocketBuffer();
         skbuf.setProtocolID(EthernetConstants.ETH_P_ARP);
         hdr.prefixTo(skbuf);

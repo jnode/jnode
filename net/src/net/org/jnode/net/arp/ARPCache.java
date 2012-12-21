@@ -23,6 +23,7 @@ package org.jnode.net.arp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jnode.net.HardwareAddress;
@@ -35,33 +36,33 @@ import org.jnode.net.ProtocolAddress;
  */
 public class ARPCache {
 
-    /** My logger */
     private static final Logger log = Logger.getLogger(ARPCache.class);
-    private final HashMap<HardwareAddress, ARPCacheEntry> hw2p =
+    
+    private final Map<HardwareAddress, ARPCacheEntry> networkToProtocolAddresses =
             new HashMap<HardwareAddress, ARPCacheEntry>();
-    private final HashMap<ProtocolAddress, ARPCacheEntry> p2hw =
+    
+    private final Map<ProtocolAddress, ARPCacheEntry> protocolToNetworkAddresses =
             new HashMap<ProtocolAddress, ARPCacheEntry>();
 
     /**
      * Remove all cached entries
      */
     public synchronized void clear() {
-        hw2p.clear();
-        p2hw.clear();
+        networkToProtocolAddresses.clear();
+        protocolToNetworkAddresses.clear();
     }
 
     /**
-     * Update/Add an extry to the cache
+     * Update/Add an entry to the cache
      * 
-     * @param hwAddress
-     * @param pAddress
+     * @param hardwareAddress Network address
+     * @param protocolAddress Protocol address
      */
-    public synchronized void set(HardwareAddress hwAddress, ProtocolAddress pAddress,
+    public synchronized void set(HardwareAddress hardwareAddress, ProtocolAddress protocolAddress,
             boolean dynamic) {
-        final ARPCacheEntry entry = new ARPCacheEntry(hwAddress, pAddress, dynamic);
-        hw2p.put(hwAddress, entry);
-        p2hw.put(pAddress, entry);
-        // log.debug("Adding ARP cache " + hwAddress + " - " + pAddress);
+        final ARPCacheEntry entry = new ARPCacheEntry(hardwareAddress, protocolAddress, dynamic);
+        networkToProtocolAddresses.put(hardwareAddress, entry);
+        protocolToNetworkAddresses.put(protocolAddress, entry);
         notifyAll();
     }
 
@@ -69,18 +70,18 @@ public class ARPCache {
      * Gets the cached netword address for the given protocol address, or null
      * if not found.
      * 
-     * @param pAddress
+     * @param protocolAddress
      */
-    public synchronized HardwareAddress get(ProtocolAddress pAddress) {
-        final ARPCacheEntry entry = (ARPCacheEntry) p2hw.get(pAddress);
+    public synchronized HardwareAddress get(ProtocolAddress protocolAddress) {
+        final ARPCacheEntry entry = protocolToNetworkAddresses.get(protocolAddress);
         if (entry == null) {
             return null;
         }
         if (entry.isExpired()) {
             log.debug("Removing expired ARP entry " + entry);
-            p2hw.remove(pAddress);
-            if (hw2p.get(entry.getHwAddress()) == entry) {
-                hw2p.remove(entry.getHwAddress());
+            protocolToNetworkAddresses.remove(protocolAddress);
+            if (networkToProtocolAddresses.get(entry.getHwAddress()) == entry) {
+                networkToProtocolAddresses.remove(entry.getHwAddress());
             }
             return null;
         }
@@ -91,17 +92,17 @@ public class ARPCache {
      * Gets the cached protocol address for the given netword address, or null
      * if not found.
      * 
-     * @param hwAddress
+     * @param hardwareAddress
      */
-    public synchronized ProtocolAddress get(HardwareAddress hwAddress) {
-        final ARPCacheEntry entry = (ARPCacheEntry) hw2p.get(hwAddress);
+    public synchronized ProtocolAddress get(HardwareAddress hardwareAddress) {
+        final ARPCacheEntry entry = networkToProtocolAddresses.get(hardwareAddress);
         if (entry == null) {
             return null;
         }
         if (entry.isExpired()) {
-            hw2p.remove(hwAddress);
-            if (p2hw.get(entry.getPAddress()) == entry) {
-                p2hw.remove(entry.getPAddress());
+            networkToProtocolAddresses.remove(hardwareAddress);
+            if (protocolToNetworkAddresses.get(entry.getPAddress()) == entry) {
+                protocolToNetworkAddresses.remove(entry.getPAddress());
             }
             return null;
         }
@@ -112,7 +113,7 @@ public class ARPCache {
      * Return all cache-entries.
      */
     public synchronized Collection<ARPCacheEntry> entries() {
-        return new ArrayList<ARPCacheEntry>(hw2p.values());
+        return new ArrayList<ARPCacheEntry>(networkToProtocolAddresses.values());
     }
 
     /**
