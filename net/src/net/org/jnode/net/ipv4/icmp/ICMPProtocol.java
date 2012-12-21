@@ -44,7 +44,9 @@ import org.jnode.vm.objects.Statistics;
 public class ICMPProtocol implements IPv4Protocol, IPv4Constants, ICMPConstants,
         QueueProcessor<SocketBuffer> {
 
-    /** My logger */
+    private static final String IPNAME_ICMP = "icmp";
+
+	/** My logger */
     private Logger log = Logger.getLogger(getClass());
 
     /** The IP service we're a part of */
@@ -77,7 +79,7 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants, ICMPConstants,
      * @see org.jnode.net.ipv4.IPv4Protocol#getName()
      */
     public String getName() {
-        return "icmp";
+        return IPNAME_ICMP;
     }
 
     /**
@@ -96,7 +98,7 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants, ICMPConstants,
         stat.ipackets.inc();
 
         try {
-            final ICMPHeader hdr = createHeader(skbuf);
+            final ICMPHeader hdr = ICMPHeaderFactory.createHeader(skbuf);
             skbuf.setTransportLayerHeader(hdr);
             skbuf.pull(hdr.getLength());
 
@@ -181,42 +183,7 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants, ICMPConstants,
         send(ipReplyHdr, hdr.createReplyHeader(), new SocketBuffer(skbuf));
     }
 
-    /**
-     * Create a type specific ICMP header. The type is read from the first first
-     * in the skbuf.
-     * 
-     * @param skbuf
-     * @throws SocketException
-     */
-    private ICMPHeader createHeader(SocketBuffer skbuf) throws SocketException {
-        final int type = skbuf.get(0);
-        switch (type) {
-            case ICMP_DEST_UNREACH:
-                return new ICMPUnreachableHeader(skbuf);
-
-            case ICMP_TIMESTAMP:
-            case ICMP_TIMESTAMPREPLY:
-                return new ICMPTimestampHeader(skbuf);
-
-            case ICMP_ADDRESS:
-            case ICMP_ADDRESSREPLY:
-                return new ICMPAddressMaskHeader(skbuf);
-
-            case ICMP_ECHOREPLY:
-            case ICMP_ECHO:
-                return new ICMPEchoHeader(skbuf);
-
-            case ICMP_SOURCE_QUENCH:
-            case ICMP_REDIRECT:
-            case ICMP_TIME_EXCEEDED:
-            case ICMP_PARAMETERPROB:
-            case ICMP_INFO_REQUEST:
-            case ICMP_INFO_REPLY:
-                throw new SocketException("Not implemented");
-            default:
-                throw new SocketException("Unknown ICMP type " + type);
-        }
-    }
+    
 
     /**
      * @see org.jnode.net.ipv4.IPv4Protocol#getStatistics()
@@ -242,13 +209,11 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants, ICMPConstants,
     private void processReplyRequest(SocketBuffer skbuf) {
         final ICMPHeader hdr = (ICMPHeader) skbuf.getTransportLayerHeader();
         try {
-            switch (hdr.getType()) {
-                case ICMP_ECHO:
+            if(hdr.getType() == ICMPType.ICMP_ECHO) {
                     sendEchoReply((ICMPEchoHeader) hdr, skbuf);
-                    break;
             }
         } catch (SocketException ex) {
-            log.debug("Error in ICMP reply", ex);
+            log.error("Error in ICMP reply", ex);
         }
     }
 

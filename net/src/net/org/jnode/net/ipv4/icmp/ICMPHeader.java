@@ -30,7 +30,7 @@ import org.jnode.net.ipv4.IPv4Utils;
  */
 public abstract class ICMPHeader implements TransportLayerHeader, ICMPConstants {
 
-    private final int type;
+    private final ICMPType type;
     private final int code;
     private final boolean checksumOk;
 
@@ -40,10 +40,7 @@ public abstract class ICMPHeader implements TransportLayerHeader, ICMPConstants 
      * @param type
      * @param code
      */
-    public ICMPHeader(int type, int code) {
-        if ((type < 0) || (type > NR_ICMP_TYPES)) {
-            throw new IllegalArgumentException("Invalid type " + type);
-        }
+    public ICMPHeader(ICMPType type, int code) {
         if (code < 0) {
             throw new IllegalArgumentException("Invalid code " + code);
         }
@@ -58,7 +55,7 @@ public abstract class ICMPHeader implements TransportLayerHeader, ICMPConstants 
      * @param skbuf
      */
     public ICMPHeader(SocketBuffer skbuf) {
-        this.type = skbuf.get(0);
+        this.type = ICMPType.getType(skbuf.get(0));
         this.code = skbuf.get(1);
         final int dataLength = ((IPv4Header) skbuf.getNetworkLayerHeader()).getDataLength();
         final int ccs = IPv4Utils.calcChecksum(skbuf, 0, dataLength);
@@ -70,7 +67,7 @@ public abstract class ICMPHeader implements TransportLayerHeader, ICMPConstants 
      */
     public void prefixTo(SocketBuffer skbuf) {
         skbuf.insert(getLength());
-        skbuf.set(0, type);
+        skbuf.set(0, type.getId());
         skbuf.set(1, code);
         skbuf.set16(2, 0); // Checksum, overwritten later
         doPrefixTo(skbuf);
@@ -114,7 +111,7 @@ public abstract class ICMPHeader implements TransportLayerHeader, ICMPConstants 
     /**
      * Gets the type field
      */
-    public int getType() {
+    public ICMPType getType() {
         return type;
     }
 

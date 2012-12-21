@@ -33,9 +33,9 @@ public class ICMPAddressMaskHeader extends ICMPExHeader {
     /**
      * @param type
      */
-    public ICMPAddressMaskHeader(int type, int identifier, int seqNumber, IPv4Address subnetMask) {
+    public ICMPAddressMaskHeader(ICMPType type, int identifier, int seqNumber, IPv4Address subnetMask) {
         super(type, 0, identifier, seqNumber);
-        if ((type != ICMP_ADDRESS) && (type != ICMP_ADDRESSREPLY)) {
+        if ((type != ICMPType.ICMP_ADDRESS) && (type != ICMPType.ICMP_ADDRESSREPLY)) {
             throw new IllegalArgumentException("Invalid type " + type);
         }
         this.subnetMask = subnetMask;
@@ -46,8 +46,8 @@ public class ICMPAddressMaskHeader extends ICMPExHeader {
      */
     public ICMPAddressMaskHeader(SocketBuffer skbuf) {
         super(skbuf);
-        final int type = getType();
-        if ((type != ICMP_ADDRESS) && (type != ICMP_ADDRESSREPLY)) {
+        final ICMPType type = getType();
+        if ((type != ICMPType.ICMP_ADDRESS) && (type != ICMPType.ICMP_ADDRESSREPLY)) {
             throw new IllegalArgumentException("Invalid type " + type);
         }
         this.subnetMask = new IPv4Address(skbuf, 8);

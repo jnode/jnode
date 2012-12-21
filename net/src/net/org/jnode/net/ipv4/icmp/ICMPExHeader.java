@@ -35,7 +35,7 @@ public abstract class ICMPExHeader extends ICMPHeader {
     /**
      * @param type
      */
-    public ICMPExHeader(int type, int code, int identifier, int seqNumber) {
+    public ICMPExHeader(ICMPType type, int code, int identifier, int seqNumber) {
         super(type, code);
         this.identifier = identifier;
         this.seqNumber = seqNumber;
