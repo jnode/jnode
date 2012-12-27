@@ -111,25 +111,25 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Create a new instance
      *
-     * @param e the root XMLElement for the XML plugin descriptor
+     * @param rootElement the root XMLElement for the XML plugin descriptor
      * @param jarFile the PluginJar object to associate with the descriptor.
      */
-    PluginDescriptorModel(PluginJar jarFile, XMLElement e)
+    PluginDescriptorModel(PluginJar jarFile, XMLElement rootElement)
         throws PluginException {
         this.jarFile = jarFile;
         this.fragments = new BootableArrayList<FragmentDescriptorModel>();
-        id = getAttribute(e, "id", true);
-        name = getAttribute(e, "name", true);
-        providerName = getAttribute(e, "provider-name", false);
-        providerUrl = getAttribute(e, "provider-url", false);
-        licenseName = getAttribute(e, "license-name", true);
-        licenseUrl = getAttribute(e, "license-url", false);
-        version = getAttribute(e, "version", true);
-        className = getAttribute(e, "class", false);
-        system = getBooleanAttribute(e, "system", false);
-        autoStart = getBooleanAttribute(e, "auto-start", false);
+        id = getAttribute(rootElement, "id", true);
+        name = getAttribute(rootElement, "name", true);
+        providerName = getAttribute(rootElement, "provider-name", false);
+        providerUrl = getAttribute(rootElement, "provider-url", false);
+        licenseName = getAttribute(rootElement, "license-name", true);
+        licenseUrl = getAttribute(rootElement, "license-url", false);
+        version = getAttribute(rootElement, "version", true);
+        className = getAttribute(rootElement, "class", false);
+        system = getBooleanAttribute(rootElement, "system", false);
+        autoStart = getBooleanAttribute(rootElement, "auto-start", false);
         priority = Math.min(MAX_PRIORITY, Math.max(MIN_PRIORITY,
-            getIntAttribute(e, "priority", DEFAULT_PRIORITY)));
+            getIntAttribute(rootElement, "priority", DEFAULT_PRIORITY)));
 
         // if (registry != null) {
         // registry.registerPlugin(this);
@@ -140,9 +140,9 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         final ArrayList<PluginPrerequisiteModel> reqList = new ArrayList<PluginPrerequisiteModel>();
         RuntimeModel runtime = null;
 
-        initializeRequiresList(reqList, e);
+        initializeRequiresList(reqList, rootElement);
 
-        for (final XMLElement childE : e.getChildren()) {
+        for (final XMLElement childE : rootElement.getChildren()) {
             final String tag = childE.getName();
             if (tag.equals("extension-point")) {
                 final ExtensionPointModel ep = new ExtensionPointModel(this,
