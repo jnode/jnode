@@ -29,7 +29,7 @@ import org.jnode.plugin.PluginPrerequisite;
  */
 final class PluginPrerequisiteModel extends PluginModelObject implements PluginPrerequisite {
 
-    private final String plugin;
+    private final String pluginIdentifier;
     private final String version;
 
     /**
@@ -42,7 +42,7 @@ final class PluginPrerequisiteModel extends PluginModelObject implements PluginP
     public PluginPrerequisiteModel(PluginDescriptorModel plugin, XMLElement e)
         throws PluginException {
         super(plugin);
-        this.plugin = getAttribute(e, "plugin", true);
+        this.pluginIdentifier = getAttribute(e, "plugin", true);
         final String version = getAttribute(e, "version", false);
         if (version != null) {
             this.version = version;
@@ -55,19 +55,19 @@ final class PluginPrerequisiteModel extends PluginModelObject implements PluginP
      * Initialize this instance.
      *
      * @param plugin
-     * @param pluginId
+     * @param pluginIdentifier
      * @param pluginVersion
      */
     public PluginPrerequisiteModel(PluginDescriptorModel plugin,
-                                   String pluginId, String pluginVersion) {
+                                   String pluginIdentifier, String pluginVersion) {
         super(plugin);
-        if (pluginId == null) {
+        if (pluginIdentifier == null) {
             throw new IllegalArgumentException("pluginId is null");
         }
         if (pluginVersion == null) {
             throw new IllegalArgumentException("pluginVersion is null");
         }
-        this.plugin = pluginId;
+        this.pluginIdentifier = pluginIdentifier;
         this.version = pluginVersion;
     }
 
@@ -75,7 +75,7 @@ final class PluginPrerequisiteModel extends PluginModelObject implements PluginP
      * Gets the identifier of the plugin that is required
      */
     public String getPluginId() {
-        return plugin;
+        return pluginIdentifier;
     }
 
 
@@ -97,9 +97,9 @@ final class PluginPrerequisiteModel extends PluginModelObject implements PluginP
      */
     protected void resolve(PluginRegistryModel registry)
         throws PluginException {
-        if (registry.getPluginDescriptor(plugin) == null) {
+        if (registry.getPluginDescriptor(pluginIdentifier) == null) {
             throw new PluginException(
-                "Unknown plugin " + plugin + " in import of " + getDeclaringPluginDescriptor().getId());
+                "Unknown plugin " + pluginIdentifier + " in import of " + getDeclaringPluginDescriptor().getId());
         }
     }
 
