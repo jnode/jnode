@@ -8,13 +8,13 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
@@ -41,7 +41,7 @@ final class ConfigurationElementModel extends PluginModelObject implements Confi
 
     /**
      * Create new instance of configuration element model.
-     * 
+     *
      * @param plugin The model for plugin descriptor.
      * @param element An XML element.
      * @throws PluginException
@@ -76,7 +76,7 @@ final class ConfigurationElementModel extends PluginModelObject implements Confi
 
     /**
      * Gets the value of an attribute with a given name
-     * 
+     *
      * @param name Name of the element.
      * @return The attribute value, or null if not found.
      */
@@ -84,7 +84,7 @@ final class ConfigurationElementModel extends PluginModelObject implements Confi
     public String getAttribute(String name) {
         if (attributes != null) {
             for (AttributeModel attribute : attributes)
-                if (attribute.equals(name)) {
+                if (attribute.getName().equals(name)) {
                     return attribute.getValue();
                 }
         }
@@ -93,7 +93,7 @@ final class ConfigurationElementModel extends PluginModelObject implements Confi
 
     /**
      * Gets the names of all attributes in this element.
-     * 
+     *
      * @return A set of attribute names. This set can be empty if no attributes
      *         found.
      */
