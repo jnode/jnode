@@ -15,13 +15,13 @@
     <import plugin="org.jnode.shell.syntax"/>
     <import plugin="org.jnode.util"/>
   </requires>
-  
+
   <runtime>
     <library name="jnode-cli.jar">
       <export name="org.jnode.command.system.*"/>
     </library>
   </runtime>
-  
+
   <extension point="org.jnode.shell.aliases">
     <alias name="alias"     class="org.jnode.command.system.AliasCommand"/>
     <alias name="bindkeys"  class="org.jnode.command.system.BindKeysCommand"/>
@@ -50,9 +50,10 @@
     <alias name="syntax"    class="org.jnode.command.system.SyntaxCommand"/>
     <alias name="terminate" class="org.jnode.command.system.TerminateCommand"/>
     <alias name="thread"    class="org.jnode.command.system.ThreadCommand"/>
+    <alias name="uname"     class="org.jnode.command.system.UnameCommand"/>
     <alias name="vminfo"    class="org.jnode.command.system.VmInfoCommand"/>
   </extension>
-  
+
   <extension point="org.jnode.shell.syntaxes">
     <syntax alias="alias">
       <empty description="List all aliases"/>
@@ -222,7 +223,7 @@
         <option argLabel="minTotalSize" longName="minTotalSize"/>
         <option argLabel="className"    longName="className"/>
       </optionSet>
-    </syntax> 
+    </syntax>
     <syntax alias="page">
       <empty description="Filter standard input a page (screen) at a time"/>
       <argument argLabel="file" description="Output the file a page (screen) at a time"/>
@@ -294,13 +295,25 @@
       </optional>
       <argument argLabel="threadName" description="Display the named Thread"/>
     </syntax>
+    <syntax alias="uname" description="Print operating system informations.">
+      <empty description="Print the hardware type on witch system is running; same like argument -m"/>
+      <optionSet>
+          <option argLabel="a" shortName="a"/>
+          <option argLabel="m" shortName="m"/>
+          <option argLabel="n" shortName="n"/>
+          <option argLabel="r" shortName="r"/>
+          <option argLabel="s" shortName="s"/>
+          <option argLabel="v" shortName="v"/>
+      </optionSet>
+    </syntax>
+
     <syntax alias="vminfo">
       <optional description="dump IRQ handler information">
         <option argLabel="reset" longName="reset"/>
       </optional>
     </syntax>
   </extension>
-  
+
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission"        name="*" actions="read,write"/>
     <permission class="java.lang.RuntimePermission"         name="getProtectionDomain"/>
@@ -317,5 +330,5 @@
     <permission class="org.jnode.permission.JNodePermission"  name="getVmClass"/>
     <permission class="java.lang.reflect.ReflectPermission" name="suppressAccessChecks"/>
   </extension>
-  
+
 </plugin>
