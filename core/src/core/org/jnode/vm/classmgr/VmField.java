@@ -22,6 +22,7 @@ package org.jnode.vm.classmgr;
 
 import java.lang.reflect.Field;
 import org.jnode.vm.isolate.VmIsolateLocal;
+import sun.reflect.ReflectionFactory;
 
 public abstract class VmField extends VmMember {
 
@@ -132,8 +133,8 @@ public abstract class VmField extends VmMember {
             if (slot == -1) {
                 throw new ClassFormatError("Invalid field: " + this.getName());
             }
-            javaField = new Field(d_class.asClass(), getName(), getType().asClass(), getModifiers(), slot,
-                getSignature(), getRawAnnotations());
+            javaField = ReflectionFactory.getReflectionFactory().newField(d_class.asClass(), getName(),
+                getType().asClass(), getModifiers(), slot,getSignature(), getRawAnnotations());
             javaFieldHolder.set(javaField);
         }
         return javaField;
