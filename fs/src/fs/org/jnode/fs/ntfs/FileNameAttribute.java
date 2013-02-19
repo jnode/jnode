@@ -85,6 +85,16 @@ public final class FileNameAttribute extends NTFSResidentAttribute {
 		final int flags = getFlags();
 		return ((flags & 0x0800) != 0);
 	}
+	
+	/**
+     * Gets the index of the parent MFT entry.
+     *
+     * @return the index of the parent MFT entry.
+     */
+    public int getParentMftIndex() {
+        final int attrOffset = getAttributeOffset();
+        return getInt32(attrOffset);
+    }
 
 	/**
 	 * Gets the allocated file size.
