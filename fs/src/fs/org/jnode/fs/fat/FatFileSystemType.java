@@ -66,7 +66,6 @@ public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSyste
                 return false;
             }
         }
-*/
 
         try
         {
@@ -77,6 +76,7 @@ public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSyste
         {
             return false;
         }
+*/
 
         // FAT-32 is currently handled by the newer jfat package.
         return (firstSector[38] == 0x29 &&
