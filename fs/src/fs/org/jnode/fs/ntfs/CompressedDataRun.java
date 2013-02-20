@@ -29,7 +29,7 @@ import org.jnode.util.LittleEndian;
 /**
  * @author Daniel Noll (daniel@noll.id.au)
  */
-final class CompressedDataRun implements DataRunInterface {
+public final class CompressedDataRun implements DataRunInterface {
 	/**
 	 * Size of a compressed block in NTFS. This is always the same even if the cluster size is not 4k.
 	 */

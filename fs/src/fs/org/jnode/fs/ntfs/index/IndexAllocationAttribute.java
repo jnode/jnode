@@ -23,7 +23,7 @@ package org.jnode.fs.ntfs.index;
 import java.io.IOException;
 
 import org.jnode.fs.ntfs.FileRecord;
-import org.jnode.fs.ntfs.NTFSNonResidentAttribute;
+import org.jnode.fs.ntfs.attribute.NTFSNonResidentAttribute;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

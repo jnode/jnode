@@ -26,7 +26,7 @@ import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
 import org.jnode.fs.ntfs.FileRecord;
-import org.jnode.fs.ntfs.NTFSAttribute;
+import org.jnode.fs.ntfs.attribute.NTFSAttribute;
 import org.jnode.util.Queue;
 
 /**

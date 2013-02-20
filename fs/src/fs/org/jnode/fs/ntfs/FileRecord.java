@@ -25,6 +25,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.jnode.fs.ntfs.attribute.AttributeListAttribute;
+import org.jnode.fs.ntfs.attribute.AttributeListEntry;
+import org.jnode.fs.ntfs.attribute.NTFSAttribute;
+import org.jnode.fs.ntfs.attribute.NTFSNonResidentAttribute;
+import org.jnode.fs.ntfs.attribute.NTFSResidentAttribute;
 import org.jnode.util.NumberUtils;
 
 /**

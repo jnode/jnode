@@ -1,7 +1,7 @@
 /*
- * $Id$
+ * $Id: header.txt 5714 2010-01-03 13:33:07Z lsantha $
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2012 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -18,10 +18,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.fs.ntfs;
+package org.jnode.fs.ntfs.attribute;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import org.jnode.fs.ntfs.NTFSStructure;
 
 /**
  * Data structure containing a list of {@link AttributeListEntry} entries.

@@ -23,7 +23,7 @@ package org.jnode.fs.ntfs.index;
 import java.util.Iterator;
 
 import org.jnode.fs.ntfs.FileRecord;
-import org.jnode.fs.ntfs.NTFSResidentAttribute;
+import org.jnode.fs.ntfs.attribute.NTFSResidentAttribute;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

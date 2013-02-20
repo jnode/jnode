@@ -20,6 +20,8 @@
  
 package org.jnode.fs.ntfs;
 
+import org.jnode.fs.ntfs.attribute.NTFSResidentAttribute;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */

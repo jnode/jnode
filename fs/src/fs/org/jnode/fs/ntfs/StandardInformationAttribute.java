@@ -20,6 +20,8 @@
  
 package org.jnode.fs.ntfs;
 
+import org.jnode.fs.ntfs.attribute.NTFSResidentAttribute;
+
 /**
  * @author Daniel Noll (daniel@noll.id.au)
  */
