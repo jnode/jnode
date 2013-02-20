@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import org.jnode.util.NumberUtils;
 
 /**
@@ -32,7 +33,7 @@ import org.jnode.util.NumberUtils;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Daniel Noll (daniel@noll.id.au) (new attribute iteration support)
  */
-class FileRecord extends NTFSRecord {
+public class FileRecord extends NTFSRecord {
 
 	/**
 	 * Sequence number of the file within the MFT.

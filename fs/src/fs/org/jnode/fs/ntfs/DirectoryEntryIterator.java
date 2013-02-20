@@ -23,6 +23,8 @@ package org.jnode.fs.ntfs;
 import java.util.Iterator;
 
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.ntfs.index.IndexEntry;
+import org.jnode.fs.ntfs.index.NTFSIndex;
 
 /**
  * Iterator for FSEntry's.
@@ -51,8 +53,6 @@ final class DirectoryEntryIterator implements Iterator<FSEntry> {
 
     /**
      * Are there more entries.
-     * 
-     * @see org.jnode.fs.FSEntryIterator#hasNext()
      */
     public boolean hasNext() {
         return (nextEntry != null);
@@ -60,8 +60,6 @@ final class DirectoryEntryIterator implements Iterator<FSEntry> {
 
     /**
      * Get the next entry.
-     * 
-     * @see org.jnode.fs.FSEntryIterator#next()
      */
     public FSEntry next() {
         final NTFSEntry result = nextEntry;

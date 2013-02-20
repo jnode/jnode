@@ -22,9 +22,11 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FSFileSlackSpace;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.ntfs.index.IndexEntry;
 import org.jnode.util.ByteBufferUtils;
 
 /**

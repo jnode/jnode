@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2012 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -18,14 +18,17 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.fs.ntfs;
+package org.jnode.fs.ntfs.index;
 
 import java.io.IOException;
+
+import org.jnode.fs.ntfs.FileRecord;
+import org.jnode.fs.ntfs.NTFSNonResidentAttribute;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class IndexAllocationAttribute extends NTFSNonResidentAttribute {
+public final class IndexAllocationAttribute extends NTFSNonResidentAttribute {
 
     /**
      * Creates the index allocation attribute.
