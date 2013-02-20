@@ -26,7 +26,7 @@ import org.jnode.util.LittleEndian;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-abstract class NTFSStructure {
+public abstract class NTFSStructure {
 
 	/** My logger */
 	protected static final Logger log = Logger.getLogger(NTFSStructure.class);
@@ -39,7 +39,7 @@ abstract class NTFSStructure {
 	 * @param buffer
 	 * @param offset
 	 */
-	NTFSStructure(byte[] buffer, int offset) {
+	public NTFSStructure(byte[] buffer, int offset) {
 		this.buffer = buffer;
 		this.offset = offset;
 	}
@@ -49,7 +49,7 @@ abstract class NTFSStructure {
 	 * @param parent
 	 * @param offset
 	 */
-	NTFSStructure(NTFSStructure parent, int offset) {
+	public NTFSStructure(NTFSStructure parent, int offset) {
 		this.buffer = parent.buffer;
 		this.offset = parent.offset + offset;
 	}
@@ -79,7 +79,7 @@ abstract class NTFSStructure {
 	 * @param offset
 	 * @return
 	 */
-	final int getUInt8(int offset) {
+	public final int getUInt8(int offset) {
 		return LittleEndian.getUInt8(buffer, this.offset + offset);
 	}
 
@@ -88,7 +88,7 @@ abstract class NTFSStructure {
 	 * @param offset
 	 * @return
 	 */
-	final int getUInt16(int offset) {
+	public final int getUInt16(int offset) {
 		return LittleEndian.getUInt16(buffer, this.offset + offset);
 	}
 
@@ -97,7 +97,7 @@ abstract class NTFSStructure {
 	 * @param offset
 	 * @return
 	 */
-	final int getUInt24(int offset) {
+	public final int getUInt24(int offset) {
 		return LittleEndian.getUInt24(buffer, this.offset + offset);
 	}
 
@@ -106,7 +106,7 @@ abstract class NTFSStructure {
 	 * @param offset
 	 * @return
 	 */
-	final long getUInt32(int offset) {
+	public final long getUInt32(int offset) {
 		return LittleEndian.getUInt32(buffer, this.offset + offset);
 	}
 
@@ -115,7 +115,7 @@ abstract class NTFSStructure {
 	 * @param offset
 	 * @return
 	 */
-	final int getUInt32AsInt(int offset) {
+	public final int getUInt32AsInt(int offset) {
 		return (int) LittleEndian.getUInt32(buffer, this.offset + offset);
 	}
 
@@ -124,7 +124,7 @@ abstract class NTFSStructure {
 	 * @param offset
 	 * @return
 	 */
-	final long getUInt48(int offset) {
+	public final long getUInt48(int offset) {
 		return LittleEndian.getUInt48(buffer, this.offset + offset);
 	}
 
@@ -133,7 +133,7 @@ abstract class NTFSStructure {
 	 * @param offset
 	 * @return
 	 */
-	final int getInt8(int offset) {
+	public final int getInt8(int offset) {
 		return LittleEndian.getInt8(buffer, this.offset + offset);
 	}
 
@@ -142,7 +142,7 @@ abstract class NTFSStructure {
 	 * @param offset
 	 * @return
 	 */
-	final int getInt16(int offset) {
+	public final int getInt16(int offset) {
 		return LittleEndian.getInt16(buffer, this.offset + offset);
 	}
 
@@ -151,7 +151,7 @@ abstract class NTFSStructure {
 	 * @param offset
 	 * @return
 	 */
-	final int getInt24(int offset) {
+	public final int getInt24(int offset) {
 		return LittleEndian.getInt24(buffer, this.offset + offset);
 	}
 
@@ -160,7 +160,7 @@ abstract class NTFSStructure {
 	 * @param offset
 	 * @return
 	 */
-	final int getInt32(int offset) {
+	public final int getInt32(int offset) {
 		return LittleEndian.getInt32(buffer, this.offset + offset);
 	}
 
@@ -169,7 +169,7 @@ abstract class NTFSStructure {
 	 * @param offset
 	 * @return
 	 */
-	final long getInt64(int offset) {
+	public final long getInt64(int offset) {
 		return LittleEndian.getInt64(buffer, this.offset + offset);
 	}
 
@@ -189,7 +189,7 @@ abstract class NTFSStructure {
 	 * @param offset
 	 * @return
 	 */
-	final char getChar16(int offset) {
+	public final char getChar16(int offset) {
 		final int v0 = buffer[this.offset + offset] & 0xFF;
 		final int v1 = buffer[this.offset + offset + 1] & 0xFF;
 		return (char) ((v1 << 8) | v0);
@@ -199,7 +199,7 @@ abstract class NTFSStructure {
 	 * Write an unsigned 16-bit integer to a given offset.
 	 * @param offset
 	 */
-	final void setUInt16(int offset, int value) {
+	public final void setUInt16(int offset, int value) {
 		LittleEndian.setInt16(buffer, this.offset + offset, value);
 	}
 

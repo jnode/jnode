@@ -20,6 +20,9 @@
  
 package org.jnode.fs.ntfs;
 
+import org.jnode.fs.ntfs.index.IndexAllocationAttribute;
+import org.jnode.fs.ntfs.index.IndexRootAttribute;
+
 /**
  * @author Chira
  * @author Ewout Prangsma (epr@users.sourceforge.net)

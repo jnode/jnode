@@ -22,6 +22,7 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+
 import org.jnode.driver.Device;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;

@@ -22,6 +22,8 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 
+import org.jnode.fs.ntfs.index.IndexEntry;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */

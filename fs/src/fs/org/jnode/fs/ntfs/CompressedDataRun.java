@@ -22,6 +22,7 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 import java.util.Arrays;
+
 import org.apache.log4j.Logger;
 import org.jnode.util.LittleEndian;
 
