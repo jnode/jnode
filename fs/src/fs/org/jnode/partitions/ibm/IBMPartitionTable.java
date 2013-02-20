@@ -33,6 +33,7 @@ import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.bus.ide.IDEConstants;
 import org.jnode.partitions.PartitionTable;
 import org.jnode.partitions.PartitionTableType;
+import org.jnode.util.LittleEndian;
 
 /**
  * @author epr
@@ -125,18 +126,56 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
     }
 
     /**
-     * Does the given bootsector contain an IBM partition table?
+     * Does the given boot sector contain an IBM partition table?
      * 
-     * @param bootSector
+     * @param bootSector the data to check.
+     * @return {@code true} if the data contains an IBM partition table, {@code false} otherwise.
      */
     public static boolean containsPartitionTable(byte[] bootSector) {
-        if ((bootSector[510] & 0xFF) != 0x55) {
+        if (LittleEndian.getUInt16(bootSector, 510) != 0xaa55) {
             return false;
         }
-        if ((bootSector[511] & 0xFF) != 0xAA) {
-            return false;
+
+        if (LittleEndian.getUInt16(bootSector, 428) == 0x5678) {
+            // Matches the AAP MBR extra signature, probably an valid partition table
+            return true;
         }
-        return true;
+
+        if (LittleEndian.getUInt16(bootSector, 380) == 0xa55a) {
+            // Matches the AST/NEC MBR extra signature, probably an valid partition table
+            return true;
+        }
+
+        if (LittleEndian.getUInt16(bootSector, 252) == 0x55aa) {
+            // Matches the Disk Manager MBR extra signature, probably an valid partition table
+            return true;
+        }
+
+        if (LittleEndian.getUInt32(bootSector, 2) == 0x4c57454e) {
+            // Matches the NEWLDR MBR extra signature, probably an valid partition table
+            return true;
+        }
+
+        // Nothing matched, fall back to validating any specified partition entries
+        IBMPartitionTableEntry lastValid = null;
+        boolean foundValidEntry = false;
+        for (int partitionNumber = 0; partitionNumber < TABLE_SIZE; partitionNumber++) {
+            IBMPartitionTableEntry partition = new IBMPartitionTableEntry(null, bootSector, partitionNumber);
+
+            if (partition.isValid()) {
+                if (lastValid != null) {
+                    if (lastValid.getStartLba() + lastValid.getNrSectors() > partition.getStartLba()) {
+                        // End of previous partition entry after the start of the next one
+                        return false;
+                    }
+                }
+
+                foundValidEntry = true;
+                lastValid = partition;
+            }
+        }
+
+        return foundValidEntry;
     }
 
     public Iterator<IBMPartitionTableEntry> iterator() {
