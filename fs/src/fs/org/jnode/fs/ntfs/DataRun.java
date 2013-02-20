@@ -22,11 +22,12 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 import java.util.Arrays;
+import org.jnode.fs.ntfs.attribute.NTFSNonResidentAttribute;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class DataRun extends NTFSStructure implements DataRunInterface {
+public final class DataRun extends NTFSStructure implements DataRunInterface {
 
 	/** Type of this datarun */
 	private final int type;

@@ -1,7 +1,7 @@
 /*
- * $Id$
+ * $Id: header.txt 5714 2010-01-03 13:33:07Z lsantha $
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2012 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -18,13 +18,15 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.fs.ntfs;
+package org.jnode.fs.ntfs.attribute;
 
+
+import org.jnode.fs.ntfs.NTFSStructure;
 
 /**
  * @author Daniel Noll (daniel@noll.id.au)
  */
-final class AttributeListEntry extends NTFSStructure {
+public final class AttributeListEntry extends NTFSStructure {
 
     /**
      * Creates the entry.

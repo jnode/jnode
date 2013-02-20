@@ -28,6 +28,8 @@ import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.ntfs.attribute.NTFSAttribute;
+import org.jnode.fs.ntfs.attribute.NTFSResidentAttribute;
 import org.jnode.fs.spi.AbstractFileSystem;
 
 /**

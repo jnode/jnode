@@ -26,6 +26,9 @@ import java.nio.ByteBuffer;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FSFileSlackSpace;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.ntfs.attribute.NTFSAttribute;
+import org.jnode.fs.ntfs.attribute.NTFSNonResidentAttribute;
+import org.jnode.fs.ntfs.attribute.NTFSResidentAttribute;
 import org.jnode.fs.ntfs.index.IndexEntry;
 import org.jnode.util.ByteBufferUtils;
 
