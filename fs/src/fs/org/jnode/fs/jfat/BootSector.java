@@ -138,7 +138,11 @@ public class BootSector {
         else
             FATSz = BPB_FATSz32;
 
-        FirstDataSector = BPB_RsvdSecCnt + (BPB_NumFATs * FATSz) + RootDirSectors;
+        if (isFat32()) {
+            FirstDataSector = BPB_RsvdSecCnt + (BPB_NumFATs * FATSz) + RootDirSectors;
+        } else {
+            FirstDataSector = BPB_RsvdSecCnt + (BPB_NumFATs * FATSz);
+        }
 
         if (BPB_TotSec16 != 0)
             TotSec = BPB_TotSec16;
@@ -305,7 +309,7 @@ public class BootSector {
         dirty = true;
     }
 
-    private String fatType() {
+    public String fatType() {
         switch (type) {
             case IFAT12:
                 return SFAT12;
@@ -366,6 +370,10 @@ public class BootSector {
         return BPB_BytsPerSec;
     }
 
+    public int getClusterSize() {
+        return BPB_SecPerClus * BPB_BytsPerSec;
+    }
+
     public int getSectorsPerCluster() {
         return BPB_SecPerClus;
     }
@@ -388,6 +396,10 @@ public class BootSector {
 
     public long getFirstDataSector() {
         return FirstDataSector;
+    }
+
+    public long getNrRootDirEntries() {
+        return BPB_RootEntCnt;
     }
 
     /**

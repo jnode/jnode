@@ -30,10 +30,8 @@ public class FatRootDirectory extends FatDirectory {
     public FatRootDirectory(FatFileSystem fs) throws IOException {
         super(fs);
         Fat fat = getFatFileSystem().getFat();
-        if (fat.isFat32()) {
+        if (fat.isFat32() || fat.isFat16()) {
             setRoot32((int) getFatFileSystem().getBootSector().getRootDirectoryStartCluster());
-        } else if (fat.isFat16()) {
-            throw new UnsupportedOperationException("Fat16");
         } else if (fat.isFat12()) {
             throw new UnsupportedOperationException("Fat12");
         } else {
