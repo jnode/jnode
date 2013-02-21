@@ -41,6 +41,9 @@ public class GptPartitionTable implements PartitionTable<GptPartitionTableEntry>
     /** The type of partition table */
     private final GptPartitionTableType tableType;
 
+    /** The detected block size. */
+    private final int blockSize;
+
     /** The partition entries */
     private final List<GptPartitionTableEntry> partitions = new ArrayList<GptPartitionTableEntry>();
 
@@ -57,7 +60,7 @@ public class GptPartitionTable implements PartitionTable<GptPartitionTableEntry>
     public GptPartitionTable(GptPartitionTableType tableType, byte[] first16KiB, Device device) {
         this.tableType = tableType;
 
-        int blockSize = detectBlockSize(first16KiB);
+        blockSize = detectBlockSize(first16KiB);
 
         if (blockSize != -1) {
             long entries = LittleEndian.getUInt32(first16KiB, blockSize + 0x50);
@@ -117,6 +120,15 @@ public class GptPartitionTable implements PartitionTable<GptPartitionTableEntry>
     @Override
     public Iterator<GptPartitionTableEntry> iterator() {
         return Collections.unmodifiableList(partitions).iterator();
+    }
+
+    /**
+     * Gets the block size.
+     *
+     * @return the block size.
+     */
+    public int getBlockSize() {
+        return blockSize;
     }
 
     /**
