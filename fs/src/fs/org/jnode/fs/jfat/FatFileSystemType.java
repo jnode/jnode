@@ -59,12 +59,20 @@ public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSyste
         }
 */
 
-        // Only supports FAT-32 for now, don't want any false results
-        // for FAT-16 or FAT-12.
-        return (firstSector[66] == 0x29 &&
+        // Check for FAT-32
+        if (firstSector[66] == 0x29 &&
                 firstSector[82] == 'F' &&
                 firstSector[83] == 'A' &&
-                firstSector[84] == 'T');
+                firstSector[84] == 'T')
+        {
+            return true;
+        }
+
+        // Check for FAT-16/12
+        return (firstSector[38] == 0x29 &&
+                firstSector[54] == 'F' &&
+                firstSector[55] == 'A' &&
+                firstSector[56] == 'T');
     }
 
     public FatFileSystem create(Device device, boolean readOnly) throws FileSystemException {

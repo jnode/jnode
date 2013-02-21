@@ -37,6 +37,10 @@ public class Fat32 extends Fat {
         return (long) (4 * index);
     }
 
+    public long getClusterPosition(int index) {
+        return getClusterSector(index) * (long) getBootSector().getBytesPerSector();
+    }
+
     public int get(int index) throws IOException {
         return (int) (getUInt32(index) & 0x0FFFFFFF);
     }
