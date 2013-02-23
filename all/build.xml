@@ -835,7 +835,9 @@ clean             Remove all intermediate build results.
 
 		<header update="on" headerFile="${root.dir}/all/template/header.txt">
 			<fileset dir="${root.dir}/builder/src/builder" includes="**/*.java"/>
+            <fileset dir="${root.dir}/builder/src/configure" includes="**/*.java"/>
 			<fileset dir="${root.dir}/cli/src/commands" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/classlib" includes="**/*.java"/>
 			<fileset dir="${root.dir}/core/src/classpath/ext" includes="**/*.java" excludes="gnu/classpath/jdwp/**/*.java"/>
 			<fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java"
                      excludes="java/lang/VMProcess.java,java/lang/VMSystem.java"/>
@@ -843,7 +845,9 @@ clean             Remove all intermediate build results.
 			<fileset dir="${root.dir}/core/src/core" includes="**/*.java" excludes="org/jnode/imageio/jpeg/JPEGDecoder"/>
 			<fileset dir="${root.dir}/core/src/mmtk-vm" includes="**/*.java" excludes="org/mmtk/vm/**/*.java"/>
 			<fileset dir="${root.dir}/core/src/driver" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/emu" includes="**/*.java" excludes="gnu/**/*.java"/>
 			<fileset dir="${root.dir}/core/src/test" includes="**/*.java" excludes="org/jnode/test/mauve/**/*.java,org/jtestserver/**/*.java"/>
+            <fileset dir="${root.dir}/core/src/template" includes="**/*.java"/>
 			<fileset dir="${root.dir}/distr/src/install" includes="**/*.java"/>
 			<fileset dir="${root.dir}/distr/src/apps" includes="**/*.java"/>
 			<fileset dir="${root.dir}/distr/src/emu" includes="**/*.java"/>
