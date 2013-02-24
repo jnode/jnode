@@ -38,6 +38,7 @@ public class HeaderTask extends FileSetTask {
     private String[] header;
 
     private boolean update = false;
+    private boolean xml = false;
 
     private boolean compareHeader(String[] lines, String[] header) {
         final int linesCnt = lines.length;
@@ -62,6 +63,31 @@ public class HeaderTask extends FileSetTask {
 
         return false;
     }
+
+    private boolean compareXMLHeader(String[] lines, String[] header) {
+        final int linesCnt = lines.length;
+        final int hdrCnt = header.length;
+
+        for (int i = 0; i < linesCnt; i++) {
+            final String line = lines[i];
+            if (i < hdrCnt) {
+                if (!compareLine(line, header[i])) {
+                    return false;
+                }
+            } else {
+                String trimmedLine = line.trim();
+                if (trimmedLine.startsWith("<")) {
+                    return true;
+                }
+                if (trimmedLine.length() > 0) {
+                    return false;
+                }
+            }
+        }
+
+        return false;
+    }
+
 
     private boolean compareLine(String line, String hdrLine) {
         if ((line.indexOf('$') >= 0) && (hdrLine.indexOf('$') >= 0)) {
@@ -93,12 +119,23 @@ public class HeaderTask extends FileSetTask {
     @Override
     protected void processFile(File file) throws IOException {
         final String[] inp = readFile(file);
-        if (!compareHeader(inp, header)) {
-            if (update) {
-                log("Updating " + file);
-                writeUpdateFile(file, inp, header);
-            } else {
-                log("Wrong header in " + file);
+        if (xml) {
+            if (!compareXMLHeader(inp, header)) {
+                if (update) {
+                    log("Updating " + file);
+                    writeUpdateXMLFile(file, inp, header);
+                } else {
+                    log("Wrong header in " + file);
+                }
+            }
+        } else {
+            if (!compareHeader(inp, header)) {
+                if (update) {
+                    log("Updating " + file);
+                    writeUpdateFile(file, inp, header);
+                } else {
+                    log("Wrong header in " + file);
+                }
             }
         }
     }
@@ -128,6 +165,47 @@ public class HeaderTask extends FileSetTask {
         }
     }
 
+    private void writeUpdateXMLFile(File file, String[] lines, String[] header) throws IOException {
+        PrintWriter out = new PrintWriter(new FileWriter(file));
+        try {
+            boolean write = true;
+            boolean headerAdded = false;
+            for (String line : lines) {
+                String trimmedLine = line.trim();
+                if (!headerAdded) {
+                    if (!write) {
+                        for (String aHeader : header) {
+                            out.println(aHeader);
+                        }
+                        headerAdded = true;
+
+                        if (!trimmedLine.startsWith("<!--")) {
+                            write = true;
+                        }
+                    }
+                    if (trimmedLine.startsWith("<?xml")) {
+                        write = false;
+                    } else if (!headerAdded) {
+                        for (String aHeader : header) {
+                            out.println(aHeader);
+                        }
+                        headerAdded = true;
+                    }
+                }
+
+                if (write) {
+                    out.println(line);
+                }
+
+                if (trimmedLine.endsWith("-->")) {
+                    write = true;
+                }
+            }
+        } finally {
+            out.close();
+        }
+    }
+
 
     private String[] readFile(File file) throws IOException {
         final BufferedReader in = new BufferedReader(new FileReader(file));
@@ -149,5 +227,9 @@ public class HeaderTask extends FileSetTask {
 
     public final void setUpdate(boolean update) {
         this.update = update;
+    }
+
+    public void setXml(boolean xml) {
+        this.xml = xml;
     }
 }
