@@ -1,3 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    $Id$
+
+    Copyright (C) 2003-2013 JNode.org
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this library; If not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
 <project name="JNode" default="help" basedir=".">
 
 	<property name="root.dir" value="${basedir}/.."/>
@@ -866,6 +886,31 @@ clean             Remove all intermediate build results.
 			<fileset dir="${root.dir}/shell/src/shell" includes="**/*.java"/>
 			<fileset dir="${root.dir}/shell/src/test" includes="**/*.java"/>
 		</header>
+        <header update="on" xml="on" headerFile="${root.dir}/all/template/header.xml">
+            <fileset dir="${root.dir}/all" includes="*.xml"/>
+            <fileset dir="${root.dir}/all/conf" includes="*.xml"/>
+            <fileset dir="${root.dir}/all/conf-source" includes="*.xml"/>
+            <fileset dir="${root.dir}/all/lib" includes="*.xml"/>
+            <fileset dir="${root.dir}/builder" includes="*.xml"/>
+            <fileset dir="${root.dir}/cli" includes="*.xml"/>
+            <fileset dir="${root.dir}/cli/descriptors" includes="*.xml"/>
+            <fileset dir="${root.dir}/core" includes="*.xml"/>
+            <fileset dir="${root.dir}/core/descriptors" includes="*.xml"/>
+            <fileset dir="${root.dir}/distr" includes="*.xml"/>
+            <fileset dir="${root.dir}/distr/descriptors" includes="*.xml"/>
+            <fileset dir="${root.dir}/fs" includes="*.xml"/>
+            <fileset dir="${root.dir}/fs/descriptors" includes="*.xml"/>
+            <fileset dir="${root.dir}/gui" includes="*.xml"/>
+            <fileset dir="${root.dir}/gui/descriptors" includes="*.xml"/>
+            <fileset dir="${root.dir}/net" includes="*.xml"/>
+            <fileset dir="${root.dir}/net/descriptors" includes="*.xml"/>
+            <fileset dir="${root.dir}/shell" includes="*.xml"/>
+            <fileset dir="${root.dir}/shell/descriptors" includes="*.xml"/>
+            <fileset dir="${root.dir}/sound" includes="*.xml"/>
+            <fileset dir="${root.dir}/sound/descriptors" includes="*.xml"/>
+            <fileset dir="${root.dir}/textui" includes="*.xml"/>
+            <fileset dir="${root.dir}/textui/descriptors" includes="*.xml"/>
+        </header>
 	</target>
 
 	<target name="check-debugger-properties" depends="prepare">
