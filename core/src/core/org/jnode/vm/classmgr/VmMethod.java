@@ -22,6 +22,7 @@ package org.jnode.vm.classmgr;
 
 import java.lang.reflect.Member;
 import org.jnode.annotation.MagicPermission;
+import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.vm.InternString;
 import org.jnode.vm.LoadCompileService;
 import org.jnode.vm.VmAddress;
@@ -184,6 +185,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      *
      * @return Method
      */
+    @PrivilegedActionPragma
     public final Member asMember() {
         if (javaMemberHolder == null) {
             javaMemberHolder = new VmIsolateLocal<Member>();
