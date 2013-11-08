@@ -4,7 +4,6 @@
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/driver"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
 	<classpathentry kind="src" path="/shell"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/edtftpj-1.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/jcifs-1.2.6.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net"/>
