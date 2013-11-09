@@ -347,6 +347,7 @@
             saveDir="${save.dir}"
 			vmdkImageFile="${vmware.vmx.vmdk.image}"
 		    overrideFile="${vmware.vmx.overrides}"
+			name="JNode x86"
 		/>
 	</target>
 
@@ -362,6 +363,7 @@
             saveDir="${save.dir}"
 			vmdkImageFile="${vmware.vmx.vmdk.image}"
             overrideFile="${vmware.vmx.overrides}"
+			name="JNode x86 lite"
 		/>
 	</target>
 
@@ -376,6 +378,7 @@
 			saveDir="${save.dir}"
 			vmdkImageFile="${vmware.vmx.vmdk.image}"
             overrideFile="${vmware.vmx.overrides}"
+			name="JNode x64 lite"
 		/>
 	</target>
 

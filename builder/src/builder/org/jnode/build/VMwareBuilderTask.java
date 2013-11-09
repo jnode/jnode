@@ -42,8 +42,8 @@ import org.apache.tools.ant.Task;
 /**
  * This task builds a VMWare '.vmx' file to allow JNode to be run using VMWare player.
  * 
- * @author ...
  * @author crawley@jnode.org
+ * @author epr@jnode.org
  */
 public class VMwareBuilderTask extends Task {
 
@@ -53,7 +53,22 @@ public class VMwareBuilderTask extends Task {
     private String overrideFile;
     private String vmdkImageFile;
     private String saveDir;
+    private String name;
 
+    /**
+     * @return Returns the Virtual machine name
+     */
+    public final String getName() {
+    	return name;
+    }
+
+    /**
+     * @Set the Virtual machine name
+     */
+    public final void setName(String name) {
+    	this.name = name;
+    }
+    
     /**
      * @return Returns the memory size.
      */
@@ -272,7 +287,7 @@ public class VMwareBuilderTask extends Task {
         props.put("usb.present", "TRUE");
         props.put("sound.present", "FALSE");
         props.put("sound.virtualDev", "es1371");
-        props.put("displayName", "JNode");
+        props.put("displayName", (name != null) ? name : "JNode");
         props.put("guestOS", "dos");
 
         props.put("nvram", "JNode.nvram");  
