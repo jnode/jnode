@@ -133,30 +133,36 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
      */
     public static boolean containsPartitionTable(byte[] bootSector) {
         if (LittleEndian.getUInt16(bootSector, 510) != 0xaa55) {
+        	log.debug("No aa55 magic");
             return false;
         }
 
         if (LittleEndian.getUInt16(bootSector, 428) == 0x5678) {
             // Matches the AAP MBR extra signature, probably an valid partition table
+        	log.debug("Has AAP MBR extra signature");
             return true;
         }
 
         if (LittleEndian.getUInt16(bootSector, 380) == 0xa55a) {
             // Matches the AST/NEC MBR extra signature, probably an valid partition table
+        	log.debug("Has AST/NEC MBR extra signature");
             return true;
         }
 
         if (LittleEndian.getUInt16(bootSector, 252) == 0x55aa) {
             // Matches the Disk Manager MBR extra signature, probably an valid partition table
+        	log.debug("Has Dis Manager MBR extra signature");
             return true;
         }
 
         if (LittleEndian.getUInt32(bootSector, 2) == 0x4c57454e) {
             // Matches the NEWLDR MBR extra signature, probably an valid partition table
+        	log.debug("Has NEWLDR MBR extra signature");
             return true;
         }
 
         // Nothing matched, fall back to validating any specified partition entries
+    	log.debug("Checking partitions");
         IBMPartitionTableEntry lastValid = null;
         boolean foundValidEntry = false;
         for (int partitionNumber = 0; partitionNumber < TABLE_SIZE; partitionNumber++) {
