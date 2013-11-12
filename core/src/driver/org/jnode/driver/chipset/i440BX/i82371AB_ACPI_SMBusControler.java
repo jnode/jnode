@@ -20,8 +20,11 @@
  
 package org.jnode.driver.chipset.i440BX;
 
+import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
+
 import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.DriverException;
@@ -129,12 +132,20 @@ public class i82371AB_ACPI_SMBusControler extends SMBusControler {
 
     public boolean sendByte(byte address, byte value)
         throws java.security.InvalidParameterException, java.lang.UnsupportedOperationException {
+    	if (ioRes == null) {
+    		throw new UnsupportedOperationException("IO resource not available");
+    	}
         ioRes.outPortByte(hostAddressIORegister, address | ADDRESS_WRITE_TAG);
         ioRes.outPortByte(hostData0IORegister, value);
         ioRes.outPortByte(hostCommandIORegister, value);
         ioRes.outPortByte(hostControlIORegister,
             CONTROL_START | CONTROL_PROTOCOL_READWRITE_BYTE | CONTROL_INTERUPT_DISABLED);
-        byte status = statusWait();
+        byte status;
+		try {
+			status = statusWait();
+		} catch (IOException e) {
+			throw new UnsupportedOperationException(e);
+		}
         return status == 0;
     }
 
@@ -317,12 +328,15 @@ public class i82371AB_ACPI_SMBusControler extends SMBusControler {
 
     }
 
-    private void reset() {
+    private void reset() throws IOException {
         statusWait(); // just make sure it is available (may be errors due to last conditions so...
         ioRes.outPortByte(hostStatusIORegister, 0x1e); // ...clears the error bits
     }
 
-    private byte statusWait() {
+    private byte statusWait() throws IOException {
+    	if (ioRes == null) {
+    		throw new IOException("IO resource not available");
+    	}
         byte status = 0;
         for (int i = 0; i < 500; i++) ; // dumb delay : see specification update
         status = (byte) ioRes.inPortByte(hostStatusIORegister);
