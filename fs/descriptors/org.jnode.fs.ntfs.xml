@@ -35,6 +35,8 @@
   <runtime>
     <library name="jnode-fs.jar">
       <export name="org.jnode.fs.ntfs.*"/>
+      <export name="org.jnode.fs.ntfs.attribute.*"/>
+      <export name="org.jnode.fs.ntfs.index.*"/>
     </library>
   </runtime>
   
