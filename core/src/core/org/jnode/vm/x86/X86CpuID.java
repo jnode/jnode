@@ -22,6 +22,8 @@ package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.CpuID;
+import org.jnode.vm.Unsafe;
+import org.vmmagic.unboxed.Word;
 
 /**
  * Class used to identify the current processor.
@@ -60,9 +62,18 @@ public class X86CpuID extends CpuID {
     public static final int FEAT_TM = (1 << 29);
     public static final int FEAT_PBE = (1 << 31);
     // Extended features
-    public static final long FEAT_EST = (1L << 39);
-    public static final long FEAT_TM2 = (1L << 40);
-    public static final long FEAT_CNXTID = (1L << 42);
+    public static final long FEAT_PNI = (1L << 32); // Prescott New Instructions (SSE3)
+    public static final long FEAT_PCLMULQDQ = (1L << 33); // PCLMULQDQ support
+    public static final long FEAT_DTES64 = (1L << 34); // 64-bit debug store (edx bit 21)
+    public static final long FEAT_MONITOR = (1L << 35); // MONITOR and MWAIT instructions (SSE3)
+    public static final long FEAT_DS_CPL = (1L << 36); // CPL qualified debug store
+    public static final long FEAT_VMX = (1L << 37); // Virtual Machine eXtensions
+    public static final long FEAT_SMX = (1L << 38); // Safer Mode Extensions (LaGrande)
+    public static final long FEAT_EST = (1L << 39); // Enhanced SpeedStep
+    public static final long FEAT_TM2 = (1L << 40); // Thermal Monitor 2
+    public static final long FEAT_SSSE3 = (1L << 41); // Supplemental SSE3 instructions
+    public static final long FEAT_CNXTID = (1L << 42); // Context ID
+    public static final long FEAT_HYPERVISOR = (1L << 63); // Running on a hypervisor (always 0 on a real CPU, but also with some hypervisors)
 
     // Family codes
     public static final int FAM_486 = 0x04;
@@ -83,6 +94,8 @@ public class X86CpuID extends CpuID {
     private final int family;
     private final int features;
     private final long exFeatures;
+    private final String brand;
+    private String hypervisorVendor;
 
     /**
      * Create a cpu id that contains the data of a processor identified by the given processor id.
@@ -123,14 +136,15 @@ public class X86CpuID extends CpuID {
         id[1] = 0x756e6547;
         id[2] = 0x6c65746e;
         id[3] = 0x49656e69;
-        return new X86CpuID(id);
+        return new X86CpuID(id, "?");
     }
 
     /**
      * Initialize this instance
      */
-    X86CpuID(int[] data) {
+    X86CpuID(int[] data, String brand) {
         this.data = data;
+        this.brand = brand;
         final int eax = data[4];
         this.steppingID = eax & 0xF;
         this.model = (eax >> 4) & 0xF;
@@ -138,9 +152,78 @@ public class X86CpuID extends CpuID {
         this.features = data[7];
         this.exFeatures = features | (((long) data[6]) << 32);
     }
+    
+    /**
+     * Load a new CpuID from the current CPU.
+     * @return
+     */
+    static X86CpuID loadFromCurrentCpu() {
+    	
+    	// Load low values (eax=0)
+    	int[] regs = new int[4];
+    	UnsafeX86.getCPUID(Word.zero(), regs);
+    	
+    	final int count = regs[0] + 1;
+    	int[] data = new int[count * 4];
+    	
+    	int index = 0;
+    	for (int i = 0; i < count; i++) {
+        	UnsafeX86.getCPUID(Word.fromIntZeroExtend(i), regs);
+        	data[index++] = regs[0];
+        	data[index++] = regs[1];
+        	data[index++] = regs[2];
+        	data[index++] = regs[3];    		
+    	}
+    	
+    	// Load extended functions (0x80000000)
+    	String brand = "?";
+    	final Word extendedBase = Word.fromIntZeroExtend(0x80000000);
+    	UnsafeX86.getCPUID(extendedBase, regs);
+    	Word max = Word.fromIntZeroExtend(regs[0]);
+    	if (max.GE(extendedBase.add(4))) {
+    		// Load brand 0x80000002..0x80000004
+            final StringBuilder buf = new StringBuilder();
+            for (int i = 0; i < 3; i++) {
+            	UnsafeX86.getCPUID(extendedBase.add(2 + i), regs);
+                intToString(buf, regs[0]);
+                intToString(buf, regs[1]);
+                intToString(buf, regs[2]);
+                intToString(buf, regs[3]);
+            }
+            brand = buf.toString().trim();
+    	}
+    	
+    	X86CpuID id = new X86CpuID(data, brand);
+    	
+    	// Load hypervisor data
+    	if (id.hasHYPERVISOR()) {
+        	UnsafeX86.getCPUID(Word.fromIntZeroExtend(0x40000001), regs);
+        	if (regs[0] == 0x31237648) {
+        		// Found 'Hv#1' Hypervisor vendor neutral identification 
+            	UnsafeX86.getCPUID(Word.fromIntZeroExtend(0x40000000), regs);
+                final StringBuilder buf = new StringBuilder();
+                intToString(buf, regs[1]); // ebx
+                intToString(buf, regs[2]); // ecx
+                intToString(buf, regs[3]); // edx
+        		id.hypervisorVendor = buf.toString().trim();        		
+        	}    	    	
+    	}
+    	    	
+    	return id;
+    }
 
+    /**
+     * Processor vendor string
+     */
     public String getName() {
         return getVendor();
+    }
+    
+    /**
+     * Processor brand string
+     */
+    public String getBrand() {
+    	return brand;
     }
 
     /**
@@ -177,7 +260,7 @@ public class X86CpuID extends CpuID {
         return getVendor().equals(X86Vendor.AMD.getId());
     }
 
-    private final void intToString(StringBuilder buf, int value) {
+    private static final void intToString(StringBuilder buf, int value) {
         buf.append((char) (value & 0xFF));
         buf.append((char) ((value >> 8) & 0xFF));
         buf.append((char) ((value >> 16) & 0xFF));
@@ -404,6 +487,10 @@ public class X86CpuID extends CpuID {
     public final boolean hasCNXTID() {
         return hasFeature(FEAT_CNXTID);
     }
+    
+    public final boolean hasHYPERVISOR() {
+    	return hasFeature(FEAT_HYPERVISOR);
+    }
 
     /**
      * Convert all features to a human readable string.
@@ -442,9 +529,18 @@ public class X86CpuID extends CpuID {
         getFeatureString(buf, FEAT_TM, "TM");
         getFeatureString(buf, FEAT_PBE, "PBE");
         // Extended features
+        getFeatureString(buf, FEAT_PNI, "PNI");
+        getFeatureString(buf, FEAT_PCLMULQDQ, "PCLMULQDQ");
+        getFeatureString(buf, FEAT_DTES64, "DTES64");
+        getFeatureString(buf, FEAT_MONITOR, "MONITOR");
+        getFeatureString(buf, FEAT_DS_CPL, "DS_CPL");
+        getFeatureString(buf, FEAT_VMX, "VMX");
+        getFeatureString(buf, FEAT_SMX, "SMX");
         getFeatureString(buf, FEAT_EST, "EST");
         getFeatureString(buf, FEAT_TM2, "TM2");
+        getFeatureString(buf, FEAT_SSSE3, "SSSE3");
         getFeatureString(buf, FEAT_CNXTID, "CNXTID");
+        getFeatureString(buf, FEAT_HYPERVISOR, "HYPERVISOR");
         return buf.toString();
     }
 
@@ -473,23 +569,47 @@ public class X86CpuID extends CpuID {
      */
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("CPU:");
-        sb.append(" name:");
+        sb.append("CPUID");
+        sb.append('\n');
+        
+        sb.append(" name     : ");
         sb.append(getName());
-        sb.append(" family:");
+        sb.append('\n');
+        
+        sb.append(" brand    : ");
+        sb.append(getBrand());
+        sb.append('\n');
+        
+        sb.append(" family   : ");
         sb.append(getFamily());
-        sb.append(" model:");
+        sb.append('\n');
+        
+        sb.append(" model    : ");
         sb.append(getModel());
-        sb.append(" step:");
+        sb.append('\n');
+        
+        sb.append(" step     : ");
         sb.append(getSteppingID());
+        sb.append('\n');
+        
         if (hasFeature(FEAT_HTT)) {
-            sb.append(" #log.proc:");
-            sb.append(getLogicalProcessors());
+            sb.append(" #log.proc: ");
+            sb.append(getLogicalProcessors());            
+            sb.append('\n');
         }
-        sb.append(" features:");
+        if (hypervisorVendor != null) {
+        	sb.append(" hyperv.  : ");
+        	sb.append(hypervisorVendor);
+            sb.append('\n');            
+        }
+        sb.append(" features : ");
         sb.append(getFeatureString());
-        sb.append(" raw:");
+        sb.append('\n');
+        
+        sb.append(" raw      : ");
         sb.append(NumberUtils.hex(data, 8));
+        sb.append('\n');
+        
         return sb.toString();
     }
 }

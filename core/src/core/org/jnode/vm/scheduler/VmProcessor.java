@@ -43,6 +43,7 @@ import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.objects.VmSystemObject;
 import org.jnode.vm.performance.PerformanceCounters;
+import org.jnode.vm.x86.UnsafeX86;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Word;
@@ -574,10 +575,7 @@ public abstract class VmProcessor extends VmSystemObject implements org.jnode.vm
      */
     public final CpuID getCPUID() {
         if (cpuId == null) {
-            final int length = Unsafe.getCPUID(null);
-            final int[] id = new int[length];
-            Unsafe.getCPUID(id);
-            cpuId = loadCPUID(id);
+            cpuId = loadCPUID();
         }
         return cpuId;
     }
@@ -588,7 +586,7 @@ public abstract class VmProcessor extends VmSystemObject implements org.jnode.vm
      * @param id The identification returned by Unsafe.getCpuID
      * @return CpuID
      */
-    protected abstract CpuID loadCPUID(int[] id);
+    protected abstract CpuID loadCPUID();
 
     /**
      * Set the CPU id.

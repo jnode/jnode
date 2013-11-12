@@ -133,7 +133,7 @@ TSS_DS		equ 0x38
 %include "unsafe.asm"
 %include "unsafe-binop.asm"
 %include "unsafe-setmulti.asm"
-%include "unsafe-cpuid.asm"
+%include "unsafex86-cpuid.asm"
 %include "unsafex86.asm"
 %include "unsafex86-mm.asm"
 %include "vm.asm"
