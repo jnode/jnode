@@ -174,8 +174,8 @@ public abstract class VmX86Processor extends VmProcessor {
      *
      * @return CpuID
      */
-    protected CpuID loadCPUID(int[] id) {
-        return new X86CpuID(id);
+    protected CpuID loadCPUID() {
+        return X86CpuID.loadFromCurrentCpu();
     }
 
     /**

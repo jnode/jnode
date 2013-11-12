@@ -20,7 +20,9 @@
  
 package org.jnode.vm.x86;
 
+import org.jnode.annotation.Internal;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Word;
 
 
 /**
@@ -67,6 +69,16 @@ public final class UnsafeX86 {
      * @return
      */
     static final native Address getCR3();
+
+    /**
+     * Read CPU identification data.
+     * <p/>
+	 * @param input  The number to put in EAX
+     * @param result An array of length 4 (or longer) where eax, ebx, ecx, edx is stored into.
+	 * @return 1 on success, 0 otherwise (result == null or result.length less than 4).
+     */
+    @Internal
+    public static native int getCPUID(Word input, int[] result);
 
     /**
      * Gets the address of first entry in the multiboot mmap table.

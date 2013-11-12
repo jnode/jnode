@@ -699,19 +699,6 @@ public final class Unsafe {
     }
 
     /**
-     * Read CPU identification data.
-     * <p/>
-     * If id is null, this method will return the length of the id array that is
-     * required to fit all data. If id is not null and long enough, it is filled
-     * with all identification data.
-     *
-     * @param id
-     * @return The required length of id.
-     */
-    @Internal
-    public static native int getCPUID(int[] id);
-
-    /**
      * List the current stacktrace on the kernel debug output.
      *
      * @throws UninterruptiblePragma
