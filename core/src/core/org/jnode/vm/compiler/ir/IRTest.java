@@ -154,7 +154,7 @@ public class IRTest {
         cfg.deconstrucSSA();
         cfg.fixupAddresses();
 
-        final Map<Variable, Variable<T>> liveVariables = new BootableHashMap<Variable, Variable<T>>();
+        final Map<Variable<?>, Variable<T>> liveVariables = new BootableHashMap<Variable<?>, Variable<T>>();
 
         for (IRBasicBlock<T> b : cfg) {
             System.out.println();

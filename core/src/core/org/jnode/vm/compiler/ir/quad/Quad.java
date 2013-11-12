@@ -109,7 +109,7 @@ public abstract class Quad<T> {
         return basicBlock;
     }
 
-    public void computeLiveness(Map<Variable, Variable<T>> liveVariables) {
+    public void computeLiveness(Map<Variable<?>, Variable<T>> liveVariables) {
         Operand<T>[] refs = getReferencedOps();
         if (refs != null) {
             int n = refs.length;
