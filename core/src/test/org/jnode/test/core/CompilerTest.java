@@ -168,7 +168,9 @@ public class CompilerTest {
         final String fname = cname + "#"
             + mname.replace('<', '_').replace('>', '_') + "." + c.getName()
             + ".method";
-        final FileOutputStream out = new FileOutputStream(fname);
+        final File outDir = new File("./core/build/compiler-test");
+        outDir.mkdirs();
+        final FileOutputStream out = new FileOutputStream(new File(outDir, fname));
 
         try {
             if (!method.isAbstract()) {
