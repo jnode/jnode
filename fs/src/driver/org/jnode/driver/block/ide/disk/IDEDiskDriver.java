@@ -105,6 +105,11 @@ public class IDEDiskDriver extends Driver
             // Find the devicemanager
             DeviceManager devMan = InitialNaming.lookup(DeviceManager.NAME);
             // Read the bootsector
+            final byte[] bs1 = new byte[SECTOR_SIZE];
+            read(0, ByteBuffer.wrap(bs1));
+
+            // Read the bootsector twice, since the first read seems to fail.
+            // todo: THIS IS A WORKAROUND
             final byte[] bs = new byte[SECTOR_SIZE];
             read(0, ByteBuffer.wrap(bs));
 
@@ -114,14 +119,18 @@ public class IDEDiskDriver extends Driver
             } catch (NamingException ex) {
                 throw new DriverException(ex);
             }
+            log.debug("Creating partition table object on " + dev.getId());
             this.pt = factory.createIBMPartitionTable(bs, dev);
+            log.debug("Created partition table object");
 
             int partIndex = 0;
             int i = 0;
             for (IBMPartitionTableEntry pte : pt) {
+            	log.debug("Processing partition " + i);
                 if (pte == null) {
                     BootLogInstance.get().warn("PartitionTableEntry #" + i + " is null");
                 } else if (pte.isValid()) {
+                	log.debug("Partition " + i + " is valid");
                     registerPartition(devMan, dev, pte, partIndex);
                 }
                 partIndex++;
@@ -133,11 +142,17 @@ public class IDEDiskDriver extends Driver
                 partIndex = registerExtendedPartition(devMan, dev, partIndex);
             }
         } catch (DeviceAlreadyRegisteredException ex) {
+        	log.error("Partition device is already known");
             throw new DriverException("Partition device is already known???? Probably a bug", ex);
         } catch (IOException ex) {
+        	log.error("Cannot read partition table", ex);
             throw new DriverException("Cannot read partition table", ex);
         } catch (NameNotFoundException ex) {
+        	log.error("Cannot find DeviceManager", ex);
             throw new DriverException("Cannot find DeviceManager", ex);
+        } catch (Throwable ex) {
+        	log.error("Unknown error", ex);
+        	throw new DriverException("Unknown error", ex);
         }
     }
 
@@ -210,20 +225,11 @@ public class IDEDiskDriver extends Driver
             final int partSectors = Math.min(length / SECTOR_SIZE, maxSectorCount);
             final int partLength = partSectors * SECTOR_SIZE;
 
-            final IDERWSectorsCommand cmd = isWrite ? new IDEWriteSectorsCommand(
-                dev.isPrimary(),
-                dev.isMaster(),
-                is48bit,
-                partLbaStart,
-                partSectors,
-                buf) : new IDEReadSectorsCommand(
-                    dev.isPrimary(),
-                    dev.isMaster(),
-                    is48bit,
-                    partLbaStart,
-                    partSectors,
-                    buf);
+            final IDERWSectorsCommand cmd = isWrite ? 
+            	new IDEWriteSectorsCommand(dev.isPrimary(), dev.isMaster(), is48bit, partLbaStart, partSectors, buf) : 
+            	new IDEReadSectorsCommand(dev.isPrimary(), dev.isMaster(), is48bit, partLbaStart, partSectors, buf);
             try {
+            	log.debug("bus.executeAndWait dev=" + dev.getId() + " start=" + partLbaStart + " sectors=" + partSectors + " len=" + partLength);
                 bus.executeAndWait(cmd, IDE_DATA_XFER_TIMEOUT);
             } catch (InterruptedException ex) {
                 throw new IOException("IDE " + errorSource + " interrupted", ex);
