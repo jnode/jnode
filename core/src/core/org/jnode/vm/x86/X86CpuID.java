@@ -194,22 +194,30 @@ public class X86CpuID extends CpuID {
     	}
     	
     	X86CpuID id = new X86CpuID(data, brand);
-    	
-    	// Load hypervisor data
-    	if (id.hasHYPERVISOR()) {
-        	UnsafeX86.getCPUID(Word.fromIntZeroExtend(0x40000001), regs);
-        	if (regs[0] == 0x31237648) {
-        		// Found 'Hv#1' Hypervisor vendor neutral identification 
-            	UnsafeX86.getCPUID(Word.fromIntZeroExtend(0x40000000), regs);
-                final StringBuilder buf = new StringBuilder();
-                intToString(buf, regs[1]); // ebx
-                intToString(buf, regs[2]); // ecx
-                intToString(buf, regs[3]); // edx
-        		id.hypervisorVendor = buf.toString().trim();        		
-        	}    	    	
-    	}
-    	    	
+    	id.detectHyperV();
     	return id;
+    }
+    
+    /**
+     * Try to detect if we're running in HyperV.
+     * @return true if we're running in HyperV, false otherwise.
+     */
+    public boolean detectHyperV() {
+    	if (!hasHYPERVISOR()) 
+    		return false;
+    	
+    	int[] regs = new int[4];
+    	UnsafeX86.getCPUID(Word.fromIntZeroExtend(0x40000001), regs);
+        if (regs[0] != 0x31237648) 
+        	return false;
+        // Found 'Hv#1' Hypervisor vendor neutral identification 
+        UnsafeX86.getCPUID(Word.fromIntZeroExtend(0x40000000), regs);
+        final StringBuilder buf = new StringBuilder();
+        intToString(buf, regs[1]); // ebx
+        intToString(buf, regs[2]); // ecx
+        intToString(buf, regs[3]); // edx
+        hypervisorVendor = buf.toString().trim();
+        return true;
     }
 
     /**

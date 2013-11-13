@@ -21,6 +21,7 @@
 package org.jnode.vm.x86;
 
 import org.jnode.annotation.Internal;
+import org.jnode.annotation.KernelSpace;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Word;
 
@@ -78,7 +79,19 @@ public final class UnsafeX86 {
 	 * @return 1 on success, 0 otherwise (result == null or result.length less than 4).
      */
     @Internal
-    public static native int getCPUID(Word input, int[] result);
+    static native int getCPUID(Word input, int[] result);
+    
+    /**
+     * Read a model specific register
+     */
+    @KernelSpace
+    static native long readMSR(Word index);
+    
+    /**
+     * Write a model specific register
+     */
+    @KernelSpace
+    static native void writeMSR(Word index, long value);
 
     /**
      * Gets the address of first entry in the multiboot mmap table.

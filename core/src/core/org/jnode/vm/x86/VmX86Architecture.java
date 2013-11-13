@@ -22,6 +22,7 @@ package org.jnode.vm.x86;
 
 import java.nio.ByteOrder;
 import java.util.HashMap;
+
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.assembler.x86.X86Constants;
@@ -48,6 +49,7 @@ import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Offset;
+import org.vmmagic.unboxed.Word;
 
 /**
  * Architecture descriptor for the Intel X86 architecture.
@@ -245,6 +247,9 @@ public abstract class VmX86Architecture extends BaseVmArchitecture {
         this.bootProcessor = bootCpu;
         bootCpu.setBootProcessor(true);
 
+        // Initialize HyperV
+        initializeHyperV();
+        
         final String cmdLine = VmSystem.getCmdLine();
         if (cmdLine.contains("mp=no")) {
             return;
@@ -465,5 +470,18 @@ public abstract class VmX86Architecture extends BaseVmArchitecture {
         } else {
             return super.createMultiMediaSupport();
         }
+    }
+    
+    /**
+     * Identify ourselves in HyperV (when that is detected)
+     */
+    void initializeHyperV() {
+        final X86CpuID id = (X86CpuID) VmProcessor.current().getCPUID();
+        if (!id.detectHyperV())
+        	return;
+        Unsafe.debug("Initializing HyperV");
+    	long guestOsId = (0x29L << 48);
+    	UnsafeX86.writeMSR(Word.fromIntZeroExtend(HyperV.HV_X64_MSR_GUEST_OS_ID), guestOsId);
+        Unsafe.debug("Initialized Hyper-V guest OS ID");
     }
 }

@@ -164,4 +164,33 @@ GLABEL Q53org5jnode2vm3x869UnsafeX8623saveMSRs2e2829V
 GLABEL Q53org5jnode2vm3x869UnsafeX8623restoreMSRs2e2829V	
 	SYSCALL SC_RESTORE_MSRS
 	ret
-	
+
+;    /**
+;     * Read a model specific register
+;     */
+;    @KernelSpace
+;    static native long readMSR(Word index);
+GLABEL Q53org5jnode2vm3x869UnsafeX8623readMSR2e28Lorg2fvmmagic2funboxed2fWord3b29J
+	push ACX
+	mov ecx,[ASP+(2*SLOT_SIZE)] 	; index
+	rdmsr
+	pop ACX
+	ret
+		
+;    /**
+;     * Write a model specific register
+;     */
+;    @KernelSpace
+;    static native void writeMSR(Word index, long value);
+GLABEL Q53org5jnode2vm3x869UnsafeX8623writeMSR2e28Lorg2fvmmagic2funboxed2fWord3bJ29V
+	push ACX
+	mov ecx,[ASP+(2*SLOT_SIZE)+8]	; index
+	mov edx,[ASP+(2*SLOT_SIZE)+4] 	; value MSB
+	mov eax,[ASP+(2*SLOT_SIZE)+0] 	; value LSB
+	push ABX
+	mov ABX,AAX
+	SYSCALL SC_WRITE_MSR
+	pop ABX
+	pop ACX
+	ret
+		

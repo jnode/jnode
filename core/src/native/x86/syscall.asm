@@ -25,6 +25,7 @@ syscalls:
 	DA	sc_SyncMSRs
 	DA	sc_SaveMSRs
 	DA	sc_RestoreMSRs
+	DA	sc_WriteMSR
 
 sc_SyncMSRs:
 	mov ADI,CURRENTTHREAD
@@ -43,4 +44,11 @@ sc_RestoreMSRs:
 	RESTORE_MSR_ARRAY [ADI+VmX86Thread_READWRITEMSRS_OFS]
 	RESTORE_MSR_ARRAY [ADI+VmX86Thread_WRITEONLYMSRS_OFS]
 	ret	
+
+sc_WriteMSR:
+	mov ACX,GET_OLD_ECX
+	mov AAX,GET_OLD_EBX
+	mov ADX,GET_OLD_EDX
+	wrmsr
+	ret
 	
