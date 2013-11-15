@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    $Id$
+
+    Copyright (C) 2003-2013 JNode.org
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this library; If not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.bus.usb.ohci" 
+        name="JNode USB OHCI HostController driver"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver.bus.pci"/>
+    <import plugin="org.jnode.driver.bus.usb"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="org.jnode.driver.bus.usb.ohci.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.driver.mappers">
+    <mapper class="org.jnode.driver.bus.pci.PCIClassToDriverMapper"
+            id="0c:03:10"
+            driver-class="org.jnode.driver.bus.usb.ohci.OHCIDriver"/>
+  </extension>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.resource.ResourcePermission" name="ioports"/>
+  </extension>
+        
+</plugin>

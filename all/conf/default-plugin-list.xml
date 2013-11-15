@@ -102,6 +102,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.driver.bus.smbus"/>
     <plugin id="org.jnode.driver.bus.usb"/>
     <plugin id="org.jnode.driver.bus.usb.hub"/>
+    <plugin id="org.jnode.driver.bus.usb.ohci"/>
     <plugin id="org.jnode.driver.bus.usb.uhci"/>
     <plugin id="org.jnode.driver.chipset"/>
     <plugin id="org.jnode.driver.chipset.i440BX"/>
