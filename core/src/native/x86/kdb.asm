@@ -23,6 +23,8 @@ kdb_init:
 	
 	mov eax,0x400				; BIOS data area
 	movzx edx,word [eax+0x00]	; Get port address of COM1
+	test edx,edx				; Address is zero if there is no COM port
+	jz %%ret
 	mov [kdb_port],edx
 	
 	mov edx,[kdb_port]
