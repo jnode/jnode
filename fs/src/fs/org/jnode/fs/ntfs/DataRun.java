@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
@@ -29,7 +29,9 @@ import org.jnode.fs.ntfs.attribute.NTFSNonResidentAttribute;
  */
 public final class DataRun extends NTFSStructure implements DataRunInterface {
 
-    /** Type of this datarun */
+    /**
+     * Type of this datarun
+     */
     private final int type;
 
     /**
@@ -38,24 +40,32 @@ public final class DataRun extends NTFSStructure implements DataRunInterface {
      */
     private final long cluster;
 
-    /** Length of datarun in clusters */
+    /**
+     * Length of datarun in clusters
+     */
     private final int length;
 
-    /** Flag indicating that the data is not stored on disk but is all zero. */
+    /**
+     * Flag indicating that the data is not stored on disk but is all zero.
+     */
     private boolean sparse = false;
 
-    /** Size in bytes of this datarun descriptor */
+    /**
+     * Size in bytes of this datarun descriptor
+     */
     private final int size;
 
-    /** First VCN of this datarun. */
+    /**
+     * First VCN of this datarun.
+     */
     private long vcn;
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param attr
      * @param offset
-     * @param vcn First VCN of this datarun.
+     * @param vcn         First VCN of this datarun.
      * @param previousLCN
      */
     public DataRun(NTFSNonResidentAttribute attr, int offset, long vcn, long previousLCN) {
@@ -131,7 +141,7 @@ public final class DataRun extends NTFSStructure implements DataRunInterface {
 
     /**
      * Gets the size of this datarun descriptor in bytes.
-     * 
+     *
      * @return Returns the size.
      */
     public int getSize() {
@@ -140,7 +150,7 @@ public final class DataRun extends NTFSStructure implements DataRunInterface {
 
     /**
      * Gets the length of this datarun in clusters.
-     * 
+     *
      * @return Returns the length.
      */
     public int getLength() {
@@ -149,7 +159,7 @@ public final class DataRun extends NTFSStructure implements DataRunInterface {
 
     /**
      * Gets the first VCN of this data run.
-     * 
+     *
      * @return Returns the vcn.
      */
     @Override
@@ -169,7 +179,7 @@ public final class DataRun extends NTFSStructure implements DataRunInterface {
 
     /**
      * Read clusters from this datarun.
-     * 
+     *
      * @param vcn
      * @param dst
      * @param dstOffset
@@ -180,7 +190,7 @@ public final class DataRun extends NTFSStructure implements DataRunInterface {
      * @throws IOException
      */
     public int readClusters(long vcn, byte[] dst, int dstOffset, int nrClusters, int clusterSize,
-            NTFSVolume volume) throws IOException {
+                            NTFSVolume volume) throws IOException {
 
         final long myFirstVcn = getFirstVcn();
         final int myLength = getLength();
@@ -244,5 +254,10 @@ public final class DataRun extends NTFSStructure implements DataRunInterface {
         }
 
         return cluster + vcn;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[data-run vcn:%d-%d sparse=%b]", getFirstVcn(), getLastVcn(), isSparse());
     }
 }

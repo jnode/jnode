@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ntfs.attribute;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ import org.jnode.fs.ntfs.NTFSVolume;
 /**
  * An NTFS file attribute that has its data stored outside the attribute.
  * The attribute itself contains a runlist refering to the actual data.
- *  
+ *
  * @author Chira
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Daniel Noll (daniel@noll.id.au) (compression support)
@@ -89,7 +89,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      * Gets the compression unit size.  2 to the power of this value is the number of clusters
      * per compression unit.
      *
-     * @return the compression unit size. 
+     * @return the compression unit size.
      */
     public int getCompressionUnitSize() {
         return getUInt16(0x22);
@@ -178,8 +178,8 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         if (this.numberOfVCNs != allocatedVCNs) {
             // Probably not a problem, often multiple attributes make up one allocation.
             log.debug("VCN mismatch between data runs and allocated size, possibly a composite attribute. " +
-                      "data run VCNs = " + this.numberOfVCNs + ", allocated size = " + allocatedVCNs +
-                      ", data run count = " + dataRuns.size());
+                "data run VCNs = " + this.numberOfVCNs + ", allocated size = " + allocatedVCNs +
+                ", data run count = " + dataRuns.size());
         }
     }
 
@@ -193,7 +193,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
     /**
      * Read a number of clusters starting from a given virtual cluster number
      * (vcn).
-     * 
+     *
      * @param vcn
      * @param nrClusters
      * @return The number of clusters read.
@@ -207,7 +207,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
 
         if (log.isDebugEnabled()) {
             log.debug("readVCN: wants start " + vcn + " length " + nrClusters +
-                      ", we have start " + getStartVCN() + " length " + getNumberOfVCNs());
+                ", we have start " + getStartVCN() + " length " + getNumberOfVCNs());
         }
 
         final NTFSVolume volume = getFileRecord().getVolume();
@@ -232,5 +232,11 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      */
     public int getNumberOfVCNs() {
         return numberOfVCNs;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[attribute (non-res) type=x%x name'%s' size=%d runs=%d]", getAttributeType(),
+            getAttributeName(), getAttributeActualSize(), getDataRuns().size());
     }
 }
