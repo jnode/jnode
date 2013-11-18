@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jfat;
 
 import org.jnode.driver.Device;
@@ -61,18 +61,21 @@ public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSyste
 
         // Check for FAT-32
         if (firstSector[66] == 0x29 &&
-                firstSector[82] == 'F' &&
-                firstSector[83] == 'A' &&
-                firstSector[84] == 'T')
-        {
+            firstSector[82] == 'F' &&
+            firstSector[83] == 'A' &&
+            firstSector[84] == 'T' &&
+            firstSector[85] == '3' &&
+            firstSector[86] == '2') {
             return true;
         }
 
         // Check for FAT-16/12
         return (firstSector[38] == 0x29 &&
-                firstSector[54] == 'F' &&
-                firstSector[55] == 'A' &&
-                firstSector[56] == 'T');
+            firstSector[54] == 'F' &&
+            firstSector[55] == 'A' &&
+            firstSector[56] == 'T' &&
+            firstSector[57] == '1' &&
+            firstSector[58] == '2' || firstSector[58] == '6');
     }
 
     public FatFileSystem create(Device device, boolean readOnly) throws FileSystemException {
