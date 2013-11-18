@@ -142,6 +142,16 @@ public class FileRecord extends NTFSRecord {
 	public long getAllocatedSize() {
 		return getUInt32(0x1C);
 	}
+	
+	/**
+     * Gets the reference number of the base record. For continuation MFT entries this will reference the main record.
+     * For main records this should match {@link #referenceNumber}.
+     *
+     * @return Returns the base reference number.
+     */
+    public long getBaseReferenceNumber() {
+        return getUInt48(0x20);
+    }
 
 	/**
 	 * Gets the real size of the FILE record in bytes.
@@ -451,8 +461,8 @@ public class FileRecord extends NTFSRecord {
 		}
 
 		if (readClusters != nrClusters) {
-			throw new IOException("Requested " + nrClusters + " clusters but only read " + readClusters
-					+ ", file record = " + this);
+			throw new IOException("Requested " + nrClusters + " clusters but only read " + readClusters +
+                    ", offset = " + off + ", file record = " + this);
 		}
 
 		System.arraycopy(tmp, (int) fileOffset % clusterSize, dest, off, len);
