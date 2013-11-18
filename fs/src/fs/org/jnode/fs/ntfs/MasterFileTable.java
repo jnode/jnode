@@ -21,7 +21,7 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
-
+import org.jnode.fs.ntfs.attribute.NTFSAttribute;
 import org.jnode.fs.ntfs.index.IndexEntry;
 
 /**
@@ -112,14 +112,20 @@ public final class MasterFileTable extends FileRecord {
 		public static final int FIRST_USER = 16;
 	}
 
-	/**
-	 * @param volume
-	 * @param buffer
-	 * @throws IOException
-	 */
+    /**
+     * The cached length of the MFT.
+     */
+    private final long mftLength;
+
+    /**
+     * @param volume
+     * @param buffer
+     * @throws IOException
+     */
 	public MasterFileTable(NTFSVolume volume, byte[] buffer, int offset) throws IOException {
 		super(volume, SystemFiles.MFT, buffer, offset);
-	}
+        mftLength = getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
+    }
 
 	/**
 	 * Gets an MFT record with a given index but does not check if it is a valid file record.
@@ -127,17 +133,21 @@ public final class MasterFileTable extends FileRecord {
 	 * @return the file record.
 	 */
 	public FileRecord getRecordUnchecked(long index) throws IOException {
-		log.debug("getRecord(" + index + ")");
+        log.debug("getRecord(" + index + ")");
 
-		final NTFSVolume volume = getVolume();
-		final int bytesPerFileRecord = volume.getBootRecord().getFileRecordSize();
-		final long offset = bytesPerFileRecord * index;
+        final NTFSVolume volume = getVolume();
+        final int bytesPerFileRecord = volume.getBootRecord().getFileRecordSize();
+        final long offset = bytesPerFileRecord * index;
 
-		// read the buffer
-		final byte[] buffer = new byte[bytesPerFileRecord];
-		readData(offset, buffer, 0, bytesPerFileRecord);
-		return new FileRecord(volume, index, buffer, 0);
-	}
+        if (offset + bytesPerFileRecord > mftLength) {
+            throw new IOException("Attempt to read past the end of the MFT, offset: " + offset);
+        }
+
+        // read the buffer
+        final byte[] buffer = new byte[bytesPerFileRecord];
+        readData(offset, buffer, 0, bytesPerFileRecord);
+        return new FileRecord(volume, index, buffer, 0);
+    }
 
 	/**
 	 * Gets an MFT record with a given index.

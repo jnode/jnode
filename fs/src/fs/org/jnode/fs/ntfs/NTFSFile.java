@@ -22,13 +22,10 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FSFileSlackSpace;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ntfs.attribute.NTFSAttribute;
-import org.jnode.fs.ntfs.attribute.NTFSNonResidentAttribute;
-import org.jnode.fs.ntfs.attribute.NTFSResidentAttribute;
 import org.jnode.fs.ntfs.index.IndexEntry;
 import org.jnode.util.ByteBufferUtils;
 
@@ -58,29 +55,10 @@ public class NTFSFile implements FSFile, FSFileSlackSpace {
 	}
 
 	public long getLength() {
-		FileRecord.AttributeIterator attributes = getFileRecord().findAttributesByTypeAndName(NTFSAttribute.Types.DATA, null);
-        NTFSAttribute attribute = attributes.next();
+        return getFileRecord().getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
+    }
 
-        if (attribute == null) {
-            return indexEntry.getRealFileSize();
-        }
-
-        long totalSize = 0;
-
-        while (attribute != null) {
-            if (attribute.isResident()) {
-                totalSize += ((NTFSResidentAttribute) attribute).getAttributeLength();
-            } else {
-                totalSize += ((NTFSNonResidentAttribute) attribute).getAttributeActualSize();
-            }
-
-            attribute = attributes.next();
-        }
-
-        return totalSize;
-	}
-
-	/*
+    /*
 	 * (non-Javadoc)
 	 * @see org.jnode.fs.FSFile#setLength(long)
 	 */
