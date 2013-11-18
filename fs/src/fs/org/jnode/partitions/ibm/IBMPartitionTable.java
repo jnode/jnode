@@ -17,15 +17,17 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.partitions.ibm;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -41,28 +43,58 @@ import org.jnode.util.LittleEndian;
 public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry> {
     private static final int TABLE_SIZE = 4;
 
-    /** The type of partition table */
+    /**
+     * The set of known filesystem markers.
+     */
+    private static final Set<String> FILESYSTEM_OEM_NAMES = new HashSet<String>();
+
+    static {
+        // FAT OEM names
+        FILESYSTEM_OEM_NAMES.add("MSDOS5.0");
+        FILESYSTEM_OEM_NAMES.add("MSWIN4.1");
+        FILESYSTEM_OEM_NAMES.add("IBM  3.3");
+        FILESYSTEM_OEM_NAMES.add("IBM  7.1");
+        FILESYSTEM_OEM_NAMES.add("mkdosfs\u0000");
+        FILESYSTEM_OEM_NAMES.add("FreeDOS ");
+
+        // NTFS
+        FILESYSTEM_OEM_NAMES.add("NTFS    ");
+    }
+
+    /**
+     * The type of partition table
+     */
     private final IBMPartitionTableType tableType;
-    
-    /** The partition entries */
+
+    /**
+     * The partition entries
+     */
     private final IBMPartitionTableEntry[] partitions;
 
-    /** The device */
+    /**
+     * The device
+     */
     private final Device drivedDevice;
 
-    /** Extended partition */
+    /**
+     * Extended partition
+     */
     private final ArrayList<IBMPartitionTableEntry> extendedPartitions =
-            new ArrayList<IBMPartitionTableEntry>();
+        new ArrayList<IBMPartitionTableEntry>();
 
-    /** My logger */
+    /**
+     * My logger
+     */
     private static final Logger log = Logger.getLogger(IBMPartitionTable.class);
 
-    /** The position of the extendedPartition in the table */
+    /**
+     * The position of the extendedPartition in the table
+     */
     private int extendedPartitionEntry = -1;
 
     /**
      * Create a new instance
-     * 
+     *
      * @param bootSector
      */
     public IBMPartitionTable(IBMPartitionTableType tableType, byte[] bootSector, Device device) {
@@ -111,13 +143,13 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
                 // correct the offset
                 if (entry.isExtended()) {
                     entry.setStartLba(entry.getStartLba() +
-                            partitions[extendedPartitionEntry].getStartLba());
+                        partitions[extendedPartitionEntry].getStartLba());
                     handleExtended(entry);
                 } else {
                     entry.setStartLba(entry.getStartLba() + current.getStartLba());
                     extendedPartitions.add(entry);
                 }
-            } 
+            }
         }
     }
 
@@ -127,42 +159,48 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
 
     /**
      * Does the given boot sector contain an IBM partition table?
-     * 
+     *
      * @param bootSector the data to check.
      * @return {@code true} if the data contains an IBM partition table, {@code false} otherwise.
      */
     public static boolean containsPartitionTable(byte[] bootSector) {
         if (LittleEndian.getUInt16(bootSector, 510) != 0xaa55) {
-        	log.debug("No aa55 magic");
+            log.debug("No aa55 magic");
             return false;
         }
 
         if (LittleEndian.getUInt16(bootSector, 428) == 0x5678) {
             // Matches the AAP MBR extra signature, probably an valid partition table
-        	log.debug("Has AAP MBR extra signature");
+            log.debug("Has AAP MBR extra signature");
             return true;
         }
 
         if (LittleEndian.getUInt16(bootSector, 380) == 0xa55a) {
             // Matches the AST/NEC MBR extra signature, probably an valid partition table
-        	log.debug("Has AST/NEC MBR extra signature");
+            log.debug("Has AST/NEC MBR extra signature");
             return true;
         }
 
         if (LittleEndian.getUInt16(bootSector, 252) == 0x55aa) {
             // Matches the Disk Manager MBR extra signature, probably an valid partition table
-        	log.debug("Has Dis Manager MBR extra signature");
+            log.debug("Has Dis Manager MBR extra signature");
             return true;
         }
 
         if (LittleEndian.getUInt32(bootSector, 2) == 0x4c57454e) {
             // Matches the NEWLDR MBR extra signature, probably an valid partition table
-        	log.debug("Has NEWLDR MBR extra signature");
+            log.debug("Has NEWLDR MBR extra signature");
             return true;
         }
 
+        // Check if this looks like a filesystem instead of a partition table
+        String oemName = new String(bootSector, 3, 8, Charset.forName("US-ASCII"));
+        if (FILESYSTEM_OEM_NAMES.contains(oemName)) {
+            return false;
+        }
+
         // Nothing matched, fall back to validating any specified partition entries
-    	log.debug("Checking partitions");
+        log.debug("Checking partitions");
         IBMPartitionTableEntry lastValid = null;
         boolean foundValidEntry = false;
         for (int partitionNumber = 0; partitionNumber < TABLE_SIZE; partitionNumber++) {
