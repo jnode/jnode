@@ -1,24 +1,25 @@
 package org.jnode.fs.jfat;
 
-import junit.framework.TestCase;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FileDevice;
 import org.jnode.fs.DataStructureAsserts;
 import org.jnode.fs.FileSystemTestUtils;
 import org.jnode.fs.service.FileSystemService;
+import org.junit.Before;
+import org.junit.Test;
 
-public class FatFileSystemTest extends TestCase {
+public class FatFileSystemTest {
 
     private Device device;
     private FileSystemService fss;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         // create file system service.
         fss = FileSystemTestUtils.createFSService(FatFileSystemType.class.getName());
     }
 
+    @Test
     public void testReadFat32Disk() throws Exception {
 
         device = new FileDevice(FileSystemTestUtils.getTestFile("jfat/test.fat32"), "r");
@@ -37,6 +38,7 @@ public class FatFileSystemTest extends TestCase {
         DataStructureAsserts.assertStructure(fs, expectedStructure);
     }
 
+    @Test
     public void testReadFat16Disk() throws Exception {
 
         device = new FileDevice(FileSystemTestUtils.getTestFile("jfat/test.fat16"), "r");
