@@ -1,5 +1,3 @@
-
-
 /*
  * $Id$
  *
@@ -62,6 +60,13 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 	}
 
 	public long getLength() {
+        FileRecord.AttributeIterator attributes =
+            getFileRecord().findAttributesByTypeAndName(NTFSAttribute.Types.DATA, null);
+        NTFSAttribute attribute = attributes.next();
+
+        if (attribute == null) {
+            return indexEntry.getRealFileSize();
+        }
         return getFileRecord().getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
     }
 
@@ -168,7 +173,6 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 		// TODO implement me
 	}
 
-    @Override
     public Map<String, FSFile> getStreams() {
         Set<String> streamNames = new LinkedHashSet<String>();
 
