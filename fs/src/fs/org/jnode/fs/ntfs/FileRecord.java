@@ -21,10 +21,10 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
 import org.jnode.fs.ntfs.attribute.AttributeListAttribute;
 import org.jnode.fs.ntfs.attribute.AttributeListEntry;
 import org.jnode.fs.ntfs.attribute.NTFSAttribute;
@@ -50,8 +50,14 @@ public class FileRecord extends NTFSRecord {
 	 */
 	private AttributeListAttribute attributeListAttribute;
 
-	/**
-	 * Cached standard information attribute.
+    /**
+     * A cached copy of the attributes.
+     */
+    private List<NTFSAttribute> attributeList;
+
+
+    /**
+     * Cached standard information attribute.
 	 */
 	private StandardInformationAttribute standardInformationAttribute;
 
@@ -324,31 +330,42 @@ public class FileRecord extends NTFSRecord {
 		return null;
 	}
 
-	/**
-	 * Gets an iterator over all attributes in this file record, including any attributes which are stored in other file
-	 * records referenced from an $ATTRIBUTE_LIST attribute.
-	 * @return an iterator over all attributes.
-	 */
-	private AttributeIterator getAllAttributes() {
-		if (attributeListAttribute == null) {
-			return getAllStoredAttributes();
-		} else {
-			return new AttributeListAttributeIterator();
-		}
-	}
+    /**
+     * Gets a collection of all attributes in this file record, including any attributes
+     * which are stored in other file records referenced from an $ATTRIBUTE_LIST attribute.
+     *
+     * @return a collection of all attributes.
+     */
+    private List<NTFSAttribute> getAllAttributes() {
+        if (attributeList == null) {
+            attributeList = new ArrayList<NTFSAttribute>();
 
-	/**
-	 * Gets the first attribute in this filerecord with a given type.
-	 * @param attrTypeID the type ID of the attribute we're looking for.
-	 * @return the attribute.
-	 */
+            AttributeIterator iter;
+            if (attributeListAttribute == null) {
+                iter = getAllStoredAttributes();
+            } else {
+                iter = new AttributeListAttributeIterator();
+            }
+
+            NTFSAttribute attr;
+            while ((attr = iter.next()) != null) {
+                attributeList.add(attr);
+            }
+        }
+
+        return attributeList;
+    }
+
+    /**
+     * Gets the first attribute in this filerecord with a given type.
+     * @param attrTypeID the type ID of the attribute we're looking for.
+     * @return the attribute.
+     */
 	public NTFSAttribute findAttributeByType(int attrTypeID) {
 		log.debug("findAttributeByType(0x" + NumberUtils.hex(attrTypeID, 4) + ")");
 
-		AttributeIterator iter = getAllAttributes();
-		NTFSAttribute attr;
-		while ((attr = iter.next()) != null) {
-			if (attr.getAttributeType() == attrTypeID) {
+        for (NTFSAttribute attr : getAllAttributes()) {
+            if (attr.getAttributeType() == attrTypeID) {
 				log.debug("findAttributeByType(0x" + NumberUtils.hex(attrTypeID, 4) + ") found");
 				return attr;
 			}
@@ -358,16 +375,33 @@ public class FileRecord extends NTFSRecord {
 		return null;
 	}
 
-	/**
-	 * Gets attributes in this filerecord with a given type and name.
-	 * @param attrTypeID the type ID of the attribute we're looking for.
-	 * @param name the name to look for.
-	 * @return the attributes, will be empty if not found, never {@code null}.
-	 */
+    /**
+     * Gets attributes in this filerecord with a given type.
+     *
+     * @param attrTypeID the type ID of the attribute we're looking for.
+     * @return the attributes, will be empty if not found, never {@code null}.
+     */
+    public AttributeIterator findAttributesByType(final int attrTypeID) {
+        log.debug("findAttributesByType(0x" + NumberUtils.hex(attrTypeID, 4) + ")");
+
+        return new FilteredAttributeIterator(getAllAttributes().iterator()) {
+            @Override
+            protected boolean matches(NTFSAttribute attr) {
+                return attr.getAttributeType() == attrTypeID;
+            }
+        };
+    }
+
+    /**
+     * Gets attributes in this filerecord with a given type and name.
+     * @param attrTypeID the type ID of the attribute we're looking for.
+     * @param name the name to look for.
+     * @return the attributes, will be empty if not found, never {@code null}.
+     */
 	public AttributeIterator findAttributesByTypeAndName(final int attrTypeID, final String name) {
 		log.debug("findAttributesByTypeAndName(0x" + NumberUtils.hex(attrTypeID, 4) + "," + name + ")");
-		return new FilteredAttributeIterator(getAllAttributes()) {
-			@Override
+        return new FilteredAttributeIterator(getAllAttributes().iterator()) {
+            @Override
 			protected boolean matches(NTFSAttribute attr) {
 				if (attr.getAttributeType() == attrTypeID) {
 					String attrName = attr.getAttributeName();
@@ -563,17 +597,17 @@ public class FileRecord extends NTFSRecord {
 	 * An iterator for filtering another iterator.
 	 */
 	private abstract class FilteredAttributeIterator extends AttributeIterator {
-		private AttributeIterator inner;
+        private Iterator<NTFSAttribute> attributes;
 
-		private FilteredAttributeIterator(AttributeIterator inner) {
-			this.inner = inner;
-		}
+        private FilteredAttributeIterator(Iterator<NTFSAttribute> attributes) {
+            this.attributes = attributes;
+        }
 
 		@Override
 		protected NTFSAttribute next() {
 			NTFSAttribute attr;
-			while ((attr = inner.next()) != null) {
-				if (matches(attr)) {
+            while ((attr = attributes.next()) != null) {
+                if (matches(attr)) {
 					return attr;
 				}
 			}
