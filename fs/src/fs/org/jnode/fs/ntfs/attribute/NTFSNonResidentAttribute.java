@@ -128,6 +128,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         // data run pairs into a single data run object for convenience when reading.
         boolean compressed = (getFlags() & 0x0001) != 0;
         boolean expectingSparseRunNext = false;
+        int lastCompressedSize = 0;
         int compUnitSize = 1 << getCompressionUnitSize();
 
         while (getUInt8(offset) != 0x0) {
@@ -138,8 +139,18 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
                     // This is the sparse run which follows a compressed run.
                     // The number of runs it contains does not count towards the total
                     // as the compressed run reports holding all the runs for the pair.
-                    // But we do need to move the offsets.  Leaving this block open in case
-                    // later it makes sense to put some logic in here.
+                    // But we do need to move the offsets.
+
+                    // Also the sparse run following a compressed run can be coalesced with a subsequent 'real' sparse
+                    // run. So add that in if we hit one
+                    if (dataRun.getLength() + lastCompressedSize > compUnitSize) {
+                        int length = dataRun.getLength() - (compUnitSize - lastCompressedSize);
+                        dataruns.add(new DataRun(0, length, true, 0, vcn));
+
+                        this.numberOfVCNs += length;
+                        vcn += length;
+                        previousLCN = 0; // TODO: is it correct to reset this?
+                    }
                 } else if (dataRun.getLength() >= compUnitSize) {
                     // Compressed/sparse pairs always add to the compression unit size.  If
                     // the unit only compresses to 16, the system will store it uncompressed.
@@ -154,6 +165,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
                     dataruns.add(new CompressedDataRun(dataRun, compUnitSize));
                     if (dataRun.getLength() != compUnitSize) {
                         expectingSparseRunNext = true;
+                        lastCompressedSize = dataRun.getLength();
                     }
 
                     this.numberOfVCNs += compUnitSize;
