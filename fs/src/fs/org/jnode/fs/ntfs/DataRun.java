@@ -22,17 +22,21 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 import java.util.Arrays;
+import org.apache.log4j.Logger;
 import org.jnode.fs.ntfs.attribute.NTFSNonResidentAttribute;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class DataRun extends NTFSStructure implements DataRunInterface {
+public final class DataRun implements DataRunInterface {
 
     /**
      * Type of this datarun
      */
-    private final int type;
+    /**
+     * logger
+     */
+    protected static final Logger log = Logger.getLogger(DataRun.class);
 
     /**
      * Cluster number of first cluster of this run. If this is zero, the run
@@ -63,15 +67,33 @@ public final class DataRun extends NTFSStructure implements DataRunInterface {
     /**
      * Initialize this instance.
      *
+     * @param cluster Cluster number of first cluster of this run.
+     * @param length  Length of datarun in clusters
+     * @param sparse  Flag indicating that the data is not stored on disk but is all zero.
+     * @param size    Size in bytes of this datarun descriptor
+     * @param vcn     First VCN of this datarun.
+     */
+    public DataRun(long cluster, int length, boolean sparse, int size, long vcn) {
+        this.cluster = cluster;
+        this.length = length;
+        this.sparse = sparse;
+        this.size = size;
+        this.vcn = vcn;
+    }
+
+    /**
+     * Initialize this instance.
+     *
      * @param attr
      * @param offset
      * @param vcn         First VCN of this datarun.
      * @param previousLCN
      */
     public DataRun(NTFSNonResidentAttribute attr, int offset, long vcn, long previousLCN) {
-        super(attr, offset);
+        NTFSStructure dataRunStructure = new NTFSStructure(attr, offset);
+
         // read first byte in type attribute
-        this.type = getUInt8(0);
+        int type = dataRunStructure.getUInt8(0);
         final int lenlen = type & 0xF;
         final int clusterlen = type >>> 4;
 
@@ -83,16 +105,16 @@ public final class DataRun extends NTFSStructure implements DataRunInterface {
                 length = 0;
                 break;
             case 0x01:
-                length = getUInt8(1);
+                length = dataRunStructure.getUInt8(1);
                 break;
             case 0x02:
-                length = getUInt16(1);
+                length = dataRunStructure.getUInt16(1);
                 break;
             case 0x03:
-                length = getUInt24(1);
+                length = dataRunStructure.getUInt24(1);
                 break;
             case 0x04:
-                length = getUInt32AsInt(1);
+                length = dataRunStructure.getUInt32AsInt(1);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid length length " + lenlen);
@@ -104,16 +126,16 @@ public final class DataRun extends NTFSStructure implements DataRunInterface {
                 cluster = 0;
                 break;
             case 0x01:
-                cluster = getInt8(1 + lenlen);
+                cluster = dataRunStructure.getInt8(1 + lenlen);
                 break;
             case 0x02:
-                cluster = getInt16(1 + lenlen);
+                cluster = dataRunStructure.getInt16(1 + lenlen);
                 break;
             case 0x03:
-                cluster = getInt24(1 + lenlen);
+                cluster = dataRunStructure.getInt24(1 + lenlen);
                 break;
             case 0x04:
-                cluster = getInt32(1 + lenlen);
+                cluster = dataRunStructure.getInt32(1 + lenlen);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown cluster length " + clusterlen);
@@ -258,6 +280,6 @@ public final class DataRun extends NTFSStructure implements DataRunInterface {
 
     @Override
     public String toString() {
-        return String.format("[data-run vcn:%d-%d sparse=%b]", getFirstVcn(), getLastVcn(), isSparse());
+        return String.format("[%s-run vcn:%d-%d]", isSparse() ? "sparse" : "data", getFirstVcn(), getLastVcn());
     }
 }
