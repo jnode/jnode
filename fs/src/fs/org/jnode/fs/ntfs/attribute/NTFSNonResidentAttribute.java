@@ -140,16 +140,17 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
                     // as the compressed run reports holding all the runs for the pair.
                     // But we do need to move the offsets.  Leaving this block open in case
                     // later it makes sense to put some logic in here.
-                } else if (dataRun.getLength() == compUnitSize) {
+                } else if (dataRun.getLength() >= compUnitSize) {
                     // Compressed/sparse pairs always add to the compression unit size.  If
                     // the unit only compresses to 16, the system will store it uncompressed.
                     // So this whole unit is stored as-is, we'll leave it as a normal data run.
+                    // Also if one-or more of these uncompressed runs happen next to each other then they can be
+                    // coalesced into a single run
                     dataruns.add(dataRun);
                     this.numberOfVCNs += dataRun.getLength();
                     vcn += dataRun.getLength();
                     previousLCN = dataRun.getCluster();
                 } else {
-                    // TODO: Is it possible for the length to be GREATER than the unit size?
                     dataruns.add(new CompressedDataRun(dataRun, compUnitSize));
                     if (dataRun.getLength() != compUnitSize) {
                         expectingSparseRunNext = true;
