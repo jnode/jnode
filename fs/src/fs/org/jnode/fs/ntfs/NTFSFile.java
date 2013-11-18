@@ -1,3 +1,5 @@
+
+
 /*
  * $Id$
  *
@@ -22,8 +24,13 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FSFileSlackSpace;
+import org.jnode.fs.FSFileStreams;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ntfs.attribute.NTFSAttribute;
 import org.jnode.fs.ntfs.index.IndexEntry;
@@ -33,9 +40,9 @@ import org.jnode.util.ByteBufferUtils;
  * @author vali
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class NTFSFile implements FSFile, FSFileSlackSpace {
+public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 
-	private FileRecord fileRecord;
+    private FileRecord fileRecord;
 
 	/**
 	 * The file system that contains this file.
@@ -160,4 +167,109 @@ public class NTFSFile implements FSFile, FSFileSlackSpace {
 	public void flush() throws IOException {
 		// TODO implement me
 	}
+
+    @Override
+    public Map<String, FSFile> getStreams() {
+        Set<String> streamNames = new LinkedHashSet<String>();
+
+        FileRecord.AttributeIterator dataAttributes = getFileRecord().findAttributesByType(NTFSAttribute.Types.DATA);
+        NTFSAttribute attribute = dataAttributes.next();
+
+        while (attribute != null) {
+            String attributeName = attribute.getAttributeName();
+
+            // The unnamed data attribute is the main file data, so ignore it
+            if (attributeName != null) {
+                streamNames.add(attributeName);
+            }
+
+            attribute = dataAttributes.next();
+        }
+
+        Map<String, FSFile> streams = new HashMap<String, FSFile>();
+        for (String streamName : streamNames) {
+            streams.put(streamName, new StreamFile(streamName));
+        }
+
+        return streams;
+    }
+
+    /**
+     * A file for reading data out of alternate streams.
+     */
+    public class StreamFile implements FSFile {
+        /**
+         * The name of the alternate data stream.
+         */
+        private final String attributeName;
+
+        /**
+         * Creates a new stream file.
+         *
+         * @param attributeName the name of the alternate data stream.
+         */
+        public StreamFile(String attributeName) {
+            this.attributeName = attributeName;
+        }
+
+        /**
+         * Gets the name of this stream.
+         *
+         * @return the stream name.
+         */
+        public String getStreamName() {
+            return attributeName;
+        }
+
+        /**
+         * Gets the associated file record.
+         *
+         * @return the file record.
+         */
+        public FileRecord getFileRecord() {
+            return NTFSFile.this.getFileRecord();
+        }
+
+        @Override
+        public long getLength() {
+            return NTFSFile.this.getFileRecord().getAttributeTotalSize(NTFSAttribute.Types.DATA, attributeName);
+        }
+
+        @Override
+        public void setLength(long length) throws IOException {
+            throw new UnsupportedOperationException("Not implemented yet");
+        }
+
+        @Override
+        public void read(long fileOffset, ByteBuffer dest) throws IOException {
+            ByteBufferUtils.ByteArray destByteArray = ByteBufferUtils.toByteArray(dest);
+            byte[] destBuffer = destByteArray.toArray();
+
+            if (fileOffset + destBuffer.length > getLength()) {
+                throw new IOException("Attempt to read past the end of stream, offset: " + fileOffset);
+            }
+
+            getFileRecord().readData(fileOffset, destBuffer, 0, destBuffer.length);
+            destByteArray.refreshByteBuffer();
+        }
+
+        @Override
+        public void write(long fileOffset, ByteBuffer src) throws IOException {
+            throw new UnsupportedOperationException("Not implemented yet");
+        }
+
+        @Override
+        public void flush() throws IOException {
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public FileSystem<?> getFileSystem() {
+            return NTFSFile.this.getFileSystem();
+        }
+    }
 }
