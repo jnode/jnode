@@ -31,7 +31,7 @@ public class FileSystemTestUtils {
      * @throws IOException if an error occurs.
      */
     public static File getTestFile(String testFile) throws IOException {
-        File file = new File("src/test/org/jnode/fs/", testFile);
+        File file = new File("fs/src/test/org/jnode/fs/", testFile);
 
         // Look for the gzip file.
         File gzipFile = new File(file.getParent(), file.getName() + ".gz");
