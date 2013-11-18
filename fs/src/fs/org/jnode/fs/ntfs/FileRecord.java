@@ -360,8 +360,8 @@ public class FileRecord extends NTFSRecord {
     private List<NTFSAttribute> getAllAttributes() {
         if (attributeList == null) {
             attributeList = new ArrayList<NTFSAttribute>();
-
-            AttributeIterator iter;
+            try {
+                AttributeIterator iter;
             if (attributeListAttribute == null) {
                 iter = getAllStoredAttributes();
             } else {
@@ -371,6 +371,9 @@ public class FileRecord extends NTFSRecord {
             NTFSAttribute attr;
             while ((attr = iter.next()) != null) {
                 attributeList.add(attr);
+            }
+            } catch (Exception e) {
+                log.error("Error getting attributes for entry: " + this, e);
             }
         }
 
