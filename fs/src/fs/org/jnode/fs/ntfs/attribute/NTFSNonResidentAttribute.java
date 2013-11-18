@@ -111,7 +111,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      * @return the actual size taken up by the attribute data.
      */
     public long getAttributeActualSize() {
-        return getUInt32(0x30);
+        return getInt64(0x30);
     }
 
     /**
