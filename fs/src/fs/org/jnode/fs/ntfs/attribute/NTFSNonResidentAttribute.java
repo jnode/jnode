@@ -140,6 +140,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
                     // The number of runs it contains does not count towards the total
                     // as the compressed run reports holding all the runs for the pair.
                     // But we do need to move the offsets.
+                    expectingSparseRunNext = false;
 
                     // Also the sparse run following a compressed run can be coalesced with a subsequent 'real' sparse
                     // run. So add that in if we hit one
@@ -150,6 +151,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
                         this.numberOfVCNs += length;
                         vcn += length;
                         previousLCN = 0; // TODO: is it correct to reset this?
+                        lastCompressedSize = 0;
                     }
                 } else if (dataRun.getLength() >= compUnitSize) {
                     // Compressed/sparse pairs always add to the compression unit size.  If
@@ -178,6 +180,8 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
                 this.numberOfVCNs += dataRun.getLength();
                 vcn += dataRun.getLength();
                 previousLCN = dataRun.getCluster();
+                lastCompressedSize = 0;
+                expectingSparseRunNext = false;
             }
 
             offset += dataRun.getSize();
