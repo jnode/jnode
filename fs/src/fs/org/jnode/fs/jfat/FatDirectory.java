@@ -28,9 +28,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSDirectoryId;
 import org.jnode.fs.FSEntry;
 
-public class FatDirectory extends FatEntry implements FSDirectory {
+public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId {
     private static final int MAXENTRIES = 65535; // 2^16-1; fatgen 1.03, page 33
 
     private static final Logger log = Logger.getLogger(FatDirectory.class);

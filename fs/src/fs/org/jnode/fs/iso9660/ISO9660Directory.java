@@ -43,11 +43,6 @@ public final class ISO9660Directory implements FSDirectory {
         this.entry = entry;
     }
 
-    @Override
-    public String getDirectoryId() {
-        return entry.getId();
-    }
-
     /**
      * @see org.jnode.fs.FSDirectory#iterator()
      */

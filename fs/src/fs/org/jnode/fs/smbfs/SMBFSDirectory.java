@@ -179,11 +179,6 @@ public class SMBFSDirectory extends SMBFSEntry implements FSDirectory {
     }
 
     @Override
-    public String getDirectoryId() {
-        return getName();
-    }
-
-    @Override
     public String getId() {
         return getName();
     }

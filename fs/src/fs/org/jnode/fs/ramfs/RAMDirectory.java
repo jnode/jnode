@@ -26,6 +26,8 @@ import java.util.Iterator;
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSEntryCreated;
+import org.jnode.fs.FSEntryLastAccessed;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 
@@ -34,7 +36,7 @@ import org.jnode.fs.FileSystem;
  *
  * @author peda
  */
-public class RAMDirectory implements FSEntry, FSDirectory {
+public class RAMDirectory implements FSEntry, FSDirectory, FSEntryCreated, FSEntryLastAccessed {
 
     private RAMFileSystem filesystem;
 
@@ -69,11 +71,6 @@ public class RAMDirectory implements FSEntry, FSDirectory {
         // TODO: accessRights
 
         entries = new HashMap<String, FSEntry>();
-    }
-
-    @Override
-    public String getDirectoryId() {
-        return getName();
     }
 
     @Override

@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.jnode.fs.FSDirectoryId;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.spi.AbstractFSDirectory;
@@ -37,7 +38,7 @@ import org.jnode.fs.util.FSUtils;
 /**
  * @author Andras Nagy
  */
-public class Ext2Directory extends AbstractFSDirectory {
+public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId {
 
     INode iNode;
 

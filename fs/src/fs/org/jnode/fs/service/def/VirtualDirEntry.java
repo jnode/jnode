@@ -30,6 +30,8 @@ import org.jnode.driver.Device;
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSEntryCreated;
+import org.jnode.fs.FSEntryLastAccessed;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 
@@ -38,7 +40,7 @@ import org.jnode.fs.FileSystem;
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class VirtualDirEntry implements FSEntry, FSDirectory {
+final class VirtualDirEntry implements FSEntry, FSDirectory, FSEntryCreated, FSEntryLastAccessed {
 
     /**
      * The filesystem
@@ -123,11 +125,6 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
 
     public long getLastAccessed() throws IOException {
         return lastAccessed;
-    }
-
-    @Override
-    public String getDirectoryId() {
-        return getName();
     }
 
     @Override

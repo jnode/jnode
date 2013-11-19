@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSDirectoryId;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
@@ -33,7 +34,7 @@ import org.jnode.fs.ntfs.index.NTFSIndex;
  * @author vali
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class NTFSDirectory implements FSDirectory {
+public class NTFSDirectory implements FSDirectory, FSDirectoryId {
 
     private static final Logger log = Logger.getLogger(NTFSDirectory.class);
 

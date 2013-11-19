@@ -28,13 +28,14 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSDirectoryId;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.ReadOnlyFileSystemException;
 
 /**
  * @author epr
  */
-public abstract class AbstractDirectory extends FatObject implements FSDirectory {
+public abstract class AbstractDirectory extends FatObject implements FSDirectory, FSDirectoryId {
 
     protected Vector<FatBasicDirEntry> entries = new Vector<FatBasicDirEntry>();
     private boolean _dirty;

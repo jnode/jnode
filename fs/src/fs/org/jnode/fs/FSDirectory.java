@@ -31,16 +31,6 @@ import java.util.Iterator;
 public interface FSDirectory extends FSObject {
 
     /**
-     * Gets a unique ID for this directory in the context of its parent. This value should be the same every time the
-     * directory is accessed. Depending on the file system implementation this may return the same value as
-     * {@link FSEntry#getId} for the associated entry, or it may return a different ID that is unique across all
-     * directories. E.g. start cluster / directory entry index (FAT) vs global ID such as inode number (ext2).
-     *
-     * @return the unique ID for this directory.
-     */
-    public String getDirectoryId();
-
-    /**
      * Gets an iterator used to iterate over all the entries of this directory.
      * All elements returned by the iterator must be instance of FSEntry.
      *
