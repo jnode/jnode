@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
@@ -42,136 +42,150 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 
     private FileRecord fileRecord;
 
-	/**
-	 * The file system that contains this file.
-	 */
-	private NTFSFileSystem fs;
+    /**
+     * The file system that contains this file.
+     */
+    private NTFSFileSystem fs;
 
-	private final IndexEntry indexEntry;
+    private IndexEntry indexEntry;
 
-	/**
-	 * Initialize this instance.
-	 * @param fs the file system.
-	 * @param indexEntry
-	 */
-	public NTFSFile(NTFSFileSystem fs, IndexEntry indexEntry) {
-		this.fs = fs;
-		this.indexEntry = indexEntry;
-	}
+    /**
+     * Initialize this instance.
+     *
+     * @param fs         the file system.
+     * @param indexEntry the index entry.
+     */
+    public NTFSFile(NTFSFileSystem fs, IndexEntry indexEntry) {
+        this.fs = fs;
+        this.indexEntry = indexEntry;
+    }
 
-	public long getLength() {
+    /**
+     * Initialize this instance.
+     *
+     * @param fs         the file system.
+     * @param fileRecord the file record.
+     */
+    public NTFSFile(NTFSFileSystem fs, FileRecord fileRecord) {
+        this.fs = fs;
+        this.fileRecord = fileRecord;
+    }
+
+    public long getLength() {
         FileRecord.AttributeIterator attributes =
             getFileRecord().findAttributesByTypeAndName(NTFSAttribute.Types.DATA, null);
         NTFSAttribute attribute = attributes.next();
 
-        if (attribute == null) {
+        if (attribute == null && indexEntry != null) {
+            // Fall back to the size stored in the index entry if the data attribute is not present (even possible??)
             return indexEntry.getRealFileSize();
         }
         return getFileRecord().getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
     }
 
     /*
-	 * (non-Javadoc)
+     * (non-Javadoc)
 	 * @see org.jnode.fs.FSFile#setLength(long)
 	 */
-	public void setLength(long length) {
-		// TODO Auto-generated method stub
+    public void setLength(long length) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
-	 */
-	// public void read(long fileOffset, byte[] dest, int off, int len)
-	public void read(long fileOffset, ByteBuffer destBuf) throws IOException {
-		// TODO optimize it also to use ByteBuffer at lower level
-		final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
-		final byte[] dest = destBA.toArray();
-		getFileRecord().readData(fileOffset, dest, 0, dest.length);
-		destBA.refreshByteBuffer();
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
+     */
+    // public void read(long fileOffset, byte[] dest, int off, int len)
+    public void read(long fileOffset, ByteBuffer destBuf) throws IOException {
+        // TODO optimize it also to use ByteBuffer at lower level
+        final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
+        final byte[] dest = destBA.toArray();
+        getFileRecord().readData(fileOffset, dest, 0, dest.length);
+        destBA.refreshByteBuffer();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.jnode.fs.FSFile#write(long, byte[], int, int)
-	 */
-	// public void write(long fileOffset, byte[] src, int off, int len) {
-	public void write(long fileOffset, ByteBuffer src) {
-		// TODO Auto-generated method stub
+    /*
+     * (non-Javadoc)
+     * @see org.jnode.fs.FSFile#write(long, byte[], int, int)
+     */
+    // public void write(long fileOffset, byte[] src, int off, int len) {
+    public void write(long fileOffset, ByteBuffer src) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.jnode.fs.FSObject#isValid()
-	 */
-	public boolean isValid() {
-		return true;
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.jnode.fs.FSObject#isValid()
+     */
+    public boolean isValid() {
+        return true;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.jnode.fs.FSObject#getFileSystem()
-	 */
-	public FileSystem<?> getFileSystem() {
-		return fs;
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.jnode.fs.FSObject#getFileSystem()
+     */
+    public FileSystem<?> getFileSystem() {
+        return fs;
+    }
 
-	/**
-	 * @return Returns the fileRecord.
-	 */
-	public FileRecord getFileRecord() {
-		if (fileRecord == null) {
-			try {
-				fileRecord = indexEntry.getParentFileRecord().getVolume().getMFT().getIndexedFileRecord(indexEntry);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return this.fileRecord;
-	}
+    /**
+     * @return Returns the fileRecord.
+     */
+    public FileRecord getFileRecord() {
+        if (fileRecord == null) {
+            try {
+                fileRecord = indexEntry.getParentFileRecord().getVolume().getMFT().getIndexedFileRecord(indexEntry);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return this.fileRecord;
+    }
 
-	/**
-	 * @param fileRecord The fileRecord to set.
-	 */
-	public void setFileRecord(FileRecord fileRecord) {
-		this.fileRecord = fileRecord;
-	}
+    /**
+     * @param fileRecord The fileRecord to set.
+     */
+    public void setFileRecord(FileRecord fileRecord) {
+        this.fileRecord = fileRecord;
+    }
 
-	@Override
-	public byte[] getSlackSpace() throws IOException {
-		FileRecord.AttributeIterator dataAttributes = getFileRecord().findAttributesByTypeAndName(
-				NTFSAttribute.Types.DATA, null);
-		NTFSAttribute attribute = dataAttributes.next();
+    @Override
+    public byte[] getSlackSpace() throws IOException {
+        FileRecord.AttributeIterator dataAttributes = getFileRecord().findAttributesByTypeAndName(
+            NTFSAttribute.Types.DATA, null);
+        NTFSAttribute attribute = dataAttributes.next();
 
-		if (attribute == null || attribute.isResident()) {
-			// If the data attribute is missing there is no slack space. If it is resident then another attribute might
-			// immediately follow the data. So for now we'll ignore that case
-			return new byte[0];
-		}
+        if (attribute == null || attribute.isResident()) {
+            // If the data attribute is missing there is no slack space. If it is resident then another attribute might
+            // immediately follow the data. So for now we'll ignore that case
+            return new byte[0];
+        }
 
-		int clusterSize = ((NTFSFileSystem) getFileSystem()).getNTFSVolume().getClusterSize();
+        int clusterSize = ((NTFSFileSystem) getFileSystem()).getNTFSVolume().getClusterSize();
 
-		int slackSpaceSize = clusterSize - (int) (getLength() % clusterSize);
+        int slackSpaceSize = clusterSize - (int) (getLength() % clusterSize);
 
-		if (slackSpaceSize == clusterSize) {
-			slackSpaceSize = 0;
-		}
+        if (slackSpaceSize == clusterSize) {
+            slackSpaceSize = 0;
+        }
 
-		byte[] slackSpace = new byte[slackSpaceSize];
-		getFileRecord().readData(getLength(), slackSpace, 0, slackSpace.length);
+        byte[] slackSpace = new byte[slackSpaceSize];
+        getFileRecord().readData(getLength(), slackSpace, 0, slackSpace.length);
 
-		return slackSpace;
-	}
+        return slackSpace;
+    }
 
-	/**
-	 * Flush any cached data to the disk.
-	 * @throws IOException
-	 */
-	public void flush() throws IOException {
-		// TODO implement me
-	}
+    /**
+     * Flush any cached data to the disk.
+     *
+     * @throws IOException
+     */
+    public void flush() throws IOException {
+        // TODO implement me
+    }
 
     public Map<String, FSFile> getStreams() {
         Set<String> streamNames = new LinkedHashSet<String>();

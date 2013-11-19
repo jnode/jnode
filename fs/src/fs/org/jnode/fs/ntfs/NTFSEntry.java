@@ -21,7 +21,6 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -39,27 +38,55 @@ import org.jnode.fs.ntfs.index.IndexEntry;
  */
 public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, FSEntryLastAccessed {
 
-	private FSObject cachedFSObject;
+    /**
+     * The index entry.
+     */
+    private IndexEntry indexEntry;
+    private FSObject cachedFSObject;
 
-	private final IndexEntry indexEntry;
+    /**
+     * The associated file record.
+     */
+    private FileRecord fileRecord;
 
-	private final NTFSFileSystem fs;
+    /**
+     * The containing file system.
+     */
+    private final NTFSFileSystem fs;
 
 	/**
 	 * Initialize this instance.
-	 */
-	public NTFSEntry(NTFSFileSystem fs, IndexEntry indexEntry) {
+     *
+     * @param fs the file system.
+     * @param indexEntry the index entry.
+     */
+    public NTFSEntry(NTFSFileSystem fs, IndexEntry indexEntry) {
 		this.fs = fs;
 		this.indexEntry = indexEntry;
 	}
 
-	/**
-	 * Gets the name of this entry.
-	 * @see org.jnode.fs.FSEntry#getName()
-	 */
+    /**
+     * Initialize this instance.
+     *
+     * @param fs         the file system.
+     * @param fileRecord the file record.
+     */
+    public NTFSEntry(NTFSFileSystem fs, FileRecord fileRecord) {
+        this.fs = fs;
+        this.fileRecord = fileRecord;
+    }
+
+    /**
+     * Gets the name of this entry.
+     * @see org.jnode.fs.FSEntry#getName()
+     */
 	public String getName() {
-		if (indexEntry != null) return indexEntry.getFileName();
-		return null;
+        if (indexEntry != null) {
+            return indexEntry.getFileName();
+        } else if (fileRecord != null) {
+            return fileRecord.getFileName();
+        }
+        return null;
 	}
 
 	/**
@@ -126,8 +153,12 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
 	public FSFile getFile() {
 		if (this.isFile()) {
 			if (cachedFSObject == null) {
-				cachedFSObject = new NTFSFile(fs, indexEntry);
-			}
+                if (indexEntry != null) {
+                    cachedFSObject = new NTFSFile(fs, indexEntry);
+                } else {
+                    cachedFSObject = new NTFSFile(fs, fileRecord);
+                }
+            }
 			return (FSFile) cachedFSObject;
 		} else {
 			return null;
@@ -140,10 +171,14 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
 	public FSDirectory getDirectory() throws IOException {
 		if (this.isDirectory()) {
 			if (cachedFSObject == null) {
-				// XXX: Why can't this just use getFileRecord()?
-				cachedFSObject = new NTFSDirectory(fs, getFileRecord().getVolume().getMFT().getIndexedFileRecord(
-						indexEntry));
-			}
+                if (fileRecord != null) {
+                    cachedFSObject = new NTFSDirectory(fs, fileRecord);
+                } else {
+                    // XXX: Why can't this just use getFileRecord()?
+                    cachedFSObject = new NTFSDirectory(fs, getFileRecord().getVolume().getMFT().getIndexedFileRecord(
+                        indexEntry));
+                }
+            }
 			return (FSDirectory) cachedFSObject;
 		} else return null;
 	}
@@ -175,7 +210,10 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
 	 * @return Returns the fileRecord.
 	 */
 	public FileRecord getFileRecord() throws IOException {
-		return indexEntry.getParentFileRecord().getVolume().getMFT().getIndexedFileRecord(indexEntry);
+        if (fileRecord != null) {
+            return fileRecord;
+        }
+        return indexEntry.getParentFileRecord().getVolume().getMFT().getIndexedFileRecord(indexEntry);
 	}
 
 	/**
@@ -196,6 +234,8 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
 
 	@Override
 	public String toString() {
-		return super.toString() + '(' + indexEntry + ')';
+        Object obj = indexEntry == null ? fileRecord : indexEntry;
+        return super.toString() + '(' + obj + ')';
 	}
+
 }
