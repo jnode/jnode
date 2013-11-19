@@ -98,7 +98,9 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
     public Map<String, FSFile> getStreams() {
         Map<String, FSFile> streams = new HashMap<String, FSFile>();
 
-        streams.put("rsrc", new ResourceForkFile());
+        if (file.getResources().getTotalSize() > 0) {
+            streams.put("rsrc", new ResourceForkFile());
+        }
 
         return streams;
     }
