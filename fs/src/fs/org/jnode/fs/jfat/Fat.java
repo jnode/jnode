@@ -293,6 +293,10 @@ public abstract class Fat {
     }
 
     public String toString() {
+        return String.format("FAT cluster:%d boot sector: %s", getClusterSize(), getBootSector());
+    }
+
+    public String toDebugString() {
         StrWriter out = new StrWriter();
 
         out.println("***************************  Fat   **************************");

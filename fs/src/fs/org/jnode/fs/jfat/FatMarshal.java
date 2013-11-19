@@ -17,13 +17,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jfat;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-
 import org.jnode.util.LittleEndian;
+import org.jnode.util.NumberUtils;
 
 
 /**
@@ -83,7 +83,7 @@ public class FatMarshal {
 
         if (offset > (array.length - length))
             throw new IndexOutOfBoundsException("length[" + length + "] + offset[" + offset +
-                    "] >" + "array.length[" + array.length + "]");
+                "] >" + "array.length[" + array.length + "]");
     }
 
     public byte get(int offset) {
@@ -196,7 +196,12 @@ public class FatMarshal {
         setDirty();
     }
 
+    @Override
     public String toString() {
+        return String.format("FatMarshal %s", NumberUtils.hex(array));
+    }
+
+    public String toDebugString() {
         StrWriter out = new StrWriter();
 
         out.println("*************************************************");

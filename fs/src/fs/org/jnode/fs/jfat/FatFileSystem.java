@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jfat;
 
 import java.io.IOException;
@@ -33,91 +33,96 @@ import org.jnode.fs.spi.AbstractFileSystem;
  * @author gvt
  */
 public class FatFileSystem extends AbstractFileSystem<FatRootDirectory> {
-	private static final Logger log = Logger.getLogger(FatFileSystem.class);
+    private static final Logger log = Logger.getLogger(FatFileSystem.class);
 
-	private Fat fat;
-	private final CodePage cp;
+    private Fat fat;
+    private final CodePage cp;
 
-	public FatFileSystem(Device device, String codePageName, boolean readOnly, FatFileSystemType type)
-			throws FileSystemException {
-		super(device, readOnly, type);
+    public FatFileSystem(Device device, String codePageName, boolean readOnly, FatFileSystemType type)
+        throws FileSystemException {
+        super(device, readOnly, type);
 
-		try {
-			fat = Fat.create(getApi());
-		} catch (IOException ex) {
-			throw new FileSystemException(ex);
-		} catch (Exception e) {
-			throw new FileSystemException(e);
-		}
+        try {
+            fat = Fat.create(getApi());
+        } catch (IOException ex) {
+            throw new FileSystemException(ex);
+        } catch (Exception e) {
+            throw new FileSystemException(e);
+        }
 
-		cp = CodePage.forName(codePageName);
-	}
+        cp = CodePage.forName(codePageName);
+    }
 
-	public FatFileSystem(Device device, boolean readOnly, FatFileSystemType type) throws FileSystemException {
-		this(device, "ISO_8859_1", readOnly, type);
-	}
+    public FatFileSystem(Device device, boolean readOnly, FatFileSystemType type) throws FileSystemException {
+        this(device, "ISO_8859_1", readOnly, type);
+    }
 
-	public int getClusterSize() {
-		return fat.getClusterSize();
-	}
+    public int getClusterSize() {
+        return fat.getClusterSize();
+    }
 
-	public Fat getFat() {
-		return fat;
-	}
+    public Fat getFat() {
+        return fat;
+    }
 
-	public BootSector getBootSector() {
-		return fat.getBootSector();
-	}
+    public BootSector getBootSector() {
+        return fat.getBootSector();
+    }
 
-	public CodePage getCodePage() {
-		return cp;
-	}
+    public CodePage getCodePage() {
+        return cp;
+    }
 
-	protected FSFile createFile(FSEntry entry) throws IOException {
-		return entry.getFile();
-	}
+    protected FSFile createFile(FSEntry entry) throws IOException {
+        return entry.getFile();
+    }
 
-	protected FSDirectory createDirectory(FSEntry entry) throws IOException {
-		return entry.getDirectory();
-	}
+    protected FSDirectory createDirectory(FSEntry entry) throws IOException {
+        return entry.getDirectory();
+    }
 
-	protected FatRootDirectory createRootEntry() throws IOException {
-		return new FatRootDirectory(this);
-	}
+    protected FatRootDirectory createRootEntry() throws IOException {
+        return new FatRootDirectory(this);
+    }
 
-	public void flush() throws IOException {
-		super.flush();
-		fat.flush();
-		log.debug(getFat().getCacheStat());
-	}
+    public void flush() throws IOException {
+        super.flush();
+        fat.flush();
+        log.debug(getFat().getCacheStat());
+    }
 
-	public String toString() {
-		StrWriter out = new StrWriter();
+    @Override
+    public String toString() {
+        return String.format("FAT File System: %s", getFat());
+    }
 
-		out.println("********************** FatFileSystem ************************");
-		out.println(getFat());
-		out.print("*************************************************************");
+    public String toDebugString() {
+        StrWriter out = new StrWriter();
 
-		return out.toString();
-	}
+        out.println("********************** FatFileSystem ************************");
+        out.println(getFat());
+        out.print("*************************************************************");
 
-	public long getFreeSpace() {
-		// TODO implement me
-		return -1;
-	}
+        return out.toString();
+    }
 
-	public long getTotalSpace() {
-		// TODO implement me
-		return -1;
-	}
+    public long getFreeSpace() {
+        // TODO implement me
+        return -1;
+    }
 
-	public long getUsableSpace() {
-		// TODO implement me
-		return -1;
-	}
+    public long getTotalSpace() {
+        // TODO implement me
+        return -1;
+    }
 
-	@Override
-	public String getVolumeName() throws IOException {
-		return getRootEntry().getLabel();
-	}
+    public long getUsableSpace() {
+        // TODO implement me
+        return -1;
+    }
+
+    @Override
+    public String getVolumeName() throws IOException {
+        return getRootEntry().getLabel();
+    }
 }
