@@ -106,9 +106,13 @@ public class CatalogKey extends AbstractKey {
             CatalogKey ck = (CatalogKey) key;
             res = this.getParentId().compareTo(ck.getParentId());
             if (res == 0) {
-                res =
-                    this.getNodeName().getUnicodeString()
-                        .compareTo(ck.getNodeName().getUnicodeString());
+                // Note: this is unlikely to be correct. See TN1150 section "Unicode Subtleties" for details
+                // For reading in data is should be safe since the B-Tree will be pre-sorted, but for adding new entries
+                // it will cause the order to be wrong.
+                res = this.getNodeName().getUnicodeString()
+                    .compareTo(ck.getNodeName().getUnicodeString());
+                this.getNodeName().getUnicodeString()
+                    .compareTo(ck.getNodeName().getUnicodeString());
             }
         }
         return res;
