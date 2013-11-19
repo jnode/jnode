@@ -340,7 +340,7 @@ public class FileRecord extends NTFSRecord {
      * @return the attribute found, or {@code null} if not found.
      * @see NTFSAttribute.Types
      */
-    private NTFSAttribute findStoredAttributeByType(int typeID) {
+    public NTFSAttribute findStoredAttributeByType(int typeID) {
         AttributeIterator iter = getAllStoredAttributes();
         NTFSAttribute attr;
         while ((attr = iter.next()) != null) {
