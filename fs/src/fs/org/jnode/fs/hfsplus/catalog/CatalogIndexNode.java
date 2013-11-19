@@ -111,10 +111,12 @@ public class CatalogIndexNode extends AbstractNode<IndexRecord> {
         LinkedList<IndexRecord> result = new LinkedList<IndexRecord>();
         IndexRecord largestMatchingRecord = null;
         CatalogKey largestMatchingKey = null;
+
         for (IndexRecord record : records) {
             CatalogKey key = (CatalogKey) record.getKey();
-            if (key.getParentId().getId() < parentId.getId() &&
-                (largestMatchingKey == null || key.compareTo(largestMatchingKey) > 0)) {
+
+            if (key.getParentId().getId() < parentId.getId()) {
+                // The keys/records should be sorted in this index record so take the highest key less than the parent
                 largestMatchingKey = key;
                 largestMatchingRecord = record;
             } else if (key.getParentId().getId() == parentId.getId()) {
@@ -125,6 +127,7 @@ public class CatalogIndexNode extends AbstractNode<IndexRecord> {
         if (largestMatchingKey != null) {
             result.addFirst(largestMatchingRecord);
         }
+
         return result.toArray(new IndexRecord[result.size()]);
     }
 
