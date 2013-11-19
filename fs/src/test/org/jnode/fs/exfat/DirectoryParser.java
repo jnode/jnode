@@ -1,4 +1,3 @@
-
 package org.jnode.fs.exfat;
 
 import java.io.IOException;
@@ -44,6 +43,7 @@ final class DirectoryParser {
     private final Node node;
     private long cluster;
     private UpcaseTable upcase;
+    private int index;
 
     private DirectoryParser(Node node) {
         this.node = node;
@@ -129,6 +129,8 @@ final class DirectoryParser {
             if (!advance()) {
                 return;
             }
+
+            index++;
         }
     }
 
@@ -250,9 +252,7 @@ final class DirectoryParser {
                 " != " + Integer.toHexString(nameHash) + ")");
         }
 
-        v.foundNode(Node.create(
-            sb, startCluster, attrib, name,
-            (flag == FLAG_CONTIGUOUS), realSize, times));
+        v.foundNode(Node.create(sb, startCluster, attrib, name, (flag == FLAG_CONTIGUOUS), realSize, times), index);
     }
 
     private int hashName(String name) throws IOException {
@@ -321,9 +321,7 @@ final class DirectoryParser {
         public void foundUpcaseTable(DirectoryParser parser,
                                      long checksum, long startCluster, long size) throws IOException;
 
-        public void foundNode(
-            Node node) throws IOException;
-
+        public void foundNode(Node node, int index) throws IOException;
     }
 
 }

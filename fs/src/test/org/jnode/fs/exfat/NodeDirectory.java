@@ -1,4 +1,3 @@
-
 package org.jnode.fs.exfat;
 
 import java.io.IOException;
@@ -33,6 +32,11 @@ final class NodeDirectory extends AbstractFSObject implements FSDirectory {
             setUpcase(this.upcase).
             parse(new VisitorImpl());
 
+    }
+
+    @Override
+    public String getId() {
+        return Long.toString(node.getStartCluster());
     }
 
     @Override
@@ -88,11 +92,12 @@ final class NodeDirectory extends AbstractFSObject implements FSDirectory {
         }
 
         @Override
-        public void foundNode(Node node) throws IOException {
+        public void foundNode(Node node, int index) throws IOException {
             final String upcaseName = upcase.toUpperCase(node.getName());
 
             nameToNode.put(upcaseName,
-                new NodeEntry((ExFatFileSystem) getFileSystem(), node, NodeDirectory.this));
+                new NodeEntry((ExFatFileSystem) getFileSystem(), node, NodeDirectory.this, index));
+
         }
 
     }

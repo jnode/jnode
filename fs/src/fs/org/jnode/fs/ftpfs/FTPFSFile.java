@@ -17,15 +17,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ftpfs;
 
-import org.jnode.fs.FSFile;
-
+import com.enterprisedt.net.ftp.FTPFile;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
-import com.enterprisedt.net.ftp.FTPFile;
+import org.jnode.fs.FSFile;
 
 
 /**
@@ -109,5 +107,10 @@ public class FTPFSFile extends FTPFSEntry implements FSFile {
      */
     public void write(long fileOffset, ByteBuffer src) throws IOException {
         // TODO implement me
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 }

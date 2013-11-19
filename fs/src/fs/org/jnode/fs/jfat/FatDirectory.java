@@ -119,6 +119,11 @@ public class FatDirectory extends FatEntry implements FSDirectory {
         return entries;
     }
 
+    @Override
+    public String getId() {
+        return Integer.toString(getStartCluster());
+    }
+
     public boolean isDirectory() {
         return true;
     }

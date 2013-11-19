@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.fat;
 
 /**
@@ -30,4 +30,6 @@ public interface FatConstants {
     public static final int F_LABEL = 0x08;
     public static final int F_DIRECTORY = 0x10;
     public static final int F_ARCHIVE = 0x20;
+
+    public static final int DIR_ENTRY_SIZE = 32;
 }

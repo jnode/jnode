@@ -17,12 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.service.def;
 
 import java.io.File;
 import java.io.IOException;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -44,9 +43,9 @@ final class VirtualMountEntry implements FSEntry {
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param mountedFS
-     * @param path Path in the mountedFS (null or "" for root)
+     * @param path      Path in the mountedFS (null or "" for root)
      * @param name
      * @param parent
      * @throws IOException
@@ -102,6 +101,11 @@ final class VirtualMountEntry implements FSEntry {
      */
     public long getLastModified() throws IOException {
         return root.getLastModified();
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 
     /**

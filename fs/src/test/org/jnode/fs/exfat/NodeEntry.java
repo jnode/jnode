@@ -1,4 +1,3 @@
-
 package org.jnode.fs.exfat;
 
 import java.io.IOException;
@@ -18,11 +17,22 @@ final class NodeEntry extends AbstractFSObject implements FSEntry, FSEntryCreate
     private final Node node;
     private final NodeDirectory parent;
 
-    public NodeEntry(ExFatFileSystem fs, Node node, NodeDirectory parent) {
+    /**
+     * The index of this entry in the parent.
+     */
+    private int index;
+
+    public NodeEntry(ExFatFileSystem fs, Node node, NodeDirectory parent, int index) {
         super(fs);
 
         this.node = node;
         this.parent = parent;
+        this.index = index;
+    }
+
+    @Override
+    public String getId() {
+        return Integer.toString(index);
     }
 
     @Override

@@ -17,22 +17,19 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jarfs;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
 
 /**
- * 
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
- * 
  */
 public final class JarFSDirectory implements FSDirectory {
 
@@ -45,6 +42,11 @@ public final class JarFSDirectory implements FSDirectory {
     public JarFSDirectory(JarFSEntry entry, Map<String, JarFSEntry> entries) {
         this.entry = entry;
         this.jarEntries = entries;
+    }
+
+    @Override
+    public String getId() {
+        return entry.getId();
     }
 
     /**
@@ -98,7 +100,7 @@ public final class JarFSDirectory implements FSDirectory {
 
     /**
      * Save all dirty (unsaved) data to the device
-     * 
+     *
      * @throws IOException
      */
     public void flush() throws IOException {

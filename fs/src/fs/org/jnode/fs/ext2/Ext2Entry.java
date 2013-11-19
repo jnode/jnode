@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
@@ -30,11 +30,11 @@ import org.jnode.fs.spi.AbstractFSEntry;
 
 /**
  * @author Andras Nagy
- * 
+ *         <p/>
  *         In case of a directory, the data will be parsed to get the file-list
  *         by Ext2Directory. In case of a regular file, no more processing is
  *         needed.
- * 
+ *         <p/>
  *         TODO: besides getFile() and getDirectory(), we will need
  *         getBlockDevice() getCharacterDevice(), etc.
  */
@@ -51,11 +51,16 @@ public class Ext2Entry extends AbstractFSEntry implements FSEntryLastChanged, FS
 
         log.setLevel(Level.INFO);
         log.debug("Ext2Entry(iNode, name): name=" + name +
-                (isDirectory() ? " is a directory " : "") + (isFile() ? " is a file " : ""));
+            (isDirectory() ? " is a directory " : "") + (isFile() ? " is a file " : ""));
     }
 
     public long getLastChanged() throws IOException {
         return iNode.getCtime() * 1000;
+    }
+
+    @Override
+    public String getId() {
+        return Integer.toString(iNode.getINodeNr());
     }
 
     public long getLastModified() throws IOException {
@@ -80,7 +85,7 @@ public class Ext2Entry extends AbstractFSEntry implements FSEntryLastChanged, FS
 
     /**
      * Returns the type.
-     * 
+     *
      * @return int type. Valid types are Ext2Constants.EXT2_FT_*
      */
     public int getType() {
@@ -99,8 +104,8 @@ public class Ext2Entry extends AbstractFSEntry implements FSEntryLastChanged, FS
         else if (mode == Ext2Constants.EXT2_S_IFDIR)
             return AbstractFSEntry.DIR_ENTRY;
         else if (mode == Ext2Constants.EXT2_S_IFREG || mode == Ext2Constants.EXT2_S_IFLNK ||
-                 mode == Ext2Constants.EXT2_S_IFIFO || mode == Ext2Constants.EXT2_S_IFCHR ||
-                 mode == Ext2Constants.EXT2_S_IFBLK)
+            mode == Ext2Constants.EXT2_S_IFIFO || mode == Ext2Constants.EXT2_S_IFCHR ||
+            mode == Ext2Constants.EXT2_S_IFBLK)
             return AbstractFSEntry.FILE_ENTRY;
         else
             return AbstractFSEntry.OTHER_ENTRY;

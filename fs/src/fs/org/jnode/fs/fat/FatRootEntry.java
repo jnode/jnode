@@ -17,11 +17,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.fat;
 
 import java.io.IOException;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -32,12 +31,19 @@ import org.jnode.fs.FSFile;
  */
 public class FatRootEntry extends FatObject implements FSEntry {
 
-    /** The actual root directory */
+    /**
+     * The actual root directory
+     */
     private final FatDirectory rootDir;
 
     public FatRootEntry(FatDirectory rootDir) {
         super(rootDir.getFatFileSystem());
         this.rootDir = rootDir;
+    }
+
+    @Override
+    public String getId() {
+        return "2";
     }
 
     /**
@@ -59,14 +65,14 @@ public class FatRootEntry extends FatObject implements FSEntry {
     }
 
     /**
-     * Is this entry refering to a file?
+     * Is this entry referring to a file?
      */
     public boolean isFile() {
         return false;
     }
 
     /**
-     * Is this entry refering to a (sub-)directory?
+     * Is this entry referring to a (sub-)directory?
      */
     public boolean isDirectory() {
         return true;
@@ -81,7 +87,7 @@ public class FatRootEntry extends FatObject implements FSEntry {
 
     /**
      * Sets the last modification time of this entry.
-     * 
+     *
      * @throws IOException
      */
     public void setLastModified(long lastModified) throws IOException {
@@ -105,8 +111,8 @@ public class FatRootEntry extends FatObject implements FSEntry {
     }
 
     /**
-     * Gets the accessrights for this entry.
-     * 
+     * Gets the access rights for this entry.
+     *
      * @throws IOException
      */
     public FSAccessRights getAccessRights() throws IOException {
@@ -115,6 +121,7 @@ public class FatRootEntry extends FatObject implements FSEntry {
 
     /**
      * Indicate if the entry has been modified in memory (ie need to be saved)
+     *
      * @return true if the entry need to be saved
      * @throws IOException
      */
