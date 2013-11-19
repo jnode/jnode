@@ -94,7 +94,12 @@ public class FatRootDirectory extends FatDirectory {
         throw new UnsupportedOperationException("cannot change root time");
     }
 
+    @Override
     public String toString() {
+        return String.format("FatRootDirectory [%s]", getName());
+    }
+
+    public String toDebugString() {
         StrWriter out = new StrWriter();
 
         out.println("*******************************************");

@@ -309,7 +309,12 @@ public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId
         idMap.remove(entry.getId());
     }
 
+    @Override
     public String toString() {
+        return String.format("FatDirectory [%s] index:%d", getName(), getIndex());
+    }
+
+    public String toDebugString() {
         StrWriter out = new StrWriter();
         out.println("*******************************************");
         out.println("FatDirectory");

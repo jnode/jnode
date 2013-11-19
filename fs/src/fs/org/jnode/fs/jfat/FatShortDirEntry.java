@@ -17,13 +17,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jfat;
 
 import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
 import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.jnode.util.NumberUtils;
 
@@ -237,11 +236,11 @@ public class FatShortDirEntry extends FatDirEntry {
          */
         if (lFstClusLo > 0xFFFF)
             throw new IllegalArgumentException("FstClusLo too large: " +
-                    NumberUtils.hex(lFstClusLo, 4));
+                NumberUtils.hex(lFstClusLo, 4));
 
         if (lFstClusHi > 0xFFF)
             throw new IllegalArgumentException("FstClusHi too large: " +
-                    NumberUtils.hex(lFstClusHi, 4));
+                NumberUtils.hex(lFstClusHi, 4));
 
         /*
          * FstClusHi have to be "zero" for FAT12/FAT16 remind to add a check
@@ -498,7 +497,14 @@ public class FatShortDirEntry extends FatDirEntry {
         encodeLength();
     }
 
+    @Override
     public String toString() {
+        return String.format(
+            "Short Entry [%s] index:%d attr:%s size:%d",
+            getShortName(), getIndex(), NumberUtils.hex(lAttr, 2), lFileSize);
+    }
+
+    public String toDebugString() {
         StrWriter out = new StrWriter();
 
         out.println("*******************************************");

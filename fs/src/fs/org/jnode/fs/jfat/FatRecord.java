@@ -194,7 +194,18 @@ public class FatRecord {
         return longName;
     }
 
+    @Override
     public String toString() {
+        if (shortEntry == null) {
+            return String.format("FatRecord (Open) %s", longEntries);
+        } else {
+            return String.format(
+                "FatRecord (Closed) ['%s' %s] index:%d chksum:%s size:%d",
+                getLongName(), getShortName(), getShortEntry().getIndex(), NumberUtils.hex(getChkSum(), 2), size());
+        }
+    }
+
+    public String toDebugString() {
         mustBeClose();
 
         StrWriter out = new StrWriter();
