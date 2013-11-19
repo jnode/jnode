@@ -86,7 +86,8 @@ public class FatDirEntry {
         }
 
         FatDirEntry fatDirEntry;
-        if (attr.isLong()) {
+        // 0xffffffff is the end of long file name marker
+        if (attr.isLong() || entry.getUInt32(28) == 0xffffffffL) {
             fatDirEntry = new FatLongDirEntry(fs, entry, index);
         } else {
             fatDirEntry = new FatShortDirEntry(fs, entry, index);
@@ -150,7 +151,12 @@ public class FatDirEntry {
         entry.flush();
     }
 
+    @Override
     public String toString() {
+        return String.format("FatDirEntry [%s] index:%d", entry, index);
+    }
+
+    public String toDebugString() {
         StrWriter out = new StrWriter();
         if (isFreeDirEntry()) {
             out.println("*******************************************");
