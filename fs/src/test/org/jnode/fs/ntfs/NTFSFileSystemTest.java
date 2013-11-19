@@ -1,7 +1,6 @@
 package org.jnode.fs.ntfs;
 
 import java.io.FileInputStream;
-import junit.framework.TestCase;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FileDevice;
 import org.jnode.fs.DataStructureAsserts;
@@ -10,19 +9,21 @@ import org.jnode.fs.FileSystemTestUtils;
 import org.jnode.fs.ntfs.index.NTFSIndex;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.util.FileUtils;
+import org.junit.Before;
+import org.junit.Test;
 
-public class NTFSFileSystemTest extends TestCase {
+public class NTFSFileSystemTest {
 
     private Device device;
     private FileSystemService fss;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         // create file system service.
         fss = FileSystemTestUtils.createFSService(NTFSFileSystemType.class.getName());
     }
 
+    @Test
     public void testReadSmallDisk() throws Exception {
 
         device = new FileDevice(FileSystemTestUtils.getTestFile("ntfs/test.ntfs"), "r");
@@ -57,6 +58,7 @@ public class NTFSFileSystemTest extends TestCase {
         DataStructureAsserts.assertStructure(fs, expectedStructure);
     }
 
+    @Test
     public void testBrokenIndex() throws Exception {
 
         device = new FileDevice(FileSystemTestUtils.getTestFile("ntfs/test.ntfs"), "r");
@@ -75,6 +77,7 @@ public class NTFSFileSystemTest extends TestCase {
         }
     }
 
+    @Test
     public void testReadCompressedDisk() throws Exception {
 
         device = new FileDevice(FileSystemTestUtils.getTestFile("ntfs/compressed.dd"), "r");
