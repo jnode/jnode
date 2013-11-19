@@ -17,13 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem.config;
 
 import java.io.IOException;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
@@ -48,7 +46,9 @@ public enum FSType {
     FAT("fat", FatFileSystem.class, FatFileSystemType.class,
         null),
     JFAT("jfat", org.jnode.fs.jfat.FatFileSystem.class, org.jnode.fs.jfat.FatFileSystemType.class,
-            null),
+        null),
+    EXFAT("exfat", org.jnode.fs.exfat.ExFatFileSystem.class, org.jnode.fs.exfat.ExFatFileSystemType.class,
+        null),
 
     ISO9660("iso9660", ISO9660FileSystem.class, ISO9660FileSystemType.class,
         new String[]{".", ".."}),
@@ -56,8 +56,8 @@ public enum FSType {
         new String[]{"."}),
 
     HFS_PLUS("HFS+", HfsPlusFileSystem.class, HfsPlusFileSystemType.class,
-            new String[]{"."});
-    
+        new String[]{"."});
+
     private final Class<? extends FileSystem<?>> fsClass;
 
     private final Class<? extends FileSystemType<?>> fsTypeClass;

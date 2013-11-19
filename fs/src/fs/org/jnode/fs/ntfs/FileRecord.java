@@ -357,21 +357,21 @@ public class FileRecord extends NTFSRecord {
      *
      * @return a collection of all attributes.
      */
-    private List<NTFSAttribute> getAllAttributes() {
+    private synchronized List<NTFSAttribute> getAllAttributes() {
         if (attributeList == null) {
             attributeList = new ArrayList<NTFSAttribute>();
             try {
                 AttributeIterator iter;
-            if (attributeListAttribute == null) {
-                iter = getAllStoredAttributes();
-            } else {
-                iter = new AttributeListAttributeIterator();
-            }
+                if (attributeListAttribute == null) {
+                    iter = getAllStoredAttributes();
+                } else {
+                    iter = new AttributeListAttributeIterator();
+                }
 
-            NTFSAttribute attr;
-            while ((attr = iter.next()) != null) {
-                attributeList.add(attr);
-            }
+                NTFSAttribute attr;
+                while ((attr = iter.next()) != null) {
+                    attributeList.add(attr);
+                }
             } catch (Exception e) {
                 log.error("Error getting attributes for entry: " + this, e);
             }
