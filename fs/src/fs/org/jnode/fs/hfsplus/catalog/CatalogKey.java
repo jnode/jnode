@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.catalog;
 
 import org.jnode.fs.hfsplus.HfsUnicodeString;
@@ -32,9 +32,8 @@ import org.jnode.util.BigEndian;
  * <li>The node identifier of the parent folder</li>
  * <li>The name of the file or folder</li>
  * </ul>
- * 
+ * <p/>
  * The minimal length for a key is 6 bytes. 2 bytes for the length and 4 bytes for the catalog node id.
- *
  */
 public class CatalogKey extends AbstractKey {
 
@@ -46,12 +45,14 @@ public class CatalogKey extends AbstractKey {
      * or folder itself.
      */
     private CatalogNodeId parentId;
-    /** Name of the file or folder, empty for thread records. */
+    /**
+     * Name of the file or folder, empty for thread records.
+     */
     private HfsUnicodeString nodeName;
 
     /**
      * Create catalog key from existing data.
-     * 
+     *
      * @param src
      * @param offset
      */
@@ -61,7 +62,7 @@ public class CatalogKey extends AbstractKey {
         byte[] ck = new byte[2];
         System.arraycopy(src, currentOffset, ck, 0, 2);
         //TODO Understand why the +2 is necessary
-        keyLength = BigEndian.getInt16(ck, 0) + 2;
+        keyLength = BigEndian.getUInt16(ck, 0) + 2;
         currentOffset += 2;
         ck = new byte[4];
         System.arraycopy(src, currentOffset, ck, 0, 4);
@@ -75,10 +76,9 @@ public class CatalogKey extends AbstractKey {
     /**
      * Create new catalog key based on parent CNID and the name of the file or
      * folder.
-     * 
+     *
      * @param parentID Parent catalog node identifier.
-     * @param name Name of the file or folder.
-     * 
+     * @param name     Name of the file or folder.
      */
     public CatalogKey(final CatalogNodeId parentID, final HfsUnicodeString name) {
         this.parentId = parentID;
@@ -97,9 +97,8 @@ public class CatalogKey extends AbstractKey {
     /**
      * Compare two catalog keys. These keys are compared by parent id and next
      * by node name.
-     * 
+     *
      * @param key
-     * 
      */
     public final int compareTo(final Key key) {
         int res = -1;
@@ -108,8 +107,8 @@ public class CatalogKey extends AbstractKey {
             res = this.getParentId().compareTo(ck.getParentId());
             if (res == 0) {
                 res =
-                        this.getNodeName().getUnicodeString()
-                                .compareTo(ck.getNodeName().getUnicodeString());
+                    this.getNodeName().getUnicodeString()
+                        .compareTo(ck.getNodeName().getUnicodeString());
             }
         }
         return res;
@@ -137,8 +136,8 @@ public class CatalogKey extends AbstractKey {
     public final String toString() {
         StringBuffer s = new StringBuffer();
         s.append("[length, Parent ID, Node name]:").append(getKeyLength()).append(",")
-                .append(getParentId().getId()).append(",")
-                .append((getNodeName() != null) ? getNodeName().getUnicodeString() : "");
+            .append(getParentId().getId()).append(",")
+            .append((getNodeName() != null) ? getNodeName().getUnicodeString() : "");
         return s.toString();
     }
 

@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import org.jnode.util.BigEndian;
@@ -30,7 +30,7 @@ public class FileInfo {
     public FileInfo(byte[] data, int offset) {
         fileType = BigEndian.getInt32(data, offset);
         fileCreator = BigEndian.getInt32(data, offset + 4);
-        finderFlags = BigEndian.getInt16(data, offset + 8);
+        finderFlags = BigEndian.getUInt16(data, offset + 8);
     }
 
     public int getFileType() {

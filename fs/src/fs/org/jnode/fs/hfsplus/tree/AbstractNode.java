@@ -17,12 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.tree;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jnode.util.BigEndian;
 
 public abstract class AbstractNode<T extends NodeRecord> implements Node<T> {
@@ -46,7 +45,7 @@ public abstract class AbstractNode<T extends NodeRecord> implements Node<T> {
         this.offsets = new ArrayList<Integer>(this.descriptor.getNumRecords() + 1);
         int offset;
         for (int i = 0; i < this.descriptor.getNumRecords() + 1; i++) {
-            offset = BigEndian.getInt16(nodeData, size - ((i + 1) * 2));
+            offset = BigEndian.getUInt16(nodeData, size - ((i + 1) * 2));
             offsets.add(Integer.valueOf(offset));
         }
         loadRecords(nodeData);
@@ -85,7 +84,7 @@ public abstract class AbstractNode<T extends NodeRecord> implements Node<T> {
     public boolean check(int treeHeigth) {
         // Node type is correct.
         if (this.getNodeDescriptor().getKind() < NodeDescriptor.BT_LEAF_NODE ||
-                this.getNodeDescriptor().getKind() > NodeDescriptor.BT_MAP_NODE) {
+            this.getNodeDescriptor().getKind() > NodeDescriptor.BT_MAP_NODE) {
             return false;
         }
 
@@ -97,7 +96,7 @@ public abstract class AbstractNode<T extends NodeRecord> implements Node<T> {
 
     /**
      * Return amount of free space remaining.
-     * 
+     *
      * @return remaining free space.
      */
     protected int getFreeSize() {
@@ -109,7 +108,7 @@ public abstract class AbstractNode<T extends NodeRecord> implements Node<T> {
     public byte[] getBytes() {
         byte[] datas = new byte[size];
         System.arraycopy(descriptor.getBytes(), 0, datas, 0,
-                NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH);
+            NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH);
         int offsetIndex = 0;
         int offset;
         for (NodeRecord record : records) {

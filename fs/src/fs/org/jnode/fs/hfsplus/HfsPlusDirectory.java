@@ -141,7 +141,7 @@ public class HfsPlusDirectory implements FSDirectory, FSDirectoryId {
 
     @Override
     public String getDirectoryId() {
-        return Integer.toString(folder.getFolderId().getId());
+        return Long.toString(folder.getFolderId().getId());
     }
 
     @Override

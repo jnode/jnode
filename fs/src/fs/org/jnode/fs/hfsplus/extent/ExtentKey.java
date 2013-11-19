@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.extent;
 
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
@@ -35,25 +35,23 @@ public class ExtentKey extends AbstractKey {
     private int forkType;
     private int pad;
     private CatalogNodeId fileId;
-    private int startBlock;
+    private long startBlock;
 
     /**
-     * 
      * @param src
      * @param offset
      */
     public ExtentKey(final byte[] src, final int offset) {
         byte[] ek = new byte[KEY_LENGTH];
         System.arraycopy(src, offset, ek, 0, KEY_LENGTH);
-        keyLength = BigEndian.getInt16(ek, 0);
-        forkType = BigEndian.getInt8(ek, 2);
-        pad = BigEndian.getInt8(ek, 3);
+        keyLength = BigEndian.getUInt16(ek, 0);
+        forkType = BigEndian.getUInt8(ek, 2);
+        pad = BigEndian.getUInt8(ek, 3);
         fileId = new CatalogNodeId(ek, 4);
-        startBlock = BigEndian.getInt32(ek, 8);
+        startBlock = BigEndian.getUInt32(ek, 8);
     }
 
     /**
-     * 
      * @param forkType
      * @param pad
      * @param fileId
@@ -95,9 +93,9 @@ public class ExtentKey extends AbstractKey {
         return currentForkType.compareTo(forkType);
     }
 
-    private int compareStartBlock(int block) {
-        Integer currentStartBlock = Integer.valueOf(startBlock);
-        Integer startBlock = Integer.valueOf(block);
+    private int compareStartBlock(long block) {
+        Long currentStartBlock = Long.valueOf(startBlock);
+        Long startBlock = Long.valueOf(block);
         return currentStartBlock.compareTo(startBlock);
     }
 
@@ -113,7 +111,7 @@ public class ExtentKey extends AbstractKey {
         return fileId;
     }
 
-    public int getStartBlock() {
+    public long getStartBlock() {
         return startBlock;
     }
 
