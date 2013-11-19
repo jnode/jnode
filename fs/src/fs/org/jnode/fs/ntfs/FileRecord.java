@@ -493,8 +493,6 @@ public class FileRecord extends NTFSRecord {
             return;
         }
 
-        // Explicitly look for the attribute with no name, to avoid getting alternate streams.
-        // XXX: Add API for getting length and content from alternate streams.
         final AttributeIterator dataAttrs = findAttributesByTypeAndName(NTFSAttribute.Types.DATA, null);
         NTFSAttribute attr = dataAttrs.next();
         if (attr == null) {
@@ -676,8 +674,8 @@ public class FileRecord extends NTFSRecord {
 
         @Override
         protected NTFSAttribute next() {
-            NTFSAttribute attr;
-            while ((attr = attributes.next()) != null) {
+            while (attributes.hasNext()) {
+                NTFSAttribute attr = attributes.next();
                 if (matches(attr)) {
                     return attr;
                 }

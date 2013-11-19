@@ -29,7 +29,7 @@ import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 
 public class CatalogLeafNode extends AbstractNode<LeafRecord> {
 
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(CatalogLeafNode.class);
 
     /**
      * Create a new node.
