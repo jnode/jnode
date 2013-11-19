@@ -112,13 +112,11 @@ public final class CompressedDataRun implements DataRunInterface {
 
         // Now we know the data is compressed.  Read in the compressed block...
         final int vcnOffsetWithinUnit = (int) (actFirstVcn % compressionUnitSize);
-        final long compFirstVcn = actFirstVcn - vcnOffsetWithinUnit;
-        final byte[] tempCompressed = new byte[compClusters * clusterSize];
-        final int read = compressedRun.readClusters(compFirstVcn, tempCompressed, 0,
+        final byte[] tempCompressed = new byte[compressionUnitSize * clusterSize];
+        final int read = compressedRun.readClusters(myFirstVcn, tempCompressed, 0,
             compClusters, clusterSize, volume);
         if (read != compClusters) {
-            throw new IOException("Needed " + compClusters + " clusters but could " +
-                "only read " + read);
+            throw new IOException("Needed " + compClusters + " clusters but could " + "only read " + read);
         }
 
         // Uncompress it, and copy into the destination.

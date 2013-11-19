@@ -250,7 +250,16 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 
         @Override
         public long getLength() {
-            return NTFSFile.this.getFileRecord().getAttributeTotalSize(NTFSAttribute.Types.DATA, attributeName);
+            FileRecord.AttributeIterator attributes =
+                getFileRecord().findAttributesByTypeAndName(NTFSAttribute.Types.DATA, null);
+            NTFSAttribute attribute = attributes.next();
+
+            if (attribute == null) {
+                // Fall back to the size stored in the index entry if the data attribute is not present (even possible??)
+                return indexEntry.getRealFileSize();
+            }
+
+            return getFileRecord().getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
         }
 
         @Override
@@ -259,16 +268,12 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
         }
 
         @Override
-        public void read(long fileOffset, ByteBuffer dest) throws IOException {
-            ByteBufferUtils.ByteArray destByteArray = ByteBufferUtils.toByteArray(dest);
-            byte[] destBuffer = destByteArray.toArray();
-
-            if (fileOffset + destBuffer.length > getLength()) {
-                throw new IOException("Attempt to read past the end of stream, offset: " + fileOffset);
-            }
-
-            getFileRecord().readData(fileOffset, destBuffer, 0, destBuffer.length);
-            destByteArray.refreshByteBuffer();
+        public void read(long fileOffset, ByteBuffer destBuf) throws IOException {
+            // TODO optimize it also to use ByteBuffer at lower level
+            final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
+            final byte[] dest = destBA.toArray();
+            getFileRecord().readData(fileOffset, dest, 0, dest.length);
+            destBA.refreshByteBuffer();
         }
 
         @Override
