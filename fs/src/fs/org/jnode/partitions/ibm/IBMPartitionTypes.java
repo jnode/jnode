@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.partitions.ibm;
 
 /**
@@ -42,8 +42,8 @@ public enum IBMPartitionTypes {
     PARTTYPE_OPUS(0x10, "OPUS"),
     PARTTYPE_OS2_BOOT_HIDDEN_12(0x11, "OS/2 Boot Manager hidden 12-bit FAT partition"),
     PARTTYPE_COMPAQ_DIAG(0x12, "Compaq Diagnostics partition"),
-    PARTTYPE_OS2_BOOT_HIDDEN_16_S32(0x14, 
-            "(resulted from using Novell DOS 7.0 FDISK to delete Linux Native part), " +
+    PARTTYPE_OS2_BOOT_HIDDEN_16_S32(0x14,
+        "(resulted from using Novell DOS 7.0 FDISK to delete Linux Native part), " +
             "OS/2 Boot Manager hidden sub-32M 16-bit FAT partition"),
     PARTTYPE_OS2_BOOT_HIDDEN_16_O32(0x16, "OS/2 Boot Manager hidden over-32M 16-bit FAT partition"),
     PARTTYPE_OS2_BOOT_HIDDEN_HPFS(0x17, "OS/2 Boot Manager hidden HPFS partition"),
@@ -52,6 +52,7 @@ public enum IBMPartitionTypes {
     PARTTYPE_WIN95_FAT32_LBA_HIDDEN(0x1C, "Hidden Win 95 Fat 32 Partition (LBA)"),
     PARTTYPE_WIN95_FAT16_LBA_HIDDEN(0x1E, "Hidden Win 95 Fat 16 Partition (LBA)"),
     PARTTYPE_NEC_MSDOS(0x24, "NEC MS-DOS 3.x"),
+    PARTTYPE_WINDOWS_RE_HIDDEN(0x27, "Windows Recovery Environment (RE) partition"),
     PARTTYPE_PLAN_9(0x39, "Plan 9"),
     PARTTYPE_POWERQUEST_RECOVERY(0x3C, "PowerQuest PartitionMagic recovery partition"),
     PARTTYPE_VENIX80286(0x40, "VENIX 80286"),
