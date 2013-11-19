@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jfat;
 
 import java.io.IOException;
@@ -30,10 +30,8 @@ public class FatRootDirectory extends FatDirectory {
     public FatRootDirectory(FatFileSystem fs) throws IOException {
         super(fs);
         Fat fat = getFatFileSystem().getFat();
-        if (fat.isFat32() || fat.isFat16()) {
+        if (fat.isFat32() || fat.isFat16() || fat.isFat12()) {
             setRoot32((int) getFatFileSystem().getBootSector().getRootDirectoryStartCluster());
-        } else if (fat.isFat12()) {
-            throw new UnsupportedOperationException("Fat12");
         } else {
             throw new UnsupportedOperationException("Unknown Fat Type");
         }
