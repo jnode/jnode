@@ -336,7 +336,11 @@ public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId
         }
 
         public FSEntry next() {
-            return fatTable.look(createNextEntry());
+            if (includeDeleted) {
+                return createNextEntry();
+            } else {
+                return fatTable.look(createNextEntry());
+            }
         }
 
         public void remove() {
@@ -349,7 +353,7 @@ public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId
         private int index;
         private int next;
         private FatEntry entry;
-        private boolean includeDeleted;
+        protected boolean includeDeleted;
         private FatDirectory directory;
 
         protected EntriesFactory(FatDirectory directory, boolean includeDeleted) {
