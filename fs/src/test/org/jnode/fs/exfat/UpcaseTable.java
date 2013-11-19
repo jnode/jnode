@@ -1,4 +1,3 @@
-
 package org.jnode.fs.exfat;
 
 import java.io.IOException;
@@ -9,7 +8,7 @@ import java.io.IOException;
  *
  * @author Matthias Treydte &lt;waldheinz at gmail.com&gt;
  */
-final class UpcaseTable {
+public final class UpcaseTable {
 
     public static UpcaseTable read(ExFatSuperBlock sb,
                                    long startCluster, long size, long checksum) throws IOException {
@@ -68,6 +67,24 @@ final class UpcaseTable {
         this.size = size;
         this.chars = size / 2;
         this.offset = offset;
+    }
+
+    /**
+     * Gets the offset to the upcase table.
+     *
+     * @return the offset.
+     */
+    public long getOffset() {
+        return offset;
+    }
+
+    /**
+     * Gets the size of the upcase table.
+     *
+     * @return the size.
+     */
+    public long getSize() {
+        return size;
     }
 
     public long checkSum() throws IOException {

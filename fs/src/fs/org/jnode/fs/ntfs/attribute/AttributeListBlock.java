@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ntfs.attribute;
 
 import java.util.Iterator;
@@ -29,7 +29,7 @@ import org.jnode.fs.ntfs.NTFSStructure;
  *
  * @author Daniel Noll (daniel@noll.id.au)
  */
-final class AttributeListBlock extends NTFSStructure {
+public final class AttributeListBlock extends NTFSStructure {
 
     /**
      * The length of the block.
@@ -37,7 +37,7 @@ final class AttributeListBlock extends NTFSStructure {
     private long length;
 
     /**
-     * @param data binary data for the block.
+     * @param data   binary data for the block.
      * @param offset the offset into the binary data.
      * @param length the length of the attribute list block, or 0 if unknown.
      */
@@ -85,7 +85,7 @@ final class AttributeListBlock extends NTFSStructure {
             if (offset + 4 > length) {
                 return false;
             }
-            
+
             int length = getUInt16(offset + 0x04);
             nextElement = new AttributeListEntry(AttributeListBlock.this, offset);
             offset += length;

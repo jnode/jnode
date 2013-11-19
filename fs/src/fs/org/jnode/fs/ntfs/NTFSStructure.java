@@ -59,6 +59,15 @@ public class NTFSStructure {
     }
 
     /**
+     * Gets the offset into the buffer.
+     *
+     * @return the offset.
+     */
+    public int getOffset() {
+        return offset;
+    }
+
+    /**
      * Re-initialize this instance.
      *
      * @param buffer

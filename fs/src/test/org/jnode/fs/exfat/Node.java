@@ -1,4 +1,3 @@
-
 package org.jnode.fs.exfat;
 
 import java.io.IOException;
@@ -6,14 +5,14 @@ import java.io.IOException;
 /**
  * @author Matthias Treydte &lt;waldheinz at gmail.com&gt;
  */
-final class Node {
+public final class Node {
 
-    private final static int ATTRIB_RO = 0x01;
-    private final static int ATTRIB_HIDDEN = 0x02;
-    private final static int ATTRIB_SYSTEM = 0x04;
-    private final static int ATTRIB_VOLUME = 0x08;
-    private final static int ATTRIB_DIR = 0x10;
-    private final static int ATTRIB_ARCH = 0x20;
+    public final static int ATTRIB_RO = 0x01;
+    public final static int ATTRIB_HIDDEN = 0x02;
+    public final static int ATTRIB_SYSTEM = 0x04;
+    public final static int ATTRIB_VOLUME = 0x08;
+    public final static int ATTRIB_DIR = 0x10;
+    public final static int ATTRIB_ARCH = 0x20;
 
     public static Node createRoot(ExFatSuperBlock sb)
         throws IOException {
@@ -56,6 +55,24 @@ final class Node {
         this.da = sb.getDeviceAccess();
         this.startCluster = startCluster;
         this.times = times;
+    }
+
+    /**
+     * Gets the flags for this node.
+     *
+     * @return the flags.
+     */
+    public int getFlags() {
+        return flags;
+    }
+
+    /**
+     * Returns whether this node is contiguous.
+     *
+     * @return {@code true} if contiguous.
+     */
+    public boolean isContiguous() {
+        return isContiguous;
     }
 
     public boolean isDirectory() {
