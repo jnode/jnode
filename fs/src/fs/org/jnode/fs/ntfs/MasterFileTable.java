@@ -115,7 +115,7 @@ public final class MasterFileTable extends FileRecord {
     /**
      * The cached length of the MFT.
      */
-    private final long mftLength;
+    private long mftLength;
 
     /**
      * @param volume
@@ -127,11 +127,24 @@ public final class MasterFileTable extends FileRecord {
         mftLength = getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
     }
 
-	/**
-	 * Gets an MFT record with a given index but does not check if it is a valid file record.
-	 * @param index the index to get.
-	 * @return the file record.
-	 */
+    /**
+     * Gets the length of the MFT.
+     *
+     * @return the length.
+     */
+    public long getMftLength() {
+        if (mftLength == 0) {
+            mftLength = getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
+        }
+
+        return mftLength;
+    }
+
+    /**
+     * Gets an MFT record with a given index but does not check if it is a valid file record.
+     * @param index the index to get.
+     * @return the file record.
+     */
 	public FileRecord getRecordUnchecked(long index) throws IOException {
         log.debug("getRecord(" + index + ")");
 
@@ -139,7 +152,7 @@ public final class MasterFileTable extends FileRecord {
         final int bytesPerFileRecord = volume.getBootRecord().getFileRecordSize();
         final long offset = bytesPerFileRecord * index;
 
-        if (offset + bytesPerFileRecord > mftLength) {
+        if (offset + bytesPerFileRecord > getMftLength()) {
             throw new IOException("Attempt to read past the end of the MFT, offset: " + offset);
         }
 
