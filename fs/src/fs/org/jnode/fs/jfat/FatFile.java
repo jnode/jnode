@@ -126,7 +126,7 @@ public class FatFile extends FatEntry implements FSFile, FSFileSlackSpace {
         }
 
         byte[] slackSpace = new byte[slackSpaceSize];
-        read(getLength(), ByteBuffer.wrap(slackSpace));
+        getChain().read(getLength(), ByteBuffer.wrap(slackSpace));
 
         return slackSpace;
     }
