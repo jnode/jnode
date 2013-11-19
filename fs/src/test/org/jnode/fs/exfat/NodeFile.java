@@ -1,4 +1,3 @@
-
 package org.jnode.fs.exfat;
 
 import java.io.EOFException;
@@ -42,10 +41,38 @@ final class NodeFile extends AbstractFSObject implements FSFile {
             throw new EOFException();
         }
 
-        long cluster = node.getStartCluster();
         final int bpc = node.getSuperBlock().getBytesPerCluster();
+        long cluster = node.getStartCluster();
         int remain = dest.remaining();
 
+        // Skip to the cluster that corresponds to the requested offset
+        long clustersToSkip = offset / bpc;
+        for (int i = 0; i < clustersToSkip; i++) {
+            cluster = this.node.nextCluster(cluster);
+
+            if (Cluster.invalid(cluster)) {
+                throw new IOException("invalid cluster");
+            }
+        }
+
+        // Read in any leading partial cluster
+        if (offset % bpc != 0) {
+            ByteBuffer tmpBuffer = ByteBuffer.allocate(bpc);
+            node.getSuperBlock().readCluster(tmpBuffer, cluster);
+
+            int tmpOffset = (int) (offset % bpc);
+            int tmpLength = Math.min(remain, bpc - tmpOffset);
+
+            dest.put(tmpBuffer.array(), tmpOffset, tmpLength);
+            remain -= tmpLength;
+            cluster = this.node.nextCluster(cluster);
+
+            if (remain != 0 && Cluster.invalid(cluster)) {
+                throw new IOException("invalid cluster");
+            }
+        }
+
+        // Read in the remaining data
         while (remain > 0) {
             int toRead = Math.min(bpc, remain);
             dest.limit(dest.position() + toRead);
@@ -54,7 +81,7 @@ final class NodeFile extends AbstractFSObject implements FSFile {
             remain -= toRead;
             cluster = this.node.nextCluster(cluster);
 
-            if (Cluster.invalid(cluster)) {
+            if (remain != 0 && Cluster.invalid(cluster)) {
                 throw new IOException("invalid cluster");
             }
         }
