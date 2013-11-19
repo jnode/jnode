@@ -36,6 +36,7 @@ import org.jnode.fs.hfsplus.tree.IndexRecord;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 import org.jnode.util.ByteBufferUtils;
+import org.jnode.util.NumberUtils;
 
 public class Catalog {
 
@@ -281,7 +282,9 @@ public class Catalog {
                 CatalogLeafNode node = new CatalogLeafNode(nodeData.array(), nodeSize);
                 return (LeafRecord[]) node.findAll(parentID);
             } else {
-                return null;
+                log.info(
+                    String.format("Node %d wasn't a leaf or index: %s\n%s", nodeNumber, nd, NumberUtils.hex(datas)));
+                return new LeafRecord[0];
             }
 
         } catch (Exception e) {
