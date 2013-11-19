@@ -186,8 +186,8 @@ public class SuperBlock extends HfsPlusObject {
         blockUsed += totalBlocks;
 
         this.setFreeBlocks(this.getFreeBlocks() - (int) blockUsed);
-        this.setNextAllocation((int) blockUsed - 1 - burnedBlocksAfterAltVH + 10 *
-            (this.getCatalogFile().getClumpSize() / this.getBlockSize()));
+        this.setNextAllocation((int) (blockUsed - 1 - burnedBlocksAfterAltVH + 10 *
+            (this.getCatalogFile().getClumpSize() / this.getBlockSize())));
     }
 
     /**

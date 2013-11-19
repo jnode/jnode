@@ -17,15 +17,17 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.tree;
 
+import org.jnode.fs.hfsplus.catalog.CatalogFile;
+import org.jnode.fs.hfsplus.catalog.CatalogFolder;
 import org.jnode.util.BigEndian;
 
 public class LeafRecord extends AbstractNodeRecord {
 
     private int type;
-    
+
     public LeafRecord(final Key key, final byte[] recordData) {
         this.key = key;
         this.recordData = new byte[recordData.length];
@@ -36,7 +38,7 @@ public class LeafRecord extends AbstractNodeRecord {
     public LeafRecord(final Key key, final byte[] nodeData, final int offset, final int recordDataSize) {
         this.key = key;
         this.recordData = new byte[recordDataSize];
-        System.arraycopy(nodeData, offset + (key.getKeyLength()-2), this.recordData, 0, recordDataSize);
+        System.arraycopy(nodeData, offset + (key.getKeyLength() - 2), this.recordData, 0, recordDataSize);
         type = BigEndian.getInt16(this.recordData, 0);
     }
 
@@ -44,8 +46,23 @@ public class LeafRecord extends AbstractNodeRecord {
         return type;
     }
 
+    @Override
     public final String toString() {
-        return "Type : " + type + "\nKey : " + getKey().toString() + "\n";
+        return "Type: " + getTypeString() + "\tKey: " + getKey();
     }
 
+    public String getTypeString() {
+        switch (type) {
+            case CatalogFolder.RECORD_TYPE_FOLDER:
+                return "Folder";
+            case CatalogFolder.RECORD_TYPE_FOLDER_THREAD:
+                return "FolderThread";
+            case CatalogFile.RECORD_TYPE_FILE:
+                return "File";
+            case CatalogFile.RECORD_TYPE_FILE_THREAD:
+                return "FileThread";
+        }
+
+        return "Unknown-" + type;
+    }
 }

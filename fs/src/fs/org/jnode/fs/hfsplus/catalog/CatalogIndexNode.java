@@ -17,11 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.catalog;
 
 import java.util.LinkedList;
-
+import org.apache.log4j.Logger;
 import org.jnode.fs.hfsplus.tree.AbstractNode;
 import org.jnode.fs.hfsplus.tree.IndexRecord;
 import org.jnode.fs.hfsplus.tree.Key;
@@ -29,9 +29,11 @@ import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 
 public class CatalogIndexNode extends AbstractNode<IndexRecord> {
 
+    private final Logger log = Logger.getLogger(getClass());
+
     /**
      * Create a new node.
-     * 
+     *
      * @param descriptor
      * @param nodeSize
      */
@@ -41,7 +43,7 @@ public class CatalogIndexNode extends AbstractNode<IndexRecord> {
 
     /**
      * Create node from existing data.
-     * 
+     *
      * @param nodeData
      * @param nodeSize
      */
@@ -58,6 +60,10 @@ public class CatalogIndexNode extends AbstractNode<IndexRecord> {
             offset = offsets.get(i);
             key = new CatalogKey(nodeData, offset);
             records.add(new IndexRecord(key, nodeData, offset));
+
+            if (log.isDebugEnabled()) {
+                log.debug("Loading index record: " + key);
+            }
         }
     }
 
@@ -79,7 +85,7 @@ public class CatalogIndexNode extends AbstractNode<IndexRecord> {
 
     /**
      * Find node record based on it's key.
-     * 
+     *
      * @param key The key to search.
      * @return a NodeRecord or {@code null}
      */
@@ -89,7 +95,7 @@ public class CatalogIndexNode extends AbstractNode<IndexRecord> {
             IndexRecord record = this.getNodeRecord(index);
             if ((record.getKey().compareTo(key) <= 0)) {
                 if (largestMatchingRecord != null &&
-                        record.getKey().compareTo(largestMatchingRecord.getKey()) > 0) {
+                    record.getKey().compareTo(largestMatchingRecord.getKey()) > 0) {
                     largestMatchingRecord = record;
                 }
             }
@@ -108,7 +114,7 @@ public class CatalogIndexNode extends AbstractNode<IndexRecord> {
         for (IndexRecord record : records) {
             CatalogKey key = (CatalogKey) record.getKey();
             if (key.getParentId().getId() < parentId.getId() &&
-                    (largestMatchingKey == null || key.compareTo(largestMatchingKey) > 0)) {
+                (largestMatchingKey == null || key.compareTo(largestMatchingKey) > 0)) {
                 largestMatchingKey = key;
                 largestMatchingRecord = record;
             } else if (key.getParentId().getId() == parentId.getId()) {
