@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.catalog;
 
 import org.jnode.fs.hfsplus.ExtendedFileInfo;
@@ -30,32 +30,37 @@ import org.jnode.util.BigEndian;
 /**
  * This class implements catalog file structure use in the catalog to hold
  * information about a file on the volume.
- * 
+ *
  * @author Fabien Lesire
- * 
  */
 public class CatalogFile {
-    
+
     public static final int RECORD_TYPE_FILE = 0x0002;
     public static final int RECORD_TYPE_FILE_THREAD = 0x0004;
 
     public static final int CATALOG_FILE_SIZE = 248;
-    /** catalog record type, always RECORD_TYPE_FILE */
+    /**
+     * catalog record type, always RECORD_TYPE_FILE
+     */
     private int recordType;
     /** */
     private int flags;
-    /** the catalog node id of the file */
+    /**
+     * the catalog node id of the file
+     */
     private CatalogNodeId fileId;
-    /** The date and time the file was created */
-    private int createDate;
+    /**
+     * The date and time the file was created
+     */
+    private long createDate;
     /**  */
-    private int contentModDate;
+    private long contentModDate;
     /** */
-    private int attrModDate;
+    private long attrModDate;
     /** */
-    private int accessDate;
+    private long accessDate;
     /** */
-    private int backupDate;
+    private long backupDate;
     /** */
     private HfsPlusBSDInfo permissions;
     /** */
@@ -64,26 +69,29 @@ public class CatalogFile {
     private ExtendedFileInfo finderInfo;
     /** */
     private int textEncoding;
-    /** data fork location and size */
+    /**
+     * data fork location and size
+     */
     private HfsPlusForkData datas;
-    /** resource fork location and size */
+    /**
+     * resource fork location and size
+     */
     private HfsPlusForkData resources;
 
     /**
-     * 
      * @param src
      */
     public CatalogFile(final byte[] src) {
         byte[] data = new byte[CATALOG_FILE_SIZE];
         System.arraycopy(src, 0, data, 0, 248);
         recordType = BigEndian.getInt16(data, 0);
-        flags = BigEndian.getInt16(data, 2);
+        flags = BigEndian.getUInt16(data, 2);
         fileId = new CatalogNodeId(data, 8);
-        createDate = BigEndian.getInt32(data, 12);
-        contentModDate = BigEndian.getInt32(data, 16);
-        attrModDate = BigEndian.getInt32(data, 20);
-        accessDate = BigEndian.getInt32(data, 24);
-        backupDate = BigEndian.getInt32(data, 28);
+        createDate = BigEndian.getUInt32(data, 12);
+        contentModDate = BigEndian.getUInt32(data, 16);
+        attrModDate = BigEndian.getUInt32(data, 20);
+        accessDate = BigEndian.getUInt32(data, 24);
+        backupDate = BigEndian.getUInt32(data, 28);
         permissions = new HfsPlusBSDInfo(data, 32);
         userInfo = new FileInfo(data, 48);
         datas = new HfsPlusForkData(data, 88);
@@ -91,7 +99,6 @@ public class CatalogFile {
     }
 
     /**
-     * 
      * @param flags
      * @param fileId
      * @param datas
@@ -109,7 +116,6 @@ public class CatalogFile {
     }
 
     /**
-     * 
      * @return a serious case of nothing much at all
      */
     public byte[] getBytes() {
@@ -121,11 +127,11 @@ public class CatalogFile {
         s.append("Record type:").append(recordType).append("\t");
         s.append("File ID  :").append(fileId.getId()).append("\n");
         s.append("Creation Date :").append(
-                HfsUtils.printDate(createDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
+            HfsUtils.printDate(createDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
         s.append("Content Mod Date  :").append(
-                HfsUtils.printDate(contentModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
+            HfsUtils.printDate(contentModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
         s.append("Attr Mod Date  :").append(
-                HfsUtils.printDate(attrModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
+            HfsUtils.printDate(attrModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
         return s.toString();
     }
 
