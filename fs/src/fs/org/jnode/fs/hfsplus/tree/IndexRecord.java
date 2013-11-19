@@ -46,6 +46,11 @@ public class IndexRecord extends AbstractNodeRecord {
         index = BigEndian.getUInt32(recordData, 0);
     }
 
+    @Override
+    public String toString() {
+        return String.format("IndexRecord: %d key:%s", index, key);
+    }
+
     public final long getIndex() {
         return index;
     }
