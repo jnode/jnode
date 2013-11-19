@@ -26,7 +26,7 @@ public class CatalogNodeId implements Comparable<CatalogNodeId> {
     private long cnid;
 
     public CatalogNodeId(final byte[] src, final int offset) {
-        cnid = BigEndian.getUInt32(src, 0);
+        cnid = BigEndian.getUInt32(src, offset);
     }
 
     public CatalogNodeId(final long nodeId) {
@@ -69,5 +69,10 @@ public class CatalogNodeId implements Comparable<CatalogNodeId> {
         Long currentId = Long.valueOf(this.getId());
         Long compareId = Long.valueOf(o.getId());
         return currentId.compareTo(compareId);
+    }
+
+    @Override
+    public String toString() {
+        return "cnid:" + cnid;
     }
 }
