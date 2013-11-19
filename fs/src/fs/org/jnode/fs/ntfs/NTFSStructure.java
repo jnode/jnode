@@ -181,6 +181,16 @@ public class NTFSStructure {
     }
 
     /**
+     * Read n signed 48-bit integer from a given offset.
+     *
+     * @param offset
+     * @return
+     */
+    public final long getInt48(int offset) {
+        return LittleEndian.getInt48(buffer, this.offset + offset);
+    }
+
+    /**
      * Read n signed 64-bit integer from a given offset.
      *
      * @param offset
