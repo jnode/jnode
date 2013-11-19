@@ -24,6 +24,11 @@ public class MasterDirectoryBlock {
     public static final int HFSPLUS_EMBEDDED_SIGNATURE = 0x482B;
 
     /**
+     * The mask for MDB attributes.
+     */
+    public static final int ATTRIBUTES_MASK = 0x8380;
+
+    /**
      * The data.
      */
     private final byte[] data;
@@ -44,6 +49,15 @@ public class MasterDirectoryBlock {
      */
     public int getSignature() {
         return BigEndian.getUInt16(data, 0);
+    }
+
+    /**
+     * Gets the volume attributes (drAtrb)
+     *
+     * @return the attributes.
+     */
+    public int getAttributes() {
+        return BigEndian.getUInt16(data, 0xa);
     }
 
     /**
