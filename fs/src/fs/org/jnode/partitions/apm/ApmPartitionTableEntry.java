@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.partitions.apm;
 
 import java.nio.charset.Charset;
@@ -33,18 +33,22 @@ import org.jnode.util.NumberUtils;
  */
 public class ApmPartitionTableEntry implements PartitionTableEntry {
 
-    /** The first 16KiB of the drive. */
+    /**
+     * The first 16KiB of the drive.
+     */
     private final byte[] first16KiB;
 
-    /** The offset to this partition table entry. */
+    /**
+     * The offset to this partition table entry.
+     */
     private final int offset;
 
     /**
      * Creates a new entry.
      *
-     * @param parent the parent table.
+     * @param parent     the parent table.
      * @param first16KiB the first 16,384 bytes of the disk.
-     * @param offset the offset of this entry in the table.
+     * @param offset     the offset of this entry in the table.
      */
     public ApmPartitionTableEntry(ApmPartitionTable parent, byte[] first16KiB, int offset) {
         this.first16KiB = first16KiB;
@@ -77,7 +81,7 @@ public class ApmPartitionTableEntry implements PartitionTableEntry {
     }
 
     public long getEndOffset() {
-        return getStartOffset() + (BigEndian.getInt32(first16KiB, offset + 0xc) + 1) * 0x200L;
+        return getStartOffset() + BigEndian.getInt32(first16KiB, offset + 0xc) * 0x200L;
     }
 
     public String getName() {
