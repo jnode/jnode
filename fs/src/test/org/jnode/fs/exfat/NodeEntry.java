@@ -12,7 +12,7 @@ import org.jnode.fs.spi.AbstractFSObject;
 /**
  * @author Matthias Treydte &lt;waldheinz at gmail.com&gt;
  */
-final class NodeEntry extends AbstractFSObject implements FSEntry, FSEntryCreated, FSEntryLastAccessed {
+public final class NodeEntry extends AbstractFSObject implements FSEntry, FSEntryCreated, FSEntryLastAccessed {
 
     private final Node node;
     private final NodeDirectory parent;
@@ -106,6 +106,15 @@ final class NodeEntry extends AbstractFSObject implements FSEntry, FSEntryCreate
     @Override
     public boolean isDirty() {
         return false;
+    }
+
+    /**
+     * Gets the node for this entry.
+     *
+     * @return the node.
+     */
+    public Node getNode() {
+        return node;
     }
 
     @Override
