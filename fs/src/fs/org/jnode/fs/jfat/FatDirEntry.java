@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jfat;
 
 import java.io.IOException;
@@ -62,26 +62,42 @@ public class FatDirEntry {
     /*
      * FatDirEntry factory from a FatMarshal buffer
      */
-    public static FatDirEntry create(FatFileSystem fs, FatMarshal entry, int index)
+    public static FatDirEntry create(FatFileSystem fs, FatMarshal entry, int index, boolean allowDeleted)
         throws IOException {
         int flag;
         FatAttr attr;
 
         flag = entry.getUInt8(0);
         attr = new FatAttr(entry.getUInt8(11));
+        boolean free = flag == FREE;
 
         switch (flag) {
-            case FREE:
             case EOD:
                 return new FatDirEntry(fs, entry, index, flag);
+            case FREE:
+                if (!allowDeleted) {
+                    return new FatDirEntry(fs, entry, index, flag);
+                } else {
+                    // Fall through...
+                    break;
+                }
             case INVALID:
-            	throw new IOException("Invalid entry for index: " + index);
-            default:
-                if (attr.isLong())
-                    return new FatLongDirEntry(fs, entry, index);
-                else
-                    return new FatShortDirEntry(fs, entry, index);
+                throw new IOException("Invalid entry for index: " + index);
         }
+
+        FatDirEntry fatDirEntry;
+        if (attr.isLong()) {
+            fatDirEntry = new FatLongDirEntry(fs, entry, index);
+        } else {
+            fatDirEntry = new FatShortDirEntry(fs, entry, index);
+        }
+
+        if (free) {
+            // Still mark deleted entries as deleted.
+            fatDirEntry.freeDirEntry = true;
+        }
+
+        return fatDirEntry;
     }
 
     public void delete() {
