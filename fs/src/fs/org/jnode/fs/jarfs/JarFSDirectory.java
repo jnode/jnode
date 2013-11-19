@@ -44,11 +44,6 @@ public final class JarFSDirectory implements FSDirectory {
         this.jarEntries = entries;
     }
 
-    @Override
-    public String getDirectoryId() {
-        return entry.getId();
-    }
-
     /**
      * @see org.jnode.fs.FSDirectory#iterator()
      */

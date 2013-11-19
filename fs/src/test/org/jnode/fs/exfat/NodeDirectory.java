@@ -6,13 +6,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSDirectoryId;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.spi.AbstractFSObject;
 
 /**
  * @author Matthias Treydte &lt;waldheinz at gmail.com&gt;
  */
-final class NodeDirectory extends AbstractFSObject implements FSDirectory {
+final class NodeDirectory extends AbstractFSObject implements FSDirectory, FSDirectoryId {
 
     private final Node node;
     private final Map<String, NodeEntry> nameToNode;

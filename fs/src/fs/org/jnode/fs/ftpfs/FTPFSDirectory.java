@@ -57,11 +57,6 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
         return getEntry(id);
     }
 
-    @Override
-    public String getDirectoryId() {
-        return getName();
-    }
-
     /**
      * Gets an iterator used to iterate over all the entries of this
      * directory.

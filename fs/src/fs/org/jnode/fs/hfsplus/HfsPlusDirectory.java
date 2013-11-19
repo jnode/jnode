@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSDirectoryId;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
@@ -39,7 +40,7 @@ import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.FSEntryTable;
 
-public class HfsPlusDirectory implements FSDirectory {
+public class HfsPlusDirectory implements FSDirectory, FSDirectoryId {
 
     private static final Logger log = Logger.getLogger(HfsPlusDirectory.class);
 

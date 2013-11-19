@@ -109,11 +109,6 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
         return getEntry(id);
     }
 
-    @Override
-    public String getDirectoryId() {
-        return directoryEntry.getId();
-    }
-
     /**
      * Gets an iterator used to iterate over all the entries of this directory.
      * All elements returned by the iterator must be instanceof FSEntry.

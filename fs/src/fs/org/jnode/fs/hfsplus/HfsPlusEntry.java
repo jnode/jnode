@@ -81,7 +81,7 @@ public class HfsPlusEntry implements FSEntry, FSEntryCreated, FSEntryLastAccesse
     }
 
     @Override
-    public FSDirectory getDirectory() throws IOException {
+    public HfsPlusDirectory getDirectory() throws IOException {
         if (!isDirectory()) {
             throw new IOException("It is not a Directory");
         }
