@@ -48,7 +48,7 @@ public final class ExFatFileSystem extends AbstractFileSystem<NodeEntry> {
 
     @Override
     public NodeEntry createRootEntry() throws IOException {
-        return new NodeEntry(this, rootNode, null);
+        return new NodeEntry(this, rootNode, null, 2);
     }
 
     @Override
@@ -151,7 +151,7 @@ public final class ExFatFileSystem extends AbstractFileSystem<NodeEntry> {
         }
 
         @Override
-        public void foundNode(Node node) {
+        public void foundNode(Node node, int index) {
             /* ignore */
         }
 

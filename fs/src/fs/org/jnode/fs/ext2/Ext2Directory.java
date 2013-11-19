@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
@@ -63,8 +63,7 @@ public class Ext2Directory extends AbstractFSDirectory {
                 log.info("inode uses extents: " + entry);
             if ((iNode.getFlags() & Ext2Constants.EXT2_INDEX_FL) != 0)
                 log.info("inode uses index: " + entry);
-        }
-        else {
+        } else {
             readOnly = fs.isReadOnly();
         }
         setRights(true, !readOnly);
@@ -74,10 +73,10 @@ public class Ext2Directory extends AbstractFSDirectory {
 
     /**
      * Method to create a new ext2 directory entry from the given name
-     * 
+     *
      * @param name
      * @return @throws
-     *         IOException
+     * IOException
      */
     public FSEntry createDirectoryEntry(String name) throws IOException {
         if (!canWrite())
@@ -92,7 +91,7 @@ public class Ext2Directory extends AbstractFSDirectory {
         Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();
         try {
             int rights =
-                    0xFFFF & (Ext2Constants.EXT2_S_IRWXU | Ext2Constants.EXT2_S_IRWXG | Ext2Constants.EXT2_S_IRWXO);
+                0xFFFF & (Ext2Constants.EXT2_S_IRWXU | Ext2Constants.EXT2_S_IRWXG | Ext2Constants.EXT2_S_IRWXO);
             newINode = fs.createINode((int) iNode.getGroup(), Ext2Constants.EXT2_S_IFDIR, rights, 0, 0);
 
             dr = new Ext2DirectoryRecord(fs, newINode.getINodeNr(), Ext2Constants.EXT2_FT_DIR, name);
@@ -106,7 +105,7 @@ public class Ext2Directory extends AbstractFSDirectory {
             //add "."
             Ext2Directory newDir = new Ext2Directory(newEntry);
             Ext2DirectoryRecord drThis =
-                    new Ext2DirectoryRecord(fs, newINode.getINodeNr(), Ext2Constants.EXT2_FT_DIR, ".");
+                new Ext2DirectoryRecord(fs, newINode.getINodeNr(), Ext2Constants.EXT2_FT_DIR, ".");
             newINode.setLinksCount(2);
             newDir.addDirectoryRecord(drThis);
 
@@ -136,10 +135,10 @@ public class Ext2Directory extends AbstractFSDirectory {
 
     /**
      * Abstract method to create a new ext2 file entry from the given name
-     * 
+     *
      * @param name
      * @return @throws
-     *         IOException
+     * IOException
      */
     public FSEntry createFileEntry(String name) throws IOException {
         if (!canWrite())
@@ -153,7 +152,7 @@ public class Ext2Directory extends AbstractFSDirectory {
         Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();
         try {
             int rights =
-                    0xFFFF & (Ext2Constants.EXT2_S_IRWXU | Ext2Constants.EXT2_S_IRWXG | Ext2Constants.EXT2_S_IRWXO);
+                0xFFFF & (Ext2Constants.EXT2_S_IRWXU | Ext2Constants.EXT2_S_IRWXG | Ext2Constants.EXT2_S_IRWXO);
             newINode = fs.createINode((int) iNode.getGroup(), Ext2Constants.EXT2_S_IFREG, rights, 0, 0);
 
             dr = new Ext2DirectoryRecord(fs, newINode.getINodeNr(), Ext2Constants.EXT2_FT_REG_FILE, name);
@@ -173,10 +172,10 @@ public class Ext2Directory extends AbstractFSDirectory {
     /**
      * Attach an inode to a directory (not used normally, only during fs
      * creation)
-     * 
+     *
      * @param iNodeNr
      * @return @throws
-     *         IOException
+     * IOException
      */
     protected FSEntry addINode(int iNodeNr, String linkName, int fileType) throws IOException {
         if (!canWrite())
@@ -269,7 +268,7 @@ public class Ext2Directory extends AbstractFSDirectory {
                         //                      .getOffset(), dr.getRecLen());
 
                         log.debug("addDirectoryRecord(): LAST   record: begins at: " +
-                                (rec.getFileOffset() + rec.getRecLen()) + ", length: " + dr.getRecLen());
+                            (rec.getFileOffset() + rec.getRecLen()) + ", length: " + dr.getRecLen());
                     } else {
                         //the new record must go to the next block
                         //(the previously last record (rec) stays padded to the
@@ -283,7 +282,7 @@ public class Ext2Directory extends AbstractFSDirectory {
                         //                      dir.write(lastPos + lastLen, dr.getData(), dr
                         //                      .getOffset(), dr.getRecLen());
                         log.debug("addDirectoryRecord(): LAST   record: begins at: " + (lastPos + lastLen) +
-                                ", length: " + dr.getRecLen());
+                            ", length: " + dr.getRecLen());
                     }
                 } else { //rec==null, ie. this is the first record in the directory
                     dr.expandRecord(0, fs.getBlockSize());
@@ -328,6 +327,11 @@ public class Ext2Directory extends AbstractFSDirectory {
 
     private INode getINode() {
         return iNode;
+    }
+
+    @Override
+    public String getId() {
+        return Integer.toString(iNode.getINodeNr());
     }
 
     class Ext2FSEntryIterator implements Iterator<FSEntry> {
@@ -383,8 +387,8 @@ public class Ext2Directory extends AbstractFSDirectory {
             Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();
             current = null;
             try {
-                return new Ext2Entry(((Ext2FileSystem) getFileSystem()).getINode(dr.getINodeNr()), 
-                        dr.getName(), dr.getType(), fs, Ext2Directory.this);
+                return new Ext2Entry(((Ext2FileSystem) getFileSystem()).getINode(dr.getINodeNr()),
+                    dr.getName(), dr.getType(), fs, Ext2Directory.this);
             } catch (IOException e) {
                 throw new NoSuchElementException("Root cause: " + e.getMessage());
             } catch (FileSystemException e) {
@@ -401,7 +405,7 @@ public class Ext2Directory extends AbstractFSDirectory {
 
         /**
          * Returns the next record as an Ext2DirectoryRecord instance
-         * 
+         *
          * @return
          */
         protected Ext2DirectoryRecord nextDirectoryRecord() {
@@ -420,7 +424,7 @@ public class Ext2Directory extends AbstractFSDirectory {
     /**
      * Read the entries from the device and return the result in a new
      * FSEntryTable
-     * 
+     *
      * @return the FSEntryTable containing the directory's entries.
      */
     protected FSEntryTable readEntries() throws IOException {
@@ -440,7 +444,7 @@ public class Ext2Directory extends AbstractFSDirectory {
 
     /**
      * Write the entries in the table to the device.
-     * 
+     *
      * @param table
      */
     protected void writeEntries(FSEntryTable table) throws IOException {

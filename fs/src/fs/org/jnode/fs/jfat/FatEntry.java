@@ -104,6 +104,11 @@ public class FatEntry extends FatObject implements FSEntry, FSEntryCreated, FSEn
         return record;
     }
 
+    @Override
+    public String getId() {
+        return Integer.toString(entry.getIndex());
+    }
+
     public String getName() {
         return name;
     }

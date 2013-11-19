@@ -17,13 +17,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ramfs;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -32,7 +31,7 @@ import org.jnode.fs.FileSystem;
 
 /**
  * A Directory implementation in the system RAM
- * 
+ *
  * @author peda
  */
 public class RAMDirectory implements FSEntry, FSDirectory {
@@ -54,7 +53,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * Constructor for a new RAMDirectory
-     * 
+     *
      * @param fs
      * @param parent
      * @param name
@@ -72,9 +71,14 @@ public class RAMDirectory implements FSEntry, FSDirectory {
         entries = new HashMap<String, FSEntry>();
     }
 
+    @Override
+    public String getId() {
+        return getName();
+    }
+
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#getName()
      */
     public String getName() {
@@ -83,7 +87,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#getParent()
      */
     public FSDirectory getParent() {
@@ -104,7 +108,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#isFile()
      */
     public boolean isFile() {
@@ -113,7 +117,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#isDirectory()
      */
     public boolean isDirectory() {
@@ -122,7 +126,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#setName(java.lang.String)
      */
     public void setName(String newName) throws IOException {
@@ -144,7 +148,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#getFile()
      */
     public FSFile getFile() throws IOException {
@@ -153,7 +157,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#getDirectory()
      */
     public FSDirectory getDirectory() throws IOException {
@@ -162,7 +166,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#getAccessRights()
      */
     public FSAccessRights getAccessRights() throws IOException {
@@ -171,7 +175,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#isDirty()
      */
     public boolean isDirty() throws IOException {
@@ -180,7 +184,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSObject#isValid()
      */
     public boolean isValid() {
@@ -189,7 +193,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSObject#getFileSystem()
      */
     public FileSystem<?> getFileSystem() {
@@ -198,7 +202,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSDirectory#iterator()
      */
     public Iterator<? extends FSEntry> iterator() throws IOException {
@@ -207,7 +211,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSDirectory#getEntry(java.lang.String)
      */
     public FSEntry getEntry(String name) throws IOException {
@@ -216,7 +220,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSDirectory#addFile(java.lang.String)
      */
     public FSEntry addFile(String name) throws IOException {
@@ -228,7 +232,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSDirectory#addDirectory(java.lang.String)
      */
     public FSEntry addDirectory(String name) throws IOException {
@@ -240,7 +244,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSDirectory#remove(java.lang.String)
      */
     public void remove(String name) throws IOException {
@@ -263,7 +267,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * removes the directory and all entries inside that directory
-     * 
+     *
      * @throws IOException
      */
     private void remove() throws IOException {
@@ -283,6 +287,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 
     /**
      * (non-Javadoc)
+     *
      * @see org.jnode.fs.FSDirectory#flush()
      */
     public void flush() throws IOException {
