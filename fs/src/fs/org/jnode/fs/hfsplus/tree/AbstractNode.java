@@ -22,9 +22,11 @@ package org.jnode.fs.hfsplus.tree;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.jnode.util.BigEndian;
 
 public abstract class AbstractNode<T extends NodeRecord> implements Node<T> {
+    private final Logger log = Logger.getLogger(getClass());
     protected NodeDescriptor descriptor;
     protected List<T> records;
     protected List<Integer> offsets;
@@ -48,6 +50,11 @@ public abstract class AbstractNode<T extends NodeRecord> implements Node<T> {
             offset = BigEndian.getUInt16(nodeData, size - ((i + 1) * 2));
             offsets.add(Integer.valueOf(offset));
         }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Creating node for: " + descriptor.toString() + " offsets: " + offsets);
+        }
+
         loadRecords(nodeData);
     }
 
