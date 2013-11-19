@@ -58,7 +58,7 @@ public class NTFSDirectory implements FSDirectory {
     }
 
     @Override
-    public String getId() {
+    public String getDirectoryId() {
         return id;
     }
 
@@ -81,6 +81,12 @@ public class NTFSDirectory implements FSDirectory {
             }
         }
         return null;
+    }
+
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        FileRecord fileRecord = fs.getNTFSVolume().getMFT().getRecord(Long.parseLong(id));
+        return new NTFSEntry(fs, fileRecord);
     }
 
     /**

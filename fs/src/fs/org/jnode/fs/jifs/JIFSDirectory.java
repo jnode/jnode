@@ -108,6 +108,11 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
         return entries.get(name);
     }
 
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        return getEntry(id);
+    }
+
     public FSAccessRights getAccessRights() {
         return null;
     }
@@ -145,6 +150,11 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
 
     public void setParent(FSDirectory parent) {
         this.parent = parent;
+    }
+
+    @Override
+    public String getDirectoryId() {
+        return getName();
     }
 
     @Override

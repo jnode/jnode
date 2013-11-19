@@ -133,7 +133,13 @@ public class HfsPlusDirectory implements FSDirectory {
     }
 
     @Override
-    public String getId() {
+    public FSEntry getEntryById(String id) throws IOException {
+        checkEntriesLoaded();
+        return entries.getById(id);
+    }
+
+    @Override
+    public String getDirectoryId() {
         return Integer.toString(folder.getFolderId().getId());
     }
 

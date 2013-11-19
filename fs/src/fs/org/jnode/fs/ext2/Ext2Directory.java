@@ -330,8 +330,14 @@ public class Ext2Directory extends AbstractFSDirectory {
     }
 
     @Override
-    public String getId() {
+    public String getDirectoryId() {
         return Integer.toString(iNode.getINodeNr());
+    }
+
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        checkEntriesLoaded();
+        return getEntryTable().getById(id);
     }
 
     class Ext2FSEntryIterator implements Iterator<FSEntry> {

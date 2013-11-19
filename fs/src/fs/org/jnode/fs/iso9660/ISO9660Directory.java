@@ -44,7 +44,7 @@ public final class ISO9660Directory implements FSDirectory {
     }
 
     @Override
-    public String getId() {
+    public String getDirectoryId() {
         return entry.getId();
     }
 
@@ -91,6 +91,11 @@ public final class ISO9660Directory implements FSDirectory {
                 return entry;
         }
         return null;
+    }
+
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        return getEntry(id);
     }
 
     /**

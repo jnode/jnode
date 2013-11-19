@@ -57,7 +57,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
     }
 
     @Override
-    public String getId() {
+    public String getDirectoryId() {
         return Long.toString(file.getStartCluster());
     }
 

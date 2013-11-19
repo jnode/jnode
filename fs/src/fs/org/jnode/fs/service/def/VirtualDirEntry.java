@@ -126,6 +126,11 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
     }
 
     @Override
+    public String getDirectoryId() {
+        return getName();
+    }
+
+    @Override
     public String getId() {
         return getName();
     }
@@ -250,6 +255,11 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
      */
     public synchronized FSEntry getEntry(String name) throws IOException {
         return entries.get(name);
+    }
+
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        return getEntry(id);
     }
 
     /**
