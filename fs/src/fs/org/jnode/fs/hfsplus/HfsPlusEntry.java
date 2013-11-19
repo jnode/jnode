@@ -114,7 +114,7 @@ public class HfsPlusEntry implements FSEntry, FSEntryCreated, FSEntryLastAccesse
                 HfsPlusFile hfsPlusFile = (HfsPlusFile) getFile();
                 return Integer.toString(hfsPlusFile.getCatalogFile().getFileId().getId());
             } else {
-                return getDirectory().getId();
+                return getDirectory().getDirectoryId();
             }
         } catch (IOException e) {
             throw new IllegalStateException("Error getting ID", e);

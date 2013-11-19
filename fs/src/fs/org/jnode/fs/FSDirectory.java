@@ -32,11 +32,13 @@ public interface FSDirectory extends FSObject {
 
     /**
      * Gets a unique ID for this directory in the context of its parent. This value should be the same every time the
-     * directory is accessed.
+     * directory is accessed. Depending on the file system implementation this may return the same value as
+     * {@link FSEntry#getId} for the associated entry, or it may return a different ID that is unique across all
+     * directories. E.g. start cluster / directory entry index (FAT) vs global ID such as inode number (ext2).
      *
-     * @return the unique ID for this entry.
+     * @return the unique ID for this directory.
      */
-    public String getId();
+    public String getDirectoryId();
 
     /**
      * Gets an iterator used to iterate over all the entries of this directory.
@@ -55,6 +57,15 @@ public interface FSDirectory extends FSObject {
      * @throws IOException if no entry exists with this name.
      */
     public FSEntry getEntry(String name) throws IOException;
+
+    /**
+     * Gets the entry with the given ID, as given by {@link FSEntry#getId}.
+     *
+     * @param id identify the requested entry.
+     * @return {@link FSEntry} corresponding to the name passed as parameter.
+     * @throws IOException if no entry exists with this name.
+     */
+    public FSEntry getEntryById(String id) throws IOException;
 
     /**
      * Add a new file with a given name to this directory.

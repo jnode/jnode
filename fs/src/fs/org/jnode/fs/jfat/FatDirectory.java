@@ -22,7 +22,9 @@ package org.jnode.fs.jfat;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
@@ -34,6 +36,11 @@ public class FatDirectory extends FatEntry implements FSDirectory {
     private static final Logger log = Logger.getLogger(FatDirectory.class);
 
     private final FatTable children = new FatTable();
+
+    /**
+     * The map of ID -> entry.
+     */
+    private final Map<String, FatEntry> idMap = new HashMap<String, FatEntry>();
 
     /*
      * for root directory
@@ -120,7 +127,7 @@ public class FatDirectory extends FatEntry implements FSDirectory {
     }
 
     @Override
-    public String getId() {
+    public String getDirectoryId() {
         return Integer.toString(getStartCluster());
     }
 
@@ -172,6 +179,25 @@ public class FatDirectory extends FatEntry implements FSDirectory {
                 if (FatUtils.compareIgnoreCase(entry.getName(), name)) {
                     child = children.put(entry);
                     break;
+                }
+            }
+        }
+
+        return child;
+    }
+
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        FatEntry child = idMap.get(id);
+
+        if (child == null) {
+            EntriesFactory f = new EntriesFactory(this, true);
+
+            while (f.hasNextEntry()) {
+                FatEntry entry = f.createNextEntry();
+                idMap.put(entry.getId(), entry);
+                if (entry.getId().equals(id)) {
+                    return entry;
                 }
             }
         }
@@ -237,7 +263,10 @@ public class FatDirectory extends FatEntry implements FSDirectory {
         record.getShortEntry().setArchive();
         FatFile file = new FatFile(getFatFileSystem(), this, record);
         file.flush();
-        return children.put(file);
+
+        FatEntry entry = children.put(file);
+        idMap.put(entry.getId(), entry);
+        return entry;
     }
 
     public synchronized FSEntry addDirectory(String name) throws IOException {
@@ -250,7 +279,10 @@ public class FatDirectory extends FatEntry implements FSDirectory {
         FatDirectory dir = new FatDirectory(fs, this, record);
         dir.initialize();
         dir.flush();
-        return children.put(dir);
+
+        FatEntry entry = children.put(dir);
+        idMap.put(entry.getId(), entry);
+        return entry;
     }
 
     public synchronized void remove(String name) throws IOException {
@@ -273,6 +305,7 @@ public class FatDirectory extends FatEntry implements FSDirectory {
             dir.flush();
         }
 
+        idMap.remove(entry.getId());
     }
 
     public String toString() {

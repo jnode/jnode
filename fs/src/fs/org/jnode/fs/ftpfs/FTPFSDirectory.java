@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSEntry;
 import org.jnode.fs.ReadOnlyFileSystemException;
 
 /**
@@ -49,6 +50,16 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
     public FTPFSEntry getEntry(String name) throws IOException {
         ensureEntries();
         return entries.get(name);
+    }
+
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        return getEntry(id);
+    }
+
+    @Override
+    public String getDirectoryId() {
+        return getName();
     }
 
     /**

@@ -72,6 +72,11 @@ public class RAMDirectory implements FSEntry, FSDirectory {
     }
 
     @Override
+    public String getDirectoryId() {
+        return getName();
+    }
+
+    @Override
     public String getId() {
         return getName();
     }
@@ -216,6 +221,11 @@ public class RAMDirectory implements FSEntry, FSDirectory {
      */
     public FSEntry getEntry(String name) throws IOException {
         return entries.get(name);
+    }
+
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        return getEntry(id);
     }
 
     /**

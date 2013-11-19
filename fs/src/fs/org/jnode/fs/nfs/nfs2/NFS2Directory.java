@@ -105,7 +105,12 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
     }
 
     @Override
-    public String getId() {
+    public FSEntry getEntryById(String id) throws IOException {
+        return getEntry(id);
+    }
+
+    @Override
+    public String getDirectoryId() {
         return directoryEntry.getId();
     }
 
