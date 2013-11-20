@@ -32,6 +32,7 @@ import org.jnode.fs.FileSystemType;
 import org.jnode.fs.hfsplus.catalog.Catalog;
 import org.jnode.fs.hfsplus.catalog.CatalogKey;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
+import org.jnode.fs.hfsplus.extent.Extent;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.AbstractFileSystem;
 
@@ -47,6 +48,11 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
      * Catalog special file for this instance
      */
     private Catalog catalog;
+
+    /**
+     * The extent overflow file.
+     */
+    private Extent extentOverflow;
 
     /**
      * @param device
@@ -77,6 +83,11 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
             log.info(getDevice().getId()
                 + " Filesystem is journaled, write access is not supported. Mounting it readonly");
             setReadOnly(true);
+        }
+        try {
+            extentOverflow = new Extent(this);
+        } catch (IOException e) {
+            throw new FileSystemException(e);
         }
         try {
             catalog = new Catalog(this);
@@ -128,6 +139,10 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
         return catalog;
     }
 
+    public final Extent getExtentOverflow() {
+        return extentOverflow;
+    }
+
     public final SuperBlock getVolumeHeader() {
         return volumeHeader;
     }
@@ -152,6 +167,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
             log.debug("Write Catalog to disk.");
             Catalog catalog = new Catalog(params, this);
             catalog.update();
+            extentOverflow = new Extent(params);
             log.debug("Write volume header to disk.");
             volumeHeader.update();
             flush();
