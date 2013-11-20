@@ -44,7 +44,8 @@ public class ExtentKey extends AbstractKey {
     public ExtentKey(final byte[] src, final int offset) {
         byte[] ek = new byte[KEY_LENGTH];
         System.arraycopy(src, offset, ek, 0, KEY_LENGTH);
-        keyLength = BigEndian.getUInt16(ek, 0);
+        //TODO Understand why the +2 is necessary
+        keyLength = BigEndian.getUInt16(ek, 0) + 2;
         forkType = BigEndian.getUInt8(ek, 2);
         pad = BigEndian.getUInt8(ek, 3);
         fileId = new CatalogNodeId(ek, 4);
@@ -82,6 +83,24 @@ public class ExtentKey extends AbstractKey {
     }
 
     @Override
+    public int hashCode() {
+        return 73 ^ fileId.hashCode() * forkType + (int) startBlock;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ExtentKey)) {
+            return false;
+        }
+
+        ExtentKey otherKey = (ExtentKey) obj;
+
+        return
+            fileId.getId() == otherKey.fileId.getId() &&
+                forkType == otherKey.forkType;
+    }
+
+    @Override
     public byte[] getBytes() {
         byte[] data = new byte[this.getKeyLength()];
         return data;
@@ -115,4 +134,8 @@ public class ExtentKey extends AbstractKey {
         return startBlock;
     }
 
+    @Override
+    public final String toString() {
+        return String.format("[%s type:%s start:%d]", fileId, forkType == DATA_FORK ? "data" : "resource", startBlock);
+    }
 }

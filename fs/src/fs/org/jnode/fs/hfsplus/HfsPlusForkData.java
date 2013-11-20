@@ -22,7 +22,13 @@ package org.jnode.fs.hfsplus;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
 import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
+import org.jnode.fs.hfsplus.extent.ExtentKey;
 import org.jnode.util.BigEndian;
 
 public class HfsPlusForkData {
@@ -42,14 +48,32 @@ public class HfsPlusForkData {
      * The first eight extent descriptors for the fork.
      */
     private ExtentDescriptor[] extents;
+    /**
+     * Overflow extents.
+     */
+    private ExtentDescriptor[] overflowExtents;
 
     /**
-     * Create fork data from existing informations.
+     * The catalog node ID that owns this fork.
+     */
+    private final CatalogNodeId cnid;
+
+    /**
+     * Indicates whether this is a data fork, or a resource fork.
+     */
+    private final boolean dataFork;
+
+    /**
+     * Create fork data from existing information.
      *
+     * @param cnid the catalog node ID that owns this fork.
+     * @param dataFork indicates whether this is a data fork, or a resource fork.
      * @param src
      * @param offset
      */
-    public HfsPlusForkData(final byte[] src, final int offset) {
+    public HfsPlusForkData(CatalogNodeId cnid, boolean dataFork, final byte[] src, final int offset) {
+        this.cnid = cnid;
+        this.dataFork = dataFork;
         byte[] data = new byte[FORK_DATA_LENGTH];
         System.arraycopy(src, offset, data, 0, FORK_DATA_LENGTH);
         totalSize = BigEndian.getInt64(data, 0);
@@ -64,13 +88,16 @@ public class HfsPlusForkData {
     }
 
     /**
+     * Create a new empty data-fork data.
      * Create a new empty fork data object.
      *
      * @param totalSize
      * @param clumpSize
      * @param totalBlock
      */
-    public HfsPlusForkData(long totalSize, int clumpSize, int totalBlock) {
+    public HfsPlusForkData(CatalogNodeId cnid, long totalSize, int clumpSize, int totalBlock) {
+        this.cnid = cnid;
+        this.dataFork = true;
         this.totalSize = totalSize;
         this.clumpSize = clumpSize;
         this.totalBlock = totalBlock;
@@ -120,6 +147,31 @@ public class HfsPlusForkData {
     }
 
     /**
+     * Gets all extents to read data from.
+     *
+     * @param fileSystem the current file system.
+     * @return the collection of extents.
+     * @throws IOException if an error occurs.
+     */
+    public Collection<ExtentDescriptor> getAllExtents(HfsPlusFileSystem fileSystem) throws IOException {
+        List<ExtentDescriptor> allExtents = new ArrayList<ExtentDescriptor>();
+        Collections.addAll(allExtents, extents);
+
+        // Only check for overflow extents if the last non-overflow extent is in use
+        if (!extents[7].isEmpty() && overflowExtents == null) {
+            int forkType = dataFork ? ExtentKey.DATA_FORK : ExtentKey.RESOURCE_FORK;
+            overflowExtents = fileSystem.getExtentOverflow().getOverflowExtents(new ExtentKey(forkType, 0, cnid, 0));
+        }
+
+        // Add the overflow extents if the exist
+        if (overflowExtents != null) {
+            Collections.addAll(allExtents, overflowExtents);
+        }
+
+        return allExtents;
+    }
+
+    /**
      * Read a block of data
      *
      * @param fileSystem the associated file system.
@@ -128,21 +180,44 @@ public class HfsPlusForkData {
      * @throws java.io.IOException if an error occurs.
      */
     public void read(HfsPlusFileSystem fileSystem, long offset, ByteBuffer buffer) throws IOException {
-        for (ExtentDescriptor extentDescriptor : extents) {
-            if (buffer.remaining() > 0 && !extentDescriptor.isEmpty()) {
-                long length = extentDescriptor.getSize(fileSystem.getVolumeHeader().getBlockSize());
+        int blockSize = fileSystem.getVolumeHeader().getBlockSize();
+        int limit = buffer.limit();
+        int remaining = buffer.remaining();
+
+        Collection<ExtentDescriptor> allExtents = getAllExtents(fileSystem);
+
+        for (ExtentDescriptor extentDescriptor : allExtents) {
+            if (remaining > 0 && !extentDescriptor.isEmpty()) {
+                long length = extentDescriptor.getSize(blockSize);
 
                 if (offset != 0 && length < offset) {
                     offset -= length;
                 } else {
+                    long firstOffset = extentDescriptor.getStartOffset(blockSize);
 
-                    long firstOffset = extentDescriptor.getStartOffset(fileSystem.getVolumeHeader().getBlockSize());
-                    fileSystem.getApi().read(firstOffset + offset, buffer);
+                    while (remaining > 0 && offset < length) {
+                        int byteCount = Math.min(remaining, blockSize);
+                        byteCount = Math.min(byteCount, (int) (length - offset));
+
+                        buffer.limit(buffer.position() + byteCount);
+                        fileSystem.getApi().read(firstOffset + offset, buffer);
+
+                        offset += byteCount;
+                        remaining -= byteCount;
+                    }
 
                     offset = 0;
                 }
             }
         }
+
+        if (remaining > 0) {
+            throw new IOException(String.format("Failed to read in all the data. cnid: %s offset: %d extents: %s",
+                cnid, offset, allExtents));
+        }
+
+        // Reset the limit
+        buffer.limit(limit);
     }
 
     /**
@@ -152,6 +227,7 @@ public class HfsPlusForkData {
     public final void addDescriptor(int index, ExtentDescriptor desc) {
         extents[index] = desc;
     }
+
 
     public ExtentDescriptor[] getExtents() {
         return extents;

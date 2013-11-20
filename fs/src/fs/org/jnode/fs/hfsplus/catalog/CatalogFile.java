@@ -94,8 +94,8 @@ public class CatalogFile {
         backupDate = BigEndian.getUInt32(data, 28);
         permissions = new HfsPlusBSDInfo(data, 32);
         userInfo = new FileInfo(data, 48);
-        datas = new HfsPlusForkData(data, 88);
-        resources = new HfsPlusForkData(data, 168);
+        datas = new HfsPlusForkData(fileId, true, data, 88);
+        resources = new HfsPlusForkData(fileId, false, data, 168);
     }
 
     /**
