@@ -38,6 +38,8 @@ import org.jnode.fs.ntfs.index.IndexEntry;
  */
 public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, FSEntryLastAccessed {
 
+    private FSObject cachedFSObject;
+
     /**
      * The ID for this entry.
      */
@@ -47,7 +49,6 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
      * The index entry.
      */
     private IndexEntry indexEntry;
-    private FSObject cachedFSObject;
 
     /**
      * The associated file record.
@@ -68,6 +69,7 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
     public NTFSEntry(NTFSFileSystem fs, IndexEntry indexEntry) {
         this.fs = fs;
         this.indexEntry = indexEntry;
+        id = Long.toString(indexEntry.getFileReferenceNumber());
     }
 
     /**
@@ -78,8 +80,6 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
      */
     public NTFSEntry(NTFSFileSystem fs, FileRecord fileRecord) {
         this.fs = fs;
-        this.indexEntry = indexEntry;
-        id = Long.toString(indexEntry.getFileReferenceNumber());
         this.fileRecord = fileRecord;
         id = Long.toString(fileRecord.getReferenceNumber());
     }
@@ -131,14 +131,22 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
      * @see org.jnode.fs.FSEntry#isFile()
      */
     public boolean isFile() {
-        return !indexEntry.isDirectory();
+        if (indexEntry != null) {
+            return !indexEntry.isDirectory();
+        } else {
+            return !fileRecord.isDirectory();
+        }
     }
 
     /**
      * @see org.jnode.fs.FSEntry#isDirectory()
      */
     public boolean isDirectory() {
-        return indexEntry.isDirectory();
+        if (indexEntry != null) {
+            return indexEntry.isDirectory();
+        } else {
+            return fileRecord.isDirectory();
+        }
     }
 
     /**

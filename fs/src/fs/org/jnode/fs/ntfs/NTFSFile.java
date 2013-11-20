@@ -40,6 +40,9 @@ import org.jnode.util.ByteBufferUtils;
  */
 public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 
+    /**
+     * The associated file record.
+     */
     private FileRecord fileRecord;
 
     /**
@@ -71,6 +74,7 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
         this.fileRecord = fileRecord;
     }
 
+    @Override
     public long getLength() {
         FileRecord.AttributeIterator attributes =
             getFileRecord().findAttributesByTypeAndName(NTFSAttribute.Types.DATA, null);
@@ -80,13 +84,14 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
             // Fall back to the size stored in the index entry if the data attribute is not present (even possible??)
             return indexEntry.getRealFileSize();
         }
+
         return getFileRecord().getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
     }
 
     /*
      * (non-Javadoc)
-	 * @see org.jnode.fs.FSFile#setLength(long)
-	 */
+     * @see org.jnode.fs.FSFile#setLength(long)
+     */
     public void setLength(long length) {
         // TODO Auto-generated method stub
 
@@ -187,6 +192,7 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
         // TODO implement me
     }
 
+    @Override
     public Map<String, FSFile> getStreams() {
         Set<String> streamNames = new LinkedHashSet<String>();
 
@@ -250,16 +256,7 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 
         @Override
         public long getLength() {
-            FileRecord.AttributeIterator attributes =
-                getFileRecord().findAttributesByTypeAndName(NTFSAttribute.Types.DATA, null);
-            NTFSAttribute attribute = attributes.next();
-
-            if (attribute == null) {
-                // Fall back to the size stored in the index entry if the data attribute is not present (even possible??)
-                return indexEntry.getRealFileSize();
-            }
-
-            return getFileRecord().getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
+            return NTFSFile.this.getFileRecord().getAttributeTotalSize(NTFSAttribute.Types.DATA, attributeName);
         }
 
         @Override
@@ -268,12 +265,16 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
         }
 
         @Override
-        public void read(long fileOffset, ByteBuffer destBuf) throws IOException {
-            // TODO optimize it also to use ByteBuffer at lower level
-            final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
-            final byte[] dest = destBA.toArray();
-            getFileRecord().readData(fileOffset, dest, 0, dest.length);
-            destBA.refreshByteBuffer();
+        public void read(long fileOffset, ByteBuffer dest) throws IOException {
+            ByteBufferUtils.ByteArray destByteArray = ByteBufferUtils.toByteArray(dest);
+            byte[] destBuffer = destByteArray.toArray();
+
+            if (fileOffset + destBuffer.length > getLength()) {
+                throw new IOException("Attempt to read past the end of stream, offset: " + fileOffset);
+            }
+
+            getFileRecord().readData(attributeName, fileOffset, destBuffer, 0, destBuffer.length);
+            destByteArray.refreshByteBuffer();
         }
 
         @Override
