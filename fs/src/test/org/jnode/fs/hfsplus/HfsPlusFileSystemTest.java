@@ -31,6 +31,7 @@ import org.jnode.fs.service.FileSystemService;
 import org.jnode.test.support.TestUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class HfsPlusFileSystemTest {
@@ -80,6 +81,7 @@ public class HfsPlusFileSystemTest {
     }
 
     @Test
+    @Ignore
     public void testRead() throws Exception {
         HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
         HfsPlusFileSystem fs = new HfsPlusFileSystem(device, false, type);
