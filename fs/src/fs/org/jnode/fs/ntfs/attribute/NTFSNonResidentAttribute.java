@@ -150,38 +150,60 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
 
                         this.numberOfVCNs += length;
                         vcn += length;
-                        previousLCN = 0; // TODO: is it correct to reset this?
                         lastCompressedSize = 0;
                     }
                 } else if (dataRun.getLength() >= compUnitSize) {
                     // Compressed/sparse pairs always add to the compression unit size.  If
                     // the unit only compresses to 16, the system will store it uncompressed.
-                    // So this whole unit is stored as-is, we'll leave it as a normal data run.
                     // Also if one-or more of these uncompressed runs happen next to each other then they can be
-                    // coalesced into a single run
-                    dataruns.add(dataRun);
-                    this.numberOfVCNs += dataRun.getLength();
-                    vcn += dataRun.getLength();
-                    previousLCN = dataRun.getCluster();
+                    // coalesced into a single run and even coalesced into the next compressed run. In that case the
+                    // compressed run needs to be split off
+
+                    int remainder = dataRun.getLength() % compUnitSize;
+
+                    if (remainder != 0) {
+                        // Uncompressed run coalesced with compressed run. First add in the uncompressed portion:
+                        int uncompressedLength = dataRun.getLength() - remainder;
+                        DataRun uncompressed = new DataRun(dataRun.getCluster(), uncompressedLength, false, 0, vcn);
+                        dataruns.add(uncompressed);
+                        vcn += uncompressedLength;
+                        this.numberOfVCNs += uncompressedLength;
+
+                        // Next add in the compressed portion
+                        DataRun compressedRun =
+                            new DataRun(dataRun.getCluster() + uncompressedLength, remainder, false, 0, vcn);
+                        dataruns.add(new CompressedDataRun(compressedRun, compUnitSize));
+                        expectingSparseRunNext = true;
+                        lastCompressedSize = remainder;
+
+                        this.numberOfVCNs += compUnitSize;
+                        vcn += compUnitSize;
+
+                    } else {
+                        dataruns.add(dataRun);
+                        this.numberOfVCNs += dataRun.getLength();
+                        vcn += dataRun.getLength();
+                    }
+
                 } else {
                     dataruns.add(new CompressedDataRun(dataRun, compUnitSize));
-                    if (dataRun.getLength() != compUnitSize) {
-                        expectingSparseRunNext = true;
-                        lastCompressedSize = dataRun.getLength();
-                    }
+                    expectingSparseRunNext = true;
+                    lastCompressedSize = dataRun.getLength();
 
                     this.numberOfVCNs += compUnitSize;
                     vcn += compUnitSize;
-                    previousLCN = dataRun.getCluster();
                 }
             } else {
                 // map VCN-> datarun
                 dataruns.add(dataRun);
                 this.numberOfVCNs += dataRun.getLength();
                 vcn += dataRun.getLength();
-                previousLCN = dataRun.getCluster();
                 lastCompressedSize = 0;
                 expectingSparseRunNext = false;
+            }
+
+            if (!dataRun.isSparse()) {
+                previousLCN = dataRun.getCluster();
             }
 
             offset += dataRun.getSize();

@@ -83,8 +83,8 @@ public final class CompressedDataRun implements DataRunInterface {
      * @return the number of clusters read.
      * @throws IOException if an error occurs reading.
      */
-    public int readClusters(long vcn, byte[] dst, int dstOffset,
-                            int nrClusters, int clusterSize, NTFSVolume volume) throws IOException {
+    public int readClusters(long vcn, byte[] dst, int dstOffset, int nrClusters, int clusterSize, NTFSVolume volume)
+        throws IOException {
 
         // Logic to determine whether we own the VCN which has been requested.
         // XXX: Lifted from DataRun.  Consider moving to some good common location.
@@ -106,8 +106,7 @@ public final class CompressedDataRun implements DataRunInterface {
         // then the data can be read directly without decompressing it.
         final int compClusters = compressedRun.getLength();
         if (compClusters == compressionUnitSize) {
-            return compressedRun.readClusters(vcn, dst, dstOffset, compClusters,
-                clusterSize, volume);
+            return compressedRun.readClusters(vcn, dst, dstOffset, compClusters, clusterSize, volume);
         }
 
         // Now we know the data is compressed.  Read in the compressed block...
@@ -125,9 +124,23 @@ public final class CompressedDataRun implements DataRunInterface {
         //      routine such that it's capable of skipping chunks that aren't needed.
         unCompressUnit(tempCompressed, tempUncompressed);
 
-        System.arraycopy(tempUncompressed, vcnOffsetWithinUnit * clusterSize,
-            dst, dstOffset + (int) (actFirstVcn - vcn) * clusterSize,
-            actLength * clusterSize);
+        int copySource = vcnOffsetWithinUnit * clusterSize;
+        int copyDest = dstOffset + (int) (actFirstVcn - vcn) * clusterSize;
+        int copyLength = actLength * clusterSize;
+
+        if (copyDest + copyLength > dst.length) {
+            throw new ArrayIndexOutOfBoundsException(
+                String
+                    .format("Copy dest %d length %d is too big for destination %d", copyDest, copyLength, dst.length));
+        }
+
+        if (copySource + copyLength > tempUncompressed.length) {
+            throw new ArrayIndexOutOfBoundsException(
+                String.format("Copy source %d length %d is too big for source %d", copySource, copyLength,
+                    tempUncompressed.length));
+        }
+
+        System.arraycopy(tempUncompressed, copySource, dst, copyDest, copyLength);
 
         return actLength;
     }
