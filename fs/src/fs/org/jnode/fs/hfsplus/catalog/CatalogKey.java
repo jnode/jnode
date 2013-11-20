@@ -32,8 +32,9 @@ import org.jnode.util.BigEndian;
  * <li>The node identifier of the parent folder</li>
  * <li>The name of the file or folder</li>
  * </ul>
- * <p/>
+ *
  * The minimal length for a key is 6 bytes. 2 bytes for the length and 4 bytes for the catalog node id.
+ *
  */
 public class CatalogKey extends AbstractKey {
 
@@ -52,7 +53,7 @@ public class CatalogKey extends AbstractKey {
 
     /**
      * Create catalog key from existing data.
-     *
+     * 
      * @param src
      * @param offset
      */
@@ -62,7 +63,7 @@ public class CatalogKey extends AbstractKey {
         byte[] ck = new byte[2];
         System.arraycopy(src, currentOffset, ck, 0, 2);
         //TODO Understand why the +2 is necessary
-        keyLength = BigEndian.getUInt16(ck, 0) + 2;
+        keyLength = BigEndian.getInt16(ck, 0) + 2;
         currentOffset += 2;
         ck = new byte[4];
         System.arraycopy(src, currentOffset, ck, 0, 4);
@@ -74,11 +75,21 @@ public class CatalogKey extends AbstractKey {
     }
 
     /**
-     * Create new catalog key based on parent CNID and the name of the file or
-     * folder.
+     * Create new catalog key based on parent CNID, ignoring file/folder name.
      *
      * @param parentID Parent catalog node identifier.
-     * @param name     Name of the file or folder.
+     */
+    public CatalogKey(CatalogNodeId parentID) {
+        this(parentID, new HfsUnicodeString(""));
+    }
+
+    /**
+     * Create new catalog key based on parent CNID and the name of the file or
+     * folder.
+     * 
+     * @param parentID Parent catalog node identifier.
+     * @param name Name of the file or folder.
+     * 
      */
     public CatalogKey(final CatalogNodeId parentID, final HfsUnicodeString name) {
         this.parentId = parentID;
@@ -97,8 +108,9 @@ public class CatalogKey extends AbstractKey {
     /**
      * Compare two catalog keys. These keys are compared by parent id and next
      * by node name.
-     *
+     * 
      * @param key
+     * 
      */
     public final int compareTo(final Key key) {
         int res = -1;
@@ -106,13 +118,9 @@ public class CatalogKey extends AbstractKey {
             CatalogKey ck = (CatalogKey) key;
             res = this.getParentId().compareTo(ck.getParentId());
             if (res == 0) {
-                // Note: this is unlikely to be correct. See TN1150 section "Unicode Subtleties" for details
-                // For reading in data is should be safe since the B-Tree will be pre-sorted, but for adding new entries
-                // it will cause the order to be wrong.
-                res = this.getNodeName().getUnicodeString()
-                    .compareTo(ck.getNodeName().getUnicodeString());
-                this.getNodeName().getUnicodeString()
-                    .compareTo(ck.getNodeName().getUnicodeString());
+                res =
+                    this.getNodeName().getUnicodeString()
+                        .compareTo(ck.getNodeName().getUnicodeString());
             }
         }
         return res;

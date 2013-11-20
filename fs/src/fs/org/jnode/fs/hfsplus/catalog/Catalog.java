@@ -223,7 +223,7 @@ public class Catalog {
 
         while (nd.isIndexNode()) {
             CatalogIndexNode node = new CatalogIndexNode(data, nodeSize);
-            IndexRecord record = (IndexRecord) node.find(parentID);
+            IndexRecord record = (IndexRecord) node.find(new CatalogKey(parentID));
             currentOffset = record.getIndex() * nodeSize;
             nodeData = ByteBuffer.allocate(nodeSize);
             catalogFile.read(fs, currentOffset, nodeData);
@@ -234,7 +234,7 @@ public class Catalog {
 
         if (nd.isLeafNode()) {
             CatalogLeafNode node = new CatalogLeafNode(data, nodeSize);
-            lr = (LeafRecord) node.find(parentID);
+            lr = (LeafRecord) node.find(new CatalogKey(parentID));
         }
         return lr;
     }
@@ -271,7 +271,7 @@ public class Catalog {
             NodeDescriptor nd = new NodeDescriptor(datas, 0);
             if (nd.isIndexNode()) {
                 CatalogIndexNode node = new CatalogIndexNode(datas, nodeSize);
-                IndexRecord[] records = (IndexRecord[]) node.findAll(parentID);
+                IndexRecord[] records = node.findAll(new CatalogKey(parentID));
                 List<LeafRecord> lfList = new LinkedList<LeafRecord>();
                 for (IndexRecord rec : records) {
                     LeafRecord[] lfr = getRecords(parentID, rec.getIndex());
@@ -280,7 +280,7 @@ public class Catalog {
                 return lfList.toArray(new LeafRecord[lfList.size()]);
             } else if (nd.isLeafNode()) {
                 CatalogLeafNode node = new CatalogLeafNode(nodeData.array(), nodeSize);
-                return (LeafRecord[]) node.findAll(parentID);
+                return node.findAll(new CatalogKey(parentID));
             } else {
                 log.info(
                     String.format("Node %d wasn't a leaf or index: %s\n%s", nodeNumber, nd, NumberUtils.hex(datas)));
@@ -320,7 +320,7 @@ public class Catalog {
         LeafRecord lr = null;
         if (nd.isLeafNode()) {
             CatalogLeafNode node = new CatalogLeafNode(nodeData.array(), nodeSize);
-            lr = node.find(parentID);
+            lr = node.find(cKey);
         }
         return lr;
     }
