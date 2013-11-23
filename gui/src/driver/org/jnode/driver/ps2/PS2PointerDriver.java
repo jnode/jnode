@@ -58,10 +58,22 @@ public class PS2PointerDriver extends AbstractPointerDriver implements PS2Consta
         return MOUSE_IRQ;
     }
 
-    protected boolean initPointer() throws DeviceException {
-        boolean result = enablePointer();
+    protected boolean initPointer(boolean reset) throws DeviceException {    	
+        boolean result = true;
+        if (reset) {
+        	result &= resetPointer();
+        }
+        result &= enablePointer();
         result &= setRate(100);
         return result;
+    }
+
+    protected boolean resetPointer() throws DeviceException {
+        log.debug("resetPointer");
+        if (!bus.writeMouseCommands(CMD_RESET, null, 0))
+        	return false;
+        bus.flush();
+        return true;
     }
 
     protected boolean enablePointer() throws DeviceException {

@@ -91,7 +91,7 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
     protected PointerInterpreter createInterpreter() {
         log.debug("createInterpreter");
         try {
-            initPointer(); // bring mouse into stable state
+            initPointer(true); // bring mouse into stable state
         } catch (DeviceException ex) {
             log.error("Cannot initialize pointer", ex);
             return null;
@@ -170,14 +170,40 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
     	}
     }
 
+    /**
+     * Gets the ID of the pointer device.
+     * @return
+     * @throws DriverException
+     */
     protected abstract int getPointerId() throws DriverException;
 
-    protected abstract boolean initPointer() throws DeviceException;
+    /**
+     * Initialize the pointer to it's default values.
+     * @return
+     * @throws DeviceException
+     */
+    protected abstract boolean initPointer(boolean reset) throws DeviceException;
 
+    /**
+     * Enable pointer events
+     * @return
+     * @throws DeviceException
+     */
     protected abstract boolean enablePointer() throws DeviceException;
 
+    /**
+     * Disable pointer events
+     * @return
+     * @throws DeviceException
+     */
     protected abstract boolean disablePointer() throws DeviceException;
 
+    /**
+     * Set the sample rate (number of packets the mouse can send per second)
+     * @param samples
+     * @return
+     * @throws DeviceException
+     */
     protected abstract boolean setRate(int samples) throws DeviceException;
 
 }

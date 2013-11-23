@@ -60,7 +60,7 @@ public class MouseInterpreter implements PointerInterpreter {
         try {
             log.debug("Probe mouse");
             // reset the mouse
-            if (!d.initPointer()) {
+            if (!d.initPointer(true)) {
                 log.debug("Reset mouse failed");
                 return false;
             }
@@ -103,6 +103,9 @@ public class MouseInterpreter implements PointerInterpreter {
                 return false;
             }
             this.data = new byte[protocol.getPacketSize()];
+            
+            // Set default values back
+            d.initPointer(false);
 
             return result;
         } catch (DriverException ex) {
