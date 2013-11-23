@@ -20,6 +20,8 @@
  
 package org.jnode.driver.input;
 
+import java.io.PrintWriter;
+
 
 /**
  * @author qades
@@ -54,4 +56,10 @@ public interface PointerInterpreter {
      */
     public void reset();
 
+    /**
+     * Show all information of this interpreter to the given writer.
+     *
+     * @param out
+     */
+    public void showInfo(PrintWriter out);
 }

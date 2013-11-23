@@ -20,16 +20,22 @@
  
 package org.jnode.driver.input;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.DeviceException;
 import org.jnode.driver.DriverException;
+import org.jnode.naming.InitialNaming;
+import org.jnode.plugin.ExtensionPoint;
 import org.jnode.util.NumberUtils;
 
 /**
  * author qades
+ * @author Ewout Prangsma (epr@jnode.org)
  */
 public class MouseInterpreter implements PointerInterpreter {
 
@@ -37,21 +43,12 @@ public class MouseInterpreter implements PointerInterpreter {
      * My logger
      */
     private static final Logger log = Logger.getLogger(MouseInterpreter.class);
-    /**
-     * List of valid protocol handlers
-     */
-    private static final List<MouseProtocolHandler> protocolsHandlers = new ArrayList<MouseProtocolHandler>();
 
     private byte[] data; // will be defined as 3 or 4 bytes, according to the protocol
     private int pos = 0;
     private MouseProtocolHandler protocol;
-
-    static {
-        // should be configurable via an ExtensionPoint
-        protocolsHandlers.add(new LogitechWheelMouseProtocol());
-        protocolsHandlers.add(new LogitechProtocol());
-    }
-
+    private int pointerId;
+   
     public String getName() {
         if (protocol == null) {
             return "No Mouse";
@@ -67,12 +64,12 @@ public class MouseInterpreter implements PointerInterpreter {
                 log.debug("Reset mouse failed");
                 return false;
             }
-            int id = d.getPointerId();
+            pointerId = d.getPointerId();
             //todo -- 3 is for the wheel mouse identified bellow but when restarted the id remains 3 instead of
             //todo -- 0 as on the first start. Investigate this anomaly.
-            if (id != 0 && id != 3) {
+            if (pointerId != 0 && pointerId != 3) {
                 // does not seem to be a mouse, more likely a tablet of touch screen
-                log.debug("PointerId 0x" + NumberUtils.hex(id, 2));
+                log.debug("PointerId 0x" + NumberUtils.hex(pointerId, 2));
                 return false;
             }
 
@@ -85,17 +82,24 @@ public class MouseInterpreter implements PointerInterpreter {
             // a "normal" mouse doesn't recognize this sequence as special
             // but a mouse with a wheel will change its mouse ID
 
-            id = d.getPointerId();
-            log.debug("Actual pointerId 0x" + NumberUtils.hex(id, 2));
+            pointerId = d.getPointerId();
+            log.debug("Actual pointerId 0x" + NumberUtils.hex(pointerId, 2));
+            MouseProtocolHandlerManager mgr;
+			try {
+				mgr = InitialNaming.lookup(MouseProtocolHandlerManager.NAME);
+			} catch (NameNotFoundException e) {
+				log.error("MouseProtocolHandlerManager not found");
+				return false;
+			}
             // select protocol
-            for (MouseProtocolHandler p : protocolsHandlers) {
-                if (p.supportsId(id)) {
+            for (MouseProtocolHandler p : mgr.protocolHandlers()) {
+                if (p.supportsId(pointerId)) {
                     this.protocol = p;
                     break;
                 }
             }
             if (protocol == null) {
-                log.error("No mouse driver found for PointerID " + id);
+                log.error("No mouse driver found for PointerID " + pointerId);
                 return false;
             }
             this.data = new byte[protocol.getPacketSize()];
@@ -147,4 +151,13 @@ public class MouseInterpreter implements PointerInterpreter {
     public synchronized void reset() {
         pos = 0;
     }
+
+	@Override
+	public void showInfo(PrintWriter out) {
+		out.println("Name          : " + getName());
+		out.println("Pointer ID    : " + NumberUtils.hex(pointerId));
+		if (data != null) {
+			out.println("Package length: "+ data.length);
+		}
+	}
 }

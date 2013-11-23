@@ -28,25 +28,28 @@ import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 
 /**
- * The keyboard input plugin defines an extension point that is used to 
+ * The input plugin defines an extension point that is used to 
  * register keyboard interpreters, and hosts the keyboard layout manager.
  * 
  * @author crawley@jnode.org
+ * @author epr@jnode.org
  */
-public class KeyboardInputPlugin extends Plugin {
+public class InputPlugin extends Plugin {
     
-    private KeyboardLayoutManager mgr;
-    
-    public KeyboardInputPlugin(PluginDescriptor descriptor) {
+    public InputPlugin(PluginDescriptor descriptor) {
         super(descriptor);
     }
 
     @Override
     protected void startPlugin() throws PluginException {
         try {
-            mgr = new KeyboardLayoutManager(
-                    getDescriptor().getExtensionPoint("keyboard-layouts"));
-            InitialNaming.bind(KeyboardLayoutManager.NAME, mgr);
+        	PluginDescriptor descriptor = getDescriptor();
+        	
+        	KeyboardLayoutManager klmgr = new KeyboardLayoutManager(descriptor.getExtensionPoint("keyboard-layouts"));
+            InitialNaming.bind(KeyboardLayoutManager.NAME, klmgr);
+            
+            MouseProtocolHandlerManager mphmgr = new MouseProtocolHandlerManager(descriptor.getExtensionPoint("mouse-protocol-handlers"));
+            InitialNaming.bind(MouseProtocolHandlerManager.NAME, mphmgr);
         } catch (NamingException ex) {
             throw new PluginException(ex);
         }

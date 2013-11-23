@@ -21,17 +21,19 @@
 package org.jnode.driver.input;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.channels.ByteChannel;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceException;
+import org.jnode.driver.DeviceInfoAPI;
 import org.jnode.driver.DriverException;
 
 /**
  * @author qades
  */
-public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerEvent> implements PointerAPI {
+public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerEvent> implements PointerAPI, DeviceInfoAPI {
 
     /**
      * My logger
@@ -75,6 +77,7 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
         // start the deamon anyway, so we can register a mouse later
         startDispatcher(id);
         dev.registerAPI(PointerAPI.class, this);
+        dev.registerAPI(DeviceInfoAPI.class, this);
     }
 
     protected PointerEvent handleScancode(byte scancode) {
@@ -152,6 +155,19 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
         if (interpreter == null)
             throw new NullPointerException();
         this.interpreter = interpreter;
+    }
+
+    /**
+     * Show all information of this device to the given writer.
+     *
+     * @param out
+     */
+    public void showInfo(PrintWriter out) {
+    	if (interpreter != null) {
+    		interpreter.showInfo(out);
+    	} else {
+    		out.println("No pointer interpreter registered.");
+    	}
     }
 
     protected abstract int getPointerId() throws DriverException;
