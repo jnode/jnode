@@ -28,6 +28,7 @@
 
     <requires>
         <import plugin="org.junit"/>
+        <import plugin="org.jnode.driver.input"/>
     </requires>
 
     <runtime>
@@ -41,6 +42,7 @@
     </runtime>
 
     <extension point="org.jnode.shell.aliases">
+        <alias name="PointerTest" class="org.jnode.test.PointerTest"/>
         <alias name="TestSecurityManager" class="org.jnode.test.security.TestSecurityManager"/>
     </extension>
 
