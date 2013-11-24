@@ -157,7 +157,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
         int limit = Math.min(length, scrWidth - curX) - 1;
         for (int i = 0; i < length; i++) {
             char c = v[i + offset];
-            if (c == '\n' || c == '\b' || c == '\t' || i == limit) {
+            if (c == '\n' || c == '\r' || c == '\b' || c == '\t' || i == limit) {
                 // The current run ends now.  First, output all but 'c' directly to the
                 // current screen line, adjusting curX and curY when we're done.
                 final int ln = i - mark;
@@ -170,7 +170,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
                     }
                 }
                 // Then output 'c' using doPutChar.  This knows how to deal with 
-                // '\n', '\b' and '\t', and adjusts curX and curY accordingly.
+                // '\n', '\r', '\b' and '\t', and adjusts curX and curY accordingly.
                 doPutChar(c, color);
                 // Finally update 'mark' and 'limit' for the next run of characters.
                 mark = i + 1;
@@ -199,6 +199,9 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
             screen.set(screen.getOffset(curX, curY), ' ', scrWidth - curX, color);
             curX = 0;
             curY++;
+		} else if (v == '\r') {
+			// Goto beginning line
+			curX = 0;
         } else if (v == '\b') {
             if (curX > 0) {
                 curX--;
