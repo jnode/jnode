@@ -87,6 +87,11 @@ public final class AttributeListBlock extends NTFSStructure {
             }
 
             int length = getUInt16(offset + 0x04);
+            if (length <= 0) {
+                log.error("Invalid attribute length, preventing infinite loop. Data on disk may be corrupt.");
+                return false;
+            }
+
             nextElement = new AttributeListEntry(AttributeListBlock.this, offset);
             log.debug(nextElement);
             offset += length;
