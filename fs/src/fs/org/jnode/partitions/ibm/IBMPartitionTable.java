@@ -193,6 +193,38 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
             return true;
         }
 
+        String bootSectorAsString = new String(bootSector, 0, 512, Charset.forName("US-ASCII"));
+
+        if (bootSectorAsString.contains(
+            "Invalid partition table\u0000Error loading operating system\u0000Missing operating system\u0000")) {
+            // Matches Microsoft partition boot code error message signature
+            // see http://thestarman.pcministry.com/asm/mbr/VistaMBR.htm
+            log.debug("Has Microsft code error string signature");
+            return true;
+        }
+
+        if (bootSectorAsString.contains("Read\u0000Boot\u0000 error\r\n\u0000")) {
+            // Matches BSD partition boot code error message signature
+            // see http://thestarman.pcministry.com/asm/mbr/VistaMBR.htm
+            log.debug("Has BSD code error string signature");
+            return true;
+        }
+
+        if (LittleEndian.getUInt32(bootSector, 241) == 0x41504354) {
+            // Matches TCPA signature
+            // see http://thestarman.pcministry.com/asm/mbr/VistaMBR.htm
+            log.debug("Has TCPA extra signature");
+            return true;
+        }
+
+        String bsdNameTabString = new String(bootSector, 416, 16, Charset.forName("US-ASCII"));
+
+        if (bsdNameTabString.contains("Linu\ufffd") || bsdNameTabString.contains("FreeBD\ufffd")) {
+            // Matches BSD nametab entries signature
+            log.debug("Has BSD nametab entries");
+            return true;
+        }
+
         // Check if this looks like a filesystem instead of a partition table
         String oemName = new String(bootSector, 3, 8, Charset.forName("US-ASCII"));
         if (FILESYSTEM_OEM_NAMES.contains(oemName)) {
