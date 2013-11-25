@@ -36,6 +36,7 @@ import org.jnode.util.NumberUtils;
 
 /**
  * MFT file record structure.
+ *
  * @author Chira
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Daniel Noll (daniel@noll.id.au) (new attribute iteration support)
@@ -69,10 +70,11 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Initialize this instance.
-     * @param volume reference to the NTFS volume.
+     *
+     * @param volume          reference to the NTFS volume.
      * @param referenceNumber the reference number of the file within the MFT.
-     * @param buffer data buffer.
-     * @param offset offset into the buffer.
+     * @param buffer          data buffer.
+     * @param offset          offset into the buffer.
      */
     public FileRecord(NTFSVolume volume, long referenceNumber, byte[] buffer, int offset) throws IOException {
         super(volume, buffer, offset);
@@ -85,6 +87,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Checks if the record appears to be valid.
+     *
      * @throws IOException if an error occurs.
      */
     public void checkIfValid() throws IOException {
@@ -118,6 +121,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Gets the allocated size of the FILE record in bytes.
+     *
      * @return Returns the allocated size.
      */
     public long getAllocatedSize() {
@@ -136,6 +140,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Gets the real size of the FILE record in bytes.
+     *
      * @return Returns the realSize.
      */
     public long getRealSize() {
@@ -144,6 +149,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Is this record in use?
+     *
      * @return {@code true} if the record is in use.
      */
     public boolean isInUse() {
@@ -152,6 +158,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Is this a directory?
+     *
      * @return {@code true} if the record is a directory.
      */
     public boolean isDirectory() {
@@ -160,6 +167,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Gets the hard link count.
+     *
      * @return Returns the hardLinkCount.
      */
     public int getHardLinkCount() {
@@ -168,6 +176,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Gets the byte offset to the first attribute in this mft record from the start of the mft record.
+     *
      * @return the first attribute offset.
      */
     public int getFirstAttributeOffset() {
@@ -176,6 +185,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Gets the flags.
+     *
      * @return Returns the flags.
      */
     public int getFlags() {
@@ -184,6 +194,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Gets the Next Attribute Id.
+     *
      * @return Returns the nextAttributeID.
      */
     public int getNextAttributeID() {
@@ -192,6 +203,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Gets the number of times this mft record has been reused.
+     *
      * @return Returns the sequenceNumber.
      */
     public int getSequenceNumber() {
@@ -201,6 +213,7 @@ public class FileRecord extends NTFSRecord {
     /**
      * Gets the reference number of this record within the MFT. This value is not actually stored in the record, but
      * passed in from the outside.
+     *
      * @return the reference number.
      */
     public long getReferenceNumber() {
@@ -218,6 +231,7 @@ public class FileRecord extends NTFSRecord {
      * Gets the stored reference number. This can be compared against the reference number to confirm that the correct
      * file record was returned, however it is not available on all versions of NTFS, and even on recent versions some
      * MFT records lack it.
+     *
      * @return the stored file reference number, or {@code -1} if it is not stored.
      */
     public long getStoredReferenceNumber() {
@@ -231,6 +245,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Gets the name of this file.
+     *
      * @return the filename.
      */
     public String getFileName() {
@@ -244,6 +259,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Gets the standard information attribute for this file record.
+     *
      * @return the standard information attribute.
      */
     public StandardInformationAttribute getStandardInformationAttribute() {
@@ -256,6 +272,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Gets the file name attribute for this file record.
+     *
      * @return the file name attribute.
      */
     public FileNameAttribute getFileNameAttribute() {
@@ -278,6 +295,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Gets the attributes stored in this file record.
+     *
      * @return an iterator over attributes stored in this file record.
      */
     public AttributeIterator getAllStoredAttributes() {
@@ -286,6 +304,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Finds a single stored attribute by ID.
+     *
      * @param id the ID.
      * @return the attribute found, or {@code null} if not found.
      */
@@ -302,6 +321,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Finds a single stored attribute by type.
+     *
      * @param typeID the type ID
      * @return the attribute found, or {@code null} if not found.
      * @see NTFSAttribute.Types
@@ -330,8 +350,10 @@ public class FileRecord extends NTFSRecord {
             try {
                 AttributeIterator iter;
                 if (attributeListAttribute == null) {
+                    log.debug("All attributes stored");
                     iter = getAllStoredAttributes();
                 } else {
+                    log.debug("Attributes in attribute list");
                     iter = new AttributeListAttributeIterator();
                 }
 
@@ -349,6 +371,7 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Gets the first attribute in this filerecord with a given type.
+     *
      * @param attrTypeID the type ID of the attribute we're looking for.
      * @return the attribute.
      */
@@ -385,8 +408,9 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Gets attributes in this filerecord with a given type and name.
+     *
      * @param attrTypeID the type ID of the attribute we're looking for.
-     * @param name the name to look for.
+     * @param name       the name to look for.
      * @return the attributes, will be empty if not found, never {@code null}.
      */
     public AttributeIterator findAttributesByTypeAndName(final int attrTypeID, final String name) {
@@ -411,7 +435,7 @@ public class FileRecord extends NTFSRecord {
      * Gets the total size used for the given attribute.
      *
      * @param attrTypeID the type of attribute to get the size for, e.g. {@link NTFSAttribute.Types#DATA}.
-     * @param name the name of the attribute or {@code null} for no name.
+     * @param name       the name of the attribute or {@code null} for no name.
      * @return the total size of the attribute.
      */
     public long getAttributeTotalSize(int attrTypeID, String name) {
@@ -440,10 +464,11 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Reads data from the file.
+     *
      * @param fileOffset the offset into the file.
-     * @param dest the destination byte array into which to copy the file data.
-     * @param off the offset into the destination byte array.
-     * @param len the number of bytes of data to read.
+     * @param dest       the destination byte array into which to copy the file data.
+     * @param off        the offset into the destination byte array.
+     * @param len        the number of bytes of data to read.
      * @throws IOException if an error occurs reading from the filesystem.
      */
     public void readData(long fileOffset, byte[] dest, int off, int len) throws IOException {
@@ -455,9 +480,9 @@ public class FileRecord extends NTFSRecord {
      * Reads data from the file.
      *
      * @param fileOffset the offset into the file.
-     * @param dest the destination byte array into which to copy the file data.
-     * @param off the offset into the destination byte array.
-     * @param len the number of bytes of data to read.
+     * @param dest       the destination byte array into which to copy the file data.
+     * @param off        the offset into the destination byte array.
+     * @param len        the number of bytes of data to read.
      * @throws IOException if an error occurs reading from the filesystem.
      */
     public void readData(String streamName, long fileOffset, byte[] dest, int off, int len) throws IOException {
@@ -593,10 +618,13 @@ public class FileRecord extends NTFSRecord {
                     if (entry.getFileReferenceNumber() == referenceNumber) {
                         holdingRecord = FileRecord.this;
                     } else {
+                        log.debug("Looking up MFT entry for: " + entry.getFileReferenceNumber());
                         holdingRecord = getVolume().getMFT().getRecord(entry.getFileReferenceNumber());
                     }
 
-                    return holdingRecord.findStoredAttributeByID(entry.getAttributeID());
+                    NTFSAttribute attribute = holdingRecord.findStoredAttributeByID(entry.getAttributeID());
+                    log.debug("Attribute: " + attribute);
+                    return attribute;
                 } catch (IOException e) {
                     throw new IllegalStateException("Error getting MFT or FileRecord for attribute in list, ref = 0x" +
                         Long.toHexString(entry.getFileReferenceNumber()), e);
@@ -625,6 +653,7 @@ public class FileRecord extends NTFSRecord {
                 return null;
             } else {
                 NTFSAttribute attribute = NTFSAttribute.getAttribute(FileRecord.this, offset);
+                log.debug("Attribute: " + attribute);
                 int offsetToNextOffset = getUInt32AsInt(offset + 0x04);
                 if (offsetToNextOffset <= 0) {
                     log.error("Non-positive offset, preventing infinite loop.  Data on disk may be corrupt.  "
@@ -643,6 +672,7 @@ public class FileRecord extends NTFSRecord {
      */
     private abstract class FilteredAttributeIterator extends AttributeIterator {
         private Iterator<NTFSAttribute> attributes;
+
         private FilteredAttributeIterator(Iterator<NTFSAttribute> attributes) {
             this.attributes = attributes;
         }
@@ -660,6 +690,7 @@ public class FileRecord extends NTFSRecord {
 
         /**
          * Implemented by subclasses to perform matching logic.
+         *
          * @param attr the attribute.
          * @return {@code true} if it matches, {@code false} otherwise.
          */

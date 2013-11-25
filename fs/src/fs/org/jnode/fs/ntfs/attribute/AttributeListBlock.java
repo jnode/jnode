@@ -88,6 +88,7 @@ public final class AttributeListBlock extends NTFSStructure {
 
             int length = getUInt16(offset + 0x04);
             nextElement = new AttributeListEntry(AttributeListBlock.this, offset);
+            log.debug(nextElement);
             offset += length;
             return true;
         }
