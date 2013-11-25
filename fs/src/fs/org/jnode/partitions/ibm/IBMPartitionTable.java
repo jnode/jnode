@@ -199,6 +199,12 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
             return false;
         }
 
+        if (LittleEndian.getUInt16(bootSector, 218) != 0) {
+            // This needs to be zero in the 'standard' MBR layout
+            log.debug("Fails standard MBR reserved@218=0 test");
+            return false;
+        }
+
         // Nothing matched, fall back to validating any specified partition entries
         log.debug("Checking partitions");
         IBMPartitionTableEntry lastValid = null;
