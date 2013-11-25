@@ -40,16 +40,21 @@ public class PointerTest {
 
     public static class MyListener implements PointerListener {
 
+    	private int x;
+    	private int y;
 
         /**
          * @see org.jnode.driver.input.PointerListener#pointerStateChanged(org.jnode.driver.input.PointerEvent)
          */
         public void pointerStateChanged(PointerEvent event) {
-            System.out.println(
-                "x,y,z abs: " + event.getX() + "," + event.getY() + "," + event.getZ() + " " + event.isAbsolute());
-            // TODO Auto-generated method stub
-
+        	
+        	int newX = event.isAbsolute() ? event.getX() : x + event.getX();
+        	int newY = event.isAbsolute() ? event.getY() : y + event.getY();
+        	
+        	x = Math.min(1024,  Math.max(0, newX));
+        	y = Math.min(768,  Math.max(0, newY));
+        	
+            System.out.print("x,y dx,dy,z abs: " + x + ", " + y + "  (" + event.getX() + "," + event.getY() + "," + event.getZ() + " " + event.isAbsolute() + ")\n");
         }
-
     }
 }

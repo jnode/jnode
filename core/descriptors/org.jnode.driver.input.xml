@@ -25,7 +25,7 @@
         version="@VERSION@"
         license-name="lgpl"
         provider-name="JNode.org"
-        class="org.jnode.driver.input.KeyboardInputPlugin">
+        class="org.jnode.driver.input.InputPlugin">
         
   <requires>
     <import plugin="org.jnode.driver.character"/>
@@ -38,10 +38,16 @@
   </runtime>
   
   <extension-point id="keyboard-layouts" name="Standard keyboard layout identifier mappings"/>
+  <extension-point id="mouse-protocol-handlers" name="Mouse protocol handler implementations"/>
         
   <extension point="org.jnode.security.permissions">
     <permission class="org.jnode.driver.DriverPermission" name="setPreferredListener"/>
     <permission class="java.lang.RuntimePermission" name="setIO"/>
+  </extension>
+
+  <extension point="org.jnode.driver.input.mouse-protocol-handlers">
+    <handler class="org.jnode.driver.input.LogitechWheelMouseProtocol" name="Logitech Wheel Mouse"/>
+    <handler class="org.jnode.driver.input.LogitechProtocol" name="Logitech Mouse"/>
   </extension>
         
 </plugin>

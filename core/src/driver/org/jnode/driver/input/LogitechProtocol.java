@@ -28,6 +28,7 @@ public class LogitechProtocol implements MouseProtocolHandler {
     static final int BIT_BUTTON_MASK = BIT_LEFT | BIT_RIGHT | BIT_MIDDLE;
     static final int BIT_X_SIGN = 0x10;
     static final int BIT_Y_SIGN = 0x20;
+    static final int BITS_XY_OVFL = 0x40 | 0x80;
 
     public boolean supportsId(int id) {
         return id == 0;
@@ -45,21 +46,15 @@ public class LogitechProtocol implements MouseProtocolHandler {
         final int d0 = data[0] & 0xFF;
         final int d1 = data[1] & 0xFF;
         final int d2 = data[2] & 0xFF;
-
+        
+        // In case of overflow, discard this packet
+        if ((d0 & BITS_XY_OVFL) != 0)
+        	return null;
+        
         final int buttons = d0 & BIT_BUTTON_MASK;
-        final int x;
-        final int y;
-        if ((d0 & BIT_X_SIGN) != 0) {
-            x = d1 - 256;
-        } else {
-            x = d1;
-        }
-        if ((d0 & BIT_Y_SIGN) != 0) {
-            y = d2 - 256;
-        } else {
-            y = d2;
-        }
-
-        return new PointerEvent(buttons, x, -y, PointerEvent.RELATIVE);
+        final int x = (d1 != 0) ? d1 - ((d0 & BIT_X_SIGN) << 4) : 0;
+        final int y = (d2 != 0) ? ((d0 & BIT_Y_SIGN) << 3) - d2 : 0;
+        
+        return new PointerEvent(buttons, x, y, PointerEvent.RELATIVE);
     }
 }

@@ -21,17 +21,19 @@
 package org.jnode.driver.input;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.channels.ByteChannel;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceException;
+import org.jnode.driver.DeviceInfoAPI;
 import org.jnode.driver.DriverException;
 
 /**
  * @author qades
  */
-public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerEvent> implements PointerAPI {
+public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerEvent> implements PointerAPI, DeviceInfoAPI {
 
     /**
      * My logger
@@ -75,6 +77,7 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
         // start the deamon anyway, so we can register a mouse later
         startDispatcher(id);
         dev.registerAPI(PointerAPI.class, this);
+        dev.registerAPI(DeviceInfoAPI.class, this);
     }
 
     protected PointerEvent handleScancode(byte scancode) {
@@ -88,7 +91,7 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
     protected PointerInterpreter createInterpreter() {
         log.debug("createInterpreter");
         try {
-            initPointer(); // bring mouse into stable state
+            initPointer(true); // bring mouse into stable state
         } catch (DeviceException ex) {
             log.error("Cannot initialize pointer", ex);
             return null;
@@ -154,14 +157,53 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
         this.interpreter = interpreter;
     }
 
+    /**
+     * Show all information of this device to the given writer.
+     *
+     * @param out
+     */
+    public void showInfo(PrintWriter out) {
+    	if (interpreter != null) {
+    		interpreter.showInfo(out);
+    	} else {
+    		out.println("No pointer interpreter registered.");
+    	}
+    }
+
+    /**
+     * Gets the ID of the pointer device.
+     * @return
+     * @throws DriverException
+     */
     protected abstract int getPointerId() throws DriverException;
 
-    protected abstract boolean initPointer() throws DeviceException;
+    /**
+     * Initialize the pointer to it's default values.
+     * @return
+     * @throws DeviceException
+     */
+    protected abstract boolean initPointer(boolean reset) throws DeviceException;
 
+    /**
+     * Enable pointer events
+     * @return
+     * @throws DeviceException
+     */
     protected abstract boolean enablePointer() throws DeviceException;
 
+    /**
+     * Disable pointer events
+     * @return
+     * @throws DeviceException
+     */
     protected abstract boolean disablePointer() throws DeviceException;
 
+    /**
+     * Set the sample rate (number of packets the mouse can send per second)
+     * @param samples
+     * @return
+     * @throws DeviceException
+     */
     protected abstract boolean setRate(int samples) throws DeviceException;
 
 }

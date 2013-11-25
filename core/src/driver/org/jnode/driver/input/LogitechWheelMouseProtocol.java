@@ -36,6 +36,7 @@ public class LogitechWheelMouseProtocol extends LogitechProtocol {
 
     public PointerEvent buildEvent(byte[] data) {
         PointerEvent e = super.buildEvent(data);
+        if (e == null) return null;
 
         int z = data[3];
         if (z == 127) z = -1; //todo test this on more hardware
