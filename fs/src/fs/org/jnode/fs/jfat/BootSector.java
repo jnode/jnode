@@ -113,8 +113,8 @@ public class BootSector {
         dirty = false;
     }
 
-    public boolean isaValidBootSector() {
-        return IBMPartitionTable.containsPartitionTable(sector);
+    public boolean isaValidBootSector(boolean allowEmptyPartitionTable) {
+        return IBMPartitionTable.containsPartitionTable(sector, allowEmptyPartitionTable);
     }
 
     public synchronized void read(BlockDeviceAPI device) throws IOException {

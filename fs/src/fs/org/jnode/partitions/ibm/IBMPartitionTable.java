@@ -69,7 +69,7 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
         // this.bootSector = bootSector;
         this.tableType = tableType;
         this.drivedDevice = device;
-        if (containsPartitionTable(bootSector)) {
+        if (containsPartitionTable(bootSector, false)) {
             this.partitions = new IBMPartitionTableEntry[TABLE_SIZE];
             for (int partNr = 0; partNr < partitions.length; partNr++) {
                 log.debug("try part " + partNr);
@@ -129,9 +129,10 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
      * Does the given boot sector contain an IBM partition table?
      * 
      * @param bootSector the data to check.
+     * @param allowEmptyTable If set, we accept an empty partition table
      * @return {@code true} if the data contains an IBM partition table, {@code false} otherwise.
      */
-    public static boolean containsPartitionTable(byte[] bootSector) {
+    public static boolean containsPartitionTable(byte[] bootSector, boolean allowEmptyTable) {
         if (LittleEndian.getUInt16(bootSector, 510) != 0xaa55) {
         	log.debug("No aa55 magic");
             return false;
@@ -181,7 +182,7 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
             }
         }
 
-        return foundValidEntry;
+        return foundValidEntry || allowEmptyTable;
     }
 
     public Iterator<IBMPartitionTableEntry> iterator() {
