@@ -97,7 +97,7 @@ public interface PCI_IDs {
 
     public static final int PCI_VENDOR_ID_VMWARE = 0x15ad;
     public static final int PCI_DEVICE_ID_VMWARE_SVGA = 0x0710;
-    public static final int PCI_DEVICE_ID_VMWARE_SVGA1 = 0x0405;
+    public static final int PCI_DEVICE_ID_VMWARE_SVGA2 = 0x0405;
 
     public static final int PCI_VENDOR_ID_NVIDIA = 0x10de;
     public static final int PCI_DEVICE_ID_NVIDIA_VANTA = 0x002c;

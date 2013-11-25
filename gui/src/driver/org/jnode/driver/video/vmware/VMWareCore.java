@@ -29,6 +29,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.DirectColorModel;
 import java.awt.image.Raster;
+import java.io.PrintWriter;
 import java.security.PrivilegedExceptionAction;
 
 import javax.naming.NameNotFoundException;
@@ -67,7 +68,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
     private final int indexPort;
     private final int valuePort;
     private final IOResource ports;
-    private final MemoryResource fifo;
+    private final MemoryResource fifoMem;
     private final MemoryResource videoRam;
     private final int videoRamSize;
     private final int maxWidth;
@@ -82,13 +83,15 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
     private final int blueMaskShift;
     private final int alphaMaskShift;
     private final int capabilities;
+    private final int fifoCapabilities;
+    private final int deviceId;
     private int bytesPerLine;
     private int offset;
     private int displayWidth;
     private boolean fifoDirty = false;
     private BitmapGraphics bitmapGraphics;
     private ColorModel model;
-    private static final int MOUSE_ID = 1;
+    private static final int MOUSE_ID = 0;
     private int curX;
     private int curY;
     private boolean curVisible;
@@ -118,27 +121,41 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
                 " and 0x" + NumberUtils.hex(valuePort));
 
         try {
+        	// Allocate IO register space
             final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
             ports = claimPorts(rm, device, basePort, SVGA_NUM_PORTS * 4);
-            final int id = getVMWareID();
-            if (id == SVGA_ID_0 || id == SVGA_ID_INVALID) {
+            
+            // Detect deviceID
+            deviceId = getVMWareID();
+            if (deviceId == SVGA_ID_0 || deviceId == SVGA_ID_INVALID) {
                 dumpState();
                 throw new DriverException("No supported VMWare SVGA found, found id 0x" +
-                        NumberUtils.hex(id));
+                        NumberUtils.hex(deviceId));
             } else {
-                log.debug("VMWare SVGA ID: 0x" + NumberUtils.hex(id));
+                log.debug("VMWare SVGA ID: 0x" + NumberUtils.hex(deviceId));
             }
-            fifo = initFifo(device, rm);
+            
+            // Initialize and start FIFO
+            fifoMem = initFifo(device, rm);
+            
+            // Read info
             this.capabilities = getReg32(SVGA_REG_CAPABILITIES);
+          	this.fifoCapabilities = hasCapability(SVGA_CAP_EXTENDED_FIFO) ? getFIFO(SVGA_FIFO_CAPABILITIES) : 0;
             this.videoRamSize = getReg32(SVGA_REG_FB_MAX_SIZE);
-            final int videoRamBase = getReg32(SVGA_REG_FB_START);
             this.maxWidth = getReg32(SVGA_REG_MAX_WIDTH);
             this.maxHeight = getReg32(SVGA_REG_MAX_HEIGHT);
             final int bitsPerPixel = getReg32(SVGA_REG_BITS_PER_PIXEL);
             this.bytesPerLine = getReg32(SVGA_REG_BYTES_PER_LINE);
-            this.videoRam =
-                    rm.claimMemoryResource(device, Address.fromIntZeroExtend(videoRamBase),
-                            videoRamSize, ResourceManager.MEMMODE_NORMAL);
+
+            // Allocate framebuffer memory
+            final Address videoRamAddr;
+            if (device.getConfig().getDeviceID() == PCI_DEVICE_ID_VMWARE_SVGA2) {
+            	videoRamAddr = Address.fromLong(device.getConfig().asHeaderType0().getBaseAddresses()[1].getMemoryBase());
+            } else {
+            	videoRamAddr = Address.fromIntZeroExtend(SVGA_REG_FB_START);            
+            	
+            }
+            this.videoRam = rm.claimMemoryResource(device, videoRamAddr, videoRamSize, ResourceManager.MEMMODE_NORMAL);
             this.bitsPerPixel = bitsPerPixel;
             switch (bitsPerPixel) {
                 case 8:
@@ -188,7 +205,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
      */
     public final void release() {
         ports.release();
-        fifo.release();
+        fifoMem.release();
         videoRam.release();
     }
 
@@ -374,20 +391,42 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
      * @param mode
      */
     public final void fillRect(int x, int y, int width, int height, int color, int mode) {
-        //bitmapGraphics.fillRect(x, y, width, height, color, mode);
-        super.fillRect(x, y, width, height, color, mode);
-        // todo optimize it
-        /*
-         * if (x < 0) { width = Math.max(0, x + width); x = 0; } if (y < 0) {
-         * height = Math.max(0, y + height); y = 0; } if ((width > 0) && (height >
-         * 0)) { if (mode == Surface.XOR_MODE) {
-         * writeWordToFIFO(SVGA_CMD_RECT_ROP_FILL); writeWordToFIFO(color);
-         * writeWordToFIFO(x); writeWordToFIFO(y); writeWordToFIFO(width);
-         * writeWordToFIFO(height); writeWordToFIFO(SVGA_ROP_XOR); } else {
-         * writeWordToFIFO(SVGA_CMD_RECT_FILL); writeWordToFIFO(color);
-         * writeWordToFIFO(x); writeWordToFIFO(y); writeWordToFIFO(width);
-         * writeWordToFIFO(height); } }
-         */
+		if (x < 0) {
+			width = Math.max(0, x + width);
+			x = 0;
+		}
+		if (y < 0) {
+			height = Math.max(0, y + height);
+			y = 0;
+		}
+		if ((width <= 0) || (height <= 0))
+			return;
+
+		if (mode == Surface.XOR_MODE) {
+			if (hasCapability(SVGA_CAP_RASTER_OP)) {
+				writeWordToFIFO(SVGA_CMD_RECT_ROP_FILL);
+				writeWordToFIFO(color);
+				writeWordToFIFO(x);
+				writeWordToFIFO(y);
+				writeWordToFIFO(width);
+				writeWordToFIFO(height);
+				writeWordToFIFO(SVGA_ROP_XOR);
+				return;
+			}
+		} else /* Paint mode */{
+			if (hasCapability(SVGA_CAP_RECT_FILL)) {
+				writeWordToFIFO(SVGA_CMD_RECT_FILL);
+				writeWordToFIFO(color);
+				writeWordToFIFO(x);
+				writeWordToFIFO(y);
+				writeWordToFIFO(width);
+				writeWordToFIFO(height);
+				return;
+			}
+		}
+
+		// bitmapGraphics.fillRect(x, y, width, height, color, mode);
+		super.fillRect(x, y, width, height, color, mode);
     }
 
     /**
@@ -520,7 +559,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
     }
 
     /**
-     * Gets the contents of a 32-bit register
+     * Gets the contents of a 32-bit SVGA register
      * 
      * @param index
      * @return
@@ -531,7 +570,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
     }
 
     /**
-     * Sets the contents of a 32-bit register
+     * Sets the contents of a 32-bit SVGA register
      * 
      * @param index
      * @param value
@@ -552,19 +591,23 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
         // Integer.toHexString(nValue) + ") pos: "
         // + ReadFIFO (SVGA_FIFO_NEXT_CMD));
         /* Need to sync? */
-        if ((getFIFO(SVGA_FIFO_NEXT_CMD) + 4 == getFIFO(SVGA_FIFO_STOP)) ||
-                (getFIFO(SVGA_FIFO_NEXT_CMD) == getFIFO(SVGA_FIFO_MAX) - 4 &&
-                    getFIFO(SVGA_FIFO_STOP) == getFIFO(SVGA_FIFO_MIN))) {
+        
+        final int fifoMin = getFIFO(SVGA_FIFO_MIN);
+        final int fifoMax = getFIFO(SVGA_FIFO_MAX);
+        final int fifoNextCmd = getFIFO(SVGA_FIFO_NEXT_CMD);
+        
+        if ((fifoNextCmd + 4 == getFIFO(SVGA_FIFO_STOP)) ||
+                (fifoNextCmd == (fifoMax - 4) && getFIFO(SVGA_FIFO_STOP) == fifoMin)) {
             log.debug("VMWare::WriteWordToFIFO() syncing FIFO");
             setReg32(SVGA_REG_SYNC, 1);
             while (getReg32(SVGA_REG_BUSY) != 0) {
                 Thread.yield();
             }
         }
-        setFIFO(getFIFO(SVGA_FIFO_NEXT_CMD) / 4, value);
-        setFIFO(SVGA_FIFO_NEXT_CMD, getFIFO(SVGA_FIFO_NEXT_CMD) + 4);
-        if (getFIFO(SVGA_FIFO_NEXT_CMD) == getFIFO(SVGA_FIFO_MAX)) {
-            setFIFO(SVGA_FIFO_NEXT_CMD, getFIFO(SVGA_FIFO_MIN));
+        setFIFO(fifoNextCmd / 4, value);
+        setFIFO(SVGA_FIFO_NEXT_CMD, fifoNextCmd + 4);
+        if (getFIFO(SVGA_FIFO_NEXT_CMD) == fifoMax) {
+            setFIFO(SVGA_FIFO_NEXT_CMD, fifoMin);
         }
     }
 
@@ -588,7 +631,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
      * @return
      */
     private final int getFIFO(int index) {
-        return fifo.getInt(index * 4);
+        return fifoMem.getInt(index * 4);
     }
 
     /**
@@ -598,7 +641,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
      * @param value
      */
     private final void setFIFO(int index, int value) {
-        fifo.setInt(index * 4, value);
+        fifoMem.setInt(index * 4, value);
     }
 
     /**
@@ -676,21 +719,26 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
      * @param rm
      * @return
      */
-    private final MemoryResource initFifo(ResourceOwner owner, ResourceManager rm)
+    private final MemoryResource initFifo(PCIDevice device, ResourceManager rm)
         throws ResourceNotFreeException {
-        final int physBase = getReg32(SVGA_REG_MEM_START);
         final int size = getReg32(SVGA_REG_MEM_SIZE);
-        final Address address = Address.fromIntZeroExtend(physBase);
+        final Address address;
 
-        log.debug("Found FIFO at 0x" + NumberUtils.hex(physBase) + ", size 0x" +
-                NumberUtils.hex(size));
+        if (device.getConfig().getDeviceID() == PCI_DEVICE_ID_VMWARE_SVGA2) {
+        	address = Address.fromLong(device.getConfig().asHeaderType0().getBaseAddresses()[2].getMemoryBase());
+        } else {
+            final int physBase = getReg32(SVGA_REG_MEM_START);        	
+            address = Address.fromIntZeroExtend(physBase);
+        }
+        
+        log.debug("Found FIFO at 0x" + NumberUtils.hex(address.toInt()) + ", size 0x" + NumberUtils.hex(size));
 
-        final MemoryResource res =
-                rm.claimMemoryResource(owner, address, size, ResourceManager.MEMMODE_NORMAL);
-        res.setInt(SVGA_FIFO_MIN * 4, 16);
+        final MemoryResource res = rm.claimMemoryResource(device, address, size, ResourceManager.MEMMODE_NORMAL);
+        final int fifoMin = SVGA_FIFO_NUM_REGS * 4;
+        res.setInt(SVGA_FIFO_MIN * 4, fifoMin);
         res.setInt(SVGA_FIFO_MAX * 4, size);
-        res.setInt(SVGA_FIFO_NEXT_CMD * 4, 16);
-        res.setInt(SVGA_FIFO_STOP * 4, 16);
+        res.setInt(SVGA_FIFO_NEXT_CMD * 4, fifoMin);
+        res.setInt(SVGA_FIFO_STOP * 4, fifoMin);
         setReg32(SVGA_REG_CONFIG_DONE, 1);
 
         return res;
@@ -786,6 +834,14 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
             defineCursor(cursor.getImage(20, 20));
         }
     }
+    
+	private static int SVGA_BITMAP_SIZE(int w, int h) {
+		return ((((w) + 31) >> 5) * (h));
+	}
+
+	private static int SVGA_PIXMAP_SIZE(int w, int h, int bpp) {
+		return (((((w) * (bpp)) + 31) >> 5) * (h));
+	}
 
     /**
      * Sets the cursor image.
@@ -793,7 +849,17 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
     private void defineCursor(HardwareCursorImage cursor) {
 
         final int[] argb = cursor.getImage();
-        final int size = argb.length;
+        final int width = cursor.getWidth();
+        final int height = cursor.getHeight();
+        final int bpp = getBitsPerPixel();
+
+        final int size = width * height;
+        if (argb.length != size)
+        	throw new IllegalArgumentException("argb.length != width*height");
+
+        final int bmSize = SVGA_BITMAP_SIZE(width, height);
+        final int pmSize = SVGA_PIXMAP_SIZE(width, height, bpp);
+
         final int[] andMask = new int[size];
         final int[] xorMask = new int[size];
 
@@ -816,7 +882,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 
         // Wait for the FIFO
         syncFIFO();
-
+               
         // Command
         writeWordToFIFO(SVGA_CMD_DEFINE_CURSOR);
         // Mouse id
@@ -826,19 +892,19 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
         // Hotspot Y
         writeWordToFIFO(cursor.getHotSpotY());
         // Width
-        writeWordToFIFO(cursor.getWidth());
+        writeWordToFIFO(width);
         // Height
-        writeWordToFIFO(cursor.getHeight());
+        writeWordToFIFO(height);
         // Depth for AND mask
         writeWordToFIFO(1);
         // Depth for XOR mask
-        writeWordToFIFO(getBitsPerPixel());
+        writeWordToFIFO(bpp);
         // Scanlines for AND mask
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < bmSize; i++) {
             writeWordToFIFO(andMask[i]);
         }
         // Scanlines for XOR mask
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < pmSize; i++) {
             writeWordToFIFO(xorMask[i]);
         }
     }
@@ -849,7 +915,10 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
     private void defineARGBCursor(HardwareCursorImage cursor) {
 
         final int[] argb = cursor.getImage();
-        final int size = argb.length;
+        final int size = cursor.getWidth() * cursor.getHeight();
+        
+        if (argb.length != size)
+        	throw new IllegalArgumentException("argb.length != width*height");
 
         // Wait for the FIFO
         syncFIFO();
@@ -866,10 +935,6 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
         writeWordToFIFO(cursor.getWidth());
         // Height
         writeWordToFIFO(cursor.getHeight());
-        // Depth for AND mask
-        writeWordToFIFO(1);
-        // Depth for XOR mask
-        writeWordToFIFO(getBitsPerPixel());
         // Scanlines
         for (int i = 0; i < size; i++) {
             writeWordToFIFO(argb[i]);
@@ -879,6 +944,10 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
     private void defineCursor() {
         // Wait for the FIFO
         syncFIFO();
+        
+        final int width = 4;
+        final int height = 4;
+        final int bpp = getBitsPerPixel();
 
         // Command
         writeWordToFIFO(SVGA_CMD_DEFINE_CURSOR);
@@ -889,19 +958,21 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
         // Hotspot Y
         writeWordToFIFO(0);
         // Width
-        writeWordToFIFO(2);
+        writeWordToFIFO(width);
         // Height
-        writeWordToFIFO(2);
+        writeWordToFIFO(height);
         // Depth for AND mask
         writeWordToFIFO(1);
         // Depth for XOR mask
-        writeWordToFIFO(1);
+        writeWordToFIFO(bpp);
         // Scanlines for AND mask
-        for (int i = 0; i < 4; i++) {
+        final int bmSize = SVGA_BITMAP_SIZE(width, height);
+        for (int i = 0; i < bmSize; i++) {
             writeWordToFIFO(0);
         }
         // Scanlines for XOR mask
-        for (int i = 0; i < 4; i++) {
+        final int pmSize = SVGA_PIXMAP_SIZE(width, height, bpp);
+        for (int i = 0; i < pmSize; i++) {
             writeWordToFIFO(0xFFFFFF);
         }
         syncFIFO();
@@ -909,27 +980,49 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
     }
 
     private void setCursor(boolean visible, int x, int y) {
-        setReg32(SVGA_REG_CURSOR_ID, MOUSE_ID);
-        if (visible) {
-            if (hasCapability(SVGA_CAP_CURSOR_BYPASS)) {
-                // System.out.println("bypass " + x + ", " + y);
-                setReg32(SVGA_REG_CURSOR_X, x);
-                setReg32(SVGA_REG_CURSOR_Y, y);
-            } else {
-                // System.out.println("move " + x + ", " + y);
-                syncFIFO();
-                writeWordToFIFO(SVGA_CMD_MOVE_CURSOR);
-                writeWordToFIFO(x);
-                writeWordToFIFO(y);
-            }
-        }
-        setReg32(SVGA_REG_CURSOR_ON, visible ? 1 : 0);
+		if (hasFIFOCapability(SVGA_FIFO_CAP_CURSOR_BYPASS_3)) {
+			setFIFO(SVGA_FIFO_CURSOR_ON, visible ? 1 : 0);
+			setFIFO(SVGA_FIFO_CURSOR_X, x);
+			setFIFO(SVGA_FIFO_CURSOR_Y, y);
+			setFIFO(SVGA_FIFO_CURSOR_COUNT, getFIFO(SVGA_FIFO_CURSOR_COUNT) + 1);
+		} else {
+			setReg32(SVGA_REG_CURSOR_ID, MOUSE_ID);
+			if (visible) {
+				if (hasCapability(SVGA_CAP_CURSOR)) {
+					if (hasCapability(SVGA_CAP_CURSOR_BYPASS)) { //
+						//System.out.println("bypass " + x + ", " + y);
+						setReg32(SVGA_REG_CURSOR_X, x);
+						setReg32(SVGA_REG_CURSOR_Y, y);
+					} else { // System.out.println("move " + x + ", " + y);
+						syncFIFO();
+						writeWordToFIFO(SVGA_CMD_MOVE_CURSOR);
+						writeWordToFIFO(x);
+						writeWordToFIFO(y);
+					}
+				}
+
+			}
+			setReg32(SVGA_REG_CURSOR_ON, visible ? 1 : 0);
+		}
     }
 
+    /**
+     * Check whether the SVGA device has a particular capability bits.
+     */
     private boolean hasCapability(int cap) {
         return ((this.capabilities & cap) == cap);
     }
+    
+    /**
+     * Check whether the SVGA device has a particular FIFO capability bits.
+     */
+    private boolean hasFIFOCapability(int fifoCap) {
+    	return (fifoCapabilities & fifoCap) == fifoCap;
+    }
 
+    /**
+     * Claim an IO port range.
+     */
     private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner,
             final int low, final int length) throws ResourceNotFreeException, DriverException {
         try {
@@ -971,4 +1064,15 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
         syncFIFO();
         updateScreen(x, y, width, height);
     }
+
+	public void showInfo(PrintWriter out) {
+		out.println("Capabilities : " + NumberUtils.hex(capabilities));
+		out.println("FIFO Capabil.: " + NumberUtils.hex(fifoCapabilities));
+		out.println("Bit/pixel    : " + bitsPerPixel);
+		
+		out.println("FIFO_MIN     : " + NumberUtils.hex(getFIFO(SVGA_FIFO_MIN)));
+		out.println("FIFO_MAX     : " + NumberUtils.hex(getFIFO(SVGA_FIFO_MAX)));
+		out.println("FIFO_NEXT_CMD: " + NumberUtils.hex(getFIFO(SVGA_FIFO_NEXT_CMD)));
+		out.println("FIFO_STOP    : " + NumberUtils.hex(getFIFO(SVGA_FIFO_STOP)));
+	}
 }
