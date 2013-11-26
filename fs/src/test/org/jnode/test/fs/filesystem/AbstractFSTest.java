@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem;
 
 import java.io.IOException;
@@ -26,11 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.naming.NameNotFoundException;
-
 import junit.framework.TestCase;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.emu.naming.BasicNameSpace;
@@ -80,11 +77,11 @@ public abstract class AbstractFSTest extends TestCase {
     public static List<FSTestConfig[]> getData() {
         List<FSTestConfig[]> config = new ArrayList<FSTestConfig[]>();
         for (FSTestConfig cfg : new FSConfigurations()) {
-            config.add(new FSTestConfig[] {cfg});
+            config.add(new FSTestConfig[]{cfg});
         }
         return config;
     }
-    
+
     /**
      *
      */
@@ -268,5 +265,9 @@ public abstract class AbstractFSTest extends TestCase {
         remountFS(config, oldReadOnly);
 
         return data.array();
+    }
+
+    protected void assertSize(String message, long expectedSize, long currentSize) {
+        assertEquals(message, Long.valueOf(expectedSize), Long.valueOf(currentSize));
     }
 }

@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem.tests;
 
 import java.nio.ByteBuffer;
@@ -60,7 +60,7 @@ public class FileFSTest extends AbstractFSTest {
             file.write(0, data);
             file.flush();
 
-            assertEquals("bad file.length after write", data.capacity(), file.getLength());
+            assertSize("bad file.length after write", data.capacity(), file.getLength());
         }
 
         remountFS(config, config.isReadOnly());
@@ -69,7 +69,7 @@ public class FileFSTest extends AbstractFSTest {
             FSDirectory rootDir2 = getFs().getRootEntry().getDirectory();
             FSFile file2 = rootDir2.getEntry(fileName).getFile();
             assertNotNull("file not saved", file2);
-            assertEquals("bad file.length after remount", data.capacity(), file2.getLength());
+            assertSize("bad file.length after remount", data.capacity(), file2.getLength());
 
             ByteBuffer data2 = ByteBuffer.allocate(data.capacity());
             log.debug(
@@ -120,14 +120,15 @@ public class FileFSTest extends AbstractFSTest {
             } catch (ReadOnlyFileSystemException rofse) {
                 // success
             }
-            assertEquals("setLength mustn't change size in readOnly mode", data.length, file.getLength());
+            assertEquals("setLength mustn't change size in readOnly mode", String.valueOf(data.length),
+                String.valueOf(file.getLength()));
         } else {
             /*byte[] data =*/
             addTestFile(fileName, FILE_SIZE_IN_WORDS);
 
             FSFile file = getFs().getRootEntry().getDirectory().getEntry(fileName).getFile();
             file.setLength(newSize);
-            assertEquals("setLength must change size", newSize, file.getLength());
+            assertSize("setLength must change size", newSize, file.getLength());
         }
     }
 }
