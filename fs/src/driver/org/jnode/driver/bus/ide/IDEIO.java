@@ -177,12 +177,9 @@ public interface IDEIO extends IDEConstants {
     public boolean isBusy();
 
     /**
-     * Block the current thread until the controller is not busy anymore.
-     *
-     * @param timeout
-     * @throws TimeoutException
+     * Block the current thread until the status of the controller masked by the given mask equals value.
      */
-    public void waitUntilNotBusy(long timeout) throws TimeoutException;
+    public void waitUntilStatus(int mask, int value, long timeout, String message) throws TimeoutException;
 
     /**
      * @return Returns the irq.
