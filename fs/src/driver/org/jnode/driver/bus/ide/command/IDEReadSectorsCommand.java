@@ -26,7 +26,9 @@ import org.apache.log4j.Logger;
 import org.jnode.driver.block.ide.disk.IDEDiskDriver;
 import org.jnode.driver.bus.ide.IDEBus;
 import org.jnode.driver.bus.ide.IDEIO;
+import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
+import org.jnode.vm.Unsafe;
 
 /**
  * @author epr
@@ -34,6 +36,8 @@ import org.jnode.util.TimeoutException;
  */
 public class IDEReadSectorsCommand extends IDERWSectorsCommand {
     private final ByteBuffer buf;
+
+    private static final Logger log = Logger.getLogger(IDEReadSectorsCommand.class);
 
     private int readSectors = 0;
 
@@ -60,19 +64,23 @@ public class IDEReadSectorsCommand extends IDERWSectorsCommand {
      * @see org.jnode.driver.bus.ide.IDECommand#handleIRQ(IDEBus, IDEIO)
      */
     protected void handleIRQ(IDEBus ide, IDEIO io) {
-        final int state = io.getStatusReg();
+        final int state = io.getStatusReg(); // Read status, flush IRQ
+        log.debug("RdSect IRQ : st=" + NumberUtils.hex(state));
         if ((state & ST_ERROR) != 0) {
             setError(io.getErrorReg());
         } else {
-            if ((state & (ST_BUSY | ST_DEVICE_READY)) == ST_DEVICE_READY) {
+            if ((state & (ST_BUSY | ST_DATA_REQUEST)) == ST_DATA_REQUEST) {
                 // final int offset = readSectors * SECTOR_SIZE;
                 for (int i = 0; i < 256; i++) {
                     final int v = io.getDataReg();
                     buf.put((byte) (v & 0xFF));
                     buf.put((byte) ((v >> 8) & 0xFF));
+                    /*if (i > 253) {
+                    	log.info("Read [" + i + "]=" + v);
+                    }*/
                 }
                 readSectors++;
-                if (readSectors == sectors) {
+                if (readSectors == sectorCount) {
                     notifyFinished();
                 }
             }

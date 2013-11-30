@@ -78,6 +78,7 @@ public class MasterBootRecord {
      * @param api
      */
     public final synchronized void write(BlockDeviceAPI api) throws IOException {
+    	mbr.position(0);
         api.write(0, mbr);
         api.flush();
         dirty = false;
@@ -89,6 +90,7 @@ public class MasterBootRecord {
      * @param api
      */
     public final synchronized void read(BlockDeviceAPI api) throws IOException {
+    	mbr.position(0);
         api.read(0, mbr);
         dirty = false;
     }
