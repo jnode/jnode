@@ -22,16 +22,10 @@ package org.jnode.driver.bus.ide.command;
 
 import java.nio.ByteBuffer;
 
-import javax.sound.sampled.DataLine;
-
 import org.apache.log4j.Logger;
-import org.jnode.driver.block.ide.disk.IDEDiskDriver;
 import org.jnode.driver.bus.ide.IDEBus;
 import org.jnode.driver.bus.ide.IDEIO;
-import org.jnode.util.NumberUtils;
-import org.jnode.util.TimeUtils;
 import org.jnode.util.TimeoutException;
-import org.jnode.vm.scheduler.Semaphore;
 
 /**
  * This is a simple write command for IDE drives.
