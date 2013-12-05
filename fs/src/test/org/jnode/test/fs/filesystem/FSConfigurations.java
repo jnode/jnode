@@ -32,7 +32,6 @@ import org.jnode.fs.fat.FatFileSystemFormatter;
 import org.jnode.fs.fat.FatType;
 import org.jnode.fs.hfsplus.HFSPlusParams;
 import org.jnode.fs.hfsplus.HfsPlusFileSystemFormatter;
-import org.jnode.test.fs.filesystem.config.DeviceParam;
 import org.jnode.test.fs.filesystem.config.FS;
 import org.jnode.test.fs.filesystem.config.FSAccessMode;
 import org.jnode.test.fs.filesystem.config.FSTestConfig;
@@ -41,8 +40,9 @@ import org.jnode.test.fs.filesystem.config.FileParam;
 import org.jnode.test.fs.filesystem.config.OsType;
 
 public class FSConfigurations implements Iterable<FSTestConfig> {
-    public static final boolean DO_FORMAT = true;
-    public static final boolean DO_NOT_FORMAT = false;
+
+    public static final String DISK_FILE_NAME =
+        System.getProperty("java.io.tmpdir") + File.separatorChar + "diskimg.WRK";
 
     private List<FSTestConfig> configs = new ArrayList<FSTestConfig>();
 
@@ -51,78 +51,84 @@ public class FSConfigurations implements Iterable<FSTestConfig> {
     }
 
     public FSConfigurations() {
-        String tempDir = System.getProperty("java.io.tmpdir");
-        final String diskFileName = tempDir + File.separatorChar + "diskimg.WRK";
 
-        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.EXT2,
-            FSAccessMode.BOTH, new Ext2FileSystemFormatter(BlockSize._1Kb), diskFileName, "1M"));
+        FileSystemTestConfigurationListBuilder defaultBuilder =
+            new FileSystemTestConfigurationListBuilder().osType(OsType.OTHER_OS).accessMode(FSAccessMode.BOTH)
+                .filename(DISK_FILE_NAME).fileSize("1M");
 
-        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.EXT2,
-            FSAccessMode.BOTH, new Ext2FileSystemFormatter(BlockSize._4Kb), diskFileName, "1M"));
+        configs
+            .addAll(defaultBuilder.fsType(FSType.EXT2).formatter(new Ext2FileSystemFormatter(BlockSize._1Kb)).build());
+        configs
+            .addAll(defaultBuilder.fsType(FSType.EXT2).formatter(new Ext2FileSystemFormatter(BlockSize._4Kb)).build());
+        configs.addAll(
+            defaultBuilder.fsType(FSType.HFS_PLUS).formatter(new HfsPlusFileSystemFormatter(new HFSPlusParams()))
+                .build());
 
-//        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.NTFS,
-//                FSAccessMode.BOTH, "", DO_FORMAT, diskFileName, "1M"));
-
-        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.HFS_PLUS,
-                FSAccessMode.BOTH, new HfsPlusFileSystemFormatter(new HFSPlusParams()), diskFileName, "1M"));
-        
-        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.FAT,
-            FSAccessMode.BOTH, new FatFileSystemFormatter(FatType.FAT12), diskFileName, "1M"));
-
-        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.FAT,
-            FSAccessMode.BOTH, new FatFileSystemFormatter(FatType.FAT16), diskFileName, "1M"));
-
-        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.FAT,
-            FSAccessMode.BOTH, new FatFileSystemFormatter(FatType.FAT32), diskFileName, "1M"));
-
-        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.JFAT,
-                FSAccessMode.BOTH, new FatFileSystemFormatter(FatType.FAT32), diskFileName, "1M"));
-
-//        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.ISO9660,
-//                FSAccessMode.BOTH, "", DO_FORMAT, diskFileName, "1M"));
-
-/*
-        configs.addAll(createConfigs(OsType.JNODE_OS, FSType.EXT2,
-                FSAccessMode.BOTH, "1", DO_FORMAT));
-        //<workDevice name="hdb5" />
-
-        configs.addAll(createConfigs(OsType.JNODE_OS, FSType.EXT2,
-                FSAccessMode.BOTH, null, DO_NOT_FORMAT));
-        //<workRamdisk size="1M" />
-*/
+        configs.addAll(defaultBuilder.fsType(FSType.FAT).formatter(new FatFileSystemFormatter(FatType.FAT12)).build());
+        configs.addAll(defaultBuilder.fsType(FSType.FAT).formatter(new FatFileSystemFormatter(FatType.FAT16)).build());
+        configs.addAll(defaultBuilder.fsType(FSType.FAT).formatter(new FatFileSystemFormatter(FatType.FAT32)).build());
+        configs.addAll(defaultBuilder.fsType(FSType.JFAT).formatter(new FatFileSystemFormatter(FatType.FAT32)).build());
     }
 
-    private List<FSTestConfig> createFileConfigs(OsType osType, FSType fsType,
-                                                 FSAccessMode accessMode, Formatter<? extends FileSystem<?>> formatter,
-                                                 String fileName, String fileSize) {
-        FileParam fp = new FileParam(fileName, fileSize);
-        return createConfigs(osType, fsType,
-            accessMode, formatter, fp);
-    }
+    class FileSystemTestConfigurationListBuilder {
 
-    private List<FSTestConfig> createConfigs(OsType osType, FSType fsType,
-                                             FSAccessMode accessMode, Formatter<? extends FileSystem<?>> formatter,
-                                             DeviceParam device) {
-        List<FSTestConfig> configs = new ArrayList<FSTestConfig>();
+        private OsType osType;
+        private FSType fsType;
+        private FSAccessMode fsAccessMode;
+        private Formatter<? extends FileSystem<?>> formatter;
+        private String fileName;
+        private String fileSize;
 
-        if (osType.isCurrentOS()) {
-            if (accessMode.doReadOnlyTests()) {
-                // true=readOnly mode
-                FS fs = new FS(fsType, true, formatter);
 
-                FSTestConfig cfg = new FSTestConfig(osType, fs, device);
-                configs.add(cfg);
-            }
-
-            if (accessMode.doReadWriteTests()) {
-                // false=readWrite mode
-                FS fs = new FS(fsType, false, formatter);
-
-                FSTestConfig cfg = new FSTestConfig(osType, fs, device);
-                configs.add(cfg);
-            }
+        public FileSystemTestConfigurationListBuilder osType(OsType osType) {
+            this.osType = osType;
+            return this;
         }
 
-        return configs;
+        public FileSystemTestConfigurationListBuilder fsType(FSType fsType) {
+            this.fsType = fsType;
+            return this;
+        }
+
+        public FileSystemTestConfigurationListBuilder accessMode(FSAccessMode accessMode) {
+            this.fsAccessMode = accessMode;
+            return this;
+        }
+
+        public FileSystemTestConfigurationListBuilder formatter(Formatter<? extends FileSystem<?>> formatter) {
+            this.formatter = formatter;
+            return this;
+        }
+
+        public FileSystemTestConfigurationListBuilder filename(String filename) {
+            this.fileName = filename;
+            return this;
+        }
+
+        public FileSystemTestConfigurationListBuilder fileSize(String fileSize) {
+            this.fileSize = fileSize;
+            return this;
+        }
+
+        public List<FSTestConfig> build() {
+            FileParam fp = new FileParam(fileName, fileSize);
+            List<FSTestConfig> configurationList = new ArrayList<FSTestConfig>();
+            if (osType.isCurrentOS()) {
+                FS fs;
+                if (fsAccessMode.doReadOnlyTests()) {
+                    // true=readOnly mode
+                    fs = new FS(fsType, true, formatter);
+                    configurationList.add(new FSTestConfig(osType, fs, fp));
+                }
+
+                if (fsAccessMode.doReadWriteTests()) {
+                    // false=readWrite mode
+                    fs = new FS(fsType, false, formatter);
+                    configurationList.add(new FSTestConfig(osType, fs, fp));
+                }
+            }
+
+            return configurationList;
+        }
     }
 }
