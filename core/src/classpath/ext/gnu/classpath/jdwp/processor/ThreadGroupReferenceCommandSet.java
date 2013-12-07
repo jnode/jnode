@@ -106,9 +106,9 @@ public class ThreadGroupReferenceCommandSet
     if (parent == null) {
     	os.writeLong(0L);
     } else {
-    ObjectId parentId = idMan.getObjectId(parent);
-    parentId.write(os);
-  }
+    	ObjectId parentId = idMan.getObjectId(parent);
+    	parentId.write(os);   	
+    }
   }
 
   private void executeChildren(ByteBuffer bb, DataOutputStream os)

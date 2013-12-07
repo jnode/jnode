@@ -1,5 +1,5 @@
-/* LocationOnlyFilter.java -- filter on location
-   Copyright (C) 2005, 2006, 2007 Free Software Foundation
+/* InvalidTagException.java -- an invalid type tag exception
+   Copyright (C) 2007 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -36,59 +36,22 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+package gnu.classpath.jdwp.exception;
 
-package gnu.classpath.jdwp.event.filters;
-
-import gnu.classpath.jdwp.event.Event;
-import gnu.classpath.jdwp.exception.InvalidLocationException;
-import gnu.classpath.jdwp.util.Location;
+import gnu.classpath.jdwp.JdwpConstants;
 
 /**
- * Restricts reported events to those that occur at the given location.
+ * An exception thrown when an invalid tag is used by
+ * the debugger
  *
- * May be used with breakpoint, field access, field modification, step,
- * and exception event kinds.
- *
- * @author Keith Seitz  (keiths@redhat.com)
+ * @author Kyle Galloway  (kgallowa@redhat.com)
  */
-public class LocationOnlyFilter
-  implements IEventFilter
+public class InvalidTagException
+  extends JdwpException
 {
-  private Location _location;
-
-  /**
-   * Constructs a new <code>LocationOnlyFilter</code>.
-   *
-   * @param  loc  the location for which to report events
-   * @throws InvalidLocationException if location is invalid
-   */
-  public LocationOnlyFilter (Location loc)
-    throws InvalidLocationException
+  public InvalidTagException (byte tag)
   {
-    _location = loc;
-  }
-
-  /**
-   * Returns the location at which to restrict events
-   *
-   * @return the location
-   */
-  public Location getLocation ()
-  {
-    return _location;
-  }
-
-  /**
-   * Does the given event match the filter?
-   *
-   * @param event  the <code>Event</code> to scrutinize
-   */
-  public boolean matches(Event event)
-  {
-    Location loc = (Location) event.getParameter(Event.EVENT_LOCATION);
-    if (loc != null)
-      return (getLocation().equals(loc));
-
-    return false;
+    super (JdwpConstants.Error.INVALID_TAG,
+       "invalid tag (" + tag + ")");
   }
 }

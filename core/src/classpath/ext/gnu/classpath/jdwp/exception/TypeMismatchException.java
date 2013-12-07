@@ -1,5 +1,5 @@
-/* LocationOnlyFilter.java -- filter on location
-   Copyright (C) 2005, 2006, 2007 Free Software Foundation
+/* TypeMismatchException.java -- mismatched type of local variable
+   Copyright (C) 2007 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -37,58 +37,26 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.classpath.jdwp.event.filters;
+package gnu.classpath.jdwp.exception;
 
-import gnu.classpath.jdwp.event.Event;
-import gnu.classpath.jdwp.exception.InvalidLocationException;
-import gnu.classpath.jdwp.util.Location;
+import gnu.classpath.jdwp.JdwpConstants;
 
 /**
- * Restricts reported events to those that occur at the given location.
+ * An exception throw when attempting to access a local variable of the wrong
+ * type.
  *
- * May be used with breakpoint, field access, field modification, step,
- * and exception event kinds.
- *
- * @author Keith Seitz  (keiths@redhat.com)
+ * @author Kyle Galloway  (kgallowa@redhat.com)
  */
-public class LocationOnlyFilter
-  implements IEventFilter
+public class TypeMismatchException
+  extends JdwpException
 {
-  private Location _location;
-
-  /**
-   * Constructs a new <code>LocationOnlyFilter</code>.
-   *
-   * @param  loc  the location for which to report events
-   * @throws InvalidLocationException if location is invalid
-   */
-  public LocationOnlyFilter (Location loc)
-    throws InvalidLocationException
+  public TypeMismatchException(byte tag)
   {
-    _location = loc;
+    super(JdwpConstants.Error.TYPE_MISMATCH, "incorrect tag: " + tag);
   }
 
-  /**
-   * Returns the location at which to restrict events
-   *
-   * @return the location
-   */
-  public Location getLocation ()
+  public TypeMismatchException(String msg)
   {
-    return _location;
-  }
-
-  /**
-   * Does the given event match the filter?
-   *
-   * @param event  the <code>Event</code> to scrutinize
-   */
-  public boolean matches(Event event)
-  {
-    Location loc = (Location) event.getParameter(Event.EVENT_LOCATION);
-    if (loc != null)
-      return (getLocation().equals(loc));
-
-    return false;
+    super(JdwpConstants.Error.TYPE_MISMATCH, msg);
   }
 }

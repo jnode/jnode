@@ -67,12 +67,9 @@ public class TransportFactory
   // List of all supported transport methods
   private static TransportMethod[] _transportMethods = new TransportMethod[]
   {
-          //jnode
-    new TransportMethod (SocketTransport.NAME, getTransportClass())
+    new TransportMethod (SocketTransport.NAME, SocketTransport.class)
     //new TransportMethod (ShmemTransport.NAME, ShmemTransport.class)
   };
-
-    private static native Class getTransportClass();
 
   /**
    * Get a transport configured as specified in the properties

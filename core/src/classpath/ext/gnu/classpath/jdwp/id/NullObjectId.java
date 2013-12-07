@@ -1,5 +1,5 @@
-/* LocationOnlyFilter.java -- filter on location
-   Copyright (C) 2005, 2006, 2007 Free Software Foundation
+/* NullObjectId.java -- special objectId for null values
+   Copyright (C) 2007 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -28,7 +28,6 @@ permission to link this library with independent modules to produce an
 executable, regardless of the license terms of these independent
 modules, and to copy and distribute the resulting executable under
 terms of your choice, provided that you also meet, for each linked
-terms of your choice, provided that you also meet, for each linked
 independent module, the terms and conditions of the license of that
 module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
@@ -36,59 +35,45 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+package gnu.classpath.jdwp.id;
 
-package gnu.classpath.jdwp.event.filters;
+import gnu.classpath.jdwp.exception.InvalidObjectException;
+import gnu.classpath.jdwp.util.NullObject;
 
-import gnu.classpath.jdwp.event.Event;
-import gnu.classpath.jdwp.exception.InvalidLocationException;
-import gnu.classpath.jdwp.util.Location;
+import java.lang.ref.SoftReference;
 
 /**
- * Restricts reported events to those that occur at the given location.
+ * This is a special case of an ObjectId.  When a varaible slot contains
+ * null as its value, this is a valid value despite the fact that it does
+ * not reference an object.  To represent this, this will always be the id
+ * of the NullObject (0).
  *
- * May be used with breakpoint, field access, field modification, step,
- * and exception event kinds.
- *
- * @author Keith Seitz  (keiths@redhat.com)
+ * @author Kyle Galloway  <kgallowa@redhat.com>
  */
-public class LocationOnlyFilter
-  implements IEventFilter
+public class NullObjectId
+  extends ObjectId
 {
-  private Location _location;
-
   /**
-   * Constructs a new <code>LocationOnlyFilter</code>.
-   *
-   * @param  loc  the location for which to report events
-   * @throws InvalidLocationException if location is invalid
+   * The object class that this id represents
    */
-  public LocationOnlyFilter (Location loc)
-    throws InvalidLocationException
+  public static final Class typeClass = NullObject.class;
+  
+  /**
+   * Constructs a new <code>NullObjectId</code>
+   */
+  public NullObjectId()
   {
-    _location = loc;
+    super();
+    setId((long) 0);
+    _reference = new SoftReference<NullObject>(new NullObject());
+    try
+      {
+        disableCollection();
+      }
+    catch(InvalidObjectException ex)
+      {
+        //This will not happen
+      }
   }
 
-  /**
-   * Returns the location at which to restrict events
-   *
-   * @return the location
-   */
-  public Location getLocation ()
-  {
-    return _location;
-  }
-
-  /**
-   * Does the given event match the filter?
-   *
-   * @param event  the <code>Event</code> to scrutinize
-   */
-  public boolean matches(Event event)
-  {
-    Location loc = (Location) event.getParameter(Event.EVENT_LOCATION);
-    if (loc != null)
-      return (getLocation().equals(loc));
-
-    return false;
-  }
 }

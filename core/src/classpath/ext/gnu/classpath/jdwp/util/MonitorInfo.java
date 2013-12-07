@@ -1,5 +1,7 @@
-/* VariableTable.java -- A class representing a Variable Table for a method
-   Copyright (C) 2005, 2007 Free Software Foundation
+/* MonitorInfo.java -- class used to return monitor information
+   for JDWP.
+
+   Copyright (C) 2007 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -39,72 +41,36 @@ exception statement from your version. */
 
 package gnu.classpath.jdwp.util;
 
+import gnu.classpath.jdwp.VMIdManager;
+import gnu.classpath.jdwp.id.ObjectId;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * A class representing a Variable Table for a method.
- * 
- * @author Aaron Luchko <aluchko@redhat.com>
+ * This class is used to pass monitor information between
+ * the JDWP back-end and the virtual machine.
+ *
+ * @author Keith Seitz  (keiths@redhat.com)
  */
-public class VariableTable
+public class MonitorInfo
 {
+  public int entryCount;
+  public Thread owner;
+  public Thread[] waiters;
 
-  private final int argCnt;
-
-  private final int slots;
-
-  private final long[] lineCI;
-
-  private int[] slot;
-
-  private int[] lengths;
-
-  private String[] sigs;
-
-  private String[] names;
-
-  /**
-   * Make a new variable table with the given values.
-   * 
-   * @param argCnt number of words used by arguments in this frame
-   * @param slots number of variables
-   * @param lineCI first code index of given variable (size slots)
-   * @param names name of given variable (size slots)
-   * @param sigs signature of given variable (size slots)
-   * @param lengths size of region where variable is active (size slots)
-   * @param slot index of variable in this frame (size slots)
-   */
-  public VariableTable(int argCnt, int slots, long lineCI[], String names[],
-                       String sigs[], int lengths[], int slot[])
+  public void write(DataOutputStream os)
+    throws IOException
   {
-    this.argCnt = argCnt;
-    this.slots = slots;
-    this.lineCI = lineCI;
-    this.names = names;
-    this.sigs = sigs;
-    this.lengths = lengths;
-    this.slot = slot;
-  }
-
-  /**
-   * Writes this line table to the given DataOutputStream.
-   * 
-   * @param os the stream to write it to
-   * @throws IOException
-   */
-  public void write(DataOutputStream os) throws IOException
-  {
-    os.writeInt(argCnt);
-    os.writeInt(slots);
-    for (int i = 0; i < slots; i++)
+    VMIdManager idm = VMIdManager.getDefault();
+    ObjectId id = idm.getObjectId(owner);
+    id.write(os);
+    os.write(entryCount);
+    os.write(waiters.length);
+    for (int i = 0; i < waiters.length; ++i)
       {
-        os.writeLong(lineCI[i]);
-        JdwpString.writeString(os, names[i]);
-        JdwpString.writeString(os, sigs[i]);
-        os.writeInt(lengths[i]);
-        os.writeInt(slot[i]);
+	id = idm.getObjectId(waiters[i]);
+	id.write(os);
       }
   }
-
 }
