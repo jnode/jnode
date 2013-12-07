@@ -4,8 +4,6 @@
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/driver"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
 	<classpathentry kind="src" path="/shell"/>
-	<classpathentry kind="lib" path="lib/edtftpj-1.5.2.jar"/>
-	<classpathentry kind="lib" path="lib/jcifs-1.2.6.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net"/>
 	<classpathentry kind="src" path="/core"/>
 	<classpathentry kind="lib" path="/core/lib/ant.jar"/>
@@ -17,5 +15,7 @@
 	<classpathentry kind="lib" path="/core/lib/junit-4.5.jar"/>
 	<classpathentry kind="lib" path="/all/lib/classlib.jar" sourcepath="/all/lib/classlib-src.jar"/>
 	<classpathentry kind="lib" path="/core/lib/mockito-all-1.8.5.jar"/>
+	<classpathentry kind="lib" path="lib/edtftpj.jar"/>
+	<classpathentry kind="lib" path="lib/jcifs-1.3.17.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
