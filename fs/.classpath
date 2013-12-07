@@ -11,11 +11,11 @@
 	<classpathentry kind="lib" path="/core/lib/commons-net-1.1.0.jar"/>
 	<classpathentry kind="lib" path="/core/lib/jmock-1.0.1.jar"/>
 	<classpathentry kind="lib" path="/core/lib/jmock-cglib-1.0.1.jar"/>
-	<classpathentry kind="lib" path="/core/lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="/core/lib/junit-4.5.jar"/>
 	<classpathentry kind="lib" path="/all/lib/classlib.jar" sourcepath="/all/lib/classlib-src.jar"/>
 	<classpathentry kind="lib" path="/core/lib/mockito-all-1.8.5.jar"/>
 	<classpathentry kind="lib" path="lib/edtftpj.jar"/>
 	<classpathentry kind="lib" path="lib/jcifs-1.3.17.jar"/>
+	<classpathentry kind="lib" path="/core/lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
