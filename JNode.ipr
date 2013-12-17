@@ -194,10 +194,11 @@
   <component name="EclipseCodeFormatter">
     <option name="defaultSettings" value="true" />
     <option name="formatter" value="ECLIPSE" />
-    <option name="id" value="1378417660892" />
+    <option name="id" value="1355311468141" />
     <option name="name" value="default" />
-    <option name="pathToConfigFileJava" value="$PROJECT_DIR$/../../../sources/jnode-dev/jnode.orig/jnode-eclipse-formatter-settings.xml" />
-    <option name="selectedJavaProfile" value="Eclipse [jnode]" />
+    <option name="optimizeImports" value="false" />
+    <option name="pathToConfigFileJava" value="D:/documentation/others/isabel_codingFormat.xml" />
+    <option name="selectedJavaProfile" value="isabel" />
   </component>
   <component name="EclipseCompilerSettings">
     <option name="GENERATE_NO_WARNINGS" value="true" />

@@ -36,6 +36,7 @@ import org.jnode.system.resource.ResourceManager;
 import org.jnode.system.resource.ResourceNotFreeException;
 import org.jnode.system.resource.ResourceOwner;
 import org.jnode.util.AccessControllerUtils;
+import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeUtils;
 import org.jnode.util.TimeoutException;
 
@@ -371,19 +372,20 @@ public class DefaultIDEIO implements IDEIO {
     }
 
     /**
-     * Block the current thread until the controller is not busy anymore.
-     *
-     * @param timeout
-     * @throws TimeoutException
+     * Block the current thread until the status of the controller masked by the given mask equals value.
      */
-    public final void waitUntilNotBusy(long timeout) throws TimeoutException {
-        while (isBusy()) {
+    public void waitUntilStatus(int mask, int value, long timeout, String message) throws TimeoutException {
+        while ((getAltStatusReg() & mask) != value) {
+        	final int state = getAltStatusReg();
+        	if ((state & ST_ERROR) != 0) {
+        		throw new TimeoutException("IDE error " + NumberUtils.hex(getErrorReg(), 2));
+        	}
             if (timeout <= 0) {
-                throw new TimeoutException("Timeout in waitUntilNotBusy");
+                throw new TimeoutException((message != null) ? message : "Timeout in waitUntilStatus");
             }
             TimeUtils.sleep(10);
             timeout -= 10;
-        }
+        }    	    	
     }
 
     private IOResource claimPorts(final ResourceManager rm,
