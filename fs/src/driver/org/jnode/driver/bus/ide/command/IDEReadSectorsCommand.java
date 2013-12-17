@@ -23,12 +23,10 @@ package org.jnode.driver.bus.ide.command;
 import java.nio.ByteBuffer;
 
 import org.apache.log4j.Logger;
-import org.jnode.driver.block.ide.disk.IDEDiskDriver;
 import org.jnode.driver.bus.ide.IDEBus;
 import org.jnode.driver.bus.ide.IDEIO;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
-import org.jnode.vm.Unsafe;
 
 /**
  * @author epr

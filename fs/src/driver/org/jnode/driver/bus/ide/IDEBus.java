@@ -22,6 +22,7 @@ package org.jnode.driver.bus.ide;
 
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.Bus;
 import org.jnode.driver.Device;
