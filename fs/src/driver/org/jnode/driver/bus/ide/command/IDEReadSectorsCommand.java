@@ -58,32 +58,36 @@ public class IDEReadSectorsCommand extends IDERWSectorsCommand {
     protected void setup(IDEBus ide, IDEIO io) throws TimeoutException {
         super.setup(ide, io);
         io.setCommandReg(is48bit ? CMD_READ_EXT : CMD_READ);
+
+        // Read data
+        for (int i = 0; i < sectorCount; i++) {
+            log.debug("RDSect pw " + i);
+        	if (!pollWait(io, false))
+        		return;
+        	// Read sector
+            log.debug("RDSect trf " + i);
+        	transferOneSector(ide,  io);
+		}
+        
+        // We're done
+        notifyFinished();
+    }
+
+    /**
+     * Transfer exactly one sector of data from the device.
+     */
+    private void transferOneSector(IDEBus ide, IDEIO io) throws TimeoutException {
+        for (int i = 0; i < 256; i++) {
+            final int v = io.getDataReg();
+            buf.put((byte) (v & 0xFF));
+            buf.put((byte) ((v >> 8) & 0xFF));
+        }
     }
 
     /**
      * @see org.jnode.driver.bus.ide.IDECommand#handleIRQ(IDEBus, IDEIO)
      */
     protected void handleIRQ(IDEBus ide, IDEIO io) {
-        final int state = io.getStatusReg(); // Read status, flush IRQ
-        log.debug("RdSect IRQ : st=" + NumberUtils.hex(state));
-        if ((state & ST_ERROR) != 0) {
-            setError(io.getErrorReg());
-        } else {
-            if ((state & (ST_BUSY | ST_DATA_REQUEST)) == ST_DATA_REQUEST) {
-                // final int offset = readSectors * SECTOR_SIZE;
-                for (int i = 0; i < 256; i++) {
-                    final int v = io.getDataReg();
-                    buf.put((byte) (v & 0xFF));
-                    buf.put((byte) ((v >> 8) & 0xFF));
-                    /*if (i > 253) {
-                    	log.info("Read [" + i + "]=" + v);
-                    }*/
-                }
-                readSectors++;
-                if (readSectors == sectorCount) {
-                    notifyFinished();
-                }
-            }
-        }
+    	// Do nothing
     }
 }

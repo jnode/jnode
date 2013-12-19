@@ -90,4 +90,34 @@ public abstract class IDERWSectorsCommand extends IDECommand {
             io.setLbaHighReg((int) ((lbaStart >> 16) & 0xFF));
         }
     }
+	
+	/**
+	 * Poll waiting.
+	 * @return true if waiting succeeded, false in case of an error.
+	 */
+	protected final boolean pollWait(IDEIO io, boolean checkState) throws TimeoutException {
+		// Force a 400ns wait
+		for (int i = 0; i < 4; i++) {
+			io.getAltStatusReg(); // This wastes 100ns
+		}
+		// Wait for BUSY to be cleared
+		io.waitUntilStatus(ST_BUSY, 0, IDE_DATA_XFER_TIMEOUT, "pollWait");
+		// Check state
+		if (checkState) {
+			final int state = io.getStatusReg();
+			if ((state & ST_ERROR) != 0) {
+				setError(io.getErrorReg());
+				return false;
+			}
+			if ((state & ST_DEVICE_FAULT) != 0) {
+				setError(ERR_ABORT);
+				return false;
+			}
+			if ((state & ST_DEVICE_READY) == 0) {
+				setError(ERR_ABORT);
+				return false;
+			}
+		}
+		return true;
+	}
 }
