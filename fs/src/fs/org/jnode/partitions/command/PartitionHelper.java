@@ -81,8 +81,9 @@ public class PartitionHelper {
         BootSector oldMBR = bs;
         bs = new GrubBootSector(PLAIN_MASTER_BOOT_SECTOR);
 
-        if (MBR.containsPartitionTable(false)) {
-            out.println("This device already contains a partition table. Copy the already existing partitions.");
+        if (MBR.containsPartitionTable()) {
+            out
+                    .println("This device already contains a partition table. Copy the already existing partitions.");
 
             for (int i = 0; i < 4; i++) {
                 final IBMPartitionTableEntry oldEntry = oldMBR.getPartition(i);
@@ -121,16 +122,8 @@ public class PartitionHelper {
         bs = new BootSector(MBR.array());
     }
 
-    /**
-     * Check the MBR. Do not allow an empty partition table.
-     * @throws IOException
-     */
     public void checkMBR() throws IOException {
-    	checkMBR(false);
-    }
-
-    private void checkMBR(boolean allowEmptyTable) throws IOException {
-        if (!MBR.containsPartitionTable(allowEmptyTable))
+        if (!MBR.containsPartitionTable())
             throw new IOException("This device doesn't contain a valid partition table.");
     }
 
@@ -148,7 +141,7 @@ public class PartitionHelper {
 
     public void modifyPartition(int id, boolean bootIndicator, long start, long size,
             boolean sizeUnit, IBMPartitionTypes fs) throws IOException {
-        checkMBR(true); // We accept an empty table, because we may be adding the first partition
+        checkMBR();
 
         long nbSectors = size;
         if (sizeUnit == BYTES) {
@@ -166,12 +159,12 @@ public class PartitionHelper {
     }
 
     public void deletePartition(int partNumber) throws IOException {
-        checkMBR(false);
+        checkMBR();
         bs.getPartition(partNumber).setSystemIndicator(IBMPartitionTypes.PARTTYPE_EMPTY);
     }
 
     public void toggleBootable(int partNumber) throws IOException {
-        checkMBR(false);
+        checkMBR();
 
         // save the current state for the targeted partition
         boolean currentStatus = bs.getPartition(partNumber).getBootIndicator();

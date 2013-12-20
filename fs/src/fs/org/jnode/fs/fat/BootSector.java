@@ -54,8 +54,8 @@ public class BootSector {
         partitions = new IBMPartitionTableEntry[4];
     }
 
-    public boolean isaValidBootSector(boolean allowEmptyPartitionTable) {
-        return IBMPartitionTable.containsPartitionTable(data, allowEmptyPartitionTable);
+    public boolean isaValidBootSector() {
+        return IBMPartitionTable.containsPartitionTable(data);
     }
 
     /**

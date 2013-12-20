@@ -86,7 +86,7 @@ class MBRFormatter {
             throw new GrubException("error while reading MBR", e);
         }
 
-        if (!oldMbr.containsPartitionTable(false)) {
+        if (!oldMbr.containsPartitionTable()) {
             throw new GrubException("This device doesn't contain a valid MBR.");
         }
         log.info("done.");
@@ -150,7 +150,7 @@ class MBRFormatter {
          * the Sector Signature. 0x55AA --->
          * 
          */
-        if (!stage1.containsPartitionTable(true)) {
+        if (!stage1.containsPartitionTable()) {
             throw new GrubException("The new boot sector is not valid");
         }
 

@@ -52,10 +52,7 @@ public class SizeArgument extends Argument<Long> {
         }
         try {
             long tmp = Long.parseLong(str);
-            if (factor != null) {
-            	tmp *= factor.getMultiplier();
-            }
-            return new Long(tmp);
+            return new Long(tmp * factor.getMultiplier());
         } catch (NumberFormatException ex) {
             throw new CommandSyntaxException("invalid size");
         }
@@ -66,7 +63,7 @@ public class SizeArgument extends Argument<Long> {
                 BinaryScaleFactor.values() : DecimalScaleFactor.values();
         for (ScaleFactor unit : prefixes) {
             String unitStr = unit.getUnit();
-            if ((unitStr.length() > 0) &&  str.endsWith(unitStr)) {
+            if (str.endsWith(unitStr)) {
                 return unit;
             }
         }

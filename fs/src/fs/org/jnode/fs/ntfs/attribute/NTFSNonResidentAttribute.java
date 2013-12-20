@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ntfs.attribute;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ import org.jnode.fs.ntfs.NTFSVolume;
 /**
  * An NTFS file attribute that has its data stored outside the attribute.
  * The attribute itself contains a runlist refering to the actual data.
- *  
+ *
  * @author Chira
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Daniel Noll (daniel@noll.id.au) (compression support)
@@ -89,7 +89,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      * Gets the compression unit size.  2 to the power of this value is the number of clusters
      * per compression unit.
      *
-     * @return the compression unit size. 
+     * @return the compression unit size.
      */
     public int getCompressionUnitSize() {
         return getUInt16(0x22);
@@ -111,7 +111,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      * @return the actual size taken up by the attribute data.
      */
     public long getAttributeActualSize() {
-        return getUInt32(0x30);
+        return getInt64(0x30);
     }
 
     /**
@@ -128,6 +128,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         // data run pairs into a single data run object for convenience when reading.
         boolean compressed = (getFlags() & 0x0001) != 0;
         boolean expectingSparseRunNext = false;
+        int lastCompressedSize = 0;
         int compUnitSize = 1 << getCompressionUnitSize();
 
         while (getUInt8(offset) != 0x0) {
@@ -138,32 +139,70 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
                     // This is the sparse run which follows a compressed run.
                     // The number of runs it contains does not count towards the total
                     // as the compressed run reports holding all the runs for the pair.
-                    // But we do need to move the offsets.  Leaving this block open in case
-                    // later it makes sense to put some logic in here.
-                } else if (dataRun.getLength() == compUnitSize) {
+                    // But we do need to move the offsets.
+                    expectingSparseRunNext = false;
+
+                    // Also the sparse run following a compressed run can be coalesced with a subsequent 'real' sparse
+                    // run. So add that in if we hit one
+                    if (dataRun.getLength() + lastCompressedSize > compUnitSize) {
+                        int length = dataRun.getLength() - (compUnitSize - lastCompressedSize);
+                        dataruns.add(new DataRun(0, length, true, 0, vcn));
+
+                        this.numberOfVCNs += length;
+                        vcn += length;
+                        lastCompressedSize = 0;
+                    }
+                } else if (dataRun.getLength() >= compUnitSize) {
                     // Compressed/sparse pairs always add to the compression unit size.  If
                     // the unit only compresses to 16, the system will store it uncompressed.
-                    // So this whole unit is stored as-is, we'll leave it as a normal data run.
-                    dataruns.add(dataRun);
-                    this.numberOfVCNs += dataRun.getLength();
-                    vcn += dataRun.getLength();
-                    previousLCN = dataRun.getCluster();
-                } else {
-                    // TODO: Is it possible for the length to be GREATER than the unit size?
-                    dataruns.add(new CompressedDataRun(dataRun, compUnitSize));
-                    if (dataRun.getLength() != compUnitSize) {
+                    // Also if one-or more of these uncompressed runs happen next to each other then they can be
+                    // coalesced into a single run and even coalesced into the next compressed run. In that case the
+                    // compressed run needs to be split off
+
+                    int remainder = dataRun.getLength() % compUnitSize;
+
+                    if (remainder != 0) {
+                        // Uncompressed run coalesced with compressed run. First add in the uncompressed portion:
+                        int uncompressedLength = dataRun.getLength() - remainder;
+                        DataRun uncompressed = new DataRun(dataRun.getCluster(), uncompressedLength, false, 0, vcn);
+                        dataruns.add(uncompressed);
+                        vcn += uncompressedLength;
+                        this.numberOfVCNs += uncompressedLength;
+
+                        // Next add in the compressed portion
+                        DataRun compressedRun =
+                            new DataRun(dataRun.getCluster() + uncompressedLength, remainder, false, 0, vcn);
+                        dataruns.add(new CompressedDataRun(compressedRun, compUnitSize));
                         expectingSparseRunNext = true;
+                        lastCompressedSize = remainder;
+
+                        this.numberOfVCNs += compUnitSize;
+                        vcn += compUnitSize;
+
+                    } else {
+                        dataruns.add(dataRun);
+                        this.numberOfVCNs += dataRun.getLength();
+                        vcn += dataRun.getLength();
                     }
+
+                } else {
+                    dataruns.add(new CompressedDataRun(dataRun, compUnitSize));
+                    expectingSparseRunNext = true;
+                    lastCompressedSize = dataRun.getLength();
 
                     this.numberOfVCNs += compUnitSize;
                     vcn += compUnitSize;
-                    previousLCN = dataRun.getCluster();
                 }
             } else {
                 // map VCN-> datarun
                 dataruns.add(dataRun);
                 this.numberOfVCNs += dataRun.getLength();
                 vcn += dataRun.getLength();
+                lastCompressedSize = 0;
+                expectingSparseRunNext = false;
+            }
+
+            if (!dataRun.isSparse()) {
                 previousLCN = dataRun.getCluster();
             }
 
@@ -177,8 +216,8 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         if (this.numberOfVCNs != allocatedVCNs) {
             // Probably not a problem, often multiple attributes make up one allocation.
             log.debug("VCN mismatch between data runs and allocated size, possibly a composite attribute. " +
-                      "data run VCNs = " + this.numberOfVCNs + ", allocated size = " + allocatedVCNs +
-                      ", data run count = " + dataRuns.size());
+                "data run VCNs = " + this.numberOfVCNs + ", allocated size = " + allocatedVCNs +
+                ", data run count = " + dataRuns.size());
         }
     }
 
@@ -192,7 +231,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
     /**
      * Read a number of clusters starting from a given virtual cluster number
      * (vcn).
-     * 
+     *
      * @param vcn
      * @param nrClusters
      * @return The number of clusters read.
@@ -206,7 +245,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
 
         if (log.isDebugEnabled()) {
             log.debug("readVCN: wants start " + vcn + " length " + nrClusters +
-                      ", we have start " + getStartVCN() + " length " + getNumberOfVCNs());
+                ", we have start " + getStartVCN() + " length " + getNumberOfVCNs());
         }
 
         final NTFSVolume volume = getFileRecord().getVolume();
@@ -231,5 +270,11 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      */
     public int getNumberOfVCNs() {
         return numberOfVCNs;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[attribute (non-res) type=x%x name'%s' size=%d runs=%d]", getAttributeType(),
+            getAttributeName(), getAttributeActualSize(), getDataRuns().size());
     }
 }

@@ -17,12 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jfat;
 
 import java.io.IOException;
 import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.jnode.util.NumberUtils;
 
@@ -64,14 +63,14 @@ public class FatRecord {
 
         if (name.isMangled()) {
             FatLongDirEntry l = new FatLongDirEntry(
-                    fs, name.getComponent(n - 1), (byte) n, s.getChkSum(),
-                    true, free[0].getIndex());
+                fs, name.getComponent(n - 1), (byte) n, s.getChkSum(),
+                true, free[0].getIndex());
 
             addSetFatDirEntry(parent, l);
 
             for (int i = (n - 2); i >= 0; i--) {
                 l = new FatLongDirEntry(fs, name.getComponent(i), (byte) (i + 1),
-                        s.getChkSum(), false, free[n - 1 - i].getIndex());
+                    s.getChkSum(), false, free[n - 1 - i].getIndex());
 
                 addSetFatDirEntry(parent, l);
             }
@@ -132,12 +131,6 @@ public class FatRecord {
         if (longEntries.isEmpty())
             return;
 
-        if (!longEntries.firstElement().isLast()) {
-            log.debug("last long vector element discarded for " + getShortName());
-            clearLongEntries();
-            return;
-        }
-
         int i;
         StringBuilder lname = new StringBuilder(longEntries.size() * FatLongDirEntry.NAMELENGTH);
 
@@ -149,14 +142,14 @@ public class FatRecord {
 
             int ordinal = last - i + 1;
 
-            if (l.getOrdinal() != ordinal) {
+            if (l.getOrdinal() != ordinal && !l.isFreeDirEntry()) {
                 log.debug("ordinal orphaned vector discarded for " + getShortName());
                 clearLongEntries();
                 return;
             }
 
-            if (l.getChkSum() != chkSum) {
-                log.debug("chksum orphaed vector discarded for " + getShortName());
+            if (l.getChkSum() != chkSum && !l.isFreeDirEntry()) {
+                log.debug("chksum orphaned vector discarded for " + getShortName());
                 clearLongEntries();
                 return;
             }
@@ -201,7 +194,18 @@ public class FatRecord {
         return longName;
     }
 
+    @Override
     public String toString() {
+        if (shortEntry == null) {
+            return String.format("FatRecord (Open) %s", longEntries);
+        } else {
+            return String.format(
+                "FatRecord (Closed) ['%s' %s] index:%d chksum:%s size:%d",
+                getLongName(), getShortName(), getShortEntry().getIndex(), NumberUtils.hex(getChkSum(), 2), size());
+        }
+    }
+
+    public String toDebugString() {
         mustBeClose();
 
         StrWriter out = new StrWriter();

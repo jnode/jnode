@@ -53,8 +53,8 @@ public class MasterBootRecord {
         read(devApi);
     }
 
-    public final boolean containsPartitionTable(boolean allowEmptyTable) {
-        return IBMPartitionTable.containsPartitionTable(mbr.array(), allowEmptyTable);
+    public final boolean containsPartitionTable() {
+        return IBMPartitionTable.containsPartitionTable(mbr.array());
     }
 
     public final void copyPartitionTableFrom(MasterBootRecord srcMbr) {

@@ -17,20 +17,19 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ftpfs;
 
+import com.enterprisedt.net.ftp.FTPFile;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSEntry;
 import org.jnode.fs.ReadOnlyFileSystemException;
-
-import com.enterprisedt.net.ftp.FTPFile;
 
 /**
  * @author Levente S\u00e1ntha
@@ -51,6 +50,11 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
     public FTPFSEntry getEntry(String name) throws IOException {
         ensureEntries();
         return entries.get(name);
+    }
+
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        return getEntry(id);
     }
 
     /**
@@ -138,5 +142,10 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
      */
     public void remove(String name) throws IOException {
         throw new ReadOnlyFileSystemException();
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 }

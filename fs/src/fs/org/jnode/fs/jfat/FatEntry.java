@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jfat;
 
 import java.io.FileNotFoundException;
@@ -98,6 +98,15 @@ public class FatEntry extends FatObject implements FSEntry, FSEntryCreated, FSEn
 
     public void dumpChain(String fileName) throws FileNotFoundException, IOException {
         chain.dump(fileName);
+    }
+
+    public FatRecord getRecord() {
+        return record;
+    }
+
+    @Override
+    public String getId() {
+        return Integer.toString(entry.getIndex());
     }
 
     public String getName() {
@@ -203,7 +212,7 @@ public class FatEntry extends FatObject implements FSEntry, FSEntryCreated, FSEn
 
     /**
      * Gets the accessrights for this entry.
-     * 
+     *
      * @throws IOException
      */
     public FSAccessRights getAccessRights() throws IOException {

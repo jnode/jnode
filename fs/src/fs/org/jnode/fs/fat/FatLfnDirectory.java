@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.fat;
 
 import java.io.FileNotFoundException;
@@ -231,7 +231,7 @@ public class FatLfnDirectory extends FatDirectory {
     /*
      * Its in the DOS manual!(DOS 5: page 72) Valid: A..Z 0..9 _ ^ $ ~ ! # % & - {} () @ ' `
      * 
-     * Unvalid: spaces/periods,
+     * Invalid: spaces/periods,
      */
 
     public String generateShortNameFor(String longFullName) {
@@ -264,10 +264,10 @@ public class FatLfnDirectory extends FatDirectory {
             char[] shortNameChar = shortName.substring(0, 7).toUpperCase().toCharArray();
 
             // epurate it from alien characters
-        loop: 
+        loop:
             for (int i = 0; i < shortNameChar.length; i++) {
                 char toTest = shortNameChar[i];
-            valid: 
+            valid:
                 {
                     if (toTest > 255)
                         break valid;
@@ -278,9 +278,9 @@ public class FatLfnDirectory extends FatDirectory {
                     if (toTest >= '0' && toTest <= '9')
                         continue loop;
                     if (toTest == '_' || toTest == '^' || toTest == '$' || toTest == '~' ||
-                            toTest == '!' || toTest == '#' || toTest == '%' || toTest == '&' ||
-                            toTest == '-' || toTest == '{' || toTest == '}' || toTest == '(' ||
-                            toTest == ')' || toTest == '@' || toTest == '\'' || toTest == '`')
+                        toTest == '!' || toTest == '#' || toTest == '%' || toTest == '&' ||
+                        toTest == '-' || toTest == '{' || toTest == '}' || toTest == '(' ||
+                        toTest == ')' || toTest == '@' || toTest == '\'' || toTest == '`')
                         continue loop;
 
                 }
@@ -293,7 +293,7 @@ public class FatLfnDirectory extends FatDirectory {
                 String tildeStuff = "~" + i;
                 int tildeStuffLength = tildeStuff.length();
                 System.arraycopy(tildeStuff.toCharArray(), 0, shortNameChar, 7 - tildeStuffLength,
-                        tildeStuffLength);
+                    tildeStuffLength);
                 shortName = new String(shortNameChar);
                 if (!shortNameIndex.containsKey(shortName + "." + shortExt))
                     break;
@@ -306,7 +306,7 @@ public class FatLfnDirectory extends FatDirectory {
 
     /**
      * Remove the entry with the given name from this directory.
-     * 
+     *
      * @param name
      * @throws IOException
      */

@@ -17,14 +17,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.extent;
 
-import org.jnode.fs.hfsplus.tree.AbstractNode;
-import org.jnode.fs.hfsplus.tree.IndexRecord;
+import org.jnode.fs.hfsplus.tree.AbstractIndexNode;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 
-public class ExtentNode extends AbstractNode<IndexRecord> {
+public class ExtentNode extends AbstractIndexNode<ExtentKey> {
 
     public ExtentNode(NodeDescriptor descriptor, final int nodeSize) {
         super(descriptor, nodeSize);
@@ -35,15 +34,7 @@ public class ExtentNode extends AbstractNode<IndexRecord> {
     }
 
     @Override
-    public IndexRecord getNodeRecord(int index) {
-        // TODO Auto-generated method stub
-        return null;
+    protected ExtentKey createKey(byte[] nodeData, int offset) {
+        return new ExtentKey(nodeData, offset);
     }
-
-    @Override
-    protected void loadRecords(byte[] nodeData) {
-        // TODO Auto-generated method stub
-
-    }
-
 }

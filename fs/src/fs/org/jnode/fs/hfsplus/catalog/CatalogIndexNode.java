@@ -17,21 +17,19 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.catalog;
 
-import java.util.LinkedList;
-
-import org.jnode.fs.hfsplus.tree.AbstractNode;
-import org.jnode.fs.hfsplus.tree.IndexRecord;
-import org.jnode.fs.hfsplus.tree.Key;
+import org.apache.log4j.Logger;
+import org.jnode.fs.hfsplus.tree.AbstractIndexNode;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 
-public class CatalogIndexNode extends AbstractNode<IndexRecord> {
+public class CatalogIndexNode extends AbstractIndexNode<CatalogKey> {
+    private final Logger log = Logger.getLogger(getClass());
 
     /**
      * Create a new node.
-     * 
+     *
      * @param descriptor
      * @param nodeSize
      */
@@ -41,7 +39,7 @@ public class CatalogIndexNode extends AbstractNode<IndexRecord> {
 
     /**
      * Create node from existing data.
-     * 
+     *
      * @param nodeData
      * @param nodeSize
      */
@@ -51,75 +49,7 @@ public class CatalogIndexNode extends AbstractNode<IndexRecord> {
     }
 
     @Override
-    protected void loadRecords(final byte[] nodeData) {
-        CatalogKey key;
-        int offset;
-        for (int i = 0; i < this.descriptor.getNumRecords(); i++) {
-            offset = offsets.get(i);
-            key = new CatalogKey(nodeData, offset);
-            records.add(new IndexRecord(key, nodeData, offset));
-        }
+    protected CatalogKey createKey(byte[] nodeData, int offset) {
+        return new CatalogKey(nodeData, offset);
     }
-
-    /**
-     * @param parentId
-     * @return a NodeRecord or {@code null}
-     */
-    public final IndexRecord find(final CatalogNodeId parentId) {
-        for (IndexRecord record : records) {
-            Key key = record.getKey();
-            if (key instanceof CatalogKey) {
-                if (((CatalogKey) key).getParentId().getId() == parentId.getId()) {
-                    return record;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Find node record based on it's key.
-     * 
-     * @param key The key to search.
-     * @return a NodeRecord or {@code null}
-     */
-    public IndexRecord find(final CatalogKey key) {
-        IndexRecord largestMatchingRecord = null;
-        for (int index = 0; index < this.getNodeDescriptor().getNumRecords(); index++) {
-            IndexRecord record = this.getNodeRecord(index);
-            if ((record.getKey().compareTo(key) <= 0)) {
-                if (largestMatchingRecord != null &&
-                        record.getKey().compareTo(largestMatchingRecord.getKey()) > 0) {
-                    largestMatchingRecord = record;
-                }
-            }
-        }
-        return largestMatchingRecord;
-    }
-
-    /**
-     * @param parentId
-     * @return an array of NodeRecords
-     */
-    public final IndexRecord[] findAll(final CatalogNodeId parentId) {
-        LinkedList<IndexRecord> result = new LinkedList<IndexRecord>();
-        IndexRecord largestMatchingRecord = null;
-        CatalogKey largestMatchingKey = null;
-        for (IndexRecord record : records) {
-            CatalogKey key = (CatalogKey) record.getKey();
-            if (key.getParentId().getId() < parentId.getId() &&
-                    (largestMatchingKey == null || key.compareTo(largestMatchingKey) > 0)) {
-                largestMatchingKey = key;
-                largestMatchingRecord = record;
-            } else if (key.getParentId().getId() == parentId.getId()) {
-                result.addLast(record);
-            }
-        }
-
-        if (largestMatchingKey != null) {
-            result.addFirst(largestMatchingRecord);
-        }
-        return result.toArray(new IndexRecord[result.size()]);
-    }
-
 }

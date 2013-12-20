@@ -17,11 +17,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -39,163 +38,227 @@ import org.jnode.fs.ntfs.index.IndexEntry;
  */
 public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, FSEntryLastAccessed {
 
-	private FSObject cachedFSObject;
+    private FSObject cachedFSObject;
 
-	private final IndexEntry indexEntry;
+    /**
+     * The ID for this entry.
+     */
+    private String id;
 
-	private final NTFSFileSystem fs;
+    /**
+     * The index entry.
+     */
+    private IndexEntry indexEntry;
 
-	/**
-	 * Initialize this instance.
-	 */
-	public NTFSEntry(NTFSFileSystem fs, IndexEntry indexEntry) {
-		this.fs = fs;
-		this.indexEntry = indexEntry;
-	}
+    /**
+     * The associated file record.
+     */
+    private FileRecord fileRecord;
 
-	/**
-	 * Gets the name of this entry.
-	 * @see org.jnode.fs.FSEntry#getName()
-	 */
-	public String getName() {
-		if (indexEntry != null) return indexEntry.getFileName();
-		return null;
-	}
+    /**
+     * The containing file system.
+     */
+    private final NTFSFileSystem fs;
 
-	/**
-	 * @see org.jnode.fs.FSEntry#getParent()
-	 */
-	public FSDirectory getParent() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Initialize this instance.
+     *
+     * @param fs         the file system.
+     * @param indexEntry the index entry.
+     */
+    public NTFSEntry(NTFSFileSystem fs, IndexEntry indexEntry) {
+        this.fs = fs;
+        this.indexEntry = indexEntry;
+        id = Long.toString(indexEntry.getFileReferenceNumber());
+    }
 
-	public long getCreated() throws IOException {
-		return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getCreationTime());
-	}
+    /**
+     * Initialize this instance.
+     *
+     * @param fs         the file system.
+     * @param fileRecord the file record.
+     */
+    public NTFSEntry(NTFSFileSystem fs, FileRecord fileRecord) {
+        this.fs = fs;
+        this.fileRecord = fileRecord;
+        id = Long.toString(fileRecord.getReferenceNumber());
+    }
 
-	public long getLastModified() throws IOException {
-		return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getModificationTime());
-	}
+    @Override
+    public String getId() {
+        return id;
+    }
 
-	public long getLastChanged() throws IOException {
-		return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getMftChangeTime());
-	}
+    /**
+     * Gets the name of this entry.
+     *
+     * @see org.jnode.fs.FSEntry#getName()
+     */
+    public String getName() {
+        if (indexEntry != null) {
+            return indexEntry.getFileName();
+        } else if (fileRecord != null) {
+            return fileRecord.getFileName();
+        }
+        return null;
+    }
 
-	public long getLastAccessed() throws IOException {
-		return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getAccessTime());
-	}
+    /**
+     * @see org.jnode.fs.FSEntry#getParent()
+     */
+    public FSDirectory getParent() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	/**
-	 * @see org.jnode.fs.FSEntry#isFile()
-	 */
-	public boolean isFile() {
-		return !indexEntry.isDirectory();
-	}
+    public long getCreated() throws IOException {
+        return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getCreationTime());
+    }
 
-	/**
-	 * @see org.jnode.fs.FSEntry#isDirectory()
-	 */
-	public boolean isDirectory() {
-		return indexEntry.isDirectory();
-	}
+    public long getLastModified() throws IOException {
+        return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getModificationTime());
+    }
 
-	/**
-	 * @see org.jnode.fs.FSEntry#setName(java.lang.String)
-	 */
-	public void setName(String newName) {
-		// TODO Auto-generated method stub
+    public long getLastChanged() throws IOException {
+        return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getMftChangeTime());
+    }
 
-	}
+    public long getLastAccessed() throws IOException {
+        return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getAccessTime());
+    }
 
-	public void setCreated(long created) {
-		// TODO: Implement write support.
-	}
+    /**
+     * @see org.jnode.fs.FSEntry#isFile()
+     */
+    public boolean isFile() {
+        if (indexEntry != null) {
+            return !indexEntry.isDirectory();
+        } else {
+            return !fileRecord.isDirectory();
+        }
+    }
 
-	public void setLastModified(long lastModified) {
-		// TODO: Implement write support.
-	}
+    /**
+     * @see org.jnode.fs.FSEntry#isDirectory()
+     */
+    public boolean isDirectory() {
+        if (indexEntry != null) {
+            return indexEntry.isDirectory();
+        } else {
+            return fileRecord.isDirectory();
+        }
+    }
 
-	public void setLastAccessed(long lastAccessed) {
-		// TODO: Implement write support.
-	}
+    /**
+     * @see org.jnode.fs.FSEntry#setName(java.lang.String)
+     */
+    public void setName(String newName) {
+        // TODO Auto-generated method stub
 
-	/**
-	 * @see org.jnode.fs.FSEntry#getFile()
-	 */
-	public FSFile getFile() {
-		if (this.isFile()) {
-			if (cachedFSObject == null) {
-				cachedFSObject = new NTFSFile(fs, indexEntry);
-			}
-			return (FSFile) cachedFSObject;
-		} else {
-			return null;
-		}
-	}
+    }
 
-	/**
-	 * @see org.jnode.fs.FSEntry#getDirectory()
-	 */
-	public FSDirectory getDirectory() throws IOException {
-		if (this.isDirectory()) {
-			if (cachedFSObject == null) {
-				// XXX: Why can't this just use getFileRecord()?
-				cachedFSObject = new NTFSDirectory(fs, getFileRecord().getVolume().getMFT().getIndexedFileRecord(
-						indexEntry));
-			}
-			return (FSDirectory) cachedFSObject;
-		} else return null;
-	}
+    public void setCreated(long created) {
+        // TODO: Implement write support.
+    }
 
-	/**
-	 * @see org.jnode.fs.FSEntry#getAccessRights()
-	 */
-	public FSAccessRights getAccessRights() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public void setLastModified(long lastModified) {
+        // TODO: Implement write support.
+    }
 
-	/**
-	 * @see org.jnode.fs.FSObject#isValid()
-	 */
-	public boolean isValid() {
-		// TODO Auto-generated method stub
-		return true;
-	}
+    public void setLastAccessed(long lastAccessed) {
+        // TODO: Implement write support.
+    }
 
-	/**
-	 * @see org.jnode.fs.FSObject#getFileSystem()
-	 */
-	public FileSystem<?> getFileSystem() {
-		return fs;
-	}
+    /**
+     * @see org.jnode.fs.FSEntry#getFile()
+     */
+    public FSFile getFile() {
+        if (this.isFile()) {
+            if (cachedFSObject == null) {
+                if (indexEntry != null) {
+                    cachedFSObject = new NTFSFile(fs, indexEntry);
+                } else {
+                    cachedFSObject = new NTFSFile(fs, fileRecord);
+                }
+            }
+            return (FSFile) cachedFSObject;
+        } else {
+            return null;
+        }
+    }
 
-	/**
-	 * @return Returns the fileRecord.
-	 */
-	public FileRecord getFileRecord() throws IOException {
-		return indexEntry.getParentFileRecord().getVolume().getMFT().getIndexedFileRecord(indexEntry);
-	}
+    /**
+     * @see org.jnode.fs.FSEntry#getDirectory()
+     */
+    public FSDirectory getDirectory() throws IOException {
+        if (this.isDirectory()) {
+            if (cachedFSObject == null) {
+                if (fileRecord != null) {
+                    cachedFSObject = new NTFSDirectory(fs, fileRecord);
+                } else {
+                    // XXX: Why can't this just use getFileRecord()?
+                    cachedFSObject = new NTFSDirectory(fs, getFileRecord().getVolume().getMFT().getIndexedFileRecord(
+                        indexEntry));
+                }
+            }
+            return (FSDirectory) cachedFSObject;
+        } else return null;
+    }
 
-	/**
-	 * @return Returns the indexEntry.
-	 */
-	public IndexEntry getIndexEntry() {
-		return indexEntry;
-	}
+    /**
+     * @see org.jnode.fs.FSEntry#getAccessRights()
+     */
+    public FSAccessRights getAccessRights() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	/**
-	 * Indicate if the entry has been modified in memory (ie need to be saved)
-	 * @return true if the entry need to be saved
-	 * @throws IOException
-	 */
-	public boolean isDirty() throws IOException {
-		return true;
-	}
+    /**
+     * @see org.jnode.fs.FSObject#isValid()
+     */
+    public boolean isValid() {
+        // TODO Auto-generated method stub
+        return true;
+    }
 
-	@Override
-	public String toString() {
-		return super.toString() + '(' + indexEntry + ')';
-	}
+    /**
+     * @see org.jnode.fs.FSObject#getFileSystem()
+     */
+    public FileSystem<?> getFileSystem() {
+        return fs;
+    }
+
+    /**
+     * @return Returns the fileRecord.
+     */
+    public FileRecord getFileRecord() throws IOException {
+        if (fileRecord != null) {
+            return fileRecord;
+        }
+        return indexEntry.getParentFileRecord().getVolume().getMFT().getIndexedFileRecord(indexEntry);
+    }
+
+    /**
+     * @return Returns the indexEntry.
+     */
+    public IndexEntry getIndexEntry() {
+        return indexEntry;
+    }
+
+    /**
+     * Indicate if the entry has been modified in memory (ie need to be saved)
+     *
+     * @return true if the entry need to be saved
+     * @throws IOException
+     */
+    public boolean isDirty() throws IOException {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        Object obj = indexEntry == null ? fileRecord : indexEntry;
+        return super.toString() + '(' + obj + ')';
+    }
+
 }

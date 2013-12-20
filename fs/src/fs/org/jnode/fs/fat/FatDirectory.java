@@ -17,13 +17,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.fat;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
-
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.FSEntry;
 
@@ -37,7 +37,7 @@ public class FatDirectory extends AbstractDirectory {
 
     /**
      * Constructor for Directory.
-     * 
+     *
      * @param fs
      * @param file
      */
@@ -107,6 +107,20 @@ public class FatDirectory extends AbstractDirectory {
         resetDirty();
     }
 
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        for (FatBasicDirEntry entry : entries) {
+            if (entry != null && entry instanceof FatDirEntry) {
+                FatDirEntry fatDirEntry = (FatDirEntry) entry;
+                if (fatDirEntry.getId().equals(id)) {
+                    return fatDirEntry;
+                }
+            }
+        }
+
+        throw new FileNotFoundException("Failed to find entry with ID: " + id);
+    }
+
     /**
      * Flush the contents of this directory to the persistent storage
      */
@@ -131,7 +145,7 @@ public class FatDirectory extends AbstractDirectory {
 
     /**
      * Set the label
-     * 
+     *
      * @param label
      */
     public void setLabel(String label) throws IOException {
@@ -148,7 +162,7 @@ public class FatDirectory extends AbstractDirectory {
         while (labelEntry == null && i.hasNext()) {
             current = (FatDirEntry) i.next();
             if (current.isLabel() &&
-                    !(current.isHidden() && current.isReadonly() && current.isSystem())) {
+                !(current.isHidden() && current.isReadonly() && current.isSystem())) {
                 labelEntry = current;
             }
         }

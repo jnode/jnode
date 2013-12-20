@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.service.def;
 
 import java.io.IOException;
@@ -26,11 +26,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.jnode.driver.Device;
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSEntryCreated;
+import org.jnode.fs.FSEntryLastAccessed;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 
@@ -39,27 +40,41 @@ import org.jnode.fs.FileSystem;
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class VirtualDirEntry implements FSEntry, FSDirectory {
+final class VirtualDirEntry implements FSEntry, FSDirectory, FSEntryCreated, FSEntryLastAccessed {
 
-    /** The filesystem */
+    /**
+     * The filesystem
+     */
     private final VirtualFS fs;
 
-    /** The creation time of this entry. */
+    /**
+     * The creation time of this entry.
+     */
     private long created;
 
-    /** The last modification time of this entry. */
+    /**
+     * The last modification time of this entry.
+     */
     private long lastModified;
 
-    /** The last access time of this entry. */
+    /**
+     * The last access time of this entry.
+     */
     private long lastAccessed;
 
-    /** The name of this entry */
+    /**
+     * The name of this entry
+     */
     private final String name;
 
-    /** My parent */
+    /**
+     * My parent
+     */
     private final FSDirectory parent;
 
-    /** My entries */
+    /**
+     * My entries
+     */
     private final Map<String, FSEntry> entries;
 
     /**
@@ -110,6 +125,11 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
 
     public long getLastAccessed() throws IOException {
         return lastAccessed;
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 
     /**
@@ -198,7 +218,7 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
      * Mount the path within given filesystem to an entry with the given name.
      *
      * @param name The name of this mounted entry.
-     * @param fs The filesystem to mount
+     * @param fs   The filesystem to mount
      * @param path The path in the filesystem to use as root.
      */
     synchronized VirtualMountEntry addMount(String name, FileSystem<?> fs, String path)
@@ -234,6 +254,11 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
         return entries.get(name);
     }
 
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        return getEntry(id);
+    }
+
     /**
      * @see org.jnode.fs.FSDirectory#iterator()
      */
@@ -258,6 +283,7 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
 
     /**
      * The filesystem on the given device will be removed.
+     *
      * @param dev
      */
     final synchronized void unregisterFileSystem(Device dev) {

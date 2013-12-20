@@ -17,23 +17,24 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.tree;
 
 import org.jnode.util.BigEndian;
 
 public class IndexRecord extends AbstractNodeRecord {
-    /** A node number that represent a child node of the index node. */
-    private int index;
+    /**
+     * A node number that represent a child node of the index node.
+     */
+    private long index;
 
     public IndexRecord(final byte[] nodeData, final int offset) {
         this.recordData = new byte[4];
         System.arraycopy(nodeData, offset + key.getKeyLength(), recordData, 0, 4);
-        index = BigEndian.getInt32(recordData, 0);
+        index = BigEndian.getUInt32(recordData, 0);
     }
-    
+
     /**
-     * 
      * @param key
      * @param nodeData
      * @param offset
@@ -42,11 +43,16 @@ public class IndexRecord extends AbstractNodeRecord {
         this.key = key;
         this.recordData = new byte[4];
         System.arraycopy(nodeData, offset + key.getKeyLength(), recordData, 0, 4);
-        index = BigEndian.getInt32(recordData, 0);
+        index = BigEndian.getUInt32(recordData, 0);
     }
-   
-    public final int getIndex() {
+
+    @Override
+    public String toString() {
+        return String.format("IndexRecord: %d key:%s", index, key);
+    }
+
+    public final long getIndex() {
         return index;
     }
-    
+
 }

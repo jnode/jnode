@@ -22,7 +22,6 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
 import org.jnode.driver.Device;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -133,8 +132,8 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
 	public long getFreeSpace() throws IOException {
 		FileRecord bitmapRecord = volume.getMFT().getRecord(MasterFileTable.SystemFiles.BITMAP);
 
-		int bitmapSize = (int) bitmapRecord.getFileNameAttribute().getRealSize();
-		byte[] buffer = new byte[bitmapSize];
+        int bitmapSize = (int) bitmapRecord.getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
+        byte[] buffer = new byte[bitmapSize];
 		bitmapRecord.readData(0, buffer, 0, buffer.length);
 
 		int usedBlocks = 0;
