@@ -1,7 +1,7 @@
 /* VMVirtualMachine.java -- A reference implementation of a JDWP virtual
    machine
 
-   Copyright (C) 2005, 2006 Free Software Foundation
+   Copyright (C) 2005, 2006, 2007 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -45,11 +45,11 @@ import gnu.classpath.jdwp.event.EventRequest;
 import gnu.classpath.jdwp.exception.InvalidMethodException;
 import gnu.classpath.jdwp.exception.JdwpException;
 import gnu.classpath.jdwp.util.MethodResult;
-import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
+import gnu.classpath.jdwp.util.MonitorInfo;
+import gnu.classpath.jdwp.value.Value;
+
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.io.DataOutputStream;
+import java.util.Collection;
 
 /**
  * A virtual machine according to JDWP.
@@ -58,23 +58,40 @@ import java.io.DataOutputStream;
  */
 public class VMVirtualMachine
 {
+  // VM Capabilities
+  public static final boolean canWatchFieldModification = false;
+  public static final boolean canWatchFieldAccess = false;
+  public static final boolean canGetBytecodes = false;
+  public static final boolean canGetSyntheticAttribute = false;
+  public static final boolean canGetOwnedMonitorInfo = false;
+  public static final boolean canGetCurrentContendedMonitor = false;
+  public static final boolean canGetMonitorInfo = false;
+  public static final boolean canRedefineClasses = false;
+  public static final boolean canAddMethod = false;
+  public static final boolean canUnrestrictedlyRedefineClasses = false;
+  public static final boolean canPopFrames = false;
+  public static final boolean canUseInstanceFilters = false;
+  public static final boolean canGetSourceDebugExtension = false;
+  public static final boolean canRequestVMDeathEvent = false;
+  public static final boolean canSetDefaultStratum = false;
+
   /**
    * Suspend a thread
    *
    * @param  thread  the thread to suspend
    */
-  public static native void suspendThread (Thread thread)
+  public static native void suspendThread(Thread thread)
     throws JdwpException;
 
   /**
    * Suspend all threads
    */
-  public static void suspendAllThreads ()
+  public static void suspendAllThreads()
     throws JdwpException
   {
     // Our JDWP thread group -- don't suspend any of those threads
     Thread current = Thread.currentThread ();
-    ThreadGroup jdwpGroup = current.getThreadGroup ();
+    ThreadGroup jdwpGroup = Jdwp.getDefault().getJdwpThreadGroup();
 
     // Find the root ThreadGroup
     ThreadGroup group = jdwpGroup;
@@ -106,7 +123,8 @@ public class VMVirtualMachine
       }
 
     // Now suspend the current thread
-    suspendThread (current);
+    if (current.getThreadGroup() != jdwpGroup)
+      suspendThread (current);
   }
 
   /**
@@ -115,7 +133,7 @@ public class VMVirtualMachine
    *
    * @param  thread  the thread to resume
    */
-  public static native void resumeThread (Thread thread)
+  public static native void resumeThread(Thread thread)
     throws JdwpException;
 
   /**
@@ -123,7 +141,7 @@ public class VMVirtualMachine
    * suspend count. It can not be used to force the application
    * to run.
    */
-  public static void resumeAllThreads ()
+  public static void resumeAllThreads()
     throws JdwpException
   {
     // Our JDWP thread group -- don't resume
@@ -166,19 +184,13 @@ public class VMVirtualMachine
    * @param  thread  the thread whose suspend count is desired
    * @return the number of times the thread has been suspended
    */
-  public static native int getSuspendCount (Thread thread)
+  public static native int getSuspendCount(Thread thread)
     throws JdwpException;
  
   /**
-   * Returns a count of the number of loaded classes in the VM
+   * Returns a Collection of all classes loaded in the VM
    */
-  public static native int getAllLoadedClassesCount ()
-    throws JdwpException;
-
-  /**
-   * Returns an iterator over all the loaded classes in the VM
-   */
-  public static native Iterator getAllLoadedClasses ()
+  public static native Collection getAllLoadedClasses()
     throws JdwpException;
 
   /**
@@ -188,7 +200,7 @@ public class VMVirtualMachine
    * @return a flag containing the class's status
    * @see JdwpConstants.ClassStatus
    */
-  public static native int getClassStatus (Class clazz)
+  public static native int getClassStatus(Class clazz)
     throws JdwpException;
 
   /**
@@ -198,7 +210,7 @@ public class VMVirtualMachine
    * @param  klass  the class whose methods are desired
    * @return an array of virtual machine methods
    */
-  public static native VMMethod[] getAllClassMethods (Class klass)
+  public static native VMMethod[] getAllClassMethods(Class klass)
     throws JdwpException;
 
   /**
@@ -223,7 +235,7 @@ public class VMVirtualMachine
    * @param  length  number of frames to return (-1 for all frames)
    * @return a list of frames
    */
-  public static native ArrayList getFrames (Thread thread, int start,
+  public static native ArrayList getFrames(Thread thread, int start,
 					    int length)
     throws JdwpException;
 
@@ -237,7 +249,7 @@ public class VMVirtualMachine
    * @param  bb      buffer containing the frame's ID
    * @return the desired frame
    */
-  public static native VMFrame getFrame (Thread thread, ByteBuffer bb)
+  public static native VMFrame getFrame(Thread thread, long frameID)
     throws JdwpException;
 
   /**
@@ -246,7 +258,7 @@ public class VMVirtualMachine
    * @param  thread  the thread for which to get a frame count
    * @return the number of frames in the thread's stack
    */
-  public static native int getFrameCount (Thread thread)
+  public static native int getFrameCount(Thread thread)
     throws JdwpException;
 
 
@@ -257,7 +269,7 @@ public class VMVirtualMachine
    * @return integer status of the thread
    * @see JdwpConstants.ThreadStatus
    */
-  public static native int getThreadStatus (Thread thread)
+  public static native int getThreadStatus(Thread thread)
     throws JdwpException;
 
   /**
@@ -267,25 +279,27 @@ public class VMVirtualMachine
    * @param  cl  the class loader
    * @return a list of all visible classes
    */
-  public static native ArrayList getLoadRequests (ClassLoader cl)
+  public static native ArrayList getLoadRequests(ClassLoader cl)
     throws JdwpException;
 
   /**
-   * Executes a method in the virtual machine
+   * Executes a method in the virtual machine. The thread must already
+   * be suspended by a previous event. When the method invocation is
+   * complete, the thread (or all threads if INVOKE_SINGLE_THREADED is
+   * not set in options) must be suspended before this method returns.
    *
    * @param  obj         instance in which to invoke method (null for static)
    * @param  thread      the thread in which to invoke the method
    * @param  clazz       the class in which the method is defined
    * @param  method      the method to invoke
    * @param  values      arguments to pass to method
-   * @param  nonVirtual  "otherwise, normal virtual invoke
-   *                     (instance methods only) "
+   * @param  options     invocation options
    * @return a result object containing the results of the invocation
    */
   public static native MethodResult executeMethod (Object obj, Thread thread,
-					    Class clazz, Method method,
-					    Object[] values,
-					    boolean nonVirtual)
+					    Class clazz, VMMethod method,
+					    Value[] values,
+					    int options)
     throws JdwpException;
 
   /**
@@ -295,7 +309,7 @@ public class VMVirtualMachine
    * @return a string containing the source file name; "no path information
    *         for the file is included"
    */
-  public static native String getSourceFile (Class clazz)
+  public static native String getSourceFile(Class clazz)
     throws JdwpException;
 
   /**
@@ -307,7 +321,7 @@ public class VMVirtualMachine
    * or do some internal work to set up the event notification (useful for
    * execution-related events like breakpoints, single-stepping, etc.).
    */
-  public static native void registerEvent (EventRequest request)
+  public static native void registerEvent(EventRequest request)
     throws JdwpException;
 
   /**
@@ -315,7 +329,7 @@ public class VMVirtualMachine
    *
    * @param  request  the request to unregister
    */
-  public static native void unregisterEvent (EventRequest request)
+  public static native void unregisterEvent(EventRequest request)
     throws JdwpException;
 
 
@@ -324,8 +338,88 @@ public class VMVirtualMachine
    *
    * @param  kind  the type of events to clear
    */
-  public static native void clearEvents (byte kind)
+  public static native void clearEvents(byte kind)
     throws JdwpException;
 
-  public static native void redefineClass(Class old_class, byte[] classData);
+  /**
+   * Redefines the given types. VM must support canRedefineClasses
+   * capability (may also require canAddMethod and/or
+   * canUnrestrictedlyRedefineClasses capabilities)
+   *
+   * @param types the classes to redefine
+   * @param bytecodes the new bytecode definitions for the classes
+   */
+  public static native void redefineClasses(Class[] types, byte[][] bytecodes)
+    throws JdwpException;
+
+  /**
+   * Sets the default stratum. VM must support the
+   * canSetDefaultStratum capability.
+   *
+   * @param stratum the new default stratum or empty string to
+   *        use the reference default
+   */
+  public static native void setDefaultStratum(String stratum)
+    throws JdwpException;
+
+  /**
+   * Returns the source debug extension. VM must support the
+   * canGetSourceDebugExtension capability.
+   *
+   * @param klass the class for which to return information
+   * @returns the source debug extension
+   */
+  public static native String getSourceDebugExtension(Class klass)
+    throws JdwpException;
+
+  /**
+   * Returns the bytecode for the given method. VM must support the
+   * canGetBytecodes capability.
+   *
+   * @param method the method for which to get bytecodes
+   * @returns the bytecodes
+   */
+  public static native byte[] getBytecodes(VMMethod method)
+    throws JdwpException;
+
+  /**
+   * Returns monitor information about an object. VM must support
+   * the canGetMonitorInformation capability.
+   *
+   * @param obj the object
+   * @returns monitor information (owner, entry count, waiters)
+   */
+  public static native MonitorInfo getMonitorInfo(Object obj)
+    throws JdwpException;
+
+  /**
+   * Returns a list of owned monitors. VM must support the
+   * canGetOwnedMonitorInfo capability.
+   *
+   * @param thread a thread
+   * @returns the list of monitors owned by this thread
+   */
+  public static native Object[] getOwnedMonitors(Thread thread)
+    throws JdwpException;
+
+  /**
+   * Returns the current contended monitor for a thread. VM must
+   * support canGetCurrentContendedMonitor capability.
+   *
+   * @param thread the thread
+   * @returns the contended monitor
+   */
+  public static native Object getCurrentContendedMonitor(Thread thread)
+    throws JdwpException;
+
+  /**
+   * Pop all frames up to and including the given frame. VM must
+   * support canPopFrames capability. It is the responsibility
+   * of the VM to check if the thread is suspended. If it is not,
+   * the VM should throw ThreadNotSuspendedException.
+   *
+   * @param thread the thread
+   * @param frame the frame ID
+   */
+  public static native void popFrames(Thread thread, long frameId);
 }

@@ -79,7 +79,7 @@ class JNodeFileSystem extends FileSystem {
      * The resulting temporary file may have more restrictive access permission
      * on some platforms, if restrictive is true.
      */
-	@Override
+	
 	public boolean createFileExclusively(String pathname, boolean restrictive) throws IOException {
 		return VMFile.create(pathname);
 	}
@@ -265,5 +265,11 @@ class JNodeFileSystem extends FileSystem {
 	      return false;
 
 	    return VMFile.setReadOnly(f.getPath());
+	}
+
+	@Override
+	public boolean createFileExclusively(String arg0) throws IOException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

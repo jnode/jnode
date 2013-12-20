@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src/textui"/>
 	<classpathentry exported="true" kind="src" path="/core"/>
 	<classpathentry exported="true" kind="src" path="/shell"/>
-	<classpathentry kind="lib" path="/core/lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="/all/lib/classlib.jar" sourcepath="/all/lib/classlib-src.jar"/>
+	<classpathentry kind="lib" path="/core/lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
