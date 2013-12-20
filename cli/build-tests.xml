@@ -35,11 +35,11 @@ help            Output these messages
 	</target>
 	
 	<target name="all-junit">
-		<delete dir="${basedir}/reports/junit"/>
-		<mkdir dir="${basedir}/reports/junit"/>
+		<delete dir="${basedir}/build/reports/junit"/>
+		<mkdir dir="${basedir}/build/reports/junit"/>
 	    <junit showoutput="on" printsummary="on" fork="on">
 			<classpath refid="cp-test"/>
-			<test name="org.jnode.test.cli.CLITestSuite" todir="${basedir}/reports/junit"/>
+			<test name="org.jnode.test.cli.CLITestSuite" todir="${basedir}/build/reports/junit"/>
 		</junit>
 	</target>
 	
