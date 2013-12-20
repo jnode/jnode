@@ -17,11 +17,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jfat;
 
 import java.io.IOException;
-
 import org.jnode.util.NumberUtils;
 
 
@@ -65,7 +64,7 @@ public class FatLongDirEntry extends FatDirEntry {
     }
 
     public FatLongDirEntry(FatFileSystem fs, String component, byte ordinal, byte chksum,
-            boolean last, int index) throws IOException {
+                           boolean last, int index) throws IOException {
         this(fs, new FatMarshal(LENGTH), index);
         setOrdinal(ordinal);
         setLast(last);
@@ -301,7 +300,14 @@ public class FatLongDirEntry extends FatDirEntry {
         damaged = value;
     }
 
+    @Override
     public String toString() {
+        return String.format(
+            "Long Entry [%s] index:%d attr:%s type:%d ckhsum:%s last:%b",
+            component, getIndex(), NumberUtils.hex(lAttr, 2), lType, NumberUtils.hex(lChksum, 2), isLast());
+    }
+
+    public String toDebugString() {
         StrWriter out = new StrWriter();
 
         out.println("*******************************************");

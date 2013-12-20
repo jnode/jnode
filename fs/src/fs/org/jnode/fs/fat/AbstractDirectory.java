@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.fat;
 
 import java.io.FileNotFoundException;
@@ -27,15 +27,15 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Vector;
-
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSDirectoryId;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.ReadOnlyFileSystemException;
 
 /**
  * @author epr
  */
-public abstract class AbstractDirectory extends FatObject implements FSDirectory {
+public abstract class AbstractDirectory extends FatObject implements FSDirectory, FSDirectoryId {
 
     protected Vector<FatBasicDirEntry> entries = new Vector<FatBasicDirEntry>();
     private boolean _dirty;
@@ -54,13 +54,18 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
     }
 
     protected AbstractDirectory(FatFileSystem fs, FatFile myFile) {
-        this(fs, (int) myFile.getLength() / 32, myFile);
+        this(fs, (int) myFile.getLength() / FatConstants.DIR_ENTRY_SIZE, myFile);
+    }
+
+    @Override
+    public String getDirectoryId() {
+        return Long.toString(file.getStartCluster());
     }
 
     /**
      * Gets an iterator to iterate over all entries. The iterated objects are
      * all instance DirEntry.
-     * 
+     *
      * @return Iterator
      */
     public Iterator<FSEntry> iterator() {
@@ -69,7 +74,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 
     /**
      * Add a directory entry.
-     * 
+     *
      * @param nameExt
      * @throws IOException
      */
@@ -92,7 +97,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
                 return newEntry;
             }
         }
-        int newSize = size + 512 / 32;
+        int newSize = size + 512 / FatConstants.DIR_ENTRY_SIZE;
         if (canChangeSize(newSize)) {
             entries.ensureCapacity(newSize);
             setDirty();
@@ -104,7 +109,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 
     /**
      * Add a new file with a given name to this directory.
-     * 
+     *
      * @param name
      * @throws IOException
      */
@@ -114,7 +119,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 
     /**
      * Add a directory entry of the type directory.
-     * 
+     *
      * @param nameExt
      * @param parentCluster
      * @throws IOException
@@ -142,7 +147,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 
     /**
      * Add a new (sub-)directory with a given name to this directory.
-     * 
+     *
      * @param name
      * @throws IOException
      */
@@ -162,7 +167,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 
     /**
      * Gets the number of directory entries in this directory
-     * 
+     *
      * @return int
      */
     public int getSize() {
@@ -171,7 +176,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 
     /**
      * Search for an entry with a given name.ext
-     * 
+     *
      * @param nameExt
      * @return FatDirEntry null == not found
      */
@@ -194,7 +199,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 
     /**
      * Gets the entry with the given name.
-     * 
+     *
      * @param name
      * @throws IOException
      */
@@ -209,7 +214,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 
     /**
      * Remove a file or directory with a given name
-     * 
+     *
      * @param nameExt
      */
     public synchronized void remove(String nameExt) throws IOException {
@@ -230,7 +235,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
     /**
      * Print the contents of this directory to the given writer. Used for
      * debugging purposes.
-     * 
+     *
      * @param out
      */
     public void printTo(PrintWriter out) {
@@ -294,7 +299,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 
     /**
      * Returns the dirty.
-     * 
+     *
      * @return boolean
      */
     public boolean isDirty() {
@@ -330,7 +335,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
     /**
      * Can this directory change size of <code>newSize</code> directory
      * entries?
-     * 
+     *
      * @param newSize
      * @return boolean
      */
@@ -356,7 +361,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 
     /**
      * Sets the first two entries '.' and '..' in the directory
-     * 
+     *
      * @param parentCluster
      */
     protected void initialize(long myCluster, long parentCluster) {
@@ -377,13 +382,13 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 
     /**
      * Read the contents of this directory from the given byte array
-     * 
+     *
      * @param src
      */
     protected synchronized void read(byte[] src) {
         int size = entries.size();
         for (int i = 0; i < size; i++) {
-            int index = i * 32;
+            int index = i * FatConstants.DIR_ENTRY_SIZE;
             if (src[index] == 0) {
                 entries.set(i, null);
             } else {
@@ -396,18 +401,18 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
     /**
      * Write the contents of this directory to the given device at the given
      * offset.
-     * 
+     *
      * @param dest
      */
     protected synchronized void write(byte[] dest) {
         int size = entries.size();
-        byte[] empty = new byte[32];
+        byte[] empty = new byte[FatConstants.DIR_ENTRY_SIZE];
         for (int i = 0; i < size; i++) {
             FatBasicDirEntry entry = entries.get(i);
             if (entry != null) {
-                entry.write(dest, i * 32);
+                entry.write(dest, i * FatConstants.DIR_ENTRY_SIZE);
             } else {
-                System.arraycopy(empty, 0, dest, i * 32, 32);
+                System.arraycopy(empty, 0, dest, i * FatConstants.DIR_ENTRY_SIZE, empty.length);
             }
         }
     }

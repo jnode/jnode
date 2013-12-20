@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.fat;
 
 import java.io.IOException;
@@ -38,43 +38,74 @@ import org.jnode.util.NumberUtils;
  */
 public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCreated, FSEntryLastAccessed {
 
-    /** Name of this entry */
+    /**
+     * The ID for this entry.
+     */
+    private final String id;
+
+    /**
+     * Name of this entry
+     */
     private String name;
-    
-    /** Extension of this entry */
+
+    /**
+     * Extension of this entry
+     */
     private String ext;
-    
-    /** Has this entry been deleted? */
+
+    /**
+     * Has this entry been deleted?
+     */
     private boolean deleted;
-    
-    /** Is this entry not used? */
+
+    /**
+     * Is this entry not used?
+     */
     private boolean unused;
-    
-    /** Flags of this entry */
+
+    /**
+     * Flags of this entry
+     */
     private int flags;
 
-    /** Time of creation. */
+    /**
+     * Time of creation.
+     */
     private long created;
 
-    /** Time of last modification. */
+    /**
+     * Time of last modification.
+     */
     private long lastModified;
 
-    /** Time of last access. */
+    /**
+     * Time of last access.
+     */
     private long lastAccessed;
 
-    /** First cluster of the data of this entry */
+    /**
+     * First cluster of the data of this entry
+     */
     private int startCluster;
-    
-    /** Length in bytes of the data of this entry */
+
+    /**
+     * Length in bytes of the data of this entry
+     */
     private long length;
-    
-    /** Has this entry been changed and not yet flushed to disk? */
+
+    /**
+     * Has this entry been changed and not yet flushed to disk?
+     */
     private boolean _dirty;
-    
-    /** Directory this entry is a part of */
+
+    /**
+     * Directory this entry is a part of
+     */
     private final AbstractDirectory parent;
 
-    /** access rights of the entry */
+    /**
+     * access rights of the entry
+     */
     private final FSAccessRights rights;
 
     public static FatBasicDirEntry fatDirEntryFactory(AbstractDirectory dir, byte[] src, int offset) {
@@ -95,7 +126,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Create a new entry
-     * 
+     *
      * @param dir
      */
     public FatDirEntry(AbstractDirectory dir) {
@@ -104,7 +135,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Create a new entry
-     * 
+     *
      * @param dir
      * @param name
      * @param ext
@@ -118,11 +149,12 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
         this.created = this.lastModified = this.lastAccessed = System.currentTimeMillis();
         this._dirty = false;
         this.rights = new UnixFSAccessRights(getFileSystem());
+        id = name;
     }
 
     /**
      * Create a new entry from a FAT directory image.
-     * 
+     *
      * @param dir
      * @param src
      * @param offset
@@ -131,6 +163,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
         super(dir, src, offset);
 
         this.parent = dir;
+        id = Integer.toString(offset / FatConstants.DIR_ENTRY_SIZE);
         unused = (src[offset] == 0);
         deleted = (LittleEndian.getUInt8(src, offset) == 0xe5);
 
@@ -151,13 +184,13 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
         this.flags = LittleEndian.getUInt8(src, offset + 0x0b);
         this.created =
-                DosUtils.decodeDateTime(LittleEndian.getUInt16(src, offset + 0x10),
-                                        LittleEndian.getUInt16(src, offset + 0x0e));
+            DosUtils.decodeDateTime(LittleEndian.getUInt16(src, offset + 0x10),
+                LittleEndian.getUInt16(src, offset + 0x0e));
         this.lastModified =
-                DosUtils.decodeDateTime(LittleEndian.getUInt16(src, offset + 0x18),
-                                        LittleEndian.getUInt16(src, offset + 0x16));
+            DosUtils.decodeDateTime(LittleEndian.getUInt16(src, offset + 0x18),
+                LittleEndian.getUInt16(src, offset + 0x16));
         this.lastAccessed =
-                DosUtils.decodeDateTime(LittleEndian.getUInt16(src, offset + 0x12), 0); // time not stored
+            DosUtils.decodeDateTime(LittleEndian.getUInt16(src, offset + 0x12), 0); // time not stored
         this.startCluster = LittleEndian.getUInt16(src, offset + 0x1a);
         this.length = LittleEndian.getUInt32(src, offset + 0x1c);
         this._dirty = false;
@@ -166,7 +199,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Returns the attribute.
-     * 
+     *
      * @return int
      */
     public int getFlags() {
@@ -187,7 +220,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Returns the deleted.
-     * 
+     *
      * @return boolean
      */
     public boolean isDeleted() {
@@ -196,11 +229,16 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Returns the ext.
-     * 
+     *
      * @return String
      */
     public String getExt() {
         return ext;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     public String getName() {
@@ -213,7 +251,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Returns the length.
-     * 
+     *
      * @return long
      */
     public long getLength() {
@@ -222,7 +260,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Returns the name.
-     * 
+     *
      * @return String
      */
     public String getNameOnly() {
@@ -231,7 +269,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Returns the startCluster.
-     * 
+     *
      * @return int
      */
     public int getStartCluster() {
@@ -240,7 +278,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Returns the unused.
-     * 
+     *
      * @return boolean
      */
     public boolean isUnused() {
@@ -249,7 +287,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Sets the flags.
-     * 
+     *
      * @param flags
      */
     public void setFlags(int flags) {
@@ -274,7 +312,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Sets the deleted.
-     * 
+     *
      * @param deleted The deleted to set
      */
     public void setDeleted(boolean deleted) {
@@ -284,7 +322,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Sets the ext.
-     * 
+     *
      * @param ext The ext to set
      */
     public void setExt(String ext) {
@@ -296,7 +334,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
     /**
      * Updates the length of the entry. This method is called by
      * FatFile.setLength.
-     * 
+     *
      * @param newLength The length to set
      */
     public synchronized void updateLength(long newLength) {
@@ -309,7 +347,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
     /**
      * Gets the single instance of the file connected to this entry. Returns
      * null if the file is 0 bytes long
-     * 
+     *
      * @return File
      */
     public FSFile getFile() throws IOException {
@@ -335,7 +373,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
     /**
      * Gets the single instance of the file connected to this entry. Returns
      * null if the file is 0 bytes long
-     * 
+     *
      * @return File
      */
     public FatFile getFatFile() {
@@ -344,7 +382,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Sets the name.
-     * 
+     *
      * @param name The name to set
      */
     public void setName(String name) {
@@ -355,7 +393,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Sets the startCluster.
-     * 
+     *
      * @param startCluster The startCluster to set
      */
     protected void setStartCluster(int startCluster) {
@@ -365,7 +403,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Sets the unused.
-     * 
+     *
      * @param unused The unused to set
      */
     public void setUnused(boolean unused) {
@@ -407,7 +445,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Does this entry refer to a file?
-     * 
+     *
      * @see org.jnode.fs.FSEntry#isFile()
      */
     public boolean isFile() {
@@ -416,7 +454,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Does this entry refer to a directory?
-     * 
+     *
      * @see org.jnode.fs.FSEntry#isDirectory()
      */
     public boolean isDirectory() {
@@ -437,7 +475,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Write my contents to the given byte-array
-     * 
+     *
      * @param dest
      * @param offset
      */
@@ -530,7 +568,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
 
     /**
      * Returns the dirty.
-     * 
+     *
      * @return boolean
      */
     public final boolean isDirty() {
@@ -550,8 +588,8 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry, FSEntryCre
     }
 
     /**
-     * Gets the accessrights for this entry.
-     * 
+     * Gets the access rights for this entry.
+     *
      * @throws IOException
      */
     public FSAccessRights getAccessRights() throws IOException {

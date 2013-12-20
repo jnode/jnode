@@ -17,14 +17,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSDirectoryId;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
@@ -34,7 +34,7 @@ import org.jnode.fs.ntfs.index.NTFSIndex;
  * @author vali
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class NTFSDirectory implements FSDirectory {
+public class NTFSDirectory implements FSDirectory, FSDirectoryId {
 
     private static final Logger log = Logger.getLogger(NTFSDirectory.class);
 
@@ -43,13 +43,24 @@ public class NTFSDirectory implements FSDirectory {
     private final NTFSFileSystem fs;
 
     /**
+     * The ID for this directory.
+     */
+    private final String id;
+
+    /**
      * Initialize this instance.
-     * 
-     * @param record
+     *
+     * @param record the file record.
      */
     public NTFSDirectory(NTFSFileSystem fs, FileRecord record) throws IOException {
         this.fs = fs;
         this.index = new NTFSIndex(record);
+        id = Long.toString(record.getReferenceNumber());
+    }
+
+    @Override
+    public String getDirectoryId() {
+        return id;
     }
 
     /**
@@ -64,7 +75,7 @@ public class NTFSDirectory implements FSDirectory {
      */
     public FSEntry getEntry(String name) {
         log.debug("getEntry(" + name + ")");
-        for (Iterator<FSEntry> it = this.iterator(); it.hasNext();) {
+        for (Iterator<FSEntry> it = this.iterator(); it.hasNext(); ) {
             final NTFSEntry entry = (NTFSEntry) it.next();
             if (entry.getName().equals(name)) {
                 return entry;
@@ -73,15 +84,21 @@ public class NTFSDirectory implements FSDirectory {
         return null;
     }
 
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        FileRecord fileRecord = fs.getNTFSVolume().getMFT().getRecord(Long.parseLong(id));
+        return new NTFSEntry(fs, fileRecord);
+    }
+
     /**
-     * 
+     *
      */
     public FSEntry addFile(String name) throws IOException {
         throw new ReadOnlyFileSystemException();
     }
 
     /**
-     * 
+     *
      */
     public FSEntry addDirectory(String name) throws IOException {
         throw new ReadOnlyFileSystemException();
@@ -102,7 +119,7 @@ public class NTFSDirectory implements FSDirectory {
     }
 
     /**
-     * 
+     *
      */
     public FileSystem<?> getFileSystem() {
         return fs;
@@ -110,7 +127,7 @@ public class NTFSDirectory implements FSDirectory {
 
     /**
      * Save all dirty (unsaved) data to the device
-     * 
+     *
      * @throws IOException
      */
     public void flush() throws IOException {

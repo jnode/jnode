@@ -17,14 +17,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jifs;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Iterator;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -34,7 +33,7 @@ import org.jnode.fs.FileSystem;
 /**
  * JIFSFile <br>
  * The JIFSFile holds information in a StringBuffer.
- * 
+ *
  * @author Andreas H\u00e4nel
  */
 public class JIFSFile implements ExtFSEntry, FSFile {
@@ -159,6 +158,11 @@ public class JIFSFile implements ExtFSEntry, FSFile {
 
     public void setParent(FSDirectory parent) {
         this.parent = parent;
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 
     public String getName() {

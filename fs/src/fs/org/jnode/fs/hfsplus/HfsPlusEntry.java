@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import java.io.IOException;
@@ -47,14 +47,13 @@ public class HfsPlusEntry implements FSEntry, FSEntryCreated, FSEntryLastAccesse
     protected FSAccessRights rights;
 
     /**
-     *
      * @param fs
      * @param parent
      * @param name
      * @param record
      */
     public HfsPlusEntry(HfsPlusFileSystem fs, HfsPlusDirectory parent, String name,
-            LeafRecord record) {
+                        LeafRecord record) {
         this.fs = fs;
         this.parent = parent;
         this.name = name;
@@ -82,7 +81,7 @@ public class HfsPlusEntry implements FSEntry, FSEntryCreated, FSEntryLastAccesse
     }
 
     @Override
-    public FSDirectory getDirectory() throws IOException {
+    public HfsPlusDirectory getDirectory() throws IOException {
         if (!isDirectory()) {
             throw new IOException("It is not a Directory");
         }
@@ -102,10 +101,23 @@ public class HfsPlusEntry implements FSEntry, FSEntryCreated, FSEntryLastAccesse
         if (isFile()) {
             CatalogFile catalogFile = new CatalogFile(getData());
             return catalogFile.getContentModDate();
-        }
-        else {
+        } else {
             CatalogFolder catalogFolder = new CatalogFolder(getData());
             return catalogFolder.getContentModDate();
+        }
+    }
+
+    @Override
+    public String getId() {
+        try {
+            if (isFile()) {
+                HfsPlusFile hfsPlusFile = (HfsPlusFile) getFile();
+                return Long.toString(hfsPlusFile.getCatalogFile().getFileId().getId());
+            } else {
+                return getDirectory().getDirectoryId();
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Error getting ID", e);
         }
     }
 
@@ -164,8 +176,7 @@ public class HfsPlusEntry implements FSEntry, FSEntryCreated, FSEntryLastAccesse
             CatalogFile catalogFile = new CatalogFile(getData());
             // catalogFile.setContentModDate();
             throw new UnsupportedOperationException("Not implemented yet.");
-        }
-        else {
+        } else {
             CatalogFolder catalogFolder = new CatalogFolder(getData());
             catalogFolder.setContentModDate(lastModified);
         }
@@ -202,8 +213,7 @@ public class HfsPlusEntry implements FSEntry, FSEntryCreated, FSEntryLastAccesse
         if (isFile()) {
             CatalogFile catalogFile = new CatalogFile(getData());
             return catalogFile.getCreateDate();
-        }
-        else {
+        } else {
             CatalogFolder catalogFolder = new CatalogFolder(getData());
             return catalogFolder.getCreateDate();
         }
@@ -214,8 +224,7 @@ public class HfsPlusEntry implements FSEntry, FSEntryCreated, FSEntryLastAccesse
         if (isFile()) {
             CatalogFile catalogFile = new CatalogFile(getData());
             return catalogFile.getAccessDate();
-        }
-        else {
+        } else {
             CatalogFolder catalogFolder = new CatalogFolder(getData());
             return catalogFolder.getAccessDate();
         }

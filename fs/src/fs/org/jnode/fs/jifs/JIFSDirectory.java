@@ -17,14 +17,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jifs;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -109,6 +108,11 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
         return entries.get(name);
     }
 
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        return getEntry(id);
+    }
+
     public FSAccessRights getAccessRights() {
         return null;
     }
@@ -146,6 +150,11 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
 
     public void setParent(FSDirectory parent) {
         this.parent = parent;
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 
     public String getName() {

@@ -17,14 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import java.io.File;
 import java.io.IOException;
-
-import junit.framework.TestCase;
-
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FileDevice;
 import org.jnode.emu.plugin.model.DummyConfigurationElement;
@@ -35,22 +32,25 @@ import org.jnode.fs.FSDirectory;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.fs.service.def.FileSystemPlugin;
 import org.jnode.test.support.TestUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-public class HfsPlusFileSystemTest extends TestCase {
-    
+public class HfsPlusFileSystemTest {
+
     private Device device;
     private FileSystemService fss;
-    
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+
+    @Before
+    public void setUp() throws Exception {
         // create test device.
         device = createTestDisk(false);
         // create file system service.
         fss = createFSService();
-     
+
     }
 
+    @Test
     public void testCreate() throws Exception {
         HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
         HfsPlusFileSystem fs = new HfsPlusFileSystem(device, false, type);
@@ -61,11 +61,12 @@ public class HfsPlusFileSystemTest extends TestCase {
         params.setJournalSize(HFSPlusParams.DEFAULT_JOURNAL_SIZE);
         fs.create(params);
         SuperBlock vh = fs.getVolumeHeader();
-        assertEquals(SuperBlock.HFSPLUS_SUPER_MAGIC, vh.getMagic());
-        assertEquals(4096, vh.getBlockSize());
+        Assert.assertEquals(SuperBlock.HFSPLUS_SUPER_MAGIC, vh.getMagic());
+        Assert.assertEquals(4096, vh.getBlockSize());
 
     }
 
+    @Test
     public void testRead() throws Exception {
         HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
         HfsPlusFileSystem fs = new HfsPlusFileSystem(device, false, type);
@@ -80,16 +81,16 @@ public class HfsPlusFileSystemTest extends TestCase {
         fs.read();
         fs.createRootEntry();
         FSDirectory root = fs.getRootEntry().getDirectory();
-        assertFalse("Must be empty", root.iterator().hasNext());
+        Assert.assertFalse("Must be empty", root.iterator().hasNext());
         root.addDirectory("test");
         fs.flush();
         fs.close();
         fs = new HfsPlusFileSystemType().create(device, false);
         fs.read();
-        assertEquals(1,fs.getVolumeHeader().getFolderCount());
+        Assert.assertEquals(1, fs.getVolumeHeader().getFolderCount());
         fs.createRootEntry();
         root = fs.getRootEntry().getDirectory();
-        assertTrue("Must contains one directory", root.iterator().hasNext());
+        Assert.assertTrue("Must contains one directory", root.iterator().hasNext());
     }
 
     private Device createTestDisk(boolean formatted) throws IOException {

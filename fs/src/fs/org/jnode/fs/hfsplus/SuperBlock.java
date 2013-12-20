@@ -17,14 +17,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Calendar;
 import java.util.Date;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
@@ -35,9 +34,9 @@ import org.jnode.util.NumberUtils;
 
 /**
  * HFS+ volume header definition.
- * 
+ *
  * @author Fabien Lesire
- * 
+ *
  */
 public class SuperBlock extends HfsPlusObject {
 
@@ -58,7 +57,9 @@ public class SuperBlock extends HfsPlusObject {
 
     private final Logger log = Logger.getLogger(getClass());
 
-    /** Volume header data length */
+    /**
+     * Volume header data length
+     */
     public static final int SUPERBLOCK_LENGTH = 1024;
 
     /** Data bytes array that contains volume header information */
@@ -88,7 +89,7 @@ public class SuperBlock extends HfsPlusObject {
                 System.arraycopy(b.array(), 0, data, 0, SUPERBLOCK_LENGTH);
                 if (getMagic() != HFSPLUS_SUPER_MAGIC && getMagic() != HFSX_SUPER_MAGIC) {
                     throw new FileSystemException("Not hfs+ volume header (" + getMagic() +
-                            ": bad magic)");
+                        ": bad magic)");
                 }
 
             }
@@ -105,7 +106,7 @@ public class SuperBlock extends HfsPlusObject {
      */
     public void create(HFSPlusParams params) throws IOException {
         log.info("Create new HFS+ volume header (" + params.getVolumeName() +
-                ") with block size of " + params.getBlockSize() + " bytes.");
+            ") with block size of " + params.getBlockSize() + " bytes.");
         int burnedBlocksBeforeVH = 0;
         int burnedBlocksAfterAltVH = 0;
         /*
@@ -146,8 +147,8 @@ public class SuperBlock extends HfsPlusObject {
         int startBlock = 1 + burnedBlocksBeforeVH;
         int blockCount = (int) bitmapBlocks;
         HfsPlusForkData forkdata =
-                new HfsPlusForkData(allocationClumpSize, (int) allocationClumpSize,
-                        (int) bitmapBlocks);
+            new HfsPlusForkData(CatalogNodeId.HFSPLUS_ALLOC_CNID, allocationClumpSize, (int) allocationClumpSize,
+                (int) bitmapBlocks);
         ExtentDescriptor desc = new ExtentDescriptor(startBlock, blockCount);
         forkdata.addDescriptor(0, desc);
         forkdata.write(data, 112);
@@ -166,8 +167,8 @@ public class SuperBlock extends HfsPlusObject {
         // Extent B-Tree initialization
         log.info("Init extent file.");
         forkdata =
-                new HfsPlusForkData(params.getExtentClumpSize(), params.getExtentClumpSize(),
-                        (params.getExtentClumpSize() / blockSize));
+            new HfsPlusForkData(CatalogNodeId.HFSPLUS_EXT_CNID, params.getExtentClumpSize(),
+                params.getExtentClumpSize(), (params.getExtentClumpSize() / blockSize));
         desc = new ExtentDescriptor(nextBlock, forkdata.getTotalBlocks());
         forkdata.addDescriptor(0, desc);
         forkdata.write(data, 192);
@@ -177,8 +178,8 @@ public class SuperBlock extends HfsPlusObject {
         log.info("Init catalog file.");
         int totalBlocks = params.getCatalogClumpSize() / blockSize;
         forkdata =
-                new HfsPlusForkData(params.getCatalogClumpSize(), params.getCatalogClumpSize(),
-                        totalBlocks);
+            new HfsPlusForkData(CatalogNodeId.HFSPLUS_CAT_CNID, params.getCatalogClumpSize(),
+                params.getCatalogClumpSize(), totalBlocks);
         desc = new ExtentDescriptor(nextBlock, totalBlocks);
         forkdata.addDescriptor(0, desc);
         forkdata.write(data, 272);
@@ -186,7 +187,7 @@ public class SuperBlock extends HfsPlusObject {
 
         this.setFreeBlocks(this.getFreeBlocks() - (int) blockUsed);
         this.setNextAllocation((int) blockUsed - 1 - burnedBlocksAfterAltVH + 10 *
-                (this.getCatalogFile().getClumpSize() / this.getBlockSize()));
+            (this.getCatalogFile().getClumpSize() / this.getBlockSize()));
     }
 
     /**
@@ -360,8 +361,8 @@ public class SuperBlock extends HfsPlusObject {
         return BigEndian.getInt32(data, 64);
     }
 
-    public final void setNextCatalogId(final int value) {
-        BigEndian.setInt32(data, 64, value);
+    public final void setNextCatalogId(final long value) {
+        BigEndian.setInt32(data, 64, (int) value);
     }
 
     public final int getWriteCount() {
@@ -387,23 +388,23 @@ public class SuperBlock extends HfsPlusObject {
     }
 
     public final HfsPlusForkData getAllocationFile() {
-        return new HfsPlusForkData(data, 112);
+        return new HfsPlusForkData(CatalogNodeId.HFSPLUS_ALLOC_CNID, true, data, 112);
     }
 
     public final HfsPlusForkData getExtentsFile() {
-        return new HfsPlusForkData(data, 192);
+        return new HfsPlusForkData(CatalogNodeId.HFSPLUS_EXT_CNID, true, data, 192);
     }
 
     public final HfsPlusForkData getCatalogFile() {
-        return new HfsPlusForkData(data, 272);
+        return new HfsPlusForkData(CatalogNodeId.HFSPLUS_CAT_CNID, true, data, 272);
     }
 
     public final HfsPlusForkData getAttributesFile() {
-        return new HfsPlusForkData(data, 352);
+        return new HfsPlusForkData(CatalogNodeId.HFSPLUS_ATTR_CNID, true, data, 352);
     }
 
     public final HfsPlusForkData getStartupFile() {
-        return new HfsPlusForkData(data, 432);
+        return new HfsPlusForkData(CatalogNodeId.HFSPLUS_START_CNID, true, data, 432);
     }
 
     /**
@@ -413,8 +414,8 @@ public class SuperBlock extends HfsPlusObject {
      */
     public final String getAttributesAsString() {
         return ((isAttribute(HFSPLUS_VOL_UNMNT_BIT)) ? " kHFSVolumeUnmountedBit" : "") +
-                ((isAttribute(HFSPLUS_VOL_INCNSTNT_BIT)) ? " kHFSBootVolumeInconsistentBit" : "") +
-                ((isAttribute(HFSPLUS_VOL_JOURNALED_BIT)) ? " kHFSVolumeJournaledBit" : "");
+            ((isAttribute(HFSPLUS_VOL_INCNSTNT_BIT)) ? " kHFSBootVolumeInconsistentBit" : "") +
+            ((isAttribute(HFSPLUS_VOL_JOURNALED_BIT)) ? " kHFSVolumeJournaledBit" : "");
     }
 
     /**
@@ -427,11 +428,11 @@ public class SuperBlock extends HfsPlusObject {
     public final boolean isAttribute(final int maskBit) {
         return (((getAttributes() >> maskBit) & 0x1) != 0);
     }
-    
-    public void incrementFolderCount(){
-    	this.setFolderCount(this.getFolderCount() + 1);
+
+    public void incrementFolderCount() {
+        this.setFolderCount(this.getFolderCount() + 1);
     }
-    		
+
 
     public byte[] getBytes() {
         return data;
@@ -446,16 +447,16 @@ public class SuperBlock extends HfsPlusObject {
         buffer.append("Magic: 0x").append(NumberUtils.hex(getMagic(), 4)).append("\n");
         buffer.append("Version: ").append(getVersion()).append("\n").append("\n");
         buffer.append("Attributes: ").append(getAttributesAsString()).append(" (").append(
-                getAttributes()).append(")").append("\n").append("\n");
+            getAttributes()).append(")").append("\n").append("\n");
         buffer.append("Create date: ").append(
-                HfsUtils.printDate(getCreateDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
+            HfsUtils.printDate(getCreateDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
         buffer.append("Modify date: ").append(
-                HfsUtils.printDate(getModifyDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
+            HfsUtils.printDate(getModifyDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
         buffer.append("Backup date: ").append(
-                HfsUtils.printDate(getBackupDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
+            HfsUtils.printDate(getBackupDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
         buffer.append("Checked date: ").append(
-                HfsUtils.printDate(getCheckedDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n")
-                .append("\n");
+            HfsUtils.printDate(getCheckedDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n")
+            .append("\n");
         buffer.append("File count: ").append(getFileCount()).append("\n");
         buffer.append("Folder count: ").append(getFolderCount()).append("\n").append("\n");
         buffer.append("Block size: ").append(getBlockSize()).append("\n");

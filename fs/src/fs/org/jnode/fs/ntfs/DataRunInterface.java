@@ -47,10 +47,24 @@ public interface DataRunInterface {
 	public int readClusters(long vcn, byte[] dst, int dstOffset, int nrClusters, int clusterSize, NTFSVolume volume)
 			throws IOException;
 
+	/** Gets the first virtual cluster in this data run.
+    *
+    * @return the first VCN.
+    */
+   public long getFirstVcn();
+
+   /**
+    * Gets the last virtual cluster in this data run.
+    *
+    * @return the last VCN.
+    */
+   public long getLastVcn();
+
+	
 	/**
 	 * Maps a virtual cluster to a logical cluster.
 	 * @param vcn the virtual cluster number to map.
-	 * @return the logical cluster number or -1 if this cluster is not stored (e.g. for a sparse cluster).
+     * @return the logical cluster number or -1 if this cluster is not stored (e.g. for a sparse cluster).
 	 * @throws ArrayIndexOutOfBoundsException if the VCN doesn't belong to this data run.
 	 */
 	public long mapVcnToLcn(long vcn);

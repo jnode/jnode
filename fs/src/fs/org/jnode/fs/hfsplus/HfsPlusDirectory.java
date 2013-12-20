@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import java.io.FileNotFoundException;
@@ -25,9 +25,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSDirectoryId;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
@@ -40,17 +40,23 @@ import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.FSEntryTable;
 
-public class HfsPlusDirectory implements FSDirectory {
+public class HfsPlusDirectory implements FSDirectory, FSDirectoryId {
 
     private static final Logger log = Logger.getLogger(HfsPlusDirectory.class);
 
-    /** The directory entry */
+    /**
+     * The directory entry
+     */
     private HfsPlusEntry entry;
 
-    /** Table of entries of our parent */
+    /**
+     * Table of entries of our parent
+     */
     private FSEntryTable entries;
 
-    /** The catalog directory record */
+    /**
+     * The catalog directory record
+     */
     private CatalogFolder folder;
 
     public HfsPlusDirectory(HfsPlusEntry entry) {
@@ -128,6 +134,17 @@ public class HfsPlusDirectory implements FSDirectory {
     }
 
     @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        checkEntriesLoaded();
+        return entries.getById(id);
+    }
+
+    @Override
+    public String getDirectoryId() {
+        return Long.toString(folder.getFolderId().getId());
+    }
+
+    @Override
     public Iterator<? extends FSEntry> iterator() throws IOException {
         checkEntriesLoaded();
         return entries.iterator();
@@ -182,7 +199,7 @@ public class HfsPlusDirectory implements FSDirectory {
 
     /**
      * Have we already loaded our entries from device ?
-     * 
+     *
      * @return if the entries are already loaded from the device
      */
     private boolean isEntriesLoaded() {
@@ -190,7 +207,6 @@ public class HfsPlusDirectory implements FSDirectory {
     }
 
     /**
-     * 
      * @return read all entries link to the current directory in the file system.
      * @throws IOException
      */
@@ -201,7 +217,7 @@ public class HfsPlusDirectory implements FSDirectory {
             LeafRecord[] records = fs.getCatalog().getRecords(folder.getFolderId());
             for (LeafRecord rec : records) {
                 if (rec.getType() == CatalogFolder.RECORD_TYPE_FOLDER ||
-                        rec.getType() == CatalogFile.RECORD_TYPE_FILE) {
+                    rec.getType() == CatalogFile.RECORD_TYPE_FILE) {
                     String name = ((CatalogKey) rec.getKey()).getNodeName().getUnicodeString();
                     HfsPlusEntry e = new HfsPlusEntry(fs, this, name, rec);
                     pathList.add(e);
@@ -216,9 +232,8 @@ public class HfsPlusDirectory implements FSDirectory {
     }
 
     /**
-     * 
      * @param name The name of the entry.
-     * @return  Return the newly created entry.
+     * @return Return the newly created entry.
      * @throws IOException if problem occurs during catalog node creation or if system is read-only.
      */
     private FSEntry createDirectoryEntry(final String name) throws IOException {
@@ -228,12 +243,13 @@ public class HfsPlusDirectory implements FSDirectory {
         Catalog catalog = ((HfsPlusFileSystem) getFileSystem()).getCatalog();
         SuperBlock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
         CatalogLeafNode node =
-                catalog.createNode(name, this.folder.getFolderId(),
-                        new CatalogNodeId(volumeHeader.getNextCatalogId()),
-                        CatalogFolder.RECORD_TYPE_FOLDER_THREAD);
+            catalog.createNode(name, this.folder.getFolderId(),
+                new CatalogNodeId(volumeHeader.getNextCatalogId()),
+                CatalogFolder.RECORD_TYPE_FOLDER_THREAD);
         folder.incrementValence();
 
-        HfsPlusEntry newEntry = new HfsPlusEntry((HfsPlusFileSystem) getFileSystem(), this, name, node.getNodeRecord(0));
+        HfsPlusEntry newEntry =
+            new HfsPlusEntry((HfsPlusFileSystem) getFileSystem(), this, name, node.getNodeRecord(0));
         newEntry.setDirty();
         volumeHeader.incrementFolderCount();
         log.debug("New volume header :\n" + volumeHeader.toString());
@@ -244,7 +260,7 @@ public class HfsPlusDirectory implements FSDirectory {
 
     /**
      * Find a free entry and set it with the given entry
-     * 
+     *
      * @param newEntry
      * @throws IOException
      */

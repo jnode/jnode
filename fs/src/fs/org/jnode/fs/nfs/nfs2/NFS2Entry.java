@@ -17,11 +17,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.nfs.nfs2;
 
 import java.io.IOException;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -50,10 +49,10 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
 
     @SuppressWarnings("unused")
     private NFS2AccessRights accessRights;
-    
+
 
     NFS2Entry(NFS2FileSystem fileSystem, NFS2Directory parent, String name, byte[] fileHandle,
-            FileAttribute fileAttribute) {
+              FileAttribute fileAttribute) {
         super(fileSystem);
 
         this.parent = parent;
@@ -71,6 +70,11 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
 
     public FSDirectory getParent() {
         return parent;
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 
     public String getName() {
@@ -151,8 +155,8 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
         NFS2Directory parentDirectory = (NFS2Directory) getParent();
         try {
             client.renameFile(
-                    parentDirectory.getNFS2Entry().getFileHandle(), name,
-                    parentDirectory.getNFS2Entry().getFileHandle(), newName);
+                parentDirectory.getNFS2Entry().getFileHandle(), name,
+                parentDirectory.getNFS2Entry().getFileHandle(), newName);
         } catch (NFS2Exception e) {
             throw new IOException("Can not rename ." + e.getMessage(), e);
         }

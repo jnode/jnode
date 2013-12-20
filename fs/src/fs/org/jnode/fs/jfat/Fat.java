@@ -17,13 +17,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jfat;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.FileSystemException;
 
@@ -78,7 +77,7 @@ public abstract class Fat {
         } else if (bs.isFat16()) {
             return new Fat16(bs, api);
         } else if (bs.isFat12()) {
-//            return new Fat12(bs, api);
+            return new Fat12(bs, api);
         }
 
         throw new FileSystemException("FAT not recognized");
@@ -101,7 +100,7 @@ public abstract class Fat {
             throw new IndexOutOfBoundsException("illegal fat: " + fatnum);
         }
         return (long) getBootSector().getNrReservedSectors() + getBootSector().getSectorsPerFat() *
-                (long) fatnum;
+            (long) fatnum;
     }
 
     public final boolean isFirstSector(int fatnum, long sector) {
@@ -138,7 +137,7 @@ public abstract class Fat {
 
         if ((offset + dst.remaining()) > getClusterSize()) {
             throw new IllegalArgumentException("length[" + (offset + dst.remaining()) + "] " +
-                    "exceed clusterSize[" + getClusterSize() + "]");
+                "exceed clusterSize[" + getClusterSize() + "]");
         }
 
         getApi().read(getClusterPosition(cluster) + offset, dst);
@@ -151,7 +150,7 @@ public abstract class Fat {
 
         if ((offset + src.remaining()) > getClusterSize()) {
             throw new IllegalArgumentException("length[" + (offset + src.remaining()) + "] " +
-                    "exceed clusterSize[" + getClusterSize() + "]");
+                "exceed clusterSize[" + getClusterSize() + "]");
         }
 
         getApi().write(getClusterPosition(cluster) + offset, src);
@@ -168,7 +167,7 @@ public abstract class Fat {
 
         if (end > getClusterSize()) {
             throw new IllegalArgumentException("end[" + end + "] " + "exceed clusterSize[" +
-                    getClusterSize() + "]");
+                getClusterSize() + "]");
         }
 
         clearbuf.clear();
@@ -191,7 +190,7 @@ public abstract class Fat {
         }
 
         return (long) (index - firstCluster()) * (long) bs.getSectorsPerCluster() +
-                getBootSector().getFirstDataSector();
+            getBootSector().getFirstDataSector();
     }
 
     public abstract long getClusterPosition(int index);
@@ -289,11 +288,15 @@ public abstract class Fat {
     public String getCacheStat() {
         StrWriter out = new StrWriter();
         out.println("Access: " + cache.getAccess() + " Hits: " + cache.getHit() + " Ratio: " +
-                cache.getRatio() * 100 + "%");
+            cache.getRatio() * 100 + "%");
         return out.toString();
     }
 
     public String toString() {
+        return String.format("FAT cluster:%d boot sector: %s", getClusterSize(), getBootSector());
+    }
+
+    public String toDebugString() {
         StrWriter out = new StrWriter();
 
         out.println("***************************  Fat   **************************");

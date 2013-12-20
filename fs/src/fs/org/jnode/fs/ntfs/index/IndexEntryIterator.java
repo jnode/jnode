@@ -17,12 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ntfs.index;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
 import org.jnode.fs.ntfs.FileRecord;
 import org.jnode.fs.ntfs.NTFSStructure;
 
@@ -30,7 +29,7 @@ import org.jnode.fs.ntfs.NTFSStructure;
 /**
  * Iterator used to iterate over all IndexEntry's in an index block
  * or index_root attribute.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class IndexEntryIterator implements Iterator<IndexEntry> {
@@ -62,8 +61,8 @@ public final class IndexEntryIterator implements Iterator<IndexEntry> {
     /**
      * @see java.util.Iterator#next()
      */
-    public IndexEntry next() { 
-        if (nextEntry == null) { 
+    public IndexEntry next() {
+        if (nextEntry == null) {
             throw new NoSuchElementException();
         } else {
             final IndexEntry result = nextEntry;
@@ -93,7 +92,15 @@ public final class IndexEntryIterator implements Iterator<IndexEntry> {
 
     private void readNext() {
         nextEntry = new IndexEntry(parentFileRecord, parent, offset);
-        if (nextEntry.isLastIndexEntryInSubnode() && !nextEntry.hasSubNodes()) {
+
+        try {
+            if (nextEntry.isLastIndexEntryInSubnode() && !nextEntry.hasSubNodes()) {
+                nextEntry = null;
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // If the last entry in the sub-node doesn't have the right flags set, an out-of-bounds exception can be
+            // raised trying to read the next entry that isn't there. E.g. offset 4088 in a 4096 block. Just ignore this
+            // for now
             nextEntry = null;
         }
     }

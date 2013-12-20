@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
@@ -39,6 +39,11 @@ public final class ISO9660Entry implements FSEntry {
     public ISO9660Entry(ISO9660FileSystem fs, EntryRecord entry) {
         this.fs = fs;
         this.entryRecord = entry;
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 
     /**
@@ -94,9 +99,9 @@ public final class ISO9660Entry implements FSEntry {
         throw new UnsupportedOperationException("not yet implemented");
     }
 
-	public void setLastAccessed(long lastAccessed) {
-	    throw new UnsupportedOperationException("Filesystem is read-only");
-	}
+    public void setLastAccessed(long lastAccessed) {
+        throw new UnsupportedOperationException("Filesystem is read-only");
+    }
 
     /**
      * @see org.jnode.fs.FSEntry#getFile()
@@ -149,7 +154,7 @@ public final class ISO9660Entry implements FSEntry {
 
     /**
      * Indicate if the entry has been modified in memory (ie need to be saved)
-     * 
+     *
      * @return true if the entry need to be saved
      * @throws IOException
      */

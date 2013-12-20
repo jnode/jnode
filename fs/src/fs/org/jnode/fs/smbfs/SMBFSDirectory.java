@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.smbfs;
 
 import java.io.IOException;
@@ -30,6 +30,7 @@ import java.util.Map;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSEntry;
 
 /**
  * @author Levente S\u00e1ntha
@@ -105,6 +106,11 @@ public class SMBFSDirectory extends SMBFSEntry implements FSDirectory {
         return entries.get(name);
     }
 
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        return getEntry(id);
+    }
+
     /**
      * @see org.jnode.fs.FSDirectory#iterator()
      */
@@ -170,5 +176,10 @@ public class SMBFSDirectory extends SMBFSEntry implements FSDirectory {
         if (!dname.endsWith("/"))
             dname += "/";
         return dname;
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 }
