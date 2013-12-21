@@ -196,7 +196,7 @@
     <option name="formatter" value="ECLIPSE" />
     <option name="id" value="1378417660892" />
     <option name="name" value="default" />
-    <option name="pathToConfigFileJava" value="$PROJECT_DIR$/../../../sources/jnode-dev/jnode.orig/jnode-eclipse-formatter-settings.xml" />
+    <option name="pathToConfigFileJava" value="$PROJECT_DIR$/../jnode.luke/jnode-eclipse-formatter-settings.xml" />
     <option name="selectedJavaProfile" value="Eclipse [jnode]" />
   </component>
   <component name="EclipseCompilerSettings">

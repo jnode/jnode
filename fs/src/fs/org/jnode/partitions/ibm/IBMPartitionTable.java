@@ -136,7 +136,7 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
             log.error("IOException");
         }
 
-        IBMPartitionTableEntry entry = null;
+        IBMPartitionTableEntry entry;
         for (int i = 0; i < TABLE_SIZE; i++) {
             entry = new IBMPartitionTableEntry(this, sector.array(), i);
             if (entry.isValid() && !entry.isEmpty()) {
@@ -193,27 +193,54 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
             return true;
         }
 
+        if (LittleEndian.getUInt32(bootSector, 6) == 0x4f4c494c) {
+            // Matches the LILO signature, probably an valid partition table
+        	log.debug("Has LILO signature");
+            return true;
+        }
+
         String bootSectorAsString = new String(bootSector, 0, 512, Charset.forName("US-ASCII"));
 
-        if (bootSectorAsString.contains(
-            "Invalid partition table\u0000Error loading operating system\u0000Missing operating system\u0000")) {
+        if (bootSectorAsString.contains("Invalid partition table\u0000Error loading operating system\u0000Missing operating system")) {
             // Matches Microsoft partition boot code error message signature
-            // see http://thestarman.pcministry.com/asm/mbr/VistaMBR.htm
-            log.debug("Has Microsft code error string signature");
+            // see:
+            //     http://thestarman.pcministry.com/asm/mbr/VistaMBR.htm
+            //     http://thestarman.narod.ru/asm/mbr/Win2kmbr.htm
+            //     http://thestarman.narod.ru/asm/mbr/200MBR.htm
+            //     http://thestarman.narod.ru/asm/mbr/95BMEMBR.htm
+            //     http://thestarman.narod.ru/asm/mbr/STDMBR.htm
+            log.debug("Has Microsoft code error string signature");
             return true;
         }
 
         if (bootSectorAsString.contains("Read\u0000Boot\u0000 error\r\n\u0000")) {
             // Matches BSD partition boot code error message signature
-            // see http://thestarman.pcministry.com/asm/mbr/VistaMBR.htm
-            log.debug("Has BSD code error string signature");
+        	log.debug("Has BSD code error string signature");
+            return true;
+        }
+
+        if (bootSectorAsString.contains("GRUB \u0000Geom\u0000Hard Disk\u0000Read\u0000 Error\r\n\u0000")) {
+            // Matches GRUB string signature
+        	log.debug("Has GRUB string signature");
+            return true;
+        }
+
+        if (bootSectorAsString.contains("\u0000Multiple active partitions.\r\n")) {
+            // Matches SYSLINUX string signature
+        	log.debug("Has SYSLINUX string signature");
+            return true;
+        }
+
+        if (bootSectorAsString.contains("MBR \u0010\u0000")) {
+            // Matches MBR string extra signature
+        	log.debug("Has MBR string signature");
             return true;
         }
 
         if (LittleEndian.getUInt32(bootSector, 241) == 0x41504354) {
             // Matches TCPA signature
             // see http://thestarman.pcministry.com/asm/mbr/VistaMBR.htm
-            log.debug("Has TCPA extra signature");
+        	log.debug("Has TCPA extra signature");
             return true;
         }
 
@@ -221,21 +248,23 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
 
         if (bsdNameTabString.contains("Linu\ufffd") || bsdNameTabString.contains("FreeBD\ufffd")) {
             // Matches BSD nametab entries signature
-            log.debug("Has BSD nametab entries");
+        	log.debug("Has BSD nametab entries");
             return true;
         }
 
         // Check if this looks like a filesystem instead of a partition table
         String oemName = new String(bootSector, 3, 8, Charset.forName("US-ASCII"));
         if (FILESYSTEM_OEM_NAMES.contains(oemName)) {
+            log.error("Looks like a file system instead of a partition table.");
             return false;
         }
-
+        /* FIXME Always failed
         if (LittleEndian.getUInt16(bootSector, 218) != 0) {
             // This needs to be zero in the 'standard' MBR layout
             log.debug("Fails standard MBR reserved@218=0 test");
             return false;
         }
+        */
 
         // Nothing matched, fall back to validating any specified partition entries
         log.debug("Checking partitions");
@@ -247,7 +276,7 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
             if (partition.isValid()) {
                 if (lastValid != null) {
                     if (lastValid.getStartLba() + lastValid.getNrSectors() > partition.getStartLba()) {
-                        // End of previous partition entry after the start of the next one
+                        log.error(" End of previous partition entry after the start of the next one");
                         return false;
                     }
                 }
@@ -263,7 +292,7 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
     public Iterator<IBMPartitionTableEntry> iterator() {
         return new Iterator<IBMPartitionTableEntry>() {
             private int index = 0;
-            private final int last = (partitions == null) ? 0 : partitions.length - 1;
+            private final int last = (partitions == null) ? 0 : partitions.length;
 
             public boolean hasNext() {
                 return index < last;
