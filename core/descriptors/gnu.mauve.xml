@@ -28,9 +28,20 @@
   provider-url="http://sources.redhat.com/mauve/"
   license-name="gpl">
 
+  <requires>
+    <import plugin="org.junit"/>
+  </requires>
+    
+    
   <runtime>
+    <!--  Exclude junit classes -->
     <library name="mauve.jar">
-      <export name="*"/>
+      <export name="build/*"/>
+      <export name="gnu/*"/>
+      <export name="META-INF/*"/>
+      <export name="net/*"/>
+      <export name="testlists"/>
+      <export name="testlists.orig"/>
     </library>
   </runtime>
 
