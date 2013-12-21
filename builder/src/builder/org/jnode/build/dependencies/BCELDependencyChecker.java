@@ -474,7 +474,9 @@ public class BCELDependencyChecker extends AbstractPluginTask {
                         if (signature.startsWith("[")) {
                             signature = decodeTypeName(signature);
                         }
-                        addUsedClass(usingClass, signature);
+                        if (signature != null) {
+                        	addUsedClass(usingClass, signature);
+                        }
                     }
                 } else if (constant instanceof ConstantNameAndType) {
                     for (String typeName : decodeSignature(
