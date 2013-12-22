@@ -588,6 +588,8 @@ encoding-fix      Correct the file encoding of all java source
 javadoc           Generate documentation of all java source files.
 javadoc-small     Generate documentation of the basic JNode api's.
 
+tests             Run all tests from all sub-projects.
+
 check-plugins     Run tests to check plugin dependencies.
 
 clean             Remove all intermediate build results.
@@ -1061,7 +1063,10 @@ clean             Remove all intermediate build results.
 
 	<!-- Run all tests -->
 	<target name="tests" depends="assemble">
-		<ant target="tests" dir="${root.dir}/fs" inheritall="on" inheritrefs="on"/>
+	    <subant>
+	        <fileset dir="${root.dir}" includes="**/build-tests.xml"/>
+	    </subant>
+	    <antcall target="check-plugins"/>
 	</target>
 
 	<!-- Check the encoding of all files -->
