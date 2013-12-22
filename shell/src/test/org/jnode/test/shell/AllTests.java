@@ -20,19 +20,13 @@
  
 package org.jnode.test.shell;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.jnode.test.shell.help.DefaultHelpTest;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
+@RunWith(Suite.class)
+@Suite.SuiteClasses({CompletionInfoTest.class, PathnamePatternTest.class, CompletionTest.class,
+    DefaultSyntaxCompletionTest.class, DefaultHelpTest.class,
+    org.jnode.test.shell.bjorne.AllTests.class, org.jnode.test.shell.syntax.AllTests.class})
 public class AllTests {
-
-    public static Test suite() {
-        TestSuite suite = new TestSuite("Tests for org.jnode.test.shell");
-        //$JUnit-BEGIN$
-        suite.addTestSuite(CompletionInfoTest.class);
-        suite.addTestSuite(PathnamePatternTest.class);
-        suite.addTestSuite(CompletionTest.class);
-        suite.addTestSuite(DefaultSyntaxCompletionTest.class);
-        //$JUnit-END$
-        return suite;
-    }
 }
