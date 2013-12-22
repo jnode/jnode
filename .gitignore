@@ -3,6 +3,7 @@
 build
 .classpath
 .project
+*.iws
 *.patch
 jnode.properties
 local/
