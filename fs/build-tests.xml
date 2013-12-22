@@ -37,8 +37,9 @@ help         Output these messages
 		<junit showoutput="off" printsummary="on" fork="on" haltonfailure="on">
 			<classpath refid="cp-test"/>
 			<formatter type="xml"/>
-			<test name="org.jnode.test.fs.filesystem.FSTestSuite" todir="${basedir}/build/reports/junit"/>
-		</junit>
+            <test name="org.jnode.driver.bus.ide.IDEDriveDescriptorTest" todir="${basedir}/build/reports/junit"/>
+            <!-- <test name="org.jnode.test.fs.filesystem.FSTestSuite" todir="${basedir}/build/reports/junit"/>-->
+        </junit>
 	</target>
 
 	<target name="all" depends="all-junit" />
