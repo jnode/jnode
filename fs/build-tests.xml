@@ -38,7 +38,7 @@ help         Output these messages
 			<classpath refid="cp-test"/>
 			<formatter type="xml"/>
             <test name="org.jnode.driver.bus.ide.IDEDriveDescriptorTest" todir="${basedir}/build/reports/junit"/>
-            <!-- <test name="org.jnode.test.fs.filesystem.FSTestSuite" todir="${basedir}/build/reports/junit"/>-->
+            <test name="org.jnode.test.fs.filesystem.FSTestSuite" todir="${basedir}/build/reports/junit"/>
         </junit>
 	</target>
 
