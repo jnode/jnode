@@ -35,6 +35,7 @@ help            Output these messages
 	</target>
 	
 	<target name="all-junit">
+	    <!-- 
 		<delete dir="${basedir}/build/reports/junit"/>
 		<mkdir dir="${basedir}/build/reports/junit"/>
 	    <junit showoutput="off" printsummary="on" fork="on">
@@ -42,12 +43,14 @@ help            Output these messages
 			<classpath refid="cp-test"/>
 			<test name="org.jnode.test.cli.CLITestSuite" todir="${basedir}/build/reports/junit"/>
 		</junit>
+		-->
 	</target>
 	
 	<target name="blackbox-common">
 	    <java classpathref="cp-test" classname="org.jnode.test.shell.harness.TestHarness">
 	        <arg value="-E"/>
-	        <arg value="-s"/>
+	        <arg value="-F"/>
+			<arg value="-s"/>
 	        <arg value="${root.dir}"/>
 	        <arg value="${basedir}/src/test/org/jnode/test/command/common/all-common-tests.xml"/>
 	    </java>
@@ -56,6 +59,7 @@ help            Output these messages
 	<target name="blackbox-file">
 	    <java classpathref="cp-test" classname="org.jnode.test.shell.harness.TestHarness">
 	        <arg value="-E"/>
+	        <arg value="-F"/>
 	        <arg value="-s"/>
 	        <arg value="${root.dir}"/>
 	        <arg value="${basedir}/src/test/org/jnode/test/command/file/all-file-tests.xml"/>
