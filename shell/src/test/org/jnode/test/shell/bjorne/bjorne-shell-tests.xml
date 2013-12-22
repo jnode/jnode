@@ -586,7 +586,7 @@ A hashhash c* is
 B hashhash c* is
 </output>
     </testSpec>
-    <testSpec title="${..%..} expansions" command="test" runMode="AS_SCRIPT" rc="0">
+    <!--  testSpec title="${..%..} expansions" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 A=cat
                 B=caaat
@@ -604,7 +604,7 @@ B % ?t is caa
 A % *t is ca
 B % *t is caaa
 </output>
-    </testSpec>
+    </testSpec -->
     <testSpec title="script arguments" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 echo $0
