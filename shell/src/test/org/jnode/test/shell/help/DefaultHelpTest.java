@@ -88,6 +88,7 @@ public class DefaultHelpTest extends TestCase {
                     "The quick brown fox jumped over the lazy dog." +
                     "The quick brown fox jumped over the lazy dog."
             });
+        pw.flush();
         assertEquals(
             "   12345   The quick brown fox \n" +
                 "   67890   jumped over the lazy\n" +

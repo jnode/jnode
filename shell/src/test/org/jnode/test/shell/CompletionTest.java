@@ -138,7 +138,7 @@ public class CompletionTest extends TestCase {
         final String[] propertyCompletions = getExpectedPropertyNameCompletions();
 
         checkCompletions(cs, "set ", propertyCompletions, -1);
-        checkCompletions(cs, "set a", new String[]{}, -1);
+        checkCompletions(cs, "set a", new String[]{ "awt.toolkit "}, -1);
         checkCompletions(cs, "set u", new String[]{
             "user.country ", "user.dir ", "user.home ",
             "user.language ", "user.name ", "user.timezone "}, 4);
@@ -166,7 +166,7 @@ public class CompletionTest extends TestCase {
     private String[] getExpectedPropertyNameCompletions() {
         TreeSet<String> tmp = new TreeSet<String>();
         for (Object key : System.getProperties().keySet()) {
-            tmp.add(key + " ");
+      		tmp.add(key + " ");
         }
         return tmp.toArray(new String[tmp.size()]);
     }
