@@ -38,7 +38,7 @@ help            Output these messages
 	    <!-- 
 		<delete dir="${basedir}/build/reports/junit"/>
 		<mkdir dir="${basedir}/build/reports/junit"/>
-	    <junit showoutput="off" printsummary="on" fork="on">
+	    <junit showoutput="off" printsummary="on" fork="on" haltonfailure="on">
 	        <formatter type="xml"/>
 			<classpath refid="cp-test"/>
 			<test name="org.jnode.test.cli.CLITestSuite" todir="${basedir}/build/reports/junit"/>
