@@ -18,17 +18,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jnode.test.shell.syntax;
+package org.jnode.test.shell.bjorne;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ArgumentTypesTest.class, ArgumentBundleTest.class, DefaultTokenizerTest.class,
-    MuSyntaxTest.class, MuParserTest.class, MuParserTest2.class, ArgumentMultiplicityTest.class,
-    CommandLineTest.class, RepeatSyntaxTest.class, SequenceSyntaxTest.class,
-    OptionSyntaxTest.class, PowersetSyntaxTest.class, OptionSetSyntaxTest.class,
-    AlternativesSyntaxTest.class})
+@Suite.SuiteClasses({BjorneArithmeticEvaluatorTest.class, BjorneCompletionTest.class,
+    BjorneContextTest.class, BjorneParserTest.class, BjorneTokenizerTest.class})
 public class AllTests {
 
 }
