@@ -18,32 +18,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jnode.test;
+package org.jnode.test.shell.bjorne;
 
-import org.jnode.vm.classmgr.Signature;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-/**
- * @author epr
- */
-public class SignatureTest {
+@RunWith(Suite.class)
+@Suite.SuiteClasses({BjorneArithmeticEvaluatorTest.class, BjorneCompletionTest.class,
+    BjorneContextTest.class, BjorneParserTest.class, BjorneTokenizerTest.class})
+public class AllTests {
 
-    @Test
-    public void testSignatureObject() {
-        String res = Signature.toSignature(Object.class);
-        Assert.assertEquals("Ljava/lang/Object;", res);
-    }
-
-    @Test
-    public void testSignatureChar() {
-        String res = Signature.toSignature(Character.TYPE);
-        Assert.assertEquals("C", res);
-    }
-
-    @Test
-    public void testSignatureCharArray() {
-        String res = Signature.toSignature(char[].class);
-        Assert.assertEquals("[C", res);
-    }
 }

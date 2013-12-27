@@ -17,27 +17,17 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import org.apache.log4j.Logger;
+import org.jnode.test.util.NumberUtilsTest;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
  * @author epr
  */
+@RunWith(Suite.class)
+@Suite.SuiteClasses({TestVmClass.class, SignatureTest.class, NumberUtilsTest.class})
 public class AllTests {
-
-    static final Logger log = Logger.getLogger(AllTests.class);
-
-    public static Test suite() {
-        log.info("Starting test");
-        TestSuite suite = new TestSuite("Test for org.jnode.test");
-        //$JUnit-BEGIN$
-        suite.addTest(new TestSuite(TestVmClass.class));
-        suite.addTest(new TestSuite(SignatureTest.class));
-        //$JUnit-END$
-        return suite;
-    }
 }

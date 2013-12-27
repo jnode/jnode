@@ -17,17 +17,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-package org.jnode.test.net.ethernet;
+
+package org.jnode.net.ethernet;
 
 import org.jnode.net.HardwareAddress;
-import org.jnode.net.ethernet.EthernetAddress;
-import org.jnode.net.ethernet.EthernetConstants;
+import org.junit.Assert;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-
-public class EthernetAddressTest extends TestCase {
+public class EthernetAddressTest {
 
     private static final String TEST_MAC_ADDRESS_STRING = "00-14-22-49-DD-2B";
     private static final String TEST_MAC_ADDRESS_STRING_DISPLAY = "00:14:22:49:DD:2B";
@@ -40,109 +37,90 @@ public class EthernetAddressTest extends TestCase {
     private static final String TEST_MAC_ADDRESS_STRING_WRONG = "00-14-22-49-XX-2B";
     private static final String TEST_MAC_ADDRESS_STRING_WRONG_LENGTH = "00-14-22-49-DD-2B-32";
 
-    public void testEqualsObject() {
-        fail("Not yet implemented");
-    }
-
-    public void testHashCode() {
-        fail("Not yet implemented");
-    }
-
+    @Test
     public void testToString() {
         EthernetAddress mac =
                 new EthernetAddress(TEST_MAC_ADDRESS_BYTE_0, TEST_MAC_ADDRESS_BYTE_1,
                         TEST_MAC_ADDRESS_BYTE_2, TEST_MAC_ADDRESS_BYTE_3, TEST_MAC_ADDRESS_BYTE_4,
                         TEST_MAC_ADDRESS_BYTE_5);
-        assertEquals(TEST_MAC_ADDRESS_STRING_DISPLAY, mac.toString());
+        Assert.assertEquals(TEST_MAC_ADDRESS_STRING_DISPLAY, mac.toString());
     }
 
-    public void testEthernetAddressByteArrayInt() {
-        fail("Not yet implemented");
-    }
-
-    public void testEthernetAddressSocketBufferInt() {
-        fail("Not yet implemented");
-    }
-
+    @Test
     public void testEthernetAddressString() {
         EthernetAddress mac = new EthernetAddress(TEST_MAC_ADDRESS_STRING);
-        assertNotNull(mac);
+        Assert.assertNotNull(mac);
         try {
             mac = new EthernetAddress(TEST_MAC_ADDRESS_STRING_WRONG_LENGTH);
-            fail();
+            Assert.fail();
         } catch (IllegalArgumentException e) {
-            assertTrue(e.getMessage().startsWith("Invalid address"));
+            Assert.assertTrue(e.getMessage().startsWith("Invalid address"));
         }
         try {
             mac = new EthernetAddress(TEST_MAC_ADDRESS_STRING_WRONG);
-            fail();
+            Assert.fail();
         } catch (IllegalArgumentException e) {
-            assertTrue(e.getMessage().startsWith("Not an ethernet address"));
+            Assert.assertTrue(e.getMessage().startsWith("Not an ethernet address"));
         }
     }
 
+    @Test
     public void testEthernetAddressByteByteByteByteByteByte() {
         EthernetAddress mac =
                 new EthernetAddress(TEST_MAC_ADDRESS_BYTE_0, TEST_MAC_ADDRESS_BYTE_1,
                         TEST_MAC_ADDRESS_BYTE_2, TEST_MAC_ADDRESS_BYTE_3, TEST_MAC_ADDRESS_BYTE_4,
                         TEST_MAC_ADDRESS_BYTE_5);
-        assertNotNull(mac);
+        Assert.assertNotNull(mac);
     }
 
+    @Test
     public void testEqualsEthernetAddress() {
         EthernetAddress mac =
                 new EthernetAddress(TEST_MAC_ADDRESS_BYTE_0, TEST_MAC_ADDRESS_BYTE_1,
                         TEST_MAC_ADDRESS_BYTE_2, TEST_MAC_ADDRESS_BYTE_3, TEST_MAC_ADDRESS_BYTE_4,
                         TEST_MAC_ADDRESS_BYTE_5);
-        assertTrue(mac.equals(new EthernetAddress(TEST_MAC_ADDRESS_STRING)));
+        Assert.assertTrue(mac.equals(new EthernetAddress(TEST_MAC_ADDRESS_STRING)));
     }
 
+    @Test
     public void testEqualsHardwareAddress() {
         EthernetAddress mac =
                 new EthernetAddress(TEST_MAC_ADDRESS_BYTE_0, TEST_MAC_ADDRESS_BYTE_1,
                         TEST_MAC_ADDRESS_BYTE_2, TEST_MAC_ADDRESS_BYTE_3, TEST_MAC_ADDRESS_BYTE_4,
                         TEST_MAC_ADDRESS_BYTE_5);
         HardwareAddress mac2 = new EthernetAddress(TEST_MAC_ADDRESS_STRING);
-        assertTrue(mac.equals(mac2));
+        Assert.assertTrue(mac.equals(mac2));
     }
 
+    @Test
     public void testGetLength() {
         EthernetAddress mac = new EthernetAddress(TEST_MAC_ADDRESS_STRING);
-        assertEquals(EthernetConstants.ETH_ALEN, mac.getLength());
+        Assert.assertEquals(EthernetConstants.ETH_ALEN, mac.getLength());
     }
 
+    @Test
     public void testGet() {
         EthernetAddress mac = new EthernetAddress(TEST_MAC_ADDRESS_STRING);
-        assertEquals(TEST_MAC_ADDRESS_BYTE_0, mac.get(0));
-        assertEquals(TEST_MAC_ADDRESS_BYTE_1, mac.get(1));
-        assertEquals(TEST_MAC_ADDRESS_BYTE_2, mac.get(2));
-        assertEquals(TEST_MAC_ADDRESS_BYTE_3, mac.get(3));
-        assertEquals(TEST_MAC_ADDRESS_BYTE_4, mac.get(4));
-        assertEquals(TEST_MAC_ADDRESS_BYTE_5, mac.get(5));
+        Assert.assertEquals(TEST_MAC_ADDRESS_BYTE_0, mac.get(0));
+        Assert.assertEquals(TEST_MAC_ADDRESS_BYTE_1, mac.get(1));
+        Assert.assertEquals(TEST_MAC_ADDRESS_BYTE_2, mac.get(2));
+        Assert.assertEquals(TEST_MAC_ADDRESS_BYTE_3, mac.get(3));
+        Assert.assertEquals(TEST_MAC_ADDRESS_BYTE_4, mac.get(4));
+        Assert.assertEquals(TEST_MAC_ADDRESS_BYTE_5, mac.get(5));
     }
 
-    public void testWriteToSocketBufferInt() {
-        fail("Not yet implemented");
-    }
-
-    public void testWriteToByteArrayInt() {
-        fail("Not yet implemented");
-    }
-
+    @Test
     public void testIsBroadcast() {
         EthernetAddress mac = new EthernetAddress(TEST_MAC_ADDRESS_STRING);
-        assertFalse(mac.isBroadcast());
+        Assert.assertFalse(mac.isBroadcast());
         EthernetAddress broadcast = new EthernetAddress("FF-FF-FF-FF-FF-FF");
-        assertTrue(broadcast.isBroadcast());
+        Assert.assertTrue(broadcast.isBroadcast());
     }
 
-    public void testGetDefaultBroadcastAddress() {
-        fail("Not yet implemented");
-    }
-
+    @Test
     public void testGetType() {
         EthernetAddress mac = new EthernetAddress(TEST_MAC_ADDRESS_STRING);
-        assertEquals(1, mac.getType());
+        Assert.assertEquals(1, mac.getType());
     }
 
 }

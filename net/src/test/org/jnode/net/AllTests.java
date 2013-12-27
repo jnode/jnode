@@ -18,32 +18,15 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jnode.test;
+package org.jnode.net;
 
-import org.jnode.vm.classmgr.Signature;
-import org.junit.Assert;
-import org.junit.Test;
+import org.jnode.net.arp.ARPHeaderTest;
+import org.jnode.net.ethernet.EthernetAddressTest;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-/**
- * @author epr
- */
-public class SignatureTest {
-
-    @Test
-    public void testSignatureObject() {
-        String res = Signature.toSignature(Object.class);
-        Assert.assertEquals("Ljava/lang/Object;", res);
-    }
-
-    @Test
-    public void testSignatureChar() {
-        String res = Signature.toSignature(Character.TYPE);
-        Assert.assertEquals("C", res);
-    }
-
-    @Test
-    public void testSignatureCharArray() {
-        String res = Signature.toSignature(char[].class);
-        Assert.assertEquals("[C", res);
-    }
+@RunWith(Suite.class)
+@Suite.SuiteClasses({ARPHeaderTest.class, //
+    EthernetAddressTest.class})
+public class AllTests {
 }

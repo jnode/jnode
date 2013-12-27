@@ -67,13 +67,8 @@ help         Output these messages
 			<formatter type="xml"/>
 			<batchtest fork="yes" todir="${basedir}/build/reports/junit">
 				<fileset dir="${basedir}/src/test">
-					<include name="**/*Test.java" />
-					<exclude name="org/jnode/test/shell/proclet/ProcletStreamTest.java"/>
-					<!-- 
-						FIXME - Some of the unit tests may need to be excluded if they cannot be 
-					    made to run in classic Java from the sandbox command line.
-					 -->
-				</fileset>
+                    <include name="org/jnode/test/shell/AllTests.java"/>
+                </fileset>
 			</batchtest>
 		</junit>
 	</target>

@@ -30,8 +30,6 @@ import java.util.TreeSet;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
-import junit.framework.TestCase;
-
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.DefaultCommandInvoker;
 import org.jnode.shell.DefaultInterpreter;
@@ -48,13 +46,19 @@ import org.jnode.shell.syntax.SyntaxBundle;
 import org.jnode.shell.syntax.SyntaxManager;
 import org.jnode.test.shell.syntax.TestAliasManager;
 import org.jnode.test.shell.syntax.TestSyntaxManager;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Test command completion using various interpreters and commands.
  *
  * @author crawley@jnode.org
  */
-public class CompletionTest extends TestCase {
+// FIXME
+@Ignore
+public class CompletionTest {
 
     private String userDirName = System.getProperty("user.dir");
     private File testDir;
@@ -68,8 +72,8 @@ public class CompletionTest extends TestCase {
         }
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         // Setup a temporary home directory for filename completion
         File tempDir = new File(System.getProperty("java.io.tmpdir"));
         testDir = new File(tempDir, "CompletionTestDir");
@@ -87,8 +91,8 @@ public class CompletionTest extends TestCase {
         fw.close();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         for (File f : testDir.listFiles()) {
             f.delete();
         }
@@ -131,6 +135,7 @@ public class CompletionTest extends TestCase {
         }
     }
 
+    @Test
     public void testDefaultInterpreterNewSyntax() throws Exception {
         MyTestCommandShell cs = new MyTestCommandShell();
         cs.setProperty(CommandShell.INTERPRETER_PROPERTY_NAME, "default");
