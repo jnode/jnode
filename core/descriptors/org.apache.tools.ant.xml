@@ -29,6 +29,7 @@
                 
   <requires>
     <import plugin="org.apache.tools.ant-launcher"/>
+    <import plugin="org.apache.tools.archive"/>
     <import plugin="com.sun.tools.javac"/>
   </requires>
         
@@ -44,6 +45,10 @@
       <export name="org.apache.tools.ant.taskdefs.*"/>
       <export name="org.apache.tools.ant.types.*"/>
       <export name="org.apache.tools.ant.util.*"/>            
+      
+      <exclude name="org.apache.tools.tar.*" />
+      <exclude name="org.apache.tools.zip.*" />
+      <exclude name="org.apache.tools.bzip2.*" />
     </library>
   </runtime>  
   
