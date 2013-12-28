@@ -523,6 +523,11 @@ public class PluginDocumentationTask extends AbstractPluginTask {
                         sb.append(export);
                         sb.append("<br/>");
                     }
+                    for (String exclude : library.getExcludes()) {
+                    	sb.append("exclude: ");
+                        sb.append(exclude);
+                        sb.append("<br/>");
+                    }
                     addTableRow(out, libName, sb.toString());
                 }
                 endSummaryTableHdr(out);

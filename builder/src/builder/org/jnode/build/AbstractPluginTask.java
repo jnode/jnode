@@ -112,6 +112,23 @@ public abstract class AbstractPluginTask extends Task {
         }
         fs.createExclude().setName("**/package.html");
 
+        final String[] excludes = lib.getExcludes();
+        for (int i = 0; i < excludes.length; i++) {
+            final String exclude = excludes[i];
+            if (exclude.equals("*")) {
+                fs.createExclude().setName("**/*");                
+            } else {
+                String exp = exclude.replace('.', '/');
+                fs.createExclude().setName(exp + ".*");
+                fs.createExclude().setName(exp + ".class");
+                if (!exp.endsWith("*")) {
+                    fs.createExclude().setName(exp + "*");
+                } else {
+                    fs.createExclude().setName(exp);
+                }
+            }
+        }
+
         final String[] exports = lib.getExports();
         for (int i = 0; i < exports.length; i++) {
             final String export = exports[i];

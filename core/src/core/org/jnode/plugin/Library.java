@@ -56,6 +56,14 @@ public interface Library {
     public String[] getExports();
 
     /**
+     * Gets all declared exclude names.
+     * Exclude overrides export.
+     *
+     * @return All declared exclude names
+     */
+    public String[] getExcludes();
+
+    /**
      * Gets the descriptor of the plugin in which this element was declared.
      *
      * @return The descriptor
