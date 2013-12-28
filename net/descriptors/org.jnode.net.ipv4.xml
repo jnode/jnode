@@ -30,7 +30,7 @@
     <import plugin="org.jnode.net"/>
     <import plugin="org.jnode.net.arp"/>
     <import plugin="org.jnode.net.ipv4.core"/>
-    <import plugin="org.xbill.dns"/>
+    <import plugin="org.xbill.dns" version="1.6.6"/>
     <import plugin="org.apache.jakarta.commons.net"/>
   </requires>
 
