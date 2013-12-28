@@ -3,6 +3,8 @@
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/fs"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/driver"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
+	<classpathentry kind="src" path="src/commands"/>
+	<classpathentry kind="src" path="src/partitions"/>
 	<classpathentry kind="src" path="/shell"/>
 	<classpathentry kind="lib" path="lib/edtftpj-1.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/jcifs-1.2.6.jar"/>

@@ -49,7 +49,9 @@
   <target name="compile" depends="prepare">
     <jnode.compile>
 	  <src path="${my-src.dir}/fs"/>
+	  <src path="${my-src.dir}/partitions"/>
 	  <src path="${my-src.dir}/driver"/>
+	  <src path="${my-src.dir}/commands"/>
 	  <src path="${my-src.dir}/test"/>
       <classpath refid="my-cp"/>
     </jnode.compile>
