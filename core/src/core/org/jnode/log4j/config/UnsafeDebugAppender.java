@@ -25,7 +25,6 @@ import java.io.Writer;
 
 import org.apache.log4j.Layout;
 import org.apache.log4j.WriterAppender;
-import org.jnode.driver.console.ConsoleManager;
 import org.jnode.vm.Unsafe;
 
 /**
@@ -34,8 +33,6 @@ import org.jnode.vm.Unsafe;
  * @author crawley@jnode.org
  */
 public class UnsafeDebugAppender extends WriterAppender {
-    
-    private static ConsoleManager mgr;
     
     private Writer writer;
 

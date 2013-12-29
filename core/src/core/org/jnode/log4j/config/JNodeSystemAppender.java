@@ -97,7 +97,8 @@ public class JNodeSystemAppender extends WriterAppender {
         @Override
         public void write(char[] cbuf, int off, int len) throws IOException {
             synchronized (this.lock) {
-                PrintStream currentStream = this.toErr ? System.err : System.out;
+                @SuppressWarnings("resource")
+				PrintStream currentStream = this.toErr ? System.err : System.out;
                 if (currentStream != this.myStream) {
                     currentStream = this.myStream;
                     this.myWriter = new OutputStreamWriter(this.myStream);

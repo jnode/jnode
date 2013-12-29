@@ -35,7 +35,12 @@ import java.security.BasicPermission;
  */
 public class JNodePermission extends BasicPermission {
 
-    /**
+	/**
+	 * Serialization
+	 */
+	private static final long serialVersionUID = -4640568385065658738L;
+
+	/**
      * @param name
      */
     public JNodePermission(String name) {

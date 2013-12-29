@@ -28,6 +28,11 @@ package org.jnode.plugin;
 public class PluginException extends Exception {
 
     /**
+	 * Serialization
+	 */
+	private static final long serialVersionUID = 173965793309418665L;
+
+	/**
      *
      */
     public PluginException() {
