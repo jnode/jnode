@@ -29,6 +29,7 @@
   <runtime>
     <library name="cglib.jar">
       <export name="net.sf.cglib.*"/>
+      <export name="net.sf.cglib.proxy.*"/>
     </library>
   </runtime>        
 </plugin>
