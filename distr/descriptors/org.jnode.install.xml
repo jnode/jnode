@@ -34,7 +34,9 @@
   <runtime>
     <library name="jnode-distr.jar">
       <export name="org.jnode.install.*"/>
-    </library>
+      <export name="org.jnode.install.action.*"/>
+      <export name="org.jnode.install.cmdline.*"/>
+      </library>
   </runtime>
         
 </plugin>

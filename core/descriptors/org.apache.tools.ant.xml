@@ -29,8 +29,8 @@
                 
   <requires>
     <import plugin="org.apache.tools.ant-launcher"/>
-    <import plugin="org.apache.tools.archive"/>
-    <import plugin="com.sun.tools.javac"/>
+    <import plugin="org.apache.tools.archive" version="1.7.1"/>
+    <import plugin="com.sun.tools.javac" version="@VERSION@"/>
   </requires>
         
   <runtime>

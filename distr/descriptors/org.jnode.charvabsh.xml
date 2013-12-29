@@ -27,7 +27,7 @@
         license-name="lgpl">
 
     <requires>
-        <import plugin="charva"/>
+        <import plugin="charva" version="1.0.1"/>
         <import plugin="org.jnode.shell"/>
         <import plugin="org.beanshell"/>
 <!--        <import plugin="org.jnode.net"/>-->

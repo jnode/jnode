@@ -33,7 +33,7 @@
   </runtime>
   
   <requires>
-     <import plugin="charva"/>
+     <import plugin="charva" version="1.0.1"/>
      <import plugin="org.jnode.shell.help"/>
   </requires>
 		 

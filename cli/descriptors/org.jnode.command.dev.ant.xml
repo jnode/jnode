@@ -29,7 +29,6 @@
   <requires>
     <import plugin="org.jnode.shell.help"/>
     <import plugin="org.apache.tools.ant" version="1.6.3"/>
-    <import plugin="org.apache.tools.ant-launcher" version="1.6.3"/>        
   </requires>
 
   <runtime>

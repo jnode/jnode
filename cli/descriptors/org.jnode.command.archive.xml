@@ -27,7 +27,7 @@
         license-name="lgpl">
 
   <requires>
-    <import plugin="org.apache.tools.archive" />
+    <import plugin="org.apache.tools.archive" version="1.7.1"/>
     <import plugin="org.jnode.shell" />
     <import plugin="org.jnode.shell.syntax" />
     <import plugin="org.jnode.command.util" />
