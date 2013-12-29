@@ -87,17 +87,7 @@ public abstract class AbstractPluginTask extends Task {
 
     protected void processLibrary(Jar jarTask, Library lib, HashMap<File, ZipFileSet> fileSets, File srcDir) {
         final String jarName = jarTask.getDestFile().getName();
-        final LibAlias libAlias = getAlias(lib.getName());
-        final File f;
-        if (libAlias == null) {
-            f = new File(srcDir, lib.getName());
-            if (!f.exists()) {
-                throw new BuildException(
-                    "file not found " + f.getAbsoluteFile() + " because " + lib.getName() + " has no alias");
-            }
-        } else {
-            f = libAlias.getAlias();
-        }
+        final File f = getLibraryFile(lib, srcDir);
 
         ZipFileSet fs = fileSets.get(f);
         if (fs == null) {
@@ -147,6 +137,24 @@ public abstract class AbstractPluginTask extends Task {
                 }
             }
         }
+    }
+    
+    /**
+     * Gets the file described by the given library
+     */
+    protected File getLibraryFile(Library lib, File srcDir) {
+        final LibAlias libAlias = getAlias(lib.getName());
+        final File f;
+        if (libAlias == null) {
+            f = new File(srcDir, lib.getName());
+            if (!f.exists()) {
+                throw new BuildException(
+                    "file not found " + f.getAbsoluteFile() + " because " + lib.getName() + " has no alias");
+            }
+        } else {
+            f = libAlias.getAlias();
+        }    	
+        return f;
     }
     
     private void checkPackageExists(String jarName, final String export, File src) {

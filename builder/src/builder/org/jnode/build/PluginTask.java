@@ -146,6 +146,10 @@ public class PluginTask extends AbstractPluginTask {
 
         File destFile = new File(todir, fullId + ".jar");
 
+        // Check if we have to do something
+        if (isUpToDate(descriptor, descr, destFile))
+        	return;
+        
         final Jar jarTask = new Jar();
         jarTask.setProject(getProject());
         jarTask.setTaskName(getTaskName());
@@ -186,6 +190,34 @@ public class PluginTask extends AbstractPluginTask {
         }
 
         jarTask.execute();
+    }
+    
+    /**
+     * Is the given destination file up to date with respect to it's sources?
+     * @param descriptor
+     * @param descr
+     * @param destFile
+     * @return
+     */
+    private boolean isUpToDate(File descriptor, PluginDescriptor descr, File destFile) {
+    	if (!destFile.exists())
+    		return false;
+    	long destLastModified = destFile.lastModified();
+    	
+    	if (descriptor.lastModified() > destLastModified)
+    		return false;
+
+        // Check runtime resources
+        final Runtime rt = descr.getRuntime();
+        if (rt != null) {
+        	for (Library lib : rt.getLibraries()) {
+        		File libFile = getLibraryFile(lib, getPluginDir());
+        		if (libFile.lastModified() > destLastModified)
+        			return false;
+        	}
+        }
+
+    	return true;
     }
 
     /**
