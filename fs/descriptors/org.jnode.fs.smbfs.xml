@@ -28,7 +28,7 @@
 
   <requires>
 	<import plugin="org.jnode.fs"/>
-    <import plugin="jcifs"/>
+    <import plugin="jcifs" version="1.2.6"/>
   </requires>
         
   <runtime>

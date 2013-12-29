@@ -29,19 +29,15 @@
   license-name="gpl">
 
   <requires>
-    <import plugin="org.junit"/>
+    <import plugin="org.junit" version="4.5"/>
   </requires>
     
     
   <runtime>
     <!--  Exclude junit classes -->
     <library name="mauve.jar">
-      <export name="build/*"/>
-      <export name="gnu/*"/>
-      <export name="META-INF/*"/>
-      <export name="net/*"/>
-      <export name="testlists"/>
-      <export name="testlists.orig"/>
+      <export name="*"/>
+      <exclude name="junit.framework.*"/>
     </library>
   </runtime>
 

@@ -28,7 +28,7 @@
         provider-url="http://www.enterprisedt.com/products/edtftpj/">
         
   <requires>
-    <import plugin="org.jnode.net"/>
+    <import plugin="org.jnode.net" version="@VERSION@"/>
   </requires>
         
   <runtime>

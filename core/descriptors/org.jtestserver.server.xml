@@ -28,7 +28,7 @@
         license-name="gpl">
 
   <requires>
-    <import plugin="gnu.mauve"/>
+    <import plugin="gnu.mauve" version="@VERSION@"/>
   </requires>
                 
   <runtime>
@@ -38,7 +38,8 @@
       <export name="org.jtestserver.common.*"/>
       <export name="org.jtestserver.common.message.*"/>
       <export name="org.jtestserver.common.protocol.*"/>
-    </library>
+      <export name="org.jtestserver.common.protocol.udp.*"/>
+      </library>
   </runtime>
         
   <extension point="org.jnode.security.permissions">

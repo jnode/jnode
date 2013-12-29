@@ -28,7 +28,7 @@
         provider-name="JNode.org">
         
   <requires>
-    <import plugin="nanoxml"/>
+    <import plugin="nanoxml" version="1.4"/>
     <import plugin="org.jnode.plugin"/>
     <import plugin="org.jnode.security"/>
     <import plugin="org.jnode.util"/>

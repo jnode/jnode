@@ -28,8 +28,8 @@
         provider-url="http://jcifs.samba.org">
         
   <requires>
-    <import plugin="org.jnode.net"/>
-    <import plugin="org.jnode.protocol" />  
+    <import plugin="org.jnode.net" version="@VERSION@"/>
+    <import plugin="org.jnode.protocol" version="@VERSION@"/>  
   </requires>
         
   <runtime>

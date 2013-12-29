@@ -31,8 +31,8 @@
     <import plugin="org.jnode.shell"/>
     <import plugin="org.jnode.shell.help"/>
     <import plugin="org.jnode.shell.syntax"/>
-    <import plugin="org.junit"/>
-    <import plugin="net.n3.nanoxml"/>
+    <import plugin="org.junit" version="4.5"/>
+    <import plugin="net.n3.nanoxml" version="2.2.3"/>
     <import plugin="org.jnode.shell.help"/>
     <import plugin="org.jnode.testrunner"/>
   </requires>

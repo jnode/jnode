@@ -25,7 +25,7 @@
 
 	<requires>
 		<import plugin="org.jnode.net" />
-		<import plugin="org.acplt.oncrpc" />
+		<import plugin="org.acplt.oncrpc" version="1.0.6"/>
 	</requires>
 
 	<runtime>

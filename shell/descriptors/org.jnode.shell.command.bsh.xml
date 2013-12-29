@@ -28,7 +28,7 @@
 
   <requires>
     <import plugin="org.jnode.shell.help"/>
-    <import plugin="org.beanshell"/>
+    <import plugin="org.beanshell" version="1.0"/>
   </requires>
 
   <runtime>
