@@ -288,7 +288,7 @@ public final class PluginRegistryModel extends VmSystemObject implements
     /**
      * {@inheritDoc}
      */
-    public PluginDescriptor loadPlugin(final PluginLoader loader, final String pluginId, final String pluginVersion,
+    public PluginDescriptor loadPlugin(final PluginLoader loader, final PluginReference pluginReference,
                                        boolean resolve)
         throws PluginException {
         final SecurityManager sm = System.getSecurityManager();
@@ -296,7 +296,7 @@ public final class PluginRegistryModel extends VmSystemObject implements
             sm.checkPermission(PluginSecurityConstants.LOAD_PERM);
         }
         // Load the requested plugin
-        final PluginDescriptorModel descr = loadPluginImpl(loader, pluginId, pluginVersion);
+        final PluginDescriptorModel descr = loadPluginImpl(loader, pluginReference);
 
         if (resolve) {
             final HashMap<String, PluginDescriptorModel> descriptors = new HashMap<String, PluginDescriptorModel>();
@@ -318,9 +318,7 @@ public final class PluginRegistryModel extends VmSystemObject implements
         final int reqLength = reqs.length;
         for (int i = 0; i < reqLength; i++) {
             final PluginPrerequisite req = reqs[i];
-            final String id = req.getPluginReference().getId();
-            final String version = req.getPluginReference().getVersion();
-            loadDependency(loader, id, version, descriptors);
+            loadDependency(loader, req.getPluginReference(), descriptors);
         }
         // Extensions
         final Extension[] exts = descr.getExtensions();
@@ -328,19 +326,19 @@ public final class PluginRegistryModel extends VmSystemObject implements
         for (int i = 0; i < extLength; i++) {
             final Extension ext = exts[i];
             final String id = ext.getExtensionPointPluginId();
-            loadDependency(loader, id, descr.getVersion(), descriptors);
+            loadDependency(loader, new PluginReference(id, descr.getVersion()), descriptors);
         }
     }
 
-    private final void loadDependency(PluginLoader loader, String id, String version,
+    private final void loadDependency(PluginLoader loader, PluginReference dependency,
                                       Map<String, PluginDescriptorModel> descriptors) throws PluginException {
-        if (getPluginDescriptor(id) != null) {
+        if (getPluginDescriptor(dependency.getId()) != null) {
             return;
         }
-        if (descriptors.containsKey(id)) {
+        if (descriptors.containsKey(dependency.getId())) {
             return;
         }
-        final PluginDescriptorModel descr = loadPluginImpl(loader, id, version);
+        final PluginDescriptorModel descr = loadPluginImpl(loader, dependency);
         descriptors.put(descr.getId(), descr);
         loadDependencies(loader, descr, descriptors);
     }
@@ -354,8 +352,8 @@ public final class PluginRegistryModel extends VmSystemObject implements
      * @return The descriptor of the loaded plugin.
      * @throws PluginException
      */
-    private final PluginDescriptorModel loadPluginImpl(final PluginLoader loader, final String pluginId,
-                                                       final String pluginVersion) throws PluginException {
+    private final PluginDescriptorModel loadPluginImpl(final PluginLoader loader, final PluginReference pluginReference)
+    		throws PluginException {
         final PluginRegistryModel registry = this;
         final PluginJar pluginJar;
         try {
@@ -363,10 +361,10 @@ public final class PluginRegistryModel extends VmSystemObject implements
                 .doPrivileged(new PrivilegedExceptionAction<PluginJar>() {
 
                     public PluginJar run() throws PluginException, IOException {
-                        final ByteBuffer buf = loader.getPluginBuffer(pluginId, pluginVersion);
+                        final ByteBuffer buf = loader.getPluginBuffer(pluginReference);
                         if (buf == null) {
                             throw new PluginException(
-                                "Plugin " + pluginId + ", version " + pluginVersion + " not found");
+                                "Plugin " + pluginReference + " not found");
                         }
                         return new PluginJar(registry, buf, null);
                     }
