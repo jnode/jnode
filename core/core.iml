@@ -19,7 +19,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="core" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -49,7 +48,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/jmock-1.0.1.jar!/" />
@@ -58,7 +57,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/jmock-cglib-1.0.1.jar!/" />
@@ -67,7 +66,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/cglib-2.1.jar!/" />
@@ -93,7 +92,18 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$MODULE_DIR$/../all/lib/classlib-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/../all/lib/classlib-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/../all/lib/classlib-src.jar!/" />
         </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/log4j-1.2.8.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
       </library>
     </orderEntry>
   </component>
