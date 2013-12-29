@@ -20,11 +20,11 @@
  
 package org.jnode.test.partitions.ibm;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.util.LittleEndian;
-import org.junit.Before;
 import org.junit.Test;
 
 public class IBMPartitionTableEntryTest {
