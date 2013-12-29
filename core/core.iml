@@ -14,8 +14,8 @@
       <sourceFolder url="file://$MODULE_DIR$/src/mmtk-vm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/vm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/template" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/vmmagic" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="true" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

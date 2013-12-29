@@ -7,7 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/apps" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/emu" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/install" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="true" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
