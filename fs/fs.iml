@@ -10,6 +10,8 @@
       <sourceFolder url="file://$MODULE_DIR$/src/driver" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/fs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/commands" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/partitions" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
