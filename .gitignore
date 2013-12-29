@@ -1,6 +1,7 @@
 
 # /
-build
+/build
+/*/build
 .classpath
 .project
 *.iws
