@@ -22,7 +22,7 @@ package org.jnode.apps.jpartition.model;
 
 import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.utils.device.DeviceUtils;
-import org.jnode.test.AnnotationTest.Test;
+import org.junit.Test;
 import org.junit.Before;
 
 public class TestOSFacade extends AbstractTest {

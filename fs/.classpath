@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/fs"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/driver"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
+	<classpathentry excluding="**/.svn/**" kind="src" output="build/testclasses" path="src/test"/>
 	<classpathentry kind="src" path="src/commands"/>
 	<classpathentry kind="src" path="src/partitions"/>
 	<classpathentry kind="src" path="/shell"/>

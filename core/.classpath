@@ -10,8 +10,9 @@
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/vmmagic"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/mmtk-vm"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/driver"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
+	<classpathentry excluding="**/.svn/**" kind="src" output="build/testclasses" path="src/test"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/template"/>
+	<classpathentry kind="src" path="src/testframework"/>
 	<classpathentry exported="true" kind="lib" path="lib/ant.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.5.jar"/>

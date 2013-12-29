@@ -31,7 +31,7 @@ import org.jnode.apps.vmware.disk.IOUtils;
 import org.jnode.apps.vmware.disk.VMWareDisk;
 import org.jnode.apps.vmware.disk.handler.IOHandler;
 import org.jnode.apps.vmware.disk.test.Utils;
-import org.jnode.test.AnnotationTest.Test;
+import org.junit.Test;
 import org.junit.Ignore;
 
 /**

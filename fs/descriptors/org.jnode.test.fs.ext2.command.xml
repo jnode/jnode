@@ -33,7 +33,7 @@
   </requires>
         
   <runtime>
-    <library name="jnode-fs.jar">
+    <library name="jnode-fs-test.jar">
       <export name="org.jnode.test.fs.ext2.command.*"/>
     </library>
   </runtime>

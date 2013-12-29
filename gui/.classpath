@@ -4,7 +4,7 @@
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/font"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/desktop"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/driver"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
+	<classpathentry excluding="**/.svn/**" kind="src" output="build/testclasses" path="src/test"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/thinlet"/>
 	<classpathentry kind="src" path="/core"/>
 	<classpathentry kind="src" path="/shell"/>

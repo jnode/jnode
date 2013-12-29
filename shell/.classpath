@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/shell"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/emu"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
+	<classpathentry excluding="**/.svn/**" kind="src" output="build/testclasses" path="src/test"/>
 	<classpathentry kind="src" path="/core"/>
 	<classpathentry exported="true" kind="lib" path="lib/bsh-2.0b5.jar"/>
 	<classpathentry kind="lib" path="lib/rhino1.6r5-jsr223.jar"/>

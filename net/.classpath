@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/net"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/driver"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
+	<classpathentry excluding="**/.svn/**" kind="src" output="build/testclasses" path="src/test"/>
 	<classpathentry kind="src" path="/core"/>
 	<classpathentry exported="true" kind="lib" path="lib/oncrpc.jar"/>
 	<classpathentry kind="src" path="/shell"/>

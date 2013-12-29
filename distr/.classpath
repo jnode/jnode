@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/install"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/emu"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
+	<classpathentry excluding="**/.svn/**" kind="src" output="build/testclasses" path="src/test"/>
 	<classpathentry kind="src" path="/core"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/apps"/>
 	<classpathentry kind="src" path="/gui"/>

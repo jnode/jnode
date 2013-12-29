@@ -31,7 +31,7 @@
   </requires>
 
   <runtime>
-    <library name="jnode-net.jar">
+    <library name="jnode-net-test.jar">
       <export name="org.jnode.test.net.*"/>
     </library>
   </runtime>

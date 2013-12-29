@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/commands"/>
-	<classpathentry kind="src" path="src/test"/>
+	<classpathentry kind="src" output="build/testclasses" path="src/test"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/shell"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net"/>
