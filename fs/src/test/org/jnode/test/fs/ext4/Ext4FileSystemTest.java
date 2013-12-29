@@ -1,12 +1,12 @@
-package org.jnode.fs.ext4;
+package org.jnode.test.fs.ext4;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FileDevice;
-import org.jnode.fs.DataStructureAsserts;
-import org.jnode.fs.FileSystemTestUtils;
 import org.jnode.fs.ext2.Ext2FileSystem;
 import org.jnode.fs.ext2.Ext2FileSystemType;
 import org.jnode.fs.service.FileSystemService;
+import org.jnode.test.fs.DataStructureAsserts;
+import org.jnode.test.fs.FileSystemTestUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ public class Ext4FileSystemTest {
     @Test
     public void testReadExt4SpecialFiles() throws Exception {
 
-        device = new FileDevice(FileSystemTestUtils.getTestFile("ext4/test-special-files.ext4"), "r");
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/ext4/test-special-files.ext4"), "r");
         Ext2FileSystemType type = fss.getFileSystemType(Ext2FileSystemType.ID);
         Ext2FileSystem fs = type.create(device, true);
 

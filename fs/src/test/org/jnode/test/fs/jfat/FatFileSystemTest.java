@@ -1,10 +1,12 @@
-package org.jnode.fs.jfat;
+package org.jnode.test.fs.jfat;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FileDevice;
-import org.jnode.fs.DataStructureAsserts;
-import org.jnode.fs.FileSystemTestUtils;
+import org.jnode.fs.jfat.FatFileSystem;
+import org.jnode.fs.jfat.FatFileSystemType;
 import org.jnode.fs.service.FileSystemService;
+import org.jnode.test.fs.DataStructureAsserts;
+import org.jnode.test.fs.FileSystemTestUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,7 +24,7 @@ public class FatFileSystemTest {
     @Test
     public void testReadFat32Disk() throws Exception {
 
-        device = new FileDevice(FileSystemTestUtils.getTestFile("jfat/test.fat32"), "r");
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/jfat/test.fat32"), "r");
         FatFileSystemType type = fss.getFileSystemType(FatFileSystemType.ID);
         FatFileSystem fs = type.create(device, true);
 

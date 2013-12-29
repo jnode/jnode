@@ -29,6 +29,7 @@ import java.util.Collection;
 
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.service.def.FileSystemManager;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -72,7 +73,5 @@ public class FileSystemManagerTest {
         result = fsm.fileSystems();
         assertNotNull(result);
         assertEquals(0,result.size());
-    }
-    
-    
+    }       
 }

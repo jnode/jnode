@@ -1,4 +1,4 @@
-package org.jnode.fs;
+package org.jnode.test.fs;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -6,7 +6,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.Map;
+
 import jcifs.util.Hexdump;
+
+import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSFile;
+import org.jnode.fs.FSFileStreams;
+import org.jnode.fs.FileSystem;
 import org.junit.Assert;
 
 /**

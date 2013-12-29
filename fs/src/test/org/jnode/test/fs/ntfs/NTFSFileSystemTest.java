@@ -1,10 +1,12 @@
-package org.jnode.fs.ntfs;
+package org.jnode.test.fs.ntfs;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FileDevice;
-import org.jnode.fs.DataStructureAsserts;
-import org.jnode.fs.FileSystemTestUtils;
+import org.jnode.fs.ntfs.NTFSFileSystem;
+import org.jnode.fs.ntfs.NTFSFileSystemType;
 import org.jnode.fs.service.FileSystemService;
+import org.jnode.test.fs.DataStructureAsserts;
+import org.jnode.test.fs.FileSystemTestUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -23,7 +25,7 @@ public class NTFSFileSystemTest {
     @Test
     public void testReadSmallDisk() throws Exception {
 
-        device = new FileDevice(FileSystemTestUtils.getTestFile("ntfs/test.ntfs"), "r");
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/ntfs/test.ntfs"), "r");
         NTFSFileSystemType type = fss.getFileSystemType(NTFSFileSystemType.ID);
         NTFSFileSystem fs = type.create(device, true);
 
@@ -59,7 +61,7 @@ public class NTFSFileSystemTest {
     @Ignore
     public void testReadCompressedDisk() throws Exception {
 
-        device = new FileDevice(FileSystemTestUtils.getTestFile("ntfs/compressed.dd"), "r");
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/ntfs/compressed.dd"), "r");
         NTFSFileSystemType type = fss.getFileSystemType(NTFSFileSystemType.ID);
         NTFSFileSystem fs = type.create(device, true);
 

@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.fs.fat.test;
+package org.jnode.test.fs.fat;
 
 import java.io.File;
 import java.io.FileNotFoundException;

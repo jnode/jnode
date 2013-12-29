@@ -18,10 +18,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.fs.hfsplus;
+package org.jnode.test.fs.hfsplus;
 
 import static org.junit.Assert.assertEquals;
 
+import org.jnode.fs.hfsplus.HfsUnicodeString;
 import org.junit.Test;
 
 public class HfsUnicodeStringTest {

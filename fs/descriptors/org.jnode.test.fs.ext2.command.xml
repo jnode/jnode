@@ -20,7 +20,7 @@
 -->
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.fs.ext2.test.command" 
+<plugin id="org.jnode.test.fs.ext2.command" 
         name="JNode ext2fs test commands"
         version="@VERSION@"
         license-name="lgpl"
@@ -34,14 +34,14 @@
         
   <runtime>
     <library name="jnode-fs.jar">
-      <export name="org.jnode.fs.ext2.test.command.*"/>
+      <export name="org.jnode.test.fs.ext2.command.*"/>
     </library>
   </runtime>
         
   <extension point="org.jnode.shell.aliases">
-    <alias name="writeTest" class="org.jnode.fs.ext2.test.command.WriteTest"/>
-  	<alias name="copyTest" class="org.jnode.fs.ext2.test.command.CopyTest"/>
-  	<alias name="fillTest" class="org.jnode.fs.ext2.test.command.FillTest"/>
+    <alias name="writeTest" class="org.jnode.test.fs.ext2.command.WriteTest"/>
+  	<alias name="copyTest" class="org.jnode.test.fs.ext2.command.CopyTest"/>
+  	<alias name="fillTest" class="org.jnode.test.fs.ext2.command.FillTest"/>
   </extension>
 
   <extension point="org.jnode.security.permissions">

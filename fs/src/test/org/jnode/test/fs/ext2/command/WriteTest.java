@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.fs.ext2.test.command;
+package org.jnode.test.fs.ext2.command;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

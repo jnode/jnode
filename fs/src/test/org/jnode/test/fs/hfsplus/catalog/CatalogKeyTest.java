@@ -18,11 +18,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.fs.hfsplus.catalog;
+package org.jnode.test.fs.hfsplus.catalog;
 
 import static org.junit.Assert.assertEquals;
 
 import org.jnode.fs.hfsplus.HfsUnicodeString;
+import org.jnode.fs.hfsplus.catalog.CatalogKey;
+import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
 import org.junit.Test;
 
 public class CatalogKeyTest {

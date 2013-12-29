@@ -40,6 +40,7 @@
     <library name="jnode-fs.jar">
       <export name="org.jnode.fs.*"/>
       <export name="org.jnode.fs.service.def.*"/>
+      <exclude name="org.jnode.fs.service.def.FileSystemManagerTest"/>
       <export name="org.jnode.fs.spi.*"/>
       <export name="org.jnode.fs.util.*"/>
     </library>

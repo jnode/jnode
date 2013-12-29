@@ -18,10 +18,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.partitions.ibm;
+package org.jnode.test.partitions.ibm;
 
 import static org.junit.Assert.*;
 
+import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.util.LittleEndian;
 import org.junit.Before;
 import org.junit.Test;

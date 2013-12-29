@@ -18,10 +18,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.driver.bus.ide;
+package org.jnode.test.driver.bus.ide;
 
 import static org.junit.Assert.*;
 
+import org.jnode.driver.bus.ide.IDEDriveDescriptor;
 import org.junit.Before;
 import org.junit.Test;
 
