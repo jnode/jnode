@@ -292,7 +292,7 @@ public final class DefaultPluginManager extends PluginManager {
         }
         final PluginPrerequisite[] prereq = descr.getPrerequisites();
         for (final PluginPrerequisite pr : prereq) {
-            if (!nameSet.contains(pr.getPluginId())) {
+            if (!nameSet.contains(pr.getPluginReference().getId())) {
                 //Syslog.debug("Not in set: " + pr.getPluginId());
                 return false;
             }
@@ -309,7 +309,7 @@ public final class DefaultPluginManager extends PluginManager {
     private boolean prerequisitesExist(PluginDescriptor descr, Map<String, PluginDescriptor> all) {
         final PluginPrerequisite[] prereq = descr.getPrerequisites();
         for (final PluginPrerequisite pr : prereq) {
-            if (!all.containsKey(pr.getPluginId())) {
+            if (!all.containsKey(pr.getPluginReference().getId())) {
                 return false;
             }
         }

@@ -212,25 +212,25 @@ public class InitJarBuilder extends AbstractPluginsTask {
             
             for (int j = 0; j < prereqs.length; j++) {
                 PluginPrerequisite required = prereqs[j]; 
-                List<String> versions = idToVersions.get(required.getPluginId());
+                List<String> versions = idToVersions.get(required.getPluginReference().getId());
                 
-                boolean versionSpecified = (required.getPluginVersion() == null); 
+                boolean versionSpecified = (required.getPluginReference().getVersion() == null); 
 
                 boolean satisfied = false;
                 if (versions != null) {
                     satisfied = !versionSpecified || 
-                        versions.contains(required.getPluginVersion());
+                        versions.contains(required.getPluginReference().getVersion());
                 }
                 
                 if (!satisfied) {
                     String reqVersionStr =  versionSpecified ? "" : " version " + 
-                            required.getPluginVersion();
+                            required.getPluginReference().getVersion();
                     
                     String versionStr =  (descr.getVersion()  == null) ? "" : " version " + 
                             descr.getVersion();
                     
                     throw new BuildException("Cannot find plugin "
-                        + required.getPluginId() + reqVersionStr 
+                        + required.getPluginReference().getId() + reqVersionStr 
                         + ", which is required by " + descr.getId() 
                         + versionStr);
                 }
@@ -297,7 +297,7 @@ public class InitJarBuilder extends AbstractPluginsTask {
             final PluginDescriptor descr = getDescriptor();
             final PluginPrerequisite[] prereqs = descr.getPrerequisites();
             for (int j = 0; j < prereqs.length; j++) {
-                if (!ids.contains(prereqs[j].getPluginId())) {
+                if (!ids.contains(prereqs[j].getPluginReference().getId())) {
                     return false;
                 }
             }

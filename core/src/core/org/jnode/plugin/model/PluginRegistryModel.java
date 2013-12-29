@@ -171,7 +171,7 @@ public final class PluginRegistryModel extends VmSystemObject implements
         final int length = reqs.length;
         for (int i = 0; i < length; i++) {
             // We cannot (yet) resolve a plugin if it imports an as-yet unresolved plugin.
-            if (getPluginDescriptor(reqs[i].getPluginId()) == null) {
+            if (getPluginDescriptor(reqs[i].getPluginReference().getId()) == null) {
                 return false;
             }
         }
@@ -318,8 +318,8 @@ public final class PluginRegistryModel extends VmSystemObject implements
         final int reqLength = reqs.length;
         for (int i = 0; i < reqLength; i++) {
             final PluginPrerequisite req = reqs[i];
-            final String id = req.getPluginId();
-            final String version = req.getPluginVersion();
+            final String id = req.getPluginReference().getId();
+            final String version = req.getPluginReference().getVersion();
             loadDependency(loader, id, version, descriptors);
         }
         // Extensions

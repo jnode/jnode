@@ -489,13 +489,13 @@ public class PluginDocumentationTask extends AbstractPluginTask {
             if (descr.getPrerequisites().length > 0) {
                 addSummaryTableHdr(out, "Requires");
                 for (PluginPrerequisite prereq : descr.getPrerequisites()) {
-                    final String href = prereq.getPluginId() + EXT;
+                    final String href = prereq.getPluginReference().getId() + EXT;
                     final PluginData prereqData = getPluginData(prereq
-                        .getPluginId());
+                        .getPluginReference().getId());
                     final String name = (prereqData != null) ? prereqData
                         .getDescriptor().getName() : "?";
                     addTableRow(out, "<a href='" + href + "'>"
-                        + prereq.getPluginId() + "</a>", name);
+                        + prereq.getPluginReference().getId() + "</a>", name);
                 }
                 endSummaryTableHdr(out);
             }
@@ -745,7 +745,7 @@ public class PluginDocumentationTask extends AbstractPluginTask {
                 .getPrerequisites();
             if ((reqs != null) && (reqs.length > 0)) {
                 for (PluginPrerequisite req : reqs) {
-                    if (req.getPluginId().equals(id)) {
+                    if (req.getPluginReference().getId().equals(id)) {
                         list.add(data);
                         break;
                     }

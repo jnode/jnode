@@ -56,7 +56,7 @@ final class DotBuilder {
         PluginPrerequisite[] prereqs = data.getDescriptor().getPrerequisites();
         if (prereqs != null) {
             for (PluginPrerequisite pr : prereqs) {
-                dot.println("  " + fixId(id) + " -> " + fixId(pr.getPluginId()) + ";");
+                dot.println("  " + fixId(id) + " -> " + fixId(pr.getPluginReference().getId()) + ";");
             }
         }
     }

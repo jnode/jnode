@@ -81,7 +81,7 @@ public class JIFSFplugin extends JIFSFile {
                 PluginPrerequisite current;
                 for (int i = 0; i < allPreqs.length; i++) {
                     current = allPreqs[i];
-                    addStringln("\t" + current.getPluginId() + "\t\t" + current.getPluginVersion());
+                    addStringln("\t" + current.getPluginReference().getId() + "\t\t" + current.getPluginReference().getVersion());
                 }
             } else {
                 isvalid = false;
