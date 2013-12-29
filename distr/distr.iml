@@ -7,14 +7,12 @@
       <sourceFolder url="file://$MODULE_DIR$/src/apps" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/emu" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/install" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="true" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="shell" level="project" />
     <orderEntry type="module" module-name="shell" />
     <orderEntry type="module" module-name="core" />
-    <orderEntry type="library" name="core" level="project" />
     <orderEntry type="module" module-name="textui" />
     <orderEntry type="module-library">
       <library>
