@@ -249,12 +249,10 @@ public class MuParserTest2 {
 
         // <root> ::= ( ( <<intArg>> <root> ) | ( <<bigArg>> <<smallArg>> ) ) |
         // ( ( <<intArg>> <root> ) | <<bigArg>> ) )
-        MuSyntax syntax =
-                new MuAlternation("root", new MuAlternation(new MuSequence(
-                        new MuArgument("intArg"), new MuBackReference("root")), new MuSequence(
-                        new MuArgument("bigArg"), new MuArgument("smallArg"))), new MuAlternation(
-                        new MuSequence(new MuArgument("intArg"), new MuBackReference("root")),
-                        new MuArgument("bigArg")));
+        MuSyntax syntax = new MuAlternation("root", new MuAlternation(new MuSequence(new MuArgument("intArg"),
+            new MuBackReference("root")), new MuSequence(new MuArgument("bigArg"), new MuArgument("smallArg"))),
+            new MuAlternation(new MuSequence(new MuArgument("intArg"), new MuBackReference("root")),
+                new MuArgument("bigArg")));
         syntax.resolveBackReferences();
 
         MuParser parser = new MuParser();

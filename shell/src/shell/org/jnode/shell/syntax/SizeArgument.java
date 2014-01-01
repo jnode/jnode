@@ -53,7 +53,7 @@ public class SizeArgument extends Argument<Long> {
         try {
             long tmp = Long.parseLong(str);
             if (factor != null) {
-            	tmp *= factor.getMultiplier();
+                tmp *= factor.getMultiplier();
             }
             return new Long(tmp);
         } catch (NumberFormatException ex) {
