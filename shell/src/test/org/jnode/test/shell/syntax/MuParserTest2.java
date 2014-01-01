@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -22,8 +22,6 @@ package org.jnode.test.shell.syntax;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.NoTokensAvailableException;
 import org.jnode.shell.syntax.Argument;
@@ -38,10 +36,15 @@ import org.jnode.shell.syntax.MuBackReference;
 import org.jnode.shell.syntax.MuParser;
 import org.jnode.shell.syntax.MuSequence;
 import org.jnode.shell.syntax.MuSyntax;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
 @SuppressWarnings("deprecation")
-public class MuParserTest2 extends TestCase {
+@Ignore
+public class MuParserTest2 {
 
+    @Test
     public void testStatefullParsing1() throws NoTokensAvailableException, CommandSyntaxException {
         IntegerArgument intArg = new IntegerArgument("intArg", Argument.MULTIPLE);
         ArgumentBundle bundle = new ArgumentBundle(intArg);
@@ -51,156 +54,157 @@ public class MuParserTest2 extends TestCase {
         MuParser parser = new MuParser();
         CommandLine cl;
 
-        cl = new CommandLine(new String[]{"1"});
+        cl = new CommandLine(new String[] {"1"});
 
         parser.parse(syntax, null, cl.tokenIterator(), bundle);
-        assertEquals(new Integer(1), intArg.getValue());
+        Assert.assertEquals(new Integer(1), intArg.getValue());
 
         try {
-            cl = new CommandLine(new String[]{"X"});
+            cl = new CommandLine(new String[] {"X"});
             parser.parse(syntax, null, cl.tokenIterator(), bundle);
-            fail("parse didn't fail");
+            Assert.fail("parse didn't fail");
         } catch (CommandSyntaxException ex) {
             // expected
         }
 
         try {
-            cl = new CommandLine(new String[]{"1", "1"});
+            cl = new CommandLine(new String[] {"1", "1"});
             parser.parse(syntax, null, cl.tokenIterator(), bundle);
-            fail("parse didn't fail");
+            Assert.fail("parse didn't fail");
         } catch (CommandSyntaxException ex) {
             // expected
         }
     }
 
+    @Test
     public void testStatefullParsing2() throws NoTokensAvailableException, CommandSyntaxException {
         IntegerArgument intArg = new IntegerArgument("intArg", Argument.MULTIPLE);
         FileArgument fileArg = new FileArgument("fileArg", Argument.MULTIPLE);
         ArgumentBundle bundle = new ArgumentBundle(intArg, fileArg);
 
         // <start> ::= <<intArg>> <<fileArg>>
-        MuSyntax syntax = new MuSequence(
-            new MuArgument("intArg"), new MuArgument("fileArg"));
+        MuSyntax syntax = new MuSequence(new MuArgument("intArg"), new MuArgument("fileArg"));
         MuParser parser = new MuParser();
         CommandLine cl;
 
-        cl = new CommandLine(new String[]{"1", "x"});
+        cl = new CommandLine(new String[] {"1", "x"});
         parser.parse(syntax, null, cl.tokenIterator(), bundle);
 
-        assertEquals(new Integer(1), intArg.getValue());
-        assertEquals(new File("x"), fileArg.getValue());
+        Assert.assertEquals(new Integer(1), intArg.getValue());
+        Assert.assertEquals(new File("x"), fileArg.getValue());
 
         try {
-            cl = new CommandLine(new String[]{"1"});
+            cl = new CommandLine(new String[] {"1"});
             parser.parse(syntax, null, cl.tokenIterator(), bundle);
-            fail("parse didn't fail");
+            Assert.fail("parse didn't fail");
         } catch (CommandSyntaxException ex) {
             // expected
         }
         try {
-            cl = new CommandLine(new String[]{"1", ""});
+            cl = new CommandLine(new String[] {"1", ""});
             parser.parse(syntax, null, cl.tokenIterator(), bundle);
-            fail("parse didn't fail");
+            Assert.fail("parse didn't fail");
         } catch (CommandSyntaxException ex) {
             // expected
         }
 
     }
 
+    @Test
     public void testStatefullParsing3() throws NoTokensAvailableException, CommandSyntaxException {
         IntegerArgument intArg = new IntegerArgument("intArg", Argument.MULTIPLE);
         FileArgument fileArg = new FileArgument("fileArg", Argument.MULTIPLE);
         ArgumentBundle bundle = new ArgumentBundle(intArg, fileArg);
 
         // <start> :: = <<intArg>> | <<fileArg>>
-        MuSyntax syntax = new MuAlternation(
-            new MuArgument("intArg"), new MuArgument("fileArg"));
+        MuSyntax syntax = new MuAlternation(new MuArgument("intArg"), new MuArgument("fileArg"));
         MuParser parser = new MuParser();
         CommandLine cl;
 
-        cl = new CommandLine(new String[]{"1"});
+        cl = new CommandLine(new String[] {"1"});
         parser.parse(syntax, null, cl.tokenIterator(), bundle);
-        assertEquals(new Integer(1), intArg.getValue());
-        assertEquals(false, fileArg.isSet());
+        Assert.assertEquals(new Integer(1), intArg.getValue());
+        Assert.assertEquals(false, fileArg.isSet());
 
-        cl = new CommandLine(new String[]{"x"});
+        cl = new CommandLine(new String[] {"x"});
         parser.parse(syntax, null, cl.tokenIterator(), bundle);
-        assertEquals(new File("x"), fileArg.getValue());
-        assertEquals(false, intArg.isSet());
+        Assert.assertEquals(new File("x"), fileArg.getValue());
+        Assert.assertEquals(false, intArg.isSet());
 
     }
 
+    @Test
     public void testStatefullParsing4() throws NoTokensAvailableException, CommandSyntaxException {
         IntegerArgument intArg = new IntegerArgument("intArg", Argument.MULTIPLE);
         FileArgument fileArg = new FileArgument("fileArg", Argument.MULTIPLE);
         ArgumentBundle bundle = new ArgumentBundle(intArg, fileArg);
 
         // <root> ::= <<fileArg>> | ( <<intArg>> <root> )
-        MuSyntax syntax = new MuAlternation("root",
-            new MuArgument("fileArg"),
-            new MuSequence(new MuArgument("intArg"), new MuBackReference("root")));
+        MuSyntax syntax =
+                new MuAlternation("root", new MuArgument("fileArg"), new MuSequence(new MuArgument(
+                        "intArg"), new MuBackReference("root")));
         syntax.resolveBackReferences();
 
         MuParser parser = new MuParser();
         CommandLine cl;
 
-        cl = new CommandLine(new String[]{"x"});
+        cl = new CommandLine(new String[] {"x"});
         parser.parse(syntax, null, cl.tokenIterator(), bundle);
-        assertEquals(1, fileArg.getValues().length);
-        assertEquals(0, intArg.getValues().length);
+        Assert.assertEquals(1, fileArg.getValues().length);
+        Assert.assertEquals(0, intArg.getValues().length);
 
-        cl = new CommandLine(new String[]{"1", "x"});
+        cl = new CommandLine(new String[] {"1", "x"});
         parser.parse(syntax, null, cl.tokenIterator(), bundle);
-        assertEquals(1, fileArg.getValues().length);
-        assertEquals(1, intArg.getValues().length);
+        Assert.assertEquals(1, fileArg.getValues().length);
+        Assert.assertEquals(1, intArg.getValues().length);
 
-        cl = new CommandLine(new String[]{"1", "2", "x"});
+        cl = new CommandLine(new String[] {"1", "2", "x"});
         parser.parse(syntax, null, cl.tokenIterator(), bundle);
-        assertEquals(1, fileArg.getValues().length);
-        assertEquals(2, intArg.getValues().length);
+        Assert.assertEquals(1, fileArg.getValues().length);
+        Assert.assertEquals(2, intArg.getValues().length);
 
         try {
-            cl = new CommandLine(new String[]{"1", "2", ""});
+            cl = new CommandLine(new String[] {"1", "2", ""});
             parser.parse(syntax, null, cl.tokenIterator(), bundle);
-            fail("expected SEE");
+            Assert.fail("expected SEE");
         } catch (CommandSyntaxException ex) {
             // expected
         }
     }
 
+    @Test
     public void testStatefullParsing5() throws NoTokensAvailableException, CommandSyntaxException {
         IntegerArgument intArg = new IntegerArgument("intArg", Argument.MULTIPLE);
         FileArgument fileArg = new FileArgument("fileArg", Argument.MULTIPLE);
         ArgumentBundle bundle = new ArgumentBundle(intArg, fileArg);
 
         // <root> ::= ( <<intArg>> <root> ) | <<fileArg>>
-        MuSyntax syntax = new MuAlternation("root",
-            new MuSequence(new MuArgument("intArg"), new MuBackReference("root")),
-            new MuArgument("fileArg"));
+        MuSyntax syntax =
+                new MuAlternation("root", new MuSequence(new MuArgument("intArg"),
+                        new MuBackReference("root")), new MuArgument("fileArg"));
         syntax.resolveBackReferences();
         MuParser parser = new MuParser();
         CommandLine cl;
 
-
-        cl = new CommandLine(new String[]{"x"});
+        cl = new CommandLine(new String[] {"x"});
         parser.parse(syntax, null, cl.tokenIterator(), bundle);
-        assertEquals(1, fileArg.getValues().length);
-        assertEquals(0, intArg.getValues().length);
+        Assert.assertEquals(1, fileArg.getValues().length);
+        Assert.assertEquals(0, intArg.getValues().length);
 
-        cl = new CommandLine(new String[]{"1", "x"});
+        cl = new CommandLine(new String[] {"1", "x"});
         parser.parse(syntax, null, cl.tokenIterator(), bundle);
-        assertEquals(1, fileArg.getValues().length);
-        assertEquals(1, intArg.getValues().length);
+        Assert.assertEquals(1, fileArg.getValues().length);
+        Assert.assertEquals(1, intArg.getValues().length);
 
-        cl = new CommandLine(new String[]{"1", "1", "x"});
+        cl = new CommandLine(new String[] {"1", "1", "x"});
         parser.parse(syntax, null, cl.tokenIterator(), bundle);
-        assertEquals(1, fileArg.getValues().length);
-        assertEquals(2, intArg.getValues().length);
+        Assert.assertEquals(1, fileArg.getValues().length);
+        Assert.assertEquals(2, intArg.getValues().length);
 
         try {
-            cl = new CommandLine(new String[]{"1", "1", ""});
+            cl = new CommandLine(new String[] {"1", "1", ""});
             parser.parse(syntax, null, cl.tokenIterator(), bundle);
-            fail("expected SEE");
+            Assert.fail("expected SEE");
         } catch (CommandSyntaxException ex) {
             // expected
         }
@@ -236,54 +240,52 @@ public class MuParserTest2 extends TestCase {
         }
     }
 
+    @Test
     public void testStatefullParsing6() throws NoTokensAvailableException, CommandSyntaxException {
         EnumArgument<Big> bigArg = new BigArgument("bigArg", Argument.MULTIPLE);
         EnumArgument<Small> smallArg = new SmallArgument("smallArg", Argument.MULTIPLE);
         IntegerArgument intArg = new IntegerArgument("intArg", Argument.MULTIPLE);
         ArgumentBundle bundle = new ArgumentBundle(intArg, smallArg, bigArg);
 
-        // <root> ::= ( ( <<intArg>> <root> ) | ( <<bigArg>> <<smallArg>> ) ) | 
-        //            ( ( <<intArg>> <root> ) | <<bigArg>> ) )
-        MuSyntax syntax = new MuAlternation("root",
-            new MuAlternation(
-                new MuSequence(new MuArgument("intArg"), new MuBackReference("root")),
-                new MuSequence(new MuArgument("bigArg"), new MuArgument("smallArg"))),
-            new MuAlternation(
-                new MuSequence(new MuArgument("intArg"), new MuBackReference("root")),
+        // <root> ::= ( ( <<intArg>> <root> ) | ( <<bigArg>> <<smallArg>> ) ) |
+        // ( ( <<intArg>> <root> ) | <<bigArg>> ) )
+        MuSyntax syntax = new MuAlternation("root", new MuAlternation(new MuSequence(new MuArgument("intArg"),
+            new MuBackReference("root")), new MuSequence(new MuArgument("bigArg"), new MuArgument("smallArg"))),
+            new MuAlternation(new MuSequence(new MuArgument("intArg"), new MuBackReference("root")),
                 new MuArgument("bigArg")));
         syntax.resolveBackReferences();
 
         MuParser parser = new MuParser();
         CommandLine cl;
 
-        cl = new CommandLine(new String[]{"BIG"});
+        cl = new CommandLine(new String[] {"BIG"});
         parser.parse(syntax, null, cl.tokenIterator(), bundle);
-        assertEquals(1, bigArg.getValues().length);
-        assertEquals(0, smallArg.getValues().length);
-        assertEquals(0, intArg.getValues().length);
+        Assert.assertEquals(1, bigArg.getValues().length);
+        Assert.assertEquals(0, smallArg.getValues().length);
+        Assert.assertEquals(0, intArg.getValues().length);
 
-        cl = new CommandLine(new String[]{"1", "LARGE"});
+        cl = new CommandLine(new String[] {"1", "LARGE"});
         parser.parse(syntax, null, cl.tokenIterator(), bundle);
-        assertEquals(1, bigArg.getValues().length);
-        assertEquals(0, smallArg.getValues().length);
-        assertEquals(1, intArg.getValues().length);
+        Assert.assertEquals(1, bigArg.getValues().length);
+        Assert.assertEquals(0, smallArg.getValues().length);
+        Assert.assertEquals(1, intArg.getValues().length);
 
-        cl = new CommandLine(new String[]{"1", "2", "BIG"});
+        cl = new CommandLine(new String[] {"1", "2", "BIG"});
         parser.parse(syntax, null, cl.tokenIterator(), bundle);
-        assertEquals(1, bigArg.getValues().length);
-        assertEquals(0, smallArg.getValues().length);
-        assertEquals(2, intArg.getValues().length);
+        Assert.assertEquals(1, bigArg.getValues().length);
+        Assert.assertEquals(0, smallArg.getValues().length);
+        Assert.assertEquals(2, intArg.getValues().length);
 
-        cl = new CommandLine(new String[]{"1", "2", "3", "BIG", "SMALL"});
+        cl = new CommandLine(new String[] {"1", "2", "3", "BIG", "SMALL"});
         parser.parse(syntax, null, cl.tokenIterator(), bundle);
-        assertEquals(1, bigArg.getValues().length);
-        assertEquals(1, smallArg.getValues().length);
-        assertEquals(3, intArg.getValues().length);
+        Assert.assertEquals(1, bigArg.getValues().length);
+        Assert.assertEquals(1, smallArg.getValues().length);
+        Assert.assertEquals(3, intArg.getValues().length);
 
         try {
-            cl = new CommandLine(new String[]{"1", "2", "TINY"});
+            cl = new CommandLine(new String[] {"1", "2", "TINY"});
             parser.parse(syntax, null, cl.tokenIterator(), bundle);
-            fail("expected SEE");
+            Assert.fail("expected SEE");
         } catch (CommandSyntaxException ex) {
             // expected
         }

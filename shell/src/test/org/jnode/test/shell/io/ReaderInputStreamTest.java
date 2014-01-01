@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -28,48 +28,53 @@ import java.io.StringReader;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.UnmappableCharacterException;
 
-import junit.framework.TestCase;
-
 import org.jnode.util.ReaderInputStream;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class ReaderInputStreamTest extends TestCase {
+public class ReaderInputStreamTest {
 
+    @Test
     public void testEmpty() throws Exception {
         Reader r = new StringReader("");
         ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
         BufferedReader bisr = new BufferedReader(new InputStreamReader(ris));
         String line = bisr.readLine();
-        assertNull(line);
+        Assert.assertNull(line);
     }
-    
+
+    @Test
     public void testOneLine() throws Exception {
         final String LINE = "The quick brown fox jumped over the lazy dog";
         Reader r = new StringReader(LINE + "\n");
         ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
         BufferedReader bisr = new BufferedReader(new InputStreamReader(ris));
         String line = bisr.readLine();
-        assertEquals(LINE, line);
+        Assert.assertEquals(LINE, line);
     }
-    
+
+    @Test
     public void testByteAtATime() throws Exception {
         final String LINE = "The quick brown fox jumped over the lazy dog\n";
         final byte[] BYTES = LINE.getBytes();
         Reader r = new StringReader(LINE);
         ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
         for (int i = 0; i < BYTES.length; i++) {
-            assertEquals(BYTES[i], ris.read());
+            Assert.assertEquals(BYTES[i], ris.read());
         }
-        assertEquals(-1, ris.read());
+        Assert.assertEquals(-1, ris.read());
     }
-    
+
+    @Test
     public void testBigBuffer() throws Exception {
         final String LINE = "The quick brown fox jumped over the lazy dog\n";
         Reader r = new StringReader(LINE);
         ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
         byte[] buffer = new byte[100];
-        assertEquals(LINE.length(), ris.read(buffer));
+        Assert.assertEquals(LINE.length(), ris.read(buffer));
     }
-    
+
+    @Test
     public void testTwoBytesAtATime() throws Exception {
         final String LINE = "The quick brown fox jumped over the lazy dog";
         final byte[] BYTES = LINE.getBytes();
@@ -77,30 +82,33 @@ public class ReaderInputStreamTest extends TestCase {
         Reader r = new StringReader(LINE);
         ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
         for (int i = 0; i < BYTES.length; i += 2) {
-            assertEquals(2, ris.read(buffer));
-            assertEquals(BYTES[i], buffer[0]);
-            assertEquals(BYTES[i + 1], buffer[1]);
+            Assert.assertEquals(2, ris.read(buffer));
+            Assert.assertEquals(BYTES[i], buffer[0]);
+            Assert.assertEquals(BYTES[i + 1], buffer[1]);
         }
-        assertEquals(-1, ris.read(buffer));
+        Assert.assertEquals(-1, ris.read(buffer));
     }
-    
+
+    @Test
     public void testEmpty2() throws Exception {
         Reader r = new StringReader("");
         ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
-        assertEquals(-1, ris.read());
+        Assert.assertEquals(-1, ris.read());
     }
-    
+
+    @Test
     public void testLatin1Simple() throws Exception {
         final String LINE = "The quick brown fox jumped over the lazy dog";
         Reader r = new StringReader(LINE);
         ReaderInputStream ris = new ReaderInputStream(r, "latin1");
         byte[] buffer = new byte[100];
-        assertEquals(LINE.length(), ris.read(buffer));
+        Assert.assertEquals(LINE.length(), ris.read(buffer));
         for (int i = 0; i < LINE.length(); i++) {
-            assertEquals((byte) LINE.charAt(i), buffer[i]);
+            Assert.assertEquals((byte) LINE.charAt(i), buffer[i]);
         }
     }
-    
+
+    @Test
     public void testLatin1All() throws Exception {
         byte[] bytes = new byte[256];
         for (int i = 0; i < 256; i++) {
@@ -110,12 +118,13 @@ public class ReaderInputStreamTest extends TestCase {
         Reader r = new StringReader(LINE);
         ReaderInputStream ris = new ReaderInputStream(r, "latin1");
         byte[] buffer = new byte[256];
-        assertEquals(LINE.length(), ris.read(buffer));
+        Assert.assertEquals(LINE.length(), ris.read(buffer));
         for (int i = 0; i < LINE.length(); i++) {
-            assertEquals((byte) i, buffer[i]);
+            Assert.assertEquals((byte) i, buffer[i]);
         }
     }
 
+    @Test
     public void testBadLatin1All() throws Exception {
         char[] chars = new char[257];
         for (int i = 0; i < 257; i++) {
@@ -125,15 +134,16 @@ public class ReaderInputStreamTest extends TestCase {
         Reader r = new StringReader(LINE);
         ReaderInputStream ris = new ReaderInputStream(r, "latin1");
         byte[] buffer = new byte[257];
-        assertEquals(256, ris.read(buffer));
+        Assert.assertEquals(256, ris.read(buffer));
         try {
             ris.read(buffer);
-            fail("No exception raised");
+            Assert.fail("No exception raised");
         } catch (UnmappableCharacterException ex) {
             // expected
         }
     }
-    
+
+    @Test
     public void testBadLatin1Recovery() throws Exception {
         char[] chars = new char[11];
         for (int i = 0; i < 11; i++) {
@@ -143,16 +153,17 @@ public class ReaderInputStreamTest extends TestCase {
         Reader r = new StringReader(LINE);
         ReaderInputStream ris = new ReaderInputStream(r, "latin1");
         byte[] buffer = new byte[5];
-        assertEquals(5, ris.read(buffer));
+        Assert.assertEquals(5, ris.read(buffer));
         try {
             ris.read();
-            fail("No exception raised");
+            Assert.fail("No exception raised");
         } catch (UnmappableCharacterException ex) {
             // expected
         }
-        assertEquals(5, ris.read(buffer));
+        Assert.assertEquals(5, ris.read(buffer));
     }
-    
+
+    @Test
     public void testUnicode() throws Exception {
         char[] chars = new char[1024];
         for (int i = 0; i < 1024; i++) {
@@ -165,122 +176,135 @@ public class ReaderInputStreamTest extends TestCase {
         char[] buffer = new char[1024];
         isr.read(buffer);
         for (int i = 0; i < 1024; i++) {
-            assertEquals(chars[i], buffer[i]);
+            Assert.assertEquals(chars[i], buffer[i]);
         }
     }
-    
+
+    @Test
     public void testUnicode2() throws Exception {
-        char[] chars = new char[]{'\ud800', '\udc00'};
+        char[] chars = new char[] {'\ud800', '\udc00'};
         final String LINE = new String(chars);
         Reader r = new StringReader(LINE);
         ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
         InputStreamReader isr = new InputStreamReader(ris);
-        assertEquals(chars[0], isr.read());
-        assertEquals(chars[1], isr.read());
+        Assert.assertEquals(chars[0], isr.read());
+        Assert.assertEquals(chars[1], isr.read());
     }
-    
+
+    @Test
     public void testBadUnicode() throws Exception {
-        char[] chars = new char[]{'\ud800'};
+        char[] chars = new char[] {'\ud800'};
         final String LINE = new String(chars);
         Reader r = new StringReader(LINE);
         ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
         InputStreamReader isr = new InputStreamReader(ris);
         try {
             isr.read();
-            fail("No exception raised");
+            Assert.fail("No exception raised");
         } catch (MalformedInputException ex) {
             // expected
         }
     }
-    
+
+    @Test
     public void testBadUnicode2() throws Exception {
-        char[] chars = new char[]{'a', '\ud800'};
+        char[] chars = new char[] {'a', '\ud800'};
         final String LINE = new String(chars);
-        Reader r = new StringReader(LINE);
-        ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
-        InputStreamReader isr = new InputStreamReader(ris);
-        assertEquals(chars[0], isr.read());
+        {
+            Reader r = new StringReader(LINE.substring(0, 1));
+            ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
+            InputStreamReader isr = new InputStreamReader(ris);
+            Assert.assertEquals(chars[0], isr.read());
+        }
         try {
+            Reader r = new StringReader(LINE.substring(1));
+            ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
+            InputStreamReader isr = new InputStreamReader(ris);
             isr.read();
-            fail("No exception raised");
+            Assert.fail("No exception raised");
         } catch (MalformedInputException ex) {
             // expected
         }
     }
-    
+
+    @Test
     public void testBadUnicode3() throws Exception {
-        char[] chars = new char[]{'\udc00'};
+        char[] chars = new char[] {'\udc00'};
         final String LINE = new String(chars);
         Reader r = new StringReader(LINE);
         ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
         InputStreamReader isr = new InputStreamReader(ris);
         try {
             isr.read();
-            fail("No exception raised");
+            Assert.fail("No exception raised");
         } catch (MalformedInputException ex) {
             // expected
         }
     }
-    
+
+    @Test
     public void testUnicode3() throws Exception {
-        char[] chars = new char[]{'\ud800', '\udc00'};
+        char[] chars = new char[] {'\ud800', '\udc00'};
         final String LINE = new String(chars);
         Reader r = new OneCharAtATimeReader(new StringReader(LINE));
         ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
         InputStreamReader isr = new InputStreamReader(ris);
-        assertEquals(chars[0], isr.read());
-        assertEquals(chars[1], isr.read());
+        Assert.assertEquals(chars[0], isr.read());
+        Assert.assertEquals(chars[1], isr.read());
     }
-    
+
+    @Test
     public void testBadUnicode4() throws Exception {
-        char[] chars = new char[]{'\ud800'};
+        char[] chars = new char[] {'\ud800'};
         final String LINE = new String(chars);
         Reader r = new OneCharAtATimeReader(new StringReader(LINE));
         ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
         InputStreamReader isr = new InputStreamReader(ris);
         try {
             isr.read();
-            fail("No exception raised");
+            Assert.fail("No exception raised");
         } catch (MalformedInputException ex) {
             // expected
         }
     }
-    
+
+    @Test
     public void testBadUnicode5() throws Exception {
-        char[] chars = new char[]{'a', '\ud800'};
+        char[] chars = new char[] {'a', '\ud800'};
         final String LINE = new String(chars);
         Reader r = new OneCharAtATimeReader(new StringReader(LINE));
         ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
         InputStreamReader isr = new InputStreamReader(ris);
-        assertEquals(chars[0], isr.read());
+        Assert.assertEquals(chars[0], isr.read());
         try {
             isr.read();
-            fail("No exception raised");
+            Assert.fail("No exception raised");
         } catch (MalformedInputException ex) {
             // expected
         }
     }
-    
+
+    @Test
     public void testBadUnicode6() throws Exception {
-        char[] chars = new char[]{'\udc00'};
+        char[] chars = new char[] {'\udc00'};
         final String LINE = new String(chars);
         Reader r = new OneCharAtATimeReader(new StringReader(LINE));
         ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
         InputStreamReader isr = new InputStreamReader(ris);
         try {
             isr.read();
-            fail("No exception raised");
+            Assert.fail("No exception raised");
         } catch (MalformedInputException ex) {
             // expected
         }
     }
-    
+
     /**
-     * This wrapper class delivers characters from a Reader one at a time, no matter
-     * what the client asks for.
+     * This wrapper class delivers characters from a Reader one at a time, no
+     * matter what the client asks for.
      */
     private class OneCharAtATimeReader extends Reader {
-        
+
         private Reader reader;
 
         public OneCharAtATimeReader(Reader reader) {

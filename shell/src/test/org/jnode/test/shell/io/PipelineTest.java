@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -20,132 +20,139 @@
  
 package org.jnode.test.shell.io;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.jnode.shell.io.Pipeline;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class PipelineTest extends TestCase {
+public class PipelineTest {
 
+    @Test
     public void testConstructor() {
         new Pipeline();
     }
-    
+
+    @Test
     public void testLifecycle() throws IOException {
         Pipeline p = new Pipeline();
         InputStream is = p.createSink();
         OutputStream os = p.createSource();
-        assertFalse(p.isActive());
-        assertFalse(p.isClosed());
-        assertFalse(p.isShutdown());
+        Assert.assertFalse(p.isActive());
+        Assert.assertFalse(p.isClosed());
+        Assert.assertFalse(p.isShutdown());
         p.activate();
-        assertTrue(p.isActive());
-        assertFalse(p.isClosed());
-        assertFalse(p.isShutdown());
+        Assert.assertTrue(p.isActive());
+        Assert.assertFalse(p.isClosed());
+        Assert.assertFalse(p.isShutdown());
         is.close();
         os.close();
-        assertFalse(p.isActive());
-        assertTrue(p.isClosed());
-        assertFalse(p.isShutdown());
+        Assert.assertFalse(p.isActive());
+        Assert.assertTrue(p.isClosed());
+        Assert.assertFalse(p.isShutdown());
     }
-    
+
+    @Test
     public void testLifecycle2() throws IOException {
         Pipeline p = new Pipeline();
         InputStream is = p.createSink();
         OutputStream os = p.createSource();
-        assertFalse(p.isActive());
-        assertFalse(p.isShutdown());
+        Assert.assertFalse(p.isActive());
+        Assert.assertFalse(p.isShutdown());
         p.activate();
-        assertTrue(p.isActive());
-        assertFalse(p.isShutdown());
+        Assert.assertTrue(p.isActive());
+        Assert.assertFalse(p.isShutdown());
         p.shutdown();
-        assertFalse(p.isActive());
-        assertTrue(p.isShutdown());
-        assertEquals(-1, is.read());
+        Assert.assertFalse(p.isActive());
+        Assert.assertTrue(p.isShutdown());
+        Assert.assertEquals(-1, is.read());
         try {
             os.write('X');
-            fail("no exception on write()");
+            Assert.fail("no exception on write()");
         } catch (IOException ex) {
             // expected ...
         }
     }
-    
+
+    @Test
     public void testOneOne() throws IOException {
         // This should work ... despite the source and sink being operated from
-        // the same thread ... because we are reading/writing less than a buffer full.
+        // the same thread ... because we are reading/writing less than a buffer
+        // full.
         Pipeline p = new Pipeline();
         InputStream is = p.createSink();
         OutputStream os = p.createSource();
         p.activate();
-        assertEquals(0, is.available());
+        Assert.assertEquals(0, is.available());
         os.write('A');
-        assertEquals(1, is.available());
-        assertEquals('A', is.read());
+        Assert.assertEquals(1, is.available());
+        Assert.assertEquals('A', is.read());
         os.write('B');
-        assertEquals('B', is.read());
-        assertEquals(0, is.available());
+        Assert.assertEquals('B', is.read());
+        Assert.assertEquals(0, is.available());
         os.write("the quick brown fox".getBytes());
         int len = "the quick brown fox".length();
-        assertEquals(len, is.available());
+        Assert.assertEquals(len, is.available());
         byte[] buffer = new byte[100];
-        assertEquals(len, is.read(buffer, 0, len));
-        assertEquals("the quick brown fox", new String(buffer, 0, len));
+        Assert.assertEquals(len, is.read(buffer, 0, len));
+        Assert.assertEquals("the quick brown fox", new String(buffer, 0, len));
     }
-    
+
+    @Test
     public void testTwo1_One1() throws Throwable {
         Pipeline p = new Pipeline();
         InputStream is = p.createSink();
         OutputStream os = p.createSource();
         OutputStream os2 = p.createSource();
         p.activate();
-        
+
         Source source = new Source("1".getBytes(), 10000, -1, os);
         Source source2 = new Source("2".getBytes(), 10000, -1, os2);
         Sink sink = new Sink(20000, 1, -1, is);
-        
+
         List<Throwable> exceptions = runInThreads(new Runnable[] {source, source2, sink});
         if (exceptions.size() > 0) {
             throw exceptions.get(0);
         }
-        assertEquals(10000, sink.getCount((byte) '1'));
-        assertEquals(10000, sink.getCount((byte) '2'));
+        Assert.assertEquals(10000, sink.getCount((byte) '1'));
+        Assert.assertEquals(10000, sink.getCount((byte) '2'));
     }
-    
+
+    @Test
     public void testTwo10_One10() throws Throwable {
         Pipeline p = new Pipeline();
         InputStream is = p.createSink();
         OutputStream os = p.createSource();
         OutputStream os2 = p.createSource();
         p.activate();
-        
+
         Source source = new Source("1111111111".getBytes(), 1000, -1, os);
         Source source2 = new Source("2222222222".getBytes(), 1000, -1, os2);
         Sink sink = new Sink(20000, 10, -1, is);
-        
+
         List<Throwable> exceptions = runInThreads(new Runnable[] {source, source2, sink});
         if (exceptions.size() > 0) {
             throw exceptions.get(0);
         }
-        assertEquals(10000, sink.getCount((byte) '1'));
-        assertEquals(10000, sink.getCount((byte) '2'));
+        Assert.assertEquals(10000, sink.getCount((byte) '1'));
+        Assert.assertEquals(10000, sink.getCount((byte) '2'));
     }
-    
+
+    @Test
     public void testTwo100_One100() throws Throwable {
         Pipeline p = new Pipeline();
         InputStream is = p.createSink();
         OutputStream os = p.createSource();
         OutputStream os2 = p.createSource();
         p.activate();
-        
+
         byte[] buff1 = new byte[100];
         Arrays.fill(buff1, (byte) '1');
         Source source = new Source(buff1, 100, -1, os);
@@ -153,22 +160,23 @@ public class PipelineTest extends TestCase {
         Arrays.fill(buff2, (byte) '2');
         Source source2 = new Source(buff2, 100, -1, os2);
         Sink sink = new Sink(20000, 100, -1, is);
-        
+
         List<Throwable> exceptions = runInThreads(new Runnable[] {source, source2, sink});
         if (exceptions.size() > 0) {
             throw exceptions.get(0);
         }
-        assertEquals(10000, sink.getCount((byte) '1'));
-        assertEquals(10000, sink.getCount((byte) '2'));
+        Assert.assertEquals(10000, sink.getCount((byte) '1'));
+        Assert.assertEquals(10000, sink.getCount((byte) '2'));
     }
-    
+
+    @Test
     public void testTwo100_One100_SmallBuffer() throws Throwable {
         Pipeline p = new Pipeline(100);
         InputStream is = p.createSink();
         OutputStream os = p.createSource();
         OutputStream os2 = p.createSource();
         p.activate();
-        
+
         byte[] buff1 = new byte[100];
         Arrays.fill(buff1, (byte) '1');
         Source source = new Source(buff1, 100, -1, os);
@@ -176,18 +184,19 @@ public class PipelineTest extends TestCase {
         Arrays.fill(buff2, (byte) '2');
         Source source2 = new Source(buff2, 100, -1, os2);
         Sink sink = new Sink(20000, 100, -1, is);
-        
+
         List<Throwable> exceptions = runInThreads(new Runnable[] {source, source2, sink});
         if (exceptions.size() > 0) {
             throw exceptions.get(0);
         }
-        assertEquals(10000, sink.getCount((byte) '1'));
-        assertEquals(10000, sink.getCount((byte) '2'));
+        Assert.assertEquals(10000, sink.getCount((byte) '1'));
+        Assert.assertEquals(10000, sink.getCount((byte) '2'));
     }
-    
+
     /**
      * Create Threads for each runnable (with an exception handler), start them,
      * join them and return any exceptions
+     * 
      * @param runnables the test runnables
      * @return any exceptions caught.
      */
@@ -197,14 +206,13 @@ public class PipelineTest extends TestCase {
         for (int i = 0; i < threads.length; i++) {
             System.err.println("create");
             threads[i] = new Thread(runnables[i]);
-            threads[i].setUncaughtExceptionHandler(
-                    new UncaughtExceptionHandler() {
-                        public void uncaughtException(Thread thr, Throwable exc) {
-                            System.err.println("handled exception " + exc);
-                            exc.printStackTrace();
-                            exceptions.add(exc);
-                        }
-                    });
+            threads[i].setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+                public void uncaughtException(Thread thr, Throwable exc) {
+                    System.err.println("handled exception " + exc);
+                    exc.printStackTrace();
+                    exceptions.add(exc);
+                }
+            });
         }
         for (Thread thread : threads) {
             System.err.println("start");
@@ -221,7 +229,7 @@ public class PipelineTest extends TestCase {
         System.err.println("done");
         return exceptions;
     }
-    
+
     private static class Source implements Runnable {
         private byte[] b;
         private int count;
@@ -230,9 +238,11 @@ public class PipelineTest extends TestCase {
 
         /**
          * Create a test source.
+         * 
          * @param b the buffer to be written
-         * @param count the number of times 
-         * @param sleep sleep this number of milliseconds between writes; -1 means no sleep.
+         * @param count the number of times
+         * @param sleep sleep this number of milliseconds between writes; -1
+         *            means no sleep.
          * @param os write bytes here.
          */
         Source(byte[] b, int count, int sleep, OutputStream os) {
@@ -269,7 +279,7 @@ public class PipelineTest extends TestCase {
             }
         }
     }
-    
+
     private static class Sink implements Runnable {
         private HashMap<Byte, Integer> counters = new HashMap<Byte, Integer>();
         private InputStream is;
@@ -279,9 +289,12 @@ public class PipelineTest extends TestCase {
 
         /**
          * Create a test Sink.
-         * @param max if we read more than this number of bytes, throw an exception
+         * 
+         * @param max if we read more than this number of bytes, throw an
+         *            exception
          * @param len the read buffer size.
-         * @param sleep sleep this number of milliseconds between reads; -1 means no sleep.
+         * @param sleep sleep this number of milliseconds between reads; -1
+         *            means no sleep.
          * @param is read bytes from here.
          */
         Sink(int max, int len, int sleep, InputStream is) {
@@ -329,9 +342,10 @@ public class PipelineTest extends TestCase {
                 }
             }
         }
-        
+
         /**
          * Get the number of bytes read for a given byte value.
+         * 
          * @param b the key byte
          * @return the number instances of the 'key' byte read.
          */

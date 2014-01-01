@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -23,12 +23,13 @@ package org.jnode.test.shell.io;
 import java.io.StringWriter;
 import java.nio.charset.MalformedInputException;
 
-import junit.framework.TestCase;
-
 import org.jnode.util.WriterOutputStream;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class WriterOutputStreamTest extends TestCase {
-    
+public class WriterOutputStreamTest {
+
+    @Test
     public void testEmpty() throws Exception {
         String LINE = "";
         StringWriter sw = new StringWriter();
@@ -36,9 +37,10 @@ public class WriterOutputStreamTest extends TestCase {
         byte[] buffer = LINE.getBytes();
         wos.write(buffer);
         wos.flush();
-        assertEquals(LINE, sw.getBuffer().toString());
+        Assert.assertEquals(LINE, sw.getBuffer().toString());
     }
-    
+
+    @Test
     public void testLine() throws Exception {
         String LINE = "The quick brown fox jumped over the lazy doc";
         StringWriter sw = new StringWriter();
@@ -46,9 +48,10 @@ public class WriterOutputStreamTest extends TestCase {
         byte[] buffer = LINE.getBytes();
         wos.write(buffer);
         wos.flush();
-        assertEquals(LINE, sw.getBuffer().toString());
+        Assert.assertEquals(LINE, sw.getBuffer().toString());
     }
-    
+
+    @Test
     public void testByteAtATime() throws Exception {
         String LINE = "The quick brown fox jumped over the lazy doc";
         StringWriter sw = new StringWriter();
@@ -58,9 +61,10 @@ public class WriterOutputStreamTest extends TestCase {
             wos.write(b);
         }
         wos.flush();
-        assertEquals(LINE, sw.getBuffer().toString());
+        Assert.assertEquals(LINE, sw.getBuffer().toString());
     }
-    
+
+    @Test
     public void testByteAtATimeWithFlushes() throws Exception {
         String LINE = "The quick brown fox jumped over the lazy doc";
         StringWriter sw = new StringWriter();
@@ -69,11 +73,12 @@ public class WriterOutputStreamTest extends TestCase {
         for (int i = 0; i < buffer.length; i++) {
             wos.write(buffer[i]);
             wos.flush();
-            assertEquals(LINE.charAt(i), sw.getBuffer().charAt(i));
+            Assert.assertEquals(LINE.charAt(i), sw.getBuffer().charAt(i));
         }
-        assertEquals(LINE, sw.getBuffer().toString());
+        Assert.assertEquals(LINE, sw.getBuffer().toString());
     }
-    
+
+    @Test
     public void testUnicode() throws Exception {
         char[] chars = new char[8192];
         for (int i = 0; i < chars.length; i++) {
@@ -85,12 +90,13 @@ public class WriterOutputStreamTest extends TestCase {
         wos.write(buffer);
         wos.flush();
         StringBuffer sb = sw.getBuffer();
-        assertEquals(chars.length, sb.length());
+        Assert.assertEquals(chars.length, sb.length());
         for (int i = 0; i < chars.length; i++) {
-            assertEquals(chars[i], sb.charAt(i));
+            Assert.assertEquals(chars[i], sb.charAt(i));
         }
     }
-    
+
+    @Test
     public void testBadUnicode() throws Exception {
         byte[] BAD = new byte[] {(byte) 0x80};
         StringWriter sw = new StringWriter();
@@ -98,12 +104,13 @@ public class WriterOutputStreamTest extends TestCase {
         try {
             wos.write(BAD);
             wos.flush();
-            fail("no exception thrown");
+            Assert.fail("no exception thrown");
         } catch (MalformedInputException ex) {
             // expected
         }
     }
-    
+
+    @Test
     public void testBadUnicode2() throws Exception {
         byte[] BAD = new byte[] {(byte) 'h', (byte) 'i', (byte) 0x80};
         StringWriter sw = new StringWriter();
@@ -111,13 +118,14 @@ public class WriterOutputStreamTest extends TestCase {
         try {
             wos.write(BAD);
             wos.flush();
-            fail("no exception thrown");
+            Assert.fail("no exception thrown");
         } catch (MalformedInputException ex) {
             // expected
-            assertEquals("hi", sw.getBuffer().toString());
+            Assert.assertEquals("hi", sw.getBuffer().toString());
         }
     }
-    
+
+    @Test
     public void testBadUnicode3() throws Exception {
         byte[] BAD = new byte[] {(byte) 'h', (byte) 'i', (byte) 0xc2, (byte) 0x00};
         StringWriter sw = new StringWriter();
@@ -125,13 +133,14 @@ public class WriterOutputStreamTest extends TestCase {
         try {
             wos.write(BAD);
             wos.flush();
-            fail("no exception thrown");
+            Assert.fail("no exception thrown");
         } catch (MalformedInputException ex) {
             // expected
-            assertEquals("hi", sw.getBuffer().toString());
+            Assert.assertEquals("hi", sw.getBuffer().toString());
         }
     }
-    
+
+    @Test
     public void testBadUnicode4() throws Exception {
         byte[] BAD = new byte[] {(byte) 'h', (byte) 'i', (byte) 0xc2};
         StringWriter sw = new StringWriter();
@@ -140,10 +149,10 @@ public class WriterOutputStreamTest extends TestCase {
         wos.flush();
         try {
             wos.close();
-            fail("no exception thrown");
+            Assert.fail("no exception thrown");
         } catch (MalformedInputException ex) {
             // expected
-            assertEquals("hi", sw.getBuffer().toString());
+            Assert.assertEquals("hi", sw.getBuffer().toString());
         }
     }
 }

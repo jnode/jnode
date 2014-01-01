@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -33,6 +33,7 @@ import java.io.PrintStream;
 
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginManager;
+import org.jnode.plugin.PluginReference;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
@@ -225,7 +226,7 @@ public abstract class TestRunnerBase implements TestRunnable {
                 PluginManager mgr = InitialNaming.lookup(PluginManager.NAME);
                 PluginRegistry reg = mgr.getRegistry();
                 if (reg.getPluginDescriptor(id) == null) {
-                    reg.loadPlugin(mgr.getLoaderManager(), id, ver, true); //resolve=true
+                    reg.loadPlugin(mgr.getLoaderManager(), new PluginReference(id, ver), true); //resolve=true
                 }
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());

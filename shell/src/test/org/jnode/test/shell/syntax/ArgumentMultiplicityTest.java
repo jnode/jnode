@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -20,8 +20,6 @@
  
 package org.jnode.test.shell.syntax;
 
-import junit.framework.TestCase;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
@@ -32,8 +30,10 @@ import org.jnode.shell.syntax.ArgumentSyntax;
 import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.RepeatSyntax;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class ArgumentMultiplicityTest extends TestCase {
+public class ArgumentMultiplicityTest {
 
     public static class Optional extends AbstractCommand {
         private final FileArgument arg = new FileArgument("arg1", Argument.OPTIONAL);
@@ -60,8 +60,8 @@ public class ArgumentMultiplicityTest extends TestCase {
     }
 
     public static class OptionalMulti extends AbstractCommand {
-        private final FileArgument arg =
-            new FileArgument("arg1", Argument.OPTIONAL + Argument.MULTIPLE);
+        private final FileArgument arg = new FileArgument("arg1", Argument.OPTIONAL +
+                Argument.MULTIPLE);
 
         public OptionalMulti() {
             registerArguments(arg);
@@ -73,8 +73,8 @@ public class ArgumentMultiplicityTest extends TestCase {
     }
 
     public static class MandatoryMulti extends AbstractCommand {
-        private final FileArgument arg =
-            new FileArgument("arg1", Argument.MANDATORY + Argument.MULTIPLE);
+        private final FileArgument arg = new FileArgument("arg1", Argument.MANDATORY +
+                Argument.MULTIPLE);
 
         public MandatoryMulti() {
             registerArguments(arg);
@@ -85,76 +85,84 @@ public class ArgumentMultiplicityTest extends TestCase {
         }
     }
 
+    @Test
     public void testOptionalArgument() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.ArgumentMultiplicityTest$Optional");
         shell.addSyntax("cmd", new ArgumentSyntax("arg1"));
-        CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
+        CommandLine cl = new CommandLine(new Token("cmd"), new Token[] {new Token("F1")}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
         Command cmd = cmdInfo.createCommandInstance();
-        assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
+        Assert.assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
 
         try {
-            cl = new CommandLine(new Token("cmd"), new Token[]{new Token("")}, null);
+            cl = new CommandLine(new Token("cmd"), new Token[] {new Token("")}, null);
             cl.parseCommandLine(shell);
-            fail("parse didn't fail");
+            Assert.fail("parse didn't fail");
         } catch (CommandSyntaxException ex) {
             // expected
         }
     }
 
+    @Test
     public void testMandatoryArgument() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.ArgumentMultiplicityTest$Mandatory");
         shell.addSyntax("cmd", new ArgumentSyntax("arg1"));
-        CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
+        CommandLine cl = new CommandLine(new Token("cmd"), new Token[] {new Token("F1")}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
         Command cmd = cmdInfo.createCommandInstance();
-        assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
+        Assert.assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
 
         try {
-            cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
+            cl = new CommandLine(new Token("cmd"), new Token[] {}, null);
             cl.parseCommandLine(shell);
-            fail("parse didn't fail");
+            Assert.fail("parse didn't fail");
         } catch (CommandSyntaxException ex) {
             // expected
         }
     }
 
+    @Test
     public void testOptionalMultiArgument() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.ArgumentMultiplicityTest$OptionalMulti");
         shell.addSyntax("cmd", new RepeatSyntax(new ArgumentSyntax("arg1")));
-        CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
+        CommandLine cl = new CommandLine(new Token("cmd"), new Token[] {new Token("F1")}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
         Command cmd = cmdInfo.createCommandInstance();
-        assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
+        Assert.assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
 
-        cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
+        cl = new CommandLine(new Token("cmd"), new Token[] {}, null);
         cmdInfo = cl.parseCommandLine(shell);
 
-        cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1"), new Token("F2")}, null);
+        cl =
+                new CommandLine(new Token("cmd"), new Token[] {new Token("F1"), new Token("F2")},
+                        null);
         cmdInfo = cl.parseCommandLine(shell);
     }
 
+    @Test
     public void testMandatoryMultiArgument() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.ArgumentMultiplicityTest$MandatoryMulti");
         shell.addSyntax("cmd", new RepeatSyntax(new ArgumentSyntax("arg1")));
-        CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
+        CommandLine cl = new CommandLine(new Token("cmd"), new Token[] {new Token("F1")}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
         Command cmd = cmdInfo.createCommandInstance();
-        assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
+        Assert.assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
 
         try {
-            cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
+            cl = new CommandLine(new Token("cmd"), new Token[] {}, null);
             cl.parseCommandLine(shell);
-            fail("parse didn't fail");
+            Assert.fail("parse didn't fail");
         } catch (CommandSyntaxException ex) {
             // expected
         }
 
-        cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1"), new Token("F2")}, null);
+        cl =
+                new CommandLine(new Token("cmd"), new Token[] {new Token("F1"), new Token("F2")},
+                        null);
         cl.parseCommandLine(shell);
     }
 }

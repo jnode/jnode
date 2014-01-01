@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -20,29 +20,15 @@
  
 package org.jnode.test.shell.syntax;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
+@RunWith(Suite.class)
+@Suite.SuiteClasses({ArgumentTypesTest.class, ArgumentBundleTest.class, DefaultTokenizerTest.class,
+    MuSyntaxTest.class, MuParserTest.class, MuParserTest2.class, ArgumentMultiplicityTest.class,
+    CommandLineTest.class, RepeatSyntaxTest.class, SequenceSyntaxTest.class,
+    OptionSyntaxTest.class, PowersetSyntaxTest.class, OptionSetSyntaxTest.class,
+    AlternativesSyntaxTest.class})
 public class AllTests {
 
-    public static Test suite() {
-        TestSuite suite = new TestSuite("Tests for org.jnode.test.shell.syntax");
-        //$JUnit-BEGIN$
-        suite.addTestSuite(ArgumentTypesTest.class);
-        suite.addTestSuite(ArgumentBundleTest.class);
-        suite.addTestSuite(DefaultTokenizerTest.class);
-        suite.addTestSuite(MuSyntaxTest.class);
-        suite.addTestSuite(MuParserTest.class);
-        suite.addTestSuite(MuParserTest2.class);
-        suite.addTestSuite(ArgumentMultiplicityTest.class);
-        suite.addTestSuite(CommandLineTest.class);
-        suite.addTestSuite(RepeatSyntaxTest.class);
-        suite.addTestSuite(SequenceSyntaxTest.class);
-        suite.addTestSuite(OptionSyntaxTest.class);
-        suite.addTestSuite(PowersetSyntaxTest.class);
-        suite.addTestSuite(OptionSetSyntaxTest.class);
-        suite.addTestSuite(AlternativesSyntaxTest.class);
-        //$JUnit-END$
-        return suite;
-    }
 }

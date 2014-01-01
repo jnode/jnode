@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -20,77 +20,78 @@
  
 package org.jnode.test.shell.syntax;
 
-import junit.framework.TestCase;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.SymbolSource;
 import org.jnode.shell.CommandLine.Token;
+import org.jnode.shell.SymbolSource;
 import org.jnode.shell.syntax.ArgumentSyntax;
 import org.jnode.shell.syntax.StringArgument;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class CommandLineTest extends TestCase {
+public class CommandLineTest {
 
+    @Test
     @SuppressWarnings("deprecation")
     public void testStringConstructors() {
-        String[] args = new String[]{"1", "2", "3"};
+        String[] args = new String[] {"1", "2", "3"};
 
         CommandLine c1 = new CommandLine(args);
-        assertEquals(null, c1.getCommandName());
-        assertEquals(null, c1.getCommandToken());
+        Assert.assertEquals(null, c1.getCommandName());
+        Assert.assertEquals(null, c1.getCommandToken());
 
         SymbolSource<String> ss = c1.iterator();
-        assertEquals(true, ss.hasNext());
-        assertEquals("1", ss.next());
-        assertEquals(true, ss.hasNext());
-        assertEquals("2", ss.next());
-        assertEquals(true, ss.hasNext());
-        assertEquals("3", ss.next());
-        assertEquals(false, ss.hasNext());
+        Assert.assertEquals(true, ss.hasNext());
+        Assert.assertEquals("1", ss.next());
+        Assert.assertEquals(true, ss.hasNext());
+        Assert.assertEquals("2", ss.next());
+        Assert.assertEquals(true, ss.hasNext());
+        Assert.assertEquals("3", ss.next());
+        Assert.assertEquals(false, ss.hasNext());
 
         SymbolSource<Token> ts = c1.tokenIterator();
-        assertEquals(true, ts.hasNext());
-        assertEquals("1", ts.next().text);
-        assertEquals(true, ts.hasNext());
-        assertEquals("2", ts.next().text);
-        assertEquals(true, ts.hasNext());
-        assertEquals("3", ts.next().text);
-        assertEquals(false, ts.hasNext());
+        Assert.assertEquals(true, ts.hasNext());
+        Assert.assertEquals("1", ts.next().text);
+        Assert.assertEquals(true, ts.hasNext());
+        Assert.assertEquals("2", ts.next().text);
+        Assert.assertEquals(true, ts.hasNext());
+        Assert.assertEquals("3", ts.next().text);
+        Assert.assertEquals(false, ts.hasNext());
 
         CommandLine c2 = new CommandLine("foo", args);
-        assertEquals("foo", c2.getCommandName());
-        assertEquals("foo", c2.getCommandToken().text);
+        Assert.assertEquals("foo", c2.getCommandName());
+        Assert.assertEquals("foo", c2.getCommandToken().text);
     }
 
+    @Test
     @SuppressWarnings("deprecation")
     public void testTokenConstructors() {
         Token foo = new Token("foo");
-        Token[] args = new Token[]{
-            new Token("1"), new Token("2"), new Token("3")};
+        Token[] args = new Token[] {new Token("1"), new Token("2"), new Token("3")};
 
         CommandLine c1 = new CommandLine(foo, args, null);
-        assertEquals("foo", c1.getCommandName());
-        assertEquals(foo, c1.getCommandToken());
+        Assert.assertEquals("foo", c1.getCommandName());
+        Assert.assertEquals(foo, c1.getCommandToken());
 
         SymbolSource<String> ss = c1.iterator();
-        assertEquals(true, ss.hasNext());
-        assertEquals("1", ss.next());
-        assertEquals(true, ss.hasNext());
-        assertEquals("2", ss.next());
-        assertEquals(true, ss.hasNext());
-        assertEquals("3", ss.next());
-        assertEquals(false, ss.hasNext());
+        Assert.assertEquals(true, ss.hasNext());
+        Assert.assertEquals("1", ss.next());
+        Assert.assertEquals(true, ss.hasNext());
+        Assert.assertEquals("2", ss.next());
+        Assert.assertEquals(true, ss.hasNext());
+        Assert.assertEquals("3", ss.next());
+        Assert.assertEquals(false, ss.hasNext());
 
         SymbolSource<Token> ts = c1.tokenIterator();
-        assertEquals(true, ts.hasNext());
-        assertEquals(args[0], ts.next());
-        assertEquals(true, ts.hasNext());
-        assertEquals(args[1], ts.next());
-        assertEquals(true, ts.hasNext());
-        assertEquals(args[2], ts.next());
-        assertEquals(false, ts.hasNext());
+        Assert.assertEquals(true, ts.hasNext());
+        Assert.assertEquals(args[0], ts.next());
+        Assert.assertEquals(true, ts.hasNext());
+        Assert.assertEquals(args[1], ts.next());
+        Assert.assertEquals(true, ts.hasNext());
+        Assert.assertEquals(args[2], ts.next());
+        Assert.assertEquals(false, ts.hasNext());
     }
 
     public static class TestCommand extends AbstractCommand {
@@ -105,13 +106,15 @@ public class CommandLineTest extends TestCase {
         }
     }
 
+    @Test
     public void testParse() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("command", "org.jnode.test.shell.syntax.CommandLineTest$TestCommand");
         shell.addSyntax("command", new ArgumentSyntax("arg1"));
-        CommandLine cl = new CommandLine(new Token("command"), new Token[]{new Token("fish")}, null);
+        CommandLine cl =
+                new CommandLine(new Token("command"), new Token[] {new Token("fish")}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
         Command cmd = cmdInfo.createCommandInstance();
-        assertEquals("fish", cmd.getArgumentBundle().getArgument("arg1").getValue());
+        Assert.assertEquals("fish", cmd.getArgumentBundle().getArgument("arg1").getValue());
     }
 }

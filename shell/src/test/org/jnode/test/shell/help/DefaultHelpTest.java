@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -23,16 +23,16 @@ package org.jnode.test.shell.help;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 
-import junit.framework.TestCase;
-
 import org.jnode.shell.help.def.DefaultHelpFactory;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Unit tests for the DefaultHelp implementation of the Help
- *
+ * 
  * @author crawley@jnode.org
  */
-public class DefaultHelpTest extends TestCase {
+public class DefaultHelpTest {
 
     static class MyDefaultHelp extends DefaultHelpFactory {
         static class MyCell extends Cell {
@@ -55,49 +55,46 @@ public class DefaultHelpTest extends TestCase {
         }
     }
 
+    @Test
     public void testConstructor() {
         new DefaultHelpFactory();
     }
 
+    @Test
     public void testCellFit() {
         String msg = "The quick brown fox jumped over the lazy dog.";
         for (int i = 1; i < msg.length() + 5; i++) {
             String m = new MyDefaultHelp.MyCell(5, i).fit(msg);
-            assertTrue("fit length", m.length() <= i);
-            assertTrue("text starts with fit ", msg.startsWith(m));
+            Assert.assertTrue("fit length", m.length() <= i);
+            Assert.assertTrue("text starts with fit ", msg.startsWith(m));
         }
 
-        assertEquals("   Hello  ", new MyDefaultHelp.MyCell(5, 10).fit("   Hello   "));
+        Assert.assertEquals("   Hello  ", new MyDefaultHelp.MyCell(5, 10).fit("   Hello   "));
     }
 
+    @Test
     public void testCellStamp() {
         String msg = "Hello Mum";
         String m = new MyDefaultHelp.MyCell(5, 10).stamp(msg);
-        assertEquals(m, "     Hello Mum ");
+        Assert.assertEquals(m, "     Hello Mum ");
     }
 
+    @Test
     public void testFormat() {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         PrintWriter pw = new PrintWriter(bos);
-        new MyDefaultHelp().format(pw,
-            new MyDefaultHelp.MyCell[]{
-                new MyDefaultHelp.MyCell(3, 5), new MyDefaultHelp.MyCell(3, 20)},
-            new String[]{
-                "12345678901234567890",
-                "The quick brown fox jumped over the lazy dog." +
-                    "The quick brown fox jumped over the lazy dog." +
-                    "The quick brown fox jumped over the lazy dog."
-            });
-        assertEquals(
-            "   12345   The quick brown fox \n" +
-                "   67890   jumped over the lazy\n" +
-                "   12345   dog.The quick brown \n" +
-                "   67890   fox jumped over     \n" +
-                "           the lazy dog.The    \n" +
-                "           quick brown fox     \n" +
-                "           jumped over the     \n" +
-                "           lazy dog.           \n",
-            bos.toString());
+        new MyDefaultHelp().format(pw, new MyDefaultHelp.MyCell[] {new MyDefaultHelp.MyCell(3, 5),
+            new MyDefaultHelp.MyCell(3, 20)}, new String[] {
+            "12345678901234567890",
+            "The quick brown fox jumped over the lazy dog."
+                    + "The quick brown fox jumped over the lazy dog."
+                    + "The quick brown fox jumped over the lazy dog."});
+        pw.flush();
+        Assert.assertEquals("   12345   The quick brown fox \n"
+                + "   67890   jumped over the lazy\n" + "   12345   dog.The quick brown \n"
+                + "   67890   fox jumped over     \n" + "           the lazy dog.The    \n"
+                + "           quick brown fox     \n" + "           jumped over the     \n"
+                + "           lazy dog.           \n", bos.toString());
     }
 
 }

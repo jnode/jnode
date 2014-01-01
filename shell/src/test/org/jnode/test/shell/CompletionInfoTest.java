@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -23,22 +23,24 @@ package org.jnode.test.shell;
 import java.util.Iterator;
 import java.util.SortedSet;
 
-import junit.framework.TestCase;
-
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandCompletions;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test key methods of the CompletionInfo class.
  *
  * @author crawley@jnode.org
  */
-public class CompletionInfoTest extends TestCase {
+public class CompletionInfoTest {
 
+    @Test
     public void testConstructor() {
         new CommandCompletions();
     }
 
+    @Test
     public void testAddCompletion() {
         CompletionInfo ci = new CommandCompletions();
 
@@ -46,42 +48,44 @@ public class CompletionInfoTest extends TestCase {
         ci.addCompletion("full-2", false);
         ci.addCompletion("partial", true);
         SortedSet<String> completions = ci.getCompletions();
-        assertEquals(3, completions.size());
+        Assert.assertEquals(3, completions.size());
 
         Iterator<String> it = completions.iterator();
-        assertEquals("full-1 ", it.next());
-        assertEquals("full-2 ", it.next());
-        assertEquals("partial", it.next());
+        Assert.assertEquals("full-1 ", it.next());
+        Assert.assertEquals("full-2 ", it.next());
+        Assert.assertEquals("partial", it.next());
     }
 
+    @Test
     public void testSetCompletionStart() {
         CompletionInfo ci = new CommandCompletions();
-        assertEquals(-1, ci.getCompletionStart());
+        Assert.assertEquals(-1, ci.getCompletionStart());
         ci.setCompletionStart(-1);
-        assertEquals(-1, ci.getCompletionStart());
+        Assert.assertEquals(-1, ci.getCompletionStart());
         ci.setCompletionStart(1);
-        assertEquals(1, ci.getCompletionStart());
+        Assert.assertEquals(1, ci.getCompletionStart());
         ci.setCompletionStart(1);
-        assertEquals(1, ci.getCompletionStart());
+        Assert.assertEquals(1, ci.getCompletionStart());
         try {
             ci.setCompletionStart(2);
-            fail("no exception");
+            Assert.fail("no exception");
         } catch (IllegalArgumentException ex) {
             // expected
         }
     }
 
+    @Test
     public void testGetCompletion() {
         CompletionInfo ci = new CommandCompletions();
-        assertEquals(null, ci.getCompletion());
+        Assert.assertEquals(null, ci.getCompletion());
 
         ci.addCompletion("full-1");
-        assertEquals("full-1 ", ci.getCompletion());
+        Assert.assertEquals("full-1 ", ci.getCompletion());
 
         ci.addCompletion("full-2");
-        assertEquals("full-", ci.getCompletion());
+        Assert.assertEquals("full-", ci.getCompletion());
 
         ci.addCompletion("partial", true);
-        assertEquals(null, ci.getCompletion());
+        Assert.assertEquals(null, ci.getCompletion());
     }
 }

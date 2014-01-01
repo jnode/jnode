@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -30,8 +30,6 @@ import java.util.TreeSet;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
-import junit.framework.TestCase;
-
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.DefaultCommandInvoker;
 import org.jnode.shell.DefaultInterpreter;
@@ -42,13 +40,19 @@ import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.proclet.ProcletCommandInvoker;
 import org.jnode.test.shell.syntax.TestAliasManager;
 import org.jnode.test.shell.syntax.TestSyntaxManager;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Test command completion using the default syntax created by a command's ArgumentBundle.
  *
  * @author crawley@jnode.org
  */
-public class DefaultSyntaxCompletionTest extends TestCase {
+// FIXME
+@Ignore
+public class DefaultSyntaxCompletionTest {
 
     private String userDirName = System.getProperty("user.dir");
     private File testDir;
@@ -62,8 +66,8 @@ public class DefaultSyntaxCompletionTest extends TestCase {
         }
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         // Setup a temporary home directory for filename completion
         File tempDir = new File(System.getProperty("java.io.tmpdir"));
         testDir = new File(tempDir, "CompletionTestDir");
@@ -81,8 +85,8 @@ public class DefaultSyntaxCompletionTest extends TestCase {
         fw.close();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         for (File f : testDir.listFiles()) {
             f.delete();
         }
@@ -113,6 +117,7 @@ public class DefaultSyntaxCompletionTest extends TestCase {
         }
     }
 
+    @Test
     public void testDefaultSyntax() throws Exception {
         MyTestCommandShell cs = new MyTestCommandShell();
         cs.setProperty(CommandShell.INTERPRETER_PROPERTY_NAME, "default");

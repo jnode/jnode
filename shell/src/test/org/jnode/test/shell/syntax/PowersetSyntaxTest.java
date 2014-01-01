@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -20,8 +20,6 @@
  
 package org.jnode.test.shell.syntax;
 
-import junit.framework.TestCase;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
@@ -38,16 +36,17 @@ import org.jnode.shell.syntax.RepeatSyntax;
 import org.jnode.shell.syntax.SequenceSyntax;
 import org.jnode.shell.syntax.StringArgument;
 import org.jnode.shell.syntax.Syntax;
+import org.junit.Assert;
 
-public class PowersetSyntaxTest extends TestCase {
+public class PowersetSyntaxTest {
 
     public static class Test extends AbstractCommand {
-        private final FileArgument fileArg =
-            new FileArgument("fileArg", Argument.OPTIONAL + Argument.MULTIPLE);
-        private final IntegerArgument intArg =
-            new IntegerArgument("intArg", Argument.OPTIONAL + Argument.MULTIPLE);
-        private final StringArgument otherArg =
-            new StringArgument("otherArg", Argument.OPTIONAL + Argument.MULTIPLE);
+        private final FileArgument fileArg = new FileArgument("fileArg", Argument.OPTIONAL +
+                Argument.MULTIPLE);
+        private final IntegerArgument intArg = new IntegerArgument("intArg", Argument.OPTIONAL +
+                Argument.MULTIPLE);
+        private final StringArgument otherArg = new StringArgument("otherArg", Argument.OPTIONAL +
+                Argument.MULTIPLE);
 
         public Test() {
             registerArguments(fileArg, intArg, otherArg);
@@ -57,193 +56,213 @@ public class PowersetSyntaxTest extends TestCase {
         }
     }
 
+    @org.junit.Test
     public void testConstructor() {
-        new PowersetSyntax(
-            new OptionSyntax("intArg", 'i'),
-            new OptionSyntax("fileArg", 'f'));
+        new PowersetSyntax(new OptionSyntax("intArg", 'i'), new OptionSyntax("fileArg", 'f'));
     }
 
+    @org.junit.Test
     public void testFormat() {
         ArgumentBundle bundle = new Test().getArgumentBundle();
-        Syntax syntax1 = new PowersetSyntax(
-            new OptionSyntax("intArg", 'i'),
-            new OptionSyntax("fileArg", 'f'));
-        assertEquals("[ ( -i <intArg> ) | ( -f <fileArg> ) ] ...",
-            syntax1.format(bundle));
+        Syntax syntax1 =
+                new PowersetSyntax(new OptionSyntax("intArg", 'i'),
+                        new OptionSyntax("fileArg", 'f'));
+        Assert.assertEquals("[ ( -i <intArg> ) | ( -f <fileArg> ) ] ...", syntax1.format(bundle));
     }
 
+    @org.junit.Test
     public void testOne() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.PowersetSyntaxTest$Test");
-        shell.addSyntax("cmd", new PowersetSyntax(
-            new OptionSyntax("intArg", 'i'),
-            new OptionSyntax("fileArg", 'f')));
+        shell.addSyntax("cmd", new PowersetSyntax(new OptionSyntax("intArg", 'i'),
+                new OptionSyntax("fileArg", 'f')));
 
         CommandLine cl;
         CommandInfo cmdInfo;
         Command cmd;
 
-        cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
+        cl = new CommandLine(new Token("cmd"), new Token[] {}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
-        assertEquals(0, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
 
-        cl = new CommandLine(new Token("cmd"), new Token[]{new Token("-f"), new Token("F1")}, null);
+        cl =
+                new CommandLine(new Token("cmd"), new Token[] {new Token("-f"), new Token("F1")},
+                        null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
-        assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
-        assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue().toString());
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
+        Assert.assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue()
+                .toString());
 
-        cl = new CommandLine(new Token("cmd"),
-            new Token[]{new Token("-f"), new Token("F1"), new Token("-i"), new Token("1")}, null);
+        cl =
+                new CommandLine(new Token("cmd"), new Token[] {new Token("-f"), new Token("F1"),
+                    new Token("-i"), new Token("1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
-        assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
-        assertEquals(1, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
-        assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue().toString());
-        assertEquals("1", cmd.getArgumentBundle().getArgument("intArg").getValue().toString());
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
+        Assert.assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue()
+                .toString());
+        Assert.assertEquals("1", cmd.getArgumentBundle().getArgument("intArg").getValue()
+                .toString());
 
         try {
-            cl = new CommandLine(new Token("cmd"), new Token[]{new Token("-f")}, null);
+            cl = new CommandLine(new Token("cmd"), new Token[] {new Token("-f")}, null);
             cl.parseCommandLine(shell);
-            fail("no exception");
+            Assert.fail("no exception");
         } catch (CommandSyntaxException ex) {
             // expected
         }
 
         try {
-            cl = new CommandLine(new Token("cmd"), new Token[]{new Token("-i"), new Token("F1")}, null);
+            cl =
+                    new CommandLine(new Token("cmd"),
+                            new Token[] {new Token("-i"), new Token("F1")}, null);
             cl.parseCommandLine(shell);
-            fail("no exception");
+            Assert.fail("no exception");
         } catch (CommandSyntaxException ex) {
             // expected
         }
     }
-    
+
+    @org.junit.Test
     public void testLazy() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.PowersetSyntaxTest$Test");
-        shell.addSyntax("cmd", new SequenceSyntax(
-                new PowersetSyntax(
-                        new OptionSyntax("intArg", 'i'),
-                        new OptionSyntax("fileArg", 'f')),
+        shell.addSyntax("cmd", new SequenceSyntax(new PowersetSyntax(
+                new OptionSyntax("intArg", 'i'), new OptionSyntax("fileArg", 'f')),
                 new RepeatSyntax(new OptionSyntax("otherArg", 'i'))));
 
         CommandLine cl;
         CommandInfo cmdInfo;
         Command cmd;
 
-        cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
+        cl = new CommandLine(new Token("cmd"), new Token[] {}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
-        assertEquals(0, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
 
-        cl = new CommandLine(new Token("cmd"), new Token[]{new Token("-f"), new Token("F1")}, null);
+        cl =
+                new CommandLine(new Token("cmd"), new Token[] {new Token("-f"), new Token("F1")},
+                        null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
-        assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
-        assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue().toString());
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
+        Assert.assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue()
+                .toString());
 
-        cl = new CommandLine(new Token("cmd"),
-            new Token[]{new Token("-f"), new Token("F1"), new Token("-i"), new Token("1")}, null);
+        cl =
+                new CommandLine(new Token("cmd"), new Token[] {new Token("-f"), new Token("F1"),
+                    new Token("-i"), new Token("1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
-        assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
-        assertEquals(1, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
-        assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue().toString());
-        assertEquals("1", cmd.getArgumentBundle().getArgument("otherArg").getValue().toString());
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
+        Assert.assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue()
+                .toString());
+        Assert.assertEquals("1", cmd.getArgumentBundle().getArgument("otherArg").getValue()
+                .toString());
 
-        cl = new CommandLine(new Token("cmd"),
-            new Token[]{new Token("-i"), new Token("1"), new Token("-f"), new Token("F1")}, null);
+        cl =
+                new CommandLine(new Token("cmd"), new Token[] {new Token("-i"), new Token("1"),
+                    new Token("-f"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
-        assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
-        assertEquals(1, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
-        assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue().toString());
-        assertEquals("1", cmd.getArgumentBundle().getArgument("intArg").getValue().toString());
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
+        Assert.assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue()
+                .toString());
+        Assert.assertEquals("1", cmd.getArgumentBundle().getArgument("intArg").getValue()
+                .toString());
 
-        cl = new CommandLine(new Token("cmd"),
-            new Token[]{
-                new Token("-i"), new Token("1"), new Token("-f"), new Token("F1"), 
-                new Token("-i"), new Token("2")}, 
-            null);
+        cl =
+                new CommandLine(new Token("cmd"), new Token[] {new Token("-i"), new Token("1"),
+                    new Token("-f"), new Token("F1"), new Token("-i"), new Token("2")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
-        assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
-        assertEquals(1, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
-        assertEquals(1, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
-        assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue().toString());
-        assertEquals("1", cmd.getArgumentBundle().getArgument("intArg").getValue().toString());
-        assertEquals("2", cmd.getArgumentBundle().getArgument("otherArg").getValue().toString());
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
+        Assert.assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue()
+                .toString());
+        Assert.assertEquals("1", cmd.getArgumentBundle().getArgument("intArg").getValue()
+                .toString());
+        Assert.assertEquals("2", cmd.getArgumentBundle().getArgument("otherArg").getValue()
+                .toString());
     }
-    
 
-    
+    @org.junit.Test
     public void testEager() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.PowersetSyntaxTest$Test");
-        shell.addSyntax("cmd", new SequenceSyntax(
-                new PowersetSyntax(null, true, null, 
-                        new OptionSyntax("intArg", 'i'),
-                        new OptionSyntax("fileArg", 'f')),
+        shell.addSyntax("cmd", new SequenceSyntax(new PowersetSyntax(null, true, null,
+                new OptionSyntax("intArg", 'i'), new OptionSyntax("fileArg", 'f')),
                 new RepeatSyntax(new OptionSyntax("otherArg", 'i'))));
 
         CommandLine cl;
         CommandInfo cmdInfo;
         Command cmd;
 
-        cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
+        cl = new CommandLine(new Token("cmd"), new Token[] {}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
-        assertEquals(0, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
 
-        cl = new CommandLine(new Token("cmd"), new Token[]{new Token("-f"), new Token("F1")}, null);
+        cl =
+                new CommandLine(new Token("cmd"), new Token[] {new Token("-f"), new Token("F1")},
+                        null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
-        assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
-        assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue().toString());
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
+        Assert.assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue()
+                .toString());
 
-        cl = new CommandLine(new Token("cmd"),
-            new Token[]{new Token("-f"), new Token("F1"), new Token("-i"), new Token("1")}, null);
+        cl =
+                new CommandLine(new Token("cmd"), new Token[] {new Token("-f"), new Token("F1"),
+                    new Token("-i"), new Token("1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
-        assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
-        assertEquals(1, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
-        assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue().toString());
-        assertEquals("1", cmd.getArgumentBundle().getArgument("intArg").getValue().toString());
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
+        Assert.assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue()
+                .toString());
+        Assert.assertEquals("1", cmd.getArgumentBundle().getArgument("intArg").getValue()
+                .toString());
 
-        cl = new CommandLine(new Token("cmd"),
-            new Token[]{new Token("-i"), new Token("1"), new Token("-f"), new Token("F1")}, null);
+        cl =
+                new CommandLine(new Token("cmd"), new Token[] {new Token("-i"), new Token("1"),
+                    new Token("-f"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
-        assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
-        assertEquals(1, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
-        assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue().toString());
-        assertEquals("1", cmd.getArgumentBundle().getArgument("intArg").getValue().toString());
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
+        Assert.assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue()
+                .toString());
+        Assert.assertEquals("1", cmd.getArgumentBundle().getArgument("intArg").getValue()
+                .toString());
 
-        cl = new CommandLine(new Token("cmd"),
-            new Token[]{
-                new Token("-i"), new Token("1"), new Token("-f"), new Token("F1"), 
-                new Token("-i"), new Token("2")}, 
-            null);
+        cl =
+                new CommandLine(new Token("cmd"), new Token[] {new Token("-i"), new Token("1"),
+                    new Token("-f"), new Token("F1"), new Token("-i"), new Token("2")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
-        assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
-        assertEquals(2, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
-        assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
+        Assert.assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
+        Assert.assertEquals(2, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
+        Assert.assertEquals(0, cmd.getArgumentBundle().getArgument("otherArg").getValues().length);
     }
 }

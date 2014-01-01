@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -31,14 +31,14 @@
     <import plugin="org.jnode.shell"/>
     <import plugin="org.jnode.shell.help"/>
     <import plugin="org.jnode.shell.syntax"/>
-    <import plugin="org.junit"/>
-    <import plugin="net.n3.nanoxml"/>
+    <import plugin="org.junit" version="4.5"/>
+    <import plugin="net.n3.nanoxml" version="2.2.3"/>
     <import plugin="org.jnode.shell.help"/>
     <import plugin="org.jnode.testrunner"/>
   </requires>
         
   <runtime>
-    <library name="jnode-shell.jar">
+    <library name="jnode-shell-test.jar">
       <export name="org.jnode.test.shell.*"/>
       <export name="org.jnode.test.shell.bjorne.*"/>
       <export name="org.jnode.test.shell.harness.*"/>

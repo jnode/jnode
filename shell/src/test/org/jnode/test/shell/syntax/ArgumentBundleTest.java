@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -22,49 +22,50 @@ package org.jnode.test.shell.syntax;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.Syntax;
 import org.jnode.shell.syntax.SyntaxFailureException;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class ArgumentBundleTest extends TestCase {
+public class ArgumentBundleTest {
 
+    @Test
     public void testArgumentBundle() {
         new ArgumentBundle();
         new ArgumentBundle(new FileArgument("arg1", 0));
         try {
-            new ArgumentBundle(new FileArgument("arg1", 0),
-                new FileArgument("arg1", 0));
-            fail("Didn't throw an IllegalArgumentException for duplicate labels");
+            new ArgumentBundle(new FileArgument("arg1", 0), new FileArgument("arg1", 0));
+            Assert.fail("Didn't throw an IllegalArgumentException for duplicate labels");
         } catch (IllegalArgumentException ex) {
             // expected ...
         }
         try {
             new ArgumentBundle((Argument<?>) null);
-            fail("Didn't throw an NullPointerException for null argument");
+            Assert.fail("Didn't throw an NullPointerException for null argument");
         } catch (NullPointerException ex) {
             // expected ...
         }
         try {
             new ArgumentBundle(new FileArgument(null, 0));
-            fail("Didn't throw an NullPointerException for null label");
+            Assert.fail("Didn't throw an NullPointerException for null label");
         } catch (NullPointerException ex) {
             // expected ...
         }
     }
 
+    @Test
     public void testGetArgumentString() {
         Argument<File> arg1 = new FileArgument("arg1", 0);
         Argument<File> arg2 = new FileArgument("arg2", 0);
         ArgumentBundle b = new ArgumentBundle(arg1, arg2);
-        assertEquals(arg1, b.getArgument("arg1"));
-        assertEquals(arg2, b.getArgument("arg2"));
+        Assert.assertEquals(arg1, b.getArgument("arg1"));
+        Assert.assertEquals(arg2, b.getArgument("arg2"));
         try {
             b.getArgument("arg3");
-            fail("didn't throw exception");
+            Assert.fail("didn't throw exception");
         } catch (SyntaxFailureException ex) {
             // expected
         }
@@ -81,6 +82,7 @@ public class ArgumentBundleTest extends TestCase {
         }
     }
 
+    @Test
     public void testCreateDefaultSyntax() {
         Argument<File> arg1 = new FileArgument("arg1", 0);
         Argument<File> arg2 = new FileArgument("arg2", 0);

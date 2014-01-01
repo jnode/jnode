@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -24,8 +24,6 @@ import java.util.Set;
 
 import javax.naming.NamingException;
 
-import junit.framework.TestCase;
-
 import org.jnode.shell.CommandCompletions;
 import org.jnode.shell.Completable;
 import org.jnode.shell.ShellSyntaxException;
@@ -42,22 +40,25 @@ import org.jnode.shell.syntax.SyntaxBundle;
 import org.jnode.shell.syntax.SyntaxManager;
 import org.jnode.test.shell.Cassowary;
 import org.jnode.test.shell.syntax.TestShell;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
- * Tests for completion in the bjorne interpreter.  Some of the sample commands are 
- * nonsensical ... but that's OK because we're only interested in completion behavior.
+ * Tests for completion in the bjorne interpreter. Some of the sample commands
+ * are nonsensical ... but that's OK because we're only interested in completion
+ * behavior.
  * 
  * @author crawley@jnode.org
  */
-public class BjorneCompletionTest extends TestCase {
-    
+public class BjorneCompletionTest {
+
     static TestShell shell;
     static {
         try {
             Cassowary.initEnv();
             shell = new TestShell();
             ShellUtils.getShellManager().registerShell(shell);
-            
+
             AliasManager am = shell.getAliasManager();
             am.add("gc", "org.jnode.command.system.GcCommand");
             am.add("cpuid", "org.jnode.test.shell.MyCpuIDCommand");
@@ -69,180 +70,222 @@ public class BjorneCompletionTest extends TestCase {
             am.add("alias", "org.jnode.test.shell.MyAliasCommand");
 
             SyntaxManager sm = shell.getSyntaxManager();
-            sm.add(new SyntaxBundle("set",
-                new SequenceSyntax(new ArgumentSyntax("key"), new ArgumentSyntax("value"))));
+            sm.add(new SyntaxBundle("set", new SequenceSyntax(new ArgumentSyntax("key"),
+                    new ArgumentSyntax("value"))));
             sm.add(new SyntaxBundle("duh", new ArgumentSyntax("path")));
             sm.add(new SyntaxBundle("echo", new RepeatSyntax(new ArgumentSyntax("text"))));
             sm.add(new SyntaxBundle("cpuid", new SequenceSyntax()));
-            sm.add(new SyntaxBundle("alias",
-                new EmptySyntax(null, "Print all available aliases and corresponding classnames"),
-                new SequenceSyntax(null, "Set an aliases for given classnames",
-                    new ArgumentSyntax("alias"), new ArgumentSyntax("classname")),
-                new OptionSyntax("remove", 'r', null, "Remove an alias")));
-            
+            sm.add(new SyntaxBundle("alias", new EmptySyntax(null,
+                    "Print all available aliases and corresponding classnames"),
+                    new SequenceSyntax(null, "Set an aliases for given classnames",
+                            new ArgumentSyntax("alias"), new ArgumentSyntax("classname")),
+                    new OptionSyntax("remove", 'r', null, "Remove an alias")));
+
         } catch (NamingException ex) {
             throw new RuntimeException(ex);
         }
     }
-    
 
+    @Test
     public void testSimpleCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("echo hi", "TE");
     }
 
+    @Test
     public void testListCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("echo hi ; echo", "TETT");
     }
 
+    @Test
     public void testAndCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("echo hi && echo", "TETT");
     }
 
+    @Test
     public void testPipeCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("echo hi | echo", "TETT");
     }
 
+    @Test
     public void testPipe2Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("echo hi |\necho", "TETT");
     }
-    
+
+    @Test
     public void testSourceCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("source /", "TT");
     }
 
+    @Test
     public void testIfCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("if cpuid ; then echo hi ; fi", "TTTTTETT");
     }
 
+    @Test
     public void testIf2Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("if\ncpuid ; then echo hi ; fi", "TTTTTETT");
     }
 
+    @Test
     public void testIf3Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("if cpuid\nthen echo hi ; fi", "TTTTETT");
     }
 
+    @Test
     public void testIf4Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("if cpuid ; then\necho hi ; fi", "TTTTTETT");
     }
 
+    @Test
     public void testIf5Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("if cpuid ; then\necho hi\nfi", "TTTTTET");
     }
 
+    @Test
     public void testIfElseCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("if cpuid ; then echo hi ; else echo ho ; fi", "TTTTTETTTETT");
     }
 
+    @Test
     public void testIfElse2Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("if cpuid ; then echo hi ; else\necho ho ; fi", "TTTTTETTTETT");
     }
 
+    @Test
     public void testIfElse3Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("if cpuid ; then echo hi ; else echo ho\nfi", "TTTTTETTTET");
     }
 
+    @Test
     public void testIfElifCommand() throws ShellSyntaxException, CompletionException {
-        doCompletionTest("if cpuid ; then echo hi ; elif cpuid ; then echo ho ; fi", "TTTTTETTTTTTETT");
+        doCompletionTest("if cpuid ; then echo hi ; elif cpuid ; then echo ho ; fi",
+                "TTTTTETTTTTTETT");
     }
 
+    @Test
     public void testIfElif2Command() throws ShellSyntaxException, CompletionException {
-        doCompletionTest("if cpuid ; then echo hi ; elif\ncpuid ; then echo ho ; fi", "TTTTTETTTTTTETT");
+        doCompletionTest("if cpuid ; then echo hi ; elif\ncpuid ; then echo ho ; fi",
+                "TTTTTETTTTTTETT");
     }
 
+    @Test
     public void testIfElif3Command() throws ShellSyntaxException, CompletionException {
-        doCompletionTest("if cpuid ; then echo hi ; elif cpuid\nthen echo ho ; fi", "TTTTTETTTTTETT");
+        doCompletionTest("if cpuid ; then echo hi ; elif cpuid\nthen echo ho ; fi",
+                "TTTTTETTTTTETT");
     }
 
+    @Test
     public void testIfElif4Command() throws ShellSyntaxException, CompletionException {
-        doCompletionTest("if cpuid ; then echo hi ; elif cpuid ; then\necho ho ; fi", "TTTTTETTTTTTETT");
+        doCompletionTest("if cpuid ; then echo hi ; elif cpuid ; then\necho ho ; fi",
+                "TTTTTETTTTTTETT");
     }
 
+    @Test
     public void testWhileCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("while cpuid ; do echo hi ; done", "TTTTTETT");
     }
 
+    @Test
     public void testWhile2Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("while\ncpuid ; do echo hi ; done", "TTTTTETT");
     }
-    
+
+    @Test
     public void testWhile3Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("while cpuid\ndo echo hi ; done", "TTTTETT");
     }
 
+    @Test
     public void testWhile4Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("while cpuid ; do\necho hi ; done", "TTTTTETT");
     }
-    
+
+    @Test
     public void testWhile5Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("while cpuid ; do echo hi\ndone", "TTTTTET");
     }
-   
+
+    @Test
     public void testForCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("for X in 1 2 3 ; do echo hi ; done", "TFTEEETTTETT");
     }
-   
+
+    @Test
     public void testFor2Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("for X in 1 2 3\ndo echo hi ; done", "TFTEEETTETT");
     }
 
+    @Test
     public void testFor3Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("for X in 1 2 3 ; do\necho hi ; done", "TFTEEETTTETT");
     }
-   
+
+    @Test
     public void testFor4Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("for X in 1 2 3 ; do echo hi\ndone", "TFTEEETTTET");
     }
-   
+
+    @Test
     public void testCaseCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("case 3 in ( 1 | 2 ) echo hi ;; 3 ) echo bye ; esac", "TFTTFTFTTETETTETT");
     }
-    
+
+    @Test
     public void testCase2Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("case 3\nin ( 1 | 2 ) echo hi ;; 3 ) echo bye ; esac", "TFTTFTFTTETETTETT");
     }
-    
+
+    @Test
     public void testCase3Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("case 3 in\n( 1 | 2 ) echo hi ;; 3 ) echo bye ; esac", "TFTTFTFTTETETTETT");
     }
-    
+
+    @Test
     public void testCase4Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("case 3 in ( 1 | 2 )\necho hi ;; 3 ) echo bye ; esac", "TFTTFTFTTETETTETT");
     }
-    
+
+    @Test
     public void testCase5Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("case 3 in ( 1 | 2 ) echo hi\n;; 3 ) echo bye ; esac", "TFTTFTFTTETETTETT");
     }
-    
+
+    @Test
     public void testCase6Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("case 3 in ( 1 | 2 ) echo hi ;;\n3 ) echo bye ; esac", "TFTTFTFTTETETTETT");
     }
-    
+
+    @Test
     public void testCase7Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("case 3 in ( 1 | 2 ) echo hi ;; 3 )\necho bye ; esac", "TFTTFTFTTETETTETT");
     }
-    
+
+    @Test
     public void testCase8Command() throws ShellSyntaxException, CompletionException {
         doCompletionTest("case 3 in ( 1 | 2 ) echo hi ;; 3 ) echo bye\nesac", "TFTTFTFTTETETTET");
     }
-    
+
+    @Test
     public void testBadCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("cpuid hi", "TE");
     }
-    
+
+    @Test
     public void testBad2Command() throws ShellSyntaxException, CompletionException {
         try {
             doCompletionTest("if fi ;", "T??");
         } catch (CompletionException ex) {
-            assertEquals("Cannot find an alias or load a command class for 'fi'", ex.getMessage());
+            Assert.assertEquals("Cannot find an alias or load a command class for 'fi'",
+                    ex.getMessage());
         }
     }
-    
+
+    @Test
     public void testRedirCommand() throws ShellSyntaxException, CompletionException {
         doCompletionTest("echo hi > /", "TETZ");
     }
-   
-    private void doCompletionTest(String input, String flags) 
+
+    private void doCompletionTest(String input, String flags)
         throws ShellSyntaxException, CompletionException {
         BjorneInterpreter interpreter = new BjorneInterpreter();
         for (int i = 0; i <= input.length(); i++) {
@@ -263,21 +306,22 @@ public class BjorneCompletionTest extends TestCase {
             switch (flags.charAt(inWord)) {
                 case 'T':
                     // Expect completions
-                    assertTrue("got no completions: " + diag(partial, completions), 
+                    Assert.assertTrue("got no completions: " + diag(partial, completions),
                             completionWords.size() > 0);
                     break;
                 case 'F':
                     // Expect no completions
-                    assertTrue("got unexpected completions: " + diag(partial, completions),
+                    Assert.assertTrue("got unexpected completions: " + diag(partial, completions),
                             completionWords.size() == 0);
                     break;
                 case 'E':
                     // Expect completions if the last char is ' ', otherwise not
                     if (wordStart >= partial.length()) {
-                        assertTrue("got no completions: " + diag(partial, completions),
+                        Assert.assertTrue("got no completions: " + diag(partial, completions),
                                 completionWords.size() > 0);
                     } else {
-                        assertTrue("got unexpected completions: " + diag(partial, completions), 
+                        Assert.assertTrue(
+                                "got unexpected completions: " + diag(partial, completions),
                                 completionWords.size() == 0);
                     }
                     break;
@@ -286,7 +330,7 @@ public class BjorneCompletionTest extends TestCase {
                     if (wordStart >= partial.length()) {
                         //
                     } else {
-                        assertTrue("got no completions: " + diag(partial, completions), 
+                        Assert.assertTrue("got no completions: " + diag(partial, completions),
                                 completionWords.size() > 0);
                     }
                     break;
@@ -295,7 +339,7 @@ public class BjorneCompletionTest extends TestCase {
             }
             for (String completionWord : completionWords) {
                 if (!completionWord.startsWith(lastWord)) {
-                    fail("completion(s) don't start with '" + lastWord + "': " + 
+                    Assert.fail("completion(s) don't start with '" + lastWord + "': " +
                             diag(partial, completions));
                 }
             }
@@ -303,6 +347,6 @@ public class BjorneCompletionTest extends TestCase {
     }
 
     private String diag(String partial, CommandCompletions completions) {
-        return "partial = '" + partial + "', completions = " + completions; 
+        return "partial = '" + partial + "', completions = " + completions;
     }
 }
