@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -489,13 +489,13 @@ public class PluginDocumentationTask extends AbstractPluginTask {
             if (descr.getPrerequisites().length > 0) {
                 addSummaryTableHdr(out, "Requires");
                 for (PluginPrerequisite prereq : descr.getPrerequisites()) {
-                    final String href = prereq.getPluginId() + EXT;
+                    final String href = prereq.getPluginReference().getId() + EXT;
                     final PluginData prereqData = getPluginData(prereq
-                        .getPluginId());
+                        .getPluginReference().getId());
                     final String name = (prereqData != null) ? prereqData
                         .getDescriptor().getName() : "?";
                     addTableRow(out, "<a href='" + href + "'>"
-                        + prereq.getPluginId() + "</a>", name);
+                        + prereq.getPluginReference().getId() + "</a>", name);
                 }
                 endSummaryTableHdr(out);
             }
@@ -521,6 +521,11 @@ public class PluginDocumentationTask extends AbstractPluginTask {
 
                     for (String export : library.getExports()) {
                         sb.append(export);
+                        sb.append("<br/>");
+                    }
+                    for (String exclude : library.getExcludes()) {
+                    	sb.append("exclude: ");
+                        sb.append(exclude);
                         sb.append("<br/>");
                     }
                     addTableRow(out, libName, sb.toString());
@@ -740,7 +745,7 @@ public class PluginDocumentationTask extends AbstractPluginTask {
                 .getPrerequisites();
             if ((reqs != null) && (reqs.length > 0)) {
                 for (PluginPrerequisite req : reqs) {
-                    if (req.getPluginId().equals(id)) {
+                    if (req.getPluginReference().getId().equals(id)) {
                         list.add(data);
                         break;
                     }

@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -56,7 +56,7 @@ final class DotBuilder {
         PluginPrerequisite[] prereqs = data.getDescriptor().getPrerequisites();
         if (prereqs != null) {
             for (PluginPrerequisite pr : prereqs) {
-                dot.println("  " + fixId(id) + " -> " + fixId(pr.getPluginId()) + ";");
+                dot.println("  " + fixId(id) + " -> " + fixId(pr.getPluginReference().getId()) + ";");
             }
         }
     }

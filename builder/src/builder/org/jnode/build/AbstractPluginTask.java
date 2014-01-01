@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -87,17 +87,7 @@ public abstract class AbstractPluginTask extends Task {
 
     protected void processLibrary(Jar jarTask, Library lib, HashMap<File, ZipFileSet> fileSets, File srcDir) {
         final String jarName = jarTask.getDestFile().getName();
-        final LibAlias libAlias = getAlias(lib.getName());
-        final File f;
-        if (libAlias == null) {
-            f = new File(srcDir, lib.getName());
-            if (!f.exists()) {
-                throw new BuildException(
-                    "file not found " + f.getAbsoluteFile() + " because " + lib.getName() + " has no alias");
-            }
-        } else {
-            f = libAlias.getAlias();
-        }
+        final File f = getLibraryFile(lib, srcDir);
 
         ZipFileSet fs = fileSets.get(f);
         if (fs == null) {
@@ -111,6 +101,23 @@ public abstract class AbstractPluginTask extends Task {
             jarTask.addFileset(fs);
         }
         fs.createExclude().setName("**/package.html");
+
+        final String[] excludes = lib.getExcludes();
+        for (int i = 0; i < excludes.length; i++) {
+            final String exclude = excludes[i];
+            if (exclude.equals("*")) {
+                fs.createExclude().setName("**/*");                
+            } else {
+                String exp = exclude.replace('.', '/');
+                fs.createExclude().setName(exp + ".*");
+                fs.createExclude().setName(exp + ".class");
+                if (!exp.endsWith("*")) {
+                    fs.createExclude().setName(exp + "*");
+                } else {
+                    fs.createExclude().setName(exp);
+                }
+            }
+        }
 
         final String[] exports = lib.getExports();
         for (int i = 0; i < exports.length; i++) {
@@ -130,6 +137,24 @@ public abstract class AbstractPluginTask extends Task {
                 }
             }
         }
+    }
+    
+    /**
+     * Gets the file described by the given library
+     */
+    protected File getLibraryFile(Library lib, File srcDir) {
+        final LibAlias libAlias = getAlias(lib.getName());
+        final File f;
+        if (libAlias == null) {
+            f = new File(srcDir, lib.getName());
+            if (!f.exists()) {
+                throw new BuildException(
+                    "file not found " + f.getAbsoluteFile() + " because " + lib.getName() + " has no alias");
+            }
+        } else {
+            f = libAlias.getAlias();
+        }    	
+        return f;
     }
     
     private void checkPackageExists(String jarName, final String export, File src) {

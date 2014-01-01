@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -25,6 +25,7 @@
 	<property name="my-build.dir"   value="${basedir}/build"/>
 	<property name="my-gen.dir"   value="${basedir}/build/src"/>
 	<property name="my-classes.dir" value="${my-build.dir}/classes"/>
+    <property name="my-testclasses.dir" value="${my-build.dir}/testclasses"/>
 	<property name="my-src.dir"     value="${basedir}/src"/>
 	<property name="javacc.dir"     value="${basedir}/lib" />
 	<property name="jnasm-src.dir"  value="${my-src.dir}/builder/org/jnode/jnasm"/>
@@ -43,6 +44,7 @@
 
 	<target name="prepare" description="Initialize all subproject directories.">
 		<mkdir dir="${my-classes.dir}"/>
+		<mkdir dir="${my-testclasses.dir}"/>
 		<mkdir dir="${jnasm-preprocessor-gen.dir}"/>
 		<mkdir dir="${jnasm-assembler-gen.dir}"/>
 

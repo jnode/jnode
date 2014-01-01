@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -136,9 +136,9 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
             }
             final PluginPrerequisite[] prereqs = descr.getPrerequisites();
             for (int j = 0; j < prereqs.length; j++) {
-                if (registry.getPluginDescriptor(prereqs[j].getPluginId()) == null) {
+                if (registry.getPluginDescriptor(prereqs[j].getPluginReference().getId()) == null) {
                     throw new BuildException("Cannot find plugin "
-                        + prereqs[j].getPluginId()
+                        + prereqs[j].getPluginReference()
                         + ", which is required by " + descr.getId());
                 }
             }
