@@ -1,5 +1,5 @@
 /* VariableTable.java -- A class representing a Variable Table for a method
-   Copyright (C) 2005 Free Software Foundation
+   Copyright (C) 2005, 2007 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -50,9 +50,9 @@ import java.io.IOException;
 public class VariableTable
 {
 
-  private final long argCnt;
+  private final int argCnt;
 
-  private final long slots;
+  private final int slots;
 
   private final long[] lineCI;
 
@@ -95,8 +95,8 @@ public class VariableTable
    */
   public void write(DataOutputStream os) throws IOException
   {
-    os.writeLong(argCnt);
-    os.writeLong(slots);
+    os.writeInt(argCnt);
+    os.writeInt(slots);
     for (int i = 0; i < slots; i++)
       {
         os.writeLong(lineCI[i]);

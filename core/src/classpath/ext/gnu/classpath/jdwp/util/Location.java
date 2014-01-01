@@ -1,5 +1,5 @@
 /* Location.java -- class to read/write JDWP locations
-   Copyright (C) 2005, 2006 Free Software Foundation
+   Copyright (C) 2005, 2006, 2007 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -94,21 +94,21 @@ public class Location
    * @param os stream to write to
    * @throws IOException when an error occurs writing to the stream
    */
-  public void write(DataOutputStream os)
+  public void write(DataOutputStream os) 
     throws IOException
   {
     // check if this is an empty location
     if (method != null)
       {
-    VMIdManager idm = VMIdManager.getDefault();
+        VMIdManager idm = VMIdManager.getDefault();
         ClassReferenceTypeId crti = 
           (ClassReferenceTypeId) 
-      idm.getReferenceTypeId(method.getDeclaringClass());
+          idm.getReferenceTypeId(method.getDeclaringClass());
 
-    crti.writeTagged(os);
-    method.writeId(os);
-    os.writeLong(index);
-  }
+        crti.writeTagged(os);
+        method.writeId(os);
+        os.writeLong(index);
+      }
     else
       {
         os.writeByte(1);
@@ -127,7 +127,7 @@ public class Location
   {
        return new Location(null, 0);
   }
-
+   
   /**
    * Gets the method of this location
    * 
@@ -152,5 +152,17 @@ public class Location
   public String toString ()
   {
     return method.toString () + "." + index;
+  }
+
+  public boolean equals(Object obj)
+  {
+    if (obj instanceof Location)
+      {
+	Location l = (Location) obj;
+	return (getMethod().equals(l.getMethod())
+		&& getIndex() == l.getIndex());
+      }
+
+    return false;
   }
 }

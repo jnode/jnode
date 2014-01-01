@@ -29,7 +29,6 @@ public class Main {
                     Jdwp jdwp = new Jdwp();
                     jdwp.configure(ps);
                     jdwp.run();
-                    jdwp.waitToFinish();
                     jdwp.shutdown();
                 }
                 // workaround for the restricted capabilities of JDWP support in GNU Classpath.
