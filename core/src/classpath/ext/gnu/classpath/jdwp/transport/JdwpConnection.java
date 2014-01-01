@@ -1,5 +1,5 @@
 /* JdwpConnection.java -- A JDWP-speaking connection
-   Copyright (C) 2005, 2006, 2007 Free Software Foundation
+   Copyright (C) 2005, 2006 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -182,7 +182,10 @@ public class JdwpConnection
 	       2. Transport was shutdown
 	       In either case, we make sure that all of the
 	       back-end gets shutdown. */
-	    Jdwp.getDefault().shutdown ();
+          //jnode
+          //we will take care of the shutdown elsewhere
+          break;
+        //Jdwp.getDefault().shutdown ();
 	  }
 	catch (Throwable t)
 	  {
@@ -267,17 +270,13 @@ public class JdwpConnection
   }
 
   /**
-   * Send an event notification to the debugger. Note that this
-   * method will only send out one notification: all the events
-   * are passed in a single Event.COMPOSITE packet.
+   * Send an event notification to the debugger
    *
-   * @param requests  debugger requests for events
-   * @param events    the events to send
-   * @param suspendPolicy  the suspend policy enforced by the VM
+   * @param request  the debugger request that wanted this event
+   * @param event    the event
    * @throws IOException
    */
-  public void sendEvents(EventRequest[] requests, Event[] events,
-			 byte suspendPolicy)
+  public void sendEvent (EventRequest request, Event event)
     throws IOException
   {
     JdwpPacket pkt;
@@ -285,7 +284,7 @@ public class JdwpConnection
     synchronized (_bytes)
       {
 	_bytes.reset ();
-	pkt = Event.toPacket (_doStream, events, requests, suspendPolicy);
+	pkt = event.toPacket (_doStream, request);
 	pkt.setData (_bytes.toByteArray ());
       }
 

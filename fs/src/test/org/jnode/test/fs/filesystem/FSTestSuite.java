@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -20,10 +20,13 @@
  
 package org.jnode.test.fs.filesystem;
 
+import org.jnode.fs.service.def.FileSystemManagerTest;
+import org.jnode.test.fs.ext4.Ext4FileSystemTest;
 import org.jnode.test.fs.filesystem.tests.BasicFSTest;
 import org.jnode.test.fs.filesystem.tests.ConcurrentAccessFSTest;
 import org.jnode.test.fs.filesystem.tests.FileFSTest;
 import org.jnode.test.fs.filesystem.tests.TreeFSTest;
+import org.jnode.test.fs.ntfs.NTFSFileSystemTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -42,7 +45,10 @@ import org.junit.runners.Suite.SuiteClasses;
     BasicFSTest.class, 
     ConcurrentAccessFSTest.class,
     FileFSTest.class,
-    TreeFSTest.class
+    TreeFSTest.class,
+    /*FileSystemManagerTest.class,*/
+    Ext4FileSystemTest.class,
+    NTFSFileSystemTest.class,
     }
 )
 public class FSTestSuite {

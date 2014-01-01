@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -22,7 +22,6 @@ package org.jnode.fs.service.def;
 
 import java.io.File;
 import java.io.IOException;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -44,9 +43,9 @@ final class VirtualMountEntry implements FSEntry {
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param mountedFS
-     * @param path Path in the mountedFS (null or "" for root)
+     * @param path      Path in the mountedFS (null or "" for root)
      * @param name
      * @param parent
      * @throws IOException
@@ -102,6 +101,11 @@ final class VirtualMountEntry implements FSEntry {
      */
     public long getLastModified() throws IOException {
         return root.getLastModified();
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 
     /**

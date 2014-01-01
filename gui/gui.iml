@@ -8,13 +8,12 @@
       <sourceFolder url="file://$MODULE_DIR$/src/desktop" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/driver" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/font" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/thinlet" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="true" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="core" />
-    <orderEntry type="library" name="core" level="project" />
     <orderEntry type="module" module-name="shell" />
   </component>
 </module>

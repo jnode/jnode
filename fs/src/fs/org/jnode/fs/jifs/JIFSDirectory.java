@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -109,6 +108,11 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
         return entries.get(name);
     }
 
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        return getEntry(id);
+    }
+
     public FSAccessRights getAccessRights() {
         return null;
     }
@@ -146,6 +150,11 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
 
     public void setParent(FSDirectory parent) {
         this.parent = parent;
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 
     public String getName() {

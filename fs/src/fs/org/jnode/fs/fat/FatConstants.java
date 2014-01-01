@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -30,4 +30,6 @@ public interface FatConstants {
     public static final int F_LABEL = 0x08;
     public static final int F_DIRECTORY = 0x10;
     public static final int F_ARCHIVE = 0x20;
+
+    public static final int DIR_ENTRY_SIZE = 32;
 }

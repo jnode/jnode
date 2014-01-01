@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -50,6 +50,7 @@
 
       <export name="java.applet.*"/>
       <export name="java.awt.*"/>
+      <exclude name="java.awt.AWTPermission"/>
       <export name="java.awt.color.*"/>
       <export name="java.awt.datatransfer.*"/>
       <export name="java.awt.dnd.*"/>
@@ -64,6 +65,11 @@
       <export name="java.awt.peer.*"/>
       <export name="java.awt.print.*"/>
       <export name="java.beans.*"/>
+      <exclude name="java.beans.ChangeListenerMap" />
+      <exclude name="java.beans.PropertyChangeListener" />
+      <exclude name="java.beans.PropertyChangeListenerProxy" />
+      <exclude name="java.beans.PropertyChangeSupport" />
+      <exclude name="java.beans.PropertyChangeEvent" />
       <export name="java.beans.beancontext.*"/>
       <export name="java.rmi.*"/>
       <export name="java.rmi.activation.*"/>
@@ -98,6 +104,8 @@
       <export name="javax.naming.ldap.*"/>
       <export name="javax.net.*"/>
       <export name="javax.net.ssl.*"/>
+      <exclude name="javax.net.ssl.SSLException"/>  
+      <exclude name="javax.net.ssl.SSLPeerUnverifiedException"/>
 
       <export name="javax.sound.midi.*"/>
       <export name="javax.sound.midi.spi.*"/>
@@ -116,8 +124,14 @@
       <export name="sun.net.spi.nameservice.*"/>
       <export name="sun.net.spi.nameservice.dns.*"/>
       <export name="sun.net.spi.nameservice.dns.META-INF.services.*"/>      
+      <exclude name="sun.net.ApplicationProxy*"/>
+      <exclude name="sun.net.InetAddressCachePolicy"/>
+      <exclude name="sun.net.www.protocol.http.InMemoryCookieStore"/>
+      <exclude name="sun.net.spi.nameservice.NameService"/>
+      <exclude name="sun.net.spi.nameservice.NameServiceDescriptor"/>
 
       <export name="sun.security.*"/>
+      <exclude name="sun.security.pkcs.ParsingException"/>
     </library>
   </runtime>
   

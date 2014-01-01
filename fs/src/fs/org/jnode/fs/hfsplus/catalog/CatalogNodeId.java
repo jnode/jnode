@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -23,16 +23,14 @@ package org.jnode.fs.hfsplus.catalog;
 import org.jnode.util.BigEndian;
 
 public class CatalogNodeId implements Comparable<CatalogNodeId> {
-    private byte[] cnid;
+    private long cnid;
 
     public CatalogNodeId(final byte[] src, final int offset) {
-        cnid = new byte[4];
-        System.arraycopy(src, offset, cnid, 0, 4);
+        cnid = BigEndian.getUInt32(src, offset);
     }
 
-    public CatalogNodeId(final int nodeId) {
-        cnid = new byte[4];
-        BigEndian.setInt32(cnid, 0, nodeId);
+    public CatalogNodeId(final long nodeId) {
+        cnid = nodeId;
     }
 
     /* Parent Of the Root */
@@ -56,18 +54,25 @@ public class CatalogNodeId implements Comparable<CatalogNodeId> {
     /* first available user id */
     public static final CatalogNodeId HFSPLUS_FIRSTUSER_CNID = new CatalogNodeId(16);
 
-    public final int getId() {
-        return BigEndian.getInt32(cnid, 0);
+    public final long getId() {
+        return cnid;
     }
 
     public final byte[] getBytes() {
-        return cnid;
+        byte[] cnidBuffer = new byte[4];
+        BigEndian.setInt32(cnidBuffer, 0, (int) cnid);
+        return cnidBuffer;
     }
 
     @Override
     public int compareTo(CatalogNodeId o) {
-        Integer currentId = Integer.valueOf(this.getId());
-        Integer compareId = Integer.valueOf(o.getId());
+        Long currentId = Long.valueOf(this.getId());
+        Long compareId = Long.valueOf(o.getId());
         return currentId.compareTo(compareId);
+    }
+
+    @Override
+    public String toString() {
+        return "cnid:" + cnid;
     }
 }

@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -71,5 +71,8 @@
       <permission class="java.lang.RuntimePermission" name="readFileDescriptor"/>
       <permission class="java.lang.RuntimePermission" name="exitVM"/>
       <permission class="java.util.PropertyPermission" name="sun.tools.jar.useExtractionTime" actions="read"/>
+      <permission class="java.util.PropertyPermission" name="sun.boot.class.path" actions="read"/>
+      <permission class="java.util.PropertyPermission" name="java.ext.dirs" actions="read"/>
+      <permission class="java.util.PropertyPermission" name="env.class.path" actions="read"/>
   </extension>
 </plugin>

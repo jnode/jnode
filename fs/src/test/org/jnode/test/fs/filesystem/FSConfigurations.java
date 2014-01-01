@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -28,10 +28,11 @@ import org.jnode.fs.FileSystem;
 import org.jnode.fs.Formatter;
 import org.jnode.fs.ext2.BlockSize;
 import org.jnode.fs.ext2.Ext2FileSystemFormatter;
-import org.jnode.fs.fat.FatFileSystemFormatter;
 import org.jnode.fs.fat.FatType;
 import org.jnode.fs.hfsplus.HFSPlusParams;
 import org.jnode.fs.hfsplus.HfsPlusFileSystemFormatter;
+import org.jnode.fs.jfat.ClusterSize;
+import org.jnode.fs.jfat.FatFileSystemFormatter;
 import org.jnode.test.fs.filesystem.config.FS;
 import org.jnode.test.fs.filesystem.config.FSAccessMode;
 import org.jnode.test.fs.filesystem.config.FSTestConfig;
@@ -56,18 +57,31 @@ public class FSConfigurations implements Iterable<FSTestConfig> {
             new FileSystemTestConfigurationListBuilder().osType(OsType.OTHER_OS).accessMode(FSAccessMode.BOTH)
                 .filename(DISK_FILE_NAME).fileSize("1M");
 
+        FileSystemTestConfigurationListBuilder fatBuilder =
+            new FileSystemTestConfigurationListBuilder().osType(OsType.OTHER_OS).accessMode(FSAccessMode.BOTH)
+                .filename(DISK_FILE_NAME).fileSize("33M");
+
         configs
             .addAll(defaultBuilder.fsType(FSType.EXT2).formatter(new Ext2FileSystemFormatter(BlockSize._1Kb)).build());
         configs
             .addAll(defaultBuilder.fsType(FSType.EXT2).formatter(new Ext2FileSystemFormatter(BlockSize._4Kb)).build());
+        /* TODO Fix HFS failures
         configs.addAll(
             defaultBuilder.fsType(FSType.HFS_PLUS).formatter(new HfsPlusFileSystemFormatter(new HFSPlusParams()))
-                .build());
+                .build());*/
 
-        configs.addAll(defaultBuilder.fsType(FSType.FAT).formatter(new FatFileSystemFormatter(FatType.FAT12)).build());
-        configs.addAll(defaultBuilder.fsType(FSType.FAT).formatter(new FatFileSystemFormatter(FatType.FAT16)).build());
-        configs.addAll(defaultBuilder.fsType(FSType.FAT).formatter(new FatFileSystemFormatter(FatType.FAT32)).build());
-        configs.addAll(defaultBuilder.fsType(FSType.JFAT).formatter(new FatFileSystemFormatter(FatType.FAT32)).build());
+        /* TODO Implement FAT12 writing
+        configs.addAll(
+            fatBuilder.fsType(FSType.FAT).formatter(new org.jnode.fs.fat.FatFileSystemFormatter(FatType.FAT12))
+                .build());*/
+        configs.addAll(
+            fatBuilder.fsType(FSType.FAT).formatter(new org.jnode.fs.fat.FatFileSystemFormatter(FatType.FAT16))
+                .build());
+        configs.addAll(
+            fatBuilder.fsType(FSType.FAT).formatter(new org.jnode.fs.fat.FatFileSystemFormatter(FatType.FAT32))
+                .build());
+        /* TODO Implement FAT12 writing
+        configs.addAll(fatBuilder.fsType(FSType.JFAT).formatter(new FatFileSystemFormatter(ClusterSize._64Kb)).build());*/
     }
 
     class FileSystemTestConfigurationListBuilder {

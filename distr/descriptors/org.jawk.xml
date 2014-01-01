@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -37,8 +37,8 @@
   </runtime>
   
   <requires>
-    <import plugin="org.jnode.shell"/>
-    <import plugin="org.jnode.shell.syntax"/>
+    <import plugin="org.jnode.shell" version="@VERSION@"/>
+    <import plugin="org.jnode.shell.syntax" version="@VERSION@"/>
   </requires>
   
   <extension point="org.jnode.shell.aliases">

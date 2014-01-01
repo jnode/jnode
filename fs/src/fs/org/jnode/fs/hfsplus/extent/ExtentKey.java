@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -35,25 +35,24 @@ public class ExtentKey extends AbstractKey {
     private int forkType;
     private int pad;
     private CatalogNodeId fileId;
-    private int startBlock;
+    private long startBlock;
 
     /**
-     * 
      * @param src
      * @param offset
      */
     public ExtentKey(final byte[] src, final int offset) {
         byte[] ek = new byte[KEY_LENGTH];
         System.arraycopy(src, offset, ek, 0, KEY_LENGTH);
-        keyLength = BigEndian.getInt16(ek, 0);
-        forkType = BigEndian.getInt8(ek, 2);
-        pad = BigEndian.getInt8(ek, 3);
+        //TODO Understand why the +2 is necessary
+        keyLength = BigEndian.getUInt16(ek, 0) + 2;
+        forkType = BigEndian.getUInt8(ek, 2);
+        pad = BigEndian.getUInt8(ek, 3);
         fileId = new CatalogNodeId(ek, 4);
-        startBlock = BigEndian.getInt32(ek, 8);
+        startBlock = BigEndian.getUInt32(ek, 8);
     }
 
     /**
-     * 
      * @param forkType
      * @param pad
      * @param fileId
@@ -84,6 +83,24 @@ public class ExtentKey extends AbstractKey {
     }
 
     @Override
+    public int hashCode() {
+        return 73 ^ fileId.hashCode() * forkType + (int) startBlock;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ExtentKey)) {
+            return false;
+        }
+
+        ExtentKey otherKey = (ExtentKey) obj;
+
+        return
+            fileId.getId() == otherKey.fileId.getId() &&
+                forkType == otherKey.forkType;
+    }
+
+    @Override
     public byte[] getBytes() {
         byte[] data = new byte[this.getKeyLength()];
         return data;
@@ -95,9 +112,9 @@ public class ExtentKey extends AbstractKey {
         return currentForkType.compareTo(forkType);
     }
 
-    private int compareStartBlock(int block) {
-        Integer currentStartBlock = Integer.valueOf(startBlock);
-        Integer startBlock = Integer.valueOf(block);
+    private int compareStartBlock(long block) {
+        Long currentStartBlock = Long.valueOf(startBlock);
+        Long startBlock = Long.valueOf(block);
         return currentStartBlock.compareTo(startBlock);
     }
 
@@ -113,8 +130,12 @@ public class ExtentKey extends AbstractKey {
         return fileId;
     }
 
-    public int getStartBlock() {
+    public long getStartBlock() {
         return startBlock;
     }
 
+    @Override
+    public final String toString() {
+        return String.format("[%s type:%s start:%d]", fileId, forkType == DATA_FORK ? "data" : "resource", startBlock);
+    }
 }

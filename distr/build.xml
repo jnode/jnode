@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -24,6 +24,7 @@
 		
   <property name="my-build.dir"   value="${basedir}/build"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
+  <property name="my-testclasses.dir" value="${my-build.dir}/testclasses"/>
   <property name="my-src.dir"     value="${basedir}/src"/>
   <property name="my.jar"         value="${jnode-distr.jar}"/>
 	
@@ -49,20 +50,25 @@
 <!-- Initialize all subproject directories -->
   <target name="prepare">
     <mkdir dir="${my-classes.dir}"/>
+    <mkdir dir="${my-testclasses.dir}"/>
     <mkdir dir="${my-build.dir}"/>
-  	<jnode.copy-descriptors/>
+    <jnode.copy-descriptors/>
   </target>
 
 <!-- Compile all subproject java files -->
   <target name="compile" depends="prepare">
     <jnode.compile>
-	  <src path="${my-src.dir}/apps"/>
-	  <src path="${my-src.dir}/emu"/>
-	  <src path="${my-src.dir}/install"/>
-  	  <src path="${my-src.dir}/test"/>
+      <src path="${my-src.dir}/apps"/>
+      <src path="${my-src.dir}/emu"/>
+      <src path="${my-src.dir}/install"/>
       <classpath refid="my-cp"/>
     </jnode.compile>
-
+    <jnode.compile.test>
+      <src path="${my-src.dir}/test"/>
+      <classpath refid="my-cp"/>
+      <classpath refid="cp-test"/>
+    </jnode.compile.test>
+    
 	<!-- copy properties files -->
     <copy todir="${my-classes.dir}/org/jnode/apps/telnetd">
 	  <fileset dir="${my-src.dir}/apps/org/jnode/apps/telnetd">

@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -46,9 +46,9 @@ public class URLPluginLoader extends PluginLoader {
     /**
      * @see org.jnode.plugin.PluginLoader#getPluginBuffer(String, String)
      */
-    public ByteBuffer getPluginBuffer(String pluginId, String pluginVersion) {
+    public ByteBuffer getPluginBuffer(PluginReference pluginReference) {
         try {
-            final URL url = new URL(baseUrl, getPluginFileName(pluginId, pluginVersion));
+            final URL url = new URL(baseUrl, getPluginFileName(pluginReference));
             System.out.println("url=" + url);
             return ByteBuffer.wrap(FileUtils.load(url.openStream(), true));
         } catch (IOException ex) {

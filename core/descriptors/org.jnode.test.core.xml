@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -27,7 +27,7 @@
     provider-name="JNode.org">
 
     <runtime>
-        <library name="jnode-core.jar">
+        <library name="jnode-core-test.jar">
             <export name="org.jnode.test.core.*"/>
         </library>
     </runtime>

@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -57,13 +57,12 @@ public interface PluginRegistry extends Iterable<PluginDescriptor> {
      * Load a plugin from a given loader.
      *
      * @param loader
-     * @param pluginId
-     * @param pluginVersion
+     * @param pluginReference A fully qualified reference to the plugin that should be loaded.
      * @param resolve true to resolve the plugin dependencies, false otherwise
      * @return The descriptor of the loaded plugin.
      * @throws PluginException
      */
-    public PluginDescriptor loadPlugin(PluginLoader loader, String pluginId, String pluginVersion, boolean resolve)
+    public PluginDescriptor loadPlugin(PluginLoader loader, PluginReference pluginReference, boolean resolve)
         throws PluginException;
 
     /**

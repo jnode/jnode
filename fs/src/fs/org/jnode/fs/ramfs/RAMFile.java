@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-
 import java.util.ArrayList;
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
@@ -35,7 +34,7 @@ import org.jnode.fs.FileSystemFullException;
 
 /**
  * A File implementation in the system RAM
- * 
+ *
  * @author peda
  * @author Levente S\u00e1ntha
  */
@@ -56,7 +55,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * Constructor for a new RAMFile
-     * 
+     *
      * @param parent
      * @param filename
      */
@@ -99,9 +98,14 @@ public class RAMFile implements FSEntry, FSFile {
         fileSystem.addSummmedBufferSize(newCapacity - oldCapacity);
     }
 
+    @Override
+    public String getId() {
+        return getName();
+    }
+
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#getName()
      */
     public String getName() {
@@ -110,7 +114,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#getParent()
      */
     public FSDirectory getParent() {
@@ -131,7 +135,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#isFile()
      */
     public boolean isFile() {
@@ -140,7 +144,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#isDirectory()
      */
     public boolean isDirectory() {
@@ -149,7 +153,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#setName(java.lang.String)
      */
     public void setName(String newName) throws IOException {
@@ -172,7 +176,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#getFile()
      */
     public FSFile getFile() throws IOException {
@@ -181,7 +185,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#getDirectory()
      */
     public FSDirectory getDirectory() throws IOException {
@@ -190,7 +194,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#getAccessRights()
      */
     public FSAccessRights getAccessRights() throws IOException {
@@ -199,7 +203,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSEntry#isDirty()
      */
     public boolean isDirty() throws IOException {
@@ -208,7 +212,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSObject#isValid()
      */
     public boolean isValid() {
@@ -217,7 +221,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSObject#getFileSystem()
      */
     public FileSystem<?> getFileSystem() {
@@ -226,7 +230,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSFile#getLength()
      */
     public long getLength() {
@@ -235,7 +239,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSFile#setLength(long)
      */
     public void setLength(long length) throws IOException {
@@ -260,7 +264,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSFile#read(long, java.nio.ByteBuffer)
      */
     public void read(long fileOffset, ByteBuffer dest) throws IOException {
@@ -277,7 +281,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.jnode.fs.FSFile#write(long, java.nio.ByteBuffer)
      */
     public void write(long fileOffset, ByteBuffer src) throws IOException {
@@ -295,6 +299,7 @@ public class RAMFile implements FSEntry, FSFile {
 
     /**
      * (non-Javadoc)
+     *
      * @see org.jnode.fs.FSFile#flush()
      */
     public void flush() throws IOException {

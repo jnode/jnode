@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -22,7 +22,6 @@ package org.jnode.fs.jarfs;
 
 import java.io.IOException;
 import java.util.jar.JarEntry;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -30,7 +29,7 @@ import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
 
-/** 
+/**
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
  */
 public final class JarFSEntry implements FSEntry {
@@ -53,6 +52,11 @@ public final class JarFSEntry implements FSEntry {
 
     public JarFSEntry getParentFSEntry() {
         return parent;
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 
     /**

@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -54,6 +54,14 @@ public interface Library {
      * @return All declared export names
      */
     public String[] getExports();
+
+    /**
+     * Gets all declared exclude names.
+     * Exclude overrides export.
+     *
+     * @return All declared exclude names
+     */
+    public String[] getExcludes();
 
     /**
      * Gets the descriptor of the plugin in which this element was declared.

@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -28,39 +28,38 @@ public class CatalogFolder {
     /* Types */
     public static final int RECORD_TYPE_FOLDER = 0x0001;
     public static final int RECORD_TYPE_FOLDER_THREAD = 0x0003;
-    
+
     public static final int CATALOG_FOLDER_SIZE = 88;
 
     private int recordType;
-    private int valence;
+    private long valence;
     private CatalogNodeId folderId;
-    private int createDate;
-    private int contentModDate;
-    private int attrModDate;
-    private int accessDate;
-    private int backupDate;
+    private long createDate;
+    private long contentModDate;
+    private long attrModDate;
+    private long accessDate;
+    private long backupDate;
     private HfsPlusBSDInfo permissions;
 
     /**
-     * 
      * @param src
      */
     public CatalogFolder(final byte[] src) {
         byte[] data = new byte[88];
         System.arraycopy(src, 0, data, 0, CATALOG_FOLDER_SIZE);
         recordType = BigEndian.getInt16(data, 0);
-        valence = BigEndian.getInt32(data, 4);
+        // UInt16 flags - offset 2
+        valence = BigEndian.getUInt32(data, 4);
         folderId = new CatalogNodeId(data, 8);
-        createDate = BigEndian.getInt32(data, 12);
-        contentModDate = BigEndian.getInt32(data, 16);
-        attrModDate = BigEndian.getInt32(data, 20);
-        accessDate = BigEndian.getInt32(data, 24);
-        backupDate = BigEndian.getInt32(data, 28);
+        createDate = BigEndian.getUInt32(data, 12);
+        contentModDate = BigEndian.getUInt32(data, 16);
+        attrModDate = BigEndian.getUInt32(data, 20);
+        accessDate = BigEndian.getUInt32(data, 24);
+        backupDate = BigEndian.getUInt32(data, 28);
         permissions = new HfsPlusBSDInfo(data, 32);
     }
 
     /**
-     * 
      * @param valence
      * @param folderID
      */
@@ -75,17 +74,17 @@ public class CatalogFolder {
 
     /**
      * Return bytes representation of the catalog folder.
-     * 
+     *
      * @return byte array representation.
      */
     public byte[] getBytes() {
         byte[] data = new byte[88];
         BigEndian.setInt16(data, 0, recordType);
-        BigEndian.setInt32(data, 4, valence);
+        BigEndian.setInt32(data, 4, (int) valence);
         System.arraycopy(folderId.getBytes(), 0, data, 8, folderId.getBytes().length);
-        BigEndian.setInt32(data, 12, createDate);
-        BigEndian.setInt32(data, 16, contentModDate);
-        BigEndian.setInt32(data, 20, attrModDate);
+        BigEndian.setInt32(data, 12, (int) createDate);
+        BigEndian.setInt32(data, 16, (int) contentModDate);
+        BigEndian.setInt32(data, 20, (int) attrModDate);
         return data;
     }
 
@@ -99,11 +98,11 @@ public class CatalogFolder {
         s.append("Valence: ").append(valence).append("\n");
         s.append("Folder ID: ").append(folderId.getId()).append("\n");
         s.append("Creation Date :").append(
-                HfsUtils.printDate(createDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
+            HfsUtils.printDate(createDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
         s.append("Content Mod Date  :").append(
-                HfsUtils.printDate(contentModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
+            HfsUtils.printDate(contentModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
         s.append("Attr Mod Date  :").append(
-                HfsUtils.printDate(attrModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
+            HfsUtils.printDate(attrModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
         return s.toString();
     }
 
@@ -111,7 +110,7 @@ public class CatalogFolder {
         return recordType;
     }
 
-    public int getValence() {
+    public long getValence() {
         return valence;
     }
 
@@ -147,7 +146,7 @@ public class CatalogFolder {
         this.recordType = recordType;
     }
 
-    public void setValence(int valence) {
+    public void setValence(long valence) {
         this.valence = valence;
     }
 
@@ -156,19 +155,19 @@ public class CatalogFolder {
     }
 
     public void setCreateDate(long createDate) {
-        this.createDate = (int) HfsUtils.getDate(createDate / 1000L, true);
+        this.createDate = HfsUtils.getDate(createDate / 1000L, true);
     }
 
     public void setContentModDate(long contentModDate) {
-        this.contentModDate = (int) HfsUtils.getDate(contentModDate / 1000L, true);
+        this.contentModDate = HfsUtils.getDate(contentModDate / 1000L, true);
     }
 
     public void setAttrModDate(long attrModDate) {
-        this.attrModDate = (int) HfsUtils.getDate(attrModDate / 1000L, true);
+        this.attrModDate = HfsUtils.getDate(attrModDate / 1000L, true);
     }
-    
-    public void incrementValence(){
-    	this.setValence(this.getValence() + 1);
+
+    public void incrementValence() {
+        this.setValence(this.getValence() + 1);
     }
-    
+
 }

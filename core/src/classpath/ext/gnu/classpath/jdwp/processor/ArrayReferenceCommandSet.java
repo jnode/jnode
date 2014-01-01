@@ -46,8 +46,7 @@ import gnu.classpath.jdwp.exception.JdwpException;
 import gnu.classpath.jdwp.exception.JdwpInternalErrorException;
 import gnu.classpath.jdwp.exception.NotImplementedException;
 import gnu.classpath.jdwp.id.ObjectId;
-import gnu.classpath.jdwp.value.Value;
-import gnu.classpath.jdwp.value.ValueFactory;
+import gnu.classpath.jdwp.util.Value;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -151,11 +150,11 @@ public class ArrayReferenceCommandSet
     // tagged
     for (int i = first; i < first + length; i++)
       {
-        Value val = ValueFactory.createFromObject(Array.get(array, i), clazz);
+        Object value = Array.get(array, i);
         if (clazz.isPrimitive())
-          val.writeUntagged(os);
+          Value.writeUntaggedValue(os, value);
         else
-          val.writeTagged(os);
+          Value.writeTaggedValue(os, value);
       }
   }
 
@@ -169,7 +168,7 @@ public class ArrayReferenceCommandSet
     Class type = array.getClass().getComponentType();
     for (int i = first; i < first + length; i++)
       {
-        Object value = Value.getUntaggedObject(bb, type);
+        Object value = Value.getUntaggedObj(bb, type);
         Array.set(array, i, value);
       }
   }

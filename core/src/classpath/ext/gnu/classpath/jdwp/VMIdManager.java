@@ -48,9 +48,11 @@ import gnu.classpath.jdwp.id.*;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 /**
  * This class manages objects and referencetypes that are reported
@@ -109,7 +111,7 @@ public class VMIdManager
     /**
      * Returns a new id for the given object
      *
-     * @param obj  SoftReference of the object for which an id is desired
+     * @param object  the object for which an id is desired
      * @returns a suitable object id
      */
     public static ObjectId newObjectId (SoftReference obj)
@@ -169,7 +171,7 @@ public class VMIdManager
     /**
      * Returns a new reference type id for the given class
      *
-     * @param ref  SoftReference to the desired type
+     * @param clazz  the <code>Class</code> for which an id is desired
      * @returns a suitable reference type id or null when the
      * reference is cleared.
      */
@@ -337,10 +339,6 @@ public class VMIdManager
    */
   public ObjectId getObjectId (Object theObject)
   {
-    // Special case: null
-    if (theObject == null)
-      return new NullObjectId ();
-    
     ReferenceKey ref = new ReferenceKey (theObject, _refQueue);
     ObjectId id = (ObjectId) _oidTable.get (ref);
     if (id == null)
@@ -368,10 +366,6 @@ public class VMIdManager
   public ObjectId get (long id)
     throws InvalidObjectException
   {
-    // Special case: null
-    if (id == 0)
-      return new NullObjectId ();
-    
     ObjectId oid = (ObjectId) _idTable.get (new Long (id));
     if (oid == null)
       throw new InvalidObjectException (id);

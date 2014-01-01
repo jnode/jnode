@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Stack;
-
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.util.LittleEndian;
 
@@ -50,7 +49,7 @@ public class FatCache {
         this.fat = fat;
         this.api = fat.getApi();
         this.fatsize =
-                fat.getBootSector().getSectorsPerFat() * fat.getBootSector().getBytesPerSector();
+            fat.getBootSector().getSectorsPerFat() * fat.getBootSector().getBytesPerSector();
         this.nrfats = fat.getBootSector().getNrFats();
         this.elementSize = elementSize;
 
@@ -113,8 +112,8 @@ public class FatCache {
         // containsKey();
         if (c != null)
             hit++;
-        // otherwise put a new element inside the cache
-        // possibly flushing and discarding the eldest element
+            // otherwise put a new element inside the cache
+            // possibly flushing and discarding the eldest element
         else
             c = put(address);
 
@@ -351,7 +350,7 @@ public class FatCache {
         /**
          * CacheKey element is allocated and its reference is stored here to
          * avoid to allocate new CacheKey objects at runtime
-         * 
+         * <p/>
          * In this way .. just one global key will be enough to access
          * CacheElements
          */
@@ -362,7 +361,10 @@ public class FatCache {
         private CacheElement() {
             this.dirty = false;
             this.address = new CacheKey();
-            this.elem = ByteBuffer.wrap(new byte[elementSize]);
+
+            // FAT-12 reads in two byte chunks so add an extra element to prevent an array index out of bounds exception
+            // when reading in the last element
+            this.elem = ByteBuffer.wrap(new byte[elementSize + 1]);
         }
 
         private boolean isFree() {

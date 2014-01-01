@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -98,6 +98,15 @@ public class FatEntry extends FatObject implements FSEntry, FSEntryCreated, FSEn
 
     public void dumpChain(String fileName) throws FileNotFoundException, IOException {
         chain.dump(fileName);
+    }
+
+    public FatRecord getRecord() {
+        return record;
+    }
+
+    @Override
+    public String getId() {
+        return Integer.toString(entry.getIndex());
     }
 
     public String getName() {
@@ -203,7 +212,7 @@ public class FatEntry extends FatObject implements FSEntry, FSEntryCreated, FSEn
 
     /**
      * Gets the accessrights for this entry.
-     * 
+     *
      * @throws IOException
      */
     public FSAccessRights getAccessRights() throws IOException {

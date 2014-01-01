@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -346,6 +346,10 @@ public final class VmSystem {
         res.put("swing.handleTopLevelPaint", "false");
         res.put("java.protocol.handler.pkgs", "org.jnode.protocol|gnu.java.net.protocol|gnu.inet");
         res.put("java.content.handler.pkgs", "gnu.java.net.content");
+        //todo fix MethodAccessorGenerator issue with isolates
+        //Setting it to max value to avoid the bugs with isolates & MethodAccessorGenerator,
+        //see sun.reflect.ReflectionFactory for details
+        res.put("sun.reflect.inflationThreshold", String.valueOf(Integer.MAX_VALUE));
 
         VmSystemSettings.insertSystemProperties(res);
     }

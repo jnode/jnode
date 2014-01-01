@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -79,8 +79,8 @@ class JNodeFileSystem extends FileSystem {
      * The resulting temporary file may have more restrictive access permission
      * on some platforms, if restrictive is true.
      */
-	
-	public boolean createFileExclusively(String pathname, boolean restrictive) throws IOException {
+	@Override
+	public boolean createFileExclusively(String pathname) throws IOException {
 		return VMFile.create(pathname);
 	}
 
@@ -265,11 +265,5 @@ class JNodeFileSystem extends FileSystem {
 	      return false;
 
 	    return VMFile.setReadOnly(f.getPath());
-	}
-
-	@Override
-	public boolean createFileExclusively(String arg0) throws IOException {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

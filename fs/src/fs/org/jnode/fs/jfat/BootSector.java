@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -113,8 +113,8 @@ public class BootSector {
         dirty = false;
     }
 
-    public boolean isaValidBootSector(boolean allowEmptyPartitionTable) {
-        return IBMPartitionTable.containsPartitionTable(sector, allowEmptyPartitionTable);
+    public boolean isaValidBootSector() {
+        return IBMPartitionTable.containsPartitionTable(sector);
     }
 
     public synchronized void read(BlockDeviceAPI device) throws IOException {

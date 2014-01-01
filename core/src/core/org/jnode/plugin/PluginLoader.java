@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,6 +21,7 @@
 package org.jnode.plugin;
 
 import java.nio.ByteBuffer;
+
 import org.jnode.permission.JNodePermission;
 
 
@@ -52,7 +53,7 @@ public abstract class PluginLoader {
      * @param pluginVersion
      * @return The input stream, of null if not found.
      */
-    public abstract ByteBuffer getPluginBuffer(String pluginId, String pluginVersion);
+    public abstract ByteBuffer getPluginBuffer(PluginReference pluginReference);
 
     /**
      * Gets the filename of a plugin with a given id and version.
@@ -61,7 +62,7 @@ public abstract class PluginLoader {
      * @param pluginVersion
      * @return the filename of the plugin
      */
-    public static String getPluginFileName(String pluginId, String pluginVersion) {
-        return pluginId + '_' + pluginVersion + ".jar";
+    public static String getPluginFileName(PluginReference pluginReference) {
+        return pluginReference.getId() + '_' + pluginReference.getVersion() + ".jar";
     }
 }

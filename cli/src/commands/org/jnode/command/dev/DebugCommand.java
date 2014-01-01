@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -69,7 +69,7 @@ public class DebugCommand extends AbstractCommand {
                     Jdwp jdwp = new Jdwp();
                     jdwp.configure(ps);
                     jdwp.run();
-                    //jdwp.waitToFinish();
+                    jdwp.waitToFinish();
                     jdwp.shutdown();
                 }
                 // workaround for the restricted capabilities of JDWP support in GNU Classpath.

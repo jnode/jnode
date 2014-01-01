@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -34,6 +34,7 @@
       <export name="sun.security.tools.*"/>
       <export name="sun.security.timestamp.*"/>
       <export name="sun.security.acl.*"/>
+      <exclude name="sun.security.acl.GroupImpl"/>
       <export name="sun.security.ec.*"/>
       <export name="sun.security.internal.interfaces*"/>
       <export name="sun.security.internal.spec*"/>
@@ -52,10 +53,14 @@
       <export name="sun.security.krb5.internal.ktab.*"/>
       <export name="sun.security.krb5.internal.util.*"/>
       <export name="sun.security.pkcs.*"/>
+      <exclude name="sun.security.pkcs.ParsingException"/>
       <export name="sun.security.pkcs11.*"/>
       <export name="sun.security.pkcs11.wrapper.*"/>
       <export name="sun.security.pkcs12.*"/>
       <export name="sun.security.provider.*"/>
+      <exclude name="sun.security.provider.SecureRandom"/>
+      <exclude name="sun.security.provider.PolicyFile"/>
+      <exclude name="sun.security.provider.PolicyParser"/>      
       <export name="sun.security.provider.certpath.*"/>
       <export name="sun.security.rsa.*"/>
       <export name="sun.security.ssl.*"/>
@@ -66,6 +71,7 @@
       <export name="com.sun.net.ssl.internal.ssl.*"/>
       <export name="com.sun.jarsigner.*"/>
       <export name="sun.nio.ch.*"/>
+      <exclude name="sun.nio.ch.Interruptible"/>
     </library>
   </runtime>
     

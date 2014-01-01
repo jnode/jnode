@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -28,9 +28,16 @@
   provider-url="http://sources.redhat.com/mauve/"
   license-name="gpl">
 
+  <requires>
+    <import plugin="org.junit" version="4.5"/>
+  </requires>
+    
+    
   <runtime>
+    <!--  Exclude junit classes -->
     <library name="mauve.jar">
       <export name="*"/>
+      <exclude name="junit.framework.*"/>
     </library>
   </runtime>
 

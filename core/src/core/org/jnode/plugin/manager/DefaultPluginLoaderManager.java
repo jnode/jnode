@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.jnode.plugin.PluginLoader;
 import org.jnode.plugin.PluginLoaderManager;
+import org.jnode.plugin.PluginReference;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -44,13 +45,13 @@ public class DefaultPluginLoaderManager extends PluginLoaderManager {
         loaders.remove(loader);
     }
 
-    public ByteBuffer getPluginBuffer(String pluginId, String pluginVersion) {
+    public ByteBuffer getPluginBuffer(PluginReference pluginReference) {
         final List<PluginLoader> loaders;
         synchronized (this) {
             loaders = new ArrayList<PluginLoader>(this.loaders);
         }
         for (PluginLoader loader : loaders) {
-            final ByteBuffer buf = loader.getPluginBuffer(pluginId, pluginVersion);
+            final ByteBuffer buf = loader.getPluginBuffer(pluginReference);
             if (buf != null) {
                 return buf;
             }

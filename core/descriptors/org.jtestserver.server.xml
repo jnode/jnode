@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -28,17 +28,18 @@
         license-name="gpl">
 
   <requires>
-    <import plugin="gnu.mauve"/>
+    <import plugin="gnu.mauve" version="@VERSION@"/>
   </requires>
                 
   <runtime>
-    <library name="jnode-core.jar">
+    <library name="jnode-core-test.jar">
       <export name="org.jtestserver.server.*"/>
       <export name="org.jtestserver.server.commands.*"/>
       <export name="org.jtestserver.common.*"/>
       <export name="org.jtestserver.common.message.*"/>
       <export name="org.jtestserver.common.protocol.*"/>
-    </library>
+      <export name="org.jtestserver.common.protocol.udp.*"/>
+      </library>
   </runtime>
         
   <extension point="org.jnode.security.permissions">

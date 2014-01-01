@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -41,8 +41,7 @@
     <import plugin="org.jnode.driver.block.scsi.cdrom"/> 
     <import plugin="org.jnode.driver.block.usb.storage"/> 
         
-	<import plugin="org.junit"/>
-	<import plugin="org.objectweb.asm" version="1"/>
+	<import plugin="org.junit" version="4.5"/>
 	<import plugin="net.sf.cglib" version="2.1"/>	
 	<import plugin="org.jmock" version="1.0.1"/>
 	<import plugin="org.jmock.cglib" version="1.0.1"/>
@@ -51,11 +50,11 @@
     <import plugin="org.jnode.driver.block.ramdisk"/>    
     <import plugin="org.jnode.fs.service"/>
     <import plugin="org.jnode.log4j"/>	
-    <import plugin="org.apache.tools.ant"/>
+    <import plugin="org.apache.tools.ant" version="1.6.3"/>
   </requires>
         
   <runtime>
-    <library name="jnode-fs.jar">
+    <library name="jnode-fs-test.jar">
       <export name="org.jnode.test.support.*"/>
       <export name="org.jnode.test.fs.*"/>
       

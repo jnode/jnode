@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -25,7 +25,6 @@ import java.io.Writer;
 
 import org.apache.log4j.Layout;
 import org.apache.log4j.WriterAppender;
-import org.jnode.driver.console.ConsoleManager;
 import org.jnode.vm.Unsafe;
 
 /**
@@ -34,8 +33,6 @@ import org.jnode.vm.Unsafe;
  * @author crawley@jnode.org
  */
 public class UnsafeDebugAppender extends WriterAppender {
-    
-    private static ConsoleManager mgr;
     
     private Writer writer;
 

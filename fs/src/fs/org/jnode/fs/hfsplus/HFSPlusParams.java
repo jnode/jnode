@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,7 +21,6 @@
 package org.jnode.fs.hfsplus;
 
 import java.io.IOException;
-
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.fs.FileSystemException;
 
@@ -64,13 +63,15 @@ public class HFSPlusParams {
      * Default constructor.
      */
     public HFSPlusParams() {
+        this.volumeName = "";
+        this.blockSize = DEFAULT_BLOCK_SIZE;
         this.catalogNodeSize = DEFAULT_CATALOG_NODE_SIZE;
         this.extentNodeSize = DEFAULT_EXTENT_NODE_SIZE;
     }
 
     /**
      * Initialize default sizes (allocation, catalog node, etc...)
-     * 
+     *
      * @param fs
      * @throws FileSystemException
      * @throws IOException
@@ -126,7 +127,7 @@ public class HFSPlusParams {
                 clumpSize = clumpSizeCalculation(attributeClumpBlocks);
                 if (clumpSize % attributeNodeSize != 0) {
                     throw new FileSystemException(
-                            "clump size is not a multiple of attribute node size");
+                        "clump size is not a multiple of attribute node size");
                 }
             }
             attributeClumpSize = (int) clumpSize;
@@ -150,19 +151,18 @@ public class HFSPlusParams {
         }
     }
 
-    private int[] extentClumpTable = new int[] {4, 4, 4, 5, 5, 6, 7, 8, 9, 11, 14, 16, 20, 25, 32};
+    private int[] extentClumpTable = new int[]{4, 4, 4, 5, 5, 6, 7, 8, 9, 11, 14, 16, 20, 25, 32};
     private int[] catalogClumpTable =
-            new int[] {4, 6, 8, 11, 14, 19, 25, 34, 45, 60, 80, 107, 144, 192, 256};
+        new int[]{4, 6, 8, 11, 14, 19, 25, 34, 45, 60, 80, 107, 144, 192, 256};
 
     /**
      * Get the file clump size for Extent and catalog B-Tree files.
-     * 
+     *
      * @param blockSize Size of a block.
-     * @param nodeSize Size of a node.
-     * @param sectors Number of sector for the device.
-     * @param catalog If true, calculate catalog clump size. In the other case,
-     *            calculate extent clump size.
-     * 
+     * @param nodeSize  Size of a node.
+     * @param sectors   Number of sector for the device.
+     * @param catalog   If true, calculate catalog clump size. In the other case,
+     *                  calculate extent clump size.
      * @return B-Tree clump size.
      */
     private long getBTreeClumpSize(int blockSize, int nodeSize, long sectors, boolean catalog) {
@@ -196,16 +196,14 @@ public class HFSPlusParams {
     }
 
     /**
-     * 
      * @param clumpBlocks
-     * 
      * @return
      */
     private int clumpSizeCalculation(long clumpBlocks) throws FileSystemException {
         long clumpSize = clumpBlocks * blockSize;
         if ((clumpSize & 0XFFFFFFFF00000000L) == 0) {
             throw new FileSystemException("Too many blocks (" + clumpBlocks + ") for clump size (" +
-                    clumpSize + ").");
+                clumpSize + ").");
         }
         return (int) clumpSize;
     }

@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -28,20 +28,11 @@ package org.jnode.plugin;
 public interface PluginPrerequisite {
 
     /**
-     * Gets the identifier of the plugin that is required
+     * Gets the fully qualified reference to the plugin that is required
      *
-     * @return The id
+     * @return The fully qualified reference to the required plugin.
      */
-    public String getPluginId();
-
-    /**
-     * Gets the version of the plugin that is required.
-     * If not specified, this version is equal to the version of the
-     * declaring plugin.
-     *
-     * @return The version
-     */
-    public String getPluginVersion();
+    public PluginReference getPluginReference();
 
     /**
      * Gets the descriptor of the plugin in which this element was declared.

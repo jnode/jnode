@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -40,6 +40,7 @@
     <library name="jnode-fs.jar">
       <export name="org.jnode.fs.*"/>
       <export name="org.jnode.fs.service.def.*"/>
+      <exclude name="org.jnode.fs.service.def.FileSystemManagerTest"/>
       <export name="org.jnode.fs.spi.*"/>
       <export name="org.jnode.fs.util.*"/>
     </library>

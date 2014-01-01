@@ -91,7 +91,7 @@ public class ExceptionOnlyFilter
   
   /**
    * Does the given event match the filter?
-   * 
+   *
    * @param event the <code>Event</code> to scrutinize
    */
   public boolean matches(Event event)
@@ -102,16 +102,16 @@ public class ExceptionOnlyFilter
     if (_refId != null)
       {
         try
-          {
+  {
             Class klass 
               = (Class) event.getParameter(Event.EVENT_EXCEPTION_CLASS);
             classMatch = klass == _refId.getType();
-          }
+  }
         catch (InvalidClassException ex)
-          {
+  {
             classMatch = false;
           }
-      }
+  }
     
     // check against the caught and uncaught options
     Boolean caught 

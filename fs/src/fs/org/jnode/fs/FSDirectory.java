@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -25,7 +25,7 @@ import java.util.Iterator;
 
 /**
  * <tt>FSDirectory</tt> interface provide methods related to directory operations in a file system.
- * 
+ *
  * @author epr
  */
 public interface FSDirectory extends FSObject {
@@ -33,58 +33,59 @@ public interface FSDirectory extends FSObject {
     /**
      * Gets an iterator used to iterate over all the entries of this directory.
      * All elements returned by the iterator must be instance of FSEntry.
-     * 
+     *
      * @return an iterator over the entries of this directory.
-     *  
      * @throws IOException if error occurs during iteration.
      */
     public Iterator<? extends FSEntry> iterator() throws IOException;
 
     /**
      * Gets the entry with the given name.
-     * 
+     *
      * @param name identify the requested entry.
-     * 
      * @return {@link FSEntry} corresponding to the name passed as parameter.
-     * 
      * @throws IOException if no entry exists with this name.
      */
     public FSEntry getEntry(String name) throws IOException;
 
     /**
+     * Gets the entry with the given ID, as given by {@link FSEntry#getId}.
+     *
+     * @param id identify the requested entry.
+     * @return {@link FSEntry} corresponding to the name passed as parameter.
+     * @throws IOException if no entry exists with this name.
+     */
+    public FSEntry getEntryById(String id) throws IOException;
+
+    /**
      * Add a new file with a given name to this directory.
-     * 
+     *
      * @param name identify the new file.
-     * 
      * @return {@link FSEntry} corresponding to new created file.
-     *  
      * @throws IOException if a directory already exists with this name
      */
     public FSEntry addFile(String name) throws IOException;
 
     /**
      * Add a new (sub-)directory with a given name to this directory.
-     * 
+     *
      * @param name identify the new directory.
-     * 
      * @return {@link FSEntry} corresponding to new created directory.
-     * 
      * @throws IOException if a directory already exists with this name.
      */
     public FSEntry addDirectory(String name) throws IOException;
 
     /**
      * Remove the entry with the given name from this directory.
-     * 
+     *
      * @param name identify the entry that should be remove.
-     * 
-     * @throws IOException if there is no entry with this name. 
+     * @throws IOException if there is no entry with this name.
      */
     public void remove(String name) throws IOException;
 
     /**
      * Save all unsaved data to the device.
-     * 
+     *
      * @throws IOException if error occurs during write of the data.
      */
     public void flush() throws IOException;

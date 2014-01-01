@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -23,12 +23,10 @@ package org.jnode.driver.bus.ide.command;
 import java.nio.ByteBuffer;
 
 import org.apache.log4j.Logger;
-import org.jnode.driver.block.ide.disk.IDEDiskDriver;
 import org.jnode.driver.bus.ide.IDEBus;
 import org.jnode.driver.bus.ide.IDEIO;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
-import org.jnode.vm.Unsafe;
 
 /**
  * @author epr
@@ -58,32 +56,36 @@ public class IDEReadSectorsCommand extends IDERWSectorsCommand {
     protected void setup(IDEBus ide, IDEIO io) throws TimeoutException {
         super.setup(ide, io);
         io.setCommandReg(is48bit ? CMD_READ_EXT : CMD_READ);
+
+        // Read data
+        for (int i = 0; i < sectorCount; i++) {
+            log.debug("RDSect pw " + i);
+        	if (!pollWait(io, false))
+        		return;
+        	// Read sector
+            log.debug("RDSect trf " + i);
+        	transferOneSector(ide,  io);
+		}
+        
+        // We're done
+        notifyFinished();
+    }
+
+    /**
+     * Transfer exactly one sector of data from the device.
+     */
+    private void transferOneSector(IDEBus ide, IDEIO io) throws TimeoutException {
+        for (int i = 0; i < 256; i++) {
+            final int v = io.getDataReg();
+            buf.put((byte) (v & 0xFF));
+            buf.put((byte) ((v >> 8) & 0xFF));
+        }
     }
 
     /**
      * @see org.jnode.driver.bus.ide.IDECommand#handleIRQ(IDEBus, IDEIO)
      */
     protected void handleIRQ(IDEBus ide, IDEIO io) {
-        final int state = io.getStatusReg(); // Read status, flush IRQ
-        log.debug("RdSect IRQ : st=" + NumberUtils.hex(state));
-        if ((state & ST_ERROR) != 0) {
-            setError(io.getErrorReg());
-        } else {
-            if ((state & (ST_BUSY | ST_DATA_REQUEST)) == ST_DATA_REQUEST) {
-                // final int offset = readSectors * SECTOR_SIZE;
-                for (int i = 0; i < 256; i++) {
-                    final int v = io.getDataReg();
-                    buf.put((byte) (v & 0xFF));
-                    buf.put((byte) ((v >> 8) & 0xFF));
-                    /*if (i > 253) {
-                    	log.info("Read [" + i + "]=" + v);
-                    }*/
-                }
-                readSectors++;
-                if (readSectors == sectorCount) {
-                    notifyFinished();
-                }
-            }
-        }
+    	// Do nothing
     }
 }

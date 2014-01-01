@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -34,9 +34,13 @@
 	  <export name="com.sun.beans.finder.*"/>
 	  <export name="com.sun.java.util.jar.pack.*"/>
 	  <export name="com.sun.naming.internal.*"/>
-      <export name="com.sun.security.auth.UserPrincipal"/>
+      <export name="com.sun.security.auth.PolicyFile"/>
+      <export name="com.sun.security.auth.PolicyParser"/>
+      <export name="com.sun.security.auth.PolicyPermissions"/>
       <export name="com.sun.security.auth.PrincipalComparator"/>  
-
+      <export name="com.sun.security.auth.SubjectCodeSource"/>
+      <export name="com.sun.security.auth.UserPrincipal"/>
+      
 	  <export name="sun.awt.EventListenerAggregate" />
       <export name="sun.misc.*"/>
       <export name="sun.reflect.*"/>
@@ -51,6 +55,8 @@
       <export name="sun.reflect.generics.visitor.*"/>
       <export name="sun.reflect.misc.*"/>
       <export name="sun.net.InetAddressCachePolicy"/>
+      <export name="sun.net.idn.Punycode"/>
+      <export name="sun.net.idn.StringPrep"/>
       <export name="sun.net.util.IPAddressUtil"/>
       <export name="sun.net.www.*"/>
       <export name="sun.net.www.protocol.jar.*"/>
@@ -94,7 +100,8 @@
       <export name="gnu.java.nio.charset.*"/>
       <export name="gnu.java.lang.*"/>
       <export name="gnu.java.lang.reflect.*"/>
-
+      <export name="org.jnode.java.nio.VmChannel"/>
+      
       <export name="gnu.java.security.*"/>
       <export name="gnu.java.security.action.*"/>
       <export name="gnu.java.security.provider.*"/>

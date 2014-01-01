@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -29,7 +29,7 @@ import org.jnode.fs.ntfs.NTFSStructure;
  *
  * @author Daniel Noll (daniel@noll.id.au)
  */
-final class AttributeListBlock extends NTFSStructure {
+public final class AttributeListBlock extends NTFSStructure {
 
     /**
      * The length of the block.
@@ -37,7 +37,7 @@ final class AttributeListBlock extends NTFSStructure {
     private long length;
 
     /**
-     * @param data binary data for the block.
+     * @param data   binary data for the block.
      * @param offset the offset into the binary data.
      * @param length the length of the attribute list block, or 0 if unknown.
      */
@@ -85,9 +85,15 @@ final class AttributeListBlock extends NTFSStructure {
             if (offset + 4 > length) {
                 return false;
             }
-            
+
             int length = getUInt16(offset + 0x04);
+            if (length <= 0) {
+                log.error("Invalid attribute length, preventing infinite loop. Data on disk may be corrupt.");
+                return false;
+            }
+
             nextElement = new AttributeListEntry(AttributeListBlock.this, offset);
+            log.debug(nextElement);
             offset += length;
             return true;
         }

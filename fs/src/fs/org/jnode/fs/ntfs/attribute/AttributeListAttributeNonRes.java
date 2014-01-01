@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -26,13 +26,13 @@ import org.jnode.fs.ntfs.FileRecord;
 
 /**
  * $ATTRIBUTE_LIST attribute, non-resident version.
- *
+ * <p/>
  * XXX: Is there a sensible way we can merge this with the resident version?
  *
  * @author Daniel Noll (daniel@noll.id.au)
  */
-final class AttributeListAttributeNonRes extends NTFSNonResidentAttribute implements
-        AttributeListAttribute {
+public class AttributeListAttributeNonRes extends NTFSNonResidentAttribute implements
+    AttributeListAttribute {
 
     /**
      * @param fileRecord
@@ -53,6 +53,7 @@ final class AttributeListAttributeNonRes extends NTFSNonResidentAttribute implem
         // TODO: Consider handling multiple data runs separately instead
         //       of "glueing" them all together like this.
         final int nrClusters = getNumberOfVCNs();
+        log.debug(String.format("Allocating %d clusters for non-resident attribute", nrClusters));
         final byte[] data = new byte[nrClusters * getFileRecord().getVolume().getClusterSize()];
         readVCN(getStartVCN(), data, 0, nrClusters);
         AttributeListBlock listBlock = new AttributeListBlock(data, 0, getAttributeActualSize());

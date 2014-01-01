@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -97,7 +97,8 @@ public class JNodeSystemAppender extends WriterAppender {
         @Override
         public void write(char[] cbuf, int off, int len) throws IOException {
             synchronized (this.lock) {
-                PrintStream currentStream = this.toErr ? System.err : System.out;
+                @SuppressWarnings("resource")
+				PrintStream currentStream = this.toErr ? System.err : System.out;
                 if (currentStream != this.myStream) {
                     currentStream = this.myStream;
                     this.myWriter = new OutputStreamWriter(this.myStream);

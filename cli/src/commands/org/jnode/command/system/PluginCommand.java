@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -120,12 +120,13 @@ public class PluginCommand extends AbstractCommand {
         mgr = InitialNaming.lookup(PluginManager.NAME);
         final String version = argVersion.isSet() ? argVersion.getValue() : VmUtils.getVm().getVersion();
         final String pluginId = argPluginID.getValue();
+        final PluginReference pluginRef = new PluginReference(pluginId, version);
         if (argLoaderUrl.isSet()) {
             addPluginLoader(argLoaderUrl.getValue());
         } else if (argLoad.isSet()) {
-            loadPlugin(pluginId, version);
+            loadPlugin(pluginRef);
         } else if (argReload.isSet()) {
-            reloadPlugin(pluginId, version);
+            reloadPlugin(pluginRef);
         } else if (argUnload.isSet()) {
             unloadPlugin(pluginId);
         } else if (pluginId != null) {
@@ -144,23 +145,23 @@ public class PluginCommand extends AbstractCommand {
         out.format(fmt_add_loader, url);
     }
 
-    private void loadPlugin(String id, String version) throws PluginException {
-        mgr.getRegistry().loadPlugin(mgr.getLoaderManager(), id, version, true); //resolve=true
-        out.format(fmt_load, id, version);
+    private void loadPlugin(PluginReference pluginReference) throws PluginException {
+        mgr.getRegistry().loadPlugin(mgr.getLoaderManager(), pluginReference, true); //resolve=true
+        out.format(fmt_load, pluginReference.getId(), pluginReference.getVersion());
     }
     
-    private void reloadPlugin(String id, String version) throws PluginException {
+    private void reloadPlugin(PluginReference pluginReference) throws PluginException {
         final PluginRegistry reg = mgr.getRegistry();
-        final List<PluginReference> refs = reg.unloadPlugin(id);
+        final List<PluginReference> refs = reg.unloadPlugin(pluginReference.getId());
         for (PluginReference ref : refs) {
             if (reg.getPluginDescriptor(ref.getId()) == null) {
-                reg.loadPlugin(mgr.getLoaderManager(), ref.getId(), ref.getVersion(), true); //resolve=true
+                reg.loadPlugin(mgr.getLoaderManager(), ref, true); //resolve=true
             }
         }
-        if (reg.getPluginDescriptor(id) == null) {
-            reg.loadPlugin(mgr.getLoaderManager(), id, version, true); //resolve=true
+        if (reg.getPluginDescriptor(pluginReference.getId()) == null) {
+            reg.loadPlugin(mgr.getLoaderManager(), pluginReference, true); //resolve=true
         }
-        out.format(fmt_reload, id, version);
+        out.format(fmt_reload, pluginReference.getId(), pluginReference.getVersion());
     }
 
     private void unloadPlugin(String id) throws PluginException {

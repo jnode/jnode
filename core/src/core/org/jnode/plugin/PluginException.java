@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -28,6 +28,11 @@ package org.jnode.plugin;
 public class PluginException extends Exception {
 
     /**
+	 * Serialization
+	 */
+	private static final long serialVersionUID = 173965793309418665L;
+
+	/**
      *
      */
     public PluginException() {

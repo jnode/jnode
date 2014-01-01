@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -39,6 +39,11 @@ public final class ISO9660Entry implements FSEntry {
     public ISO9660Entry(ISO9660FileSystem fs, EntryRecord entry) {
         this.fs = fs;
         this.entryRecord = entry;
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 
     /**
@@ -94,9 +99,9 @@ public final class ISO9660Entry implements FSEntry {
         throw new UnsupportedOperationException("not yet implemented");
     }
 
-	public void setLastAccessed(long lastAccessed) {
-	    throw new UnsupportedOperationException("Filesystem is read-only");
-	}
+    public void setLastAccessed(long lastAccessed) {
+        throw new UnsupportedOperationException("Filesystem is read-only");
+    }
 
     /**
      * @see org.jnode.fs.FSEntry#getFile()
@@ -149,7 +154,7 @@ public final class ISO9660Entry implements FSEntry {
 
     /**
      * Indicate if the entry has been modified in memory (ie need to be saved)
-     * 
+     *
      * @return true if the entry need to be saved
      * @throws IOException
      */

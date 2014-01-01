@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -24,7 +24,7 @@ import org.jnode.fs.ntfs.FileRecord;
 
 /**
  * An NTFS file attribute that has its data stored inside the attribute.
- * 
+ *
  * @author Chira
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -40,7 +40,7 @@ public class NTFSResidentAttribute extends NTFSAttribute {
 
     /**
      * Gets the offset to the actual attribute.
-     * 
+     *
      * @return Returns the attributeOffset.
      */
     public int getAttributeOffset() {
@@ -56,5 +56,11 @@ public class NTFSResidentAttribute extends NTFSAttribute {
 
     public int getAttributeLength() {
         return (int) getUInt32(0x10);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[attribute (res) type=x%x name'%s' size=%d]", getAttributeType(), getAttributeName(),
+            getAttributeLength());
     }
 }

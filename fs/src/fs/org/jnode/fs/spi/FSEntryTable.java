@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSEntry;
 
@@ -36,7 +35,7 @@ import org.jnode.fs.FSEntry;
  * have the responsibility to identify an entry by its name (case sensitivity,
  * long file name, ...). The class can limit the number of entries (for root
  * directories ...) if necessary.
- * 
+ *
  * @author Fabien DUMINY
  */
 public class FSEntryTable extends AbstractFSObject {
@@ -58,6 +57,12 @@ public class FSEntryTable extends AbstractFSObject {
     private Map<String, FSEntry> entries; // must be a HashMap
 
     /**
+     * Map of entries (key=id, value=entry). As a value may be null (a free
+     * entry) we must use Hashtable and not Hashtable
+     */
+    private Map<String, FSEntry> entriesById; // must be a HashMap
+
+    /**
      * Names of the entries (list of String or null)
      */
     private List<String> entryNames;
@@ -67,12 +72,13 @@ public class FSEntryTable extends AbstractFSObject {
      */
     private FSEntryTable() {
         entries = Collections.emptyMap();
+        entriesById = Collections.emptyMap();
         entryNames = Collections.emptyList();
     }
 
     /**
      * Construct a FSEntryTable from a list of FSEntry
-     * 
+     *
      * @param fs
      * @param entryList
      */
@@ -81,6 +87,7 @@ public class FSEntryTable extends AbstractFSObject {
         // As a value may be null (a free entry)
         // we must use HashMap and not Hashtable
         this.entries = new HashMap<String, FSEntry>();
+        this.entriesById = new HashMap<String, FSEntry>();
         this.entryNames = new ArrayList<String>();
 
         for (FSEntry entry : entryList) {
@@ -91,6 +98,7 @@ public class FSEntryTable extends AbstractFSObject {
                 final String name = normalizeName(entry.getName());
                 log.debug("FSEntryTable: adding entry " + name + " (length=+" + name.length() + ")");
                 entries.put(name, entry);
+                entriesById.put(entry.getId(), entry);
                 entryNames.add(name);
             }
         }
@@ -109,7 +117,7 @@ public class FSEntryTable extends AbstractFSObject {
     /**
      * Find the index of free entry. If not found, resize the table is possible.
      * If resize is impossible, an IOException is thrown.
-     * 
+     *
      * @param entry
      * @return the index of a free entry
      */
@@ -132,7 +140,7 @@ public class FSEntryTable extends AbstractFSObject {
 
     /**
      * Get the entry given by its index. The result can be null.
-     * 
+     *
      * @param index
      * @return the FSEntry at index
      */
@@ -142,7 +150,7 @@ public class FSEntryTable extends AbstractFSObject {
 
     /**
      * Get the entry given by its name. The result can be null.
-     * 
+     *
      * @param name
      * @return the FSEntry with given name
      */
@@ -157,8 +165,22 @@ public class FSEntryTable extends AbstractFSObject {
     }
 
     /**
+     * Get the entry given by its ID. The result can be null.
+     *
+     * @param id the ID to lookup.
+     * @return the FSEntry with given ID.
+     */
+    public FSEntry getById(String id) {
+        if (id == null) {
+            return null;
+        }
+
+        return entriesById.get(id);
+    }
+
+    /**
      * return a list of FSEntry names
-     * 
+     *
      * @return a List of FSEntry names
      */
     protected List<String> getEntryNames() {
@@ -167,7 +189,7 @@ public class FSEntryTable extends AbstractFSObject {
 
     /**
      * return a list of used FSEntry
-     * 
+     *
      * @return a list of used FSEntrys
      */
     protected List<FSEntry> getUsedEntries() {
@@ -187,7 +209,7 @@ public class FSEntryTable extends AbstractFSObject {
     /**
      * Get the index of an entry given byt its name. If there is no entry with
      * this name, return -1.
-     * 
+     *
      * @param name
      * @return the index of the given entry name
      */
@@ -197,7 +219,7 @@ public class FSEntryTable extends AbstractFSObject {
 
     /**
      * Indicate if the table need to be saved to the device.
-     * 
+     *
      * @return if the table needs to be saved to the device
      * @throws IOException
      */
@@ -218,7 +240,7 @@ public class FSEntryTable extends AbstractFSObject {
 
     /**
      * Iterator that returns all used entries (ie entries that aren't null)
-     * 
+     *
      * @return an Iterator with all used entries
      */
     public final Iterator<FSEntry> iterator() {
@@ -248,7 +270,7 @@ public class FSEntryTable extends AbstractFSObject {
 
     /**
      * Return a normalized entry name (for case insensitivity for example)
-     * 
+     *
      * @param name
      * @return a normalized name (e.g. case insensitiv)
      */
@@ -258,7 +280,7 @@ public class FSEntryTable extends AbstractFSObject {
 
     /**
      * Remove an entry given by its name
-     * 
+     *
      * @param name
      * @return the index of removed entry
      */
@@ -268,9 +290,15 @@ public class FSEntryTable extends AbstractFSObject {
         if (index < 0)
             return -1;
 
+        FSEntry entry = entries.get(name);
+        if (entry != null) {
+            entriesById.remove(entry.getId());
+        }
+
         // in entries and entryNames, a free (deleted) entry
         // is represented by null
         entries.put(name, null);
+
         entryNames.set(index, null);
 
         return index;
@@ -278,7 +306,7 @@ public class FSEntryTable extends AbstractFSObject {
 
     /**
      * Rename an entry given by its oldName.
-     * 
+     *
      * @param oldName
      * @param newName
      * @return the index of renamed file
@@ -311,7 +339,7 @@ public class FSEntryTable extends AbstractFSObject {
      * Find a free entry in the table and set it with newEntry. If the table is
      * too small, it is resized. If the table can't be resized, an IOException
      * is thrown
-     * 
+     *
      * @param newEntry
      * @return the index of the stored entry
      * @throws IOException if directory is full (can't be resized)
@@ -324,8 +352,11 @@ public class FSEntryTable extends AbstractFSObject {
             throw new IOException("Directory is full");
         }
 
-        /* Object oldN = */entryNames.set(index, name);
-        /* Object oldE = */entries.put(name, newEntry);
+        /* Object oldN = */
+        entryNames.set(index, name);
+        /* Object oldE = */
+        entries.put(name, newEntry);
+        entriesById.put(newEntry.getId(), newEntry);
 
         // entry added, so need to be flushed later
         setDirty();
@@ -335,7 +366,7 @@ public class FSEntryTable extends AbstractFSObject {
     /**
      * Get the actual size of the table : the number of free entries + the
      * number of used entries.
-     * 
+     *
      * @return the complete size of the entry table
      */
     public final int size() {
@@ -344,7 +375,7 @@ public class FSEntryTable extends AbstractFSObject {
 
     /**
      * Return a list of FSEntry representing the content of the table.
-     * 
+     *
      * @return a list of all FSEntries
      */
     public List<?>/* <FSEntry> */toList() {
@@ -356,7 +387,7 @@ public class FSEntryTable extends AbstractFSObject {
      * Return a list of FSEntry representing the content of the table. The table
      * can be compacted (ie: without null entries) or uncompacted (with null
      * entries if there are).
-     * 
+     *
      * @param compacted
      * @return a list of FSEntries
      */
@@ -376,7 +407,7 @@ public class FSEntryTable extends AbstractFSObject {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {

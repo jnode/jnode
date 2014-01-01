@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -24,6 +24,7 @@
 				
   <property name="my-build.dir"   value="${basedir}/build"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
+  <property name="my-testclasses.dir" value="${my-build.dir}/testclasses"/>
   <property name="my-src.dir"     value="${basedir}/src"/>
   <property name="my.jar"         value="${jnode-gui.jar}"/>
 
@@ -37,7 +38,8 @@
 <!-- Initialize all subproject directories -->
   <target name="prepare">
     <mkdir dir="${my-classes.dir}"/>
-  	<jnode.copy-descriptors/>
+    <mkdir dir="${my-testclasses.dir}"/>
+    <jnode.copy-descriptors/>
   </target>
 
 <!-- Compile all subproject java files -->
@@ -46,11 +48,15 @@
 	  <src path="${my-src.dir}/awt"/>
 	  <src path="${my-src.dir}/desktop"/>
       <src path="${my-src.dir}/driver"/>
-	  <src path="${my-src.dir}/test"/>
       <src path="${my-src.dir}/thinlet"/>
       <src path="${my-src.dir}/font"/>  
       <classpath refid="my-cp"/>
     </jnode.compile>
+    <jnode.compile.test>
+	  <src path="${my-src.dir}/test"/>
+      <classpath refid="my-cp"/>
+    </jnode.compile.test>
+    
 	<!-- copy properties files -->
     <copy todir="${my-classes.dir}/org/jnode/font/bdf/">
 	  <fileset dir="${my-src.dir}/font/org/jnode/font/bdf/">
@@ -80,5 +86,3 @@
   </target>
 
 </project>
-
-

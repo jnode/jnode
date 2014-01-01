@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -33,8 +33,8 @@
     <library name="jnode-core.jar">
         <export name="com.sun.management.*"/>
         <export name="gnu.classpath.*"/>
-        <export name="gnu.classpath.jdwp.*"/>
-        <export name="gnu.classpath.jdwp.transport.*"/>
+        <!--  export name="gnu.classpath.jdwp.*"/>
+        <export name="gnu.classpath.jdwp.transport.*"/ -->
         <export name="gnu.java.security.action.*"/>
         <export name="gnu.java.security.util.*"/>
         <export name="java.io.*"/>
@@ -55,7 +55,7 @@
         <export name="sun.reflect.*"/>
         <export name="sun.misc.*"/>
         <export name="sun.management.*"/>
-        <export name="sun.security.provider.*"/>
+        <!--  export name="sun.security.provider.*"/ -->
 
         <export name="javax.isolate.*"/>
     </library>

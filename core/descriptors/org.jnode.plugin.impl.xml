@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -28,7 +28,7 @@
         provider-name="JNode.org">
         
   <requires>
-    <import plugin="nanoxml"/>
+    <import plugin="nanoxml" version="1.4"/>
     <import plugin="org.jnode.plugin"/>
     <import plugin="org.jnode.security"/>
     <import plugin="org.jnode.util"/>

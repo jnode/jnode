@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -30,6 +30,7 @@ import java.util.Map;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSEntry;
 
 /**
  * @author Levente S\u00e1ntha
@@ -105,6 +106,11 @@ public class SMBFSDirectory extends SMBFSEntry implements FSDirectory {
         return entries.get(name);
     }
 
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        return getEntry(id);
+    }
+
     /**
      * @see org.jnode.fs.FSDirectory#iterator()
      */
@@ -170,5 +176,10 @@ public class SMBFSDirectory extends SMBFSEntry implements FSDirectory {
         if (!dname.endsWith("/"))
             dname += "/";
         return dname;
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 }

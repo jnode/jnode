@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -22,10 +22,11 @@ package org.jnode.fs.hfsplus.tree;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import org.apache.log4j.Logger;
 import org.jnode.util.BigEndian;
 
-public abstract class AbstractNode<T extends NodeRecord> implements Node<T> {
+public abstract class AbstractNode<K extends Key, T extends NodeRecord> implements Node<T> {
+    private final Logger log = Logger.getLogger(getClass());
     protected NodeDescriptor descriptor;
     protected List<T> records;
     protected List<Integer> offsets;
@@ -46,13 +47,55 @@ public abstract class AbstractNode<T extends NodeRecord> implements Node<T> {
         this.offsets = new ArrayList<Integer>(this.descriptor.getNumRecords() + 1);
         int offset;
         for (int i = 0; i < this.descriptor.getNumRecords() + 1; i++) {
-            offset = BigEndian.getInt16(nodeData, size - ((i + 1) * 2));
+            offset = BigEndian.getUInt16(nodeData, size - ((i + 1) * 2));
             offsets.add(Integer.valueOf(offset));
         }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Creating node for: " + descriptor.toString() + " offsets: " + offsets);
+        }
+
         loadRecords(nodeData);
     }
 
-    protected abstract void loadRecords(final byte[] nodeData);
+    /**
+     * Loads the node's records.
+     *
+     * @param nodeData the node data.
+     */
+    private void loadRecords(final byte[] nodeData) {
+        int offset;
+        for (int i = 0; i < this.descriptor.getNumRecords(); i++) {
+            offset = offsets.get(i);
+            Key key = createKey(nodeData, offset);
+            int recordSize = offsets.get(i + 1) - offset;
+            records.add(createRecord(key, nodeData, offset, recordSize));
+
+            if (log.isDebugEnabled()) {
+                log.debug("Loading record: " + key);
+            }
+        }
+    }
+
+    /**
+     * Creates a key for the node.
+     *
+     * @param nodeData the node data.
+     * @param offset   the offset the key is at.
+     * @return the key.
+     */
+    protected abstract K createKey(byte[] nodeData, int offset);
+
+    /**
+     * Creates a record.
+     *
+     * @param key        the key.
+     * @param nodeData   the node data.
+     * @param offset     the offset.
+     * @param recordSize the record size.
+     * @return the record.
+     */
+    protected abstract T createRecord(Key key, byte[] nodeData, int offset, int recordSize);
 
     @Override
     public NodeDescriptor getNodeDescriptor() {
@@ -69,6 +112,23 @@ public abstract class AbstractNode<T extends NodeRecord> implements Node<T> {
         return records.get(index);
     }
 
+    /**
+     * Find a matching record.
+     *
+     * @param key the key to match.
+     * @return a NodeRecord or {@code null}
+     */
+    public final T find(K key) {
+        for (T record : records) {
+            log.debug("Record: " + record.toString() + " Key: " + key);
+            K recordKey = (K) record.getKey();
+            if (recordKey != null && recordKey.equals(key)) {
+                return record;
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean addNodeRecord(T record) {
         int freeSpace = getFreeSize();
@@ -82,14 +142,14 @@ public abstract class AbstractNode<T extends NodeRecord> implements Node<T> {
         return true;
     }
 
-    public boolean check(int treeHeigth) {
+    public boolean check(int treeHeight) {
         // Node type is correct.
         if (this.getNodeDescriptor().getKind() < NodeDescriptor.BT_LEAF_NODE ||
-                this.getNodeDescriptor().getKind() > NodeDescriptor.BT_MAP_NODE) {
+            this.getNodeDescriptor().getKind() > NodeDescriptor.BT_MAP_NODE) {
             return false;
         }
 
-        if (this.getNodeDescriptor().getHeight() > treeHeigth) {
+        if (this.getNodeDescriptor().getHeight() > treeHeight) {
             return false;
         }
         return true;
@@ -97,7 +157,7 @@ public abstract class AbstractNode<T extends NodeRecord> implements Node<T> {
 
     /**
      * Return amount of free space remaining.
-     * 
+     *
      * @return remaining free space.
      */
     protected int getFreeSize() {
@@ -109,7 +169,7 @@ public abstract class AbstractNode<T extends NodeRecord> implements Node<T> {
     public byte[] getBytes() {
         byte[] datas = new byte[size];
         System.arraycopy(descriptor.getBytes(), 0, datas, 0,
-                NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH);
+            NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH);
         int offsetIndex = 0;
         int offset;
         for (NodeRecord record : records) {
@@ -123,12 +183,12 @@ public abstract class AbstractNode<T extends NodeRecord> implements Node<T> {
         return datas;
     }
 
+    @Override
     public String toString() {
         StringBuffer b = new StringBuffer();
         b.append((this.getNodeDescriptor().isLeafNode()) ? "Leaf node" : "Index node").append("\n");
         b.append(this.getNodeDescriptor().toString()).append("\n");
         b.append("Offsets : ").append(offsets.toString());
         return b.toString();
-
     }
 }

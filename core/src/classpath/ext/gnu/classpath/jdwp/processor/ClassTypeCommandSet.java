@@ -1,6 +1,6 @@
 /* ClassTypeCommandSet.java -- class to implement the ClassType
    Command Set
-   Copyright (C) 2005, 2007 Free Software Foundation
+   Copyright (C) 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -41,7 +41,6 @@ exception statement from your version. */
 package gnu.classpath.jdwp.processor;
 
 import gnu.classpath.jdwp.JdwpConstants;
-import gnu.classpath.jdwp.VMMethod;
 import gnu.classpath.jdwp.VMVirtualMachine;
 import gnu.classpath.jdwp.exception.InvalidFieldException;
 import gnu.classpath.jdwp.exception.JdwpException;
@@ -50,13 +49,12 @@ import gnu.classpath.jdwp.exception.NotImplementedException;
 import gnu.classpath.jdwp.id.ObjectId;
 import gnu.classpath.jdwp.id.ReferenceTypeId;
 import gnu.classpath.jdwp.util.MethodResult;
-import gnu.classpath.jdwp.value.ObjectValue;
-import gnu.classpath.jdwp.value.Value;
-import gnu.classpath.jdwp.value.ValueFactory;
+import gnu.classpath.jdwp.util.Value;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
 /**
@@ -111,9 +109,9 @@ public class ClassTypeCommandSet
     if (superClazz == null) {
     	os.writeLong(0L);
     } else {
-    	ReferenceTypeId clazzId = idMan.getReferenceTypeId(superClazz);
-    	clazzId.write(os);
-    }
+    ReferenceTypeId clazzId = idMan.getReferenceTypeId(superClazz);
+    clazzId.write(os);
+  }
   }
 
   private void executeSetValues(ByteBuffer bb, DataOutputStream os)
@@ -130,7 +128,7 @@ public class ClassTypeCommandSet
       {
         ObjectId fieldId = idMan.readObjectId(bb);
         Field field = (Field) (fieldId.getObject());
-        Object value = Value.getUntaggedObject(bb, field.getType());
+        Object value = Value.getUntaggedObj(bb, field.getType());
         try
           {
             field.setAccessible(true); // Might be a private field
@@ -152,9 +150,11 @@ public class ClassTypeCommandSet
   {
     MethodResult mr = invokeMethod(bb);
 
-    Throwable exception = mr.getThrownException();
+    Object value = mr.getReturnedValue();
+    Exception exception = mr.getThrownException();
     ObjectId eId = idMan.getObjectId(exception);
-    mr.getReturnedValue().writeTagged(os);
+
+    Value.writeTaggedValue(os, value);
     eId.writeTagged(os);
   }
 
@@ -162,14 +162,10 @@ public class ClassTypeCommandSet
       throws JdwpException, IOException
   {
     MethodResult mr = invokeMethod(bb);
-    Throwable exception = mr.getThrownException();
 
-    if (exception == null && ! (mr.getReturnedValue() instanceof ObjectValue))
-      throw new JdwpInternalErrorException("new instance returned non-object");
-
-    ObjectValue ov = (ObjectValue) mr.getReturnedValue();
-    ObjectId oId = idMan.getObjectId(ov.getValue());
-
+    Object obj = mr.getReturnedValue();
+    ObjectId oId = idMan.getObjectId(obj);
+    Exception exception = mr.getThrownException();
     ObjectId eId = idMan.getObjectId(exception);
 
     oId.writeTagged(os);
@@ -179,8 +175,8 @@ public class ClassTypeCommandSet
   /**
    * Execute the static method and return the resulting MethodResult.
    */
-  private MethodResult invokeMethod(ByteBuffer bb)
-    throws JdwpException, IOException
+  private MethodResult invokeMethod(ByteBuffer bb) throws JdwpException,
+      IOException
   {
     ReferenceTypeId refId = idMan.readReferenceTypeId(bb);
     Class clazz = refId.getType();
@@ -188,18 +184,40 @@ public class ClassTypeCommandSet
     ObjectId tId = idMan.readObjectId(bb);
     Thread thread = (Thread) tId.getObject();
 
-    VMMethod method = VMMethod.readId(clazz, bb);
+    ObjectId mId = idMan.readObjectId(bb);
+    Method method = (Method) mId.getObject();
 
     int args = bb.getInt();
-    Value[] values = new Value[args];
+    Object[] values = new Object[args];
 
     for (int i = 0; i < args; i++)
-      values[i] = ValueFactory.createFromTagged(bb);
+      {
+        values[i] = Value.getObj(bb);
+      }
 
     int invokeOpts = bb.getInt();
-    MethodResult mr = VMVirtualMachine.executeMethod(null, thread,
-						     clazz, method,
-						     values, invokeOpts);
-    return mr;
+    boolean suspend = ((invokeOpts
+			& JdwpConstants.InvokeOptions.INVOKE_SINGLE_THREADED)
+		       != 0);
+    try
+      {
+        if (suspend)
+	  VMVirtualMachine.suspendAllThreads ();
+
+        MethodResult mr = VMVirtualMachine.executeMethod(null, thread,
+							 clazz, method,
+							 values, false);
+        if (suspend)
+	  VMVirtualMachine.resumeAllThreads ();
+
+        return mr;
+      }
+    catch (Exception ex)
+      {
+        if (suspend)
+	  VMVirtualMachine.resumeAllThreads ();
+
+        throw new JdwpInternalErrorException(ex);
+      }
   }
 }

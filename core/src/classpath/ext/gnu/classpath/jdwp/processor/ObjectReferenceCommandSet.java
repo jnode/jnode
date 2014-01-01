@@ -1,6 +1,6 @@
 /* ObjectReferenceCommandSet.java -- class to implement the ObjectReference
    Command Set
-   Copyright (C) 2005, 2007 Free Software Foundation
+   Copyright (C) 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -40,7 +40,6 @@ exception statement from your version. */
 package gnu.classpath.jdwp.processor;
 
 import gnu.classpath.jdwp.JdwpConstants;
-import gnu.classpath.jdwp.VMMethod;
 import gnu.classpath.jdwp.VMVirtualMachine;
 import gnu.classpath.jdwp.exception.InvalidFieldException;
 import gnu.classpath.jdwp.exception.JdwpException;
@@ -48,14 +47,13 @@ import gnu.classpath.jdwp.exception.JdwpInternalErrorException;
 import gnu.classpath.jdwp.exception.NotImplementedException;
 import gnu.classpath.jdwp.id.ObjectId;
 import gnu.classpath.jdwp.id.ReferenceTypeId;
+import gnu.classpath.jdwp.util.Value;
 import gnu.classpath.jdwp.util.MethodResult;
-import gnu.classpath.jdwp.util.MonitorInfo;
-import gnu.classpath.jdwp.value.Value;
-import gnu.classpath.jdwp.value.ValueFactory;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
 /**
@@ -139,9 +137,7 @@ public class ObjectReferenceCommandSet
           {
             field.setAccessible(true); // Might be a private field
             Object value = field.get(obj);
-            Value val = ValueFactory.createFromObject(value, 
-                                                      field.getType());
-            val.writeTagged(os);
+            Value.writeTaggedValue(os, value);
           }
         catch (IllegalArgumentException ex)
           {
@@ -167,7 +163,7 @@ public class ObjectReferenceCommandSet
     for (int i = 0; i < numFields; i++)
       {
         Field field = (Field) idMan.readObjectId(bb).getObject();
-        Object value = Value.getUntaggedObject(bb, field.getType());
+        Object value = Value.getUntaggedObj(bb, field.getType());
         try
           {
             field.setAccessible(true); // Might be a private field
@@ -187,18 +183,13 @@ public class ObjectReferenceCommandSet
   }
 
   private void executeMonitorInfo(ByteBuffer bb, DataOutputStream os)
-    throws JdwpException, IOException
+    throws JdwpException
   {
-    if (!VMVirtualMachine.canGetMonitorInfo)
-      {
-	String msg = "getting monitor info not supported";
-	throw new NotImplementedException(msg);
-      }
+    // This command is optional, determined by VirtualMachines CapabilitiesNew
+    // so we'll leave it till later to implement
+    throw new NotImplementedException(
+      "Command ExecuteMonitorInfo not implemented.");
 
-    ObjectId oid = idMan.readObjectId(bb);
-    Object obj = oid.getObject();
-    MonitorInfo info = VMVirtualMachine.getMonitorInfo(obj);
-    info.write(os);
   }
 
   private void executeInvokeMethod(ByteBuffer bb, DataOutputStream os)
@@ -213,21 +204,39 @@ public class ObjectReferenceCommandSet
     ReferenceTypeId rid = idMan.readReferenceTypeId(bb);
     Class clazz = rid.getType();
 
-    VMMethod method = VMMethod.readId(clazz, bb);
+    ObjectId mid = idMan.readObjectId(bb);
+    Method method = (Method) mid.getObject();
 
     int args = bb.getInt();
-    Value[] values = new Value[args];
+    Object[] values = new Object[args];
 
     for (int i = 0; i < args; i++)
-      values[i] = ValueFactory.createFromTagged(bb);
+      {
+        values[i] = Value.getObj(bb);
+      }
 
     int invokeOptions = bb.getInt();
+    boolean suspend = ((invokeOptions
+			& JdwpConstants.InvokeOptions.INVOKE_SINGLE_THREADED)
+		       != 0);
+    if (suspend)
+      {
+	// We must suspend all other running threads first
+        VMVirtualMachine.suspendAllThreads ();
+      }
+
+    boolean nonVirtual = ((invokeOptions
+			   & JdwpConstants.InvokeOptions.INVOKE_NONVIRTUAL)
+			  != 0);
+
     MethodResult mr = VMVirtualMachine.executeMethod(obj, thread,
 						     clazz, method,
-						     values, invokeOptions);
-    Throwable exception = mr.getThrownException();
+						     values, nonVirtual);
+    Object value = mr.getReturnedValue();
+    Exception exception = mr.getThrownException();
+
     ObjectId eId = idMan.getObjectId(exception);
-    mr.getReturnedValue().writeTagged(os);
+    Value.writeTaggedValue(os, value);
     eId.writeTagged(os);
   }
 

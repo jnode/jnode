@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -69,6 +69,7 @@
       <export name="com.sun.swing.internal.plaf.metal.resources.*"/>
       <export name="com.sun.swing.internal.plaf.synth.resources.*"/>
       <export name="sun.awt.*"/>
+	  <exclude name="sun.awt.EventListenerAggregate" />
       <export name="sun.awt.im.*"/>
       <export name="sun.awt.image.*"/>
       <export name="sun.awt.datatransfer.*"/>

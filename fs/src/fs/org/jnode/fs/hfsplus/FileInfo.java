@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -30,7 +30,7 @@ public class FileInfo {
     public FileInfo(byte[] data, int offset) {
         fileType = BigEndian.getInt32(data, offset);
         fileCreator = BigEndian.getInt32(data, offset + 4);
-        finderFlags = BigEndian.getInt16(data, offset + 8);
+        finderFlags = BigEndian.getUInt16(data, offset + 8);
     }
 
     public int getFileType() {

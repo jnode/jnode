@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -32,12 +32,14 @@ help         Output these messages
 	</target>
 
 	<target name="all-junit">
-		<delete dir="${basedir}/reports/junit"/>
-		<mkdir dir="${basedir}/reports/junit"/>
-		<junit showoutput="on" printsummary="on" fork="on">
+		<delete dir="${basedir}/build/reports/junit"/>
+		<mkdir dir="${basedir}/build/reports/junit"/>
+		<junit showoutput="off" printsummary="on" fork="on" haltonfailure="on">
 			<classpath refid="cp-test"/>
-			<test name="org.jnode.test.fs.filesystem.FSTestSuite" todir="${basedir}/reports/junit"/>
-		</junit>
+			<formatter type="xml"/>
+            <test name="org.jnode.test.driver.bus.ide.IDEDriveDescriptorTest" todir="${basedir}/build/reports/junit"/>
+            <test name="org.jnode.test.fs.filesystem.FSTestSuite" todir="${basedir}/build/reports/junit"/>
+        </junit>
 	</target>
 
 	<target name="all" depends="all-junit" />

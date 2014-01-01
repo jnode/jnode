@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -20,12 +20,10 @@
  
 package org.jnode.fs.ftpfs;
 
-import org.jnode.fs.FSFile;
-
+import com.enterprisedt.net.ftp.FTPFile;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
-import com.enterprisedt.net.ftp.FTPFile;
+import org.jnode.fs.FSFile;
 
 
 /**
@@ -109,5 +107,10 @@ public class FTPFSFile extends FTPFSEntry implements FSFile {
      */
     public void write(long fileOffset, ByteBuffer src) throws IOException {
         // TODO implement me
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 }

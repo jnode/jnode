@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -37,6 +37,7 @@
       <export name="org.jnode.fs.ntfs.*"/>
       <export name="org.jnode.fs.ntfs.attribute.*"/>
       <export name="org.jnode.fs.ntfs.index.*"/>
+      <export name="org.jnode.fs.ntfs.security.*"/>
     </library>
   </runtime>
   

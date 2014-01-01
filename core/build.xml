@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -26,6 +26,7 @@
   <property name="my-gen.dir" value="${my-build.dir}/gen"/>
   <property name="my-gen-plan.dir" value="${my-build.dir}/gen-plan"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
+  <property name="my-testclasses.dir" value="${my-build.dir}/testclasses"/>
   <property name="my-classes-plan.dir" value="${my-build.dir}/classes-plan"/>
   <property name="my-src.dir" value="${basedir}/src"/>
   <property name="my-non-resources" value="**/*.java,**/package.html"/>
@@ -74,14 +75,17 @@
 	<pathelement location="${my-src.dir}/vmmagic"/>
 	<pathelement location="${my-src.dir}/mmtk-vm"/>
 	<pathelement location="${my-src.dir}/driver"/>
-	<pathelement location="${my-src.dir}/test"/>
 	<pathelement location="${my-src.dir}/emu"/>
-  </path>
+	<pathelement location="${my-src.dir}/testframework"/>
+	</path>
   <path id="my-sources">
 	<path refid="my-sources1"/>
 	<pathelement location="${my-gen.dir}"/>
   </path>
-		
+  <path id="my-testsources">
+	<pathelement location="${my-src.dir}/test"/>
+  </path>
+  		
   <macrodef name="ExpandTest">
     <attribute name="classname"/>
     <attribute name="type"/>
@@ -126,6 +130,7 @@
   <!-- Initialize all subproject directories -->
   <target name="prepare">
     <mkdir dir="${my-classes.dir}"/>
+    <mkdir dir="${my-testclasses.dir}"/>
     <mkdir dir="${my-gen.dir}"/>
   	<jnode.copy-descriptors/>
 
@@ -153,18 +158,15 @@
 
   <!-- Compile all subproject java files -->
   <target name="compile" depends="prepare">
-      <!--
-    <jnode.compile>
-      <src refid="classpath-sources" />
-      <classpath refid="my-cp"/>
-    </jnode.compile>
-    -->
-    <parallel >
       <jnode.compile>
         <src refid="my-sources" />
         <classpath refid="my-cp"/>
       </jnode.compile>
-        <!--
+      <jnode.compile.test>
+        <src refid="my-testsources" />
+        <classpath refid="my-cp"/>
+      </jnode.compile.test>
+      <!--
       <jnode.compile>
         <src refid="classpath-sources-corba" />
         <classpath refid="my-cp"/>
@@ -178,7 +180,6 @@
         <classpath refid="my-cp"/>
       </jnode.compile>
       -->
-    </parallel>
 
     <!-- Copy all non java files to class dir -->
     <copy todir="${my-classes.dir}">
@@ -190,9 +191,12 @@
 	    <fileset dir="${my-src.dir}/vmmagic" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/mmtk-vm" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/driver" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/testframework" excludes="${my-non-resources}"/>
+	</copy>
+    <copy todir="${my-testclasses.dir}">
 	    <fileset dir="${my-src.dir}/test" excludes="${my-non-resources}"/>
     </copy>
-
+    
   	<!-- Create & compile plan classes -->
 	<CreatePlan package="org.jnode.vm.memmgr.mmtk.genrc"/>
 	<CreatePlan package="org.jnode.vm.memmgr.mmtk.ms"/>

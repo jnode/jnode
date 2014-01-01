@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -29,7 +29,8 @@
                 
   <requires>
     <import plugin="org.apache.tools.ant-launcher"/>
-    <import plugin="com.sun.tools.javac"/>
+    <import plugin="org.apache.tools.archive" version="1.7.1"/>
+    <import plugin="com.sun.tools.javac" version="@VERSION@"/>
   </requires>
         
   <runtime>
@@ -44,6 +45,10 @@
       <export name="org.apache.tools.ant.taskdefs.*"/>
       <export name="org.apache.tools.ant.types.*"/>
       <export name="org.apache.tools.ant.util.*"/>            
+      
+      <exclude name="org.apache.tools.tar.*" />
+      <exclude name="org.apache.tools.zip.*" />
+      <exclude name="org.apache.tools.bzip2.*" />
     </library>
   </runtime>  
   

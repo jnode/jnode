@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -23,16 +23,13 @@ package org.jnode.fs.jarfs;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
 
 /**
- * 
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
- * 
  */
 public final class JarFSDirectory implements FSDirectory {
 
@@ -59,6 +56,11 @@ public final class JarFSDirectory implements FSDirectory {
      */
     public FSEntry getEntry(String name) throws IOException {
         return jarEntries.get(name);
+    }
+
+    @Override
+    public FSEntry getEntryById(String id) throws IOException {
+        return getEntry(id);
     }
 
     /**
@@ -98,7 +100,7 @@ public final class JarFSDirectory implements FSDirectory {
 
     /**
      * Save all dirty (unsaved) data to the device
-     * 
+     *
      * @throws IOException
      */
     public void flush() throws IOException {

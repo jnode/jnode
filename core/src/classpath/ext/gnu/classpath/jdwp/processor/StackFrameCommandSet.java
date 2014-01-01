@@ -1,5 +1,5 @@
 /* StackFrameCommandSet.java -- class to implement the StackFrame Command Set
-   Copyright (C) 2005, 2007 Free Software Foundation
+   Copyright (C) 2005 Free Software Foundation
  
 This file is part of GNU Classpath.
 
@@ -45,10 +45,8 @@ import gnu.classpath.jdwp.VMVirtualMachine;
 import gnu.classpath.jdwp.exception.JdwpException;
 import gnu.classpath.jdwp.exception.JdwpInternalErrorException;
 import gnu.classpath.jdwp.exception.NotImplementedException;
-import gnu.classpath.jdwp.id.ThreadId;
-import gnu.classpath.jdwp.value.ObjectValue;
-import gnu.classpath.jdwp.value.Value;
-import gnu.classpath.jdwp.value.ValueFactory;
+import gnu.classpath.jdwp.id.ObjectId;
+import gnu.classpath.jdwp.util.Value;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -100,8 +98,8 @@ public class StackFrameCommandSet
   private void executeGetValues(ByteBuffer bb, DataOutputStream os)
       throws JdwpException, IOException
   {
-    ThreadId tId = (ThreadId) idMan.readObjectId(bb);
-    Thread thread = tId.getThread();
+    ObjectId tId = idMan.readObjectId(bb);
+    Thread thread = (Thread) tId.getObject();
 
     // Although Frames look like other ids they are not. First they are not
     // ObjectIds since they don't exist in the users code. Storing them as an
@@ -109,33 +107,31 @@ public class StackFrameCommandSet
     // has a reference to them. Furthermore they are not ReferenceTypeIds since
     // these are held permanently and we want these to be held only as long as
     // the Thread is suspended.
-    long frameID = bb.getLong();
-    VMFrame frame = VMVirtualMachine.getFrame(thread, frameID);
+    VMFrame frame = VMVirtualMachine.getFrame(thread, bb);
     int slots = bb.getInt();
     os.writeInt(slots); // Looks pointless but this is the protocol
     for (int i = 0; i < slots; i++)
       {
         int slot = bb.getInt();
         byte sig = bb.get();
-        Value val = frame.getValue(slot, sig);
-        val.writeTagged(os);
+        Object val = frame.getValue(slot);
+        Value.writeTaggedValue(os, val);
       }
   }
 
   private void executeSetValues(ByteBuffer bb, DataOutputStream os)
       throws JdwpException, IOException
   {
-    ThreadId tId = (ThreadId) idMan.readObjectId(bb);
-    Thread thread = tId.getThread();
+    ObjectId tId = idMan.readObjectId(bb);
+    Thread thread = (Thread) tId.getObject();
 
-    long frameID = bb.getLong();
-    VMFrame frame = VMVirtualMachine.getFrame(thread, frameID);
+    VMFrame frame = VMVirtualMachine.getFrame(thread, bb);
 
     int slots = bb.getInt();
     for (int i = 0; i < slots; i++)
       {
         int slot = bb.getInt();
-        Value value = ValueFactory.createFromTagged(bb);
+        Object value = Value.getObj(bb);
         frame.setValue(slot, value);
       }
   }
@@ -143,28 +139,20 @@ public class StackFrameCommandSet
   private void executeThisObject(ByteBuffer bb, DataOutputStream os)
       throws JdwpException, IOException
   {
-    ThreadId tId = (ThreadId) idMan.readObjectId(bb);
-    Thread thread = tId.getThread();
+    ObjectId tId = idMan.readObjectId(bb);
+    Thread thread = (Thread) tId.getObject();
 
-    long frameID = bb.getLong();
-    VMFrame frame = VMVirtualMachine.getFrame(thread, frameID);
+    VMFrame frame = VMVirtualMachine.getFrame(thread, bb);
 
-    ObjectValue objVal = new ObjectValue(frame.getObject());
-    objVal.writeTagged(os);
+    Object thisObject = frame.getObject();
+    Value.writeTaggedValue(os, thisObject);
   }
 
   private void executePopFrames(ByteBuffer bb, DataOutputStream os)
-    throws JdwpException, IOException
+      throws JdwpException
   {
-    if (!VMVirtualMachine.canPopFrames)
-      {
-	String msg = "popping frames is unsupported";
-	throw new NotImplementedException(msg);
-      }
-
-    ThreadId tid = (ThreadId) idMan.readObjectId(bb);
-    Thread thread = tid.getThread();
-    long fid = bb.getLong();
-    VMVirtualMachine.popFrames(thread, fid);
+    // This command is optional, determined by VirtualMachines CapabilitiesNew
+    // so we'll leave it till later to implement
+    throw new NotImplementedException("Command PopFrames not implemented.");
   }
 }

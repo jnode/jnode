@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -34,7 +34,9 @@
   <runtime>
     <library name="jnode-distr.jar">
       <export name="org.jnode.install.*"/>
-    </library>
+      <export name="org.jnode.install.action.*"/>
+      <export name="org.jnode.install.cmdline.*"/>
+      </library>
   </runtime>
         
 </plugin>

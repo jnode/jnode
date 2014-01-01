@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -30,10 +30,8 @@ public class FatRootDirectory extends FatDirectory {
     public FatRootDirectory(FatFileSystem fs) throws IOException {
         super(fs);
         Fat fat = getFatFileSystem().getFat();
-        if (fat.isFat32() || fat.isFat16()) {
+        if (fat.isFat32() || fat.isFat16() || fat.isFat12()) {
             setRoot32((int) getFatFileSystem().getBootSector().getRootDirectoryStartCluster());
-        } else if (fat.isFat12()) {
-            throw new UnsupportedOperationException("Fat12");
         } else {
             throw new UnsupportedOperationException("Unknown Fat Type");
         }
@@ -96,7 +94,12 @@ public class FatRootDirectory extends FatDirectory {
         throw new UnsupportedOperationException("cannot change root time");
     }
 
+    @Override
     public String toString() {
+        return String.format("FatRootDirectory [%s]", getName());
+    }
+
+    public String toDebugString() {
         StrWriter out = new StrWriter();
 
         out.println("*******************************************");

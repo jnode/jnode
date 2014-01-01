@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -20,24 +20,14 @@
  
 package org.jnode.test;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import org.apache.log4j.Logger;
+import org.jnode.test.util.NumberUtilsTest;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
  * @author epr
  */
+@RunWith(Suite.class)
+@Suite.SuiteClasses({TestVmClass.class, SignatureTest.class, NumberUtilsTest.class})
 public class AllTests {
-
-    static final Logger log = Logger.getLogger(AllTests.class);
-
-    public static Test suite() {
-        log.info("Starting test");
-        TestSuite suite = new TestSuite("Test for org.jnode.test");
-        //$JUnit-BEGIN$
-        suite.addTest(new TestSuite(TestVmClass.class));
-        suite.addTest(new TestSuite(SignatureTest.class));
-        //$JUnit-END$
-        return suite;
-    }
 }

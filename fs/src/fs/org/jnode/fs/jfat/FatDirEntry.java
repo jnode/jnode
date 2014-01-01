@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -62,26 +62,43 @@ public class FatDirEntry {
     /*
      * FatDirEntry factory from a FatMarshal buffer
      */
-    public static FatDirEntry create(FatFileSystem fs, FatMarshal entry, int index)
+    public static FatDirEntry create(FatFileSystem fs, FatMarshal entry, int index, boolean allowDeleted)
         throws IOException {
         int flag;
         FatAttr attr;
 
         flag = entry.getUInt8(0);
         attr = new FatAttr(entry.getUInt8(11));
+        boolean free = flag == FREE;
 
         switch (flag) {
-            case FREE:
             case EOD:
                 return new FatDirEntry(fs, entry, index, flag);
+            case FREE:
+                if (!allowDeleted) {
+                    return new FatDirEntry(fs, entry, index, flag);
+                } else {
+                    // Fall through...
+                    break;
+                }
             case INVALID:
-            	throw new IOException("Invalid entry for index: " + index);
-            default:
-                if (attr.isLong())
-                    return new FatLongDirEntry(fs, entry, index);
-                else
-                    return new FatShortDirEntry(fs, entry, index);
+                throw new IOException("Invalid entry for index: " + index);
         }
+
+        FatDirEntry fatDirEntry;
+        // 0xffffffff is the end of long file name marker
+        if (attr.isLong() || entry.getUInt32(28) == 0xffffffffL) {
+            fatDirEntry = new FatLongDirEntry(fs, entry, index);
+        } else {
+            fatDirEntry = new FatShortDirEntry(fs, entry, index);
+        }
+
+        if (free) {
+            // Still mark deleted entries as deleted.
+            fatDirEntry.freeDirEntry = true;
+        }
+
+        return fatDirEntry;
     }
 
     public void delete() {
@@ -134,7 +151,12 @@ public class FatDirEntry {
         entry.flush();
     }
 
+    @Override
     public String toString() {
+        return String.format("FatDirEntry [%s] index:%d", entry, index);
+    }
+
+    public String toDebugString() {
         StrWriter out = new StrWriter();
         if (isFreeDirEntry()) {
             out.println("*******************************************");

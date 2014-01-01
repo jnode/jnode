@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -34,6 +34,12 @@ import org.jnode.fs.FileSystem;
  * @author gbin
  */
 class LfnEntry implements FSEntry, FSEntryCreated, FSEntryLastAccessed {
+
+    /**
+     * The ID for this entry.
+     */
+    private final String id;
+
     // decompacted LFN entry
     private String fileName;
     // TODO: Make them available
@@ -46,10 +52,13 @@ class LfnEntry implements FSEntry, FSEntryCreated, FSEntryLastAccessed {
         this.realEntry = realEntry;
         this.parent = parent;
         fileName = longName.trim();
+        id = realEntry.getId();
     }
 
     public LfnEntry(FatLfnDirectory parent, Vector<?> entries, int offset, int length) {
         this.parent = parent;
+        id = Integer.toString(offset);
+
         // this is just an old plain 8.3 entry, copy it;
         if (length == 1) {
             realEntry = (FatDirEntry) entries.get(offset);
@@ -78,12 +87,12 @@ class LfnEntry implements FSEntry, FSEntryCreated, FSEntryLastAccessed {
         int checkSum = calculateCheckSum();
         for (int i = totalEntrySize - 2; i > 0; i--) {
             entries[i] =
-                    new FatLfnDirEntry(parent, fileName.substring(j * 13, j * 13 + 13), j + 1,
-                            (byte) checkSum, false);
+                new FatLfnDirEntry(parent, fileName.substring(j * 13, j * 13 + 13), j + 1,
+                    (byte) checkSum, false);
             j++;
         }
         entries[0] =
-                new FatLfnDirEntry(parent, fileName.substring(j * 13), j + 1, (byte) checkSum, true);
+            new FatLfnDirEntry(parent, fileName.substring(j * 13), j + 1, (byte) checkSum, true);
         entries[totalEntrySize - 1] = realEntry;
         return entries;
 
@@ -91,7 +100,7 @@ class LfnEntry implements FSEntry, FSEntryCreated, FSEntryLastAccessed {
 
     private byte calculateCheckSum() {
 
-        char[] fullName = new char[] {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+        char[] fullName = new char[]{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
         char[] name = realEntry.getNameOnly().toCharArray();
         char[] ext = realEntry.getExt().toCharArray();
         System.arraycopy(name, 0, fullName, 0, name.length);
@@ -107,6 +116,11 @@ class LfnEntry implements FSEntry, FSEntryCreated, FSEntryLastAccessed {
         }
 
         return (byte) (sum & 0xff);
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     public String getName() {
@@ -198,6 +212,7 @@ class LfnEntry implements FSEntry, FSEntryCreated, FSEntryLastAccessed {
 
     /**
      * Indicate if the entry has been modified in memory (ie need to be saved)
+     *
      * @return true if the entry need to be saved
      * @throws IOException
      */

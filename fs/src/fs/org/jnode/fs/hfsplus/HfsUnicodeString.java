@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -23,23 +23,24 @@ package org.jnode.fs.hfsplus;
 import org.jnode.util.BigEndian;
 
 public class HfsUnicodeString {
-    /** Length of string in characters. */
+    /**
+     * Length of string in characters.
+     */
     private int length;
 
     private String string;
 
     /**
      * Create HFSUnicodeString from existing data.
-     * 
-     * 
-     * @param src byte array contains data.
+     *
+     * @param src    byte array contains data.
      * @param offset start of data in the array.
      */
     public HfsUnicodeString(final byte[] src, final int offset) {
-        length = BigEndian.getInt16(src, offset);
+        length = BigEndian.getUInt16(src, offset);
         byte[] data = new byte[2 + (length * 2)];
         System.arraycopy(src, offset, data, 0, 2);
-        length = BigEndian.getInt16(data, 0);
+        length = BigEndian.getUInt16(data, 0);
         data = new byte[length * 2];
         System.arraycopy(src, offset + 2, data, 0, length * 2);
         char[] result = new char[length];
@@ -50,7 +51,6 @@ public class HfsUnicodeString {
     }
 
     /**
-     * 
      * @param string
      */
     public HfsUnicodeString(String string) {

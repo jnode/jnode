@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -22,8 +22,8 @@ package org.jnode.fs.jfat;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-
 import org.jnode.util.LittleEndian;
+import org.jnode.util.NumberUtils;
 
 
 /**
@@ -83,7 +83,7 @@ public class FatMarshal {
 
         if (offset > (array.length - length))
             throw new IndexOutOfBoundsException("length[" + length + "] + offset[" + offset +
-                    "] >" + "array.length[" + array.length + "]");
+                "] >" + "array.length[" + array.length + "]");
     }
 
     public byte get(int offset) {
@@ -196,7 +196,12 @@ public class FatMarshal {
         setDirty();
     }
 
+    @Override
     public String toString() {
+        return String.format("FatMarshal %s", NumberUtils.hex(array));
+    }
+
+    public String toDebugString() {
         StrWriter out = new StrWriter();
 
         out.println("*************************************************");

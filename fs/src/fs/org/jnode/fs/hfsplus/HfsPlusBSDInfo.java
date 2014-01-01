@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -23,27 +23,27 @@ package org.jnode.fs.hfsplus;
 import org.jnode.util.BigEndian;
 
 public class HfsPlusBSDInfo {
-    private int ownerID;
-    private int groupID;
+    private long ownerID;
+    private long groupID;
     private int adminFlags;
     private int ownerFlags;
     private int fileMode;
-    private int special;
+    private long special;
 
     public HfsPlusBSDInfo(byte[] data, int offset) {
-        ownerID = BigEndian.getInt32(data, offset);
-        groupID = BigEndian.getInt32(data, offset + 4);
-        adminFlags = data[offset + 8];
-        ownerFlags = data[offset + 9];
-        fileMode = BigEndian.getInt16(data, offset + 10);
-        special = BigEndian.getInt32(data, offset + 12);
+        ownerID = BigEndian.getUInt32(data, offset);
+        groupID = BigEndian.getUInt32(data, offset + 4);
+        adminFlags = BigEndian.getUInt8(data, offset + 8);
+        ownerFlags = BigEndian.getUInt8(data, offset + 9);
+        fileMode = BigEndian.getUInt16(data, offset + 10);
+        special = BigEndian.getUInt32(data, offset + 12);
     }
 
-    public int getOwnerID() {
+    public long getOwnerID() {
         return ownerID;
     }
 
-    public int getGroupID() {
+    public long getGroupID() {
         return groupID;
     }
 
@@ -59,7 +59,7 @@ public class HfsPlusBSDInfo {
         return fileMode;
     }
 
-    public int getSpecial() {
+    public long getSpecial() {
         return special;
     }
 }

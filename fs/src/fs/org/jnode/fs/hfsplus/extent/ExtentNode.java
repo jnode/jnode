@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -20,11 +20,10 @@
  
 package org.jnode.fs.hfsplus.extent;
 
-import org.jnode.fs.hfsplus.tree.AbstractNode;
-import org.jnode.fs.hfsplus.tree.IndexRecord;
+import org.jnode.fs.hfsplus.tree.AbstractIndexNode;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 
-public class ExtentNode extends AbstractNode<IndexRecord> {
+public class ExtentNode extends AbstractIndexNode<ExtentKey> {
 
     public ExtentNode(NodeDescriptor descriptor, final int nodeSize) {
         super(descriptor, nodeSize);
@@ -35,15 +34,7 @@ public class ExtentNode extends AbstractNode<IndexRecord> {
     }
 
     @Override
-    public IndexRecord getNodeRecord(int index) {
-        // TODO Auto-generated method stub
-        return null;
+    protected ExtentKey createKey(byte[] nodeData, int offset) {
+        return new ExtentKey(nodeData, offset);
     }
-
-    @Override
-    protected void loadRecords(byte[] nodeData) {
-        // TODO Auto-generated method stub
-
-    }
-
 }

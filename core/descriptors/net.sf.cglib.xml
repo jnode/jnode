@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -29,6 +29,9 @@
   <runtime>
     <library name="cglib.jar">
       <export name="net.sf.cglib.*"/>
+      <export name="net.sf.cglib.core.*"/>
+      <export name="net.sf.cglib.proxy.*"/>
+      <export name="net.sf.cglib.reflect.*"/>
     </library>
   </runtime>        
 </plugin>

@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -35,18 +35,22 @@ help            Output these messages
 	</target>
 	
 	<target name="all-junit">
-		<delete dir="${basedir}/reports/junit"/>
-		<mkdir dir="${basedir}/reports/junit"/>
-	    <junit showoutput="on" printsummary="on" fork="on">
+	    <!-- 
+		<delete dir="${basedir}/build/reports/junit"/>
+		<mkdir dir="${basedir}/build/reports/junit"/>
+	    <junit showoutput="off" printsummary="on" fork="on" haltonfailure="on">
+	        <formatter type="xml"/>
 			<classpath refid="cp-test"/>
-			<test name="org.jnode.test.cli.CLITestSuite" todir="${basedir}/reports/junit"/>
+			<test name="org.jnode.test.cli.CLITestSuite" todir="${basedir}/build/reports/junit"/>
 		</junit>
+		-->
 	</target>
 	
 	<target name="blackbox-common">
 	    <java classpathref="cp-test" classname="org.jnode.test.shell.harness.TestHarness">
 	        <arg value="-E"/>
-	        <arg value="-s"/>
+	        <arg value="-F"/>
+			<arg value="-s"/>
 	        <arg value="${root.dir}"/>
 	        <arg value="${basedir}/src/test/org/jnode/test/command/common/all-common-tests.xml"/>
 	    </java>
@@ -55,6 +59,7 @@ help            Output these messages
 	<target name="blackbox-file">
 	    <java classpathref="cp-test" classname="org.jnode.test.shell.harness.TestHarness">
 	        <arg value="-E"/>
+	        <arg value="-F"/>
 	        <arg value="-s"/>
 	        <arg value="${root.dir}"/>
 	        <arg value="${basedir}/src/test/org/jnode/test/command/file/all-file-tests.xml"/>

@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Iterator;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -34,7 +33,7 @@ import org.jnode.fs.FileSystem;
 /**
  * JIFSFile <br>
  * The JIFSFile holds information in a StringBuffer.
- * 
+ *
  * @author Andreas H\u00e4nel
  */
 public class JIFSFile implements ExtFSEntry, FSFile {
@@ -159,6 +158,11 @@ public class JIFSFile implements ExtFSEntry, FSFile {
 
     public void setParent(FSDirectory parent) {
         this.parent = parent;
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 
     public String getName() {

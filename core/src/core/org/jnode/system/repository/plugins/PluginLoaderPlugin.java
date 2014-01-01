@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginLoader;
 import org.jnode.plugin.PluginManager;
+import org.jnode.plugin.PluginReference;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.system.repository.RepositoryPlugin;
 import org.jnode.system.repository.spi.SystemRepositoryProvider;
@@ -133,11 +134,10 @@ public final class PluginLoaderPlugin extends RepositoryPlugin {
          *      java.lang.String)
          */
         @Override
-        public ByteBuffer getPluginBuffer(String pluginId, String pluginVersion) {
+        public ByteBuffer getPluginBuffer(PluginReference pluginReference) {
             final Name name;
             try {
-                name = ((Name) PLUGINS.clone()).add(getPluginFileName(pluginId,
-                    pluginVersion));
+                name = ((Name) PLUGINS.clone()).add(getPluginFileName(pluginReference));
             } catch (InvalidNameException ex) {
                 log.debug("Cannot combine name", ex);
                 return null;

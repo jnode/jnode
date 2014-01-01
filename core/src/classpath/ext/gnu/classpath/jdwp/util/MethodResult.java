@@ -1,6 +1,6 @@
 /* MethodResult.java -- class to wrap around values returned from a Method call
    in the VM 
-   Copyright (C) 2005, 2007 Free Software Foundation
+   Copyright (C) 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -40,8 +40,6 @@ exception statement from your version. */
 
 package gnu.classpath.jdwp.util;
 
-import gnu.classpath.jdwp.value.Value;
-
 /**
  * A class to wrap around values returned from a Method call in the VM.
  * 
@@ -50,37 +48,29 @@ import gnu.classpath.jdwp.value.Value;
 public class MethodResult
 {
   // The Object returned by the executing method
-  private Value returnedValue;
+  private Object returnedValue;
   
   // Any Exception that was thrown by the executing method
-  private Throwable thrownException;
-  
-  /**
-   * Constructs a new MethodResult object
-   *
-   * @param return_value the return value of the method invocation
-   * @param exc exception thrown during the invocation (or null if none)
-   */
-  public MethodResult (Value return_value, Throwable exc)
-  {
-    returnedValue = return_value;
-    thrownException = exc;
-  }
+  private Exception thrownException;
 
-  /**
-   * Returns the return value of the method invocation
-   */
-  public Value getReturnedValue()
+  public Object getReturnedValue()
   {
     return returnedValue;
   }
 
-  /**
-   * Returns the exception thrown during the method invocation
-   * (or null if none)
-   */
-  public Throwable getThrownException()
+  public void setReturnedValue(Object returnedValue)
+  {
+    this.returnedValue = returnedValue;
+  }
+
+  public Exception getThrownException()
   {
     return thrownException;
   }
+
+  public void setThrownException(Exception thrownException)
+  {
+    this.thrownException = thrownException;
+  }
+  
 }

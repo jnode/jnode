@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2013 JNode.org
+ * Copyright (C) 2003-2014 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -34,6 +34,7 @@ import org.jnode.bootlog.BootLogInstance;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginLoader;
+import org.jnode.plugin.PluginReference;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.system.resource.MemoryResource;
 import org.jnode.util.JarBuffer;
@@ -85,8 +86,7 @@ public class InitJarProcessor {
                 try {
                     // Load it
                     loader.setBuffer(entry.getValue());
-                    final PluginDescriptor descr = piRegistry.loadPlugin(
-                        loader, "", "", false); //resolve=false
+                    final PluginDescriptor descr = piRegistry.loadPlugin(loader, null, false); //resolve=false
                     descriptors.add(descr);
                 } catch (PluginException ex) {
                     BootLogInstance.get().error("Cannot load " + name, ex);
@@ -107,7 +107,7 @@ public class InitJarProcessor {
          * @see org.jnode.plugin.PluginLoader#getPluginStream(java.lang.String,
          *      java.lang.String)
          */
-        public ByteBuffer getPluginBuffer(String pluginId, String pluginVersion) {
+        public ByteBuffer getPluginBuffer(PluginReference pluginReference) {
             return buf;
         }
 
