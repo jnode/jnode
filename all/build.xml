@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -823,7 +823,7 @@ clean             Remove all intermediate build results.
             <fileset dir="${root.dir}/shell" includes="*.xml"/>
             <fileset dir="${root.dir}/shell/descriptors" includes="*.xml"/>
             <fileset dir="${root.dir}/sound" includes="*.xml"/>
-            <fileset dir="${root.dir}/sound/descriptors" includes="*.xml"/>
+            <!-- fileset dir="${root.dir}/sound/descriptors" includes="*.xml"/ -->
             <fileset dir="${root.dir}/textui" includes="*.xml"/>
             <fileset dir="${root.dir}/textui/descriptors" includes="*.xml"/>
         </header>
