@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -38,7 +38,25 @@
       <compilerarg value="${compilerarg}"/>
     </javac>
   </presetdef>
-
+  
+  <presetdef name="jnode.compile.test">
+    <javac destdir="${my-testclasses.dir}"
+	       debug="on"
+	       optimize="on"
+           fork="on"
+           memoryMaximumSize="${memoryMaximumSize}"
+           compiler="modern"
+	       includeJavaRuntime="false"
+           target="${java.target}"
+           source="${java.source}"
+           encoding="${java.encoding}"
+           excludes="**/*-template.java,**/package-info.java">
+	  <bootclasspath path="${jnode-core.jar}"/>
+	  <classpath path="${my-classes.dir}"/>
+	  <compilerarg value="${compilerarg}"/>
+    </javac>
+  </presetdef>
+  
   <!-- Predefined way of using javadoc -->
   <macrodef name="jnode.javadoc">
     <attribute name="destdir"/>

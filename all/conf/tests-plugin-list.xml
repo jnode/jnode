@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2013 JNode.org
+    Copyright (C) 2003-2014 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -37,6 +37,7 @@
   <plugin id="org.jmock"/>  
   <plugin id="net.n3.nanoxml"/>  
   
+  <plugin id="org.jnode.emu"/>
   <plugin id="org.jnode.test"/>
   <plugin id="org.jnode.test.fs"/>
   <plugin id="org.jnode.test.net"/>
