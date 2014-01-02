@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.arp;
 
 import org.jnode.net.HardwareAddress;
@@ -25,22 +25,22 @@ import org.jnode.net.ProtocolAddress;
 
 /**
  * Entry of the ARP cache
- * 
+ *
  * @author epr
  */
 public class ARPCacheEntry {
 
     private static final long ARP_CACHE_LIFETIME = 10 * 60 * 1000;
-    
-	private final long creationTime;
-	private long lifeTime;
+
+    private final long creationTime;
+    private long lifeTime;
     private final HardwareAddress hardwareAddress;
     private final ProtocolAddress protocolAddress;
     private final boolean dynamic;
 
     /**
      * Create a new instance
-     * 
+     *
      * @param hardwareAddress
      * @param protocolAddress
      * @param dynamic
@@ -98,6 +98,7 @@ public class ARPCacheEntry {
 
     /**
      * Convert to a String representation
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {

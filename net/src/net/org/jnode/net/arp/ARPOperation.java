@@ -17,30 +17,30 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.arp;
 
 
 public enum ARPOperation {
-	ARP_REQUEST (1),
-    ARP_REPLY (2),
-    RARP_REQUEST (3),
-    RARP_REPLY (4);
-	
-	private int id;
-	
-	private ARPOperation(int id){
-		this.id = id;
-	}
-	
-	public int getId(){
-		return this.id;
-	}
-	
-	public static ARPOperation getType(int id){
-		for(ARPOperation t : ARPOperation.values()){
-			return t;
-		}
-		return null;
-	}
+    ARP_REQUEST(1),
+    ARP_REPLY(2),
+    RARP_REQUEST(3),
+    RARP_REPLY(4);
+
+    private int id;
+
+    private ARPOperation(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public static ARPOperation getType(int id) {
+        for (ARPOperation t : ARPOperation.values()) {
+            return t;
+        }
+        return null;
+    }
 }
