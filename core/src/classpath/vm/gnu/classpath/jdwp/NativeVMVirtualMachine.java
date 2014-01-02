@@ -27,15 +27,6 @@ import java.lang.reflect.Method;
 import gnu.classpath.jdwp.util.MethodResult;
 import gnu.classpath.jdwp.event.EventRequest;
 
-import org.jnode.annotation.NoInline;
-import org.jnode.vm.facade.VmUtils;
-import org.jnode.vm.isolate.VmIsolate;
-import org.jnode.vm.classmgr.VmIsolatedStatics;
-import org.jnode.vm.classmgr.VmStaticsIterator;
-import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.classmgr.ClassDecoder;
-import org.jnode.vm.classmgr.VmMethod;
-
 /**
  * @see gnu.classpath.jdwp.VMVirtualMachine
  *
