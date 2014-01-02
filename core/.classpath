@@ -26,7 +26,7 @@
 	<classpathentry kind="lib" path="/all/lib/classlib.jar" sourcepath="/all/lib/classlib-src.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="lib/asm-3.3.1.jar"/>
-	<classpathentry kind="lib" path="lib/asm-attrs-2.2.3.jar"/>
 	<classpathentry kind="lib" path="lib/asm-util-3.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/asm-attrs-1.5.3.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
