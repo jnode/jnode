@@ -76,7 +76,7 @@ final class PluginPrerequisiteModel extends PluginModelObject implements PluginP
      * @return The fully qualified reference to the required plugin.
      */
     public PluginReference getPluginReference() {
-    	return reference;
+        return reference;
     }
 
     /**

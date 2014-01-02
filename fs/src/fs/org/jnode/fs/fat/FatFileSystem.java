@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.fat;
 
 import java.io.IOException;
@@ -49,8 +49,8 @@ public class FatFileSystem extends AbstractFileSystem<FatRootEntry> {
         try {
             bs = new BootSector(512);
             bs.read(getApi());
-//			if (!bs.isaValidBootSector()) throw new FileSystemException(
-//					"Can't mount this partition: Invalid BootSector");
+//            if (!bs.isaValidBootSector()) throw new FileSystemException(
+//                "Can't mount this partition: Invalid BootSector");
 
             // System.out.println(bs);
 

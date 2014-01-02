@@ -17,12 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.ps2;
 
 import java.io.IOException;
 import java.nio.channels.ByteChannel;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.DeviceException;
 import org.jnode.driver.DriverException;
@@ -58,10 +57,10 @@ public class PS2PointerDriver extends AbstractPointerDriver implements PS2Consta
         return MOUSE_IRQ;
     }
 
-    protected boolean initPointer(boolean reset) throws DeviceException {    	
+    protected boolean initPointer(boolean reset) throws DeviceException {
         boolean result = true;
         if (reset) {
-        	result &= resetPointer();
+            result &= resetPointer();
         }
         result &= enablePointer();
         result &= setRate(100);
@@ -71,7 +70,7 @@ public class PS2PointerDriver extends AbstractPointerDriver implements PS2Consta
     protected boolean resetPointer() throws DeviceException {
         log.debug("resetPointer");
         if (!bus.writeMouseCommands(CMD_RESET, null, 0))
-        	return false;
+            return false;
         bus.flush();
         return true;
     }
@@ -104,7 +103,7 @@ public class PS2PointerDriver extends AbstractPointerDriver implements PS2Consta
     }
 
     protected boolean setRate(int samples) throws DeviceException {
-        return bus.writeMouseCommands(CMD_SET_RATE, new int[] {samples}, 0);
+        return bus.writeMouseCommands(CMD_SET_RATE, new int[]{samples}, 0);
     }
 
     /**

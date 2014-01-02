@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem;
 
 import java.io.File;
@@ -29,10 +29,6 @@ import org.jnode.fs.Formatter;
 import org.jnode.fs.ext2.BlockSize;
 import org.jnode.fs.ext2.Ext2FileSystemFormatter;
 import org.jnode.fs.fat.FatType;
-import org.jnode.fs.hfsplus.HFSPlusParams;
-import org.jnode.fs.hfsplus.HfsPlusFileSystemFormatter;
-import org.jnode.fs.jfat.ClusterSize;
-import org.jnode.fs.jfat.FatFileSystemFormatter;
 import org.jnode.test.fs.filesystem.config.FS;
 import org.jnode.test.fs.filesystem.config.FSAccessMode;
 import org.jnode.test.fs.filesystem.config.FSTestConfig;
@@ -81,7 +77,8 @@ public class FSConfigurations implements Iterable<FSTestConfig> {
             fatBuilder.fsType(FSType.FAT).formatter(new org.jnode.fs.fat.FatFileSystemFormatter(FatType.FAT32))
                 .build());
         /* TODO Implement FAT12 writing
-        configs.addAll(fatBuilder.fsType(FSType.JFAT).formatter(new FatFileSystemFormatter(ClusterSize._64Kb)).build());*/
+        configs.addAll(fatBuilder.fsType(FSType.JFAT).formatter(new FatFileSystemFormatter(ClusterSize._64Kb)).build());
+        */
     }
 
     class FileSystemTestConfigurationListBuilder {

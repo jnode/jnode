@@ -135,7 +135,7 @@ public class PathnamePatternTest {
 
         Assert.assertEquals(
                 "PathnamePattern{source='\"/a/*\"',absolute=true,patterns=['a','^\\*$']}",
-  PathnamePattern.compilePathPattern("\"/a/*\"", DF).toRegexString());
+                PathnamePattern.compilePathPattern("\"/a/*\"", DF).toRegexString());
         
         Assert.assertEquals("PathnamePattern{source='{print \\$1}',absolute=false,patterns=['^\\{print \\$1\\}$']}",
                 PathnamePattern.compilePathPattern("{print \\$1}", DF).toRegexString());

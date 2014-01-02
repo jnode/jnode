@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.command.net;
 
 import java.io.PrintWriter;
@@ -38,7 +38,7 @@ public class NetstatCommand extends AbstractCommand {
     private static final String help_super = "Print statistics for all network devices";
     private static final String fmt_stat = "%s: ID %s\n";
     private static final String str_none = "none";
-    
+
     public NetstatCommand() {
         super(help_super);
     }
@@ -57,46 +57,47 @@ public class NetstatCommand extends AbstractCommand {
             showStats(getOutput().getPrintWriter(), nl, 80);
         }
     }
-    
+
     private void showStats(PrintWriter out, NetworkLayer nl, int maxWidth) throws NetworkException {
         out.format(fmt_stat, nl.getName(), nl.getProtocolID());
         showStats(out, nl.getStatistics(), 4);
         for (TransportLayer tl : nl.getTransportLayers()) {
             padOutput(out, 4);
             out.format(fmt_stat, tl.getName(), tl.getProtocolID());
-            showStats(out, tl.getStatistics(),8);
+            showStats(out, tl.getStatistics(), 8);
         }
         out.println();
     }
-    
+
     private void showStats(PrintWriter out, Statistics stat, int padSize)
         throws NetworkException {
         final Statistic[] statistics = stat.getStatistics();
         if (statistics.length == 0) {
-        	padOutput(out, padSize);
+            padOutput(out, padSize);
             out.print(str_none);
         } else {
-        	StringBuffer buffer = new StringBuffer();
-        	for(Statistic statistic : statistics){
-        		buffer.append(paddedString(padSize)).append(statistic.getName()).append(' ').append(statistic.getValue()).append("\n");
-        	}
-        	out.print(buffer.toString());
+            StringBuffer buffer = new StringBuffer();
+            for (Statistic statistic : statistics) {
+                buffer.append(paddedString(padSize)).append(statistic.getName()).append(' ')
+                    .append(statistic.getValue()).append("\n");
+            }
+            out.print(buffer.toString());
         }
         out.println();
     }
-    
+
     private String paddedString(int padSize) {
-    	String result = "";
-    	for(int i = 0; i < padSize; i++){
-			result += " ";	
-		}
-    	return result;
+        String result = "";
+        for (int i = 0; i < padSize; i++) {
+            result += " ";
+        }
+        return result;
     }
-    
-	private void padOutput(PrintWriter out, int size) {
-		for(int i = 0; i < size; i++){
-			out.print(" ");	
-		}
-	}
+
+    private void padOutput(PrintWriter out, int size) {
+        for (int i = 0; i < size; i++) {
+            out.print(" ");
+        }
+    }
 
 }

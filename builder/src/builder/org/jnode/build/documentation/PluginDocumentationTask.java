@@ -524,7 +524,7 @@ public class PluginDocumentationTask extends AbstractPluginTask {
                         sb.append("<br/>");
                     }
                     for (String exclude : library.getExcludes()) {
-                    	sb.append("exclude: ");
+                        sb.append("exclude: ");
                         sb.append(exclude);
                         sb.append("<br/>");
                     }

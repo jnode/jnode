@@ -17,13 +17,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
@@ -31,10 +30,10 @@ import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.ExtensionPointListener;
 
 public class MouseProtocolHandlerManager implements ExtensionPointListener {
-	
-	/**
-	 * Name of mouse protocol handlers extension point
-	 */
+
+    /**
+     * Name of mouse protocol handlers extension point
+     */
     public static final String EP_NAME = "org.jnode.driver.input.mouse-protocol-handlers";
 
     /**
@@ -53,19 +52,20 @@ public class MouseProtocolHandlerManager implements ExtensionPointListener {
     private static final List<MouseProtocolHandler> protocolHandlers = new ArrayList<MouseProtocolHandler>();
 
     private final ExtensionPoint mouseProtocolHandlersEP;
-   
+
     /**
      * Default ctor
+     *
      * @param mouseProtocolHandlersEP
      */
     public MouseProtocolHandlerManager(ExtensionPoint mouseProtocolHandlersEP) {
-    	this.mouseProtocolHandlersEP = mouseProtocolHandlersEP;
-    	for (Extension e : mouseProtocolHandlersEP.getExtensions()) {
-    		addHandlers(e);
-    	}
-    	mouseProtocolHandlersEP.addListener(this);
+        this.mouseProtocolHandlersEP = mouseProtocolHandlersEP;
+        for (Extension e : mouseProtocolHandlersEP.getExtensions()) {
+            addHandlers(e);
+        }
+        mouseProtocolHandlersEP.addListener(this);
     }
-    
+
     /**
      * Gets a collection of all registered protocol handlers.
      */
@@ -89,12 +89,13 @@ public class MouseProtocolHandlerManager implements ExtensionPointListener {
     @Override
     public void extensionRemoved(ExtensionPoint point, Extension extension) {
         if (point.equals(mouseProtocolHandlersEP)) {
-        	removeHandlers(extension);
+            removeHandlers(extension);
         }
     }
-    
+
     /**
      * Add handlers defined in the given extension.
+     *
      * @param extension
      */
     private synchronized void addHandlers(Extension extension) {
@@ -108,9 +109,10 @@ public class MouseProtocolHandlerManager implements ExtensionPointListener {
             }
         }
     }
-    
+
     /**
      * Remove handlers found in the given extension
+     *
      * @param extension
      */
     private synchronized void removeHandlers(Extension extension) {
@@ -121,41 +123,42 @@ public class MouseProtocolHandlerManager implements ExtensionPointListener {
                 if (name == null || className == null) {
                     continue;
                 }
-            	for (MouseProtocolHandler handler : protocolHandlers) {
-            		if ((handler.getName() == name) && (handler.getClass().getName() == className)) {
-            			protocolHandlers.remove(handler);
-            			break;
-            		}
-            	}
+                for (MouseProtocolHandler handler : protocolHandlers) {
+                    if ((handler.getName() == name) && (handler.getClass().getName() == className)) {
+                        protocolHandlers.remove(handler);
+                        break;
+                    }
+                }
             }
         }
     }
-    
+
     /**
      * Add a handler with given name and class name.
+     *
      * @param name
      * @param className
      */
     private void add(String name, String className) {
-    	for (MouseProtocolHandler handler : protocolHandlers) {
-    		if (handler.getName() == name) {
-    			log.error("Duplicate mouse protocol handler name: " + name);
-    			return;
-    		}
-    	}
-    	    	
+        for (MouseProtocolHandler handler : protocolHandlers) {
+            if (handler.getName() == name) {
+                log.error("Duplicate mouse protocol handler name: " + name);
+                return;
+            }
+        }
+
         try {
             // FIXME ... think about whether using the current thread's class
             // loader might present a security issue.
             final ClassLoader cl = Thread.currentThread().getContextClassLoader();
             MouseProtocolHandler handler = (MouseProtocolHandler) cl.loadClass(className).newInstance();
             protocolHandlers.add(handler);
-            
+
         } catch (ClassNotFoundException ex) {
-        	log.error("Mouse protocol handler class not found: " + className);
+            log.error("Mouse protocol handler class not found: " + className);
         } catch (Exception ex) {
             // Could be an access, and instantiation or a typecast exception ...
-        	log.error("Error instantiating keyboard interpreter class:" + className, ex);
+            log.error("Error instantiating keyboard interpreter class:" + className, ex);
         }
     }
 }

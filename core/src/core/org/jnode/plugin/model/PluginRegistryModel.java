@@ -347,13 +347,12 @@ public final class PluginRegistryModel extends VmSystemObject implements
      * Load a plugin from a given loader but doesn't resolve its dependencies.
      *
      * @param loader
-     * @param pluginId
-     * @param pluginVersion
+     * @param pluginReference
      * @return The descriptor of the loaded plugin.
      * @throws PluginException
      */
-    private final PluginDescriptorModel loadPluginImpl(final PluginLoader loader, final PluginReference pluginReference)
-    		throws PluginException {
+    private PluginDescriptorModel loadPluginImpl(final PluginLoader loader, final PluginReference pluginReference)
+        throws PluginException {
         final PluginRegistryModel registry = this;
         final PluginJar pluginJar;
         try {

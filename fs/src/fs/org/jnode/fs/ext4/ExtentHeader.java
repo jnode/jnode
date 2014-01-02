@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ext4;
 
 import java.io.IOException;
@@ -132,8 +132,7 @@ public class ExtentHeader {
 
             ExtentHeader indexHeader = new ExtentHeader(indexData);
             return indexHeader.getBlockNumber(fs, index);
-        }
-        else {
+        } else {
             Extent extent = binarySearchExtents(index, getExtentEntries());
             return index - extent.getBlockIndex() + extent.getStartLow();
         }
@@ -142,12 +141,11 @@ public class ExtentHeader {
     /**
      * Performs a binary search in the extent indexes.
      *
-     * @param index the index of the block to match.
+     * @param index   the index of the block to match.
      * @param indexes the indexes to search in.
      * @return the matching index.
      */
-    private ExtentIndex binarySearchIndexes(long index, ExtentIndex[] indexes)
-    {
+    private ExtentIndex binarySearchIndexes(long index, ExtentIndex[] indexes) {
         int lowIndex = 0;
         int highIndex = indexes.length - 1;
         ExtentIndex extentIndex = null;
@@ -158,8 +156,7 @@ public class ExtentHeader {
 
             if (index < extentIndex.getBlockIndex()) {
                 highIndex = middle - 1;
-            }
-            else {
+            } else {
                 lowIndex = middle + 1;
             }
         }
@@ -170,12 +167,11 @@ public class ExtentHeader {
     /**
      * Performs a binary search in the extents.
      *
-     * @param index the index of the block to match.
+     * @param index   the index of the block to match.
      * @param extents the extents to search in.
      * @return the matching extent.
      */
-    private Extent binarySearchExtents(long index, Extent[] extents)
-    {
+    private Extent binarySearchExtents(long index, Extent[] extents) {
         int lowIndex = 0;
         int highIndex = extents.length - 1;
         Extent extent = null;
@@ -186,8 +182,7 @@ public class ExtentHeader {
 
             if (index < extent.getBlockIndex()) {
                 highIndex = middle - 1;
-            }
-            else {
+            } else {
                 lowIndex = middle + 1;
             }
         }
@@ -197,6 +192,7 @@ public class ExtentHeader {
 
     @Override
     public String toString() {
-        return String.format("ExtentHeader: depth:%d entries:%d/%d", getDepth(), getEntryCount(), getMaximumEntryCount());
+        return String
+            .format("ExtentHeader: depth:%d entries:%d/%d", getDepth(), getEntryCount(), getMaximumEntryCount());
     }
 }

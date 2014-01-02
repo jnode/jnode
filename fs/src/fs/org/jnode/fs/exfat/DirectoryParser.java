@@ -29,26 +29,26 @@ import java.nio.ByteOrder;
  */
 final class DirectoryParser {
 
-    private final static int ENTRY_SIZE = 32;
-    private final static int ENAME_MAX_LEN = 15;
-    private final static int VALID = 0x80;
-    private final static int CONTINUED = 0x40;
+    private static final int ENTRY_SIZE = 32;
+    private static final int ENAME_MAX_LEN = 15;
+    private static final int VALID = 0x80;
+    private static final int CONTINUED = 0x40;
 
     /**
      * If this bit is not set it means "critical", if it is set "benign".
      */
-    private final static int IMPORTANCE_MASK = 0x20;
+    private static final int IMPORTANCE_MASK = 0x20;
 
-    private final static int EOD = (0x00);
-    private final static int BITMAP = (0x01 | VALID);
-    private final static int UPCASE = (0x02 | VALID);
-    private final static int LABEL = (0x03 | VALID);
-    private final static int FILE = (0x05 | VALID);
-    private final static int FILE_INFO = (0x00 | VALID | CONTINUED);
-    private final static int FILE_NAME = (0x01 | VALID | CONTINUED);
+    private static final int EOD = (0x00);
+    private static final int BITMAP = (0x01 | VALID);
+    private static final int UPCASE = (0x02 | VALID);
+    private static final int LABEL = (0x03 | VALID);
+    private static final int FILE = (0x05 | VALID);
+    private static final int FILE_INFO = (0x00 | VALID | CONTINUED);
+    private static final int FILE_NAME = (0x01 | VALID | CONTINUED);
 
-    private final static int FLAG_FRAGMENTED = 1;
-    private final static int FLAG_CONTIGUOUS = 3;
+    private static final int FLAG_FRAGMENTED = 1;
+    private static final int FLAG_CONTIGUOUS = 3;
 
     public static DirectoryParser create(Node node) throws IOException {
         assert (node.isDirectory()) : "not a directory"; //NOI18N

@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import org.jnode.annotation.Internal;
@@ -74,19 +74,20 @@ public final class UnsafeX86 {
     /**
      * Read CPU identification data.
      * <p/>
-	 * @param input  The number to put in EAX
+     *
+     * @param input  The number to put in EAX
      * @param result An array of length 4 (or longer) where eax, ebx, ecx, edx is stored into.
-	 * @return 1 on success, 0 otherwise (result == null or result.length less than 4).
+     * @return 1 on success, 0 otherwise (result == null or result.length less than 4).
      */
     @Internal
     static native int getCPUID(Word input, int[] result);
-    
+
     /**
      * Read a model specific register
      */
     @KernelSpace
     static native long readMSR(Word index);
-    
+
     /**
      * Write a model specific register
      */

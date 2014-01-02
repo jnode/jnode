@@ -27,6 +27,6 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ARPHeaderTest.class, //
-    EthernetAddressTest.class})
+    EthernetAddressTest.class })
 public class AllTests {
 }

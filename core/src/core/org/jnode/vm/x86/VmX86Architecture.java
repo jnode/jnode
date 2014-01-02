@@ -17,12 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import java.nio.ByteOrder;
 import java.util.HashMap;
-
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.assembler.x86.X86Constants;
@@ -147,9 +146,9 @@ public abstract class VmX86Architecture extends BaseVmArchitecture {
     /**
      * Initialize this instance.
      *
-     * @param compiler the name of the compiler to use as standard.  If 
-     * the supplied name is {@code null} or doesn't match (case insensitively) 
-     * one of the known names, the default compiler will be used.  
+     * @param compiler the name of the compiler to use as standard.  If
+     *                 the supplied name is {@code null} or doesn't match (case insensitively)
+     *                 one of the known names, the default compiler will be used.
      */
     public VmX86Architecture(int referenceSize, String compiler) {
         super(referenceSize, new VmX86StackReader(referenceSize));
@@ -157,16 +156,16 @@ public abstract class VmX86Architecture extends BaseVmArchitecture {
         this.compilers[0] = new X86StubCompiler();
         // Compare insensitively, producing a warning if the user selects
         // an unknown compiler, and using a default where appropriate.
-        if (compiler != null && compiler.length() > 0 && 
-                !compiler.equalsIgnoreCase("default")) {
+        if (compiler != null && compiler.length() > 0 &&
+            !compiler.equalsIgnoreCase("default")) {
             if ("L1B".equalsIgnoreCase(compiler)) {
                 this.compilers[1] = new X86Level1BCompiler();
             } else if ("L1A".equalsIgnoreCase(compiler)) {
                 this.compilers[1] = new X86Level1ACompiler();
-            } else { 
+            } else {
                 BootLogInstance.get().warn("JNode native compiler '" + compiler + "' is unknown.");
             }
-        } 
+        }
         if (this.compilers[1] == null) {
             BootLogInstance.get().warn("JNode native compiler defaulting to 'L1A'");
             this.compilers[1] = new X86Level1ACompiler();
@@ -249,7 +248,7 @@ public abstract class VmX86Architecture extends BaseVmArchitecture {
 
         // Initialize HyperV
         initializeHyperV();
-        
+
         final String cmdLine = VmSystem.getCmdLine();
         if (cmdLine.contains("mp=no")) {
             return;
@@ -471,17 +470,17 @@ public abstract class VmX86Architecture extends BaseVmArchitecture {
             return super.createMultiMediaSupport();
         }
     }
-    
+
     /**
      * Identify ourselves in HyperV (when that is detected)
      */
     void initializeHyperV() {
         final X86CpuID id = (X86CpuID) VmProcessor.current().getCPUID();
         if (!id.detectHyperV())
-        	return;
+            return;
         Unsafe.debug("Initializing HyperV");
-    	long guestOsId = (0x29L << 48);
-    	UnsafeX86.writeMSR(Word.fromIntZeroExtend(HyperV.HV_X64_MSR_GUEST_OS_ID), guestOsId);
+        long guestOsId = (0x29L << 48);
+        UnsafeX86.writeMSR(Word.fromIntZeroExtend(HyperV.HV_X64_MSR_GUEST_OS_ID), guestOsId);
         Unsafe.debug("Initialized Hyper-V guest OS ID");
     }
 }

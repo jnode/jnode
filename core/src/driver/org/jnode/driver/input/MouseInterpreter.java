@@ -17,24 +17,20 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.DeviceException;
 import org.jnode.driver.DriverException;
 import org.jnode.naming.InitialNaming;
-import org.jnode.plugin.ExtensionPoint;
 import org.jnode.util.NumberUtils;
 
 /**
  * author qades
+ *
  * @author Ewout Prangsma (epr@jnode.org)
  */
 public class MouseInterpreter implements PointerInterpreter {
@@ -48,7 +44,7 @@ public class MouseInterpreter implements PointerInterpreter {
     private int pos = 0;
     private MouseProtocolHandler protocol;
     private int pointerId;
-   
+
     public String getName() {
         if (protocol == null) {
             return "No Mouse";
@@ -85,12 +81,12 @@ public class MouseInterpreter implements PointerInterpreter {
             pointerId = d.getPointerId();
             log.debug("Actual pointerId 0x" + NumberUtils.hex(pointerId, 2));
             MouseProtocolHandlerManager mgr;
-			try {
-				mgr = InitialNaming.lookup(MouseProtocolHandlerManager.NAME);
-			} catch (NameNotFoundException e) {
-				log.error("MouseProtocolHandlerManager not found");
-				return false;
-			}
+            try {
+                mgr = InitialNaming.lookup(MouseProtocolHandlerManager.NAME);
+            } catch (NameNotFoundException e) {
+                log.error("MouseProtocolHandlerManager not found");
+                return false;
+            }
             // select protocol
             for (MouseProtocolHandler p : mgr.protocolHandlers()) {
                 if (p.supportsId(pointerId)) {
@@ -103,7 +99,7 @@ public class MouseInterpreter implements PointerInterpreter {
                 return false;
             }
             this.data = new byte[protocol.getPacketSize()];
-            
+
             // Set default values back
             d.initPointer(false);
 
@@ -155,12 +151,12 @@ public class MouseInterpreter implements PointerInterpreter {
         pos = 0;
     }
 
-	@Override
-	public void showInfo(PrintWriter out) {
-		out.println("Name          : " + getName());
-		out.println("Pointer ID    : " + NumberUtils.hex(pointerId));
-		if (data != null) {
-			out.println("Package length: "+ data.length);
-		}
-	}
+    @Override
+    public void showInfo(PrintWriter out) {
+        out.println("Name          : " + getName());
+        out.println("Pointer ID    : " + NumberUtils.hex(pointerId));
+        if (data != null) {
+            out.println("Package length: " + data.length);
+        }
+    }
 }

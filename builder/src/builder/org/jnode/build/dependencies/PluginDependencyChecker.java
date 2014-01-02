@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build.dependencies;
 
 import java.io.File;
@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,7 +35,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantClass;
 import org.apache.bcel.classfile.ConstantNameAndType;
@@ -143,8 +141,8 @@ public class PluginDependencyChecker extends AbstractPluginTask {
      * @param plugins
      */
     private void analyzePlugins(Map<String, Plugin> containedClasses, List<Plugin> plugins) {
-    	Collections.sort(plugins);
-    	for (Plugin plugin : plugins) { 
+        Collections.sort(plugins);
+        for (Plugin plugin : plugins) {
             analyzePlugin(containedClasses, plugin);
         }
     }
@@ -291,9 +289,8 @@ public class PluginDependencyChecker extends AbstractPluginTask {
         }
 
         /**
+         * @param buffer
          * @param containedClasses
-         * @param plugin
-         * @param unmatchedDependencies
          */
         private boolean collectUnmatchedDependencies(StringBuffer buffer, Map<String, Plugin> containedClasses) {
             Map<String, List<String>> unmatchedDependencies = new HashMap<String, List<String>>();
@@ -320,7 +317,7 @@ public class PluginDependencyChecker extends AbstractPluginTask {
         }
 
         /**
-         * @param plugin
+         * @param buffer
          * @param unmatchedDependencies
          */
         private void dumpUnmatchedDependencies(StringBuffer buffer, Map<String, List<String>> unmatchedDependencies) {
@@ -477,12 +474,12 @@ public class PluginDependencyChecker extends AbstractPluginTask {
                             signature = decodeTypeName(signature);
                         }
                         if (signature != null) {
-                        	addUsedClass(usingClass, signature);
+                            addUsedClass(usingClass, signature);
                         }
                     }
                 } else if (constant instanceof ConstantNameAndType) {
                     for (String typeName : decodeSignature(
-                            ((ConstantNameAndType) constant).getSignature(constantPool))) {
+                        ((ConstantNameAndType) constant).getSignature(constantPool))) {
                         if (typeName != null) {
                             addUsedClass(usingClass, typeName);
                         }
@@ -549,10 +546,10 @@ public class PluginDependencyChecker extends AbstractPluginTask {
             return "Plugin " + fullPluginId + " contained=" + containedClasses + " used=" + usedClasses;
         }
 
-		@Override
-		public int compareTo(Plugin other) {
-			return fullPluginId.compareTo(other.fullPluginId);
-		}
+        @Override
+        public int compareTo(Plugin other) {
+            return fullPluginId.compareTo(other.fullPluginId);
+        }
     }
 
     private class Fragment extends Plugin {

@@ -17,11 +17,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import java.util.ArrayList;
-
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.Library;
 import org.jnode.plugin.PluginException;
@@ -49,8 +48,7 @@ final class LibraryModel extends PluginModelObject implements Library {
         for (final XMLElement exE : e.getChildren()) {
             if (exE.getName().equals("export")) {
                 exportList.add(getAttribute(exE, "name", true));
-            }
-            else if (exE.getName().equals("exclude")) {
+            } else if (exE.getName().equals("exclude")) {
                 excludeList.add(getAttribute(exE, "name", true));
             }
         }
@@ -111,6 +109,6 @@ final class LibraryModel extends PluginModelObject implements Library {
      * @return All declared exclude names
      */
     public String[] getExcludes() {
-    	return excludes;
+        return excludes;
     }
 }

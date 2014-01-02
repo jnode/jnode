@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 import org.jnode.driver.DeviceUtils;
@@ -40,21 +40,23 @@ public class PointerTest {
 
     public static class MyListener implements PointerListener {
 
-    	private int x;
-    	private int y;
+        private int x;
+        private int y;
 
         /**
          * @see org.jnode.driver.input.PointerListener#pointerStateChanged(org.jnode.driver.input.PointerEvent)
          */
         public void pointerStateChanged(PointerEvent event) {
-        	
-        	int newX = event.isAbsolute() ? event.getX() : x + event.getX();
-        	int newY = event.isAbsolute() ? event.getY() : y + event.getY();
-        	
-        	x = Math.min(1024,  Math.max(0, newX));
-        	y = Math.min(768,  Math.max(0, newY));
-        	
-            System.out.print("x,y dx,dy,z abs: " + x + ", " + y + "  (" + event.getX() + "," + event.getY() + "," + event.getZ() + " " + event.isAbsolute() + ")\n");
+
+            int newX = event.isAbsolute() ? event.getX() : x + event.getX();
+            int newY = event.isAbsolute() ? event.getY() : y + event.getY();
+
+            x = Math.min(1024, Math.max(0, newX));
+            y = Math.min(768, Math.max(0, newY));
+
+            System.out.print(
+                "x,y dx,dy,z abs: " + x + ", " + y + "  (" + event.getX() + "," + event.getY() + "," + event.getZ() +
+                    " " + event.isAbsolute() + ")\n");
         }
     }
 }

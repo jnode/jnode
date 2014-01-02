@@ -59,14 +59,14 @@ public class VMwareBuilderTask extends Task {
      * @return Returns the Virtual machine name
      */
     public final String getName() {
-    	return name;
+        return name;
     }
 
     /**
      * @Set the Virtual machine name
      */
     public final void setName(String name) {
-    	this.name = name;
+        this.name = name;
     }
     
     /**

@@ -28,6 +28,6 @@ import org.junit.runners.Suite;
  * @author epr
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({TestVmClass.class, SignatureTest.class, NumberUtilsTest.class})
+@Suite.SuiteClasses({TestVmClass.class, SignatureTest.class, NumberUtilsTest.class })
 public class AllTests {
 }

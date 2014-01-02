@@ -378,7 +378,7 @@ public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId
             if (index > MAXENTRIES)
                 log.debug("Full Directory: invalid index " + index);
 
-            for (i = index; ; ) {
+            for (i = index;; ) {
                 /*
                  * create a new entry from the chain
                  */

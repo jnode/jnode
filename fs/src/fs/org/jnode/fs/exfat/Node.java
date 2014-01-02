@@ -27,12 +27,12 @@ import java.io.IOException;
  */
 public final class Node {
 
-    public final static int ATTRIB_RO = 0x01;
-    public final static int ATTRIB_HIDDEN = 0x02;
-    public final static int ATTRIB_SYSTEM = 0x04;
-    public final static int ATTRIB_VOLUME = 0x08;
-    public final static int ATTRIB_DIR = 0x10;
-    public final static int ATTRIB_ARCH = 0x20;
+    public static final int ATTRIB_RO = 0x01;
+    public static final int ATTRIB_HIDDEN = 0x02;
+    public static final int ATTRIB_SYSTEM = 0x04;
+    public static final int ATTRIB_VOLUME = 0x08;
+    public static final int ATTRIB_DIR = 0x10;
+    public static final int ATTRIB_ARCH = 0x20;
 
     public static Node createRoot(ExFatSuperBlock sb)
         throws IOException {

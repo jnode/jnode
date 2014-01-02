@@ -153,7 +153,7 @@ public abstract class AbstractPluginTask extends Task {
             }
         } else {
             f = libAlias.getAlias();
-        }    	
+        }
         return f;
     }
     

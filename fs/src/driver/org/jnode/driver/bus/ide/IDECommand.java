@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide;
 
 import org.apache.log4j.Logger;
@@ -146,28 +146,30 @@ public abstract class IDECommand extends Command implements IDEConstants {
         return getClass().getName() + " " + (primary ? "primary" : "secondary")
             + "." + (master ? "master" : "slave");
     }
-    
+
     /**
      * Perform the device selection protocol.
-     * @throws TimeoutException 
-     * @see ATA/ATAPI-4 9.6
+     * See: ATA/ATAPI-4 9.6
+     *
+     * @throws TimeoutException
      */
     protected void selectDevice(IDEIO io) throws TimeoutException {
-    	final int mask = ST_BUSY | ST_DATA_REQUEST;
-    	io.waitUntilStatus(mask, 0, IDE_TIMEOUT, null);
-    	// Write the Device/Head register with appropriate DEV bit value
-    	io.setSelectReg(getSelect());
-    	// Wait at least 400ns
-    	TimeUtils.sleep(1);
-    	io.waitUntilStatus(mask, 0, IDE_TIMEOUT, null);
+        final int mask = ST_BUSY | ST_DATA_REQUEST;
+        io.waitUntilStatus(mask, 0, IDE_TIMEOUT, null);
+        // Write the Device/Head register with appropriate DEV bit value
+        io.setSelectReg(getSelect());
+        // Wait at least 400ns
+        TimeUtils.sleep(1);
+        io.waitUntilStatus(mask, 0, IDE_TIMEOUT, null);
     }
-    
+
     /**
      * Flush the write cache.
-     * @throws TimeoutException 
+     *
+     * @throws TimeoutException
      */
     protected void flushCache(IDEIO io, boolean is48bit) throws TimeoutException {
-    	io.setCommandReg(is48bit ? CMD_FLUSH_CACHE_EXT : CMD_FLUSH_CACHE);
-    	io.waitUntilStatus(ST_BUSY, 0, IDE_TIMEOUT, "flushCache");
+        io.setCommandReg(is48bit ? CMD_FLUSH_CACHE_EXT : CMD_FLUSH_CACHE);
+        io.waitUntilStatus(ST_BUSY, 0, IDE_TIMEOUT, "flushCache");
     }
 }

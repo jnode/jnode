@@ -33,9 +33,9 @@ public final class ExFatSuperBlock extends AbstractFSObject {
     /**
      * The size of the ExFAT super block in bytes.
      */
-    private final static int SIZE = 512;
+    private static final int SIZE = 512;
 
-    private final static String OEM_NAME = "EXFAT   "; //NOI18N
+    private static final String OEM_NAME = "EXFAT   "; //NOI18N
 
     private final DeviceAccess da;
 
@@ -91,9 +91,8 @@ public final class ExFatSuperBlock extends AbstractFSObject {
         
         /* check boot signature */
 
-        if ((b.get(510) & 0xff) != 0x55 ||
-            (b.get(511) & 0xff) != 0xaa) throw new IOException(
-            "missing boot sector signature");
+        if ((b.get(510) & 0xff) != 0x55 || (b.get(511) & 0xff) != 0xaa)
+            throw new IOException("missing boot sector signature");
 
         final ExFatSuperBlock result = new ExFatSuperBlock(fs);
 

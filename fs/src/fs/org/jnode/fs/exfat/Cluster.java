@@ -30,22 +30,22 @@ final class Cluster {
     /**
      * Marks a cluster containing a bad block.
      */
-    private final static long BAD = 0xfffffff7l;
+    private static final long BAD = 0xfffffff7l;
 
     /**
      * Marks the final cluster of a file or directory.
      */
-    private final static long END = 0xffffffffl;
+    private static final long END = 0xffffffffl;
 
     /**
      * The first data cluster that can be used on exFAT file systems.
      */
-    public final static long FIRST_DATA_CLUSTER = 2;
+    public static final long FIRST_DATA_CLUSTER = 2;
 
     /**
      * The size of an exFAT cluster in blocks.
      */
-    public final static int SIZE = 4;
+    public static final int SIZE = 4;
 
     public static boolean invalid(long cluster) {
         return ((cluster == END) || (cluster == BAD));

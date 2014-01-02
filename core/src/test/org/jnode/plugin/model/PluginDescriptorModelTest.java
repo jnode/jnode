@@ -42,7 +42,11 @@ public class PluginDescriptorModelTest {
     @Before
     public void setUp() throws PluginException {
         XMLElement element = new XMLElement();
-        element.parseString("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plugin SYSTEM \"jnode.dtd\"><plugin id=\"model1\" name=\"model1 name\" version=\"version\" provider-name=\"provider\" license-name=\"lgpl\"><requires><import plugin=\"plug1\"/><import plugin=\"plug2\"/></requires><runtime><library name=\"plugin.jar\"><export name=\"content.*\"/></library></runtime><extension point=\"extension\"><alias name=\"alias\" class=\"class\"/></extension></plugin>");
+        element.parseString("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plugin SYSTEM \"jnode.dtd\">" +
+        "<plugin id=\"model1\" name=\"model1 name\" version=\"version\" provider-name=\"provider\" license-name=" +
+        "\"lgpl\"><requires><import plugin=\"plug1\"/><import plugin=\"plug2\"/></requires><runtime><library " +
+        "name=\"plugin.jar\"><export name=\"content.*\"/></library></runtime><extension point=\"extension\">" +
+        "<alias name=\"alias\" class=\"class\"/></extension></plugin>");
         model = new PluginDescriptorModel(element);
     }
 

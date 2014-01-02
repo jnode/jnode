@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs;
 
 import java.io.File;
@@ -67,7 +67,7 @@ public class FileSystemTestUtils {
     /**
      * Explodes a GZIP file to a file.
      *
-     * @param gzipFile the source GZIP file.
+     * @param gzipFile   the source GZIP file.
      * @param outputFile the destination file.
      * @throws java.io.IOException if there was an error exploding the GZIP file.
      */
@@ -85,12 +85,10 @@ public class FileSystemTestUtils {
                 OutputStream out = new FileOutputStream(tempFile);
                 try {
                     FileUtils.copy(in, out, new byte[0x10000], false);
-                }
-                finally {
+                } finally {
                     out.close();
                 }
-            }
-            finally {
+            } finally {
                 in.close();
             }
 

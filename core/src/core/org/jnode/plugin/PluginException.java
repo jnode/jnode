@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin;
 
 /**
@@ -28,11 +28,11 @@ package org.jnode.plugin;
 public class PluginException extends Exception {
 
     /**
-	 * Serialization
-	 */
-	private static final long serialVersionUID = 173965793309418665L;
+     * Serialization
+     */
+    private static final long serialVersionUID = 173965793309418665L;
 
-	/**
+    /**
      *
      */
     public PluginException() {

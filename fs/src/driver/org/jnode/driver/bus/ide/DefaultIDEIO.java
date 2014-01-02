@@ -17,13 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide;
 
 import java.security.PrivilegedExceptionAction;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
@@ -376,16 +374,16 @@ public class DefaultIDEIO implements IDEIO {
      */
     public void waitUntilStatus(int mask, int value, long timeout, String message) throws TimeoutException {
         while ((getAltStatusReg() & mask) != value) {
-        	final int state = getAltStatusReg();
-        	if ((state & ST_ERROR) != 0) {
-        		throw new TimeoutException("IDE error " + NumberUtils.hex(getErrorReg(), 2));
-        	}
+            final int state = getAltStatusReg();
+            if ((state & ST_ERROR) != 0) {
+                throw new TimeoutException("IDE error " + NumberUtils.hex(getErrorReg(), 2));
+            }
             if (timeout <= 0) {
                 throw new TimeoutException((message != null) ? message : "Timeout in waitUntilStatus");
             }
             TimeUtils.sleep(10);
             timeout -= 10;
-        }    	    	
+        }
     }
 
     private IOResource claimPorts(final ResourceManager rm,
@@ -393,10 +391,10 @@ public class DefaultIDEIO implements IDEIO {
         throws ResourceNotFreeException, DriverException {
         try {
             return AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction<IOResource>() {
-                    public IOResource run() throws ResourceNotFreeException {
-                        return rm.claimIOResource(owner, low, length);
-                    }
-                });
+                public IOResource run() throws ResourceNotFreeException {
+                    return rm.claimIOResource(owner, low, length);
+                }
+            });
         } catch (ResourceNotFreeException ex) {
             throw ex;
         } catch (Exception ex) {

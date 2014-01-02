@@ -61,7 +61,7 @@ final class EntryTimes {
         return new EntryTimes(created, modified, accessed);
     }
 
-    private final static int EXFAT_EPOCH = 1980;
+    private static final int EXFAT_EPOCH = 1980;
 
     private static Date exfatToUnix(
         int date, int time, int cs, int tzOffset) throws IOException {
