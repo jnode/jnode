@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ftpfs;
 
 import com.enterprisedt.net.ftp.FTPFile;
@@ -75,7 +75,7 @@ public abstract class FTPFSEntry implements FSEntry {
     /**
      * Gets the last modification time of this entry.
      *
-	 * @return the last modification time, in milliseconds since January 1, 1970 UTC.
+     * @return the last modification time, in milliseconds since January 1, 1970 UTC.
      * @throws java.io.IOException
      */
 
@@ -85,17 +85,17 @@ public abstract class FTPFSEntry implements FSEntry {
     }
 
     /**
-	 * <p>Gets the last access time of this entry.</p>
-	 *
-	 * <p>This implementation returns <code>0</code> as the FTP library has no means of
-	 *    obtaining the access time.</p>
-	 *
-	 * @return the last access time, in milliseconds since January 1, 1970 UTC.
-	 * @throws IOException
-	 */
-	public long getLastAccessed() throws IOException {
-		return 0;
-	}
+     * <p>Gets the last access time of this entry.</p>
+     * <p/>
+     * <p>This implementation returns <code>0</code> as the FTP library has no means of
+     * obtaining the access time.</p>
+     *
+     * @return the last access time, in milliseconds since January 1, 1970 UTC.
+     * @throws IOException
+     */
+    public long getLastAccessed() throws IOException {
+        return 0;
+    }
 
     /**
      * Gets the name of this entry.
@@ -138,7 +138,7 @@ public abstract class FTPFSEntry implements FSEntry {
     /**
      * Sets the last modification time of this entry.  This implementation does nothing.
      *
-	 * @param lastModified the new last modification time.
+     * @param lastModified the new last modification time.
      * @throws java.io.IOException
      */
     public void setLastModified(long lastModified) throws IOException {
@@ -146,12 +146,12 @@ public abstract class FTPFSEntry implements FSEntry {
     }
 
     /**
-	 * Sets the last access time of this entry.  This implementation does nothing.
-	 *
-	 * @param lastAccessed the new last access time.
-	 */
-	public void setLastAccessed(long lastAccessed) {
-	}
+     * Sets the last access time of this entry.  This implementation does nothing.
+     *
+     * @param lastAccessed the new last access time.
+     */
+    public void setLastAccessed(long lastAccessed) {
+    }
 
     /**
      * Sets the name of this entry.

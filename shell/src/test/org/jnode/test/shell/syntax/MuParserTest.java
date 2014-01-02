@@ -188,11 +188,9 @@ public class MuParserTest {
     public void testStatelessParsing6() throws NoTokensAvailableException, CommandSyntaxException {
         // <root> ::= ( ( 'a' <root> ) | ( 'b' 'c' ) ) | ( ( 'a' <root> ) | 'b'
         // ) )
-        MuSyntax syntax =
-                new MuAlternation("root", new MuAlternation(new MuSequence(new MuSymbol("a"),
-                        new MuBackReference("root")), new MuSequence(new MuSymbol("b"),
-                        new MuSymbol("c"))), new MuAlternation(new MuSequence(new MuSymbol("a"),
-                        new MuBackReference("root")), new MuSymbol("b")));
+        MuSyntax syntax = new MuAlternation("root", new MuAlternation(new MuSequence(new MuSymbol("a"),
+            new MuBackReference("root")), new MuSequence(new MuSymbol("b"), new MuSymbol("c"))),
+            new MuAlternation(new MuSequence(new MuSymbol("a"), new MuBackReference("root")), new MuSymbol("b")));
         MuParser parser = new MuParser();
         CommandLine cl;
 

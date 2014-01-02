@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.arp;
 
 import java.net.SocketException;
@@ -33,8 +33,8 @@ import org.jnode.net.ipv4.IPv4Address;
  * @author epr
  */
 public class ARPHeader implements NetworkLayerHeader {
-    
-    private final static int ARP_DATA_LENGTH = 28;
+
+    private static final int ARP_DATA_LENGTH = 28;
 
     private HardwareAddress sourceHardwareAddress;
     private ProtocolAddress sourceProtocolAddress;
@@ -48,7 +48,7 @@ public class ARPHeader implements NetworkLayerHeader {
 
     /**
      * Create a new instance
-     * 
+     *
      * @param srcHWAddress
      * @param srcPAddress
      * @param targetHWAddress
@@ -58,8 +58,8 @@ public class ARPHeader implements NetworkLayerHeader {
      * @param ptype
      */
     public ARPHeader(HardwareAddress srcHWAddress, ProtocolAddress srcPAddress,
-            HardwareAddress targetHWAddress, ProtocolAddress targetPAddress, ARPOperation op, int hwtype,
-            int ptype, int hwSize, int pSize) {
+                     HardwareAddress targetHWAddress, ProtocolAddress targetPAddress, ARPOperation op, int hwtype,
+                     int ptype, int hwSize, int pSize) {
         this.sourceHardwareAddress = srcHWAddress;
         this.sourceProtocolAddress = srcPAddress;
         this.destinationHardwareAddress = targetHWAddress;
@@ -73,7 +73,7 @@ public class ARPHeader implements NetworkLayerHeader {
 
     /**
      * Create a new packet from a socketbuffer
-     * 
+     *
      * @param skbuf
      */
     public ARPHeader(SocketBuffer skbuf) throws SocketException {
@@ -101,7 +101,7 @@ public class ARPHeader implements NetworkLayerHeader {
 
     /**
      * Write this packet to the given buffer
-     * 
+     *
      * @param skbuf
      */
     public void prefixTo(SocketBuffer skbuf) {
@@ -126,10 +126,10 @@ public class ARPHeader implements NetworkLayerHeader {
      * Finalize the header in the given buffer. This method is called when all
      * layers have set their header data and can be used e.g. to update checksum
      * values.
-     * 
-     * @param skbuf The buffer
+     *
+     * @param skbuf  The buffer
      * @param offset The offset to the first byte (in the buffer) of this header
-     *            (since low layer headers are already prefixed)
+     *               (since low layer headers are already prefixed)
      */
     public void finalizeHeader(SocketBuffer skbuf, int offset) {
         // Do nothing
@@ -201,18 +201,17 @@ public class ARPHeader implements NetworkLayerHeader {
     public ProtocolAddress getTargetPAddress() {
         return destinationProtocolAddress;
     }
-    
+
     public int getHardwareAddressSize() {
-		return hardwareAddressSize;
-	}
-    
+        return hardwareAddressSize;
+    }
+
     public int getProtocolAddressSize() {
-		return protocolAddressSize;
-	}
+        return protocolAddressSize;
+    }
 
     /**
      * Swap the two src and target addresses
-     * 
      */
     public void swapAddresses() {
         final HardwareAddress hwTmp = destinationHardwareAddress;
@@ -225,7 +224,6 @@ public class ARPHeader implements NetworkLayerHeader {
 
 
     /**
-     *
      * @param operation
      */
     public void setOperation(ARPOperation operation) {
