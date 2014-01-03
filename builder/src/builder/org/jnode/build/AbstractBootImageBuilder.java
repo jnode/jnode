@@ -1393,6 +1393,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 }
                 classNames.add(line);
             }
+            br.close();
         } catch (IOException ex) {
             throw new BuildException("Error reading '" + file + "'", ex);
         } finally {

@@ -210,7 +210,7 @@ public final class TestManager implements ExtensionPointListener {
     private <T extends Test> void addTest(List<Class<? extends T>> list,
                                           ConfigurationElement e, PluginDescriptor desc) {
         String className = e.getAttribute("class");
-        Class<T> clazz = (Class<T>) loadClass(className, desc);
+        Class<T> clazz = loadClass(className, desc);
         if (clazz != null) {
             list.add(clazz);
             log.debug("adding class " + className);

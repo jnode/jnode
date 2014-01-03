@@ -52,7 +52,7 @@ public class NanoHTTPDCommand extends AbstractCommand {
             }
 
         };
-
+        
         while (true) {
             try {
                 Thread.sleep(250);

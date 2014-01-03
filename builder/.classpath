@@ -7,12 +7,12 @@
 	<classpathentry kind="lib" path="/core/lib/ant.jar"/>
 	<classpathentry kind="src" path="/shell"/>
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
-	<classpathentry kind="lib" path="lib/bcel-5.1.jar"/>
 	<classpathentry kind="lib" path="/shell/lib/nanoxml-2.2.3.jar"/>
 	<classpathentry kind="lib" path="/all/lib/classlib.jar" sourcepath="/all/lib/classlib-src.jar"/>
 	<classpathentry kind="lib" path="/core/lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="/core/lib/asm-attrs-1.5.3.jar"/>
 	<classpathentry kind="lib" path="/core/lib/asm-1.5.3.jar"/>
 	<classpathentry kind="lib" path="/core/lib/asm-util-1.5.3.jar"/>
+	<classpathentry kind="lib" path="lib/bcel-5.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

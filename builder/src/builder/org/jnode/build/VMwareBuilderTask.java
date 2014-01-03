@@ -224,6 +224,7 @@ public class VMwareBuilderTask extends Task {
                     Object value = props.get(key);
                     w.println(key + " = \"" + value + "\"");
                 }
+                w.close();
             } finally {
                 out.close();
             }
