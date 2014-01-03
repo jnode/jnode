@@ -4,7 +4,6 @@
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/configure"/>
 	<classpathentry kind="src" path="/core"/>
 	<classpathentry kind="src" path="/fs"/>
-	<classpathentry kind="lib" path="/core/lib/ant.jar"/>
 	<classpathentry kind="src" path="/shell"/>
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="/shell/lib/nanoxml-2.2.3.jar"/>
@@ -14,5 +13,6 @@
 	<classpathentry kind="lib" path="/core/lib/asm-1.5.3.jar"/>
 	<classpathentry kind="lib" path="/core/lib/asm-util-1.5.3.jar"/>
 	<classpathentry kind="lib" path="lib/bcel-5.1.jar"/>
+	<classpathentry kind="lib" path="/core/lib/ant-1.9.2.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
