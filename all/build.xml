@@ -80,15 +80,15 @@
 	<property name="classlib-src.jar" value="${root.dir}/all/lib/classlib-src.jar"/>
 	<property name="ant.jar" value="${root.dir}/core/lib/ant.jar"/>
 	<property name="ant-launcher.jar" value="${root.dir}/core/lib/ant-launcher.jar"/>
-	<property name="commons-net.jar" value="${root.dir}/core/lib/commons-net-1.1.0.jar"/>
-	<property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-1.6.6.jar"/>
-	<property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.24.jar"/>
+	<property name="commons-net.jar" value="${root.dir}/core/lib/commons-net-3.3.jar"/>
+	<property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-2.1.6.jar"/>
+	<property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.50.jar"/>
 	<property name="junit.jar" value="${root.dir}/core/lib/junit-4.5.jar"/>
 	<property name="mmtk.jar" value="${root.dir}/core/lib/mmtk/mmtk.jar"/>
 	<property name="mauve.jar" value="${root.dir}/core/lib/mauve.jar"/>
-	<property name="edtftpj.jar" value="${root.dir}/fs/lib/edtftpj-1.5.2.jar"/>
-	<property name="jcifs.jar" value="${root.dir}/fs/lib/jcifs-1.2.6.jar"/>
-	<property name="ejc.jar" value="${root.dir}/core/lib/ejc-3.1.1.jar"/>
+	<property name="edtftpj.jar" value="${root.dir}/fs/lib/edtftpj.jar"/>
+	<property name="jcifs.jar" value="${root.dir}/fs/lib/jcifs-1.3.17.jar"/>
+	<property name="ejc.jar" value="${root.dir}/core/lib/ecj-4.2.2.jar"/>
 	<property name="oncrpc.jar" value="${root.dir}/net/lib/oncrpc.jar"/>
 	<property name="telnetd.jar" value="${root.dir}/distr/lib/telnetd.jar" />
 	<property name="commons-logging.jar" value="${root.dir}/distr/lib/commons-logging.jar" />
@@ -114,9 +114,9 @@
 	<property name="asm-attrs.jar" value="${root.dir}/core/lib/asm-attrs-1.5.3.jar"/>
 	<property name="asm-util.jar" value="${root.dir}/core/lib/asm-util-1.5.3.jar"/>
 
-	<property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
+	<property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.17.jar"/>
 	<property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b5.jar"/>
-	<property name="js.jar" value="${root.dir}/shell/lib/rhino1.6r5-jsr223.jar"/>
+	<property name="js.jar" value="${root.dir}/shell/lib/rhino-1.7R4.jar"/>
 
 	<!-- libraries needed to check plugin dependencies -->
 	<property name="bcel-5.1.jar" value="${root.dir}/builder/lib/bcel-5.1.jar" />
