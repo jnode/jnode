@@ -17,10 +17,9 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem;
 
-import org.jnode.fs.service.def.FileSystemManagerTest;
 import org.jnode.test.fs.ext4.Ext4FileSystemTest;
 import org.jnode.test.fs.filesystem.tests.BasicFSTest;
 import org.jnode.test.fs.filesystem.tests.ConcurrentAccessFSTest;
@@ -34,24 +33,24 @@ import org.junit.runners.Suite.SuiteClasses;
 /**
  * This class runs a suite of functional tests on the JNode file system
  * implementation.  The tests are designed to be run from the JNode development
- * sandbox.  The JNode core project needs to be on the bootclasspath to avoid 
+ * sandbox.  The JNode core project needs to be on the bootclasspath to avoid
  * classloader security problems.
- * 
+ *
  * @author Fabien DUMINY
  * @author crawley@jnode.org
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    BasicFSTest.class, 
+    BasicFSTest.class,
     ConcurrentAccessFSTest.class,
     FileFSTest.class,
     TreeFSTest.class,
     /*FileSystemManagerTest.class,*/
     Ext4FileSystemTest.class,
     NTFSFileSystemTest.class,
-    }
+}
 )
 public class FSTestSuite {
-    
+
 } 
 

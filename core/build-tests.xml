@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    $Id$
+
+    Copyright (C) 2003-2014 JNode.org
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this library; If not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+<project name="JNode-Core-Tests" default="all" basedir=".">
+
+	<import file="${basedir}/../all/build.xml"/>
+
+	<target name="help" description="output target descriptions">
+		<echo>
+The main targets (tests) for this build are as follows:
+all   	     Runs all tests for this project
+all-junit    Runs all JUnit tests for this project
+help         Output these messages
+		</echo>
+	</target>
+
+	<target name="all-junit">
+		<delete dir="${basedir}/build/reports/junit"/>
+		<mkdir dir="${basedir}/build/reports/junit"/>
+		<junit showoutput="off" printsummary="on" fork="on" haltonfailure="on">
+			<classpath refid="cp-test"/>
+			<formatter type="xml"/>
+            <test name="org.jnode.test.CoreTestSuite" todir="${basedir}/build/reports/junit"/>
+        </junit>
+	</target>
+
+	<target name="all" depends="all-junit" />
+
+</project>
+
+

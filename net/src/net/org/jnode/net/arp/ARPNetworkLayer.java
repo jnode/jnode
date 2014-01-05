@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.arp;
 
 import java.net.SocketException;
@@ -47,24 +47,26 @@ import org.jnode.vm.objects.Statistics;
  */
 @SharedStatics
 public class ARPNetworkLayer implements NetworkLayer {
-	
-	private static final int IPv4_PROTOCOL_SIZE = 4;
 
-	/** Delay between ARP requests in millisecond */
+    private static final int IPv4_PROTOCOL_SIZE = 4;
+
+    /**
+     * Delay between ARP requests in millisecond
+     */
     public static final int ARP_REQUEST_DELAY = 1500;
 
     /**
      * My logger
      */
     private static final Logger log = Logger.getLogger(ARPNetworkLayer.class);
-    
+
     private static final boolean DEBUG = false;
-    
+
     /**
      * My statistics
      */
     private final ARPStatistics stat = new ARPStatistics();
-    
+
     /**
      * ARP cache
      */
@@ -325,7 +327,9 @@ public class ARPNetworkLayer implements NetworkLayer {
         final int hwtype = srcHwAddr.getType();
         final int ptype = address.getType();
 
-        final ARPHeader hdr = new ARPHeader(srcHwAddr, myAddress, trgHwAddr, address, op, hwtype, ptype,EthernetConstants.ETH_ALEN,IPv4_PROTOCOL_SIZE);
+        final ARPHeader hdr =
+            new ARPHeader(srcHwAddr, myAddress, trgHwAddr, address, op, hwtype, ptype, EthernetConstants.ETH_ALEN,
+                IPv4_PROTOCOL_SIZE);
         final SocketBuffer skbuf = new SocketBuffer();
         skbuf.setProtocolID(EthernetConstants.ETH_P_ARP);
         hdr.prefixTo(skbuf);

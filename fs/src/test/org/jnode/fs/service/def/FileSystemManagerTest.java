@@ -17,21 +17,19 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.service.def;
+
+import java.util.Collection;
+import org.jnode.driver.Device;
+import org.jnode.fs.FileSystem;
+import org.junit.Before;
+import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.util.Collection;
-
-import org.jnode.driver.Device;
-import org.jnode.fs.FileSystem;
-import org.jnode.fs.service.def.FileSystemManager;
-import org.junit.Before;
-import org.junit.Test;
 
 public class FileSystemManagerTest {
 
@@ -49,29 +47,29 @@ public class FileSystemManagerTest {
 
     @Test
     public void testUnregisterFileSystem() throws Exception {
-    	fsm.registerFileSystem(fs);
-    	FileSystem<?> result = fsm.unregisterFileSystem(device);
+        fsm.registerFileSystem(fs);
+        FileSystem<?> result = fsm.unregisterFileSystem(device);
         assertNotNull(result);
     }
 
     @Test
     public void testGetFileSystem() throws Exception {
-    	fsm.registerFileSystem(fs);
-    	FileSystem<?> result = fsm.getFileSystem(device);
-    	assertNotNull(result);
+        fsm.registerFileSystem(fs);
+        FileSystem<?> result = fsm.getFileSystem(device);
+        assertNotNull(result);
     }
 
     @Test
     public void testFileSystems() throws Exception {
-    	fsm.registerFileSystem(fs);
+        fsm.registerFileSystem(fs);
         Collection<FileSystem<?>> result = fsm.fileSystems();
         assertNotNull(result);
-        assertEquals(1,result.size());
-        
+        assertEquals(1, result.size());
+
         fsm.unregisterFileSystem(device);
-        
+
         result = fsm.fileSystems();
         assertNotNull(result);
-        assertEquals(0,result.size());
-    }       
+        assertEquals(0, result.size());
+    }
 }

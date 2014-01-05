@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.permission;
 
 import java.security.BasicPermission;
@@ -35,12 +35,12 @@ import java.security.BasicPermission;
  */
 public class JNodePermission extends BasicPermission {
 
-	/**
-	 * Serialization
-	 */
-	private static final long serialVersionUID = -4640568385065658738L;
+    /**
+     * Serialization
+     */
+    private static final long serialVersionUID = -4640568385065658738L;
 
-	/**
+    /**
      * @param name
      */
     public JNodePermission(String name) {

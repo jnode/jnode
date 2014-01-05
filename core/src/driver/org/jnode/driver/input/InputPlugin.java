@@ -17,25 +17,24 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input;
 
 import javax.naming.NamingException;
-
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 
 /**
- * The input plugin defines an extension point that is used to 
+ * The input plugin defines an extension point that is used to
  * register keyboard interpreters, and hosts the keyboard layout manager.
- * 
+ *
  * @author crawley@jnode.org
  * @author epr@jnode.org
  */
 public class InputPlugin extends Plugin {
-    
+
     public InputPlugin(PluginDescriptor descriptor) {
         super(descriptor);
     }
@@ -43,12 +42,13 @@ public class InputPlugin extends Plugin {
     @Override
     protected void startPlugin() throws PluginException {
         try {
-        	PluginDescriptor descriptor = getDescriptor();
-        	
-        	KeyboardLayoutManager klmgr = new KeyboardLayoutManager(descriptor.getExtensionPoint("keyboard-layouts"));
+            PluginDescriptor descriptor = getDescriptor();
+
+            KeyboardLayoutManager klmgr = new KeyboardLayoutManager(descriptor.getExtensionPoint("keyboard-layouts"));
             InitialNaming.bind(KeyboardLayoutManager.NAME, klmgr);
-            
-            MouseProtocolHandlerManager mphmgr = new MouseProtocolHandlerManager(descriptor.getExtensionPoint("mouse-protocol-handlers"));
+
+            MouseProtocolHandlerManager mphmgr =
+                new MouseProtocolHandlerManager(descriptor.getExtensionPoint("mouse-protocol-handlers"));
             InitialNaming.bind(MouseProtocolHandlerManager.NAME, mphmgr);
         } catch (NamingException ex) {
             throw new PluginException(ex);

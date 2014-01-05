@@ -17,13 +17,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.channels.ByteChannel;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceException;
@@ -33,7 +32,8 @@ import org.jnode.driver.DriverException;
 /**
  * @author qades
  */
-public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerEvent> implements PointerAPI, DeviceInfoAPI {
+public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerEvent>
+    implements PointerAPI, DeviceInfoAPI {
 
     /**
      * My logger
@@ -131,7 +131,7 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
      * Send a given pointer event to the given listener.
      *
      * @param listener the pointer listener to recieve the event
-     * @param event the pointer event
+     * @param event    the pointer event
      */
     @Override
     protected void sendEvent(SystemListener listener, PointerEvent event) {
@@ -163,15 +163,16 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
      * @param out
      */
     public void showInfo(PrintWriter out) {
-    	if (interpreter != null) {
-    		interpreter.showInfo(out);
-    	} else {
-    		out.println("No pointer interpreter registered.");
-    	}
+        if (interpreter != null) {
+            interpreter.showInfo(out);
+        } else {
+            out.println("No pointer interpreter registered.");
+        }
     }
 
     /**
      * Gets the ID of the pointer device.
+     *
      * @return
      * @throws DriverException
      */
@@ -179,6 +180,7 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
 
     /**
      * Initialize the pointer to it's default values.
+     *
      * @return
      * @throws DeviceException
      */
@@ -186,6 +188,7 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
 
     /**
      * Enable pointer events
+     *
      * @return
      * @throws DeviceException
      */
@@ -193,6 +196,7 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
 
     /**
      * Disable pointer events
+     *
      * @return
      * @throws DeviceException
      */
@@ -200,6 +204,7 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
 
     /**
      * Set the sample rate (number of packets the mouse can send per second)
+     *
      * @param samples
      * @return
      * @throws DeviceException

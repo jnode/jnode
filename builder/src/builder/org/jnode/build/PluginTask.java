@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build;
 
 import java.io.File;
@@ -29,7 +29,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.taskdefs.Jar;
@@ -51,7 +50,7 @@ public class PluginTask extends AbstractPluginTask {
     private LinkedList<ZipFileSet> descriptorSets = new LinkedList<ZipFileSet>();
     private File todir;
     private File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-    
+
     private PluginBuilder packager;
 
     public ZipFileSet createDescriptors() {
@@ -94,7 +93,7 @@ public class PluginTask extends AbstractPluginTask {
                 }
             }
         };
-        
+
         final Map<String, File> descriptors = new HashMap<String, File>();
         for (FileSet fs : descriptorSets) {
             final DirectoryScanner ds = fs.getDirectoryScanner(getProject());
@@ -111,18 +110,18 @@ public class PluginTask extends AbstractPluginTask {
         if (packager != null) {
             packager.execute(executor, descriptors);
         }
-        
+
         executor.shutdown();
         try {
             executor.awaitTermination(10, TimeUnit.MINUTES);
         } catch (InterruptedException ie) {
             throw new RuntimeException("Building plugins interrupted");
         }
-        
+
         if (failure.get()) {
             throw new RuntimeException("At least one plugin task failed : see above errors");
         }
-        
+
         if (packager != null) {
             // that must be called after completion of all plugin tasks
             packager.finish();
@@ -148,8 +147,8 @@ public class PluginTask extends AbstractPluginTask {
 
         // Check if we have to do something
         if (isUpToDate(descriptor, descr, destFile))
-        	return;
-        
+            return;
+
         final Jar jarTask = new Jar();
         jarTask.setProject(getProject());
         jarTask.setTaskName(getTaskName());
@@ -191,33 +190,34 @@ public class PluginTask extends AbstractPluginTask {
 
         jarTask.execute();
     }
-    
+
     /**
      * Is the given destination file up to date with respect to it's sources?
+     *
      * @param descriptor
      * @param descr
      * @param destFile
      * @return
      */
     private boolean isUpToDate(File descriptor, PluginDescriptor descr, File destFile) {
-    	if (!destFile.exists())
-    		return false;
-    	long destLastModified = destFile.lastModified();
-    	
-    	if (descriptor.lastModified() > destLastModified)
-    		return false;
+        if (!destFile.exists())
+            return false;
+        long destLastModified = destFile.lastModified();
+
+        if (descriptor.lastModified() > destLastModified)
+            return false;
 
         // Check runtime resources
         final Runtime rt = descr.getRuntime();
         if (rt != null) {
-        	for (Library lib : rt.getLibraries()) {
-        		File libFile = getLibraryFile(lib, getPluginDir());
-        		if (libFile.lastModified() > destLastModified)
-        			return false;
-        	}
+            for (Library lib : rt.getLibraries()) {
+                File libFile = getLibraryFile(lib, getPluginDir());
+                if (libFile.lastModified() > destLastModified)
+                    return false;
+            }
         }
 
-    	return true;
+        return true;
     }
 
     /**
@@ -232,7 +232,7 @@ public class PluginTask extends AbstractPluginTask {
 
         mf.addConfiguredAttribute(new Manifest.Attribute("Bundle-SymbolicName", descr.getId()));
         mf.addConfiguredAttribute(new Manifest.Attribute("Bundle-ManifestVersion", "2"));
-        mf.addConfiguredAttribute(new Manifest.Attribute("Bundle-Version", descr.getVersion()));
+        mf.addConfiguredAttribute(new Manifest.Attribute("Bundle-Version", descr.getVersion().toString()));
 
         return mf;
     }

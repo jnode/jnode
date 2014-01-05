@@ -17,12 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide;
 
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Bus;
 import org.jnode.driver.Device;
@@ -345,6 +344,7 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
 
     /**
      * Process an IDE command from our queue.
+     *
      * @see org.jnode.util.QueueProcessor#process(java.lang.Object)
      */
     public void process(IDECommand cmd) /*throws Exception*/ {
@@ -379,16 +379,16 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
 
         this.currentCommand = cmd;
         try {
-        	io.getStatusReg(); // Flush any pending IRQ
+            io.getStatusReg(); // Flush any pending IRQ
             cmd.setup(IDEBus.this, io);
         } catch (TimeoutException ex) {
             log.error("Timeout in setup of " + cmd + ": " + ex.getMessage());
             if ((io.getAltStatusReg() & ST_ERROR) != 0) {
-            	cmd.setError(io.getErrorReg());
+                cmd.setError(io.getErrorReg());
             } else {
-            	cmd.setError(ERR_ABORT);
+                cmd.setError(ERR_ABORT);
             }
             this.currentCommand = null;
         }
-    }    
+    }
 }

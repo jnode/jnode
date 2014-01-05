@@ -210,12 +210,6 @@ public class ReaderInputStreamTest {
     public void testBadUnicode2() throws Exception {
         char[] chars = new char[] {'a', '\ud800'};
         final String LINE = new String(chars);
-        {
-            Reader r = new StringReader(LINE.substring(0, 1));
-            ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
-            InputStreamReader isr = new InputStreamReader(ris);
-            Assert.assertEquals(chars[0], isr.read());
-        }
         try {
             Reader r = new StringReader(LINE.substring(1));
             ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
@@ -225,6 +219,11 @@ public class ReaderInputStreamTest {
         } catch (MalformedInputException ex) {
             // expected
         }
+
+        Reader r = new StringReader(LINE.substring(0, 1));
+        ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
+        InputStreamReader isr = new InputStreamReader(ris);
+        Assert.assertEquals(chars[0], isr.read());
     }
 
     @Test

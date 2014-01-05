@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide.command;
 
 import org.jnode.driver.bus.ide.IDEBus;
@@ -35,8 +35,8 @@ public abstract class IDERWSectorsCommand extends IDECommand {
     protected final int sectorCount;
     protected final boolean is48bit;
 
-	public IDERWSectorsCommand(boolean primary, boolean master,
-			boolean is48bit, long lbaStart, int sectorCount) {
+    public IDERWSectorsCommand(boolean primary, boolean master,
+                               boolean is48bit, long lbaStart, int sectorCount) {
         super(primary, master);
         this.is48bit = is48bit;
         this.lbaStart = lbaStart;
@@ -67,57 +67,58 @@ public abstract class IDERWSectorsCommand extends IDECommand {
         final int select = SEL_LBA | getSelect();
         io.waitUntilStatus(ST_BUSY, 0, IDE_TIMEOUT, "before selectDevice");
         selectDevice(io);
-               
+
         if (is48bit) {
             io.setSelectReg(select);
-        	io.setFeatureReg(0); 
-        	io.setFeatureReg(0); // indeed, twice
-        	io.setSectorCountReg((sectorCount >> 8) & 0xFF);
+            io.setFeatureReg(0);
+            io.setFeatureReg(0); // indeed, twice
+            io.setSectorCountReg((sectorCount >> 8) & 0xFF);
             io.setLbaLowReg((int) ((lbaStart >> 24) & 0xFF));
             io.setLbaMidReg((int) ((lbaStart >> 32) & 0xFF));
             io.setLbaHighReg((int) ((lbaStart >> 40) & 0xFF));
-        	io.setSectorCountReg((sectorCount >> 0) & 0xFF);
+            io.setSectorCountReg((sectorCount >> 0) & 0xFF);
             io.setLbaLowReg((int) ((lbaStart >> 0) & 0xFF));
             io.setLbaMidReg((int) ((lbaStart >> 8) & 0xFF));
             io.setLbaHighReg((int) ((lbaStart >> 16) & 0xFF));
         } else {
-        	// 28-bit addressing
+            // 28-bit addressing
             io.setSelectReg(select | ((int) (lbaStart >> 24) & 0xF));
-        	io.setFeatureReg(0); 
-        	io.setSectorCountReg((sectorCount >> 0) & 0xFF);
+            io.setFeatureReg(0);
+            io.setSectorCountReg((sectorCount >> 0) & 0xFF);
             io.setLbaLowReg((int) ((lbaStart >> 0) & 0xFF));
             io.setLbaMidReg((int) ((lbaStart >> 8) & 0xFF));
             io.setLbaHighReg((int) ((lbaStart >> 16) & 0xFF));
         }
     }
-	
-	/**
-	 * Poll waiting.
-	 * @return true if waiting succeeded, false in case of an error.
-	 */
-	protected final boolean pollWait(IDEIO io, boolean checkState) throws TimeoutException {
-		// Force a 400ns wait
-		for (int i = 0; i < 4; i++) {
-			io.getAltStatusReg(); // This wastes 100ns
-		}
-		// Wait for BUSY to be cleared
-		io.waitUntilStatus(ST_BUSY, 0, IDE_DATA_XFER_TIMEOUT, "pollWait");
-		// Check state
-		if (checkState) {
-			final int state = io.getStatusReg();
-			if ((state & ST_ERROR) != 0) {
-				setError(io.getErrorReg());
-				return false;
-			}
-			if ((state & ST_DEVICE_FAULT) != 0) {
-				setError(ERR_ABORT);
-				return false;
-			}
-			if ((state & ST_DEVICE_READY) == 0) {
-				setError(ERR_ABORT);
-				return false;
-			}
-		}
-		return true;
-	}
+
+    /**
+     * Poll waiting.
+     *
+     * @return true if waiting succeeded, false in case of an error.
+     */
+    protected final boolean pollWait(IDEIO io, boolean checkState) throws TimeoutException {
+        // Force a 400ns wait
+        for (int i = 0; i < 4; i++) {
+            io.getAltStatusReg(); // This wastes 100ns
+        }
+        // Wait for BUSY to be cleared
+        io.waitUntilStatus(ST_BUSY, 0, IDE_DATA_XFER_TIMEOUT, "pollWait");
+        // Check state
+        if (checkState) {
+            final int state = io.getStatusReg();
+            if ((state & ST_ERROR) != 0) {
+                setError(io.getErrorReg());
+                return false;
+            }
+            if ((state & ST_DEVICE_FAULT) != 0) {
+                setError(ERR_ABORT);
+                return false;
+            }
+            if ((state & ST_DEVICE_READY) == 0) {
+                setError(ERR_ABORT);
+                return false;
+            }
+        }
+        return true;
+    }
 }

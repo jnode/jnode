@@ -49,7 +49,7 @@ public class LogitechProtocol implements MouseProtocolHandler {
         
         // In case of overflow, discard this packet
         if ((d0 & BITS_XY_OVFL) != 0)
-        	return null;
+            return null;
         
         final int buttons = d0 & BIT_BUTTON_MASK;
         final int x = (d1 != 0) ? d1 - ((d0 & BIT_X_SIGN) << 4) : 0;

@@ -17,19 +17,21 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs;
 
 import java.util.Map;
 
 /**
  * A FSFileStreams is a representation of a file system file that can have alternative data streams.
+ *
  * @author Luke Quinane
  */
 public interface FSFileStreams extends FSFile {
-	/**
-	 * Gets the map of alternate stream names to their file interface.
-	 * @return the mapping.
-	 */
-	Map<String, FSFile> getStreams();
+    /**
+     * Gets the map of alternate stream names to their file interface.
+     *
+     * @return the mapping.
+     */
+    Map<String, FSFile> getStreams();
 }

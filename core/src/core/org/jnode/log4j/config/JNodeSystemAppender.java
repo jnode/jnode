@@ -17,35 +17,34 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.log4j.config;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
-
 import org.apache.log4j.Layout;
 import org.apache.log4j.WriterAppender;
 
 /**
  * Custom Log4j appender class for appending to the current System.out or System.err.
- * Unlike {@link org.apache.log4j.ConsoleAppender}, this class tracks the changes to 
- * the System streams.  (This is an interim solution until JNode gets the equivalent 
+ * Unlike {@link org.apache.log4j.ConsoleAppender}, this class tracks the changes to
+ * the System streams.  (This is an interim solution until JNode gets the equivalent
  * of UNIX /dev/console.)
- * 
+ *
  * @author crawley@jnode.org
  */
 public class JNodeSystemAppender extends WriterAppender {
-    
+
     private final Writer writer;
-    
+
     /**
      * Create an appender for a given JNode console.
-     * 
+     *
      * @param layout the appender's initial log message layout.
-     * @param toErr if <code>true</code> output to System.err, otherwise
-     *     output to System.out.
+     * @param toErr  if <code>true</code> output to System.err, otherwise
+     *               output to System.out.
      */
     public JNodeSystemAppender(Layout layout, boolean toErr) {
         super();
@@ -54,7 +53,7 @@ public class JNodeSystemAppender extends WriterAppender {
         this.writer = new SystemStreamWriter(toErr);
         super.setWriter(this.writer);
     }
-    
+
     @Override
     protected void closeWriter() {
         // Ignore the close request.  We don't own the writer.
@@ -72,12 +71,12 @@ public class JNodeSystemAppender extends WriterAppender {
         }
         super.setWriter(writer);
     }
-    
+
     private static class SystemStreamWriter extends Writer {
         private PrintStream myStream;
         private Writer myWriter;
         private final boolean toErr;
-        
+
         public SystemStreamWriter(boolean toErr) {
             this.toErr = toErr;
             this.myStream = toErr ? System.err : System.out;
@@ -98,7 +97,7 @@ public class JNodeSystemAppender extends WriterAppender {
         public void write(char[] cbuf, int off, int len) throws IOException {
             synchronized (this.lock) {
                 @SuppressWarnings("resource")
-				PrintStream currentStream = this.toErr ? System.err : System.out;
+                PrintStream currentStream = this.toErr ? System.err : System.out;
                 if (currentStream != this.myStream) {
                     currentStream = this.myStream;
                     this.myWriter = new OutputStreamWriter(this.myStream);
@@ -107,5 +106,5 @@ public class JNodeSystemAppender extends WriterAppender {
                 this.myWriter.flush();
             }
         }
-    };
+    }
 }

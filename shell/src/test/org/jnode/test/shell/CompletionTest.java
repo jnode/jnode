@@ -17,19 +17,15 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-package org.jnode.test.shell;
 
-import static org.jnode.test.shell.CompletionHelper.checkCompletions;
+package org.jnode.test.shell;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.TreeSet;
-
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.DefaultCommandInvoker;
 import org.jnode.shell.DefaultInterpreter;
@@ -50,6 +46,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.jnode.test.shell.CompletionHelper.checkCompletions;
 
 /**
  * Test command completion using various interpreters and commands.
@@ -143,7 +141,7 @@ public class CompletionTest {
         final String[] propertyCompletions = getExpectedPropertyNameCompletions();
 
         checkCompletions(cs, "set ", propertyCompletions, -1);
-        checkCompletions(cs, "set a", new String[]{ "awt.toolkit "}, -1);
+        checkCompletions(cs, "set a", new String[]{"awt.toolkit "}, -1);
         checkCompletions(cs, "set u", new String[]{
             "user.country ", "user.dir ", "user.home ",
             "user.language ", "user.name ", "user.timezone "}, 4);
@@ -171,7 +169,7 @@ public class CompletionTest {
     private String[] getExpectedPropertyNameCompletions() {
         TreeSet<String> tmp = new TreeSet<String>();
         for (Object key : System.getProperties().keySet()) {
-      		tmp.add(key + " ");
+            tmp.add(key + " ");
         }
         return tmp.toArray(new String[tmp.size()]);
     }

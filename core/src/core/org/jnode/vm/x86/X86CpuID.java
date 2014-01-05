@@ -17,12 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.CpuID;
-import org.jnode.vm.Unsafe;
 import org.vmmagic.unboxed.Word;
 
 /**
@@ -73,7 +72,8 @@ public class X86CpuID extends CpuID {
     public static final long FEAT_TM2 = (1L << 40); // Thermal Monitor 2
     public static final long FEAT_SSSE3 = (1L << 41); // Supplemental SSE3 instructions
     public static final long FEAT_CNXTID = (1L << 42); // Context ID
-    public static final long FEAT_HYPERVISOR = (1L << 63); // Running on a hypervisor (always 0 on a real CPU, but also with some hypervisors)
+    public static final long FEAT_HYPERVISOR = (1L << 63);
+        // Running on a hypervisor (always 0 on a real CPU, but also with some hypervisors)
 
     // Family codes
     public static final int FAM_486 = 0x04;
@@ -152,64 +152,66 @@ public class X86CpuID extends CpuID {
         this.features = data[7];
         this.exFeatures = features | (((long) data[6]) << 32);
     }
-    
+
     /**
      * Load a new CpuID from the current CPU.
+     *
      * @return
      */
     static X86CpuID loadFromCurrentCpu() {
-    	
-    	// Load low values (eax=0)
-    	int[] regs = new int[4];
-    	UnsafeX86.getCPUID(Word.zero(), regs);
-    	
-    	final int count = regs[0] + 1;
-    	int[] data = new int[count * 4];
-    	
-    	int index = 0;
-    	for (int i = 0; i < count; i++) {
-        	UnsafeX86.getCPUID(Word.fromIntZeroExtend(i), regs);
-        	data[index++] = regs[0];
-        	data[index++] = regs[1];
-        	data[index++] = regs[2];
-        	data[index++] = regs[3];    		
-    	}
-    	
-    	// Load extended functions (0x80000000)
-    	String brand = "?";
-    	final Word extendedBase = Word.fromIntZeroExtend(0x80000000);
-    	UnsafeX86.getCPUID(extendedBase, regs);
-    	Word max = Word.fromIntZeroExtend(regs[0]);
-    	if (max.GE(extendedBase.add(4))) {
-    		// Load brand 0x80000002..0x80000004
+
+        // Load low values (eax=0)
+        int[] regs = new int[4];
+        UnsafeX86.getCPUID(Word.zero(), regs);
+
+        final int count = regs[0] + 1;
+        int[] data = new int[count * 4];
+
+        int index = 0;
+        for (int i = 0; i < count; i++) {
+            UnsafeX86.getCPUID(Word.fromIntZeroExtend(i), regs);
+            data[index++] = regs[0];
+            data[index++] = regs[1];
+            data[index++] = regs[2];
+            data[index++] = regs[3];
+        }
+
+        // Load extended functions (0x80000000)
+        String brand = "?";
+        final Word extendedBase = Word.fromIntZeroExtend(0x80000000);
+        UnsafeX86.getCPUID(extendedBase, regs);
+        Word max = Word.fromIntZeroExtend(regs[0]);
+        if (max.GE(extendedBase.add(4))) {
+            // Load brand 0x80000002..0x80000004
             final StringBuilder buf = new StringBuilder();
             for (int i = 0; i < 3; i++) {
-            	UnsafeX86.getCPUID(extendedBase.add(2 + i), regs);
+                UnsafeX86.getCPUID(extendedBase.add(2 + i), regs);
                 intToString(buf, regs[0]);
                 intToString(buf, regs[1]);
                 intToString(buf, regs[2]);
                 intToString(buf, regs[3]);
             }
             brand = buf.toString().trim();
-    	}
-    	
-    	X86CpuID id = new X86CpuID(data, brand);
-    	id.detectHyperV();
-    	return id;
+        }
+
+        X86CpuID id = new X86CpuID(data, brand);
+        id.detectHyperV();
+        return id;
     }
-    
+
     /**
      * Try to detect if we're running in HyperV.
+     *
      * @return true if we're running in HyperV, false otherwise.
      */
     public boolean detectHyperV() {
-    	if (!hasHYPERVISOR()) 
-    		return false;
-    	
-    	int[] regs = new int[4];
-    	UnsafeX86.getCPUID(Word.fromIntZeroExtend(0x40000001), regs);
-        if (regs[0] != 0x31237648) 
-        	return false;
+        if (!hasHYPERVISOR())
+            return false;
+
+        int[] regs = new int[4];
+        UnsafeX86.getCPUID(Word.fromIntZeroExtend(0x40000001), regs);
+        if (regs[0] != 0x31237648)
+            return false;
         // Found 'Hv#1' Hypervisor vendor neutral identification 
         UnsafeX86.getCPUID(Word.fromIntZeroExtend(0x40000000), regs);
         final StringBuilder buf = new StringBuilder();
@@ -226,12 +228,12 @@ public class X86CpuID extends CpuID {
     public String getName() {
         return getVendor();
     }
-    
+
     /**
      * Processor brand string
      */
     public String getBrand() {
-    	return brand;
+        return brand;
     }
 
     /**
@@ -495,9 +497,9 @@ public class X86CpuID extends CpuID {
     public final boolean hasCNXTID() {
         return hasFeature(FEAT_CNXTID);
     }
-    
+
     public final boolean hasHYPERVISOR() {
-    	return hasFeature(FEAT_HYPERVISOR);
+        return hasFeature(FEAT_HYPERVISOR);
     }
 
     /**
@@ -579,45 +581,45 @@ public class X86CpuID extends CpuID {
         final StringBuilder sb = new StringBuilder();
         sb.append("CPUID");
         sb.append('\n');
-        
+
         sb.append(" name     : ");
         sb.append(getName());
         sb.append('\n');
-        
+
         sb.append(" brand    : ");
         sb.append(getBrand());
         sb.append('\n');
-        
+
         sb.append(" family   : ");
         sb.append(getFamily());
         sb.append('\n');
-        
+
         sb.append(" model    : ");
         sb.append(getModel());
         sb.append('\n');
-        
+
         sb.append(" step     : ");
         sb.append(getSteppingID());
         sb.append('\n');
-        
+
         if (hasFeature(FEAT_HTT)) {
             sb.append(" #log.proc: ");
-            sb.append(getLogicalProcessors());            
+            sb.append(getLogicalProcessors());
             sb.append('\n');
         }
         if (hypervisorVendor != null) {
-        	sb.append(" hyperv.  : ");
-        	sb.append(hypervisorVendor);
-            sb.append('\n');            
+            sb.append(" hyperv.  : ");
+            sb.append(hypervisorVendor);
+            sb.append('\n');
         }
         sb.append(" features : ");
         sb.append(getFeatureString());
         sb.append('\n');
-        
+
         sb.append(" raw      : ");
         sb.append(NumberUtils.hex(data, 8));
         sb.append('\n');
-        
+
         return sb.toString();
     }
 }

@@ -17,12 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import java.io.IOException;
 import java.util.TreeMap;
-
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.facade.HeapStatistics;
 import org.jnode.vm.facade.NoObjectFilter;
@@ -46,24 +45,24 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
     private static final String SUMMARY = "Summary : ";
     private static final String CLASSES = " classe(s) ";
     private static final String INSTANCES = " instances(s) ";
-    
+
     public boolean contains(String classname) {
-    	// If we don't accept this class, we pretend to have it already to (maybe) avoid unnecessary work
-    	// and memory allocation (we also hope to avoid a call to add(String, int)).
+        // If we don't accept this class, we pretend to have it already to (maybe) avoid unnecessary work
+        // and memory allocation (we also hope to avoid a call to add(String, int)).
         return !objectFilter.accept(classname) || countData.containsKey(classname);
     }
 
     public void add(String className, int size) {
-    	if (objectFilter.accept(className)) {	    	
-	        HeapCounter count = (HeapCounter) countData.get(className);
-	
-	        if (count == null) {
-	            count = new HeapCounter(className, size);
-	            countData.put(className, count);
-	        }
-	
-	        count.inc();
-    	}
+        if (objectFilter.accept(className)) {
+            HeapCounter count = (HeapCounter) countData.get(className);
+
+            if (count == null) {
+                count = new HeapCounter(className, size);
+                countData.put(className, count);
+            }
+
+            count.inc();
+        }
     }
 
     /**
@@ -85,7 +84,7 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
     public void setMinimumTotalSize(long bytes) {
         this.minTotalSize = bytes;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -93,10 +92,11 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
     public void setObjectFilter(ObjectFilter objectFilter) {
         this.objectFilter = (objectFilter == null) ? NoObjectFilter.INSTANCE : objectFilter;
     }
-    
+
     /**
      * {@inheritDoc}
-     * @throws IOException 
+     *
+     * @throws IOException
      */
     public void writeTo(Appendable a) throws IOException {
         boolean first = true;
@@ -107,7 +107,7 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
             int nbClasses = 0;
             int nbInstances = 0;
             int totalSize = 0;
-            
+
             for (HeapCounter c : countData.values()) {
                 if ((c.getInstanceCount() >= minInstanceCount) && (c.getTotalSize() >= minTotalSize)) {
                     if (first) {
@@ -116,15 +116,15 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
                         a.append(NEWLINE);
                     }
                     c.append(a);
-                    
+
                     nbClasses++;
                     nbInstances += c.getInstanceCount();
                     totalSize += c.getTotalSize();
                 }
             }
-            
+
             if (nbClasses == 0) {
-                a.append(NO_MATCHING_OBJECT);                
+                a.append(NO_MATCHING_OBJECT);
             } else {
                 a.append(NEWLINE);
                 a.append(SUMMARY).append(Integer.toString(nbClasses)).append(CLASSES);
@@ -134,7 +134,7 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
         }
         a.append(NEWLINE);
     }
-    
+
     private static void appendUsage(Appendable a, long size) throws IOException {
         a.append(USAGE);
         if (size >= 1024) {
@@ -145,7 +145,7 @@ final class DefHeapStatistics extends VmSystemObject implements HeapStatistics {
         }
 
     }
-    
+
     /**
      * {@inheritDoc}
      */

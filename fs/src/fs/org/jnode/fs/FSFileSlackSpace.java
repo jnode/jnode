@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs;
 
 import java.io.IOException;
@@ -32,10 +32,11 @@ import java.io.IOException;
  * </p>
  */
 public interface FSFileSlackSpace {
-	/**
-	 * Gets the file slack space.
-	 * @return the slack space.
-	 * @throws IOException if an error occurs reading the file.
-	 */
-	byte[] getSlackSpace() throws IOException;
+    /**
+     * Gets the file slack space.
+     *
+     * @return the slack space.
+     * @throws IOException if an error occurs reading the file.
+     */
+    byte[] getSlackSpace() throws IOException;
 }

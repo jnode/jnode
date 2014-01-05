@@ -28,6 +28,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.Extension;
@@ -39,6 +40,7 @@ import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.PluginReference;
 import org.jnode.plugin.Runtime;
+import org.jnode.util.Version;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.isolate.VmIsolateLocal;
@@ -102,7 +104,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     private final boolean system;
 
-    private final String version;
+    private final Version version;
 
     private final int priority;
     
@@ -124,7 +126,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         providerUrl = getAttribute(rootElement, "provider-url", false);
         licenseName = getAttribute(rootElement, "license-name", true);
         licenseUrl = getAttribute(rootElement, "license-url", false);
-        version = getAttribute(rootElement, "version", true);
+        version = new Version(getAttribute(rootElement, "version", true));
         className = getAttribute(rootElement, "class", false);
         system = getBooleanAttribute(rootElement, "system", false);
         autoStart = getBooleanAttribute(rootElement, "auto-start", false);
@@ -518,7 +520,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Gets the version of this plugin
      */
-    public String getVersion() {
+    public Version getVersion() {
         return version;
     }
     

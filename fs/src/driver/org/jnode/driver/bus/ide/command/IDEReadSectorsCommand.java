@@ -17,15 +17,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide.command;
 
 import java.nio.ByteBuffer;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.bus.ide.IDEBus;
 import org.jnode.driver.bus.ide.IDEIO;
-import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
 
 /**
@@ -40,12 +38,12 @@ public class IDEReadSectorsCommand extends IDERWSectorsCommand {
     private int readSectors = 0;
 
     public IDEReadSectorsCommand(
-            boolean primary, 
-            boolean master,
-            boolean is48bit,
-            long lbaStart, 
-            int sectors, 
-            ByteBuffer dest) {
+        boolean primary,
+        boolean master,
+        boolean is48bit,
+        long lbaStart,
+        int sectors,
+        ByteBuffer dest) {
         super(primary, master, is48bit, lbaStart, sectors);
         buf = dest;
     }
@@ -60,13 +58,13 @@ public class IDEReadSectorsCommand extends IDERWSectorsCommand {
         // Read data
         for (int i = 0; i < sectorCount; i++) {
             log.debug("RDSect pw " + i);
-        	if (!pollWait(io, false))
-        		return;
-        	// Read sector
+            if (!pollWait(io, false))
+                return;
+            // Read sector
             log.debug("RDSect trf " + i);
-        	transferOneSector(ide,  io);
-		}
-        
+            transferOneSector(ide, io);
+        }
+
         // We're done
         notifyFinished();
     }
@@ -86,6 +84,6 @@ public class IDEReadSectorsCommand extends IDERWSectorsCommand {
      * @see org.jnode.driver.bus.ide.IDECommand#handleIRQ(IDEBus, IDEIO)
      */
     protected void handleIRQ(IDEBus ide, IDEIO io) {
-    	// Do nothing
+        // Do nothing
     }
 }

@@ -24,6 +24,7 @@ import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.PluginReference;
+import org.jnode.util.Version;
 
 /**
  * @author epr
@@ -45,9 +46,9 @@ final class PluginPrerequisiteModel extends PluginModelObject implements PluginP
         final String pluginIdentifier = getAttribute(e, "plugin", true);
         String version = getAttribute(e, "version", false);
         if (version == null) {
-            version = plugin.getVersion();
+            version = plugin.getVersion().toString();
         }
-        reference = new PluginReference(pluginIdentifier, version);
+        reference = new PluginReference(pluginIdentifier, new Version(version));
     }
 
     /**
@@ -58,7 +59,7 @@ final class PluginPrerequisiteModel extends PluginModelObject implements PluginP
      * @param pluginVersion
      */
     public PluginPrerequisiteModel(PluginDescriptorModel plugin,
-                                   String pluginIdentifier, String pluginVersion) {
+                                   String pluginIdentifier, Version pluginVersion) {
         super(plugin);
         if (pluginIdentifier == null) {
             throw new IllegalArgumentException("pluginId is null");
@@ -76,7 +77,7 @@ final class PluginPrerequisiteModel extends PluginModelObject implements PluginP
      * @return The fully qualified reference to the required plugin.
      */
     public PluginReference getPluginReference() {
-    	return reference;
+        return reference;
     }
 
     /**

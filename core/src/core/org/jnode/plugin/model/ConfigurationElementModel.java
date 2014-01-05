@@ -46,8 +46,7 @@ final class ConfigurationElementModel extends PluginModelObject implements Confi
      * @param element An XML element.
      * @throws PluginException
      */
-    public ConfigurationElementModel(PluginDescriptorModel plugin, XMLElement element)
-            throws PluginException {
+    public ConfigurationElementModel(PluginDescriptorModel plugin, XMLElement element) throws PluginException {
         super(plugin);
         name = element.getName();
 

@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ import org.jnode.fs.ext4.ExtentHeader;
 /**
  * This class represents an inode. Once they are allocated, inodes are read and
  * written by the INodeTable (which is accessible through desc.getINodeTable().
- * 
+ *
  * @author Andras Nagy
  */
 public class INode {
@@ -66,7 +66,7 @@ public class INode {
 
     /**
      * Create an INode object from an existing inode on the disk.
-     * 
+     *
      * @param fs
      * @param desc
      */
@@ -127,10 +127,8 @@ public class INode {
 
     /**
      * write an inode back to disk
-     * 
-     * @throws IOException
-     * 
-     * synchronize to avoid that half-set fields get written to the inode
+     *
+     * @throws IOException synchronize to avoid that half-set fields get written to the inode
      */
     protected synchronized void update() throws IOException {
         try {
@@ -148,7 +146,7 @@ public class INode {
 
     /**
      * Return the number of the group that contains the inode.
-     * 
+     *
      * @return the group number
      */
     protected long getGroup() {
@@ -161,7 +159,7 @@ public class INode {
 
     /**
      * return the number of direct blocks that an indirect block can point to
-     * 
+     *
      * @return the count
      */
     private final int getIndirectCount() {
@@ -177,9 +175,9 @@ public class INode {
      * getIndirectCount() +getIndirectCount()^2 + 45)th block of the inode (12
      * direct blocks, getIndirectCount() simple indirect blocks,
      * getIndirectCount()^2 double indirect blocks, 45th triple indirect block).
-     * 
+     *
      * @param indirectionLevel 0 is a direct block, 1 is a simple indirect block, and
-     * so on.
+     *                         so on.
      */
     private final long indirectRead(long dataBlockNr, long offset, int indirectionLevel)
         throws IOException {
@@ -199,12 +197,11 @@ public class INode {
      * Parse the indirect blocks of level <code>indirectionLevel</code> and
      * register the address of the <code>offset</code> th block. Also see
      * indirectRead().
-     * 
-     * @param allocatedBlocks
-     *            (the number of blocks allocated so far)-1
+     *
+     * @param allocatedBlocks (the number of blocks allocated so far)-1
      */
     private final void indirectWrite(long dataBlockNr, long offset, long allocatedBlocks,
-            long value, int indirectionLevel) throws IOException, FileSystemException {
+                                     long value, int indirectionLevel) throws IOException, FileSystemException {
         log.debug("indirectWrite(blockNr=" + dataBlockNr + ", offset=" + offset + "...)");
         byte[] data = fs.getBlock(dataBlockNr);
         if (indirectionLevel == 1) {
@@ -237,7 +234,7 @@ public class INode {
 
     /**
      * Free up block dataBlockNr, and free up any indirect blocks, if needed
-     * 
+     *
      * @param dataBlockNr
      * @param offset
      * @param indirectionLevel
@@ -246,7 +243,7 @@ public class INode {
     private final void indirectFree(long dataBlockNr, long offset, int indirectionLevel)
         throws IOException, FileSystemException {
         log.debug("indirectFree(datablockNr=" + dataBlockNr + ", offset=" + offset + ", ind=" +
-                indirectionLevel + ")");
+            indirectionLevel + ")");
         if (indirectionLevel == 0) {
             fs.freeBlock(dataBlockNr);
             return;
@@ -285,12 +282,12 @@ public class INode {
      * Return the number of the block in the filesystem that stores the ith
      * block of the inode (i is a sequential index from the beginning of the
      * file)
-     * 
+     * <p/>
      * [Naming convention used: in the code, a <code>...BlockNr</code> always
      * means an absolute block nr (of the filesystem), while a
      * <code>...BlockIndex</code> means an index relative to the beginning of
      * a block]
-     * 
+     *
      * @param i
      * @return the block number
      * @throws IOException
@@ -302,8 +299,7 @@ public class INode {
             }
 
             return extentHeader.getBlockNumber(fs, i);
-        }
-        else {
+        } else {
             return getDataBlockNrIndirect(i);
         }
     }
@@ -312,7 +308,7 @@ public class INode {
      * Return the number of the block in the filesystem that stores the ith
      * block of the inode (i is a sequential index from the beginning of the
      * file) using an indirect (ext2 / ext3) lookup.
-     *
+     * <p/>
      * [Naming convention used: in the code, a <code>...BlockNr</code> always
      * means an absolute block nr (of the filesystem), while a
      * <code>...BlockIndex</code> means an index relative to the beginning of
@@ -322,12 +318,12 @@ public class INode {
      * @return the block number
      * @throws IOException
      */
-     private long getDataBlockNrIndirect(long i) throws IOException {
+    private long getDataBlockNrIndirect(long i) throws IOException {
         final long blockCount = getAllocatedBlockCount();
         final int indirectCount = getIndirectCount();
         if (i > blockCount - 1) {
             throw new IOException("Trying to read block " + i + " (counts from 0), while" +
-                    " INode contains only " + blockCount + " blocks");
+                " INode contains only " + blockCount + " blocks");
         }
 
         //get the direct blocks (0; 11)
@@ -365,7 +361,7 @@ public class INode {
     /**
      * Read the ith block of the inode (i is a sequential index from the
      * beginning of the file, and not an absolute block number)
-     * 
+     *
      * @param i
      * @return the data block
      * @throws IOException
@@ -378,13 +374,13 @@ public class INode {
      * A new block has been allocated for the inode, so register it (the
      * <code>i</code> th block of the inode is the block at
      * <code>blockNr</code>
-     * 
+     * <p/>
      * [Naming convention used: in the code, a <code>...BlockNr</code> always
      * means an absolute block nr (of the filesystem), while a
      * <code>...BlockIndex</code> means an index relative to the beginning of
      * a block]
-     * 
-     * @param i the ith block of the inode has been reserved
+     *
+     * @param i       the ith block of the inode has been reserved
      * @param blockNr the block (in the filesystem) that has been reserved
      */
     private final void registerBlockIndex(long i, long blockNr)
@@ -394,7 +390,7 @@ public class INode {
         long allocatedBlocks = i;
         if (i != blockCount) {
             throw new FileSystemException("Trying to register block " + i +
-                    " (counts from 0), when INode contains only " + blockCount + " blocks");
+                " (counts from 0), when INode contains only " + blockCount + " blocks");
         }
 
         log.debug("registering block #" + blockNr);
@@ -494,7 +490,7 @@ public class INode {
 
     /**
      * Free the preallocated blocks
-     * 
+     *
      * @throws FileSystemException
      * @throws IOException
      */
@@ -519,7 +515,7 @@ public class INode {
      * Free up the ith data block of the inode. It is neccessary to free up
      * indirect blocks as well, if the last pointer on an indirect block has
      * been freed.
-     * 
+     *
      * @param i
      * @throws IOException
      */
@@ -529,8 +525,8 @@ public class INode {
 
         if (i != blockCount - 1) {
             throw new IOException("Only the last block of the inode can be freed." +
-                    "You were trying to free block nr. " + i + ", while inode contains " +
-                    blockCount + " blocks.");
+                "You were trying to free block nr. " + i + ", while inode contains " +
+                blockCount + " blocks.");
         }
 
         desc.setLastAllocatedBlockIndex(i - 1);
@@ -602,9 +598,9 @@ public class INode {
     /**
      * Write the i. data block of the inode (i is a sequential index from the
      * beginning of the file, and not an absolute block number)
-     * 
+     * <p/>
      * This method assumes that the block has already been reserved.
-     * 
+     *
      * @param i
      * @param data
      */
@@ -618,7 +614,7 @@ public class INode {
             fs.writeBlock(blockIndex, data, false);
         } else {
             throw new UnallocatedBlockException("Block " + i + " not yet reserved " +
-                    "for the inode");
+                "for the inode");
         }
     }
 
@@ -627,7 +623,7 @@ public class INode {
      * that a new block has been allocated, but not yet been written to. In this
      * case, it is not counted by getSizeInBlocks(), because it returns the size
      * of the file in blocks, counting only written bytes
-     * 
+     *
      * @return the count
      */
     protected long getAllocatedBlockCount() {
@@ -641,6 +637,7 @@ public class INode {
     /**
      * Allocate the ith data block of the inode (i is a sequential index from
      * the beginning of the file, and not an absolute block number)
+     *
      * @param i
      */
     public synchronized void allocateDataBlock(long i) throws FileSystemException, IOException {
@@ -664,14 +661,13 @@ public class INode {
      * FINDS a free block which will be the indexth block of the inode: -first
      * check the preallocated blocks -then check around the last allocated block
      * and ALLOCATES it in the block bitmap at the same time.
-     * 
+     * <p/>
      * Block allocation should be contiguous if possible, i.e. the new block
      * should be the one that follows the last allocated block (that's why the
      * <code>index</code> parameter is needed).
-     * 
-     * @param index
-     *            the block to be found should be around the (index-1)th block
-     *            of the inode (which is already allocated, unless index==0)
+     *
+     * @param index the block to be found should be around the (index-1)th block
+     *              of the inode (which is already allocated, unless index==0)
      */
     private long findFreeBlock(long index) throws IOException, FileSystemException {
         //long newBlock;
@@ -695,7 +691,7 @@ public class INode {
                     desc.setPreallocCount(reservation.getPreallocCount());
 
                     long prealloc512 =
-                            (1 + reservation.getPreallocCount()) * (fs.getBlockSize() / 512);
+                        (1 + reservation.getPreallocCount()) * (fs.getBlockSize() / 512);
                     setBlocks(getBlocks() + prealloc512);
 
                     return lastBlock + i;
@@ -709,7 +705,7 @@ public class INode {
                     desc.setPreallocCount(reservation.getPreallocCount());
 
                     long prealloc512 =
-                            (1 + reservation.getPreallocCount()) * (fs.getBlockSize() / 512);
+                        (1 + reservation.getPreallocCount()) * (fs.getBlockSize() / 512);
                     setBlocks(getBlocks() + prealloc512);
 
                     return lastBlock + i;
@@ -740,8 +736,8 @@ public class INode {
                 continue;
             }
             long threshold =
-                    (getExt2FileSystem().getSuperblock().getBlocksPerGroup() * 
-                            Ext2Constants.EXT2_BLOCK_THRESHOLD_PERCENT) / 100;
+                (getExt2FileSystem().getSuperblock().getBlocksPerGroup() *
+                    Ext2Constants.EXT2_BLOCK_THRESHOLD_PERCENT) / 100;
             reservation = getExt2FileSystem().findFreeBlocks(i, threshold);
             if (reservation.isSuccessful()) {
                 desc.setPreallocBlock(reservation.getBlock() + 1);
@@ -800,7 +796,7 @@ public class INode {
 
     /**
      * Return the size of the file in bytes.
-     * 
+     *
      * @return the size of the file in bytes
      */
     public synchronized long getSize() {
@@ -815,7 +811,7 @@ public class INode {
     /**
      * Return the size in ext2-blocks (getBlocks() returns the size in 512-byte
      * blocks, but an ext2 block can be of different size).
-     * 
+     *
      * @return the size
      */
     public long getSizeInBlocks() {

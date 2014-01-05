@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.console.textscreen;
 
 import java.io.PrintStream;
@@ -25,7 +25,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.TextConsole;
@@ -91,7 +90,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     private final boolean claimSystemOutErr;
 
     private VmIsolate myIsolate;
-    
+
     /**
      * The options used to create this {@link TextScreenConsole}
      */
@@ -199,9 +198,9 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
             screen.set(screen.getOffset(curX, curY), ' ', scrWidth - curX, color);
             curX = 0;
             curY++;
-		} else if (v == '\r') {
-			// Goto beginning line
-			curX = 0;
+        } else if (v == '\r') {
+            // Goto beginning line
+            curX = 0;
         } else if (v == '\b') {
             if (curX > 0) {
                 curX--;
@@ -333,7 +332,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
             ((KeyboardReader) in).setCompleter(completer);
         }
     }
-    
+
     @Override
     public ConsoleKeyEventBindings getKeyEventBindings() {
         if (in instanceof KeyboardReader) {
@@ -438,28 +437,29 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 
     /**
      * Get the options used to create this {@link TextScreenConsole}
+     *
      * @return the options.
      */
     final int getOptions() {
         return options;
     }
-    
+
     @Override
     public void systemScreenChanged(TextScreen systemScreen) {
         // ensure that old and new screens are compatible
         if ((systemScreen.getWidth() != screen.getWidth()) || (systemScreen.getHeight() != screen.getHeight())) {
             throw new IllegalArgumentException("old and new screen have different sizes");
         }
-    
+
         TextScreen oldScreen = screen;
         screen = systemScreen;
-        
+
         final int size = oldScreen.getWidth() * oldScreen.getHeight();
         ensureVisible(oldScreen, 0);
         oldScreen.copyTo(screen, 0, size);
         syncScreen(0, size);
     }
-    
+
     private final void ensureVisible(TextScreen scr, int row) {
         if (scr instanceof ScrollableTextScreen) {
             ((ScrollableTextScreen) scr).ensureVisible(row, isFocused());

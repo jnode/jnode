@@ -88,7 +88,7 @@ public class FTPURLConnection extends URLConnection {
             client.logout();
             throw new IOException(replyString);
         }
-        client.setFileType(FTP.BINARY_FILE_TYPE);
+        client.setFileType(FTP.IMAGE_FILE_TYPE);
         client.enterLocalPassiveMode();
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();

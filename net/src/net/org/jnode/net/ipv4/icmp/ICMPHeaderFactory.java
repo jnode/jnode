@@ -17,19 +17,18 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.ipv4.icmp;
 
 import java.net.SocketException;
-
 import org.jnode.net.SocketBuffer;
 
 public class ICMPHeaderFactory {
-	
-	/**
+
+    /**
      * Create a type specific ICMP header. The type is read from the first first
      * in the skbuf.
-     * 
+     *
      * @param skbuf
      * @throws SocketException
      */
