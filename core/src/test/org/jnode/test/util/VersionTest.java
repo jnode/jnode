@@ -13,9 +13,21 @@ public class VersionTest {
     }
 
     @Test
+    public void testToString1b() throws Exception {
+        Version v = new Version(1, 2, "dev");
+        assertEquals("1.2-dev", v.toString());
+    }
+
+    @Test
     public void testToString2() throws Exception {
         Version v = new Version(1, 2, 3);
         assertEquals("1.2.3", v.toString());
+    }
+
+    @Test
+    public void testToString2b() throws Exception {
+        Version v = new Version(1, 2, 3, "foo");
+        assertEquals("1.2.3-foo", v.toString());
     }
 
     @Test
@@ -25,9 +37,21 @@ public class VersionTest {
     }
 
     @Test
+    public void testToString3b() throws Exception {
+        Version v = new Version(1, 2, 3, 4, "foo");
+        assertEquals("1.2.3.4-foo", v.toString());
+    }
+
+    @Test
     public void testToStringA() throws Exception {
         Version v = new Version("5");
         assertEquals("5", v.toString());
+    }
+
+    @Test
+    public void testToStringAb() throws Exception {
+        Version v = new Version("5-foo");
+        assertEquals("5-foo", v.toString());
     }
 
     @Test
@@ -37,15 +61,33 @@ public class VersionTest {
     }
 
     @Test
+    public void testToStringBb() throws Exception {
+        Version v = new Version("5.7-foo");
+        assertEquals("5.7-foo", v.toString());
+    }
+
+    @Test
     public void testToStringC() throws Exception {
         Version v = new Version("1.5.2");
         assertEquals("1.5.2", v.toString());
     }
 
     @Test
+    public void testToStringCb() throws Exception {
+        Version v = new Version("1.5.2-dev");
+        assertEquals("1.5.2-dev", v.toString());
+    }
+
+    @Test
     public void testToStringD() throws Exception {
         Version v = new Version("4.3.2.1");
         assertEquals("4.3.2.1", v.toString());
+    }
+
+    @Test
+    public void testToStringDb() throws Exception {
+        Version v = new Version("4.3.2.1-rel");
+        assertEquals("4.3.2.1-rel", v.toString());
     }
 
     @Test
