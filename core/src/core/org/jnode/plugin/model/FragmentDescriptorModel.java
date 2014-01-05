@@ -23,10 +23,12 @@ package org.jnode.plugin.model;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
+
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.FragmentDescriptor;
 import org.jnode.plugin.PluginException;
+import org.jnode.util.Version;
 import org.jnode.vm.ResourceLoader;
 
 /**
@@ -37,7 +39,7 @@ final class FragmentDescriptorModel extends PluginDescriptorModel implements
 
     private final String pluginId;
 
-    private final String pluginVersion;
+    private final Version pluginVersion;
 
     private PluginDescriptorModel plugin;
 
@@ -50,7 +52,7 @@ final class FragmentDescriptorModel extends PluginDescriptorModel implements
         throws PluginException {
         super(jarFile, e);
         this.pluginId = getAttribute(e, "plugin-id", true);
-        this.pluginVersion = getAttribute(e, "plugin-version", true);
+        this.pluginVersion = new Version(getAttribute(e, "plugin-version", true));
     }
 
     /**
@@ -95,7 +97,7 @@ final class FragmentDescriptorModel extends PluginDescriptorModel implements
     /**
      * @see org.jnode.plugin.FragmentDescriptor#getPluginVersion()
      */
-    public final String getPluginVersion() {
+    public final Version getPluginVersion() {
         return pluginVersion;
     }
 
@@ -129,7 +131,7 @@ final class FragmentDescriptorModel extends PluginDescriptorModel implements
     protected void initializeRequiresList(List<PluginPrerequisiteModel> list,
                                           XMLElement e) throws PluginException {
         final String pluginId = getAttribute(e, "plugin-id", true);
-        final String pluginVersion = getAttribute(e, "plugin-version", true);
+        final Version pluginVersion = new Version(getAttribute(e, "plugin-version", true));
         list.add(new PluginPrerequisiteModel(this, pluginId, pluginVersion));
     }
 

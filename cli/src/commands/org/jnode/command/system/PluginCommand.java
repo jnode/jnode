@@ -29,7 +29,9 @@ import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import javax.naming.NameNotFoundException;
+
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -44,6 +46,7 @@ import org.jnode.shell.syntax.PluginArgument;
 import org.jnode.shell.syntax.StringArgument;
 import org.jnode.shell.syntax.SyntaxMultiplicityException;
 import org.jnode.shell.syntax.URLArgument;
+import org.jnode.util.Version;
 import org.jnode.vm.facade.VmUtils;
 
 /**
@@ -120,7 +123,7 @@ public class PluginCommand extends AbstractCommand {
         mgr = InitialNaming.lookup(PluginManager.NAME);
         final String version = argVersion.isSet() ? argVersion.getValue() : VmUtils.getVm().getVersion();
         final String pluginId = argPluginID.getValue();
-        final PluginReference pluginRef = new PluginReference(pluginId, version);
+        final PluginReference pluginRef = new PluginReference(pluginId, new Version(version));
         if (argLoaderUrl.isSet()) {
             addPluginLoader(argLoaderUrl.getValue());
         } else if (argLoad.isSet()) {

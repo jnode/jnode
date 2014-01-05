@@ -202,7 +202,7 @@ public class InitJarBuilder extends AbstractPluginsTask {
                 idToVersions.put(descr.getId(), versions);
             }
             
-            versions.add(descr.getVersion());
+            versions.add(descr.getVersion().toString());
         }
         
         // now, check that each dependency is satisfied

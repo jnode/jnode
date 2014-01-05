@@ -214,7 +214,7 @@ final class PluginClassLoaderImpl extends ClassLoader implements PluginClassLoad
                     String specVersion = null;
                     String implTitle = descriptor.getName();
                     String implVendor = descriptor.getProviderName();
-                    String implVersion = descriptor.getVersion();
+                    String implVersion = descriptor.getVersion().toString();
                     URL sealed = null;
                     definePackage(packageName, specTitle, specVendor,
                         specVersion, implTitle, implVendor, implVersion,

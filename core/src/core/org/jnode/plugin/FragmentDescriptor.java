@@ -20,6 +20,8 @@
  
 package org.jnode.plugin;
 
+import org.jnode.util.Version;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -37,5 +39,5 @@ public interface FragmentDescriptor extends PluginDescriptor {
      *
      * @return the related plugin version
      */
-    public String getPluginVersion();
+    public Version getPluginVersion();
 }

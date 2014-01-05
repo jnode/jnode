@@ -232,7 +232,7 @@ public class PluginTask extends AbstractPluginTask {
 
         mf.addConfiguredAttribute(new Manifest.Attribute("Bundle-SymbolicName", descr.getId()));
         mf.addConfiguredAttribute(new Manifest.Attribute("Bundle-ManifestVersion", "2"));
-        mf.addConfiguredAttribute(new Manifest.Attribute("Bundle-Version", descr.getVersion()));
+        mf.addConfiguredAttribute(new Manifest.Attribute("Bundle-Version", descr.getVersion().toString()));
 
         return mf;
     }

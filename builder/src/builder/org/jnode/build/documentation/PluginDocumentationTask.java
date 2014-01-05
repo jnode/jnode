@@ -477,7 +477,7 @@ public class PluginDocumentationTask extends AbstractPluginTask {
             addSummaryTableHdr(out, title);
             addTableRow(out, "Id", descr.getId());
             addTableRow(out, "Name", descr.getName());
-            addTableRow(out, "Version", descr.getVersion());
+            addTableRow(out, "Version", descr.getVersion().toString());
             addTableRow(out, "Provider", formatProvider(descr));
             addTableRow(out, "License", formatLicense(descr));
             addTableRow(out, "Plugin class",

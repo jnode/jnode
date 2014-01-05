@@ -32,6 +32,7 @@ import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.PluginReference;
 import org.jnode.plugin.Runtime;
+import org.jnode.util.Version;
 
 /**
  * Dummy plugin descriptor for configuring plugins outside of the normal JNode framework.
@@ -135,7 +136,7 @@ public class DummyPluginDescriptor implements PluginDescriptor {
         return null;
     }
 
-    public String getVersion() {
+    public Version getVersion() {
         return null;
     }
 

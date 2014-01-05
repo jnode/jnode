@@ -20,6 +20,8 @@
  
 package org.jnode.plugin;
 
+import org.jnode.util.Version;
+
 /**
  * Descriptor of a Plugin.
  *
@@ -78,7 +80,7 @@ public interface PluginDescriptor {
      *
      * @return the version
      */
-    public abstract String getVersion();
+    public abstract Version getVersion();
     
     /**
      * Get the plugin reference which uniquely identifies a plugin.
