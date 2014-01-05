@@ -262,7 +262,7 @@ public class PluginDependencyChecker extends AbstractPluginTask {
             buffer.append("\n------------------------------------------------------------------\n");
 
             errorFound |= collectUnmatchedDependencies(buffer, containedClasses);
-            errorFound |= exportsOrIsExtension(buffer);
+            errorFound |= isNotUseful(buffer);
 
             Set<String> allClasses = getAllUsedClasses();
             errorFound |= assortClassesContainedInImportedPlugins(buffer, this, true, allClasses);
@@ -278,14 +278,15 @@ public class PluginDependencyChecker extends AbstractPluginTask {
             }
         }
 
-        private boolean exportsOrIsExtension(StringBuffer buffer) {
-            if (descr.getRuntime() == null
-                && (descr.getExtensions() == null || descr.getExtensions().length == 0)) {
-                buffer.append(" * neither exports classes, nor is an extension\n");
-                return true;
-            } else {
-                return false;
-            }
+        private boolean isNotUseful(StringBuffer buffer) {
+            if (descr.getRuntime() != null)
+            	return false;
+            if ((descr.getExtensions() != null) && (descr.getExtensions().length > 0)) 
+            	return false;
+            if (descr.hasCustomPluginClass())
+            	return false;
+            buffer.append(" * neither exports classes, nor is an extension, nor provides a plugin class\n");
+            return true;
         }
 
         /**
