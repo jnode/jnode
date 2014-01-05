@@ -16,6 +16,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/template" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/vmmagic" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testframework" isTestSource="true" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
