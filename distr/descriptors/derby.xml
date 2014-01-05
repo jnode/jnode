@@ -29,7 +29,7 @@
 
 
   <requires>
-    <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.shell" version="@VERSION@"/>
   </requires>
 
   <runtime>
@@ -45,6 +45,8 @@
     <library name="derbytools.jar">
       <export name="org.apache.derby.tools.*"/>
       <export name="org.apache.derby.impl.tools.*"/>
+      <export name="org.apache.derby.impl.tools.dblook.*"/>
+      <export name="org.apache.derby.impl.tools.ij.*"/>
       <export name="org.apache.derby.iapi.reference.*"/>
       <export name="org.apache.derby.info.tools*"/>
       <export name="org.apache.derby.loc.toolsmessages*"/>

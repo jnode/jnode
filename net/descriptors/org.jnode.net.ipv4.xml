@@ -31,7 +31,7 @@
     <import plugin="org.jnode.net.arp"/>
     <import plugin="org.jnode.net.ipv4.core"/>
     <import plugin="org.xbill.dns" version="1.6.6"/>
-    <import plugin="org.apache.jakarta.commons.net"/>
+    <import plugin="org.apache.commons.net" version="3.3"/>
   </requires>
 
   <runtime>

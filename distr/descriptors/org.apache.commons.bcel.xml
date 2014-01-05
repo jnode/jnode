@@ -20,21 +20,16 @@
 -->
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.protocol.ftp" 
-        name="JNode FTP protocol handler"
-        version="@VERSION@"
-        license-name="lgpl"
-        provider-name="JNode.org">
-        
-  <requires>
-    <import plugin="org.jnode.net.ipv4"/>
-    <import plugin="org.apache.commons.net" version="3.3"/>
-  </requires>
-        
+<plugin id="org.apache.commons.bcel"
+       name="commons-bcel"
+       version="5.2"
+       license-name="apache2.0"
+	   provider-name="apache commons"
+	   provider-url="http://commons.apache.org/commons-bcel/">
+
   <runtime>
-    <library name="jnode-net.jar">
-      <export name="org.jnode.protocol.ftp.*"/>
+    <library name="bcel.jar">
+      <export name="*"/>
     </library>
   </runtime>
-        
 </plugin>

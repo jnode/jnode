@@ -35,6 +35,7 @@
       <export name="javax.print.attribute.*"/>
       <export name="javax.print.attribute.standard.*"/>
       <export name="javax.print.event.*"/>
+      <export name="gnu.javax.print.PrinterDialog"/>
     </library>
   </runtime>
   

@@ -20,16 +20,24 @@
 -->
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.apache.jakarta.commons.logging"
-       name="commons-logging"
-       version="1.1.1"
-       license-name="apache2.0"
-	   provider-name="apache commons"
-	   provider-url="http://commons.apache.org/logging/">
-
+<plugin id="org.apache.commons.net" 
+        name="Jakarta Commons-Net"
+        version="@VERSION@"
+        provider-name="jakarta.apache.org"
+        license-name="apache2.0">
+        
+  <requires>
+    <import plugin="org.jnode.net"/>
+  </requires>
+        
   <runtime>
-    <library name="commons-logging.jar">
+    <library name="commons-net.jar">
       <export name="*"/>
     </library>
   </runtime>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.net.SocketPermission" name="*" actions="connect,listen"/>
+  </extension>
+        
 </plugin>

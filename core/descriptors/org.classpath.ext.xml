@@ -60,6 +60,7 @@
       
       <export name="org.ietf.jgss.*"/>
 
+      <export name="com.sun.java.swing.Painter"/>
       <export name="com.sun.java.swing.plaf.windows.DesktopProperty"/>
       <export name="com.sun.java.swing.plaf.motif.*"/>
       <export name="com.sun.java.swing.plaf.nimbus.*"/>
@@ -72,6 +73,7 @@
 	  <exclude name="sun.awt.EventListenerAggregate" />
       <export name="sun.awt.im.*"/>
       <export name="sun.awt.image.*"/>
+      <export name="sun.awt.event.*"/>
       <export name="sun.awt.datatransfer.*"/>
       <export name="sun.awt.dnd.*"/>
       <export name="sun.awt.geom.*"/>
@@ -80,6 +82,7 @@
       <export name="sun.dc.path.*"/>
       <export name="sun.dc.pr.*"/>
       <export name="sun.font.*"/>
+      <export name="sun.nio.cs.ext.*"/>
       <export name="sun.java2d.*"/>
       <export name="sun.java2d.cmm.*"/>
       <export name="sun.java2d.loops.*"/>

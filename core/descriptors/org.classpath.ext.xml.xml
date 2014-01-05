@@ -31,6 +31,8 @@
 
   <runtime>
     <library name="classlib.jar">
+      <export name="com.sun.java_cup.internal.runtime.*"/>
+
       <export name="com.sun.org.apache.bcel.internal.*"/>
       <export name="com.sun.org.apache.bcel.internal.classfile.*"/>
       <export name="com.sun.org.apache.bcel.internal.generic.*"/>

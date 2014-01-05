@@ -27,6 +27,10 @@
     provider-url="http://www.beanshell.org"
     license-name="lgpl">
 
+    <requires>
+      <import plugin="org.apache.commons.bsf" version="2.4"/>
+    </requires>
+
     <runtime>
         <library name="beanshell.jar">
             <export name="*"/>
