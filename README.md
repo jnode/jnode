@@ -6,16 +6,16 @@ In this file, you find the instructions needed to setup a JNode development envi
 
 JNode has been divided into several sub-projects in order to keep it "accessible". These sub-projects are:
 
-*JNode-All*    The root project where everything comes together  
-*JNode-Cli*    Various command line commands  
-*JNode-Core*   The core java classes, the Virtual Machine, the OS kernel and the Driver framework  
-*JNode-Distr*  Tools and apps needed for a JNode "distribution"  
-*JNode-FS*     The Filesystems and the various block device drivers  
-*JNode-GUI*    The AWT implementation and the various video & input device drivers  
-*JNode-Net*    The Network implementation and the various network device drivers  
-*JNode-Shell*  The Command line shell and several system commands  
-*JNode-Sound*  Future work  
-*JNode-Textui* Text based AWT interface  
+> *JNode-All*    The root project where everything comes together
+*JNode-Cli*    Various command line commands
+*JNode-Core*   The core java classes, the Virtual Machine, the OS kernel and the Driver framework
+*JNode-Distr*  Tools and apps needed for a JNode "distribution"
+*JNode-FS*     The Filesystems and the various block device drivers
+*JNode-GUI*    The AWT implementation and the various video & input device drivers
+*JNode-Net*    The Network implementation and the various network device drivers
+*JNode-Shell*  The Command line shell and several system commands
+*JNode-Sound*  Future work
+*JNode-Textui* Text based AWT interface
 
 Each sub-project has the same directory structure:
 
