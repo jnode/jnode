@@ -52,7 +52,7 @@
 
   <plugin id="org.jnode.apps.jpartition"/>
 
-  <plugin id="org.apache.jakarta.commons.logging"/>
+  <plugin id="org.apache.commons.logging"/>
   <plugin id="net.wimpi.telnetd"/>
 
   <plugin id="jetty"/>

@@ -28,7 +28,7 @@
         
   <requires>
     <import plugin="org.jnode.net.ipv4"/>
-    <import plugin="org.apache.jakarta.commons.net"/>
+    <import plugin="org.apache.commons.net" version="3.3"/>
   </requires>
         
   <runtime>

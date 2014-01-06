@@ -34,6 +34,9 @@
         <export name="gnu.java.awt.peer.headless.*"/>
         <export name="gnu.java.awt.peer.swing.*"/>
         <export name="gnu.java.awt.font.*"/>
+        <export name="gnu.java.awt.font.autofit.*"/>
+        <export name="gnu.java.awt.font.opentype.*"/>
+        <export name="gnu.java.awt.font.opentype.truetype.*"/>
     </library>
   </runtime>
   

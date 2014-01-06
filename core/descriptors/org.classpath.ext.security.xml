@@ -36,8 +36,8 @@
       <export name="sun.security.acl.*"/>
       <exclude name="sun.security.acl.GroupImpl"/>
       <export name="sun.security.ec.*"/>
-      <export name="sun.security.internal.interfaces*"/>
-      <export name="sun.security.internal.spec*"/>
+      <export name="sun.security.internal.interfaces.*"/>
+      <export name="sun.security.internal.spec.*"/>
       <export name="sun.security.internal.*"/>
       <export name="sun.security.jgss.*"/>
       <export name="sun.security.jgss.krb5.*"/>
@@ -70,6 +70,8 @@
       <export name="com.sun.net.ssl.*"/>
       <export name="com.sun.net.ssl.internal.ssl.*"/>
       <export name="com.sun.jarsigner.*"/>
+      <export name="com.sun.security.auth.callback.TextCallbackHandler"/>
+      <export name="com.sun.security.auth.login.ConfigFile"/>
       <export name="sun.nio.ch.*"/>
       <exclude name="sun.nio.ch.Interruptible"/>
     </library>

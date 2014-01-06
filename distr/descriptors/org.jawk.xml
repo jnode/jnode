@@ -39,6 +39,7 @@
   <requires>
     <import plugin="org.jnode.shell" version="@VERSION@"/>
     <import plugin="org.jnode.shell.syntax" version="@VERSION@"/>
+    <import plugin="org.apache.commons.bcel" version="5.2"/>
   </requires>
   
   <extension point="org.jnode.shell.aliases">

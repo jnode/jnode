@@ -57,11 +57,11 @@
 
   <requires>
   	<import plugin="com.sun.tools.javac" version="@VERSION@"/>
-    <import plugin="org.apache.jakarta.commons.logging"  version="1.1.1"/>
-  	<import plugin="org.apache.jakarta.log4j" version="1.2.8"/>
+    <!-- import plugin="org.apache.commons.logging"  version="1.1.1"/ -->
+  	<!-- import plugin="org.apache.jakarta.log4j" version="1.2.8"/ -->
     <import plugin="org.jnode.shell" version="@VERSION@"/>
     <import plugin="org.jnode.shell.syntax" version="@VERSION@"/>
-  	<import plugin="org.apache.tools.ant" version="@VERSION@"/>
+  	<import plugin="org.apache.tools.ant" version="1.6.3"/>
   </requires>
 
   <extension point="org.jnode.shell.aliases">

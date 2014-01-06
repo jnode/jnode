@@ -32,6 +32,8 @@
   <runtime>
     <library name="classlib.jar">
       <export name="com.sun.activation.registries.*"/>
+      <export name="com.sun.net.httpserver.*"/>
+      <export name="com.sun.net.httpserver.spi.*"/>
       <export name="com.sun.istack.internal.*"/>
       <export name="com.sun.istack.internal.tools.*"/>
       <export name="com.sun.istack.internal.ws.*"/>
@@ -92,6 +94,7 @@
       <export name="com.sun.xml.internal.org.jvnet.fastinfoset.sax.*"/>
       <export name="com.sun.xml.internal.org.jvnet.fastinfoset.sax.helpers.*"/>
       <export name="com.sun.xml.internal.org.jvnet.fastinfoset.stax.*"/>
+      <export name="com.sun.xml.internal.org.jvnet.mimepull.*"/>
       <export name="com.sun.xml.internal.org.jvnet.staxex.*"/>
       <export name="com.sun.xml.internal.rngom.ast.*"/>
       <export name="com.sun.xml.internal.rngom.ast.builder.*"/>
@@ -157,6 +160,7 @@
       <export name="com.sun.xml.internal.ws.model.*"/>
       <export name="com.sun.xml.internal.ws.model.soap.*"/>
       <export name="com.sun.xml.internal.ws.model.wsdl.*"/>
+      <export name="com.sun.xml.internal.ws.org.objectweb.asm.*"/>
       <export name="com.sun.xml.internal.ws.protocol.soap.*"/>
       <export name="com.sun.xml.internal.ws.protocol.xml.*"/>
       <export name="com.sun.xml.internal.ws.resources.*"/>
