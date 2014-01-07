@@ -25,7 +25,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../core/lib/commons-net-1.1.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../core/lib/commons-net-3.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
