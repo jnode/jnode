@@ -73,6 +73,7 @@ public class Emu {
         "org.jnode.shell.command.driver.console",
         "org.jnode.apps.editor",
         "org.jnode.apps.edit",
+        "org.jnode.apps.commander",
         "org.jnode.apps.console",
     };
     

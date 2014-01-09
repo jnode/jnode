@@ -32,16 +32,21 @@ import charva.awt.event.KeyEvent;
 import charva.awt.event.ScrollEvent;
 import charvax.swing.JButton;
 import charvax.swing.JFrame;
+import charvax.swing.JLabel;
 import charvax.swing.JList;
 import charvax.swing.JOptionPane;
 import charvax.swing.JPanel;
 import charvax.swing.JScrollPane;
 import charvax.swing.border.TitledBorder;
+import charvax.swing.event.ListSelectionEvent;
+import charvax.swing.event.ListSelectionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * Charva based file manager.
@@ -52,8 +57,8 @@ public class CharvaCommander extends JFrame {
     private static final Color BACKGROUND_COLOR = Color.black;
     private static final Color FOREGROUND_COLOR = Color.cyan;
     private static final Color HIGHLIGHT_COLOR = Color.yellow;
-    private Pane currentPane;
-    private Pane otherPane;
+    private Pane leftPane;
+    private Pane rightPane;
     private boolean exitted;
 
     /**
@@ -96,22 +101,26 @@ public class CharvaCommander extends JFrame {
             //ignore
         }
 
-        currentPane = new Pane(38, 21);
-        currentPane.setPath(path);
-        currentPane.setLocation(0, 0);
-        panel.add(currentPane);
+        leftPane = new Pane(38, 20);
+        leftPane.setPath(path);
+        leftPane.setLocation(0, 0);
+        panel.add(leftPane);
+        leftPane.label.setLocation(1, 22);
+        panel.add(leftPane.label);
 
-        otherPane = new Pane(38, 21);
-        otherPane.setPath(path);
-        otherPane.setLocation(40, 0);
-        panel.add(otherPane);
+        rightPane = new Pane(38, 20);
+        rightPane.setPath(path);
+        rightPane.setLocation(40, 0);
+        panel.add(rightPane);
+        rightPane.label.setLocation(41, 22);
+        panel.add(rightPane.label);
 
         setLocation(0, 0);
         setSize(80, 24);
         validate();
 
-        currentPane.list.requestFocus();
-        currentPane.border.setTitleColor(HIGHLIGHT_COLOR);
+        leftPane.list.requestFocus();
+        leftPane.border.setTitleColor(HIGHLIGHT_COLOR);
     }
 
     private class ButtonPanel extends JPanel implements ActionListener {
@@ -164,41 +173,41 @@ public class CharvaCommander extends JFrame {
                 }
             } finally {
                 if (!exitted)
-                    currentPane.requestFocus();
+                    leftPane.requestFocus();
             }
         }
     }
 
     private synchronized void move() {
-        String sel = currentPane.getSelection();
+        String sel = leftPane.getSelection();
         if (sel == null)
             return;
 
         int conf = JOptionPane
-            .showConfirmDialog(this, sel + " to " + otherPane.getPath(), "Move ?", JOptionPane.YES_NO_OPTION);
+            .showConfirmDialog(this, sel + " to " + rightPane.getPath(), "Move ?", JOptionPane.YES_NO_OPTION);
         if (conf != JOptionPane.YES_OPTION)
             return;
 
-        int index = currentPane.list.getSelectedIndex();
+        int index = leftPane.list.getSelectedIndex();
         try {
-            File source = new File(currentPane.getPath(), sel);
-            if (copyRec(source, new File(otherPane.getPath(), sel), true))
+            File source = new File(leftPane.getPath(), sel);
+            if (copyRec(source, new File(rightPane.getPath(), sel), true))
                 delete0(source);
         } finally {
-            currentPane.setPath(currentPane.getPath());
-            currentPane.list.setCurrentRow(index);
-            currentPane.repaint();
-            otherPane.setPath(otherPane.getPath(), sel);
-            otherPane.repaint();
+            leftPane.setPath(leftPane.getPath());
+            leftPane.list.setCurrentRow(index);
+            leftPane.repaint();
+            rightPane.setPath(rightPane.getPath(), sel);
+            rightPane.repaint();
         }
     }
 
     private synchronized void view() {
-        String sel = currentPane.getSelection();
+        String sel = leftPane.getSelection();
         if (sel == null)
             return;
 
-        File f = new File(currentPane.getPath(), sel);
+        File f = new File(leftPane.getPath(), sel);
         if (!f.isFile())
             return;
 
@@ -210,7 +219,7 @@ public class CharvaCommander extends JFrame {
         if (str == null || str.trim().length() == 0)
             return;
 
-        File file = new File(currentPane.getPath(), str);
+        File file = new File(leftPane.getPath(), str);
         if (file.exists()) {
             int conf = JOptionPane
                 .showConfirmDialog(this, file.getName(), "Continue? File already exits:", JOptionPane.YES_NO_OPTION);
@@ -226,8 +235,8 @@ public class CharvaCommander extends JFrame {
         }
 
         callEditor(file);
-        currentPane.setPath(currentPane.getPath(), file.getName());
-        currentPane.repaint();
+        leftPane.setPath(leftPane.getPath(), file.getName());
+        leftPane.repaint();
     }
 
     private void callViewer(File file) {
@@ -244,11 +253,11 @@ public class CharvaCommander extends JFrame {
     }
 
     private synchronized void edit() {
-        String sel = currentPane.getSelection();
+        String sel = leftPane.getSelection();
         if (sel == null)
             return;
 
-        File f = new File(currentPane.getPath(), sel);
+        File f = new File(leftPane.getPath(), sel);
         if (!f.isFile())
             return;
 
@@ -274,7 +283,7 @@ public class CharvaCommander extends JFrame {
             return;
 
         File f = str.charAt(0) == '/' ? new File(str) :
-            new File(currentPane.getPath(), str);
+            new File(leftPane.getPath(), str);
 
         if (!f.exists())
             JOptionPane.showMessageDialog(this, f.getAbsolutePath(), "Invalid directory", JOptionPane.DEFAULT_OPTION);
@@ -282,13 +291,13 @@ public class CharvaCommander extends JFrame {
             if (!f.isDirectory())
                 f = f.getParentFile();
 
-            currentPane.setPath(f.getAbsolutePath());
-            currentPane.repaint();
+            leftPane.setPath(f.getAbsolutePath());
+            leftPane.repaint();
         }
     }
 
     private synchronized void delete() {
-        String sel = currentPane.getSelection();
+        String sel = leftPane.getSelection();
         if (sel == null)
             return;
 
@@ -296,7 +305,7 @@ public class CharvaCommander extends JFrame {
         if (conf != JOptionPane.YES_OPTION)
             return;
 
-        File f = new File(currentPane.getPath(), sel);
+        File f = new File(leftPane.getPath(), sel);
         if (f.isDirectory() && f.list().length > 0) {
             conf = JOptionPane
                 .showConfirmDialog(this, "Directory is not empty: " + sel, "Delete ?", JOptionPane.YES_NO_OPTION);
@@ -304,13 +313,13 @@ public class CharvaCommander extends JFrame {
                 return;
         }
 
-        int index = currentPane.list.getSelectedIndex();
+        int index = leftPane.list.getSelectedIndex();
         try {
-            delete0(new File(currentPane.getPath(), sel));
+            delete0(new File(leftPane.getPath(), sel));
         } finally {
-            currentPane.setPath(currentPane.getPath());
-            currentPane.list.setCurrentRow(index);
-            currentPane.repaint();
+            leftPane.setPath(leftPane.getPath());
+            leftPane.list.setCurrentRow(index);
+            leftPane.repaint();
         }
     }
 
@@ -325,24 +334,24 @@ public class CharvaCommander extends JFrame {
     @SuppressWarnings("unused")
     private void notImplemented() {
         JOptionPane.showMessageDialog(this, "NOT IMPLEMENTED!", null, JOptionPane.DEFAULT_OPTION);
-        currentPane.requestFocus();
+        leftPane.requestFocus();
     }
 
     private synchronized void copy() {
-        String sel = currentPane.getSelection();
+        String sel = leftPane.getSelection();
         if (sel == null)
             return;
 
         int conf = JOptionPane
-            .showConfirmDialog(this, sel + " to " + otherPane.getPath(), "Copy ?", JOptionPane.YES_NO_OPTION);
+            .showConfirmDialog(this, sel + " to " + rightPane.getPath(), "Copy ?", JOptionPane.YES_NO_OPTION);
         if (conf != JOptionPane.YES_OPTION)
             return;
 
         try {
-            copyRec(new File(currentPane.getPath(), sel), new File(otherPane.getPath(), sel), true);
+            copyRec(new File(leftPane.getPath(), sel), new File(rightPane.getPath(), sel), true);
         } finally {
-            otherPane.setPath(otherPane.getPath(), sel);
-            otherPane.repaint();
+            rightPane.setPath(rightPane.getPath(), sel);
+            rightPane.repaint();
         }
     }
 
@@ -402,13 +411,13 @@ public class CharvaCommander extends JFrame {
     }
 
     private synchronized void mkdir() {
-        String str =
-            JOptionPane.showInputDialog(this, "Directory name: ", "Create directory", JOptionPane.OK_CANCEL_OPTION);
+        String str = JOptionPane.showInputDialog(this, "Directory name: ", "Create directory",
+            JOptionPane.OK_CANCEL_OPTION);
         if (str != null && str.trim().length() > 0) {
-            File file = new File(currentPane.getPath(), str);
+            File file = new File(leftPane.getPath(), str);
             file.mkdir();
-            currentPane.setPath(currentPane.getPath(), "/" + file.getName());
-            currentPane.repaint();
+            leftPane.setPath(leftPane.getPath(), "/" + file.getName());
+            leftPane.repaint();
         }
     }
 
@@ -418,10 +427,87 @@ public class CharvaCommander extends JFrame {
         Toolkit.getDefaultToolkit().close();
     }
 
-    private class Pane extends JScrollPane {
+    private static void format(String str, int limit, StringBuilder sb) {
+        if (str.length() > limit) {
+            int half = limit / 2;
+            if (2 * half < limit) {
+                str = str.substring(0, half) + '~' + str.substring(str.length() - half);
+            } else {
+                str = str.substring(0, half) + '~' + str.substring(str.length() - half + 1);
+            }
+        }
+        sb.append(str);
+        int ln = str.length();
+        while (ln++ < limit) {
+            sb.append(' ');
+        }
+    }
+
+    private static class ListDataEntry implements Comparable {
+        final File file;
+        final String name;
+        private final String text;
+
+        ListDataEntry(File file, String text) {
+            this.file = file;
+            this.name = text;
+            this.text = text;
+        }
+
+        ListDataEntry(File file) {
+            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm");
+            char vline = (char) Toolkit.ACS_VLINE;
+            this.file = file;
+            this.name = (file.isDirectory() ? "/" : "") + file.getName();
+            StringBuilder text = new StringBuilder();
+            text.append((file.isDirectory() ? '/' : ' '));
+            CharvaCommander.format(file.getName(), 15, text);
+            text.append(vline);
+            format(file.length(), text);
+            text.append(vline);
+            text.append(df.format(new Date(file.lastModified())));
+            this.text = text.toString();
+        }
+
+        private static final char[] UNITS = {'B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'};
+
+        private void format(long size, StringBuilder sb) {
+            String s = String.valueOf(size);
+            int index = 0;
+            while (s.length() > 5) {
+                size /= 1024;
+                s = String.valueOf(size);
+                index++;
+            }
+            int ln = s.length();
+            while (ln++ < 5) {
+                sb.append(' ');
+            }
+            sb.append(s);
+            sb.append(UNITS[index]);
+        }
+
+        public String toString() {
+            return text;
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            ListDataEntry other = (ListDataEntry) o;
+            boolean thisDirectory = this.file.isDirectory();
+            if (!(thisDirectory ^ other.file.isDirectory())) {
+                return name.compareTo(other.name);
+            } else {
+                return thisDirectory ? -1 : 1;
+            }
+        }
+    }
+
+    private class Pane extends JScrollPane implements ListSelectionListener {
         String path;
         MyList list;
         TitledBorder border;
+        JLabel label = new JLabel();
         int w;
         int h;
 
@@ -434,17 +520,18 @@ public class CharvaCommander extends JFrame {
             setViewportView(list);
             list.setVisibleRowCount(h);
             list.setColumns(w);
+            list.addListSelectionListener(this);
             this.setViewportBorder(border);
             this.setForeground(FOREGROUND_COLOR);
         }
 
         private void handleFocus() {
-            if (currentPane != this) {
-                otherPane = currentPane;
-                currentPane = this;
-                currentPane.border.setTitleColor(HIGHLIGHT_COLOR);
-                otherPane.border.setTitleColor(FOREGROUND_COLOR);
-                otherPane.repaint();
+            if (leftPane != this) {
+                rightPane = leftPane;
+                leftPane = this;
+                leftPane.border.setTitleColor(HIGHLIGHT_COLOR);
+                rightPane.border.setTitleColor(FOREGROUND_COLOR);
+                rightPane.repaint();
             }
         }
 
@@ -453,19 +540,21 @@ public class CharvaCommander extends JFrame {
             if (file.isDirectory()) {
                 setPath0(s);
                 File[] files = file.listFiles();
-                String[] names = new String[files.length];
+                ListDataEntry[] names = new ListDataEntry[files == null ? 0 : files.length];
 
                 //prefix dirs with '/'
                 int i = 0;
-                for (File f : files)
-                    names[i++] = f.isDirectory() ? "/" + f.getName() : f.getName();
+                if (files != null) {
+                    for (File f : files)
+                        names[i++] = new ListDataEntry(f);
+                }
 
                 Arrays.sort(names);
                 //add parent entry: ".."
                 if (!"/".equals(s)) {
                     int ln = names.length;
-                    String[] names2 = new String[ln + 1];
-                    names2[0] = "..";
+                    ListDataEntry[] names2 = new ListDataEntry[ln + 1];
+                    names2[0] = new ListDataEntry(file, "..");
                     System.arraycopy(names, 0, names2, 1, ln);
                     names = names2;
                 }
@@ -478,8 +567,8 @@ public class CharvaCommander extends JFrame {
                     return 0;
                 } else {
                     i = 0;
-                    for (String nn : names) {
-                        if (n.equals(nn)) {
+                    for (ListDataEntry nn : names) {
+                        if (n.equals(nn.name)) {
                             return i;
                         }
                         i++;
@@ -507,7 +596,7 @@ public class CharvaCommander extends JFrame {
         }
 
         public String getSelection() {
-            String sel = (String) list.getSelectedValue();
+            String sel = ((ListDataEntry) list.getSelectedValue()).name;
             if (sel == null || sel.equals(".."))
                 return null;
 
@@ -530,13 +619,29 @@ public class CharvaCommander extends JFrame {
             border.setTitle(path);
         }
 
+        @Override
+        public void valueChanged(ListSelectionEvent evt) {
+            if (label != null) {
+                if (list.getModel().getSize() > evt.getFirstIndex()) {
+                    String selection = getSelection();
+                    if (selection == null) {
+                        label.setText("");
+                    } else {
+                        StringBuilder sb = new StringBuilder();
+                        format(selection, 38, sb);
+                        label.setText(sb.toString());
+                    }
+                }
+            }
+        }
+
         private class MyList extends JList {
             @Override
             public void processKeyEvent(KeyEvent ke) {
                 EventQueue evtqueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
                 int keyCode = ke.getKeyCode();
                 if (keyCode == KeyEvent.VK_ENTER) {
-                    Object sel = list.getSelectedValue();
+                    Object sel = ((ListDataEntry) list.getSelectedValue()).name;
                     String s;
                     String n = null;
                     if ("..".equals(sel)) {
