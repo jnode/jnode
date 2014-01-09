@@ -21,29 +21,29 @@
 package sun.misc;
 
 import java.lang.reflect.Field;
-import java.security.ProtectionDomain;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.security.CodeSource;
 import java.security.Policy;
+import java.security.PrivilegedAction;
+import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
-import java.util.Map;
 import java.util.HashMap;
-import org.vmmagic.unboxed.ObjectReference;
-import org.vmmagic.unboxed.Address;
-import org.jnode.vm.classmgr.VmStaticField;
-import org.jnode.vm.classmgr.VmInstanceField;
-import org.jnode.vm.classmgr.VmConstString;
-import org.jnode.vm.classmgr.VmField;
-import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.classmgr.VmArray;
-import org.jnode.vm.classmgr.VmClassLoader;
-import org.jnode.vm.facade.VmUtils;
-import org.jnode.vm.scheduler.VmProcessor;
-import org.jnode.vm.VmMagic;
-import org.jnode.vm.VmReflection;
+import java.util.Map;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.SharedStatics;
+import org.jnode.vm.VmMagic;
+import org.jnode.vm.VmReflection;
+import org.jnode.vm.classmgr.VmArray;
+import org.jnode.vm.classmgr.VmClassLoader;
+import org.jnode.vm.classmgr.VmConstString;
+import org.jnode.vm.classmgr.VmField;
+import org.jnode.vm.classmgr.VmInstanceField;
+import org.jnode.vm.classmgr.VmStaticField;
+import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.facade.VmUtils;
+import org.jnode.vm.scheduler.VmProcessor;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.ObjectReference;
 
 /**
  * @author Levente S\u00e1ntha
@@ -681,9 +681,9 @@ class NativeUnsafe {
     static final Map<Object, ThreadParker> parking = new HashMap<Object, ThreadParker>();
     @SharedStatics
     private static class ThreadParker {
-        private synchronized void park(long time){
+        private synchronized void park(long time, int nanos) {
             try {
-                wait(time);
+                wait(time, nanos);
             }catch (InterruptedException x){
                 //ignore
             }
@@ -711,7 +711,7 @@ class NativeUnsafe {
      * @see Unsafe#park(boolean, long)
      */
     public static void park(Unsafe instance, boolean isAbsolute, long time) {
-        //todo add proper support for nanotime parking
+        int nanos = 0;
         ThreadParker p;
         synchronized (parking){
             Thread thread = Thread.currentThread();
@@ -721,9 +721,11 @@ class NativeUnsafe {
                     time = time - System.currentTimeMillis();
                     if(time < 0) time = 1;
                 } else if(time > 0) {
-                    time = time / 10000000;
-                    if(time == 0)
+                    time = time / 1000; // nanoseconds -> milliseconds
+                    nanos = (int) (time % 1000);
+                    if ((time == 0) && (nanos == 0)) {
                         time = 1;
+                    }
                 } else if (time < 0){
                     time = 1;
                 }
@@ -735,7 +737,7 @@ class NativeUnsafe {
         }
 
         if(p != null){
-            p.park(time);
+            p.park(time, nanos);
             synchronized (parking){
                 parking.remove(Thread.currentThread());
             }
