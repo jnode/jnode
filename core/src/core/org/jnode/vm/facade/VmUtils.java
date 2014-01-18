@@ -50,7 +50,7 @@ public class VmUtils {
 
     public static boolean couldImplementNativeMethods(String className) {
         String clsName = VMClassHelper.getClassNamePortion(className);
-        return clsName.startsWith(NATIVE_CLASSNAME_PREFIX);
+        return clsName.startsWith(NATIVE_CLASSNAME_PREFIX) && !(clsName.indexOf('$') >= 0);
     }
 
     public static String getNativeClassName(String className) {

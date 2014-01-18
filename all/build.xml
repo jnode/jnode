@@ -1002,12 +1002,17 @@ clean             Remove all intermediate build results.
 		<echo message="native-method-check"/>
 		<taskdef name="native-check" classname="org.jnode.ant.taskdefs.NativeCheckTask" 
         		classpathref="cp-jnode"/>
+        <property name="declaration-pattern" value="**/gnu/classpath/jdwp/*.class"/>
 
-		<native-check trace="false" failonerror="false">
-			<fileset dir="${root.dir}/core/build/classes">
-				<patternset includes="**/*.class"/>
-			</fileset>
-		</native-check>
+        <native-check trace="false" failonerror="true" classlib="${classlib.jar}">
+            <declarations dir="${root.dir}/core/build/classes">
+                <patternset includes="**/*.class"/>
+            </declarations>
+
+            <implementations dir="${root.dir}/core/build/classes">
+                <patternset includes="**/*.class"/>
+            </implementations>
+        </native-check>
 	</target>
 
 	<!-- Run all tests -->

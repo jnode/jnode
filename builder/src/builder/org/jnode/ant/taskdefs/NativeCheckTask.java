@@ -20,18 +20,24 @@
  
 package org.jnode.ant.taskdefs;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.FileSet;
 import org.jnode.vm.facade.VmUtils;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassAdapter;
@@ -47,13 +53,31 @@ import org.objectweb.asm.attrs.Attributes;
  *
  * @author Fabien DUMINY (fduminy at jnode.org)
  */
-public class NativeCheckTask extends FileSetTask {
+public class NativeCheckTask extends Task {
+    /**
+     * Local files where native methods could be declared.
+     */
+    private final List<FileSet> declarations = new ArrayList<FileSet>();
+
+    /**
+     * Classlib where native methods could be declared.
+     */
+    private File classlib;
+
+    /**
+     * Local files where native methods should be implemented.
+     */
+    private final List<FileSet> implementations = new ArrayList<FileSet>();
+
+    private boolean failOnError;
+    private boolean trace;
+
     /**
      * potential implementation of the native methods for JNode.
      * key: className (String)
      * value: native methods for the class (List&lt;NativeMethod&gt;)
      */
-    private Map<String, List<NativeMethod>> jnodeNativeMethods = new HashMap<String, List<NativeMethod>>();
+    private Map<String, List<NativeMethod>> nativeMethodsImplementations = new HashMap<String, List<NativeMethod>>();
 
     /**
      * native methods per class.
@@ -65,20 +89,33 @@ public class NativeCheckTask extends FileSetTask {
     private Set<String> missingClasses = new TreeSet<String>();
     private Map<String, List<NativeMethod>> missingMethods = new HashMap<String, List<NativeMethod>>();
 
-    protected void doExecute() throws BuildException {
-        // process all classes to find native methods
-        // and classes that could potentially implement native methods
-        // for JNode
-        processFiles();
+    public void setClasslib(File classlib) {
+        this.classlib = classlib;
+    }
+
+    @Override
+    public void execute() throws BuildException {
+        // find native methods that need to be implemented in pure Java
+        log("Searching for declaration of native methods ...", Project.MSG_INFO);
+        int count = processFiles(declarations, false);
+        count += processClasslib();
+        log(count + " declarations of native methods have been found", Project.MSG_INFO);
+
+        // find potential implementations of native methods
+        log("Searching for implementations of native methods ...", Project.MSG_INFO);
+        count = processFiles(implementations, true);
+        log(count + " implementations of native methods have been found", Project.MSG_INFO);
 
         // now, check all native methods are properly implemented
         // for JNode
         int nbNativeMethods = 0;
+        Set<String> usedJNodeNativeClasses = new HashSet<String>();
         for (String className : nativeMethods.keySet()) {
             List<NativeMethod> methods = nativeMethods.get(className);
             for (NativeMethod method : methods) {
                 nbNativeMethods++;
-                checkNativeMethod(className, method);
+//                System.out.println("" + className + "." + method.getName());
+                checkNativeMethod(className, method, usedJNodeNativeClasses);
             }
         }
 
@@ -105,9 +142,40 @@ public class NativeCheckTask extends FileSetTask {
             }
         }
 
+        Set<String> unusedJNodeNativeClasses = new TreeSet<String>();
+        List<String> ignoredClasses = new ArrayList<String>();
+        if (usedJNodeNativeClasses.size() != nativeMethodsImplementations.size()) {
+            for (String cls : nativeMethodsImplementations.keySet()) {
+                if (!usedJNodeNativeClasses.contains(cls)) {
+                    unusedJNodeNativeClasses.add(cls);
+                }
+            }
+
+            if (!unusedJNodeNativeClasses.isEmpty()) {
+                System.err.println("Unused JNode native classes:");
+                for (String cls : unusedJNodeNativeClasses) {
+                    if ("org.jnode.vm.compiler.ir.NativeTest".equals(cls)) {
+                        ignoredClasses.add(cls);
+                    } else {
+                        System.err.println(INDENT + " class " + cls);
+                    }
+                }
+
+                if (!ignoredClasses.isEmpty()) {
+                    System.err.println(INDENT + " WARNING : These classes were ignored :");
+                    for (String cls : ignoredClasses) {
+                        System.err.println(INDENT + INDENT + " class " + cls);
+                    }
+                }
+            }
+        }
+
         System.out.println("Found " + nbNativeMethods + " native methods in " + nativeMethods.size() + " classes");
-        if ((nbMissingMethods != 0) || (nbMissingClasses != 0)) {
+        if ((nbMissingMethods != 0) || (nbMissingClasses != 0) || !unusedJNodeNativeClasses.isEmpty()) {
             System.err.println(missingClasses.size() + " missing classes. " + nbMissingMethods + " missing methods");
+            System.err.println(
+                unusedJNodeNativeClasses.size() + " unused JNode native classes (+" + ignoredClasses.size() +
+                    " ignored classes)");
 
             String message = "Some native methods are not properly implemented (see errors above)";
             if (failOnError) {
@@ -120,15 +188,16 @@ public class NativeCheckTask extends FileSetTask {
         }
     }
 
-    private boolean checkNativeMethod(String className, NativeMethod method) {
+    private boolean checkNativeMethod(String className, NativeMethod method, Set<String> usedJNodeNativeClasses) {
         boolean hasError = false;
         String jnodeNativeClass = VmUtils.getNativeClassName(className.replace('/', '.'));
 
-        if (jnodeNativeMethods.containsKey(jnodeNativeClass)) {
-            List<NativeMethod> methods = jnodeNativeMethods.get(jnodeNativeClass);
+        if (nativeMethodsImplementations.containsKey(jnodeNativeClass)) {
+            List<NativeMethod> methods = nativeMethodsImplementations.get(jnodeNativeClass);
             boolean found = false;
             for (NativeMethod nvMethod : methods) {
                 if (method.getName().equals(nvMethod.getName())) {
+                    usedJNodeNativeClasses.add(jnodeNativeClass);
                     found = true;
                     break;
                 }
@@ -152,33 +221,68 @@ public class NativeCheckTask extends FileSetTask {
         return hasError;
     }
 
-    @Override
-    protected void processFile(File file) throws IOException {
-        FileInputStream fis = null;
+    protected int processClasslib() {
+        int count = 0;
+
+        JarInputStream jis = null;
+        String jar = classlib.getAbsolutePath() + "!";
 
         try {
-            fis = new FileInputStream(file);
-            NativeMethodClassVisitor v = getNativeMethods(file, fis);
-            if ((v != null) && !v.getNativeMethods().isEmpty()) {
-                if (v.couldImplementNativeMethods()) {
-                    jnodeNativeMethods.put(v.getClassName(), v.getNativeMethods());
-                } else {
-                    nativeMethods.put(v.getClassName(), v.getNativeMethods());
+            jis = new JarInputStream(new FileInputStream(classlib));
+            JarEntry jarEntry;
+            while ((jarEntry = jis.getNextJarEntry()) != null) {
+                if (!jarEntry.isDirectory() && jarEntry.getName().endsWith(".class")) {
+                    byte[] buffer = new byte[(int) jarEntry.getSize()];
+                    jis.read(buffer);
+                    count += findNativeMethods(jar + jarEntry.getName(), new ByteArrayInputStream(buffer), false);
                 }
             }
+        } catch (IOException ioe) {
+            throw new BuildException(ioe);
         } finally {
-            if (fis != null) {
-                fis.close();
+            if (jis != null) {
+                try {
+                    jis.close();
+                } catch (IOException e) {
+                    throw new BuildException(e);
+                }
             }
         }
+
+        return count;
     }
 
-    private NativeMethodClassVisitor getNativeMethods(File file, InputStream inputClass) throws BuildException {
+    protected int findNativeMethods(String pathToClass, InputStream inputStream, boolean implementation)
+        throws IOException {
+        int count = 0;
+        if (trace) {
+            System.out.println("findNativeMethods in class " + pathToClass);
+        }
+
+        try {
+            NativeMethodClassVisitor v = getNativeMethods(pathToClass, inputStream, implementation);
+            if ((v != null) && !v.getMethods().isEmpty()) {
+                if (implementation) {
+                    nativeMethodsImplementations.put(v.getClassName(), v.getMethods());
+                } else {
+                    nativeMethods.put(v.getClassName(), v.getMethods());
+                }
+                count++;
+            }
+        } finally {
+            inputStream.close();
+        }
+
+        return count;
+    }
+
+    private NativeMethodClassVisitor getNativeMethods(String file, InputStream inputClass, boolean implementation)
+        throws BuildException {
         ClassWriter cw = new ClassWriter(false);
         NativeMethodClassVisitor v = null;
         try {
             ClassReader cr = new ClassReader(inputClass);
-            v = new NativeMethodClassVisitor(file, cw);
+            v = new NativeMethodClassVisitor(cw, implementation);
             cr.accept(v, Attributes.getDefaultAttributes(), true);
 
             if (v.allowNatives()) {
@@ -187,19 +291,21 @@ public class NativeCheckTask extends FileSetTask {
                 v = null;
             }
         } catch (Exception ex) {
-            System.err.println("Unable to load class in file " + file.getAbsolutePath() + " : " + ex.getMessage());
+            System.err.println("ERROR : Unable to load class in file " + file + " : " + ex);
         }
         return v;
     }
 
     private static class NativeMethodClassVisitor extends ClassAdapter {
+        private final boolean implementation;
         private String className;
         private boolean couldImplementNativeMethods;
         private boolean allowNatives = false;
-        private List<NativeMethod> nativeMethods = new ArrayList<NativeMethod>();
+        private List<NativeMethod> methods = new ArrayList<NativeMethod>();
 
-        public NativeMethodClassVisitor(File file, ClassVisitor cv) {
+        public NativeMethodClassVisitor(ClassVisitor cv, boolean implementation) {
             super(cv);
+            this.implementation = implementation;
         }
 
         @Override
@@ -211,7 +317,7 @@ public class NativeCheckTask extends FileSetTask {
                           String sourceFile) {
             this.className = name.replace('/', '.');
             this.allowNatives = VmUtils.allowNatives(className, "x86"); //TODO hard coded architecture: change that !
-            this.couldImplementNativeMethods = VmUtils.couldImplementNativeMethods(className);
+            this.couldImplementNativeMethods = implementation && VmUtils.couldImplementNativeMethods(className);
 
             super.visit(version, access, name, superName, interfaces, sourceFile);
         }
@@ -222,25 +328,28 @@ public class NativeCheckTask extends FileSetTask {
                                        String desc,
                                        String[] exceptions,
                                        Attribute attrs) {
-            if (!allowNatives) {
-                // we don't allow native for that class =>
-                // we must have a pure java implementation for that method
 
-                if ((couldImplementNativeMethods && isStatic(access)) ||
-                    isNative(access)) {
-                    nativeMethods.add(new NativeMethod(access, name, desc));
+            if (implementation) {
+                // we are looking for potential implementation of native methods
+                if (couldImplementNativeMethods && isStatic(access)) {
+                    methods.add(new NativeMethod(access, name, desc));
+                }
+            } else {
+                // we are looking for declarations of native methods
+                if (isNative(access)) {
+                    methods.add(new NativeMethod(access, name, desc));
                 }
             }
 
-            return null; // we don't to visit inside the method
+            return null; // we don't want to visit inside the method
         }
 
         public String getClassName() {
             return className;
         }
 
-        public List<NativeMethod> getNativeMethods() {
-            return nativeMethods;
+        public List<NativeMethod> getMethods() {
+            return methods;
         }
 
         public boolean couldImplementNativeMethods() {
@@ -289,7 +398,45 @@ public class NativeCheckTask extends FileSetTask {
         return isSet(access, org.objectweb.asm.Constants.ACC_STATIC);
     }
 
+    public void setFailOnError(boolean failOnError) {
+        this.failOnError = failOnError;
+    }
+
+    public void setTrace(boolean trace) {
+        this.trace = trace;
+    }
+
+    public void addImplementations(FileSet fs) {
+        implementations.add(fs);
+    }
+
+    public void addDeclarations(FileSet fs) {
+        declarations.add(fs);
+    }
+
     private static boolean isSet(int access, int flag) {
         return ((access & flag) == flag);
+    }
+
+    protected int processFiles(List<FileSet> fileSets, boolean implementation) throws BuildException {
+        int count = 0;
+
+        final Project project = getProject();
+        try {
+            for (FileSet fs : fileSets) {
+                final String[] files = fs.getDirectoryScanner(project)
+                    .getIncludedFiles();
+                final File projectDir = fs.getDir(project);
+                for (String fname : files) {
+                    File classFile = new File(projectDir, fname);
+                    count +=
+                        findNativeMethods(classFile.getAbsolutePath(), new FileInputStream(classFile), implementation);
+                }
+            }
+        } catch (IOException e) {
+            throw new BuildException(e);
+        }
+
+        return count;
     }
 }
