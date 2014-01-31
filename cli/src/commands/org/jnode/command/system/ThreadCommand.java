@@ -23,14 +23,15 @@ package org.jnode.command.system;
 import java.io.PrintWriter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
 import java.util.Comparator;
 import java.util.TreeSet;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
-import org.jnode.shell.syntax.ThreadNameArgument;
+import org.jnode.shell.syntax.ThreadArgument;
 import org.jnode.vm.scheduler.VmThread;
+
+import static org.jnode.shell.syntax.ThreadArgument.Option.NAME_OR_ID;
 
 /**
  * Shell command to print information about all threads or a specific thread.
@@ -41,8 +42,8 @@ import org.jnode.vm.scheduler.VmThread;
  * @author Levente S\u00e1ntha
  */
 public class ThreadCommand extends AbstractCommand {
-    
-    private static final String help_name = "the name of a specific thread to be printed";
+
+    private static final String help_name = "the name or id of a specific thread to be printed";
     private static final String help_group = "output a ThreadGroup dump";
     private static final String help_verbose = "show all threads in thread groups";
     private static final String help_super = "View info about all threads, or a specific thread";
@@ -52,16 +53,16 @@ public class ThreadCommand extends AbstractCommand {
     private static final String GROUP = "Group ";
     private static final String TRACE = "Stack trace";
 
-    private final ThreadNameArgument argName;
+    private final ThreadArgument argNameOrId;
     private final FlagArgument argDump;
     private final FlagArgument argVerbose;
 
     public ThreadCommand() {
         super(help_super);
-        argName = new ThreadNameArgument("threadName", Argument.OPTIONAL, help_name);
+        argNameOrId = new ThreadArgument("threadNameOrId", Argument.OPTIONAL, help_name, NAME_OR_ID);
         argDump = new FlagArgument("groupDump", Argument.OPTIONAL, help_group);
         argVerbose = new FlagArgument("verbose", Argument.OPTIONAL, help_verbose);
-        registerArguments(argName, argVerbose, argDump);
+        registerArguments(argNameOrId, argVerbose, argDump);
     }
 
     public static void main(String[] args) throws Exception {
@@ -72,8 +73,8 @@ public class ThreadCommand extends AbstractCommand {
      * Execute this command
      */
     public void execute() throws Exception {
-        // If threadName is null, we'll print all threads
-        String threadName = (argName.isSet()) ? argName.getValue() : null;
+        // If threadNameOrId is null, we'll print all threads
+        String threadNameOrId = (argNameOrId.isSet()) ? argNameOrId.getValue() : null;
         boolean dump = argDump.isSet();
 
         // Find the root of the ThreadGroup tree
@@ -88,11 +89,11 @@ public class ThreadCommand extends AbstractCommand {
             // standard API.
             grp.list();
         } else {
-            if (!argVerbose.isSet() && !argName.isSet()) {
+            if (!argVerbose.isSet() && !argNameOrId.isSet()) {
                 showDefaultInfo(grp);
             } else {
                 // Show the threads in the ThreadGroup tree.
-                showThreads(grp, getOutput().getPrintWriter(), threadName);
+                showThreads(grp, getOutput().getPrintWriter(), threadNameOrId);
             }
         }
     }
@@ -146,10 +147,10 @@ public class ThreadCommand extends AbstractCommand {
      * 
      * @param grp the ThreadGroup to traverse
      * @param out the destination for output
-     * @param threadName if non-null, only display this thread.
+     * @param threadNameOrId if non-null, only display this thread.
      */
-    private void showThreads(ThreadGroup grp, PrintWriter out, String threadName) {
-        if (threadName == null) {
+    private void showThreads(ThreadGroup grp, PrintWriter out, String threadNameOrId) {
+        if (threadNameOrId == null) {
             out.println(GROUP + grp.getName());
         }
 
@@ -160,7 +161,7 @@ public class ThreadCommand extends AbstractCommand {
         for (int i = 0; i < max; i++) {
             final Thread t = ts[i];
             if (t != null) {
-                if ((threadName == null) || threadName.equals(t.getName())) {
+                if ((threadNameOrId == null) || argNameOrId.accept(t, threadNameOrId)) {
                     VmThread vmThread = AccessController
                     .doPrivileged(new PrivilegedAction<VmThread>() {
                         public VmThread run() {
@@ -169,7 +170,7 @@ public class ThreadCommand extends AbstractCommand {
                     });
                     out.println(SLASH_T + t.getId() + SEPARATOR + t.getName() + SEPARATOR +
                             t.getPriority() + SEPARATOR + vmThread.getThreadStateName());
-                    if (threadName != null) {
+                    if (threadNameOrId != null) {
                         final Object[] trace = VmThread.getStackTrace(vmThread);
                         final int traceLen = trace.length;
                         out.println(SLASH_T + SLASH_T + TRACE);
@@ -188,7 +189,7 @@ public class ThreadCommand extends AbstractCommand {
         for (int i = 0; i < gmax; i++) {
             final ThreadGroup tg = tgs[i];
             if (tg != null) {
-                showThreads(tg, out, threadName);
+                showThreads(tg, out, threadNameOrId);
             }
         }
     }

@@ -144,12 +144,14 @@
                 </repeat>
             </sequence>
         </syntax>
-        <syntax alias="kill" description="Kill a thread">
+        <syntax alias="kill" description="Kill threads">
             <sequence>
                 <repeat maxCount="1">
                     <option argLabel="debug" longName="debug"/>
                 </repeat>
-                <argument argLabel="threadId"/>
+                <repeat>
+                    <argument argLabel="threadNameOrId"/>
+                </repeat>
             </sequence>
         </syntax>
         <syntax alias="loadkeys">
@@ -317,7 +319,7 @@
             <optional description="Display all threads in thread groups">
                 <option argLabel="verbose" shortName="v"/>
             </optional>
-            <argument argLabel="threadName" description="Display the named Thread"/>
+            <argument argLabel="threadNameOrId" description="Display the named/identified Thread"/>
         </syntax>
         <syntax alias="uname" description="Print operating system informations.">
             <empty description="Print the hardware type on witch system is running; same like argument -m"/>
