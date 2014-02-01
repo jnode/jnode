@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr;
 
 import java.io.PrintWriter;
@@ -35,6 +35,7 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.facade.GCStatistics;
 import org.jnode.vm.facade.HeapStatistics;
 import org.jnode.vm.facade.ObjectFilter;
+import org.jnode.vm.facade.ObjectVisitor;
 import org.jnode.vm.facade.VmProcessor;
 import org.jnode.vm.facade.VmWriteBarrier;
 import org.jnode.vm.objects.VmSystemObject;
@@ -322,6 +323,11 @@ public abstract class VmHeapManager extends VmSystemObject implements org.jnode.
      * {@inheritDoc}
      */
     public abstract HeapStatistics getHeapStatistics(ObjectFilter objectFilter);
+
+    /**
+     * {@inheritDoc}
+     */
+    public abstract void accept(ObjectVisitor visitor);
 
     /**
      * {@inheritDoc}

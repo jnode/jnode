@@ -17,11 +17,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.facade;
 
 import java.io.PrintWriter;
-
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmType;
 import org.vmmagic.unboxed.Address;
@@ -46,7 +45,7 @@ public interface VmHeapManager {
      *
      * @param ptr The address to examine.
      * @return True if the given address if a valid starting address of an
-     *         object, false otherwise.
+     * object, false otherwise.
      */
     boolean isObject(Address ptr);
 
@@ -91,10 +90,16 @@ public interface VmHeapManager {
 
     /**
      * Get this heap's statistics.
-     * @param objectFilter The optional filter to apply to objects found on heap. 
+     *
+     * @param objectFilter The optional filter to apply to objects found on heap.
      * @return the heap statistics
      */
     HeapStatistics getHeapStatistics(ObjectFilter objectFilter);
+
+    /**
+     * Visits heaps objects.
+     */
+    void accept(ObjectVisitor visitor);
 
     /**
      * Get this heap GC's statistics.

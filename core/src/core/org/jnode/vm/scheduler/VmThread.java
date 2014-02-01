@@ -17,9 +17,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.scheduler;
 
+import java.lang.management.ThreadInfo;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.AbstractOwnableSynchronizer;
+import java.util.concurrent.locks.LockSupport;
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.KernelSpace;
@@ -29,6 +34,7 @@ import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.annotation.SharedStatics;
 import org.jnode.annotation.Uninterruptible;
 import org.jnode.util.NumberUtils;
+import org.jnode.vm.NativeHelper;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmAccessControlContext;
 import org.jnode.vm.VmAccessController;
@@ -51,10 +57,18 @@ import org.jnode.vm.objects.VmSystemObject;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 
+import static java.lang.Thread.State.BLOCKED;
+import static java.lang.Thread.State.NEW;
+import static java.lang.Thread.State.RUNNABLE;
+import static java.lang.Thread.State.TERMINATED;
+import static java.lang.Thread.State.TIMED_WAITING;
+import static java.lang.Thread.State.WAITING;
+
 /**
  * VM thread implementation
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Fabien DUMINY (fduminy at jnode.org)
  */
 @SharedStatics
 @MagicPermission
@@ -634,7 +648,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      * destroyed.
      *
      * @return <code>true</code> if thread is alive, <code>false</code> if
-     *         not.
+     * not.
      * @see #start()
      * @see #stop(Throwable)
      * @see #suspend()
@@ -731,7 +745,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      * Gets the thread this thread is waiting for (or null).
      *
      * @return the VmThread for the thread that this one is
-     *         waiting for, or {@code null}.
+     * waiting for, or {@code null}.
      */
     @KernelSpace
     final VmThread getWaitForThread() {
@@ -1058,7 +1072,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
                 throw new Error("Unknown thread state " + threadState);
         }
         // Now detect deadlocks
-        detectDeadlock();
+        detectDeadlock(null, true); //concurrentLocks=true
     }
 
     /**
@@ -1141,40 +1155,92 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
     }
 
     /**
-     * Detect a deadlock on this thread.
+     * {@inheritDoc}
      */
     @Uninterruptible
-    private final void detectDeadlock() {
+    @Override
+    public final void detectDeadlock(List<org.jnode.vm.facade.VmThread> deadLockCycle, boolean concurrentLocks) {
+        // first, ensure the initial list is empty (when it's not null)
+        if (deadLockCycle != null) {
+            deadLockCycle.clear();
+        }
+
         if (isWaiting()) {
-            walkWaitingThreads(this);
+            walkWaitingThreads(this, deadLockCycle, concurrentLocks);
         }
     }
 
     /**
      * Helper for detectDeadlock
      *
-     * @param thread
+     * @param thread          The thread to check for deadlock.
+     * @param deadLockCycle   The list of threads involved in a deadlock.
+     * @param concurrentLocks If true, includes concurrent locks in the search.
      * @throws UninterruptiblePragma
      */
     @Uninterruptible
-    private final void walkWaitingThreads(VmThread thread) {
+    private final void walkWaitingThreads(VmThread thread, List<org.jnode.vm.facade.VmThread> deadLockCycle,
+                                          boolean concurrentLocks) {
         if (thread == null) {
+            if (deadLockCycle != null) {
+                deadLockCycle.clear();
+            }
             return;
         }
         final Monitor waitForMonitor = thread.waitForMonitor;
+        final VmThread owner;
         if (waitForMonitor == null) {
-            return;
-        }
-        final VmThread owner = waitForMonitor.getOwner();
-        if (owner == this) {
-            // We have a deadlock
-            Unsafe.debug("Deadlock[");
-            Unsafe.debug(this.asThread().getName());
-            Unsafe.debug(", ");
-            Unsafe.debug(owner.asThread().getName());
+            VmThread concurrentOwner = null;
+            if (concurrentLocks) {
+                concurrentOwner = thread.getConcurrentOwner();
+            }
+
+            if (concurrentOwner == null) {
+                if (deadLockCycle != null) {
+                    deadLockCycle.clear();
+                }
+                return;
+            }
+            owner = concurrentOwner;
         } else {
-            walkWaitingThreads(owner);
+            owner = waitForMonitor.getOwner();
         }
+
+        if (owner == this) {
+            // we have found a cycle
+            // => deadLockCycle contains threads involved in the deadlock
+            if (deadLockCycle != null) {
+                deadLockCycle.add(owner);
+            } else {
+                // We have a deadlock
+                Unsafe.debug("Deadlock[");
+                Unsafe.debug(this.asThread().getName());
+                Unsafe.debug(", ");
+                Unsafe.debug(owner.asThread().getName());
+            }
+        } else {
+            if (deadLockCycle != null) {
+                deadLockCycle.add(owner);
+            }
+            walkWaitingThreads(owner, deadLockCycle, concurrentLocks);
+        }
+    }
+
+    private VmThread getConcurrentOwner() {
+        return getConcurrentOwner(LockSupport.getBlocker(asThread()), null); // get java.lang.Thread#parkBlocker
+    }
+
+
+    private VmThread getConcurrentOwner(Object blockerObj, List<AbstractOwnableSynchronizer> ownableSynchronizers) {
+        VmThread concurrentOwner = null;
+        if (blockerObj instanceof AbstractOwnableSynchronizer) {
+            if (ownableSynchronizers != null) {
+                ownableSynchronizers.add((AbstractOwnableSynchronizer) blockerObj);
+            }
+            Thread thread = NativeHelper.callGetter(Thread.class, blockerObj, "getExclusiveOwnerThread");
+            concurrentOwner = NativeHelper.getFieldValue(VmThread.class, thread, "vmThread");
+        }
+        return concurrentOwner;
     }
 
     /**
@@ -1250,6 +1316,10 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      * @return The stacktrace
      */
     public static Object[] getStackTrace(VmThread current) {
+        return getStackTrace(current, STACKTRACE_LIMIT);
+    }
+
+    private static Object[] getStackTrace(VmThread current, int stackTraceLimit) {
         if (current.inException) {
             Unsafe.debug("Exception in getStackTrace");
             VmProcessor.current().getArchitecture().getStackReader()
@@ -1274,7 +1344,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
             try {
                 mt = reader.getVmStackTrace(current.getExceptionStackFrame(),
                     current.getExceptionInstructionPointer(),
-                    STACKTRACE_LIMIT);
+                    stackTraceLimit);
             } finally {
                 proc.enableReschedule(false);
             }
@@ -1282,12 +1352,12 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
         } else if (current == proc.getCurrentThread()) {
             final Address curFrame = VmMagic.getCurrentFrame();
             mt = reader.getVmStackTrace(reader.getPrevious(curFrame), reader
-                .getReturnAddress(curFrame), STACKTRACE_LIMIT);
+                .getReturnAddress(curFrame), stackTraceLimit);
         } else {
             proc.disableReschedule(false);
             try {
                 mt = reader.getVmStackTrace(current.getStackFrame(), current
-                    .getInstructionPointer(), STACKTRACE_LIMIT);
+                    .getInstructionPointer(), stackTraceLimit);
                 // lastIP = current.getInstructionPointer();
             } finally {
                 proc.enableReschedule(false);
@@ -1410,6 +1480,112 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
         return isolatedStatics;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ThreadInfo getThreadInfo(boolean lockedMonitors, boolean lockedSynchronizers, int maxDepth, boolean useCache,
+                                    final List<AbstractOwnableSynchronizer> cachedOwnableSynchronizers) {
+        int actualDepth = ((maxDepth < 0) || (maxDepth > STACKTRACE_LIMIT)) ? STACKTRACE_LIMIT : maxDepth;
+        StackTraceElement[] stackTrace =
+            (actualDepth == 0) ? null : VmImpl.backTrace2stackTrace(getStackTrace(this, actualDepth));
+
+        // find owned monitors
+        Object[] monitors = null;
+        if (lockedMonitors && (lastOwnedMonitor != null)) {
+            List<Object> monitorList = new ArrayList<Object>();
+            Monitor m = lastOwnedMonitor;
+            while (m != null) {
+                monitorList.add(m);
+                m = m.getPrevious();
+            }
+            monitors = monitorList.toArray();
+        }
+
+        // find owned synchronizers
+        Object[] synchronizers = null;
+        if (lockedSynchronizers) {
+            final List<Object> mySynchronizers = new ArrayList<Object>();
+            if (useCache) {
+                for (AbstractOwnableSynchronizer s : cachedOwnableSynchronizers) {
+                    addIfMySynchronizer(s, null, mySynchronizers);
+                }
+            } else {
+                ObjectVisitor visitor = new ObjectVisitor() {
+                    @Override
+                    public boolean visit(Object object) {
+                        addIfMySynchronizer(object, cachedOwnableSynchronizers, mySynchronizers);
+                        return true;
+                    }
+                };
+                VmUtils.getVm().getHeapManager().accept(visitor);
+            }
+            synchronizers = mySynchronizers.isEmpty() ? null : mySynchronizers.toArray();
+        }
+
+        Object lockObj = waitForMonitor;
+        Thread lockOwner = ((waitForMonitor == null) || (waitForMonitor.getOwner() == null)) ? null :
+            waitForMonitor.getOwner().asThread();
+
+        //TODO fill these values :
+        long blockedCount = 0;
+        long blockedTime = 0;
+        long waitedCount = 0;
+        long waitedTime = 0;
+        int[] stackDepths = null;
+        // end of TO DO "fill these values"
+
+        return createThreadInfo(asThread(), threadState, lockObj, lockOwner, blockedCount, blockedTime, waitedCount,
+            waitedTime,
+            stackTrace, (monitors == null) ? null : monitors, stackDepths, synchronizers);
+    }
+
+    private void addIfMySynchronizer(Object object, List<AbstractOwnableSynchronizer> allSynchronizers,
+                                     List<Object> mySynchronizers) {
+        VmThread owner = getConcurrentOwner(object, allSynchronizers);
+        if (owner == this) {
+            mySynchronizers.add(object);
+        }
+    }
+
+    private static final ThreadInfo createThreadInfo(Thread t, int state, Object lockObj, Thread lockOwner,
+                                                     long blockedCount, long blockedTime,
+                                                     long waitedCount, long waitedTime,
+                                                     StackTraceElement[] stackTrace,
+                                                     Object[] monitors,
+                                                     int[] stackDepths,
+                                                     Object[] synchronizers) {
+        return NativeHelper
+            .newInstance(ThreadInfo.class, new Class[]{Thread.class, int.class, Object.class, Thread.class,
+                long.class, long.class, long.class, long.class, StackTraceElement[].class, Object[].class,
+                int[].class, Object[].class},
+                new Object[]{t, state, lockObj, lockOwner, blockedCount, blockedTime, waitedCount, waitedTime,
+                    stackTrace, monitors, stackDepths, synchronizers});
+//        try {
+//            Constructor c =
+//                ThreadInfo.class.getConstructor(new Class[]{Thread.class, int.class, Object.class, Thread.class,
+//                    long.class, long.class, long.class, long.class, StackTraceElement[].class, Object[].class,
+//                    int[].class, Object[].class});
+//            c.setAccessible(true);
+//
+//            try {
+//                return (ThreadInfo) c
+//                    .newInstance(t, state, lockObj, lockOwner, blockedCount, blockedTime, waitedCount, waitedTime,
+//                        stackTrace, monitors, stackDepths, synchronizers);
+//            } finally {
+//                c.setAccessible(false);
+//            }
+//        } catch (NoSuchMethodException e) {
+//            throw new RuntimeException(e);
+//        } catch (InvocationTargetException e) {
+//            throw new RuntimeException(e);
+//        } catch (InstantiationException e) {
+//            throw new RuntimeException(e);
+//        } catch (IllegalAccessException e) {
+//            throw new RuntimeException(e);
+//        }
+    }
+
     @Uninterruptible
     final Monitor getLastOwnedMonitor() {
         return lastOwnedMonitor;
@@ -1422,5 +1598,35 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
 
     private VmScheduler getScheduler() {
         return ((VmImpl) VmUtils.getVm()).getScheduler();
+    }
+
+    /**
+     * Initialize the the mapping between VmThread states and Thread.State.
+     * TODO this mapping might need some review because meaning of some states is not clear.
+     *
+     * @param vmThreadStateValues
+     * @param vmThreadStateNames
+     */
+    public static void getThreadStateValues(int[][] vmThreadStateValues, String[][] vmThreadStateNames) {
+        vmThreadStateValues[NEW.ordinal()] = new int[]{CREATED};
+        vmThreadStateNames[NEW.ordinal()] = new String[]{NEW.name()};
+
+        vmThreadStateValues[RUNNABLE.ordinal()] = new int[]{RUNNING, SUSPENDED, YIELDING, ASLEEP};
+        vmThreadStateNames[RUNNABLE.ordinal()] =
+            new String[]{RUNNABLE.name() + ".RUNNING", RUNNABLE.name() + ".SUSPENDED", RUNNABLE.name() + ".YIELDING",
+                RUNNABLE.name() + ".ASLEEP"};
+
+        vmThreadStateValues[BLOCKED.ordinal()] = new int[]{WAITING_ENTER};
+        vmThreadStateNames[BLOCKED.ordinal()] = new String[]{BLOCKED.name()};
+
+        vmThreadStateValues[WAITING.ordinal()] = new int[]{WAITING_NOTIFY};
+        vmThreadStateNames[WAITING.ordinal()] = new String[]{WAITING.name()};
+
+        vmThreadStateValues[TIMED_WAITING.ordinal()] = new int[]{WAITING_NOTIFY_TIMEOUT};
+        vmThreadStateNames[TIMED_WAITING.ordinal()] = new String[]{TIMED_WAITING.name()};
+
+        vmThreadStateValues[TERMINATED.ordinal()] = new int[]{STOPPED, DESTROYED};
+        vmThreadStateNames[TERMINATED.ordinal()] =
+            new String[]{TERMINATED.name() + ".STOPPED", TERMINATED.name() + ".DESTROYED"};
     }
 }

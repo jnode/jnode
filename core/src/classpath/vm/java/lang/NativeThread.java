@@ -17,14 +17,15 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package java.lang;
 
-import org.jnode.vm.scheduler.VmThread;
-import org.jnode.vm.scheduler.VmProcessor;
-import org.jnode.vm.scheduler.MonitorManager;
-import org.jnode.vm.classmgr.VmIsolatedStatics;
+import org.jnode.vm.VmImpl;
 import org.jnode.vm.VmSystem;
+import org.jnode.vm.classmgr.VmIsolatedStatics;
+import org.jnode.vm.scheduler.MonitorManager;
+import org.jnode.vm.scheduler.VmProcessor;
+import org.jnode.vm.scheduler.VmThread;
 
 /**
  *
@@ -122,7 +123,7 @@ class NativeThread {
     }
 
     private static StackTraceElement[] getStackTrace0(Thread instance) {
-        return NativeThrowable.backTrace2stackTrace(VmThread.getStackTrace((VmThread) instance.vmThread));
+        return VmImpl.backTrace2stackTrace(VmThread.getStackTrace((VmThread) instance.vmThread));
     }
 
     private static Thread currentThread() {

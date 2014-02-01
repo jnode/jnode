@@ -17,11 +17,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import java.io.PrintWriter;
-
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.vm.BaseVmArchitecture;
@@ -142,7 +141,7 @@ public final class DefaultHeapManager extends VmHeapManager {
      *
      * @param ptr The address to examine.
      * @return True if the given address if a valid starting address of an
-     *         object, false otherwise.
+     * object, false otherwise.
      */
     @Inline
     public final boolean isObject(Address ptr) {
@@ -461,7 +460,14 @@ public final class DefaultHeapManager extends VmHeapManager {
 
         return heapStatistics;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    public void accept(ObjectVisitor visitor) {
+        accept(visitor, false);
+    }
+
     private void accept(ObjectVisitor visitor, boolean locking) {
         VmDefaultHeap heap = firstNormalHeap;
         final Word zero = Word.zero();
@@ -471,7 +477,7 @@ public final class DefaultHeapManager extends VmHeapManager {
             heap = heap.getNext();
         }
     }
-    
+
     /**
      * @see org.jnode.vm.memmgr.VmHeapManager#createProcessorHeapData(org.jnode.vm.facade.VmProcessor)
      */
