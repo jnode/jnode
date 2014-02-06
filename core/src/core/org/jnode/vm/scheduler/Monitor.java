@@ -20,15 +20,15 @@
  
 package org.jnode.vm.scheduler;
 
-import org.jnode.vm.Unsafe;
-import org.jnode.vm.VmMagic;
-import org.jnode.vm.VmSystem;
 import org.jnode.annotation.Inline;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.MagicPermission;
 import org.jnode.annotation.NoFieldAlignments;
 import org.jnode.annotation.NoInline;
 import org.jnode.annotation.Uninterruptible;
+import org.jnode.vm.Unsafe;
+import org.jnode.vm.VmMagic;
+import org.jnode.vm.VmSystem;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 
@@ -134,7 +134,7 @@ public final class Monitor {
     }
 
     /**
-     * Slow path of enter (current thread is not the owner). This is a seperate
+     * Slow path of enter (current thread is not the owner). This is a separate
      * method to control the inlining of the native code compiler.
      */
     @NoInline
@@ -169,7 +169,7 @@ public final class Monitor {
     }
 
     /**
-     * Giveup this monitor.
+     * Give up this monitor.
      *
      * @throws org.vmmagic.pragma.UninterruptiblePragma
      *
@@ -203,7 +203,7 @@ public final class Monitor {
     }
 
     /**
-     * Giveup this monitor.
+     * Give up this monitor.
      * Called from VmThread on thread stop.
      *
      * @throws org.vmmagic.pragma.UninterruptiblePragma
