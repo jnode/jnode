@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -271,9 +272,12 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
         log.debug("Checking partitions");
         IBMPartitionTableEntry lastValid = null;
         boolean foundValidEntry = false;
+        int emptyPartitions = 0;
         for (int partitionNumber = 0; partitionNumber < TABLE_SIZE; partitionNumber++) {
             IBMPartitionTableEntry partition = new IBMPartitionTableEntry(null, bootSector, partitionNumber);
-
+            if (partition.isEmpty()) {
+                emptyPartitions++;
+            }
             if (partition.isValid()) {
                 if (lastValid != null) {
                     if (lastValid.getStartLba() + lastValid.getNrSectors() > partition.getStartLba()) {
@@ -286,7 +290,9 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
                 lastValid = partition;
             }
         }
-
+        if (emptyPartitions == TABLE_SIZE) {
+            return true;
+        }
         return foundValidEntry;
     }
 
