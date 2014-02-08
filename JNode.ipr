@@ -499,7 +499,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Dummy" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6 (jnode)" project-jdk-type="JavaSDK" />
   <component name="ResourceManagerContainer">
     <option name="myResourceBundles">
       <value>
@@ -574,49 +574,5 @@
     <mapping directory="" vcs="Git" />
   </component>
   <component name="WebServicesPlugin" addRequiredLibraries="true" />
-  <component name="libraryTable">
-    <library name="core">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/core/lib/ant-commons-net.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/ant-junit.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/ant-launcher.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/ant-nodeps.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/ant-trax.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/ant.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/asm.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/cglib-2.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/gnu-crypto.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/javax-crypto.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/javax-security.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/jmock-1.0.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/jmock-cglib-1.0.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/junit.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/log4j-1.2.8.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/nanoxml-lite-2.2.3.jar!/" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES />
-    </library>
-    <library name="distr">
-      <CLASSES>
-        <root url="file://$PROJECT_DIR$/distr/lib" />
-        <root url="file://$PROJECT_DIR$/distr/lib" />
-        <root url="file://$PROJECT_DIR$/distr/lib" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES>
-        <root url="file://$PROJECT_DIR$/decompiled" />
-        <root url="file://$PROJECT_DIR$/distr/decompiled" />
-      </SOURCES>
-      <jarDirectory url="file://$PROJECT_DIR$/distr/lib" recursive="false" />
-    </library>
-    <library name="shell">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/shell/lib/bsh-2.0b1.jar!/" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES />
-    </library>
-  </component>
 </project>
 
