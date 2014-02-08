@@ -195,13 +195,14 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
 
         if (LittleEndian.getUInt32(bootSector, 6) == 0x4f4c494c) {
             // Matches the LILO signature, probably an valid partition table
-        	log.debug("Has LILO signature");
+            log.debug("Has LILO signature");
             return true;
         }
 
         String bootSectorAsString = new String(bootSector, 0, 512, Charset.forName("US-ASCII"));
 
-        if (bootSectorAsString.contains("Invalid partition table\u0000Error loading operating system\u0000Missing operating system")) {
+        if (bootSectorAsString
+            .contains("Invalid partition table\u0000Error loading operating system\u0000Missing operating system")) {
             // Matches Microsoft partition boot code error message signature
             // see:
             //     http://thestarman.pcministry.com/asm/mbr/VistaMBR.htm
@@ -215,32 +216,32 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
 
         if (bootSectorAsString.contains("Read\u0000Boot\u0000 error\r\n\u0000")) {
             // Matches BSD partition boot code error message signature
-        	log.debug("Has BSD code error string signature");
+            log.debug("Has BSD code error string signature");
             return true;
         }
 
         if (bootSectorAsString.contains("GRUB \u0000Geom\u0000Hard Disk\u0000Read\u0000 Error\r\n\u0000")) {
             // Matches GRUB string signature
-        	log.debug("Has GRUB string signature");
+            log.debug("Has GRUB string signature");
             return true;
         }
 
         if (bootSectorAsString.contains("\u0000Multiple active partitions.\r\n")) {
             // Matches SYSLINUX string signature
-        	log.debug("Has SYSLINUX string signature");
+            log.debug("Has SYSLINUX string signature");
             return true;
         }
 
         if (bootSectorAsString.contains("MBR \u0010\u0000")) {
             // Matches MBR string extra signature
-        	log.debug("Has MBR string signature");
+            log.debug("Has MBR string signature");
             return true;
         }
 
         if (LittleEndian.getUInt32(bootSector, 241) == 0x41504354) {
             // Matches TCPA signature
             // see http://thestarman.pcministry.com/asm/mbr/VistaMBR.htm
-        	log.debug("Has TCPA extra signature");
+            log.debug("Has TCPA extra signature");
             return true;
         }
 
@@ -248,7 +249,7 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
 
         if (bsdNameTabString.contains("Linu\ufffd") || bsdNameTabString.contains("FreeBD\ufffd")) {
             // Matches BSD nametab entries signature
-        	log.debug("Has BSD nametab entries");
+            log.debug("Has BSD nametab entries");
             return true;
         }
 

@@ -17,12 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.partitions.ibm;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.bus.ide.IDEConstants;
 
@@ -65,7 +64,7 @@ public class MasterBootRecord {
 
     /**
      * Write the BPB to the MBR to its Correct Position.
-     * 
+     *
      * @param bpb
      */
     public final void setBPB(byte[] bpb) {
@@ -74,11 +73,11 @@ public class MasterBootRecord {
 
     /**
      * Write the contents of this bootsector to the given device.
-     * 
+     *
      * @param api
      */
     public final synchronized void write(BlockDeviceAPI api) throws IOException {
-    	mbr.position(0);
+        mbr.position(0);
         api.write(0, mbr);
         api.flush();
         dirty = false;
@@ -86,17 +85,18 @@ public class MasterBootRecord {
 
     /**
      * Read the contents of this bootsector from the given device.
-     * 
+     *
      * @param api
      */
     public final synchronized void read(BlockDeviceAPI api) throws IOException {
-    	mbr.position(0);
+        mbr.position(0);
         api.read(0, mbr);
         dirty = false;
     }
 
     /**
      * TODO remove the temporary workaround : internal array shouldn't be exposed
+     *
      * @return the MBR array
      */
     public byte[] array() {

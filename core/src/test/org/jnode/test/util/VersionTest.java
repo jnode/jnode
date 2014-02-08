@@ -258,6 +258,6 @@ public class VersionTest {
     @Test(expected = IllegalArgumentException.class)
     public void testError7a() throws Exception {
         @SuppressWarnings("unused")
-		Version a = new Version("1.2.3.4.5");
+        Version a = new Version("1.2.3.4.5");
     }
 }

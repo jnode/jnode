@@ -110,8 +110,7 @@ public class GptPartitionTableEntry implements PartitionTableEntry {
         System.arraycopy(first16KiB, offset + 0x38, nameBytes, 0, nameBytes.length);
         String rawName = new String(nameBytes, Charset.forName("UTF-16LE"));
 
-        if (rawName.contains("\u0000"))
-        {
+        if (rawName.contains("\u0000")) {
             return rawName.substring(0, rawName.indexOf("\u0000"));
         }
 

@@ -280,11 +280,11 @@ public class PluginDependencyChecker extends AbstractPluginTask {
 
         private boolean isNotUseful(StringBuffer buffer) {
             if (descr.getRuntime() != null)
-            	return false;
-            if ((descr.getExtensions() != null) && (descr.getExtensions().length > 0)) 
-            	return false;
+                return false;
+            if ((descr.getExtensions() != null) && (descr.getExtensions().length > 0))
+                return false;
             if (descr.hasCustomPluginClass())
-            	return false;
+                return false;
             buffer.append(" * neither exports classes, nor is an extension, nor provides a plugin class\n");
             return true;
         }

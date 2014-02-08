@@ -90,8 +90,7 @@ public class ApmPartitionTable implements PartitionTable<ApmPartitionTableEntry>
         System.arraycopy(first16KiB, 0x230, typeBytes, 0, typeBytes.length);
         String type = new String(typeBytes, Charset.forName("ASCII")).replace("\u0000", "");
 
-        if (!"Apple_partition_map".equalsIgnoreCase(type))
-        {
+        if (!"Apple_partition_map".equalsIgnoreCase(type)) {
             return false;
         }
 
