@@ -11,11 +11,14 @@
   <component name="CheckStyle-IDEA">
     <option name="configuration">
       <map>
-        <entry key="active-configuration" value="FILE:/home/flesire/developement/sources/jnode/jnode.orig/all/jnode_checks.xml:JNode" />
+        <entry key="active-configuration" value="PROJECT_RELATIVE:$PRJ_DIR$/all/jnode_checks.xml:JNode" />
+        <entry key="check-nonjava-files" value="false" />
         <entry key="check-test-classes" value="true" />
         <entry key="config-file" value="$PROJECT_DIR$/all/jnode_checks.xml" />
-        <entry key="location-0" value="CLASSPATH:/sun_checks.xml:The default CheckStyle rules." />
-        <entry key="location-1" value="FILE:/home/flesire/developement/sources/jnode/jnode.orig/all/jnode_checks.xml:JNode" />
+        <entry key="location-0" value="CLASSPATH:/sun_checks.xml:The default CheckStyle rules" />
+        <entry key="location-1" value="CLASSPATH:/sun_checks.xml:The default CheckStyle rules." />
+        <entry key="location-2" value="PROJECT_RELATIVE:$PRJ_DIR$/all/jnode_checks.xml:JNode" />
+        <entry key="suppress-errors" value="false" />
         <entry key="thirdparty-classpath" value="" />
       </map>
     </option>
