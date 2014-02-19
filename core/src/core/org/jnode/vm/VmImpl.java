@@ -402,21 +402,22 @@ final class VmImpl extends VmSystemObject implements Statistics, org.jnode.vm.fa
         scheduler.visitAllThreads(vmThreadVisitor);
     }
 
+    public static StackTraceElement getStackTraceElement(VmStackFrame frame) {
+        final int lineNumber = frame.getLocationInfo();
+        final VmMethod method = frame.getMethod();
+        final VmType<?> vmClass = (method == null) ? null : method.getDeclaringClass();
+        final String fname = (vmClass == null) ? null : vmClass.getSourceFile();
+        final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
+        final String mname = (method == null) ? "<unknown method>" : method.getName();
+        return new StackTraceElement(cname, mname, fname, method == null || method.isNative() ? -2 : lineNumber);
+    }
 
     public static StackTraceElement[] backTrace2stackTrace(Object[] backtrace) {
         final VmStackFrame[] vm_trace = (VmStackFrame[]) backtrace;
         final int length = vm_trace.length;
         final StackTraceElement[] trace = new StackTraceElement[length];
         for (int i = length; i-- > 0; ) {
-            final VmStackFrame frame = vm_trace[i];
-            final int lineNumber = frame.getLocationInfo();
-            final VmMethod method = frame.getMethod();
-            final VmType<?> vmClass = (method == null) ? null : method.getDeclaringClass();
-            final String fname = (vmClass == null) ? null : vmClass.getSourceFile();
-            final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
-            final String mname = (method == null) ? "<unknown method>" : method.getName();
-            trace[i] =
-                new StackTraceElement(cname, mname, fname, method == null || method.isNative() ? -2 : lineNumber);
+            trace[i] = getStackTraceElement(vm_trace[i]);
         }
         return trace;
     }

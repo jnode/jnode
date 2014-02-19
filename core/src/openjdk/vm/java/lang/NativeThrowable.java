@@ -21,9 +21,9 @@
 package java.lang;
 
 import org.jnode.annotation.MagicPermission;
+import org.jnode.vm.VmImpl;
 import org.jnode.vm.VmStackFrame;
 import org.jnode.vm.classmgr.VmInstanceField;
-import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmThread;
@@ -53,12 +53,6 @@ class NativeThrowable {
         final VmStackFrame frame =
             (VmStackFrame) ((Object[]) ObjectReference.fromObject(instance).toAddress().add(BACKTRACE_OFFSET).
                 loadObjectReference().toObject())[index];
-        final int lineNumber = frame.getLocationInfo();
-        final VmMethod method = frame.getMethod();
-        final VmType<?> vmClass = (method == null) ? null : method.getDeclaringClass();
-        final String fname = (vmClass == null) ? null : vmClass.getSourceFile();
-        final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
-        final String mname = (method == null) ? "<unknown method>" : method.getName();
-        return new StackTraceElement(cname, mname, fname, method == null || method.isNative() ? -2 : lineNumber);
+        return VmImpl.getStackTraceElement(frame);
     }
 }
