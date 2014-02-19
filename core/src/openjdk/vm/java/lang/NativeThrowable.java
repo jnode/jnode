@@ -53,8 +53,7 @@ class NativeThrowable {
         final VmStackFrame frame =
             (VmStackFrame) ((Object[]) ObjectReference.fromObject(instance).toAddress().add(BACKTRACE_OFFSET).
                 loadObjectReference().toObject())[index];
-        final String location = frame.getLocationInfo();
-        final int lineNumber = "?".equals(location) ? -1 : Integer.parseInt(location);
+        final int lineNumber = frame.getLocationInfo();
         final VmMethod method = frame.getMethod();
         final VmType<?> vmClass = (method == null) ? null : method.getDeclaringClass();
         final String fname = (vmClass == null) ? null : vmClass.getSourceFile();

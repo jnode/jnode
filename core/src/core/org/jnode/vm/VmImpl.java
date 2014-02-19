@@ -409,8 +409,7 @@ final class VmImpl extends VmSystemObject implements Statistics, org.jnode.vm.fa
         final StackTraceElement[] trace = new StackTraceElement[length];
         for (int i = length; i-- > 0; ) {
             final VmStackFrame frame = vm_trace[i];
-            final String location = frame.getLocationInfo();
-            final int lineNumber = "?".equals(location) ? -1 : Integer.parseInt(location);
+            final int lineNumber = frame.getLocationInfo();
             final VmMethod method = frame.getMethod();
             final VmType<?> vmClass = (method == null) ? null : method.getDeclaringClass();
             final String fname = (vmClass == null) ? null : vmClass.getSourceFile();
