@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.scheduler;
 
 import org.jnode.annotation.Inline;
@@ -71,6 +71,11 @@ public final class Monitor {
     private Monitor previous;
 
     /**
+     * The locked object.
+     */
+    private final long lockedObject;
+
+    /**
      * Create a new instance
      */
     public Monitor() {
@@ -79,6 +84,7 @@ public final class Monitor {
         this.owner = null;
         this.enterQueue = new VmThreadQueue.ScheduleQueue("mon-enter");
         this.notifyQueue = new VmThreadQueue.ScheduleQueue("mon-notify");
+        this.lockedObject = Address.zero().toLong();
     }
 
     /**
@@ -87,7 +93,7 @@ public final class Monitor {
      * @param owner
      * @param lockCount
      */
-    Monitor(VmThread owner, int lockCount) {
+    Monitor(VmThread owner, int lockCount, Object lockedObject) {
         this.monitorLock = 0;
         this.owner = owner;
         if (owner != null)
@@ -98,6 +104,7 @@ public final class Monitor {
         }
         this.enterQueue = new VmThreadQueue.ScheduleQueue("mon-enter");
         this.notifyQueue = new VmThreadQueue.ScheduleQueue("mon-notify");
+        this.lockedObject = ObjectReference.fromObject(lockedObject).toAddress().toLong();
     }
 
     /**
@@ -119,7 +126,6 @@ public final class Monitor {
      * locked by the current thread.
      *
      * @throws org.vmmagic.pragma.UninterruptiblePragma
-     *
      */
     @Inline
     public final void enter() {
@@ -172,7 +178,6 @@ public final class Monitor {
      * Give up this monitor.
      *
      * @throws org.vmmagic.pragma.UninterruptiblePragma
-     *
      */
     public final void exit() {
         String exMsg = null;
@@ -207,7 +212,6 @@ public final class Monitor {
      * Called from VmThread on thread stop.
      *
      * @throws org.vmmagic.pragma.UninterruptiblePragma
-     *
      */
     public final void release(VmThread thread) {
         if (owner != thread) {
@@ -250,7 +254,6 @@ public final class Monitor {
      *
      * @param timeout
      * @throws org.vmmagic.pragma.UninterruptiblePragma
-     *
      * @throws InterruptedException
      */
     public final void Wait(long timeout) throws InterruptedException {
@@ -278,6 +281,7 @@ public final class Monitor {
                 VmMagic.currentProcessor().getScheduler().addToSleepQueue(current);
             }
             dropFromOwner();
+            owner.removeLockedObject(getLockedObject());
             owner = null;
             lockCount = 0;
             wakeupWaitingThreads(enterQueue, true);
@@ -321,7 +325,6 @@ public final class Monitor {
      * Notify threads waiting on this monitor.
      *
      * @throws org.vmmagic.pragma.UninterruptiblePragma
-     *
      */
     public final void NotifyAll() {
         Notify(true);
@@ -332,7 +335,6 @@ public final class Monitor {
      *
      * @param all
      * @throws org.vmmagic.pragma.UninterruptiblePragma
-     *
      */
     final void Notify(boolean all) {
         final VmProcessor proc = VmProcessor.current();
@@ -362,7 +364,6 @@ public final class Monitor {
      * exception thrown if the monitor is not locked.
      *
      * @throws org.vmmagic.pragma.UninterruptiblePragma
-     *
      */
     final boolean unsynchronizedNotifyAll() {
         if (lockNoWait()) {
@@ -383,7 +384,6 @@ public final class Monitor {
      * @param thread
      * @return boolean
      * @throws org.vmmagic.pragma.UninterruptiblePragma
-     *
      */
     @Inline
     final boolean isOwner(VmThread thread) {
@@ -407,11 +407,19 @@ public final class Monitor {
      *
      * @return boolean
      * @throws org.vmmagic.pragma.UninterruptiblePragma
-     *
      */
     @Inline
     final boolean isLocked() {
         return (lockCount > 0);
+    }
+
+    /**
+     * Returns the locked object by this monitor or null.
+     *
+     * @return
+     */
+    public Object getLockedObject() {
+        return Address.fromLong(lockedObject).toObjectReference().toObject();
     }
 
     /**
@@ -422,7 +430,6 @@ public final class Monitor {
      * @param queueName
      * @return The queue
      * @throws org.vmmagic.pragma.UninterruptiblePragma
-     *
      */
     private final void prepareWait(VmThread thread,
                                    VmThreadQueue.ScheduleQueue queue, int waitState, String queueName) {
@@ -440,7 +447,6 @@ public final class Monitor {
      *
      * @param thread
      * @throws org.vmmagic.pragma.UninterruptiblePragma
-     *
      */
     @NoInline
     private final void notifyThread(VmThread thread) {
@@ -479,7 +485,6 @@ public final class Monitor {
      * @param queue
      * @param all
      * @throws org.vmmagic.pragma.UninterruptiblePragma
-     *
      */
     @Inline
     private final void wakeupWaitingThreads(VmThreadQueue.ScheduleQueue queue, boolean all) {

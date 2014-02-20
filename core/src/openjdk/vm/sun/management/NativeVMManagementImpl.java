@@ -20,6 +20,9 @@
  
 package sun.management;
 
+import org.jnode.vm.NativeHelper;
+import org.jnode.vm.VmReflection;
+import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.isolate.VmIsolate;
 
@@ -38,7 +41,13 @@ class NativeVMManagementImpl {
      * @see sun.management.VMManagementImpl#initOptionalSupportFields()
      */
     private static void initOptionalSupportFields() {
-        //todo implement it
+        // objectMonitorUsageSupport = true
+        VmField field = NativeHelper.findDeclaredField(VMManagementImpl.class, "objectMonitorUsageSupport");
+        VmReflection.setBoolean(field, null, true);
+
+        // synchronizerUsageSupport = true
+        field = NativeHelper.findDeclaredField(VMManagementImpl.class, "synchronizerUsageSupport");
+        VmReflection.setBoolean(field, null, true);
     }
     /**
      * @see sun.management.VMManagementImpl#isThreadContentionMonitoringEnabled()

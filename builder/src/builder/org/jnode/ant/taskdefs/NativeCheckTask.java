@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.ant.taskdefs;
 
 import java.io.ByteArrayInputStream;
@@ -200,7 +200,7 @@ public class NativeCheckTask extends Task {
                 }
             }
         }
-        int nbStubMethods = printMethods(stubMethods, INDENT, "Stub methods:");
+        printMethods(stubMethods, INDENT, "Stub methods:");
 
         System.out.println("Found " + nbNativeMethods + " native methods in " + nativeMethods.size() + " classes");
         if ((nbMissingMethods != 0) || (nbMissingClasses != 0) || !unusedJNodeNativeClasses.isEmpty()) {
@@ -385,7 +385,6 @@ public class NativeCheckTask extends Task {
                     NativeMethod method = new NativeMethod(access, name, desc);
                     methods.add(method);
 
-                    //if (className.endsWith("NativeThreadImpl") && "setThreadContentionMonitoringEnabled0".equals(name)) {
                     result = new EmptyMethodVisitor(method);
                 }
             } else {

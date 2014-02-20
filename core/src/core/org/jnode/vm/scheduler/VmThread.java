@@ -21,6 +21,7 @@
 package org.jnode.vm.scheduler;
 
 import java.lang.management.ThreadInfo;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.AbstractOwnableSynchronizer;
@@ -42,10 +43,12 @@ import org.jnode.vm.VmExit;
 import org.jnode.vm.VmIOContext;
 import org.jnode.vm.VmImpl;
 import org.jnode.vm.VmMagic;
+import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmStackFrame;
 import org.jnode.vm.VmStackReader;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.ObjectFlags;
+import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
@@ -223,6 +226,24 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
     volatile VmProcessor currentProcessor;
 
     /**
+     * Number of actual locked objects (used by javax.management API).
+     */
+    private int nbLockedObjects = 0;
+
+    /**
+     * Locked objects (used by javax.management API).
+     * The actual number of elements is given by {@link #nbLockedObjects}.
+     */
+    private final Object[] lockedObjects = new Object[256];
+
+    /**
+     * {@link org.jnode.vm.classmgr.VmMethod}s where objects were locked (used by javax.management API).
+     * The actual number of elements is given by {@link #nbLockedObjects}.
+     */
+    private final VmMethod[] lockVmMethods = new VmMethod[lockedObjects.length];
+//    private final int[] lockProgCounters = new int[lockedObjects.length];
+
+    /**
      * State is set to CREATED by the static initializer. Once set to other than
      * CREATED, it should never go back. Alternates between RUNNING and
      * SUSPENDED/WAITING as suspend()/wait() and reseume() are called.
@@ -265,6 +286,21 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
     static final String[] STATE_NAMES = {"CREATED", "RUNNING", "SUSPENDED",
         "ASLEEP", "STOPPED", "DESTROYED", "WAITING_ENTER",
         "WAITING_NOTIFY", "WAITING_NOTIFY_TIMEOUT", "YIELDING"};
+
+    /**
+     * VmMethod instance for {@link java.util.concurrent.locks.AbstractOwnableSynchronizer#getExclusiveOwnerThread()}.
+     */
+    private static VmMethod aosGetExclusiveOwnerThread;
+
+    /**
+     * VmField instance for {@link java.lang.Thread#vmThread}.
+     */
+    private static VmField threadVmThread;
+
+    /**
+     * VmMethod instance for {@link java.lang.management.ThreadInfo#ThreadInfo(Thread, int, Object, Thread, long, long, long, long, StackTraceElement[], Object[], int[], Object[])}.
+     */
+    private static VmMethod tiConstructor;
 
     /**
      * Create a new instance. This constructor can only be called during the
@@ -737,7 +773,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      * @return the thread state value
      */
     @KernelSpace
-    final int getThreadState() {
+    public final int getThreadState() {
         return threadState;
     }
 
@@ -1237,8 +1273,19 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
             if (ownableSynchronizers != null) {
                 ownableSynchronizers.add((AbstractOwnableSynchronizer) blockerObj);
             }
-            Thread thread = NativeHelper.callGetter(Thread.class, blockerObj, "getExclusiveOwnerThread");
-            concurrentOwner = NativeHelper.getFieldValue(VmThread.class, thread, "vmThread");
+
+            if (aosGetExclusiveOwnerThread == null) {
+                aosGetExclusiveOwnerThread =
+                    NativeHelper.findDeclaredMethod(AbstractOwnableSynchronizer.class, "getExclusiveOwnerThread",
+                        "()Ljava/lang/Thread;");
+            }
+            Thread thread = NativeHelper.invoke(Thread.class, blockerObj, aosGetExclusiveOwnerThread);
+            if (thread != null) {
+                if (threadVmThread == null) {
+                    threadVmThread = NativeHelper.findDeclaredField(Thread.class, "vmThread");
+                }
+                concurrentOwner = (VmThread) VmReflection.getObject(threadVmThread, thread);
+            }
         }
         return concurrentOwner;
     }
@@ -1484,22 +1531,42 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      * {@inheritDoc}
      */
     @Override
+    @Uninterruptible
     public ThreadInfo getThreadInfo(boolean lockedMonitors, boolean lockedSynchronizers, int maxDepth, boolean useCache,
                                     final List<AbstractOwnableSynchronizer> cachedOwnableSynchronizers) {
         int actualDepth = ((maxDepth < 0) || (maxDepth > STACKTRACE_LIMIT)) ? STACKTRACE_LIMIT : maxDepth;
+        VmStackFrame[] vmStackFrames = (VmStackFrame[]) getStackTrace(this, actualDepth);
         StackTraceElement[] stackTrace =
-            (actualDepth == 0) ? null : VmImpl.backTrace2stackTrace(getStackTrace(this, actualDepth));
+            (actualDepth == 0) ? null : VmImpl.backTrace2stackTrace(vmStackFrames);
 
         // find owned monitors
         Object[] monitors = null;
-        if (lockedMonitors && (lastOwnedMonitor != null)) {
-            List<Object> monitorList = new ArrayList<Object>();
-            Monitor m = lastOwnedMonitor;
-            while (m != null) {
-                monitorList.add(m);
-                m = m.getPrevious();
+        int[] stackDepths = null;
+        if (lockedMonitors && (nbLockedObjects > 0)) {
+            if (nbLockedObjects == lockedObjects.length) {
+                // avoid a copy : ThreadInfo constructor doesn't keep a reference on this array
+                monitors = lockedObjects;
+            } else {
+                monitors = new Object[nbLockedObjects];
+                System.arraycopy(lockedObjects, 0, monitors, 0, nbLockedObjects);
             }
-            monitors = monitorList.toArray();
+
+            stackDepths = new int[monitors.length];
+            for (int sdIndex = 0; sdIndex < stackDepths.length; sdIndex++) {
+                VmMethod lockVmMethod = lockVmMethods[sdIndex];
+//                int lockProgCounter = lockProgCounters[sdIndex];
+
+                // search lockVmStackFrame in vmStackFrames
+                stackDepths[sdIndex] = -1;
+                for (int vsfIndex = 0; vsfIndex < vmStackFrames.length; vsfIndex++) {
+                    VmStackFrame vmStackFrame = vmStackFrames[vsfIndex];
+                    if (/*(vmStackFrame.getProgramCounter() == lockProgCounter) &&*/ //TODO fix this
+                        (vmStackFrame.getMethod() == lockVmMethod)) {
+                        stackDepths[sdIndex] = vsfIndex;
+                        break;
+                    }
+                }
+            }
         }
 
         // find owned synchronizers
@@ -1523,21 +1590,20 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
             synchronizers = mySynchronizers.isEmpty() ? null : mySynchronizers.toArray();
         }
 
-        Object lockObj = waitForMonitor;
-        Thread lockOwner = ((waitForMonitor == null) || (waitForMonitor.getOwner() == null)) ? null :
-            waitForMonitor.getOwner().asThread();
+        boolean noLock = ((waitForMonitor == null) || (waitForMonitor.getOwner() == null));
+        Object lockObj = (waitForMonitor == null) ? null : waitForMonitor.getLockedObject();
+        Thread lockOwner = noLock ? null : waitForMonitor.getOwner().asThread();
 
         //TODO fill these values :
         long blockedCount = 0;
         long blockedTime = 0;
         long waitedCount = 0;
         long waitedTime = 0;
-        int[] stackDepths = null;
         // end of TO DO "fill these values"
 
         return createThreadInfo(asThread(), threadState, lockObj, lockOwner, blockedCount, blockedTime, waitedCount,
             waitedTime,
-            stackTrace, (monitors == null) ? null : monitors, stackDepths, synchronizers);
+            stackTrace, monitors, stackDepths, synchronizers);
     }
 
     private void addIfMySynchronizer(Object object, List<AbstractOwnableSynchronizer> allSynchronizers,
@@ -1555,35 +1621,22 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
                                                      Object[] monitors,
                                                      int[] stackDepths,
                                                      Object[] synchronizers) {
-        return NativeHelper
-            .newInstance(ThreadInfo.class, new Class[]{Thread.class, int.class, Object.class, Thread.class,
-                long.class, long.class, long.class, long.class, StackTraceElement[].class, Object[].class,
-                int[].class, Object[].class},
+        if (tiConstructor == null) {
+            tiConstructor = NativeHelper.findConstructor(ThreadInfo.class,
+                "(Ljava/lang/Thread;ILjava/lang/Object;Ljava/lang/Thread;JJJJ[Ljava/lang/StackTraceElement;[Ljava/lang/Object;[I[Ljava/lang/Object;)V");
+        }
+
+        try {
+            return (ThreadInfo) VmReflection.newInstance(tiConstructor,
                 new Object[]{t, state, lockObj, lockOwner, blockedCount, blockedTime, waitedCount, waitedTime,
                     stackTrace, monitors, stackDepths, synchronizers});
-//        try {
-//            Constructor c =
-//                ThreadInfo.class.getConstructor(new Class[]{Thread.class, int.class, Object.class, Thread.class,
-//                    long.class, long.class, long.class, long.class, StackTraceElement[].class, Object[].class,
-//                    int[].class, Object[].class});
-//            c.setAccessible(true);
-//
-//            try {
-//                return (ThreadInfo) c
-//                    .newInstance(t, state, lockObj, lockOwner, blockedCount, blockedTime, waitedCount, waitedTime,
-//                        stackTrace, monitors, stackDepths, synchronizers);
-//            } finally {
-//                c.setAccessible(false);
-//            }
-//        } catch (NoSuchMethodException e) {
-//            throw new RuntimeException(e);
-//        } catch (InvocationTargetException e) {
-//            throw new RuntimeException(e);
-//        } catch (InstantiationException e) {
-//            throw new RuntimeException(e);
-//        } catch (IllegalAccessException e) {
-//            throw new RuntimeException(e);
-//        }
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e.getTargetException());
+        }
     }
 
     @Uninterruptible
@@ -1598,6 +1651,79 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
 
     private VmScheduler getScheduler() {
         return ((VmImpl) VmUtils.getVm()).getScheduler();
+    }
+
+    /**
+     * This method must NOT ALLOCATE ANY NEW OBJECT (directly or not) because
+     * allocation need a lock and thus calling this again => infinite recursion => StackOverflow.
+     *
+     * @param lockedObject
+     */
+    @Uninterruptible
+    void addLockedObject(Object lockedObject) {
+        if (nbLockedObjects >= lockedObjects.length) {
+            debug("addLockedObject : too many lockedObjects");
+            return;
+        }
+
+//        int programCounter = 0;
+//        lockVmMethods[nbLockedObjects] = VmProcessor.current().getArchitecture().getStackReader().getStackTraceAt(3).getBytecode().getLineNr(programCounter);
+        lockVmMethods[nbLockedObjects] = VmProcessor.current().getArchitecture().getStackReader().getStackTraceAt(3);
+//        lockProgCounters[nbLockedObjects] = 0; //TODO fix this
+        lockedObjects[nbLockedObjects] = lockedObject;
+        nbLockedObjects++;
+    }
+
+    @Uninterruptible
+    void removeLockedObject(Object lockedObject) {
+        if (lockedObject == null) {
+            debug("removeLockedObject : lockedObject is null");
+            return;
+        }
+        boolean waitCase = (threadState == WAITING_NOTIFY) || (threadState == WAITING_NOTIFY_TIMEOUT);
+        if (nbLockedObjects == 0) {
+//            debug("removeLockedObject : no locked object to remove");
+            return;
+        }
+
+        // we have exited a monitor
+        final int lastLockedObject = nbLockedObjects - 1;
+        if (lockedObject != lockedObjects[lastLockedObject]) {
+            if (waitCase) {
+                for (int i = 0; i < nbLockedObjects; i++) {
+                    Object obj = lockedObjects[i];
+                    if (obj == lockedObject) {
+                        Unsafe.debug("removeLockedObject: lockedObject ");
+                        Unsafe.debug(lockedObject.toString());
+                        Unsafe.debug(" found at index ");
+                        Unsafe.debug(i);
+                        Unsafe.debug("/");
+                        Unsafe.debug(nbLockedObjects);
+                        Unsafe.debug('\n');
+                        break;
+                    }
+                }
+            }
+            return;
+        }
+
+        lockedObjects[lastLockedObject] = null; // help gc
+        nbLockedObjects--;
+    }
+
+    @Inline
+    private final void debug(String message) {
+        Unsafe.debug(message);
+        Unsafe.debug(" for thread ");
+        debugThread();
+        Unsafe.debug('\n');
+    }
+
+    @Inline
+    private final void debugThread() {
+        Unsafe.debug(id);
+        Unsafe.debug(" - ");
+        Unsafe.debug(name);
     }
 
     /**

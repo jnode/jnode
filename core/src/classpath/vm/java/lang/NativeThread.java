@@ -26,6 +26,7 @@ import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.scheduler.MonitorManager;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmThread;
+import sun.management.Management;
 
 /**
  *
@@ -122,10 +123,6 @@ class NativeThread {
         return ((VmThread) instance.vmThread).getId();
     }
 
-    private static StackTraceElement[] getStackTrace0(Thread instance) {
-        return VmImpl.backTrace2stackTrace(VmThread.getStackTrace((VmThread) instance.vmThread));
-    }
-
     private static Thread currentThread() {
         VmThread current = VmThread.currentThread();
         if (current != null) {
@@ -158,5 +155,24 @@ class NativeThread {
 
     private static void die0() {
         org.jnode.vm.Unsafe.die("Root ThreadGroup creation failure.");
+    }
+
+    private static StackTraceElement[][] dumpThreads(Thread[] threads) {
+        if (threads == null) {
+            return null;
+        }
+        StackTraceElement[][] result = new StackTraceElement[threads.length][];
+        for (int i = 0; i < threads.length; i++) {
+            result[i] = VmImpl.backTrace2stackTrace(VmThread.getStackTrace((VmThread) threads[i].vmThread));
+        }
+        return result;
+    }
+
+    private static Thread[] getThreads() {
+        return Management.getThreads(false, false);
+    }
+
+    private static int getThreadStatus(Thread instance) {
+        return ((VmThread) instance.vmThread).getThreadState();
     }
 }

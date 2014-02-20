@@ -14,8 +14,8 @@ import org.jnode.vm.facade.VmUtils;
  *
  * @author Fabien DUMINY (fduminy at jnode.org)
  */
-class Management {
-    static final Thread[] getThreads(final boolean onlyDeadLocked, final boolean concurrentLocks) {
+public class Management {
+    public static final Thread[] getThreads(final boolean onlyDeadLocked, final boolean concurrentLocks) {
         final ArrayList<VmThread> vmThreads = new ArrayList<VmThread>();
         final List<VmThread> deadLockCycle = onlyDeadLocked ? new ArrayList<VmThread>() : null;
         VmUtils.getVm().accept(new VmThreadVisitor() {
