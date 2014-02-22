@@ -25,6 +25,7 @@ import org.jnode.vm.VmReflection;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.isolate.VmIsolate;
+import org.jnode.vm.scheduler.VmThread;
 
 /**
  * @see sun.management.VMManagementImpl
@@ -128,29 +129,25 @@ class NativeVMManagementImpl {
      * @see sun.management.VMManagementImpl#getTotalThreadCount()
      */
     private static long getTotalThreadCount(VMManagementImpl instance) {
-        //todo implement it
-        return 0;
+        return VmThread.getTotalStartedThreadCount();
     }
     /**
      * @see sun.management.VMManagementImpl#getLiveThreadCount()
      */
     private static int getLiveThreadCount(VMManagementImpl instance) {
-        //todo implement it
-        return 0;
+        return VmThread.getLiveThreadCount();
     }
     /**
      * @see sun.management.VMManagementImpl#getPeakThreadCount()
      */
     private static int getPeakThreadCount(VMManagementImpl instance) {
-        //todo implement it
-        return 0;
+        return VmThread.getPeakThreadCount();
     }
     /**
      * @see sun.management.VMManagementImpl#getDaemonThreadCount()
      */
     private static int getDaemonThreadCount(VMManagementImpl instance) {
-        //todo implement it
-        return 0;
+        return VmThread.getDaemonThreadCount();
     }
     /**
      * @see sun.management.VMManagementImpl#getSafepointCount()

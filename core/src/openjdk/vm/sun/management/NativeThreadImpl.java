@@ -21,6 +21,7 @@
 package sun.management;
 
 import java.lang.management.ThreadInfo;
+import org.jnode.vm.scheduler.VmThread;
 
 /**
  * @author Levente S\u00e1ntha
@@ -110,7 +111,7 @@ class NativeThreadImpl {
      * @see sun.management.ThreadImpl#resetPeakThreadCount0()
      */
     private static void resetPeakThreadCount0() {
-        //todo implement it
+        VmThread.resetPeakThreadCount();
     }
 
     /**

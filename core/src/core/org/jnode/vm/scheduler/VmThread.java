@@ -303,15 +303,34 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
     private static VmMethod tiConstructor;
 
     /**
+     * @see sun.management.VMManagementImpl#getTotalThreadCount()
+     */
+    private static int totalStartedThreadCount;
+
+    /**
+     * @see sun.management.VMManagementImpl#getLiveThreadCount()
+     */
+    private static int liveThreadCount;
+
+    /**
+     * @see sun.management.VMManagementImpl#getPeakThreadCount()
+     */
+    private static int peakLiveThreadCount;
+
+    /**
+     * @see sun.management.VMManagementImpl#getDaemonThreadCount()
+     */
+    private static int daemonThreadCount;
+
+    /**
      * Create a new instance. This constructor can only be called during the
      * bootstrap phase.
      */
     protected VmThread(VmIsolatedStatics isolatedStatics, int slotSize) {
-        this.threadState = RUNNING;
         this.stackSize = DEFAULT_STACK_SLOTS * slotSize;
         this.id = (1 << ObjectFlags.THREAD_ID_SHIFT);
         MonitorManager.testThreadId(this.id);
-        this.isolatedStatics = isolatedStatics;
+        init(isolatedStatics, RUNNING);
         getScheduler().registerThread(this);
     }
 
@@ -321,8 +340,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      */
     protected VmThread(VmIsolatedStatics isolatedStatics, Object stack,
                        Address stackEnd, int stackSize) {
-        this.isolatedStatics = isolatedStatics;
-        this.threadState = RUNNING;
+        init(isolatedStatics, RUNNING);
         this.stackSize = stackSize;
         this.stack = stack;
         this.stackEnd = stackEnd;
@@ -336,13 +354,17 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      * @param javaThread
      */
     public VmThread(VmIsolatedStatics isolatedStatics, Thread javaThread) {
-        this.isolatedStatics = isolatedStatics;
+        init(isolatedStatics, CREATED);
         this.javaThread = javaThread;
-        this.threadState = CREATED;
         this.stackSize = DEFAULT_STACK_SLOTS * VmUtils.getVm().getArch().getReferenceSize();
         this.id = createId();
         MonitorManager.testThreadId(this.id);
         this.context = VmAccessController.getContext();
+    }
+
+    private void init(VmIsolatedStatics isolatedStatics, int state) {
+        this.isolatedStatics = isolatedStatics;
+        setState(state);
     }
 
     /**
@@ -409,7 +431,8 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
                 Unsafe.initThread(this, stack, stackSize);
                 stackEnd = getStackEnd(stack, stackSize);
                 scheduler.registerThread(this);
-                threadState = RUNNING;
+                setState(RUNNING);
+                totalStartedThreadCount++;
                 scheduler.addToReadyQueue(this, false, "thread.start");
                 break;
             }
@@ -500,7 +523,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
         proc.getScheduler().unregisterThread(this);
         // Go into low level stuff
         proc.disableReschedule(true);
-        this.threadState = STOPPED;
+        setState(STOPPED);
         if (current == this) {
             proc.suspend(true);
         } else {
@@ -513,6 +536,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      * remain locked. (This method is not implemented.)
      */
     public final void destroy() {
+        setState(DESTROYED);
     }
 
     /**
@@ -572,7 +596,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
             throw new IllegalThreadStateException("Not suspended");
         } else {
             final VmProcessor proc = VmProcessor.current();
-            threadState = RUNNING;
+            setState(RUNNING);
             // FIXME make multi cpu safe
             proc.getScheduler().addToReadyQueue(this, false, "thread.resume");
         }
@@ -586,7 +610,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
     final void unsecureResume() {
         final VmProcessor proc = VmMagic.currentProcessor();
         if (threadState == SUSPENDED) {
-            threadState = RUNNING;
+            setState(RUNNING);
             // FIXME make multi cpu safe
             proc.getScheduler().addToReadyQueue(this, false,
                 "thread.unsecureResume");
@@ -605,7 +629,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
         } else {
             final VmProcessor proc = VmMagic.currentProcessor();
             proc.disableReschedule(true);
-            this.threadState = SUSPENDED;
+            setState(SUSPENDED);
             proc.suspend(true);
         }
     }
@@ -636,7 +660,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      */
     final void setYieldingState() throws UninterruptiblePragma {
         if (threadState == RUNNING) {
-            threadState = YIELDING;
+            setState(YIELDING);
         }
     }
 
@@ -667,7 +691,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
         final VmProcessor proc = VmProcessor.current();
         proc.disableReschedule(true);
         this.wakeupTime = wakeupTime;
-        this.threadState = ASLEEP;
+        setState(ASLEEP);
         proc.getScheduler().addToSleepQueue(this);
 
         /* Now un-schedule myself */
@@ -865,7 +889,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
     final void prepareWait(Monitor monitor, int waitState) {
         // Keep this order of assignments!
         this.waitForMonitor = monitor;
-        this.threadState = waitState;
+        setState(waitState);
     }
 
     /**
@@ -880,7 +904,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
             final VmProcessor proc = VmMagic.currentProcessor();
             proc.disableReschedule(true);
             try {
-                this.threadState = RUNNING;
+                setState(RUNNING);
                 proc.getScheduler().addToReadyQueue(this, false,
                     "thread.wakeupAfterMonitor");
             } finally {
@@ -920,7 +944,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
                 Unsafe.debug(threadState);
             }
         }
-        threadState = RUNNING;
+        setState(RUNNING);
     }
 
     /**
@@ -1535,9 +1559,12 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
     public ThreadInfo getThreadInfo(boolean lockedMonitors, boolean lockedSynchronizers, int maxDepth, boolean useCache,
                                     final List<AbstractOwnableSynchronizer> cachedOwnableSynchronizers) {
         int actualDepth = ((maxDepth < 0) || (maxDepth > STACKTRACE_LIMIT)) ? STACKTRACE_LIMIT : maxDepth;
-        VmStackFrame[] vmStackFrames = (VmStackFrame[]) getStackTrace(this, actualDepth);
-        StackTraceElement[] stackTrace =
-            (actualDepth == 0) ? null : VmImpl.backTrace2stackTrace(vmStackFrames);
+        VmStackFrame[] vmStackFrames = null;
+        StackTraceElement[] stackTrace = null;
+        if (actualDepth > 0) {
+            vmStackFrames = (VmStackFrame[]) getStackTrace(this, actualDepth);
+            stackTrace = (actualDepth == 0) ? null : VmImpl.backTrace2stackTrace(vmStackFrames);
+        }
 
         // find owned monitors
         Object[] monitors = null;
@@ -1558,12 +1585,14 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
 
                 // search lockVmStackFrame in vmStackFrames
                 stackDepths[sdIndex] = -1;
-                for (int vsfIndex = 0; vsfIndex < vmStackFrames.length; vsfIndex++) {
-                    VmStackFrame vmStackFrame = vmStackFrames[vsfIndex];
-                    if (/*(vmStackFrame.getProgramCounter() == lockProgCounter) &&*/ //TODO fix this
-                        (vmStackFrame.getMethod() == lockVmMethod)) {
-                        stackDepths[sdIndex] = vsfIndex;
-                        break;
+                if (vmStackFrames != null) {
+                    for (int vsfIndex = 0; vsfIndex < vmStackFrames.length; vsfIndex++) {
+                        VmStackFrame vmStackFrame = vmStackFrames[vsfIndex];
+                        if (/*(vmStackFrame.getProgramCounter() == lockProgCounter) &&*/ //TODO fix this
+                            (vmStackFrame.getMethod() == lockVmMethod)) {
+                            stackDepths[sdIndex] = vsfIndex;
+                            break;
+                        }
                     }
                 }
             }
@@ -1754,5 +1783,83 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
         vmThreadStateValues[TERMINATED.ordinal()] = new int[]{STOPPED, DESTROYED};
         vmThreadStateNames[TERMINATED.ordinal()] =
             new String[]{TERMINATED.name() + ".STOPPED", TERMINATED.name() + ".DESTROYED"};
+    }
+
+    @Inline
+    private void setState(int newState) {
+        if (this.threadState == newState) {
+            return;
+        }
+
+        boolean stopping = this.stopping && ((newState == STOPPED) || (newState == DESTROYED));
+        boolean wasAlive = isAlive() || stopping;
+        boolean wasCreated = (this.threadState == CREATED);
+        this.threadState = newState;
+        boolean isAlive = isAlive();
+
+        if (wasAlive != isAlive) {
+            if (isAlive) {
+                // not alive -> alive
+                liveThreadCount++;
+                if (liveThreadCount > peakLiveThreadCount) {
+                    peakLiveThreadCount = liveThreadCount;
+                }
+            } else {
+                // alive -> not alive
+                liveThreadCount--;
+            }
+
+            if (wasCreated && (threadState == RUNNING) && (javaThread != null)) {
+                if (javaThread.isDaemon()) {
+                    daemonThreadCount++;
+                }
+            }
+        }
+
+        if ((javaThread != null) && ((threadState == STOPPED) || (threadState == DESTROYED))) {
+            if (javaThread.isDaemon()) {
+                daemonThreadCount--;
+            }
+        }
+    }
+
+    /**
+     * @return
+     * @see java.lang.management.ThreadMXBean#getTotalStartedThreadCount()
+     */
+    public static final long getTotalStartedThreadCount() {
+        return totalStartedThreadCount;
+    }
+
+    /**
+     * @return
+     * @see java.lang.management.ThreadMXBean#getThreadCount()
+     */
+    public static final int getLiveThreadCount() {
+        return liveThreadCount;
+    }
+
+    /**
+     * @return
+     * @see java.lang.management.ThreadMXBean#getPeakThreadCount()
+     */
+    public static final int getPeakThreadCount() {
+        return peakLiveThreadCount;
+    }
+
+    /**
+     * @return
+     * @see java.lang.management.ThreadMXBean#getDaemonThreadCount()
+     */
+    public static final int getDaemonThreadCount() {
+        return daemonThreadCount;
+    }
+
+    /**
+     * @return
+     * @see java.lang.management.ThreadMXBean#resetPeakThreadCount()
+     */
+    public static final void resetPeakThreadCount() {
+        peakLiveThreadCount = liveThreadCount;
     }
 }
