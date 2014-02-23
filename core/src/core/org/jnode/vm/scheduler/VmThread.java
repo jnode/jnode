@@ -1247,24 +1247,28 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
             }
             return;
         }
-        final Monitor waitForMonitor = thread.waitForMonitor;
-        final VmThread owner;
-        if (waitForMonitor == null) {
-            VmThread concurrentOwner = null;
-            if (concurrentLocks) {
-                concurrentOwner = thread.getConcurrentOwner();
-            }
 
-            if (concurrentOwner == null) {
-                if (deadLockCycle != null) {
-                    deadLockCycle.clear();
-                }
-                return;
-            }
-            owner = concurrentOwner;
-        } else {
+        VmThread owner = null;
+
+        // is this thread waiting for a monitor ?
+        final Monitor waitForMonitor = thread.waitForMonitor;
+        if (waitForMonitor != null) {
             owner = waitForMonitor.getOwner();
         }
+
+        // is this thread waiting for a concurrent lock ?
+        if ((owner == null) && concurrentLocks) {
+            owner = thread.getConcurrentOwner();
+        }
+
+        if (owner == null) {
+            // no lock found => exit
+            if (deadLockCycle != null) {
+                deadLockCycle.clear();
+            }
+            return;
+        }
+        // here, a lock has been found
 
         if (owner == this) {
             // we have found a cycle
@@ -1272,7 +1276,6 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
             if (deadLockCycle != null) {
                 deadLockCycle.add(owner);
             } else {
-                // We have a deadlock
                 Unsafe.debug("Deadlock[");
                 Unsafe.debug(this.asThread().getName());
                 Unsafe.debug(", ");
