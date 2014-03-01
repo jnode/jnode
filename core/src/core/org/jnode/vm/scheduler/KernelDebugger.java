@@ -73,9 +73,11 @@ public class KernelDebugger {
                 debug("q   Print thread queues\n");
                 debug("r   Print stacktraces of ready-queue\n");
                 debug("t   Print current thread\n");
+                debug("T   Print stacktrace of current thread\n");
                 debug("v   Verify thread\n");
                 debug("w   Print waiting threads\n");
                 debug("W   Print stacktraces of waiting threads\n");
+                debug("#   Halt for ever\n");
                 break;
             case 'l':
                 debug("<load-compile-service: ");
@@ -104,24 +106,6 @@ public class KernelDebugger {
                 vmScheduler.getReadyQueue().dump(true, vmScheduler.getStackReader());
                 debug("/>\n");
                 break;
-            case 'v':
-                debug("<verify: ");
-                debug("\n");
-                verifyThreads();
-                debug("/>\n");
-                break;
-            case 'w':
-                debug("<waiting: ");
-                debug("\n");
-                dumpWaitingThreads(false, null);
-                debug("/>\n");
-                break;
-            case 'W':
-                debug("<waiting: ");
-                debug("\n");
-                dumpWaitingThreads(true, vmScheduler.getStackReader());
-                debug("/>\n");
-                break;
             case 't': {
                 final VmThread currentThread = VmMagic.currentProcessor().currentThread;
                 debug("<currentthread name='");
@@ -141,6 +125,24 @@ public class KernelDebugger {
                 debug("'/>\n");
                 break;
             }
+            case 'v':
+                debug("<verify: ");
+                debug("\n");
+                verifyThreads();
+                debug("/>\n");
+                break;
+            case 'w':
+                debug("<waiting: ");
+                debug("\n");
+                dumpWaitingThreads(false, null);
+                debug("/>\n");
+                break;
+            case 'W':
+                debug("<waiting: ");
+                debug("\n");
+                dumpWaitingThreads(true, vmScheduler.getStackReader());
+                debug("/>\n");
+                break;
             case '#':
                 debug("Halt for ever\n");
                 while (true)
