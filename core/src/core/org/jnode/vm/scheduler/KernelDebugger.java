@@ -107,22 +107,11 @@ public class KernelDebugger {
                 debug("/>\n");
                 break;
             case 't': {
-                final VmThread currentThread = VmMagic.currentProcessor().currentThread;
-                debug("<currentthread name='");
-                debug(currentThread.getName());
-                debug("' state='");
-                debug(currentThread.getThreadStateName());
-                debug("'/>\n");
+                dumpCurrentThread(false);
                 break;
             }
             case 'T': {
-                final VmThread currentThread = VmMagic.currentProcessor().currentThread;
-                debug("<currentthread name='");
-                debug(currentThread.getName());
-                debug("' state='");
-                debug(currentThread.getThreadStateName());
-                vmScheduler.getStackReader().debugStackTrace(currentThread);
-                debug("'/>\n");
+                dumpCurrentThread(true);
                 break;
             }
             case 'v':
@@ -132,16 +121,10 @@ public class KernelDebugger {
                 debug("/>\n");
                 break;
             case 'w':
-                debug("<waiting: ");
-                debug("\n");
-                dumpWaitingThreads(false, null);
-                debug("/>\n");
+                dumpWaitingThreads(false);
                 break;
             case 'W':
-                debug("<waiting: ");
-                debug("\n");
-                dumpWaitingThreads(true, vmScheduler.getStackReader());
-                debug("/>\n");
+                dumpWaitingThreads(true);
                 break;
             case '#':
                 debug("Halt for ever\n");
@@ -153,34 +136,58 @@ public class KernelDebugger {
         }
     }
 
+    @KernelSpace
+    private void dumpCurrentThread(boolean dumpStack) {
+        final VmThread currentThread = VmMagic.currentProcessor().currentThread;
+        debug("<currentthread ");
+        dumpThread(dumpStack, currentThread, false);
+        debug("/>\n");
+    }
+
     /**
      * Dump the status of this queue on debug.
      */
     @KernelSpace
-    private final void dumpWaitingThreads(boolean dumpStack, VmStackReader stackReader) {
+    private final void dumpWaitingThreads(boolean dumpStack) {
+        debug("<waiting: ");
+        debug("\n");
+
         VmThreadQueueEntry e = vmScheduler.getAllThreadsQueue().first;
         while (e != null) {
             if (e.thread.isWaiting()) {
-                debug(e.thread.getName());
-                debug(" id0x");
-                debug(e.thread.getId());
-                debug(" s0x");
-                debug(e.thread.getThreadState());
-                debug(" p0x");
-                debug(e.thread.priority);
-                debug(" wf:");
-                VmThread waitFor = e.thread.getWaitForThread();
-                debug((waitFor != null) ? waitFor.getName() : "none");
-                debug("\n");
-                if (dumpStack && (stackReader != null)) {
-                    stackReader.debugStackTrace(e.thread);
-                    debug("\n");
-                }
+                dumpThread(dumpStack, e.thread, !dumpStack);
             }
             e = e.next;
         }
+
+        debug("/>\n");
     }
-    
+
+    @KernelSpace
+    private void dumpThread(boolean dumpStack, VmThread thread, boolean rightPadding) {
+        debug(thread.getId());
+        debug(thread.getName(), 20, rightPadding);
+        debug(" ");
+        debug(thread.getThreadStateName(), 22, rightPadding);
+        debug(" pr=0x");
+        debug(thread.priority);
+        debug(" wf:");
+        VmThread waitFor = thread.getWaitForThread();
+        if (waitFor != null) {
+            debug(waitFor.getId());
+        } else {
+            debug("none");
+        }
+        debug("\n");
+        if (dumpStack) {
+            VmStackReader stackReader = vmScheduler.getStackReader();
+            if (stackReader != null) {
+                stackReader.debugStackTrace(thread);
+                debug("\n");
+            }
+        }
+    }
+
     /**
      * Dump the status of this queue on debug.
      */
@@ -198,9 +205,31 @@ public class KernelDebugger {
      */
     @Inline
     private final void debug(String str) {
-        Unsafe.debug(str);
+        debug(str, -1, false);
     }
-    
+
+    /**
+     * Print the given string to the output.
+     */
+    @Inline
+    private final void debug(String str, int maxSize, boolean rightPadding) {
+        if (str == null) {
+            str = "NULL";
+        }
+
+        if (rightPadding) {
+            for (int i = 0; i < maxSize; i++) {
+                if (i < str.length()) {
+                    Unsafe.debug(str.charAt(i));
+                } else {
+                    Unsafe.debug(' ');
+                }
+            }
+        } else {
+            Unsafe.debug(str);
+        }
+    }
+
     /**
      * Print the given integer to the output.
      */
