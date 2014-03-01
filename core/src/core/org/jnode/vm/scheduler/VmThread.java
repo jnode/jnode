@@ -1132,7 +1132,9 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
                 throw new Error("Unknown thread state " + threadState);
         }
         // Now detect deadlocks
-        detectDeadlock(null, true); //concurrentLocks=true
+        // (setting concurrentLocks to true, crash JNode with message
+        // "Suspend with invalid tsi: 7" while called by KernelDebugger).
+        detectDeadlock(null, false); //concurrentLocks=false
     }
 
     /**
