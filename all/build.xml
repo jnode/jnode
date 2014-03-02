@@ -24,8 +24,8 @@
 
 	<!-- if task is used from this -->
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
-	<!-- before including jnode.xml, we must set this property -->
-	<condition property="memoryMaximumSize" value="1512m" else="768m">
+    <!-- before including jnode.xml, we must set this property -->
+    <condition property="memoryMaximumSize" value="1512m" else="768m">
 		<os arch="amd64"/>
 	</condition>
 	<echo message="Setting memoryMaximumSize to ${memoryMaximumSize}"/>
@@ -118,8 +118,8 @@
 	<property name="asm-util.jar" value="${root.dir}/core/lib/asm-util-1.5.3.jar"/>
 	<property name="mockito-all.jar" value="${root.dir}/core/lib/mockito-all-1.8.5.jar"/>
 
-	<property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
-	<property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b5.jar"/>
+    <property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
+    <property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b5.jar"/>
 	<property name="js.jar" value="${root.dir}/shell/lib/rhino1.6r5-jsr223.jar"/>
 
 	<!-- libraries needed to check plugin dependencies -->
@@ -415,8 +415,8 @@
 			<libalias name="mauve.jar" alias="${mauve.jar}"/>
 			<libalias name="mockito-all-1.8.5.jar" alias="${mockito-all.jar}"/>
 
-			<libalias name="ant.jar" alias="${ant.jar}"/>
-			<libalias name="ant-launcher.jar" alias="${ant-launcher.jar}"/>
+            <libalias name="ant.jar" alias="${ant.jar}"/>
+            <libalias name="ant-launcher.jar" alias="${ant-launcher.jar}"/>
 			<libalias name="edtftpj.jar" alias="${edtftpj.jar}"/>
 			<libalias name="jcifs.jar" alias="${jcifs.jar}"/>
 			<libalias name="ejc.jar" alias="${ejc.jar}"/>
@@ -610,7 +610,6 @@ clean             Remove all intermediate build results.
 	<target name="javadoc-small" description="Generate documentation of the basic JNode APIs">
 		<jnode.javadoc destdir="${build.dir}/javadoc/small">
 			<sourcepath>
-				<pathelement location="${root.dir}/core/src/classlib"/>
 				<pathelement location="${root.dir}/core/src/classpath/ext"/>
 				<pathelement location="${root.dir}/core/src/classpath/vm"/>
 				<pathelement location="${root.dir}/core/src/openjdk/vm"/>
@@ -632,7 +631,6 @@ clean             Remove all intermediate build results.
 	<target name="javadoc-mmtk">
 		<jnode.javadoc destdir="${build.dir}/javadoc/mmtk">
 			<sourcepath>
-				<pathelement location="${root.dir}/core/src/classlib"/>
 				<pathelement location="${root.dir}/core/src/vmmagic"/>
 				<pathelement location="${root.dir}/core/src/mmtk-vm"/>
 				<pathelement location="${root.dir}/core/src/core"/>
@@ -656,7 +654,6 @@ clean             Remove all intermediate build results.
 				<pathelement location="${root.dir}/builder/src/builder"/>
 				<pathelement location="${root.dir}/builder/src/configure"/>
 				<pathelement location="${root.dir}/cli/src/commands"/>
-				<pathelement location="${root.dir}/core/src/classlib"/>
 				<pathelement location="${root.dir}/core/src/classpath/ext"/>
 				<pathelement location="${root.dir}/core/src/classpath/vm"/>
 				<pathelement location="${root.dir}/core/src/openjdk/vm"/>
@@ -784,7 +781,6 @@ clean             Remove all intermediate build results.
 			<fileset dir="${root.dir}/builder/src/builder" includes="**/*.java"/>
             <fileset dir="${root.dir}/builder/src/configure" includes="**/*.java"/>
 			<fileset dir="${root.dir}/cli/src/commands" includes="**/*.java"/>
-            <fileset dir="${root.dir}/core/src/classlib" includes="**/*.java"/>
 			<fileset dir="${root.dir}/core/src/classpath/ext" includes="**/*.java" excludes="gnu/classpath/jdwp/**/*.java"/>
 			<fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java"
                      excludes="java/lang/VMProcess.java,java/lang/VMSystem.java"/>
