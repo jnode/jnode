@@ -50,6 +50,14 @@ class NativeVMManagementImpl {
         // synchronizerUsageSupport = true
         field = NativeHelper.findDeclaredField(VMManagementImpl.class, "synchronizerUsageSupport");
         VmReflection.setBoolean(field, null, true);
+
+        // currentThreadCpuTimeSupport = true
+        field = NativeHelper.findDeclaredField(VMManagementImpl.class, "currentThreadCpuTimeSupport");
+        VmReflection.setBoolean(field, null, true);
+
+        // otherThreadCpuTimeSupport = true
+        field = NativeHelper.findDeclaredField(VMManagementImpl.class, "otherThreadCpuTimeSupport");
+        VmReflection.setBoolean(field, null, true);
     }
 
     /**

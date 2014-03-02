@@ -8,6 +8,8 @@ import org.jnode.vm.facade.VmThread;
 import org.jnode.vm.facade.VmThreadVisitor;
 import org.jnode.vm.facade.VmUtils;
 
+import static org.jnode.vm.scheduler.VmThread.currentThread;
+
 /**
  * JNode implementations of native methods for package sun.management.
  * This class is a delegate for all sun.management.Native* classes.
@@ -15,6 +17,37 @@ import org.jnode.vm.facade.VmUtils;
  * @author Fabien DUMINY (fduminy at jnode.org)
  */
 public class Management {
+    /**
+     * Find a {@link org.jnode.vm.facade.VmThread} given by its id.
+     *
+     * @param id The id of the thread to find or 0 for the current thread.
+     * @return
+     * @throws java.lang.IllegalArgumentException if there are no thread with this <code>id</code>.
+     */
+    public static VmThread getThreadById(final long id) {
+        if (id == 0) {
+            return currentThread();
+        }
+        final VmThread[] result = {null};
+        final VmThreadVisitor vmThreadVisitor = new VmThreadVisitor() {
+            @Override
+            public boolean visit(VmThread thread) {
+                if (thread.getId() == id) {
+                    result[0] = thread;
+                    return false;
+                }
+
+                return true;
+            }
+        };
+        VmUtils.getVm().accept(vmThreadVisitor);
+
+        if (result[0] == null) {
+            throw new IllegalArgumentException("No thread found for id " + id);
+        }
+        return result[0];
+    }
+
     public static final Thread[] getThreads(final boolean onlyDeadLocked, final boolean concurrentLocks) {
         final ArrayList<VmThread> vmThreads = new ArrayList<VmThread>();
         final List<VmThread> deadLockCycle = onlyDeadLocked ? new ArrayList<VmThread>() : null;

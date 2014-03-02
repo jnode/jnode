@@ -244,9 +244,20 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
 //    private final int[] lockProgCounters = new int[lockedObjects.length];
 
     /**
+     * The total CPU time used by this thread.
+     * This value doesn't include the time
+     */
+    private long totalCpuTime;
+
+    /**
+     * The last time the thread has waked up.
+     */
+    private long lastWakedUpTime;
+
+    /**
      * State is set to CREATED by the static initializer. Once set to other than
      * CREATED, it should never go back. Alternates between RUNNING and
-     * SUSPENDED/WAITING as suspend()/wait() and reseume() are called.
+     * SUSPENDED/WAITING as suspend()/wait() and resume() are called.
      * <p/>
      * Can be set to INTERRUPTED if ASLEEP, or WAITING. Can be set to DESTROYED
      * at any time. Can be set to STOPPED at any time.
@@ -708,7 +719,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      * destroyed.
      *
      * @return <code>true</code> if thread is alive, <code>false</code> if
-     * not.
+     *         not.
      * @see #start()
      * @see #stop(Throwable)
      * @see #suspend()
@@ -805,7 +816,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      * Gets the thread this thread is waiting for (or null).
      *
      * @return the VmThread for the thread that this one is
-     * waiting for, or {@code null}.
+     *         waiting for, or {@code null}.
      */
     @KernelSpace
     final VmThread getWaitForThread() {
@@ -1221,7 +1232,8 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      */
     @Uninterruptible
     @Override
-    public final void detectDeadlock(List<org.jnode.vm.facade.VmThread> deadLockCycle, boolean concurrentLocks) {
+    public final void
+    detectDeadlock(List<org.jnode.vm.facade.VmThread> deadLockCycle, boolean concurrentLocks) {
         // first, ensure the initial list is empty (when it's not null)
         if (deadLockCycle != null) {
             deadLockCycle.clear();
@@ -1763,7 +1775,11 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
     /**
      * Initialize the the mapping between VmThread states and Thread.State.
      * TODO this mapping might need some review because meaning of some states is not clear.
-     *
+     * For further details, look at hotspot sources (src/share/vm/prims/jvm.cpp) :
+     * <ul>
+     *     <li><code>JVM_GetThreadStateValues</code> for the values</li>
+     *     <li><code>JVM_GetThreadStateNames</code> for the names</li>
+     * </ul>
      * @param vmThreadStateValues
      * @param vmThreadStateNames
      */
@@ -1797,10 +1813,12 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
         }
 
         boolean stopping = this.stopping && ((newState == STOPPED) || (newState == DESTROYED));
+        boolean wasRunning = isRunning();
         boolean wasAlive = isAlive() || stopping;
         boolean wasCreated = (this.threadState == CREATED);
         this.threadState = newState;
         boolean isAlive = isAlive();
+        boolean isRunning = isRunning();
 
         if (wasAlive != isAlive) {
             if (isAlive) {
@@ -1818,6 +1836,16 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
                 if (javaThread.isDaemon()) {
                     daemonThreadCount++;
                 }
+            }
+        }
+
+        if (wasRunning != isRunning) {
+            if (isRunning) {
+                // not running --> running
+                lastWakedUpTime = VmSystem.currentKernelMillis();
+            } else {
+                // running --> not running
+                totalCpuTime += VmSystem.currentKernelMillis() - lastWakedUpTime;
             }
         }
 
@@ -1866,5 +1894,21 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      */
     public static final void resetPeakThreadCount() {
         peakLiveThreadCount = liveThreadCount;
+    }
+
+    @Override
+    public long getTotalCpuTime() {
+        long result = totalCpuTime;
+        if (isRunning()) {
+            result += VmSystem.currentKernelMillis() - lastWakedUpTime;
+        }
+        return result;
+    }
+
+    @Override
+    public long getUserCpuTime() {
+        // How to separate kernel and user cpu time ?
+        // For now, let say user CPU time = total CPU time.
+        return getTotalCpuTime();
     }
 }

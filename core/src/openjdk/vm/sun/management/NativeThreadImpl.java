@@ -21,7 +21,6 @@
 package sun.management;
 
 import java.lang.management.ThreadInfo;
-import org.jnode.vm.scheduler.VmThread;
 
 /**
  * @author Levente S\u00e1ntha
@@ -52,25 +51,22 @@ class NativeThreadImpl {
     /**
      * @see sun.management.ThreadImpl#getThreadTotalCpuTime0(long)
      */
-    private static long getThreadTotalCpuTime0(long arg1) {
-        //todo add CPU time mesurement support
-        throw new UnsupportedOperationException();
+    private static long getThreadTotalCpuTime0(long id) {
+        return Management.getThreadById(id).getTotalCpuTime();
     }
 
     /**
      * @see sun.management.ThreadImpl#getThreadUserCpuTime0(long)
      */
-    private static long getThreadUserCpuTime0(long arg1) {
-        //todo add CPU time mesurement support
-        throw new UnsupportedOperationException();
+    private static long getThreadUserCpuTime0(long id) {
+        return Management.getThreadById(id).getUserCpuTime();
     }
 
     /**
      * @see sun.management.ThreadImpl#setThreadCpuTimeEnabled0(boolean)
      */
-    private static void setThreadCpuTimeEnabled0(boolean arg1) {
-        //todo add CPU time mesurement support
-        throw new UnsupportedOperationException();
+    private static void setThreadCpuTimeEnabled0(boolean enabled) {
+        // for now, simply ignore (==> thread CPU time always enabled)
     }
 
     /**
@@ -111,7 +107,7 @@ class NativeThreadImpl {
      * @see sun.management.ThreadImpl#resetPeakThreadCount0()
      */
     private static void resetPeakThreadCount0() {
-        VmThread.resetPeakThreadCount();
+        org.jnode.vm.scheduler.VmThread.resetPeakThreadCount();
     }
 
     /**

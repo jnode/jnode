@@ -49,6 +49,19 @@ public interface VmThread {
     int getId();
 
     /**
+     * Get the total CPU time of this thread.
+     * @return
+     */
+    long getTotalCpuTime();
+
+    /**
+     * Get the user CPU time of this thread.
+     *
+     * @return
+     */
+    long getUserCpuTime();
+
+    /**
      * Get the Thread to which this VmThread belongs.
      *
      * @return The java thread
