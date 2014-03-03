@@ -206,67 +206,67 @@ class NativeUnsafe {
     }
 
     public static byte getByte(Unsafe instance, long address) {
-        throw new UnsupportedOperationException();
+        return Address.fromLong(address).loadByte();
     }
 
     public static void putByte(Unsafe instance, long address, byte x) {
-        throw new UnsupportedOperationException();
+        Address.fromLong(address).store(x);
     }
 
     public static short getShort(Unsafe instance, long address) {
-        throw new UnsupportedOperationException();
+        return Address.fromLong(address).loadShort();
     }
 
     public static void putShort(Unsafe instance, long address, short x) {
-        throw new UnsupportedOperationException();
+        Address.fromLong(address).store(x);
     }
 
     public static char getChar(Unsafe instance, long address) {
-        throw new UnsupportedOperationException();
+        return Address.fromLong(address).loadChar();
     }
 
     public static void putChar(Unsafe instance, long address, char x) {
-        throw new UnsupportedOperationException();
+        Address.fromLong(address).store(x);
     }
 
     public static int getInt(Unsafe instance, long address) {
-        throw new UnsupportedOperationException();
+        return Address.fromLong(address).loadInt();
     }
 
     public static void putInt(Unsafe instance, long address, int x) {
-        throw new UnsupportedOperationException();
+        Address.fromLong(address).store(x);
     }
 
     public static long getLong(Unsafe instance, long address) {
-        throw new UnsupportedOperationException();
+        return Address.fromLong(address).loadLong();
     }
 
     public static void putLong(Unsafe instance, long address, long x) {
-        throw new UnsupportedOperationException();
+        Address.fromLong(address).store(x);
     }
 
     public static float getFloat(Unsafe instance, long address) {
-        throw new UnsupportedOperationException();
+        return Address.fromLong(address).loadFloat();
     }
 
     public static void putFloat(Unsafe instance, long address, float x) {
-        throw new UnsupportedOperationException();
+        Address.fromLong(address).store(x);
     }
 
     public static double getDouble(Unsafe instance, long address) {
-        throw new UnsupportedOperationException();
+        return Address.fromLong(address).loadDouble();
     }
 
     public static void putDouble(Unsafe instance, long address, double x) {
-        throw new UnsupportedOperationException();
+        Address.fromLong(address).store(x);
     }
 
     public static long getAddress(Unsafe instance, long address) {
-        throw new UnsupportedOperationException();
+        return Address.fromLong(address).loadAddress().toLong();
     }
 
     public static void putAddress(Unsafe instance, long address, long x) {
-        throw new UnsupportedOperationException();
+        Address.fromLong(address).store(Address.fromLong(x));
     }
 
     public static long allocateMemory(Unsafe instance, long bytes) {
@@ -684,7 +684,13 @@ class NativeUnsafe {
     @SharedStatics
     private static class ThreadParker {
         private void park(long time, int nanos) {
-            Object parkBlocker = getParkBlocker();
+            Object parkBlocker = LockSupport.getBlocker(Thread.currentThread());
+            if (parkBlocker == null) {
+                throw new NullPointerException(
+                    "No parkBlocker for thread " + Thread.currentThread().getId() + " - " + Thread.currentThread()
+                        .getName());
+            }
+
             synchronized (parkBlocker) {
                 try {
                     parkBlocker.wait(time, nanos);
@@ -695,19 +701,14 @@ class NativeUnsafe {
         }
 
         private void unpark() {
-            Object parkBlocker = getParkBlocker();
-            synchronized (parkBlocker) {
-                parkBlocker.notifyAll();
-            }
-        }
+            Object parkBlocker = LockSupport.getBlocker(Thread.currentThread());
+            // According to LockSupport#unpark(), parkBlocker could be null.
 
-        private Object getParkBlocker() {
-            Thread t = Thread.currentThread();
-            Object parkBlocker = LockSupport.getBlocker(t);
-            if (parkBlocker == null) {
-                throw new NullPointerException("No parkBlocker for thread " + t.getId() + " - " + t.getName());
+            if (parkBlocker != null) {
+                synchronized (parkBlocker) {
+                    parkBlocker.notifyAll();
+                }
             }
-            return parkBlocker;
         }
     }
 
