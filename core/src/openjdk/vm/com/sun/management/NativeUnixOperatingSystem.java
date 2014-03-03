@@ -17,9 +17,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package com.sun.management;
 
+import java.io.IOException;
+import java.io.VMIOUtils;
 import org.jnode.vm.VmSystem;
 
 /**
@@ -30,29 +32,25 @@ class NativeUnixOperatingSystem {
      * @see com.sun.management.UnixOperatingSystem#getCommittedVirtualMemorySize()
      */
     private static long getCommittedVirtualMemorySize(UnixOperatingSystem instance) {
-        //todo implement it
-        return -1;
+        return -1; //TODO implement SWAP
     }
     /**
      * @see com.sun.management.UnixOperatingSystem#getTotalSwapSpaceSize()
      */
     private static long getTotalSwapSpaceSize(UnixOperatingSystem instance) {
-        //todo implement it
-        return 0;
+        return 0; //TODO implement SWAP
     }
     /**
      * @see com.sun.management.UnixOperatingSystem#getFreeSwapSpaceSize()
      */
     private static long getFreeSwapSpaceSize(UnixOperatingSystem instance) {
-        //todo implement it
-        return 0;
+        return 0; //TODO implement SWAP
     }
     /**
      * @see com.sun.management.UnixOperatingSystem#getProcessCpuTime()
      */
     private static long getProcessCpuTime(UnixOperatingSystem instance) {
-        //todo implement it
-        return -1;
+        return VmSystem.currentKernelMillis();
     }
     /**
      * @see com.sun.management.UnixOperatingSystem#getFreePhysicalMemorySize()
@@ -70,15 +68,20 @@ class NativeUnixOperatingSystem {
      * @see com.sun.management.UnixOperatingSystem#getOpenFileDescriptorCount()
      */
     private static long getOpenFileDescriptorCount(UnixOperatingSystem instance) {
-        //todo implement it
-        return 0;
+        try {
+            return VMIOUtils.getAPI().getOpenFileDescriptorCount();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
+
     /**
      * @see com.sun.management.UnixOperatingSystem#getMaxFileDescriptorCount()
      */
     private static long getMaxFileDescriptorCount(UnixOperatingSystem instance) {
-        //todo implement it
-        return 0;
+        // returns Integer.MAX_VALUE since
+        // VMFileSystemAPI.getOpenFileDescriptorCount() returns an int.
+        return Integer.MAX_VALUE;
     }
     /**
      * @see com.sun.management.UnixOperatingSystem#initialize()
