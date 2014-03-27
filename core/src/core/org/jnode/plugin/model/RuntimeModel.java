@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import java.util.ArrayList;
@@ -25,6 +25,8 @@ import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.Library;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.Runtime;
+
+import static org.jnode.plugin.model.XMLConstants.LIBRARY;
 
 /**
  * @author epr
@@ -41,7 +43,7 @@ final class RuntimeModel extends PluginModelObject implements Runtime {
 
         final ArrayList<LibraryModel> list = new ArrayList<LibraryModel>();
         for (final XMLElement lE : e.getChildren()) {
-            if (lE.getName().equals("library")) {
+            if (lE.getName().equals(LIBRARY)) {
                 list.add(new LibraryModel(plugin, lE));
             }
         }

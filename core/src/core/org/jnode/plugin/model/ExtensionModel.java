@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import java.util.ArrayList;
@@ -25,6 +25,9 @@ import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.PluginException;
+
+import static org.jnode.plugin.model.XMLConstants.ID;
+import static org.jnode.plugin.model.XMLConstants.POINT;
 
 /**
  * @author epr
@@ -44,8 +47,8 @@ final class ExtensionModel extends PluginModelObject implements Extension {
     public ExtensionModel(PluginDescriptorModel plugin, XMLElement e)
         throws PluginException {
         super(plugin);
-        point = getAttribute(e, "point", true);
-        id = getAttribute(e, "id", false);
+        point = getAttribute(e, POINT, true);
+        id = getAttribute(e, ID, false);
 
         final ArrayList<ConfigurationElementModel> list = new ArrayList<ConfigurationElementModel>();
         for (final XMLElement ce : e.getChildren()) {

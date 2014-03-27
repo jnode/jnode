@@ -17,19 +17,21 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
-
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.FragmentDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.util.Version;
 import org.jnode.vm.ResourceLoader;
+
+import static org.jnode.plugin.model.XMLConstants.PLUGIN_ID;
+import static org.jnode.plugin.model.XMLConstants.PLUGIN_VERSION;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -51,8 +53,8 @@ final class FragmentDescriptorModel extends PluginDescriptorModel implements
     public FragmentDescriptorModel(PluginJar jarFile, XMLElement e)
         throws PluginException {
         super(jarFile, e);
-        this.pluginId = getAttribute(e, "plugin-id", true);
-        this.pluginVersion = new Version(getAttribute(e, "plugin-version", true));
+        this.pluginId = getAttribute(e, PLUGIN_ID, true);
+        this.pluginVersion = new Version(getAttribute(e, PLUGIN_VERSION, true));
     }
 
     /**
@@ -130,8 +132,8 @@ final class FragmentDescriptorModel extends PluginDescriptorModel implements
      */
     protected void initializeRequiresList(List<PluginPrerequisiteModel> list,
                                           XMLElement e) throws PluginException {
-        final String pluginId = getAttribute(e, "plugin-id", true);
-        final Version pluginVersion = new Version(getAttribute(e, "plugin-version", true));
+        final String pluginId = getAttribute(e, PLUGIN_ID, true);
+        final Version pluginVersion = new Version(getAttribute(e, PLUGIN_VERSION, true));
         list.add(new PluginPrerequisiteModel(this, pluginId, pluginVersion));
     }
 

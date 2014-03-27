@@ -26,6 +26,9 @@ import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.PluginReference;
 import org.jnode.util.Version;
 
+import static org.jnode.plugin.model.XMLConstants.PLUGIN;
+import static org.jnode.plugin.model.XMLConstants.VERSION;
+
 /**
  * @author epr
  */
@@ -43,8 +46,8 @@ final class PluginPrerequisiteModel extends PluginModelObject implements PluginP
     public PluginPrerequisiteModel(PluginDescriptorModel plugin, XMLElement e)
         throws PluginException {
         super(plugin);
-        final String pluginIdentifier = getAttribute(e, "plugin", true);
-        String version = getAttribute(e, "version", false);
+        final String pluginIdentifier = getAttribute(e, PLUGIN, true);
+        String version = getAttribute(e, VERSION, false);
         if (version == null) {
             version = plugin.getVersion().toString();
         }

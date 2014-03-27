@@ -24,7 +24,6 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
 import org.apache.tools.ant.Project;
 import org.jnode.build.PluginList;
 import org.jnode.plugin.PluginException;
@@ -32,8 +31,8 @@ import org.jnode.plugin.PluginException;
 /**
  * Task that insert the user plugins into a plugin list 
  * without actually modifying the plugin list files.
- * 
- * @author fabien
+ *
+ * @author Fabien DUMINY (fduminy at jnode.org)
  *
  */
 public class PluginListInsertor extends PackagerTask {

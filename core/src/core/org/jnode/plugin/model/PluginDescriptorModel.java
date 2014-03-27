@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import java.lang.reflect.Constructor;
@@ -28,7 +28,6 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.Extension;
@@ -45,6 +44,23 @@ import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.isolate.VmIsolateLocal;
 import org.jnode.vm.objects.BootableArrayList;
+
+import static org.jnode.plugin.model.XMLConstants.AUTO_START;
+import static org.jnode.plugin.model.XMLConstants.CLASS;
+import static org.jnode.plugin.model.XMLConstants.EXTENSION;
+import static org.jnode.plugin.model.XMLConstants.EXTENSION_POINT;
+import static org.jnode.plugin.model.XMLConstants.ID;
+import static org.jnode.plugin.model.XMLConstants.IMPORT;
+import static org.jnode.plugin.model.XMLConstants.LICENSE_NAME;
+import static org.jnode.plugin.model.XMLConstants.LICENSE_URL;
+import static org.jnode.plugin.model.XMLConstants.NAME;
+import static org.jnode.plugin.model.XMLConstants.PRIORITY;
+import static org.jnode.plugin.model.XMLConstants.PROVIDER_NAME;
+import static org.jnode.plugin.model.XMLConstants.PROVIDER_URL;
+import static org.jnode.plugin.model.XMLConstants.REQUIRES;
+import static org.jnode.plugin.model.XMLConstants.RUNTIME;
+import static org.jnode.plugin.model.XMLConstants.SYSTEM;
+import static org.jnode.plugin.model.XMLConstants.VERSION;
 
 /**
  * Implementation of {@link org.jnode.plugin.PluginDescriptor}.
@@ -107,31 +123,31 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     private final Version version;
 
     private final int priority;
-    
+
     private PluginReference reference;
 
     /**
      * Create a new instance
      *
      * @param rootElement the root XMLElement for the XML plugin descriptor
-     * @param jarFile the PluginJar object to associate with the descriptor.
+     * @param jarFile     the PluginJar object to associate with the descriptor.
      */
     PluginDescriptorModel(PluginJar jarFile, XMLElement rootElement)
         throws PluginException {
         this.jarFile = jarFile;
         this.fragments = new BootableArrayList<FragmentDescriptorModel>();
-        id = getAttribute(rootElement, "id", true);
-        name = getAttribute(rootElement, "name", true);
-        providerName = getAttribute(rootElement, "provider-name", false);
-        providerUrl = getAttribute(rootElement, "provider-url", false);
-        licenseName = getAttribute(rootElement, "license-name", true);
-        licenseUrl = getAttribute(rootElement, "license-url", false);
-        version = new Version(getAttribute(rootElement, "version", true));
-        className = getAttribute(rootElement, "class", false);
-        system = getBooleanAttribute(rootElement, "system", false);
-        autoStart = getBooleanAttribute(rootElement, "auto-start", false);
+        id = getAttribute(rootElement, ID, true);
+        name = getAttribute(rootElement, NAME, true);
+        providerName = getAttribute(rootElement, PROVIDER_NAME, false);
+        providerUrl = getAttribute(rootElement, PROVIDER_URL, false);
+        licenseName = getAttribute(rootElement, LICENSE_NAME, true);
+        licenseUrl = getAttribute(rootElement, LICENSE_URL, false);
+        version = new Version(getAttribute(rootElement, VERSION, true));
+        className = getAttribute(rootElement, CLASS, false);
+        system = getBooleanAttribute(rootElement, SYSTEM, false);
+        autoStart = getBooleanAttribute(rootElement, AUTO_START, false);
         priority = Math.min(MAX_PRIORITY, Math.max(MIN_PRIORITY,
-            getIntAttribute(rootElement, "priority", DEFAULT_PRIORITY)));
+            getIntAttribute(rootElement, PRIORITY, DEFAULT_PRIORITY)));
 
         // if (registry != null) {
         // registry.registerPlugin(this);
@@ -146,25 +162,25 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
         for (final XMLElement childE : rootElement.getChildren()) {
             final String tag = childE.getName();
-            if (tag.equals("extension-point")) {
+            if (tag.equals(EXTENSION_POINT)) {
                 final ExtensionPointModel ep = new ExtensionPointModel(this,
                     childE);
                 epList.add(ep);
                 // if (registry != null) {
                 // registry.registerExtensionPoint(ep);
                 // }
-            } else if (tag.equals("requires")) {
+            } else if (tag.equals(REQUIRES)) {
                 for (final XMLElement impE : childE.getChildren()) {
-                    if (impE.getName().equals("import")) {
+                    if (impE.getName().equals(IMPORT)) {
                         reqList.add(new PluginPrerequisiteModel(this, impE));
                     } else {
                         throw new PluginException("Unknown element "
                             + impE.getName());
                     }
                 }
-            } else if (tag.equals("extension")) {
+            } else if (tag.equals(EXTENSION)) {
                 exList.add(new ExtensionModel(this, childE));
-            } else if (tag.equals("runtime")) {
+            } else if (tag.equals(RUNTIME)) {
                 if (runtime == null) {
                     runtime = new RuntimeModel(this, childE);
                 } else {
@@ -236,6 +252,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Create the plugin described by this descriptor
+     *
      * @return the Plugin so created.
      */
     private Plugin createPlugin() throws PluginException {
@@ -277,7 +294,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      *
      * @param id
      * @return True if id is in the list of required plugins of this descriptor,
-     *         false otherwise.
+     * false otherwise.
      */
     public boolean depends(String id) {
         final PluginPrerequisite[] req = this.requires;
@@ -389,6 +406,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Gets the unique identifier of this plugin.
+     *
      * @return the plugin identifier.
      */
     public String getId() {
@@ -397,6 +415,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Get the plugin's JAR file as a PluginJar object.
+     *
      * @return the plugin's JAR file or {@code null}
      */
     public final PluginJar getJarFile() {
@@ -523,7 +542,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     public Version getVersion() {
         return version;
     }
-    
+
     public PluginReference getPluginReference() {
         if (reference == null) {
             // lazy creation
@@ -617,7 +636,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Resolve all references to (elements of) other plugins
      *
-     * @param registry the registry that will be used to resolve references. 
+     * @param registry the registry that will be used to resolve references.
      * @throws PluginException
      */
     public void resolve(PluginRegistryModel registry) throws PluginException {
@@ -647,7 +666,8 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Start this plugin. This descriptor is resolved. All plugins that this
      * plugin depends on, are started first.
-     * @param registry the registry that will be used to resolve references. 
+     *
+     * @param registry the registry that will be used to resolve references.
      */
     final void startPlugin(final PluginRegistryModel registry)
         throws PluginException {
@@ -727,8 +747,8 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Remove all references to (elements of) other plugin descriptors
-     * 
-     * @param registry the registry that will be used to unresolve references. 
+     *
+     * @param registry the registry that will be used to unresolve references.
      * @throws PluginException
      */
     protected void unresolve(PluginRegistryModel registry)

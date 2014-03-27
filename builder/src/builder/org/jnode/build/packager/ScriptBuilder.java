@@ -32,14 +32,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
 import org.jnode.build.BuildException;
 
 /**
  * Build a jnode scripts from both a linux/unix scripts, from msdos scripts or, if none is found,
  * from scratch (with the help of {@link MainFinder}).
- * 
- * @author fabien
+ *
+ * @author Fabien DUMINY (fduminy at jnode.org)
  *
  */
 public class ScriptBuilder extends PackagerTask {

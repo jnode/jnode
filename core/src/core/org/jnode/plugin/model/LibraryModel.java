@@ -25,6 +25,11 @@ import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.Library;
 import org.jnode.plugin.PluginException;
 
+import static org.jnode.plugin.model.XMLConstants.EXCLUDE;
+import static org.jnode.plugin.model.XMLConstants.EXPORT;
+import static org.jnode.plugin.model.XMLConstants.NAME;
+import static org.jnode.plugin.model.XMLConstants.TYPE;
+
 /**
  * @author epr
  */
@@ -40,16 +45,16 @@ final class LibraryModel extends PluginModelObject implements Library {
      */
     public LibraryModel(PluginDescriptorModel plugin, XMLElement e) throws PluginException {
         super(plugin);
-        name = getAttribute(e, "name", true);
-        type = getAttribute(e, "type", false);
+        name = getAttribute(e, NAME, true);
+        type = getAttribute(e, TYPE, false);
 
         final ArrayList<String> exportList = new ArrayList<String>();
         final ArrayList<String> excludeList = new ArrayList<String>();
         for (final XMLElement exE : e.getChildren()) {
-            if (exE.getName().equals("export")) {
-                exportList.add(getAttribute(exE, "name", true));
-            } else if (exE.getName().equals("exclude")) {
-                excludeList.add(getAttribute(exE, "name", true));
+            if (exE.getName().equals(EXPORT)) {
+                exportList.add(getAttribute(exE, NAME, true));
+            } else if (exE.getName().equals(EXCLUDE)) {
+                excludeList.add(getAttribute(exE, NAME, true));
             }
         }
         exports = (String[]) exportList.toArray(new String[exportList.size()]);

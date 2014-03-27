@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassReader;
@@ -39,8 +38,8 @@ import org.objectweb.asm.CodeVisitor;
 
 /**
  * Class for searching main methods in a jar.
- * 
- * @author fabien
+ *
+ * @author Fabien DUMINY (fduminy at jnode.org)
  *
  */
 public class MainFinder {
