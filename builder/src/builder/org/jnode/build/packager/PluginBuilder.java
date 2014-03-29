@@ -52,7 +52,7 @@ public class PluginBuilder extends PackagerTask {
     /**
      * List of user plugin ids.
      */
-    private StringBuilder userPluginIds = new StringBuilder();
+    private StringBuffer userPluginIds = new StringBuffer();
 
     /**
      * {@link Path} to third party jars for compilation purpose.
@@ -136,7 +136,7 @@ public class PluginBuilder extends PackagerTask {
     }
 
     /**
-     * Attention : userPluginList must be a StringBuilder because it's accessed from multiple threads.
+     * Attention : userPluginList must be a StringBuffer because it's accessed from multiple threads.
      *
      * @param executor
      * @param descriptors
@@ -144,7 +144,7 @@ public class PluginBuilder extends PackagerTask {
      * @param userPluginList
      */
     private void processUserJar(ExecutorService executor, final Map<String, File> descriptors, final File userJar,
-                                final StringBuilder userPluginList) {
+                                final StringBuffer userPluginList) {
         final PluginTask task = (PluginTask) parent;
         executor.execute(new Runnable() {
             public void run() {
