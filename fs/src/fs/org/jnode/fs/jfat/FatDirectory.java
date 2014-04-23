@@ -197,10 +197,9 @@ public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId
             while (f.hasNextEntry()) {
                 FatEntry entry = f.createNextEntry();
                 idMap.put(entry.getId(), entry);
-                if (entry.getId().equals(id)) {
-                    return entry;
-                }
             }
+
+            return idMap.get(id);
         }
 
         return child;
