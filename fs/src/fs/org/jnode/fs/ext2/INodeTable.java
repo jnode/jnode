@@ -63,7 +63,7 @@ public class INodeTable {
      * @throws FileSystemException
      * @throws IOException
      */
-    private byte[] getINodeTableBlock(int blockNo) throws FileSystemException, IOException {
+    private byte[] getINodeTableBlock(long blockNo) throws FileSystemException, IOException {
         if (blockNo < blockCount)
             return fs.getBlock(firstBlock + blockNo);
         else
@@ -102,7 +102,7 @@ public class INodeTable {
 
         int indexCopied = 0;
         while (indexCopied < iNodeSize) {
-            int blockNo = (index * iNodeSize + indexCopied) / blockSize;
+            long blockNo = (index * iNodeSize + indexCopied) / blockSize;
             int blockOffset = (index * iNodeSize + indexCopied) % blockSize;
             int copyLength = Math.min(blockSize - blockOffset, iNodeSize);
             System.arraycopy(getINodeTableBlock(blockNo), blockOffset, data, indexCopied,

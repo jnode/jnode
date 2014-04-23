@@ -32,7 +32,7 @@ import org.jnode.fs.FileSystemException;
 
 public class INodeDescriptor {
 
-    private int iNodeNr;
+    private long iNodeNr;
 
     /* The number of blocks allocated for the iNode is not necessary equal to its size in blocks:
      * <ul>
@@ -68,7 +68,7 @@ public class INodeDescriptor {
         return preallocBlock++;
     }
 
-    public INodeDescriptor(INodeTable iNodeTable, int iNodeNr, int group, int index) {
+    public INodeDescriptor(INodeTable iNodeTable, long iNodeNr, int group, int index) {
         this.iNodeTable = iNodeTable;
         this.iNodeNr = iNodeNr;
         this.group = group;
@@ -121,7 +121,7 @@ public class INodeDescriptor {
         lastAllocatedBlockIndex = l;
     }
 
-    public int getINodeNr() {
+    public long getINodeNr() {
         return iNodeNr;
     }
 }

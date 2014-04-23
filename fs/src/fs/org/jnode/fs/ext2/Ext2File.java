@@ -35,15 +35,19 @@ import org.jnode.util.ByteBufferUtils;
  */
 public class Ext2File extends AbstractFSFile implements FSFileSlackSpace {
 
-    Ext2Entry entry;
+    String name;
     INode iNode;
 
     private final Logger log = Logger.getLogger(getClass());
 
     public Ext2File(Ext2Entry entry) {
-        super(entry.getINode().getExt2FileSystem());
-        this.iNode = entry.getINode();
-        this.entry = entry;
+        this((Ext2FileSystem) entry.getFileSystem(), entry.getINode(), entry.getName());
+    }
+
+    public Ext2File(Ext2FileSystem fs, INode iNode, String name) {
+        super(fs);
+        this.iNode = iNode;
+        this.name = name;
         log.setLevel(Level.DEBUG);
     }
 
@@ -183,7 +187,7 @@ public class Ext2File extends AbstractFSFile implements FSFileSlackSpace {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("File:" + entry.getName() + " size:" + getLength() + " read offset: " + fileOffset + " len: "
+            log.debug("File:" + name + " size:" + getLength() + " read offset: " + fileOffset + " len: "
                 + dest.length);
         }
 
@@ -336,7 +340,7 @@ public class Ext2File extends AbstractFSFile implements FSFileSlackSpace {
     }
 
     private void rereadInode() throws IOException {
-        int iNodeNr = iNode.getINodeNr();
+        long iNodeNr = iNode.getINodeNr();
         try {
             iNode = ((Ext2FileSystem) getFileSystem()).getINode(iNodeNr);
         } catch (FileSystemException ex) {

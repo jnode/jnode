@@ -213,7 +213,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
         synchronized (((Ext2FileSystem) getFileSystem()).getInodeCache()) {
             //reread the inode before synchronizing to it to make sure
             //all threads use the same instance
-            int iNodeNr = iNode.getINodeNr();
+            long iNodeNr = iNode.getINodeNr();
             iNode = ((Ext2FileSystem) getFileSystem()).getINode(iNodeNr);
 
             //lock the inode into the cache so it is not flushed before synchronizing to it
@@ -332,7 +332,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
 
     @Override
     public String getDirectoryId() {
-        return Integer.toString(iNode.getINodeNr());
+        return Long.toString(iNode.getINodeNr());
     }
 
     @Override

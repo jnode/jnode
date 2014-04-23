@@ -49,14 +49,10 @@ public class GroupDescriptor {
      */
     public void read(int groupNr, Ext2FileSystem fs) throws IOException {
         // read the group descriptors from the main copy in block group 0
-        // byte[] blockData = fs.getBlock(
-        // fs.getSuperblock().getFirstDataBlock() + 1);
         long baseBlock = fs.getSuperblock().getFirstDataBlock() + 1;
         long blockOffset = (groupNr * GROUPDESCRIPTOR_LENGTH) / fs.getBlockSize();
         long offset = (groupNr * GROUPDESCRIPTOR_LENGTH) % fs.getBlockSize();
         byte[] blockData = fs.getBlock(baseBlock + blockOffset);
-
-        // data = new byte[GROUPDESCRIPTOR_LENGTH];
         System.arraycopy(blockData, (int) offset, data, 0, GROUPDESCRIPTOR_LENGTH);
         this.groupNr = groupNr;
         this.fs = fs;

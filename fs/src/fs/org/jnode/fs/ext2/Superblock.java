@@ -25,6 +25,7 @@ import java.io.IOException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
+import org.jnode.util.LittleEndian;
 
 /**
  * Ext2fs superblock
@@ -690,6 +691,30 @@ public class Superblock {
 
     public long getLastOrphan() {
         return Ext2Utils.get8(data, 232);
+    }
+
+    /**
+     * Gets the block number that contains the multi-mount protection (MMP) data.
+     *
+     * @return the block number.
+     */
+    public long getMultiMountProtectionBlock() {
+        return LittleEndian.getInt64(data, 360);
+    }
+
+    public long getBlocksPerFlex() {
+        int logBlocksPerFlex = Ext2Utils.get8(data, 372);
+        return 1L << logBlocksPerFlex;
+    }
+
+    /**
+     * Checks whether the file system is using flexible block groups.
+     *
+     * @return {@code true} if using flexible block groups.
+     */
+    public boolean isUsingFlexibleBlockGroups() {
+        return (getFeatureIncompat() & Ext2Constants.EXT4_FEATURE_INCOMPAT_FLEX_BG) ==
+            Ext2Constants.EXT4_FEATURE_INCOMPAT_FLEX_BG;
     }
 
     /**
