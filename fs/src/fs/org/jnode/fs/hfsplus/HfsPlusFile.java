@@ -39,6 +39,7 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
     public HfsPlusFile(HfsPlusEntry entry) {
         this.entry = entry;
         this.file = new CatalogFile(entry.getData());
+        this.entry = entry;
     }
 
     @Override
