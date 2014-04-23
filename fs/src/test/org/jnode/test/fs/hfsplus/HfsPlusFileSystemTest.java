@@ -18,19 +18,20 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.fs.hfsplus;
+package org.jnode.test.fs.hfsplus;
 
 import java.io.File;
 import java.io.IOException;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FileDevice;
-import org.jnode.emu.plugin.model.DummyConfigurationElement;
-import org.jnode.emu.plugin.model.DummyExtension;
-import org.jnode.emu.plugin.model.DummyExtensionPoint;
-import org.jnode.emu.plugin.model.DummyPluginDescriptor;
+import org.jnode.fs.hfsplus.HFSPlusParams;
+import org.jnode.fs.hfsplus.HfsPlusFileSystem;
+import org.jnode.fs.hfsplus.HfsPlusFileSystemType;
+import org.jnode.fs.hfsplus.SuperBlock;
+import org.jnode.test.fs.DataStructureAsserts;
 import org.jnode.fs.FSDirectory;
+import org.jnode.test.fs.FileSystemTestUtils;
 import org.jnode.fs.service.FileSystemService;
-import org.jnode.fs.service.def.FileSystemPlugin;
 import org.jnode.test.support.TestUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,8 +47,24 @@ public class HfsPlusFileSystemTest {
         // create test device.
         device = createTestDisk(false);
         // create file system service.
-        fss = createFSService();
+        fss = FileSystemTestUtils.createFSService(HfsPlusFileSystemType.class.getName());
+    }
 
+    @Test
+    public void testReadSmallDisk() throws Exception {
+
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/hfsplus/test.hfsplus"), "r");
+        HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
+        HfsPlusFileSystem fs = type.create(device, true);
+
+        String expectedStructure =
+            "type: HFS+ vol:Kenny total:67108864 free:66035712\n" +
+            "  /; \n" +
+            "    southpark.jpeg; 6420; 5a2ec290089ee04a470135f3bda29f94\n" +
+            "    test.txt; 1141; 48b97c1f1defb52c77ce75d55a4b066c\n" +
+            "    \u0000\u0000\u0000\u0000HFS+ Private Data; \n";
+
+        DataStructureAsserts.assertStructure(fs, expectedStructure);
     }
 
     @Test
@@ -99,17 +116,4 @@ public class HfsPlusFileSystemTest {
         return device;
 
     }
-
-    private FileSystemService createFSService() {
-        DummyPluginDescriptor desc = new DummyPluginDescriptor(true);
-        DummyExtensionPoint ep = new DummyExtensionPoint("types", "org.jnode.fs.types", "types");
-        desc.addExtensionPoint(ep);
-        DummyExtension extension = new DummyExtension();
-        DummyConfigurationElement element = new DummyConfigurationElement();
-        element.addAttribute("class", HfsPlusFileSystemType.class.getName());
-        extension.addElement(element);
-        ep.addExtension(extension);
-        return new FileSystemPlugin(desc);
-    }
-
 }

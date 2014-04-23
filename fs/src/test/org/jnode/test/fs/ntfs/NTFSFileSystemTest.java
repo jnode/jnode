@@ -28,7 +28,6 @@ import org.jnode.fs.service.FileSystemService;
 import org.jnode.test.fs.DataStructureAsserts;
 import org.jnode.test.fs.FileSystemTestUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class NTFSFileSystemTest {
@@ -78,7 +77,6 @@ public class NTFSFileSystemTest {
     }
 
     @Test
-    @Ignore
     public void testReadCompressedDisk() throws Exception {
 
         device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/ntfs/compressed.dd"), "r");
