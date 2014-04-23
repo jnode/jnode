@@ -75,7 +75,7 @@ public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSyste
             firstSector[55] == 'A' &&
             firstSector[56] == 'T' &&
             firstSector[57] == '1' &&
-            firstSector[58] == '2' || firstSector[58] == '6');
+            (firstSector[58] == '2' || firstSector[58] == '6'));
     }
 
     public FatFileSystem create(Device device, boolean readOnly) throws FileSystemException {
