@@ -30,8 +30,10 @@ public class IBMPartitionTableTest {
             "makeboot.dd",
             "mbr-sig.dd",
             "syslinux.dd",
+            "thinkpad.dd",
             "win-2k.dd",
             "win-9x.dd",
+            "win-pe.dd",
             "win-vista.dd",
             "win-xp.dd");
 

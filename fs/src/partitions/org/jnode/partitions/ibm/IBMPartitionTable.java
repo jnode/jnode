@@ -261,7 +261,9 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
         }
 
         if (LittleEndian.getUInt32(bootSector, 241) == 0x41504354) {
-            // Matches TCPA signature
+            // Matches TCPA signature. Seen at offsets:
+            //  * 0xF1 - Windows Vista
+            //  * 0x18E - Windows PE
             // see http://thestarman.pcministry.com/asm/mbr/VistaMBR.htm
         	log.debug("Has TCPA extra signature");
             return true;
@@ -291,6 +293,12 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
         if (FILESYSTEM_OEM_NAMES.contains(oemName)) {
             log.error("Looks like a file system instead of a partition table.");
             return false;
+        }
+
+        if (LittleEndian.getUInt32(bootSector, 0xc) == 0x504E0000) {
+            // Matches the 'NP' signature
+            log.debug("Matches the 'NP' signature");
+            return true;
         }
 
         if (LittleEndian.getUInt16(bootSector, 218) != 0) {
