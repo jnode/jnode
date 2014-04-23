@@ -473,32 +473,36 @@ public class FileRecord extends NTFSRecord {
      */
     public void readData(long fileOffset, byte[] dest, int off, int len) throws IOException {
         // Explicitly look for the attribute with no name, to avoid getting alternate streams.
-        readData(null, fileOffset, dest, off, len);
+        readData(NTFSAttribute.Types.DATA, null, fileOffset, dest, off, len);
     }
 
     /**
      * Reads data from the file.
      *
+     * @param attributeType the attribute type to read from.
+     * @param streamName the stream name to read from, or {@code null} to read from the default stream.
      * @param fileOffset the offset into the file.
      * @param dest       the destination byte array into which to copy the file data.
      * @param off        the offset into the destination byte array.
      * @param len        the number of bytes of data to read.
      * @throws IOException if an error occurs reading from the filesystem.
      */
-    public void readData(String streamName, long fileOffset, byte[] dest, int off, int len) throws IOException {
+    public void readData(int attributeType, String streamName, long fileOffset, byte[] dest, int off, int len)
+        throws IOException {
+
         if (log.isDebugEnabled()) {
-            log.debug("readData: offset " + fileOffset + " stream: " + streamName + " length " + len +
-                ", file record = " + this);
+            log.debug("readData: offset " + fileOffset + " attr:" + attributeType + " stream: " + streamName +
+                " length " + len + ", file record = " + this);
         }
 
         if (len == 0) {
             return;
         }
 
-        final AttributeIterator dataAttrs = findAttributesByTypeAndName(NTFSAttribute.Types.DATA, streamName);
+        final AttributeIterator dataAttrs = findAttributesByTypeAndName(attributeType, streamName);
         NTFSAttribute attr = dataAttrs.next();
         if (attr == null) {
-            throw new IOException("Data attribute not found, file record = " + this);
+            throw new IOException(attributeType + " attribute not found, file record = " + this);
         }
 
         if (attr.isResident()) {
@@ -623,7 +627,11 @@ public class FileRecord extends NTFSRecord {
                     }
 
                     NTFSAttribute attribute = holdingRecord.findStoredAttributeByID(entry.getAttributeID());
-                    log.debug("Attribute: " + attribute);
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("Attribute: " + attribute);
+                    }
+
                     return attribute;
                 } catch (IOException e) {
                     throw new IllegalStateException("Error getting MFT or FileRecord for attribute in list, ref = 0x" +
@@ -653,7 +661,11 @@ public class FileRecord extends NTFSRecord {
                 return null;
             } else {
                 NTFSAttribute attribute = NTFSAttribute.getAttribute(FileRecord.this, offset);
-                log.debug("Attribute: " + attribute);
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Attribute: " + attribute);
+                }
+
                 int offsetToNextOffset = getUInt32AsInt(offset + 0x04);
                 if (offsetToNextOffset <= 0) {
                     log.error("Non-positive offset, preventing infinite loop.  Data on disk may be corrupt.  "

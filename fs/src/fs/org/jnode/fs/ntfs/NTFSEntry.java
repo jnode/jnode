@@ -43,7 +43,7 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
     /**
      * The ID for this entry.
      */
-    private String id;
+    private final String id;
 
     /**
      * The index entry.

@@ -173,7 +173,7 @@ public final class MasterFileTable extends FileRecord {
     }
 
     /**
-     * Gets an MFT record with a given index but does not check if it is a valid file record.
+     * Gets a MFT record with a given index but does not check if it is a valid file record.
      *
      * @param index the index to get.
      * @return the file record.
@@ -189,7 +189,7 @@ public final class MasterFileTable extends FileRecord {
     }
 
     /**
-     * Gets an MFT record with a given index.
+     * Gets a MFT record with a given index.
      *
      * @param index the index to get.
      * @return the file record.

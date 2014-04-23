@@ -61,7 +61,7 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
      */
     public FSEntry getRootEntry() throws IOException {
         if (root == null) {
-            root = new NTFSDirectory(this, volume.getRootDirectory()).getEntry(".");
+            root = new NTFSEntry(this, volume.getRootDirectory());
         }
         return root;
     }

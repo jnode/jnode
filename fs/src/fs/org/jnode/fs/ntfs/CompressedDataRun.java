@@ -211,9 +211,9 @@ public final class CompressedDataRun implements DataRunInterface {
             // Copies the entire compression block as-is, need to skip the compression flag,
             // no idea why they even stored it given that it isn't used.
             // Darwin's version I was referring to doesn't skip this, which seems be a bug.
-            cpos++;
             uncompressed.copyFrom(compressed, cpos, 0, len + 1);
             uncompressed.zero(len + 1, BLOCK_SIZE - 1 - len);
+            cpos++;
             return len + 3;
         }
 
