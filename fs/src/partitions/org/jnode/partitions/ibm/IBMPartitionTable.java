@@ -35,6 +35,7 @@ import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.bus.ide.IDEConstants;
 import org.jnode.partitions.PartitionTable;
 import org.jnode.partitions.PartitionTableType;
+import org.jnode.util.BigEndian;
 import org.jnode.util.LittleEndian;
 
 /**
@@ -183,7 +184,7 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
 
         if (LittleEndian.getUInt16(bootSector, 252) == 0x55aa) {
             // Matches the Disk Manager MBR extra signature, probably an valid partition table
-            log.debug("Has Dis Manager MBR extra signature");
+        	log.debug("Has Disk Manager MBR extra signature");
             return true;
         }
 
@@ -195,19 +196,34 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
 
         if (LittleEndian.getUInt32(bootSector, 6) == 0x4f4c494c) {
             // Matches the LILO signature, probably an valid partition table
-            log.debug("Has LILO signature");
+        	log.debug("Has LILO signature");
+            return true;
+        }
+
+        if (BigEndian.getUInt32(bootSector, 0) == 0x33ffbe00 && BigEndian.getUInt32(bootSector, 4) == 0x028ed7bc) {
+            // Matches HP boot code. It is not possible to match the strings here because they are localised. E.g:
+            //   "\r\nMissing operating system\r\n\u0000\r\nMaster Boot Record Error\r\n\u0000\r\nPress a key.\r\n\u0000"
+            //   "\r\nManglende operativ system\r\n\u0000\r\nFeil i hovedoppstartsposten\r\n\u0000\r\nTrykk en tast"
+
+            log.debug("Has HP boot code signature");
             return true;
         }
 
         String bootSectorAsString = new String(bootSector, 0, 512, Charset.forName("US-ASCII"));
 
-        if (bootSectorAsString
-            .contains("Invalid partition table\u0000Error loading operating system\u0000Missing operating system")) {
+        if (bootSectorAsString.contains("Invalid partition table\u001eError loading operating system\u0018Missing operating system")) {
+            // Matches DOS 2.0 partition boot code error message signature
+            // see:
+            //     http://thestarman.narod.ru/asm/mbr/200MBR.htm
+            log.debug("Has DOS 2.0 code error string signature");
+            return true;
+        }
+
+        if (bootSectorAsString.contains("Invalid partition table\u0000Error loading operating system\u0000Missing operating system")) {
             // Matches Microsoft partition boot code error message signature
             // see:
             //     http://thestarman.pcministry.com/asm/mbr/VistaMBR.htm
             //     http://thestarman.narod.ru/asm/mbr/Win2kmbr.htm
-            //     http://thestarman.narod.ru/asm/mbr/200MBR.htm
             //     http://thestarman.narod.ru/asm/mbr/95BMEMBR.htm
             //     http://thestarman.narod.ru/asm/mbr/STDMBR.htm
             log.debug("Has Microsoft code error string signature");
@@ -216,41 +232,58 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
 
         if (bootSectorAsString.contains("Read\u0000Boot\u0000 error\r\n\u0000")) {
             // Matches BSD partition boot code error message signature
-            log.debug("Has BSD code error string signature");
+        	log.debug("Has BSD code error string signature");
             return true;
         }
 
-        if (bootSectorAsString.contains("GRUB \u0000Geom\u0000Hard Disk\u0000Read\u0000 Error\r\n\u0000")) {
+        if (bootSectorAsString.contains("GRUB \u0000Geom\u0000Hard Disk\u0000Read\u0000 Error")) {
             // Matches GRUB string signature
-            log.debug("Has GRUB string signature");
+        	log.debug("Has GRUB string signature");
             return true;
         }
 
         if (bootSectorAsString.contains("\u0000Multiple active partitions.\r\n")) {
             // Matches SYSLINUX string signature
-            log.debug("Has SYSLINUX string signature");
+        	log.debug("Has SYSLINUX string signature");
+            return true;
+        }
+
+        if (bootSectorAsString.contains("MAKEBOOT")) {
+            // Matches MAKEBOOT string extra signature
+        	log.debug("Has MAKEBOOT string signature");
             return true;
         }
 
         if (bootSectorAsString.contains("MBR \u0010\u0000")) {
             // Matches MBR string extra signature
-            log.debug("Has MBR string signature");
+        	log.debug("Has MBR string signature");
             return true;
         }
 
         if (LittleEndian.getUInt32(bootSector, 241) == 0x41504354) {
             // Matches TCPA signature
             // see http://thestarman.pcministry.com/asm/mbr/VistaMBR.htm
-            log.debug("Has TCPA extra signature");
+        	log.debug("Has TCPA extra signature");
             return true;
         }
 
         String bsdNameTabString = new String(bootSector, 416, 16, Charset.forName("US-ASCII"));
 
-        if (bsdNameTabString.contains("Linu\ufffd") || bsdNameTabString.contains("FreeBD\ufffd")) {
+        if (bsdNameTabString.contains("Linu\ufffd") || bsdNameTabString.contains("FreeBS\ufffd")) {
             // Matches BSD nametab entries signature
-            log.debug("Has BSD nametab entries");
+        	log.debug("Has BSD nametab entries");
             return true;
+        }
+
+        // Rule out the Linux kernel binary
+        if (bootSector.length > 520) {
+            String linuxKernelHeaderString = new String(bootSector, 514, 4, Charset.forName("US-ASCII"));
+
+            if ("HdrS".equals(linuxKernelHeaderString)) {
+                // Matches Linux kernel header signature
+                log.debug("Has Linux kernel header signature");
+                return false;
+            }
         }
 
         // Check if this looks like a filesystem instead of a partition table
@@ -259,13 +292,12 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
             log.error("Looks like a file system instead of a partition table.");
             return false;
         }
-        /* FIXME Always failed
+
         if (LittleEndian.getUInt16(bootSector, 218) != 0) {
             // This needs to be zero in the 'standard' MBR layout
             log.debug("Fails standard MBR reserved@218=0 test");
             return false;
         }
-        */
 
         // Nothing matched, fall back to validating any specified partition entries
         log.debug("Checking partitions");
