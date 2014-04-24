@@ -51,8 +51,9 @@ public class IBMPartitionTableTest {
     public void testNotDetected() throws Exception {
 
         Collection<String> testFileNames = Arrays.asList(
+            "linux-kernel.dd",
             "random-data.dd",
-            "linux-kernel.dd");
+            "truecrypt.dd");
 
         for (String testFileName : testFileNames) {
             File testFile = FileSystemTestUtils.getTestFile("test/partitions/ibm/" + testFileName);
