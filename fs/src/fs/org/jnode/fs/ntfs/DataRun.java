@@ -287,6 +287,7 @@ public final class DataRun implements DataRunInterface {
 
     @Override
     public String toString() {
-        return String.format("[%s-run vcn:%d-%d]", isSparse() ? "sparse" : "data", getFirstVcn(), getLastVcn());
+        return String.format("[%s-run vcn:%d-%d cluster:%d]", isSparse() ? "sparse" : "data", getFirstVcn(),
+                             getLastVcn(), getCluster());
     }
 }

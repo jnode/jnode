@@ -374,6 +374,6 @@ public final class CompressedDataRun implements DataRunInterface {
 
     @Override
     public String toString() {
-        return String.format("[compressed-run vcn:%d-%d]", getFirstVcn(), getLastVcn());
+        return String.format("[compressed-run vcn:%d-%d %s]", getFirstVcn(), getLastVcn(), compressedRun);
     }
 }

@@ -277,4 +277,20 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         return String.format("[attribute (non-res) type=x%x name'%s' size=%d runs=%d]", getAttributeType(),
             getAttributeName(), getAttributeActualSize(), getDataRuns().size());
     }
+
+    /**
+     * Gets a debug string for the attribute.
+     *
+     * @return the debug string.
+     */
+    public String toDebugString() {
+        StringBuilder builder = new StringBuilder();
+
+        for (DataRunInterface dataRun : getDataRuns()) {
+            builder.append(dataRun);
+            builder.append("\n");
+        }
+
+        return String.format("%s\nData runs:\n%s", toString(), builder.toString());
+    }
 }
