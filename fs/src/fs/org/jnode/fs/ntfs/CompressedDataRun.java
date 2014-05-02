@@ -255,21 +255,22 @@ public final class CompressedDataRun implements DataRunInterface {
         return getFirstVcn() + getLength() - 1;
     }
 
-    @Override
-    public long mapVcnToLcn(long vcn) {
-        // This is the actual number of stored clusters after compression.
-        // If the number of stored clusters is the same as the compression unit size,
-        // then the data can be read directly without decompressing it.
-        final int compClusters = compressedRun.getLength();
-        if (compClusters == compressionUnitSize) {
-            return compressedRun.mapVcnToLcn(vcn);
-        }
+    /**
+     * Gets the number of clusters which make up a compression unit.
+     *
+     * @return the number of clusters.
+     */
+    public int getCompressionUnitSize() {
+        return compressionUnitSize;
+    }
 
-        // Now we know the data is compressed. Map the VCN to the corresponding compressed block...
-        final long actFirstVcn = Math.max(compressedRun.getFirstVcn(), vcn);
-        final int vcnOffsetWithinUnit = (int) (actFirstVcn % compressionUnitSize);
-        final long compFirstVcn = actFirstVcn - vcnOffsetWithinUnit;
-        return compressedRun.mapVcnToLcn(compFirstVcn);
+    /**
+     * Gets the underlying data run containing the compressed data.
+     *
+     * @return the data run.
+     */
+    public DataRun getCompressedRun() {
+        return compressedRun;
     }
 
     /**

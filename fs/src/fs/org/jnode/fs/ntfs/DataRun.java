@@ -260,7 +260,13 @@ public final class DataRun implements DataRunInterface {
         return count;
     }
 
-    @Override
+    /**
+     * Maps a virtual cluster to a logical cluster.
+     *
+     * @param vcn the virtual cluster number to map.
+     * @return the logical cluster number or -1 if this cluster is not stored (e.g. for a sparse cluster).
+     * @throws ArrayIndexOutOfBoundsException if the VCN doesn't belong to this data run.
+     */
     public long mapVcnToLcn(long vcn) {
         long myLastVcn = getFirstVcn() + getLength() - 1;
 
@@ -275,7 +281,8 @@ public final class DataRun implements DataRunInterface {
             return -1;
         }
 
-        return cluster + vcn;
+        final int vcnDelta = (int) (vcn - getFirstVcn());
+        return cluster + vcnDelta;
     }
 
     @Override
