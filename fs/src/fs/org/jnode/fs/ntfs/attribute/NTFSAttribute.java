@@ -104,6 +104,15 @@ public abstract class NTFSAttribute extends NTFSStructure {
     }
 
     /**
+     * Checks whether this attribute contains compressed data runs.
+     *
+     * @return {@code true} if the attribute contains compressed runs, {@code false} otherwise.
+     */
+    public boolean isCompressedAttribute() {
+        return (getFlags() & 0x0001) != 0;
+    }
+
+    /**
      * @return Returns the nameLength.
      */
     public int getNameLength() {

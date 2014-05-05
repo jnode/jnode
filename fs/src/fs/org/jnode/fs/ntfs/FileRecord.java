@@ -55,7 +55,12 @@ public class FileRecord extends NTFSRecord {
     protected AttributeListAttribute attributeListAttribute;
 
     /**
-     * A cached copy of the attributes.
+     * The stored attributes.
+     */
+    protected List<NTFSAttribute> storedAttributeList;
+
+    /**
+     * A cached copy of the full list of attributes.
      */
     protected List<NTFSAttribute> attributeList;
 
@@ -80,6 +85,8 @@ public class FileRecord extends NTFSRecord {
     public FileRecord(NTFSVolume volume, long referenceNumber, byte[] buffer, int offset) throws IOException {
         super(volume, buffer, offset);
         this.referenceNumber = referenceNumber;
+
+        storedAttributeList = readStoredAttributes();
 
         // Linux NTFS docs say there can only be one of these, so I'll believe them.
         attributeListAttribute = (AttributeListAttribute) findStoredAttributeByType(NTFSAttribute.Types.ATTRIBUTE_LIST);
@@ -298,8 +305,8 @@ public class FileRecord extends NTFSRecord {
      *
      * @return an iterator over attributes stored in this file record.
      */
-    public Iterator<NTFSAttribute> getAllStoredAttributes() {
-        return new StoredAttributeIterator();
+    public List<NTFSAttribute> getAllStoredAttributes() {
+        return storedAttributeList;
     }
 
     /**
@@ -309,9 +316,7 @@ public class FileRecord extends NTFSRecord {
      * @return the attribute found, or {@code null} if not found.
      */
     private NTFSAttribute findStoredAttributeByID(int id) {
-        Iterator<NTFSAttribute> iter = getAllStoredAttributes();
-        while (iter.hasNext()) {
-            NTFSAttribute attr = iter.next();
+        for (NTFSAttribute attr : storedAttributeList) {
             if (attr != null && attr.getAttributeID() == id) {
                 return attr;
             }
@@ -326,10 +331,8 @@ public class FileRecord extends NTFSRecord {
      * @return the attribute found, or {@code null} if not found.
      * @see NTFSAttribute.Types
      */
-    public NTFSAttribute findStoredAttributeByType(int typeID) {
-        Iterator<NTFSAttribute> iter = getAllStoredAttributes();
-        while (iter.hasNext()) {
-            NTFSAttribute attr = iter.next();
+    private NTFSAttribute findStoredAttributeByType(int typeID) {
+        for (NTFSAttribute attr : storedAttributeList) {
             if (attr != null && attr.getAttributeType() == typeID) {
                 return attr;
             }
@@ -348,17 +351,12 @@ public class FileRecord extends NTFSRecord {
             attributeList = new ArrayList<NTFSAttribute>();
 
             try {
-                Iterator<NTFSAttribute> iter;
                 if (attributeListAttribute == null) {
                     log.debug("All attributes stored");
-                    iter = getAllStoredAttributes();
+                    attributeList = new ArrayList<NTFSAttribute>(getAllStoredAttributes());
                 } else {
                     log.debug("Attributes in attribute list");
-                    iter = new AttributeListAttributeIterator();
-                }
-
-                while (iter.hasNext()) {
-                    attributeList.add(iter.next());
+                    attributeList = readAttributeListAttributes();
                 }
             } catch (Exception e) {
                 log.error("Error getting attributes for entry: " + this, e);
@@ -576,131 +574,77 @@ public class FileRecord extends NTFSRecord {
     }
 
     /**
-     * Iterator over multiple attributes, where those attributes are stored in an attribute list instead of directly in
-     * the file record.
+     * Reads in all attributes referenced by the attribute-list attribute.
+     *
+     * @return the attributes.
      */
-    private class AttributeListAttributeIterator implements Iterator<NTFSAttribute> {
+    private List<NTFSAttribute> readAttributeListAttributes() {
+        Iterator<AttributeListEntry> entryIterator;
 
-        /**
-         * Current iterator over attribute list entries.
-         */
-        private Iterator<AttributeListEntry> entryIterator;
+        try {
+            entryIterator = attributeListAttribute.getAllEntries();
+        } catch (IOException e) {
+            log.error("Error getting attributes from attribute list, file record " + FileRecord.this, e);
+            List<AttributeListEntry> emptyList = Collections.emptyList();
+            entryIterator = emptyList.iterator();
+        }
 
-        /**
-         * Constructs the iterator.
-         */
-        private AttributeListAttributeIterator() {
+        Set<Integer> encounteredIds = new HashSet<Integer>();
+        List<NTFSAttribute> attributes = new ArrayList<NTFSAttribute>();
+
+        while (entryIterator.hasNext()) {
+            AttributeListEntry entry = entryIterator.next();
+
+            // Sanity check - ensure we don't hit the same ID more than once
+            int attributeId = entry.getAttributeID();
+            if (encounteredIds.contains(attributeId)) {
+                throw new IllegalStateException("Hit the same attribute ID more than once, aborting. ref = 0x" +
+                    Long.toHexString(entry.getFileReferenceNumber()) + " id=" + attributeId);
+            }
+
+            encounteredIds.add(attributeId);
+
             try {
-                entryIterator = attributeListAttribute.getAllEntries();
+                // If it's resident (i.e. in the current file record) then we don't need to
+                // look it up, and doing so would risk infinite recursion.
+                NTFSAttribute attribute;
+                if (entry.getFileReferenceNumber() == referenceNumber) {
+                    attribute = findStoredAttributeByID(entry.getAttributeID());
+                } else {
+                    log.debug("Looking up MFT entry for: " + entry.getFileReferenceNumber());
+                    FileRecord holdingRecord = getVolume().getMFT().getRecord(entry.getFileReferenceNumber());
+                    attribute = holdingRecord.findStoredAttributeByID(entry.getAttributeID());
+                }
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Attribute: " + attribute);
+                }
+
+                attributes.add(attribute);
             } catch (IOException e) {
-                log.error("Error getting attributes from attribute list, file record " + FileRecord.this, e);
-                List<AttributeListEntry> emptyList = Collections.emptyList();
-                entryIterator = emptyList.iterator();
+                throw new IllegalStateException("Error getting MFT or FileRecord for attribute in list, ref = 0x" +
+                    Long.toHexString(entry.getFileReferenceNumber()), e);
             }
         }
 
-        @Override
-        public boolean hasNext() {
-            return entryIterator.hasNext();
-        }
-
-        @Override
-        public NTFSAttribute next() {
-            Set<Integer> encounteredIds = new HashSet<Integer>();
-
-            while (entryIterator.hasNext()) {
-                AttributeListEntry entry = entryIterator.next();
-
-                // Sanity check - ensure we don't hit the same ID more than once
-                int attributeId = entry.getAttributeID();
-                if (encounteredIds.contains(attributeId)) {
-                    throw new IllegalStateException("Hit the same attribute ID more than once, aborting. ref = 0x" +
-                        Long.toHexString(entry.getFileReferenceNumber()) + " id=" + attributeId);
-                }
-
-                encounteredIds.add(attributeId);
-
-                try {
-                    // If it's resident (i.e. in the current file record) then we don't need to
-                    // look it up, and doing so would risk infinite recursion.
-                    FileRecord holdingRecord;
-                    if (entry.getFileReferenceNumber() == referenceNumber) {
-                        holdingRecord = FileRecord.this;
-                    } else {
-                        log.debug("Looking up MFT entry for: " + entry.getFileReferenceNumber());
-                        holdingRecord = getVolume().getMFT().getRecord(entry.getFileReferenceNumber());
-                    }
-
-                    NTFSAttribute attribute = holdingRecord.findStoredAttributeByID(entry.getAttributeID());
-
-                    if (log.isDebugEnabled()) {
-                        log.debug("Attribute: " + attribute);
-                    }
-
-                    return attribute;
-                } catch (IOException e) {
-                    throw new IllegalStateException("Error getting MFT or FileRecord for attribute in list, ref = 0x" +
-                        Long.toHexString(entry.getFileReferenceNumber()), e);
-                }
-            }
-
-            return null;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
+        return attributes;
     }
 
     /**
-     * Iterator over stored attributes in this file record.
+     * Reads in the stored attributes.
+     *
+     * @return the stored attributes.
      */
-    private class StoredAttributeIterator implements Iterator<NTFSAttribute> {
-        /**
-         * The next attribute offset to look at.
-         */
-        private int nextOffset = getFirstAttributeOffset();
-        private NTFSAttribute nextAttribute;
-        private boolean hasNext;
+    private List<NTFSAttribute> readStoredAttributes() {
+        List<NTFSAttribute> attributes = new ArrayList<NTFSAttribute>();
+        int offset = getFirstAttributeOffset();
 
-        @Override
-        public boolean hasNext() {
-            if (hasNext) {
-                return true;
-            } else {
-                readNext();
-                return hasNext;
-            }
-        }
+        while (true) {
+            int type = getUInt32AsInt(offset);
 
-        @Override
-        public NTFSAttribute next() {
-            if (hasNext) {
-                hasNext = false;
-                return nextAttribute;
-            }
-
-            readNext();
-            hasNext = false;
-
-            if (nextAttribute == null) {
-                throw new NoSuchElementException();
-            }
-
-            return nextAttribute;
-        }
-
-        /**
-         * Reads the next attribute.
-         */
-        private void readNext() {
-            final int offset = nextOffset;
-            final int type = getUInt32AsInt(offset + 0x00);
             if (type == 0xFFFFFFFF) {
                 // Normal end of list condition.
-                hasNext = false;
-                nextAttribute = null;
+                break;
             } else {
                 NTFSAttribute attribute = NTFSAttribute.getAttribute(FileRecord.this, offset);
 
@@ -712,20 +656,15 @@ public class FileRecord extends NTFSRecord {
                 if (offsetToNextOffset <= 0) {
                     log.error("Non-positive offset, preventing infinite loop.  Data on disk may be corrupt.  "
                         + "referenceNumber = " + referenceNumber);
-                    hasNext = false;
-                    nextAttribute = null;
+                    break;
                 } else {
-                    nextOffset += offsetToNextOffset;
-                    nextAttribute = attribute;
-                    hasNext = true;
+                    offset += offsetToNextOffset;
+                    attributes.add(attribute);
                 }
             }
         }
 
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
+        return attributes;
     }
 
     /**

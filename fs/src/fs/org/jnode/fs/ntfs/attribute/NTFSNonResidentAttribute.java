@@ -60,14 +60,6 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
     }
 
     /**
-     * @see NTFSAttribute#processAttributeData(byte[])
-     */
-    /*
-     * public void processAttributeData(byte[] buffer) { // TODO Auto-generated
-     * method stub }
-     */
-
-    /**
      * @return Returns the startVCN.
      */
     public long getStartVCN() {
@@ -126,7 +118,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
 
         // If this attribute is compressed we will coalesce compressed/sparse
         // data run pairs into a single data run object for convenience when reading.
-        boolean compressed = (getFlags() & 0x0001) != 0;
+        boolean compressed = isCompressedAttribute();
         boolean expectingSparseRunNext = false;
         int lastCompressedSize = 0;
         int compUnitSize = 1 << getCompressionUnitSize();
