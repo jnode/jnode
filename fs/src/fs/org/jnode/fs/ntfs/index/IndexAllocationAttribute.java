@@ -35,9 +35,11 @@ public final class IndexAllocationAttribute extends NTFSNonResidentAttribute {
      *
      * @param fileRecord the file record.
      * @param offset the offset of this attribute into the file record.
+     * @param fallbackCompressionUnit the fallback compression unit to use if the attribute is compressed but doesn't
+     *   have a compression unit stored.
      */
-    public IndexAllocationAttribute(FileRecord fileRecord, int offset) {
-        super(fileRecord, offset);
+    public IndexAllocationAttribute(FileRecord fileRecord, int offset, int fallbackCompressionUnit) {
+        super(fileRecord, offset, fallbackCompressionUnit);
     }
 
     /**

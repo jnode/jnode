@@ -35,11 +35,15 @@ public class AttributeListAttributeNonRes extends NTFSNonResidentAttribute imple
     AttributeListAttribute {
 
     /**
-     * @param fileRecord
-     * @param offset
+     * Creates a new attribute-list attribute.
+     *
+     * @param fileRecord the holding file record.
+     * @param offset the offset to read from.
+     * @param fallbackCompressionUnit the fallback compression unit to use if the attribute is compressed but doesn't
+     *   have a compression unit stored.
      */
-    public AttributeListAttributeNonRes(FileRecord fileRecord, int offset) {
-        super(fileRecord, offset);
+    public AttributeListAttributeNonRes(FileRecord fileRecord, int offset, int fallbackCompressionUnit) {
+        super(fileRecord, offset, fallbackCompressionUnit);
     }
 
     /**

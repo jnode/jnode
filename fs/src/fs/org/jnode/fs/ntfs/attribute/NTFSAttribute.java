@@ -176,11 +176,25 @@ public abstract class NTFSAttribute extends NTFSStructure {
     /**
      * Create an NTFSAttribute instance suitable for the given attribute data.
      * 
-     * @param fileRecord
-     * @param offset
+     * @param fileRecord the containing file record.
+     * @param offset the offset to read from.
      * @return the attribute
      */
     public static NTFSAttribute getAttribute(FileRecord fileRecord, int offset) {
+        int fallbackCompressionUnit = 1; // '1 << 0' is the 'default' unit size
+        return getAttribute(fileRecord, offset, fallbackCompressionUnit);
+    }
+
+    /**
+     * Create an NTFSAttribute instance suitable for the given attribute data.
+     *
+     * @param fileRecord the containing file record.
+     * @param offset the offset to read from.
+     * @param fallbackCompressionUnit the fallback compression unit to use if the attribute is compressed but doesn't
+     *   have a compression unit stored.
+     * @return the attribute
+     */
+    public static NTFSAttribute getAttribute(FileRecord fileRecord, int offset, int fallbackCompressionUnit) {
         final boolean resident = (fileRecord.getUInt8(offset + 0x08) == 0);
         final int type = fileRecord.getUInt32AsInt(offset + 0x00);
 
@@ -191,14 +205,14 @@ public abstract class NTFSAttribute extends NTFSStructure {
                 if (resident) {
                     return new AttributeListAttributeRes(fileRecord, offset);
                 } else {
-                    return new AttributeListAttributeNonRes(fileRecord, offset);
+                    return new AttributeListAttributeNonRes(fileRecord, offset, fallbackCompressionUnit);
                 }
             case Types.FILE_NAME:
                 return new FileNameAttribute(fileRecord, offset);
             case Types.INDEX_ROOT:
                 return new IndexRootAttribute(fileRecord, offset);
             case Types.INDEX_ALLOCATION:
-                return new IndexAllocationAttribute(fileRecord, offset);
+                return new IndexAllocationAttribute(fileRecord, offset, fallbackCompressionUnit);
         }
 
         // check the resident flag
@@ -207,7 +221,7 @@ public abstract class NTFSAttribute extends NTFSStructure {
             return new NTFSResidentAttribute(fileRecord, offset);
         } else {
             // non resident
-            return new NTFSNonResidentAttribute(fileRecord, offset);
+            return new NTFSNonResidentAttribute(fileRecord, offset, fallbackCompressionUnit);
         }
     }
 }

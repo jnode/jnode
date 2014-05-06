@@ -23,11 +23,11 @@ package org.jnode.fs.ntfs;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import org.jnode.fs.ntfs.attribute.AttributeListAttribute;
 import org.jnode.fs.ntfs.attribute.AttributeListEntry;
 import org.jnode.fs.ntfs.attribute.NTFSAttribute;
@@ -356,7 +356,7 @@ public class FileRecord extends NTFSRecord {
                     attributeList = new ArrayList<NTFSAttribute>(getAllStoredAttributes());
                 } else {
                     log.debug("Attributes in attribute list");
-                    attributeList = readAttributeListAttributes();
+                    readAttributeListAttributes();
                 }
             } catch (Exception e) {
                 log.error("Error getting attributes for entry: " + this, e);
@@ -533,7 +533,7 @@ public class FileRecord extends NTFSRecord {
 
         long clusterWithinNresData = startCluster;
         int readClusters = 0;
-        do {
+        while (true) {
             if (attr.isResident()) {
                 throw new IOException("Resident attribute should be by itself, file record = " + this);
             }
@@ -549,8 +549,13 @@ public class FileRecord extends NTFSRecord {
             // When there are multiple attributes, the data in each one claims to start at VCN 0.
             // Clearly this is not the case, so we need to offset when we read.
             clusterWithinNresData -= nresData.getNumberOfVCNs();
-            attr = dataAttrs.next();
-        } while (attr != null);
+
+            if (dataAttrs.hasNext()) {
+                attr = dataAttrs.next();
+            } else {
+                break;
+            }
+        }
 
         if (log.isDebugEnabled()) {
             log.debug("readData: read " + readClusters + " from non-resident attributes");
@@ -575,10 +580,8 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Reads in all attributes referenced by the attribute-list attribute.
-     *
-     * @return the attributes.
      */
-    private List<NTFSAttribute> readAttributeListAttributes() {
+    private synchronized void readAttributeListAttributes() {
         Iterator<AttributeListEntry> entryIterator;
 
         try {
@@ -589,20 +592,11 @@ public class FileRecord extends NTFSRecord {
             entryIterator = emptyList.iterator();
         }
 
-        Set<Integer> encounteredIds = new HashSet<Integer>();
-        List<NTFSAttribute> attributes = new ArrayList<NTFSAttribute>();
+        Map<Integer, NTFSNonResidentAttribute> compressedByType =
+            new LinkedHashMap<Integer, NTFSNonResidentAttribute>();
 
         while (entryIterator.hasNext()) {
             AttributeListEntry entry = entryIterator.next();
-
-            // Sanity check - ensure we don't hit the same ID more than once
-            int attributeId = entry.getAttributeID();
-            if (encounteredIds.contains(attributeId)) {
-                throw new IllegalStateException("Hit the same attribute ID more than once, aborting. ref = 0x" +
-                    Long.toHexString(entry.getFileReferenceNumber()) + " id=" + attributeId);
-            }
-
-            encounteredIds.add(attributeId);
 
             try {
                 // If it's resident (i.e. in the current file record) then we don't need to
@@ -614,20 +608,37 @@ public class FileRecord extends NTFSRecord {
                     log.debug("Looking up MFT entry for: " + entry.getFileReferenceNumber());
                     FileRecord holdingRecord = getVolume().getMFT().getRecord(entry.getFileReferenceNumber());
                     attribute = holdingRecord.findStoredAttributeByID(entry.getAttributeID());
+
+                    if (!attribute.isResident() && attribute.isCompressedAttribute() &&
+                        compressedByType.containsKey(attribute.getAttributeType())) {
+
+                        // Get the fallback compression unit
+                        NTFSNonResidentAttribute firstAttribute = compressedByType.get(attribute.getAttributeType());
+                        int fallbackCompressionUnit = 1 << firstAttribute.getStoredCompressionUnitSize();
+
+                        // Re-read the attribute with the fallback compression unit
+                        attribute = NTFSAttribute.getAttribute(attribute.getFileRecord(), attribute.getOffset(),
+                            fallbackCompressionUnit);
+                    }
+                }
+
+                // Record the first compressed attribute of each type
+                if (!attribute.isResident() && attribute.isCompressedAttribute() &&
+                    !compressedByType.containsKey(attribute.getAttributeType())) {
+
+                    compressedByType.put(attribute.getAttributeType(), (NTFSNonResidentAttribute) attribute);
                 }
 
                 if (log.isDebugEnabled()) {
                     log.debug("Attribute: " + attribute);
                 }
 
-                attributes.add(attribute);
+                attributeList.add(attribute);
             } catch (IOException e) {
                 throw new IllegalStateException("Error getting MFT or FileRecord for attribute in list, ref = 0x" +
                     Long.toHexString(entry.getFileReferenceNumber()), e);
             }
         }
-
-        return attributes;
     }
 
     /**
@@ -691,19 +702,12 @@ public class FileRecord extends NTFSRecord {
 
         @Override
         public NTFSAttribute next() {
-            if (hasCached) {
+            if (hasNext()) {
                 hasCached = false;
                 return cached;
             }
 
-            NTFSAttribute nextMatch = nextMatch();
-            hasCached = false;
-
-            if (nextMatch == null) {
-                throw new NoSuchElementException();
-            }
-
-            return nextMatch;
+            throw new NoSuchElementException();
         }
 
         /**

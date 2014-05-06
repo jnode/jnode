@@ -44,10 +44,14 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
     private final List<DataRunInterface> dataRuns = new ArrayList<DataRunInterface>();
 
     /**
-     * @param fileRecord
-     * @param offset
+     * Creates a new non-resident attribute and reads in the associated data runs.
+     *
+     * @param fileRecord the file record that owns this attribute.
+     * @param offset the offset to read from.
+     * @param fallbackCompressionUnit the fallback compression unit to use if the attribute is compressed but doesn't
+     *   have a compression unit stored.
      */
-    public NTFSNonResidentAttribute(FileRecord fileRecord, int offset) {
+    public NTFSNonResidentAttribute(FileRecord fileRecord, int offset, int fallbackCompressionUnit) {
         super(fileRecord, offset);
         /*
          * process the dataruns...all non resident attributes have their data
@@ -55,7 +59,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
          */
         final int dataRunsOffset = getDataRunsOffset();
         if (dataRunsOffset > 0) {
-            readDataRuns(dataRunsOffset);
+            readDataRuns(dataRunsOffset, fallbackCompressionUnit);
         }
     }
 
@@ -83,8 +87,21 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      *
      * @return the compression unit size.
      */
-    public int getCompressionUnitSize() {
+    public int getStoredCompressionUnitSize() {
         return getUInt16(0x22);
+    }
+
+    private int getCompressionUnitSize(int fallbackCompressionUnit) {
+        int compressionUnitSize = getStoredCompressionUnitSize();
+
+        if (compressionUnitSize == 0) {
+            // It seems like in some situations the compression unit size is only stored onto the first attribute of a
+            // certain type in the list. For example if there are three compressed DATA attributes, the second and third
+            // attributes may not have this set. In that situation use the first attribute's compression unit size.
+            return fallbackCompressionUnit;
+        }
+
+        return 1 << compressionUnitSize;
     }
 
     /**
@@ -107,9 +124,13 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
     }
 
     /**
-     * Read the dataruns. It is called only for non resident attributes.
+     * Read the data runs.
+     *
+     * @param parentoffset
+     * @param fallbackCompressionUnit the fallback compression unit to use if the attribute is compressed but doesn't
+     *   have a compression unit stored.
      */
-    private void readDataRuns(int parentoffset) {
+    private void readDataRuns(int parentoffset, int fallbackCompressionUnit) {
         int offset = parentoffset;
 
         long previousLCN = 0;
@@ -120,14 +141,15 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         // data run pairs into a single data run object for convenience when reading.
         boolean compressed = isCompressedAttribute();
         boolean expectingSparseRunNext = false;
+        boolean firstDataRun = true;
         int lastCompressedSize = 0;
-        int compUnitSize = 1 << getCompressionUnitSize();
+        int compUnitSize = compressed ? getCompressionUnitSize(fallbackCompressionUnit) : 1;
 
         while (getUInt8(offset) != 0x0) {
             final DataRun dataRun = new DataRun(this, offset, vcn, previousLCN);
 
             if (compressed) {
-                if (dataRun.isSparse() && expectingSparseRunNext) {
+                if (dataRun.isSparse() && (expectingSparseRunNext || firstDataRun)) {
                     // This is the sparse run which follows a compressed run.
                     // The number of runs it contains does not count towards the total
                     // as the compressed run reports holding all the runs for the pair.
@@ -199,6 +221,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
             }
 
             offset += dataRun.getSize();
+            firstDataRun = false;
         }
 
         // check the dataruns
