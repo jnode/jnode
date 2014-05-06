@@ -443,7 +443,6 @@ public class FileRecord extends NTFSRecord {
                 name + "'");
         }
 
-
         long totalSize = 0;
 
         while (attributes.hasNext()) {
@@ -606,7 +605,14 @@ public class FileRecord extends NTFSRecord {
                     attribute = findStoredAttributeByID(entry.getAttributeID());
                 } else {
                     log.debug("Looking up MFT entry for: " + entry.getFileReferenceNumber());
-                    FileRecord holdingRecord = getVolume().getMFT().getRecord(entry.getFileReferenceNumber());
+
+                    // When reading the MFT itself don't attempt to check the index is in range (we won't know the total
+                    // MFT length yet)
+                    MasterFileTable mft = getVolume().getMFT();
+                    FileRecord holdingRecord = getReferenceNumber() == MasterFileTable.SystemFiles.MFT
+                        ? mft.getRecordUnchecked(entry.getFileReferenceNumber())
+                        : mft.getRecord(entry.getFileReferenceNumber());
+
                     attribute = holdingRecord.findStoredAttributeByID(entry.getAttributeID());
 
                     if (!attribute.isResident() && attribute.isCompressedAttribute() &&
