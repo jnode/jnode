@@ -51,7 +51,7 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
 
         return
             !isEmpty() &&
-            bootIndicatorValue == 0 || bootIndicatorValue == BOOTABLE &&
+            (bootIndicatorValue == 0 || bootIndicatorValue == BOOTABLE) &&
             getNrSectors() > 0;
     }
 
