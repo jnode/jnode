@@ -330,9 +330,9 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
                 if (i != partitionNumber) {
                     IBMPartitionTableEntry otherPartition = entries.get(i);
 
-                    if (partition.getStartLba() + partition.getNrSectors() > otherPartition.getStartLba() ||
-                        otherPartition.getStartLba() + otherPartition.getNrSectors() > partition.getStartLba()) {
-                        log.error(" End of previous partition entry after the start of the next one");
+                    if (partition.getStartLba() <= otherPartition.getStartLba() + otherPartition.getNrSectors() - 1 &&
+                        otherPartition.getStartLba() <= partition.getStartLba() + partition.getNrSectors() - 1) {
+                        log.error("Parition table entries overlap: " + partition + " " + otherPartition);
                         return false;
                     }
                 }

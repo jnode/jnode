@@ -29,6 +29,7 @@ public class IBMPartitionTableTest {
             "lilo.dd",
             "makeboot.dd",
             "mbr-sig.dd",
+            "powerrecover.dd",
             "syslinux.dd",
             "thinkpad.dd",
             "truecrypt.dd",
