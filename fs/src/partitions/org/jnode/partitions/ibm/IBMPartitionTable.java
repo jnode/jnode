@@ -230,6 +230,16 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
             return true;
         }
 
+        if (LittleEndian.getUInt32(bootSector, 296) == 0xC3F961D6L) {
+            // Matches Microsoft Windows 2000 partition boot code. Starting from Windows 2000 the boot code error
+            // messages are localised, so the check above won't match them.
+            //
+            // see:
+            //     http://thestarman.narod.ru/asm/mbr/Win2kmbr.htm
+            log.debug("Has w2k boot code signature");
+            return true;
+        }
+
         if (bootSectorAsString.contains("Read\u0000Boot\u0000 error\r\n\u0000")) {
             // Matches BSD partition boot code error message signature
         	log.debug("Has BSD code error string signature");
@@ -301,33 +311,36 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
             return true;
         }
 
-        if (LittleEndian.getUInt16(bootSector, 218) != 0) {
-            // This needs to be zero in the 'standard' MBR layout
-            log.debug("Fails standard MBR reserved@218=0 test");
-            return false;
-        }
-
         // Nothing matched, fall back to validating any specified partition entries
         log.debug("Checking partitions");
-        IBMPartitionTableEntry lastValid = null;
-        boolean foundValidEntry = false;
+        List<IBMPartitionTableEntry> entries = new ArrayList<IBMPartitionTableEntry>();
         for (int partitionNumber = 0; partitionNumber < TABLE_SIZE; partitionNumber++) {
             IBMPartitionTableEntry partition = new IBMPartitionTableEntry(null, bootSector, partitionNumber);
 
             if (partition.isValid()) {
-                if (lastValid != null) {
-                    if (lastValid.getStartLba() + lastValid.getNrSectors() > partition.getStartLba()) {
+                entries.add(partition);
+            }
+        }
+
+        // Check that none of the entries are overlapping with each other
+        for (int partitionNumber = 0; partitionNumber < entries.size(); partitionNumber++) {
+            IBMPartitionTableEntry partition = entries.get(partitionNumber);
+
+            for (int i = 0; i < entries.size(); i++) {
+                if (i != partitionNumber) {
+                    IBMPartitionTableEntry otherPartition = entries.get(i);
+
+                    if (partition.getStartLba() + partition.getNrSectors() > otherPartition.getStartLba() ||
+                        otherPartition.getStartLba() + otherPartition.getNrSectors() > partition.getStartLba()) {
                         log.error(" End of previous partition entry after the start of the next one");
                         return false;
                     }
                 }
-
-                foundValidEntry = true;
-                lastValid = partition;
             }
         }
 
-        return foundValidEntry;
+        // Finally, check if there is at least one entry that seems valid
+        return !entries.isEmpty();
     }
 
     public Iterator<IBMPartitionTableEntry> iterator() {

@@ -30,6 +30,8 @@ import org.jnode.util.NumberUtils;
  * @author epr
  */
 public class IBMPartitionTableEntry implements PartitionTableEntry {
+    private static final int BOOTABLE = 0x80;
+
     private final Logger log = Logger.getLogger(getClass());
 
     private final byte[] bs;
@@ -45,7 +47,12 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
     }
 
     public boolean isValid() {
-        return !isEmpty();
+        int bootIndicatorValue = getBootIndicatorValue();
+
+        return
+            !isEmpty() &&
+            bootIndicatorValue == 0 || bootIndicatorValue == BOOTABLE &&
+            getNrSectors() > 0;
     }
 
     /**
@@ -77,11 +84,15 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
     }
 
     public boolean getBootIndicator() {
-        return (LittleEndian.getUInt8(bs, ofs + 0) == 0x80);
+        return getBootIndicatorValue() == BOOTABLE;
+    }
+
+    public int getBootIndicatorValue() {
+        return LittleEndian.getUInt8(bs, ofs + 0);
     }
 
     public void setBootIndicator(boolean active) {
-        LittleEndian.setInt8(bs, ofs + 0, (active) ? 0x80 : 0);
+        LittleEndian.setInt8(bs, ofs + 0, (active) ? BOOTABLE : 0);
     }
 
     public CHS getStartCHS() {

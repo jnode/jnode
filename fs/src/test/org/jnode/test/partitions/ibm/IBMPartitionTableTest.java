@@ -31,7 +31,9 @@ public class IBMPartitionTableTest {
             "mbr-sig.dd",
             "syslinux.dd",
             "thinkpad.dd",
+            "truecrypt.dd",
             "win-2k.dd",
+            "win-2k-de.dd",
             "win-9x.dd",
             "win-pe.dd",
             "win-vista.dd",
@@ -52,8 +54,7 @@ public class IBMPartitionTableTest {
 
         Collection<String> testFileNames = Arrays.asList(
             "linux-kernel.dd",
-            "random-data.dd",
-            "truecrypt.dd");
+            "random-data.dd");
 
         for (String testFileName : testFileNames) {
             File testFile = FileSystemTestUtils.getTestFile("test/partitions/ibm/" + testFileName);
