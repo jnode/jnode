@@ -22,7 +22,6 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -565,7 +564,7 @@ public class FileRecord extends NTFSRecord {
                 ", offset = " + off + ", file record = " + this);
         }
 
-        System.arraycopy(tmp, (int) fileOffset % clusterSize, dest, off, len);
+        System.arraycopy(tmp, (int) (fileOffset % clusterSize), dest, off, len);
     }
 
     @Override
@@ -585,10 +584,9 @@ public class FileRecord extends NTFSRecord {
 
         try {
             entryIterator = attributeListAttribute.getAllEntries();
-        } catch (IOException e) {
-            log.error("Error getting attributes from attribute list, file record " + FileRecord.this, e);
-            List<AttributeListEntry> emptyList = Collections.emptyList();
-            entryIterator = emptyList.iterator();
+        } catch (Exception e) {
+            throw new IllegalStateException("Error getting attributes from attribute list, file record " +
+                FileRecord.this, e);
         }
 
         Map<Integer, NTFSNonResidentAttribute> compressedByType =
@@ -640,7 +638,7 @@ public class FileRecord extends NTFSRecord {
                 }
 
                 attributeList.add(attribute);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new IllegalStateException("Error getting MFT or FileRecord for attribute in list, ref = 0x" +
                     Long.toHexString(entry.getFileReferenceNumber()), e);
             }
