@@ -70,8 +70,9 @@ public class GptPartitionTable implements PartitionTable<GptPartitionTableEntry>
                 log.debug("try part " + partitionNumber);
 
                 int offset = blockSize * 2 + (partitionNumber * entrySize);
-
                 GptPartitionTableEntry entry = new GptPartitionTableEntry(this, first16KiB, offset, blockSize);
+
+                log.debug(entry);
 
                 if (entry.isValid()) {
                     partitions.add(entry);
