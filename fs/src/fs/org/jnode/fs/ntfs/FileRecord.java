@@ -428,7 +428,9 @@ public class FileRecord extends NTFSRecord {
     }
 
     /**
-     * Gets the total size used for the given attribute.
+     * Gets the total size used for the given attribute. Often the directory index entry and the FileRecord will have
+     * stale values for the file length, so checking the length of the {@link NTFSAttribute.Types#DATA} attribute is the
+     * most reliable way to get the actual file length.
      *
      * @param attrTypeID the type of attribute to get the size for, e.g. {@link NTFSAttribute.Types#DATA}.
      * @param name       the name of the attribute or {@code null} for no name.
@@ -440,21 +442,21 @@ public class FileRecord extends NTFSRecord {
         if (!attributes.hasNext()) {
             throw new IllegalStateException("Failed to find an attribute with type: " + attrTypeID + " and name: '" +
                 name + "'");
-        }
-
-        long totalSize = 0;
-
-        while (attributes.hasNext()) {
+        } else {
             NTFSAttribute attribute = attributes.next();
 
             if (attribute.isResident()) {
-                totalSize += ((NTFSResidentAttribute) attribute).getAttributeLength();
+                // If the attribute is resident it should be the only attribute of that type present, so just return
+                // the length
+                return ((NTFSResidentAttribute) attribute).getAttributeLength();
             } else {
-                totalSize += ((NTFSNonResidentAttribute) attribute).getAttributeActualSize();
+                // The total length seems to be stored in the first attribute of a certain type. E.g. if there are two
+                // DATA attributes each with data runs, the first one has the total length, and the intermediate ones
+                // seem to contain the length of that particular attribute. So here just return the length of the first
+                // attribute
+                return ((NTFSNonResidentAttribute) attribute).getAttributeActualSize();
             }
         }
-
-        return totalSize;
     }
 
     /**

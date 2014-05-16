@@ -22,7 +22,6 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 import org.jnode.fs.ntfs.attribute.NTFSAttribute;
-import org.jnode.fs.ntfs.attribute.NTFSNonResidentAttribute;
 import org.jnode.fs.ntfs.index.IndexEntry;
 
 /**
@@ -147,10 +146,8 @@ public final class MasterFileTable extends FileRecord {
     public long getMftLength() {
         if (mftLength == 0) {
             // The MFT doesn't update the FileRecord file-size for itself, so fall back to check the size of the DATA
-            // attribute. Further the size stored in each non-resident DATA attribute doesn't seem to be trustworthy
-            // either, instead the total size seems to be stored in the first attribute.
-            NTFSAttribute attribute = findAttributesByTypeAndName(NTFSAttribute.Types.DATA, null).next();
-            mftLength = ((NTFSNonResidentAttribute) attribute).getAttributeActualSize();
+            // attribute.
+            mftLength = getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
         }
 
         return mftLength;
