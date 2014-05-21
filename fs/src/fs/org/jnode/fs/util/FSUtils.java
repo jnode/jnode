@@ -260,4 +260,28 @@ public class FSUtils {
 
         return sb.toString();
     }
+
+    /**
+     * Rounds a value up to the next boundary.
+     *
+     * @param boundary the boundary to round up to.
+     * @param value the value to adjust.
+     * @return the adjusted value.
+     */
+    public static long roundUpToBoundary(int boundary, long value) {
+        long rounding = value % boundary == 0 ? 0 : boundary - value % boundary;
+        return rounding + value;
+    }
+
+    /**
+     * Rounds a value up to the next boundary.
+     *
+     * @param boundary the boundary to round up to.
+     * @param value the value to adjust.
+     * @return the adjusted value.
+     */
+    public static int roundUpToBoundary(int boundary, int value) {
+        int rounding = value % boundary == 0 ? 0 : boundary - value % boundary;
+        return rounding + value;
+    }
 }
