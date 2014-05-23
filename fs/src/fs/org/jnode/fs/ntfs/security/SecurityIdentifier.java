@@ -37,7 +37,7 @@ public class SecurityIdentifier {
     /**
      * The list of sub-authorities.
      */
-    private final List<Integer> subAuthorities;
+    private final List<Long> subAuthorities;
 
     /**
      * Creates a new SID.
@@ -45,7 +45,7 @@ public class SecurityIdentifier {
      * @param authority      the authority, e.g. 5.
      * @param subAuthorities the list of sub-authorities.
      */
-    public SecurityIdentifier(long authority, List<Integer> subAuthorities) {
+    public SecurityIdentifier(long authority, List<Long> subAuthorities) {
         this.authority = authority;
         this.subAuthorities = subAuthorities;
     }
@@ -101,10 +101,10 @@ public class SecurityIdentifier {
 
         String[] parts = text.split("\\-");
         Long authority = Long.parseLong(parts[0]);
-        List<Integer> subAuthorities = new ArrayList<Integer>();
+        List<Long> subAuthorities = new ArrayList<Long>();
 
         for (int i = 1; i < parts.length; i++) {
-            subAuthorities.add(Integer.parseInt(parts[i]));
+            subAuthorities.add(Long.parseLong(parts[i]));
         }
 
         return new SecurityIdentifier(authority, subAuthorities);

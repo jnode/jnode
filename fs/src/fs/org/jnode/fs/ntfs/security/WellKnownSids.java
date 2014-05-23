@@ -42,6 +42,7 @@ public class WellKnownSids {
     public static final SecurityIdentifier CREATOR_GROUP = register("Creator Group", "S-1-3-1");
     public static final SecurityIdentifier CREATOR_OWNER_SERVER = register("Creator Owner Server", "S-1-3-2");
     public static final SecurityIdentifier CREATOR_GROUP_SERVER = register("Creator Group Server", "S-1-3-3");
+    public static final SecurityIdentifier OWNDER_RIGHTS = register("Owner Rights", "S-1-3-4");
     public static final SecurityIdentifier NON_UNIQUE = register("Non-unique SID", "S-1-4");
 
     // NT Authority SIDs
@@ -58,6 +59,18 @@ public class WellKnownSids {
     public static final SecurityIdentifier AUTHENTICATED_USER = register("Authenticated User", "S-1-5-11");
     public static final SecurityIdentifier RESTRICTED_CODE = register("Restricted Code", "S-1-5-12");
     public static final SecurityIdentifier TERMINAL_SERVER = register("Terminal Server", "S-1-5-13");
+    public static final SecurityIdentifier REMOTE_INTERACTIVE_LOGON = register("Remote Interactive Logon", "S-1-5-14");
+    public static final SecurityIdentifier THIS_ORGANIZATION = register("This Organisation", "S-1-5-15");
+    public static final SecurityIdentifier IUSR = register("IIS User", "S-1-5-17");
+    public static final SecurityIdentifier LOCAL_SYSTEM = register("Local System", "S-1-5-18");
+    public static final SecurityIdentifier AUTHENTICATION_AUTHORITY_ASSERTED_IDENTITY =
+        register("Authentication Authority Asserted Identity", "S-1-5-18-1");
+    public static final SecurityIdentifier SERVICE_ASSERTED_IDENTITY =
+        register("Service Asserted Identity", "S-1-5-18-2");
+    public static final SecurityIdentifier LOCAL_SERVICE = register("Local Service", "S-1-5-19");
+    public static final SecurityIdentifier NETWORK_SERVICE = register("Network Service", "S-1-5-20");
+    public static final SecurityIdentifier COMPOUNDED_AUTHENTICATION =
+        register("Compound Authentication", "S-1-5-21-0-0-0-496");
     public static final SecurityIdentifier BUILT_IN_DOMAIN = register("Built-in Domain", "S-1-5-32");
 
     // Local domain users
@@ -89,6 +102,11 @@ public class WellKnownSids {
     public static final SecurityIdentifier LOCAL_REPLICATOR_ALIAS = register("Local Replicator", "S-1-5-32-552");
     public static final SecurityIdentifier LOCAL_RAS_SERVERS_ALIAS = register("Local RAS Servers", "S-1-5-32-553");
     public static final SecurityIdentifier LOCAL_PRE_W2K_ALIAS = register("Local Pre-W2K Comp Access", "S-1-5-32-554");
+
+    public static final SecurityIdentifier REMOTE_DESKTOP = register("Remote Desktop", "S-1-5-32-555");
+
+    public static final SecurityIdentifier NT_SERVICE = register("NT Service", "S-1-5-80");
+    public static final SecurityIdentifier LOCAL_ACCOUNT = register("Local Account", "S-1-5-113");
 
     private WellKnownSids() {
         // Prevent instantiation
