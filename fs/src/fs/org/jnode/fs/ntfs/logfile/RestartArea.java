@@ -10,6 +10,16 @@ import org.jnode.fs.ntfs.NTFSStructure;
 public class RestartArea extends NTFSStructure {
 
     /**
+     * Indicates that the volume was cleanly unmounted by Windows.
+     */
+    public static final int VOLUME_CLEANLY_UNMOUNTED = 0x2;
+
+    /**
+     * Indicates that there are no log clients.
+     */
+    public static final int LOGFILE_NO_CLIENT  = 0xffff;
+
+    /**
      * Creates a new instance.
      *
      * @param buffer the buffer.

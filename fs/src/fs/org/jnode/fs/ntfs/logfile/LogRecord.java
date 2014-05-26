@@ -10,12 +10,31 @@ import org.jnode.fs.ntfs.NTFSStructure;
 public class LogRecord extends NTFSStructure {
 
     /**
+     * The length of the fixed part of the record.
+     */
+    public static int HEADER_SIZE = 0x58;
+
+    /**
+     * The position inside the structure from which {@link #getClientDataLength()} is calculated.
+     */
+    public static int LENGTH_CALCULATION_OFFSET = 0x30;
+
+    /**
      * Creates a new log file record.
      *
      * @param buffer the buffer.
      */
     public LogRecord(byte[] buffer, int offset) {
         super(buffer, offset);
+    }
+
+    /**
+     * Checks if the record appears to be valid.
+     *
+     * @return {@code true} if valid.
+     */
+    public boolean isValid() {
+        return getLsn() != 0;
     }
 
     /**
@@ -205,6 +224,11 @@ public class LogRecord extends NTFSStructure {
      */
     public long getTargetLcn() {
         return getUInt32(0x50);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("log-record:[%d]", getLsn());
     }
 
     /**

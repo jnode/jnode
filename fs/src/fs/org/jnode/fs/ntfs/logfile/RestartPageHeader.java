@@ -28,9 +28,10 @@ public class RestartPageHeader extends NTFSStructure {
      * Creates a new log file restart page header.
      *
      * @param buffer the buffer.
+     * @param offset the offset to create the structure at.
      */
-    public RestartPageHeader(byte[] buffer) {
-        super(buffer, 0);
+    public RestartPageHeader(byte[] buffer, int offset) {
+        super(buffer, offset);
     }
 
     /**
@@ -40,6 +41,15 @@ public class RestartPageHeader extends NTFSStructure {
      */
     public int getMagic() {
         return getUInt32AsInt(0x00);
+    }
+
+    /**
+     * Checks if this header seems to be valid.
+     *
+     * @return {@code true} if valid, {@code false} otherwise.
+     */
+    public boolean isValid() {
+        return getMagic() == Magic.RSTR || getMagic() == Magic.CHKD;
     }
 
     /**

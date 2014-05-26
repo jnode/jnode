@@ -10,6 +10,11 @@ import org.jnode.fs.ntfs.NTFSStructure;
 public class RecordPageHeader extends NTFSStructure {
 
     /**
+     * The size of this structure.
+     */
+    public static final int HEADER_SIZE = 0x28;
+
+    /**
      * Magic constants
      */
     public static class Magic {
@@ -36,6 +41,15 @@ public class RecordPageHeader extends NTFSStructure {
      */
     public int getMagic() {
         return getUInt32AsInt(0x00);
+    }
+
+    /**
+     * Checks if this header seems to be valid.
+     *
+     * @return {@code true} if valid, {@code false} otherwise.
+     */
+    public boolean isValid() {
+        return getMagic() == Magic.RCRD;
     }
 
     /**
@@ -97,8 +111,8 @@ public class RecordPageHeader extends NTFSStructure {
      *
      * @return the value.
      */
-    public long getNextRecordOffset() {
-        return getInt64(0x18);
+    public int getNextRecordOffset() {
+        return getInt16(0x18);
     }
 
     /**
