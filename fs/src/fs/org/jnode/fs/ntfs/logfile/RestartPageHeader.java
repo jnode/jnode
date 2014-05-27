@@ -1,13 +1,15 @@
 package org.jnode.fs.ntfs.logfile;
 
-import org.jnode.fs.ntfs.NTFSStructure;
+import java.io.IOException;
+import org.jnode.fs.ntfs.NTFSRecord;
+import org.jnode.fs.ntfs.NTFSVolume;
 
 /**
  * $LogFile restart page header
  *
  * @author Luke Quinane
  */
-public class RestartPageHeader extends NTFSStructure {
+public class RestartPageHeader extends NTFSRecord {
 
     /**
      * Magic constants
@@ -27,20 +29,13 @@ public class RestartPageHeader extends NTFSStructure {
     /**
      * Creates a new log file restart page header.
      *
+     * @param volume the volume that contains this record.
      * @param buffer the buffer.
      * @param offset the offset to create the structure at.
+     * @throws IOException if an error occurs during fixup.
      */
-    public RestartPageHeader(byte[] buffer, int offset) {
-        super(buffer, offset);
-    }
-
-    /**
-     * Gets the magic value of this record.
-     *
-     * @return the magic
-     */
-    public int getMagic() {
-        return getUInt32AsInt(0x00);
+    public RestartPageHeader(NTFSVolume volume, byte[] buffer, int offset) throws IOException {
+        super(volume, buffer, offset);
     }
 
     /**
@@ -50,24 +45,6 @@ public class RestartPageHeader extends NTFSStructure {
      */
     public boolean isValid() {
         return getMagic() == Magic.RSTR || getMagic() == Magic.CHKD;
-    }
-
-    /**
-     * Gets the update sequence offset.
-     *
-     * @return the offset.
-     */
-    public int getUpdateSequenceOffset() {
-        return getUInt16(0x04);
-    }
-
-    /**
-     * Gets the update sequence count.
-     *
-     * @return the count.
-     */
-    public int getUpdateSequenceCount() {
-        return getUInt16(0x06);
     }
 
     /**
@@ -131,8 +108,6 @@ public class RestartPageHeader extends NTFSStructure {
      */
     public String toDebugString() {
         StringBuilder builder = new StringBuilder("Restart Page Header:[\n");
-        builder.append("update-sequence-offset: " + getUpdateSequenceOffset() + "\n");
-        builder.append("update-sequence-count: " + getUpdateSequenceCount() + "\n");
         builder.append("chkdsk-lsn: " + getCheckDiskLsn() + "\n");
         builder.append("system-page-size: " + getSystemPageSize() + "\n");
         builder.append("log-page-size: " + getLogPageSize() + "\n");

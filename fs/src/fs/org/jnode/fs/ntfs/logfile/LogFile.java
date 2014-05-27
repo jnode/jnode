@@ -88,7 +88,7 @@ public class LogFile {
         fileRecord.readData(0, logFileBuffer, 0, (int) logFileLength);
 
         // Read in the restart area info
-        restartPageHeader = getNewestRestartPageHeader(logFileBuffer);
+        restartPageHeader = getNewestRestartPageHeader(fileRecord.getVolume(), logFileBuffer);
         int restartAreaOffset = restartPageHeader.getRestartOffset();
         logPageSize = restartPageHeader.getLogPageSize();
         restartArea = new RestartArea(logFileBuffer, restartAreaOffset);
@@ -206,18 +206,20 @@ public class LogFile {
     /**
      * Gets the restart page header that corresponds to the restart page with the highest current LSN.
      *
+     * @param volume the volume that holds the log file.
      * @param buffer the buffer to read from.
      * @return the header.
+     * @throws IOException if an error occurs.
      */
-    private RestartPageHeader getNewestRestartPageHeader(byte[] buffer) {
-        RestartPageHeader restartPageHeader1 = new RestartPageHeader(buffer, 0);
+    private RestartPageHeader getNewestRestartPageHeader(NTFSVolume volume, byte[] buffer) throws IOException {
+        RestartPageHeader restartPageHeader1 = new RestartPageHeader(volume, buffer, 0);
         if (!restartPageHeader1.isValid()) {
             throw new IllegalStateException("Restart header has invalid magic: " + restartPageHeader1.getMagic());
         } else if (restartPageHeader1.getMagic() == RestartPageHeader.Magic.CHKD) {
             log.warn("First $LogFile restart header has check disk magic");
         }
 
-        RestartPageHeader restartPageHeader2 = new RestartPageHeader(buffer, restartPageHeader1.getLogPageSize());
+        RestartPageHeader restartPageHeader2 = new RestartPageHeader(volume, buffer, restartPageHeader1.getLogPageSize());
         if (!restartPageHeader2.isValid()) {
             throw new IllegalStateException("Second restart header has invalid magic: " + restartPageHeader2.getMagic());
         }  else if (restartPageHeader2.getMagic() == RestartPageHeader.Magic.CHKD) {
