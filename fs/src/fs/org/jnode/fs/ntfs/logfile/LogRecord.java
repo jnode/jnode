@@ -20,12 +20,42 @@ public class LogRecord extends NTFSStructure {
     public static int LENGTH_CALCULATION_OFFSET = 0x30;
 
     /**
-     * Creates a new log file record.
-     *
-     * @param buffer the buffer.
+     * The record type value for a check point record.
      */
-    public LogRecord(byte[] buffer, int offset) {
+    public static int RECORD_TYPE_CHECKPOINT = 0x2;
+
+    /**
+     * The flag that indicates the record crosses a page boundary.
+     */
+    public static int FLAG_CROSSES_PAGE = 0x1;
+
+    /**
+     * The 'LCNs to follow' value that indicates that there is a subsequent record.
+     */
+    public static int LCN_FOLLOWING_RECORD = 0x1;
+
+    /**
+     * The page size for log pages.
+     */
+    private final int pageSize;
+
+    /**
+     * The offset in the page to the log record data.
+     */
+    private final int logPageDataOffset;
+
+    /**
+     * Creates a new log file record.
+     *  @param buffer the buffer.
+     * @param offset the offset in the buffer to create the record at.
+     * @param pageSize the page size.
+     * @param logPageDataOffset the offset in the page to the log record data.
+     */
+    public LogRecord(byte[] buffer, int offset, int pageSize, int logPageDataOffset) {
         super(buffer, offset);
+
+        this.pageSize = pageSize;
+        this.logPageDataOffset = logPageDataOffset;
     }
 
     /**
@@ -110,12 +140,55 @@ public class LogRecord extends NTFSStructure {
     }
 
     /**
+     * Gets an unsigned 16-bit integer which may or may not cross the log file page boundary.
+     *
+     * @param offset the offset to the field in this structure.
+     * @return the value.
+     */
+    protected int getUInt16AcrossPages(int offset) {
+        if (getCrossesPage()) {
+            int offsetWithinPage = getOffset() % pageSize + offset;
+            if (offsetWithinPage + 2 > pageSize) {
+                return getUInt16(offset + logPageDataOffset);
+            }
+        }
+
+        return getUInt16(offset);
+    }
+
+    /**
+     * Gets an unsigned 32-bit integer which may or may not cross the log file page boundary.
+     *
+     * @param offset the offset to the field in this structure.
+     * @return the value.
+     */
+    protected long getUInt32AcrossPages(int offset) {
+        if (getCrossesPage()) {
+            int offsetWithinPage = getOffset() % pageSize + offset;
+            if (offsetWithinPage + 4 > pageSize) {
+                return getUInt32(offset + logPageDataOffset);
+            }
+        }
+
+        return getUInt32(offset);
+    }
+
+    /**
+     * Indicates whether this log record crosses a page boundary.
+     *
+     * @return {@code true} if it crosses a page boundary.
+     */
+    public boolean getCrossesPage() {
+        return (getFlags() & FLAG_CROSSES_PAGE) == FLAG_CROSSES_PAGE;
+    }
+
+    /**
      * Gets the redo operation.
      *
      * @return the redo operation.
      */
     public int getRedoOperation() {
-        return getUInt16(0x30);
+        return getUInt16AcrossPages(0x30);
     }
 
     /**
@@ -124,7 +197,7 @@ public class LogRecord extends NTFSStructure {
      * @return the undo operation.
      */
     public int getUndoOperation() {
-        return getUInt16(0x32);
+        return getUInt16AcrossPages(0x32);
     }
 
     /**
@@ -133,7 +206,7 @@ public class LogRecord extends NTFSStructure {
      * @return the redo offset.
      */
     public int getRedoOffset() {
-        return getUInt16(0x34);
+        return getUInt16AcrossPages(0x34);
     }
 
     /**
@@ -142,7 +215,7 @@ public class LogRecord extends NTFSStructure {
      * @return the redo length.
      */
     public int getRedoLength() {
-        return getUInt16(0x36);
+        return getUInt16AcrossPages(0x36);
     }
 
     /**
@@ -151,7 +224,7 @@ public class LogRecord extends NTFSStructure {
      * @return the undo offset.
      */
     public int getUndoOffset() {
-        return getUInt16(0x38);
+        return getUInt16AcrossPages(0x38);
     }
 
     /**
@@ -160,7 +233,7 @@ public class LogRecord extends NTFSStructure {
      * @return the undo length.
      */
     public int getUndoLength() {
-        return getUInt16(0x3a);
+        return getUInt16AcrossPages(0x3a);
     }
 
     /**
@@ -169,7 +242,7 @@ public class LogRecord extends NTFSStructure {
      * @return the attribute.
      */
     public int getTargetAttribute() {
-        return getUInt16(0x3c);
+        return getUInt16AcrossPages(0x3c);
     }
 
     /**
@@ -178,7 +251,7 @@ public class LogRecord extends NTFSStructure {
      * @return the number.
      */
     public int getLcnsToFollow() {
-        return getUInt16(0x3e);
+        return getUInt16AcrossPages(0x3e);
     }
 
     /**
@@ -187,7 +260,7 @@ public class LogRecord extends NTFSStructure {
      * @return the offset.
      */
     public int getRecordOffset() {
-        return getUInt16(0x40);
+        return getUInt16AcrossPages(0x40);
     }
 
     /**
@@ -196,7 +269,7 @@ public class LogRecord extends NTFSStructure {
      * @return the offset.
      */
     public int getAttributeOffset() {
-        return getUInt16(0x42);
+        return getUInt16AcrossPages(0x42);
     }
 
     /**
@@ -205,7 +278,7 @@ public class LogRecord extends NTFSStructure {
      * @return the value.
      */
     public int getMftClusterIndex() {
-        return getUInt16(0x44);
+        return getUInt16AcrossPages(0x44);
     }
 
     /**
@@ -214,7 +287,7 @@ public class LogRecord extends NTFSStructure {
      * @return the target VCN.
      */
     public long getTargetVcn() {
-        return getUInt32(0x48);
+        return getUInt32AcrossPages(0x48);
     }
 
     /**
@@ -223,12 +296,23 @@ public class LogRecord extends NTFSStructure {
      * @return the target LCN.
      */
     public long getTargetLcn() {
-        return getUInt32(0x50);
+        return getUInt32AcrossPages(0x50);
     }
 
     @Override
     public String toString() {
-        return String.format("log-record:[%d]", getLsn());
+        String type;
+        if (getRecordType() == RECORD_TYPE_CHECKPOINT) {
+            type = "checkpoint";
+        } else {
+            OperationCode code = OperationCode.fromCode(getRedoOperation());
+            if (code != null) {
+                type = code.name();
+            } else {
+                type = "unknown: " + getRedoOperation();
+            }
+        }
+        return String.format("log-record:[%d - %d %s]", getLsn(), getTransactionId(), type);
     }
 
     /**

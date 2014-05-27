@@ -1,13 +1,15 @@
 package org.jnode.fs.ntfs.logfile;
 
-import org.jnode.fs.ntfs.NTFSStructure;
+import java.io.IOException;
+import org.jnode.fs.ntfs.NTFSRecord;
+import org.jnode.fs.ntfs.NTFSVolume;
 
 /**
  * $LogFile record page header.
  *
  * @author Luke Quinane
  */
-public class RecordPageHeader extends NTFSStructure {
+public class RecordPageHeader extends NTFSRecord {
 
     /**
      * The size of this structure.
@@ -27,20 +29,13 @@ public class RecordPageHeader extends NTFSStructure {
     /**
      * Creates a new log file record page header.
      *
+     * @param volume the volume that contains this record.
      * @param buffer the buffer.
      * @param offset the offset.
+     * @throws IOException if an error occurs during fixup.
      */
-    public RecordPageHeader(byte[] buffer, int offset) {
-        super(buffer, offset);
-    }
-
-    /**
-     * Gets the magic value of this record.
-     *
-     * @return the magic
-     */
-    public int getMagic() {
-        return getUInt32AsInt(0x00);
+    public RecordPageHeader(NTFSVolume volume, byte[] buffer, int offset) throws IOException {
+        super(volume, buffer, offset);
     }
 
     /**

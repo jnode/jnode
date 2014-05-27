@@ -8,8 +8,10 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.jnode.fs.ntfs.FileRecord;
+import org.jnode.fs.ntfs.NTFSVolume;
 import org.jnode.fs.ntfs.attribute.NTFSAttribute;
 import org.jnode.fs.util.FSUtils;
+import org.jnode.util.LittleEndian;
 
 /**
  * $LogFile
@@ -32,6 +34,11 @@ public class LogFile {
      * The list of open log clients.
      */
     private final List<LogClientRecord> logClients = new ArrayList<LogClientRecord>();
+
+    /**
+     * The map of offset to record page headers.
+     */
+    private Map<Integer, RecordPageHeader> offsetPageMap = new HashMap<Integer, RecordPageHeader>();
 
     /**
      * The list log records.
@@ -108,16 +115,15 @@ public class LogFile {
             }
         }
 
-
-        int offset = findOldestPageOffset();
+        int offset = findOldestPageOffset(fileRecord.getVolume());
         int recordOffset = 0;
         int logPageCount = (int) ((logFileLength - NORMAL_AREA_START * logPageSize) / logPageSize);
 
         // Read in each log page
         for (int pageNumber = 0; pageNumber < logPageCount; pageNumber++) {
-            RecordPageHeader pageHeader = new RecordPageHeader(logFileBuffer, offset);
+            RecordPageHeader pageHeader = offsetPageMap.get(offset);
 
-            if (pageHeader.isValid()) {
+            if (pageHeader != null && pageHeader.isValid()) {
                 // Ensure that the record offset is within the page and beyond the page header
                 recordOffset = recordOffset % logPageSize;
                 if (recordOffset != restartArea.getLogPageDataOffset()) {
@@ -134,7 +140,9 @@ public class LogFile {
 
                     // Get the offset to the next record in the buffer rounded up to an 8-byte boundary
                     recordOffset = FSUtils.roundUpToBoundary(8, recordOffset);
-                    LogRecord logRecord = new LogRecord(logFileBuffer, offset + recordOffset);
+                    LogRecord logRecord = new LogRecord(logFileBuffer, offset + recordOffset, logPageSize,
+                        restartArea.getLogPageDataOffset());
+
                     if (logRecord.isValid()) {
                         logRecords.add(logRecord);
                         recordOffset += LogRecord.LENGTH_CALCULATION_OFFSET + (int) logRecord.getClientDataLength();
@@ -160,10 +168,11 @@ public class LogFile {
     /**
      * Finds the offset to the oldest page, i.e. the one with the lowest LSN.
      *
+     * @param volume the volume that holds the log file.
      * @return the offset to the oldest page.
      * @throws IOException if an error occurs.
      */
-    private int findOldestPageOffset() throws IOException {
+    private int findOldestPageOffset(NTFSVolume volume) throws IOException {
         TreeMap<Long, RecordPageHeader> lsnPageMap = new TreeMap<Long, RecordPageHeader>();
         Map<RecordPageHeader, Integer> pageOffsetMap = new HashMap<RecordPageHeader, Integer>();
 
@@ -172,7 +181,15 @@ public class LogFile {
         // area'.
 
         for (int offset = 4 * logPageSize; offset < logFileLength; offset += logPageSize) {
-            RecordPageHeader pageHeader = new RecordPageHeader(logFileBuffer, offset);
+            int magic = LittleEndian.getInt32(logFileBuffer, offset);
+
+            if (magic != RecordPageHeader.Magic.RCRD) {
+                // Bad page magic, possibly an uninitialised page
+                continue;
+            }
+
+            RecordPageHeader pageHeader = new RecordPageHeader(volume, logFileBuffer, offset);
+            offsetPageMap.put(offset, pageHeader);
 
             // If the last-end-LSN is zero then the page only contains data from the log record on the last page. I.e.
             // it has no new entries, so skip it
