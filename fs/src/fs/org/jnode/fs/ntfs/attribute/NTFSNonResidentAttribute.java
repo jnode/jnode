@@ -124,6 +124,16 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
     }
 
     /**
+     * Gets the size that has been initialized by the attribute data. It is possible ot non-resident attribute to
+     * allocate data runs that it hasn't yet used.
+     *
+     * @return the size that has been initialized by the attribute so far.
+     */
+    public long getAttributeInitializedSize() {
+        return getInt64(0x38);
+    }
+
+    /**
      * Read the data runs.
      *
      * @param parentoffset
