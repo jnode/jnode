@@ -2,7 +2,10 @@ package org.jnode.fs.ntfs.logfile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -41,9 +44,9 @@ public class LogFile {
     private Map<Integer, RecordPageHeader> offsetPageMap = new HashMap<Integer, RecordPageHeader>();
 
     /**
-     * The list log records.
+     * The map of LSN to log record.
      */
-    private final List<LogRecord> logRecords = new ArrayList<LogRecord>();
+    private final Map<Long, LogRecord> lsnLogRecordMap = new LinkedHashMap<Long, LogRecord>();
 
     /**
      * The restart page header.
@@ -89,20 +92,22 @@ public class LogFile {
 
         // Read in the restart area info
         restartPageHeader = getNewestRestartPageHeader(fileRecord.getVolume(), logFileBuffer);
-        int restartAreaOffset = restartPageHeader.getRestartOffset();
+        int restartAreaOffset = restartPageHeader.getOffset() + restartPageHeader.getRestartOffset();
         logPageSize = restartPageHeader.getLogPageSize();
         restartArea = new RestartArea(logFileBuffer, restartAreaOffset);
 
         if ((restartArea.getFlags() & RestartArea.VOLUME_CLEANLY_UNMOUNTED) != RestartArea.VOLUME_CLEANLY_UNMOUNTED) {
             log.info("Volume not cleanly unmounted");
             cleanlyShutdown = false;
+
+        } else {
+            log.info("Volume marked as cleanly unmounted");
         }
 
         // Read in any open log client records
         int logClientCount = restartArea.getLogClients();
         if (logClientCount != RestartArea.LOGFILE_NO_CLIENT) {
             log.info(String.format("Found %d open log clients", logClientCount));
-            cleanlyShutdown = false;
 
             int logClientOffset = restartAreaOffset + restartArea.getClientArrayOffset();
             LogClientRecord logClientRecord = new LogClientRecord(logFileBuffer, logClientOffset);
@@ -161,7 +166,7 @@ public class LogFile {
                         recordOffset = getNextRecordOffset(logRecord, recordOffset);
 
                         if (logRecord.isValid()) {
-                            logRecords.add(logRecord);
+                            lsnLogRecordMap.put(logRecord.getLsn(), logRecord);
                         } else {
                             // Seems to be the end of valid records for this page
                             break;
@@ -282,7 +287,60 @@ public class LogFile {
      *
      * @return the records.
      */
-    public List<LogRecord> getLogRecords() {
-        return logRecords;
+    public Collection<LogRecord> getLogRecords() {
+        return lsnLogRecordMap.values();
+    }
+
+    /**
+     * Gets a mapping of LSN to log record.
+     *
+     * @return the map.
+     */
+    public Map<Long, LogRecord> getLsnLogRecordMap() {
+        return Collections.unmodifiableMap(lsnLogRecordMap);
+    }
+
+    /**
+     * Dumps out a chain of log records.
+     *
+     * @param lsn the LSN to start from.
+     * @return the dumped out chain.
+     */
+    public String dumpLogChain(long lsn) {
+        List<LogRecord> records = new ArrayList<LogRecord>();
+        LogRecord midRecord = lsnLogRecordMap.get(lsn);
+        records.add(midRecord);
+
+        LogRecord current = midRecord;
+        while (current.getClientPreviousLsn() != 0) {
+            current = lsnLogRecordMap.get(current.getClientPreviousLsn());
+            records.add(0, current);
+        }
+
+        int midIndex = records.size() - 1;
+        current = midRecord;
+        while (current.getClientUndoNextLsn() != 0) {
+            current = lsnLogRecordMap.get(current.getClientUndoNextLsn());
+            records.add(current);
+        }
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        for (int i = 0; i < records.size(); i++) {
+            LogRecord record = records.get(i);
+
+            if (i < midIndex) {
+                builder.append("<");
+            } else if (i == midIndex) {
+                builder.append("=");
+            } else {
+                builder.append(">");
+            }
+
+            builder.append(record);
+            builder.append("\n");
+        }
+        builder.append("]");
+        return builder.toString();
     }
 }

@@ -299,17 +299,42 @@ public class LogRecord extends NTFSStructure {
         return getUInt32AcrossPages(0x50);
     }
 
+    /**
+     * Gets the redo data for the record.
+     *
+     * @param buffer the buffer to write into.
+     */
+    public void getRedoData(byte[] buffer) {
+        if (getCrossesPage()) {
+            int offsetWithinPage = getOffset() % pageSize + 0x30 + getRedoOffset();
+            if (offsetWithinPage + getRedoLength() > pageSize) {
+                throw new UnsupportedOperationException("Not implemented yet");
+            }
+        }
+
+        getData(0x30 + getRedoOffset(), buffer, 0, getRedoLength());
+    }
+
     @Override
     public String toString() {
-        String type;
+        String type = "";
         if (getRecordType() == RECORD_TYPE_CHECKPOINT) {
             type = "checkpoint";
         } else {
-            OperationCode code = OperationCode.fromCode(getRedoOperation());
-            if (code != null) {
-                type = code.name();
+            OperationCode undoCode = OperationCode.fromCode(getUndoOperation());
+            if (undoCode != null) {
+                type += undoCode.name();
             } else {
-                type = "unknown: " + getRedoOperation();
+                type += "unknown: " + getUndoOperation();
+            }
+
+            type += " --- ";
+
+            OperationCode redoCode = OperationCode.fromCode(getRedoOperation());
+            if (redoCode != null) {
+                type += redoCode.name();
+            } else {
+                type += "unknown: " + getRedoOperation();
             }
         }
         return String.format("log-record:[%d - %d %s]", getLsn(), getTransactionId(), type);

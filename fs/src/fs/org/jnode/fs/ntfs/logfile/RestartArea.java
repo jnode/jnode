@@ -48,12 +48,21 @@ public class RestartArea extends NTFSStructure {
     }
 
     /**
-     * Gets the number of free clients.
+     * Gets the offset to the list of free clients.
      *
-     * @return the number of free clients.
+     * @return the offset to the list of free clients.
      */
     public int getClientFreeList() {
         return getUInt16(0x0a);
+    }
+
+    /**
+     * Gets the offset to the list of in-use clients.
+     *
+     * @return the offset to the list of in-use clients.
+     */
+    public int getClientInUseList() {
+        return getUInt16(0x0c);
     }
 
     /**
@@ -61,8 +70,8 @@ public class RestartArea extends NTFSStructure {
      *
      * @return the flags.
      */
-    public long getFlags() {
-        return getUInt32(0x0c);
+    public int getFlags() {
+        return getUInt16(0x0e);
     }
 
     /**
@@ -137,6 +146,7 @@ public class RestartArea extends NTFSStructure {
         builder.append("current-lsn: " + getCurrentLsn() + "\n");
         builder.append("log-clients: " + getLogClients() + "\n");
         builder.append("client-free-list: " + getClientFreeList() + "\n");
+        builder.append("client-in-use-list: " + getClientInUseList() + "\n");
         builder.append("flags: " + getFlags() + "\n");
         builder.append("seq-number-bits: " + getSequenceNumberBits() + "\n");
         builder.append("restart-area-length: " + getRestartAreaLength() + "\n");

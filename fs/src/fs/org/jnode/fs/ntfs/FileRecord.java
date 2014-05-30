@@ -209,6 +209,15 @@ public class FileRecord extends NTFSRecord {
     }
 
     /**
+     * Gets the $LogFile sequence number.
+     *
+     * @return the $LogFile sequence number.
+     */
+    public long getLsn() {
+        return getInt64(0x08);
+    }
+
+    /**
      * Gets the number of times this mft record has been reused.
      *
      * @return Returns the sequenceNumber.
