@@ -20,9 +20,6 @@
  
 package org.jnode.fs.jfat;
 
-import org.jnode.util.NumberUtils;
-
-
 /**
  * @author gvt
  */
@@ -41,9 +38,6 @@ public class FatCase {
     }
 
     public FatCase(int ncase) {
-        if ((ncase & ~MASK) != 0)
-            throw new UnsupportedOperationException("invalid mask on " + NumberUtils.hex(ncase, 8));
-
         this.ncase = ((ncase & MASK) >> 3);
     }
 
