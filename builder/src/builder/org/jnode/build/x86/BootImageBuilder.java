@@ -763,6 +763,14 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
 
             log("Compiling native kernel with JNAsm, Version " + version + ", " + i_bist + " bits");
             JNAsm.assembler(os, sourceInfo, symbols);
+            log("Compiling native kernel with JNAsm, Version " + version + ", " + i_bist + " bits done");
+
+            // Link the jump table entries
+            for (int i = 0; i < X86JumpTable.TABLE_LENGTH; i++) {
+                final Label lbl = new Label(X86JumpTable.TABLE_ENTRY_LABELS[i]);
+                final int idx = (arch.getMode().is32()) ? i : i * 2;
+                sharedStatics.setAddress(idx, lbl);
+            }
         } catch (Exception e) {
             throw new BuildException(e);
         }
