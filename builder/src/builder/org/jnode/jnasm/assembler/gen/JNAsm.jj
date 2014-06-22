@@ -94,6 +94,7 @@ TOKEN :
 |   <EXTERN: "extern">
 |   <GLOBAL: "global">
 |   <NEAR: "near">
+|   <FAR: "far">
 |   <LOCK: "lock">
 |   <REP:  "rep">
 |   <TIMES: "times">
@@ -251,9 +252,9 @@ Object operand() :
 {
 try {
 (
-    <NEAR> t=<IDENT>  { o = new Identifier(t.image);}
+    <NEAR> { setJumpType("near"); } t=<IDENT>  { o = new Identifier(t.image);}
 |
-    [ dw=<DWORD> { setSizeInfo(dw.image); }]
+    [ dw=<DWORD> { setSizeInfo(dw.image); }] [<FAR> { setJumpType("far"); }]
     (
         LOOKAHEAD( {isRegister(getToken(1))} )
         t=<IDENT>  { o = new Register(t.image);}

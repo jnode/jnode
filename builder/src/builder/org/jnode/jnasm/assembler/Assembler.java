@@ -196,6 +196,10 @@ public abstract class Assembler {
         crtIns.setSizeInfo(size);
     }
 
+    protected final void setJumpType(String jumpType) {
+        crtIns.setJumpType(jumpType);
+    }
+
     public static class UndefinedConstantException extends RuntimeException {
         
         private static final long serialVersionUID = 1L;

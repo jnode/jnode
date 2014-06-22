@@ -34,6 +34,7 @@ public class Instruction {
     private String sizeInfo;
     private String label;
     private String mnemonic;
+    private String jumpType;
     private List<Object> operands;
 
     public Instruction(String label) {
@@ -108,5 +109,15 @@ public class Instruction {
 
     public void setTimes(int times) {
         this.times = times;
+    }
+
+    public String getJumpType() {
+        return jumpType;
+    }
+
+    public void setJumpType(String jumpType) {
+        if (jumpType != null && jumpType.trim().length() > 0) {
+            this.jumpType = jumpType.trim().toLowerCase();
+        }
     }
 }
