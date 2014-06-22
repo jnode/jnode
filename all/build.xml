@@ -235,6 +235,7 @@
 		<!-- Set overwritable properties -->
 		<property name="jnode.memmgr.plugin.id" value="org.jnode.vm.memmgr.def"/>
 		<property name="compilerarg" value="-nowarn"/>
+		<property name="jnode.enable.jnasm" value="true"/>
 
 		<!-- Derive properties -->
 		<property name="jnode-mmtk.jar" value="${root.dir}/core/build/classes-plan/${jnode.memmgr.plugin.id}"/>
