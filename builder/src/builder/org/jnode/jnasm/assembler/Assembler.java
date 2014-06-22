@@ -42,10 +42,9 @@ import org.jnode.jnasm.assembler.x86.X86Support;
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public abstract class Assembler {
-    public static final int UNDEFINED_INT = 989898989;
     private static final String PARSER_CLASS = "org.jnode.jnasm.assembler.gen.JNAsm";
     public static final boolean THROW = false;
-    protected static final Object UNDEFINED = new String("UNDEFIEND");
+    protected static final Object UNDEFINED = "UNDEFIEND";
     protected final List<Instruction> instructions = new ArrayList<Instruction>();
     private final Map<String, Integer> constants = new HashMap<String, Integer>();
     private final Map<String, Label> labels = new HashMap<String, Label>();
@@ -58,7 +57,7 @@ public abstract class Assembler {
         try {
             Class<?> clazz = Class.forName(PARSER_CLASS);
             Constructor<?> cons = clazz.getConstructor(new Class[]{InputStream.class});
-            return (Assembler) cons.newInstance(new Object[]{in});
+            return (Assembler) cons.newInstance(in);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -68,7 +67,7 @@ public abstract class Assembler {
         try {
             Class<?> clazz = Class.forName("org.jnode.jnasm.assembler.gen.JNAsm");
             Constructor<?> cons = clazz.getConstructor(new Class[]{Reader.class});
-            return (Assembler) cons.newInstance(new Object[]{reader});
+            return (Assembler) cons.newInstance(reader);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -92,12 +91,7 @@ public abstract class Assembler {
     }
 
     public void performTwoPasses(Reader reader, OutputStream out) throws Exception {
-        StringWriter sw = new StringWriter();
-        char[] buf = new char[1024];
-        for (int count; (count = reader.read(buf)) > -1; sw.write(buf, 0, count)) ;
-        sw.flush();
-        sw.close();
-        String data = sw.toString();
+        String data = readToString(reader);
 
         //1st pass
         ReInit(new StringReader(data));
@@ -114,12 +108,7 @@ public abstract class Assembler {
     }
 
     public void performTwoPasses(Reader reader, NativeStream asm) throws Exception {
-        StringWriter sw = new StringWriter();
-        char[] buf = new char[1024];
-        for (int count; (count = reader.read(buf)) > -1; sw.write(buf, 0, count)) ;
-        sw.flush();
-        sw.close();
-        String data = sw.toString();
+        String data = readToString(reader);
 
         new RandomAccessFile("jnode.lst", "rw").write(data.getBytes());
 
@@ -137,6 +126,18 @@ public abstract class Assembler {
         emit(asm);
 
         asm.writeTo(new FileOutputStream("jnode.out"));
+    }
+
+    private static String readToString(Reader reader) throws IOException {
+        StringWriter sw = new StringWriter();
+        char[] buf = new char[1024];
+        int count;
+        while ((count = reader.read(buf)) > -1) {
+            sw.write(buf, 0, count);
+        }
+        sw.flush();
+        sw.close();
+        return sw.toString();
     }
 
     public void assemble(int baseAddress) {
@@ -169,11 +170,11 @@ public abstract class Assembler {
         if (constants.get(name) != null && pass == 1)
             throw new IllegalArgumentException("Constant already defined: " + name);
 
-        constants.put(name, new Integer(value));
+        constants.put(name, value);
     }
 
     protected int getConstant(String name, int line) {
-        Integer i = (Integer) constants.get(name);
+        Integer i = constants.get(name);
         try {
             if (i == null)
                 throw new IllegalArgumentException("Undefined constant at line " + line + ": " + name);
@@ -189,7 +190,7 @@ public abstract class Assembler {
                 return Integer.MAX_VALUE;
             }
         }
-        return i.intValue();
+        return i;
     }
 
     protected final void setSizeInfo(String size) {

@@ -91,6 +91,7 @@ public class Instruction {
         return prefix;
     }
 
+    @SuppressWarnings("unused")
     public void addPrefix(int prefix) {
         if (prefix == LOCK_PREFIX || prefix == REP_PREFIX) {
             this.prefix |= prefix;

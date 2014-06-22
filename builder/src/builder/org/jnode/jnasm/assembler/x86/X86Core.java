@@ -141,11 +141,11 @@ public class X86Core extends AbstractX86Module {
         this.operands = operands;
         this.operandSize = operandSize;
 
-        Integer key = (Integer) INSTRUCTION_MAP.get(mnemonic);
+        Integer key = INSTRUCTION_MAP.get(mnemonic);
 
         if (key == null) return false;
 
-        switch (key.intValue()) {
+        switch (key) {
             case ADC_ISN:
                 emitADC();
                 break;
@@ -375,13 +375,13 @@ public class X86Core extends AbstractX86Module {
                 emitXOR();
                 break;
             default:
-                throw new Error("Invalid instruction binding " + key.intValue() + " for " + mnemonic);
+                throw new Error("Invalid instruction binding " + key + " for " + mnemonic);
         }
 
         return true;
     }
 
-    private final void emitADC() {
+    private void emitADC() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -407,7 +407,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitADD() {
+    private void emitADD() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -444,17 +444,17 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitALIGN() {
+    private void emitALIGN() {
         Object o1 = operands.get(0);
         if (o1 instanceof Integer) {
-            stream.align(((Integer) o1).intValue());
+            stream.align((Integer) o1);
         } else {
             throw new IllegalArgumentException("Unknown operand: " + o1);
         }
 
     }
 
-    private final void emitAND() {
+    private void emitAND() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -487,50 +487,48 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitCALL() {
+    private void emitCALL() {
         Object o1 = operands.get(0);
         if (o1 instanceof Register) {
             stream.writeCALL(getRegister(((Register) o1).name));
         } else if (o1 instanceof Identifier) {
             String id = ((Identifier) o1).name;
-            Label lab = (Label) labels.get(id);
+            Label lab = labels.get(id);
             lab = (lab == null) ? new Label(id) : lab;
             stream.writeCALL(lab);
         } else if (o1 instanceof Address) {
             Address ind = (Address) o1;
             if (ind.reg != null && ind.sreg != null) {
                 throw new IllegalArgumentException("Scaled is not supported for call ");
-            } else if (ind.reg != null && ind.sreg == null) {
+            } else if (ind.reg != null) {
                 if ("far".equals(this.instruction.getJumpType())) {
                     stream.writeCALL_FAR(getRegister(ind.getImg()), ind.disp);
                 } else {
                     stream.writeCALL(getRegister(ind.getImg()), ind.disp);
                 }
-            } else if (ind.reg == null && ind.sreg != null) {
+            } else if (ind.sreg != null) {
                 stream.writeCALL(getRegister(ind.sreg), ind.scale, ind.disp);
-            } else if (ind.reg == null && ind.sreg == null) {
-                throw new IllegalArgumentException("Absolute is not supported for call ");
             } else {
-                throw new IllegalArgumentException("Unknown indirect: " + ind);
+                throw new IllegalArgumentException("Absolute is not supported for call ");
             }
         } else {
             throw new IllegalArgumentException("Unknown operand: " + o1);
         }
     }
 
-    private final void emitCLD() {
+    private void emitCLD() {
         stream.writeCLD();
     }
 
-    private final void emitCLI() {
+    private void emitCLI() {
         stream.writeCLI();
     }
 
-    private final void emitCLTS() {
+    private void emitCLTS() {
         stream.writeCLTS();
     }
 
-    private final void emitCMP() {
+    private void emitCMP() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -572,11 +570,11 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitCPUID() {
+    private void emitCPUID() {
         stream.writeCPUID();
     }
 
-    private final void emitDEC() {
+    private void emitDEC() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case R_ADDR:
@@ -591,7 +589,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitDIV() {
+    private void emitDIV() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case R_ADDR:
@@ -602,7 +600,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitFLDCW() {
+    private void emitFLDCW() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case E_ADDR:
@@ -614,11 +612,11 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitFNINIT() {
+    private void emitFNINIT() {
         stream.writeFNINIT();
     }
 
-    private final void emitFNSAVE() {
+    private void emitFNSAVE() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case E_ADDR:
@@ -630,7 +628,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitFRSTOR() {
+    private void emitFRSTOR() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case E_ADDR:
@@ -642,7 +640,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitFSTCW() {
+    private void emitFSTCW() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case E_ADDR:
@@ -654,7 +652,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitFXRSTOR() {
+    private void emitFXRSTOR() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case E_ADDR:
@@ -666,7 +664,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitFXSAVE() {
+    private void emitFXSAVE() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case E_ADDR:
@@ -678,11 +676,11 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitHLT() {
+    private void emitHLT() {
         stream.writeHLT();
     }
 
-    private final void emitIN() {
+    private void emitIN() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -718,7 +716,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitINC() {
+    private void emitINC() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case R_ADDR:
@@ -744,12 +742,12 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitINT() {
+    private void emitINT() {
         Object o1 = operands.get(0);
-        Integer val = null;
+        Integer val;
         if (o1 instanceof Identifier) {
             String id = ((Identifier) o1).name;
-            val = (Integer) constants.get(id);
+            val = constants.get(id);
         } else if (o1 instanceof Integer) {
             val = (Integer) o1;
         } else {
@@ -757,21 +755,21 @@ public class X86Core extends AbstractX86Module {
         }
 
         if (val != null) {
-            stream.writeINT(val.intValue());
+            stream.writeINT(val);
         } else {
             throw new IllegalArgumentException("Missing operand for INT");
         }
     }
 
-    private final void emitIRET() {
+    private void emitIRET() {
         stream.writeIRET();
     }
 
-    private final void emitJCC(int jumpCode) {
+    private void emitJCC(int jumpCode) {
         Object o1 = operands.get(0);
         if (o1 instanceof Identifier) {
             String id = ((Identifier) o1).name;
-            Label lab = (Label) labels.get(id);
+            Label lab = labels.get(id);
             lab = (lab == null) ? new Label(id) : lab;
             stream.writeJCC(lab, jumpCode);
         } else {
@@ -779,11 +777,11 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitJECXZ() {
+    private void emitJECXZ() {
         Object o1 = operands.get(0);
         if (o1 instanceof Identifier) {
             String id = ((Identifier) o1).name;
-            Label lab = (Label) labels.get(id);
+            Label lab = labels.get(id);
             lab = (lab == null) ? new Label(id) : lab;
             stream.writeJECXZ(lab);
         } else {
@@ -791,13 +789,13 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitJMP() {
+    private void emitJMP() {
         Object o1 = operands.get(0);
         if (o1 instanceof Register) {
             stream.writeJMP(getRegister(((Register) o1).name));
         } else if (o1 instanceof Identifier) {
             String id = ((Identifier) o1).name;
-            Label lab = (Label) labels.get(id);
+            Label lab = labels.get(id);
             lab = (lab == null) ? new Label(id) : lab;
             stream.writeJMP(lab);
         } else if (o1 instanceof Address) {
@@ -812,7 +810,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitLDMXCSR() {
+    private void emitLDMXCSR() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case E_ADDR:
@@ -824,7 +822,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitLEA() {
+    private void emitLEA() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RE_ADDR:
@@ -844,7 +842,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitLGDT() {
+    private void emitLGDT() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case A_ADDR:
@@ -855,7 +853,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitLIDT() {
+    private void emitLIDT() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case A_ADDR:
@@ -866,7 +864,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitLMSW() {
+    private void emitLMSW() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case R_ADDR:
@@ -877,15 +875,15 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitLODSW() {
+    private void emitLODSW() {
         stream.writeLODSW();
     }
 
-    private final void emitLOOP() {
+    private void emitLOOP() {
         Object o1 = operands.get(0);
         if (o1 instanceof Identifier) {
             String id = ((Identifier) o1).name;
-            Label lab = (Label) labels.get(id);
+            Label lab = labels.get(id);
             lab = (lab == null) ? new Label(id) : lab;
             try {
                 stream.writeLOOP(lab);
@@ -897,7 +895,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitLTR() {
+    private void emitLTR() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case R_ADDR:
@@ -908,7 +906,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitMOV() {
+    private void emitMOV() {
         if (operands.size() == 2 &&
             operands.get(0) instanceof Register &&
             operands.get(1) instanceof Identifier) {
@@ -991,19 +989,19 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitMOVSB() {
+    private void emitMOVSB() {
         stream.writeMOVSB();
     }
 
-    private final void emitMOVSW() {
+    private void emitMOVSW() {
         stream.writeMOVSW();
     }
 
-    private final void emitMOVSD() {
+    private void emitMOVSD() {
         stream.writeMOVSD();
     }
 
-    private final void emitMOVZX() {
+    private void emitMOVZX() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -1019,7 +1017,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitNEG() {
+    private void emitNEG() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case R_ADDR:
@@ -1034,11 +1032,11 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitNOP() {
+    private void emitNOP() {
         stream.writeNOP();
     }
 
-    private final void emitOR() {
+    private void emitOR() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -1071,7 +1069,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitOUT() {
+    private void emitOUT() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -1107,7 +1105,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitPOP() {
+    private void emitPOP() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case R_ADDR:
@@ -1129,15 +1127,15 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitPOPA() {
+    private void emitPOPA() {
         stream.writePOPA();
     }
 
-    private final void emitPOPF() {
+    private void emitPOPF() {
         stream.writePOPF();
     }
 
-    private final void emitPUSH() {
+    private void emitPUSH() {
         if (operands.size() == 1 && operands.get(0) instanceof Identifier) {
             stream.writePUSH_Const(new Label(((Identifier) operands.get(0)).name));
             return;
@@ -1171,23 +1169,23 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitPUSHA() {
+    private void emitPUSHA() {
         stream.writePUSHA();
     }
 
-    private final void emitPUSHF() {
+    private void emitPUSHF() {
         stream.writePUSHF();
     }
 
-    private final void emitRDMSR() {
+    private void emitRDMSR() {
         stream.writeRDMSR();
     }
 
-    private final void emitRDTSC() {
+    private void emitRDTSC() {
         stream.writeRDTSC();
     }
 
-    private final void emitRET() {
+    private void emitRET() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case N_ADDR:
@@ -1201,7 +1199,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitSHL() {
+    private void emitSHL() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RC_ADDR:
@@ -1216,7 +1214,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitSHR() {
+    private void emitSHR() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RC_ADDR:
@@ -1231,15 +1229,15 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitSTD() {
+    private void emitSTD() {
         stream.writeSTD();
     }
 
-    private final void emitSTI() {
+    private void emitSTI() {
         stream.writeSTI();
     }
 
-    private final void emitSTMXCSR() {
+    private void emitSTMXCSR() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case E_ADDR:
@@ -1251,19 +1249,19 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitSTOSB() {
+    private void emitSTOSB() {
         stream.writeSTOSB();
     }
 
-    private final void emitSTOSD() {
+    private void emitSTOSD() {
         stream.writeSTOSD();
     }
 
-    private final void emitSTOSW() {
+    private void emitSTOSW() {
         stream.writeSTOSW();
     }
 
-    private final void emitSUB() {
+    private void emitSUB() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -1292,7 +1290,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitTEST() {
+    private void emitTEST() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -1317,11 +1315,11 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitWRMSR() {
+    private void emitWRMSR() {
         stream.writeWRMSR();
     }
 
-    private final void emitXCHG() {
+    private void emitXCHG() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -1354,7 +1352,7 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
-    private final void emitXOR() {
+    private void emitXOR() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:

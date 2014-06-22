@@ -74,8 +74,7 @@ public abstract class Preprocessor {
         try {
             Class<?> clazz = Class.forName(PARSER_CLASS);
             Constructor<?> cons = clazz.getConstructor(new Class[]{InputStream.class});
-            Preprocessor preprocessor = (Preprocessor) cons.newInstance(new Object[]{in});
-            return preprocessor;
+            return (Preprocessor) cons.newInstance(in);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -85,8 +84,7 @@ public abstract class Preprocessor {
         try {
             Class<?> clazz = Class.forName(PARSER_CLASS);
             Constructor<?> cons = clazz.getConstructor(new Class[]{Reader.class});
-            Preprocessor preprocessor = (Preprocessor) cons.newInstance(new Object[]{reader});
-            return preprocessor;
+            return (Preprocessor) cons.newInstance(reader);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

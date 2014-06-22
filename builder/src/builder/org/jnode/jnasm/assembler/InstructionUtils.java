@@ -47,9 +47,9 @@ public class InstructionUtils {
                 Field f = fields[i];
                 String fn = f.getName();
                 if (fn.endsWith(INSTRUCTION_ID_SUFFIX)) {
-                    String mnemo = fn.substring(0, fn.length() - INSTRUCTION_ID_SUFFIX.length());
-                    if (mnemo != null || !"".equals(mnemo)) {
-                        map.put(mnemo.toLowerCase(), new Integer(f.getInt(null)));
+                    String mnemo = fn.substring(0, fn.length() - INSTRUCTION_ID_SUFFIX.length()).trim();
+                    if (mnemo.length() > 0) {
+                        map.put(mnemo.toLowerCase(), f.getInt(null));
                     }
                 }
             }

@@ -110,14 +110,12 @@ public abstract class AbstractX86Module extends AssemblerModule {
                         ret |= SEG_ARG << DISP * i;
                     } else if (ind.reg != null && ind.sreg != null) {
                         ret |= SCL_ARG << DISP * i;
-                    } else if (ind.reg != null && ind.sreg == null) {
+                    } else if (ind.reg != null) {
                         ret |= REL_ARG << DISP * i;
-                    } else if (ind.reg == null && ind.sreg != null) {
+                    } else if (ind.sreg != null) {
                         ret |= ZSC_ARG << DISP * i;
-                    } else if (ind.reg == null && ind.sreg == null) {
-                        ret |= ABS_ARG << DISP * i;
                     } else {
-                        throw new IllegalArgumentException("Unknown indirect: " + ind);
+                        ret |= ABS_ARG << DISP * i;
                     }
                 } else {
                     throw new IllegalArgumentException("Unknown operand: " + o + " " + o.getClass().getName());
@@ -133,7 +131,7 @@ public abstract class AbstractX86Module extends AssemblerModule {
     }
 
     final int getInt(int i) {
-        return ((Integer) args[i]).intValue();
+        return (Integer) args[i];
     }
 
     final X86Register.GPR getReg(int i) {
