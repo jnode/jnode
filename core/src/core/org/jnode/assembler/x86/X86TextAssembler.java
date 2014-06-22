@@ -556,6 +556,16 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         println("\tcall [" + reg + disp(offset) + ']');
     }
 
+    /**
+     * Create a call to address stored at the given [reg+offset].
+     *
+     * @param reg
+     * @param offset
+     */
+    public void writeCALL_FAR(GPR reg, int offset) {
+        println("\tcall far [" + reg + disp(offset) + ']');
+    }
+
     public void writeCALL(GPR regBase, GPR regIndex, int scale, int disp) {
         println("\tcall [" + regBase + '+' + regIndex + '*' + scale
             + disp(disp) + ']');

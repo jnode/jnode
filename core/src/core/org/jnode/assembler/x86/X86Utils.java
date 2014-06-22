@@ -33,6 +33,16 @@ public class X86Utils {
      * @param value
      * @return boolean
      */
+    public static boolean isUByte(int value) {
+        return ((value >= 0) && (value <= 255));
+    }
+
+    /**
+     * Does the given value fit in an 8-bit signed byte?
+     *
+     * @param value
+     * @return boolean
+     */
     public static boolean isByte(int value) {
         return ((value >= Byte.MIN_VALUE) && (value <= Byte.MAX_VALUE));
     }

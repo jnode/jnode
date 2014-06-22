@@ -759,6 +759,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
     public abstract void writeCALL(GPR reg, int offset);
 
     /**
+     * Create a call to address stored at the given [reg+offset].
+     *
+     * @param reg
+     * @param offset
+     */
+    public abstract void writeCALL_FAR(GPR reg, int offset);
+
+    /**
      * Create a relative call to a given label
      *
      * @param label
