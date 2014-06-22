@@ -32,6 +32,7 @@ import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.SR;
 import org.jnode.jnasm.assembler.Address;
 import org.jnode.jnasm.assembler.Identifier;
+import org.jnode.jnasm.assembler.Instruction;
 import org.jnode.jnasm.assembler.InstructionUtils;
 import org.jnode.jnasm.assembler.Register;
 
@@ -71,7 +72,8 @@ public class X86Core extends AbstractX86Module {
     public static final int JL_ISN = JGE_ISN + 1;
     public static final int JLE_ISN = JL_ISN + 1;
     public static final int JMP_ISN = JLE_ISN + 1;
-    public static final int JNE_ISN = JMP_ISN + 1;
+    public static final int JNA_ISN = JMP_ISN + 1;
+    public static final int JNE_ISN = JNA_ISN + 1;
     public static final int JNZ_ISN = JNE_ISN + 1;
     public static final int JZ_ISN = JNZ_ISN + 1;
     public static final int JECXZ_ISN = JZ_ISN + 1;
@@ -99,7 +101,8 @@ public class X86Core extends AbstractX86Module {
     public static final int PUSHA_ISN = PUSH_ISN + 1;
     public static final int PUSHF_ISN = PUSHA_ISN + 1;
     public static final int RDMSR_ISN = PUSHF_ISN + 1;
-    public static final int RET_ISN = RDMSR_ISN + 1;
+    public static final int RDTSC_ISN = RDMSR_ISN + 1;
+    public static final int RET_ISN = RDTSC_ISN + 1;
     public static final int SHL_ISN = RET_ISN + 1;
     public static final int SHR_ISN = SHL_ISN + 1;
     public static final int STD_ISN = SHR_ISN + 1;
@@ -133,7 +136,8 @@ public class X86Core extends AbstractX86Module {
         return MNEMONICS;
     }
 
-    public boolean emit(String mnemonic, List<Object> operands, int operandSize) {
+    public boolean emit(String mnemonic, List<Object> operands, int operandSize, Instruction instruction) {
+        this.instruction = instruction;
         this.operands = operands;
         this.operandSize = operandSize;
 
@@ -241,6 +245,9 @@ public class X86Core extends AbstractX86Module {
             case JMP_ISN:
                 emitJMP();
                 break;
+            case JNA_ISN:
+                emitJCC(X86Assembler.JNA);
+                break;
             case JNE_ISN:
                 emitJCC(X86Assembler.JNE);
                 break;
@@ -321,6 +328,9 @@ public class X86Core extends AbstractX86Module {
                 break;
             case RDMSR_ISN:
                 emitRDMSR();
+                break;
+            case RDTSC_ISN:
+                emitRDTSC();
                 break;
             case RET_ISN:
                 emitRET();
@@ -491,7 +501,11 @@ public class X86Core extends AbstractX86Module {
             if (ind.reg != null && ind.sreg != null) {
                 throw new IllegalArgumentException("Scaled is not supported for call ");
             } else if (ind.reg != null && ind.sreg == null) {
-                stream.writeCALL(getRegister(ind.getImg()), ind.disp);
+                if ("far".equals(this.instruction.getJumpType())) {
+                    stream.writeCALL_FAR(getRegister(ind.getImg()), ind.disp);
+                } else {
+                    stream.writeCALL(getRegister(ind.getImg()), ind.disp);
+                }
             } else if (ind.reg == null && ind.sreg != null) {
                 stream.writeCALL(getRegister(ind.sreg), ind.scale, ind.disp);
             } else if (ind.reg == null && ind.sreg == null) {
@@ -788,7 +802,11 @@ public class X86Core extends AbstractX86Module {
             stream.writeJMP(lab);
         } else if (o1 instanceof Address) {
             Address addr = (Address) o1;
-            stream.writeJMP(operandSize, addr.scale, addr.disp);
+            if (addr.reg != null) {
+                stream.writeJMP(getRegister(addr.reg), addr.disp);
+            } else {
+                stream.writeJMP(operandSize, addr.scale, addr.disp);
+            }
         } else {
             throw new IllegalArgumentException("Unknown operand: " + o1);
         }
@@ -939,7 +957,11 @@ public class X86Core extends AbstractX86Module {
                 break;
             case ER_ADDR:
                 ind = getAddress(0);
-                stream.writeMOV(operandSize, getRegister(ind.getImg()), ind.disp, getReg(1));
+                int oSize = operandSize;
+                if (oSize > getReg(1).getSize()) {
+                    oSize = getReg(1).getSize();
+                }
+                stream.writeMOV(oSize, getRegister(ind.getImg()), ind.disp, getReg(1));
                 break;
             case EC_ADDR:
                 ind = getAddress(0);
@@ -1159,6 +1181,10 @@ public class X86Core extends AbstractX86Module {
 
     private final void emitRDMSR() {
         stream.writeRDMSR();
+    }
+
+    private final void emitRDTSC() {
+        stream.writeRDTSC();
     }
 
     private final void emitRET() {

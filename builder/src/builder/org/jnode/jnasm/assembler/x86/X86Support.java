@@ -62,14 +62,16 @@ public class X86Support extends HardwareSupport {
     public void assemble(int baseAddress) {
         X86CpuID cpuId = X86CpuID.createID("pentium");
         nativeStream = new X86BinaryAssembler(cpuId, X86Constants.Mode.CODE32, baseAddress);
-        ((X86BinaryAssembler) nativeStream).setByteValueEnabled(false);
+        ((X86BinaryAssembler) nativeStream).setByteValueEnabled(true);
+        ((X86BinaryAssembler) nativeStream).setRelJumpEnabled(false);
         doAssembly();
     }
 
     public void assemble(NativeStream asm) {
         nativeStream = (X86Assembler) asm;
         if (nativeStream instanceof X86BinaryAssembler) {
-            ((X86BinaryAssembler) nativeStream).setByteValueEnabled(false);
+            ((X86BinaryAssembler) nativeStream).setByteValueEnabled(true);
+            ((X86BinaryAssembler) nativeStream).setRelJumpEnabled(false);
         }
         doAssembly();
         if (nativeStream instanceof X86BinaryAssembler) {
@@ -102,10 +104,10 @@ public class X86Support extends HardwareSupport {
                     int times = ins.getTimes();
                     if (times > 0) {
                         for (; times-- > 0;) {
-                            emit(ins.getMnemonic(), ins.getOperands(), getOperandSize(ins));
+                            emit(ins.getMnemonic(), ins.getOperands(), getOperandSize(ins), ins);
                         }
                     } else {
-                        emit(ins.getMnemonic(), ins.getOperands(), getOperandSize(ins));
+                        emit(ins.getMnemonic(), ins.getOperands(), getOperandSize(ins), ins);
                     }
                 } catch (IllegalArgumentException x) {
                     if (Assembler.THROW) {
@@ -137,9 +139,9 @@ public class X86Support extends HardwareSupport {
         }
     }
 
-    private void emit(String mnemonic, List<Object> operands, int operandSize) {
+    private void emit(String mnemonic, List<Object> operands, int operandSize, Instruction instruction) {
         for (AssemblerModule module : modules) {
-            if (module.emit(mnemonic, operands, operandSize)) {
+            if (module.emit(mnemonic, operands, operandSize, instruction)) {
                 return;
             }
         }

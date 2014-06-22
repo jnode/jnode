@@ -41,7 +41,7 @@ public abstract class AssemblerModule {
     }
 
     public abstract boolean emit(String mnemonic, List<Object> operands,
-                                 int operandSize);
+                                 int operandSize, Instruction instruction);
 
     public abstract void setNativeStream(NativeStream stream);
 }

@@ -25,6 +25,7 @@ import java.util.Map;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.jnasm.assembler.Address;
+import org.jnode.jnasm.assembler.Instruction;
 import org.jnode.jnasm.assembler.InstructionUtils;
 import org.jnode.jnasm.assembler.Register;
 
@@ -65,7 +66,7 @@ public class MMX extends AbstractX86Module {
         return MNEMONICS;
     }
 
-    public boolean emit(String mnemonic, List<Object> operands, int operandSize) {
+    public boolean emit(String mnemonic, List<Object> operands, int operandSize, Instruction instruction) {
         this.operands = operands;
         this.operandSize = operandSize;
         Integer key = (Integer) INSTRUCTION_MAP.get(mnemonic);

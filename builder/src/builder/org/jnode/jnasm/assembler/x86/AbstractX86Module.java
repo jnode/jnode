@@ -28,6 +28,7 @@ import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.jnasm.assembler.Address;
 import org.jnode.jnasm.assembler.AssemblerModule;
+import org.jnode.jnasm.assembler.Instruction;
 import org.jnode.jnasm.assembler.Register;
 
 /**
@@ -71,6 +72,7 @@ public abstract class AbstractX86Module extends AssemblerModule {
     static final int GC_ADDR = SEG_ARG | CON_ARG << DISP;
     static final int RG_ADDR = REG_ARG | SEG_ARG << DISP;
     final Object[] args = new Object[3];
+    Instruction instruction;
     List<Object> operands;
     int operandSize;
     X86Assembler stream;
