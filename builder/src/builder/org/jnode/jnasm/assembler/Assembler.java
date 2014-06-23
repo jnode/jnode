@@ -44,7 +44,7 @@ import org.jnode.jnasm.assembler.x86.X86Support;
 public abstract class Assembler {
     private static final String PARSER_CLASS = "org.jnode.jnasm.assembler.gen.JNAsm";
     public static final boolean THROW = false;
-    protected static final Object UNDEFINED = "UNDEFIEND";
+    protected static final Object UNDEFINED = "UNDEFINED";
     protected final List<Instruction> instructions = new ArrayList<Instruction>();
     private final Map<String, Integer> constants = new HashMap<String, Integer>();
     private final Map<String, Label> labels = new HashMap<String, Label>();
