@@ -292,7 +292,7 @@ public class INode {
      * @return the block number
      * @throws IOException
      */
-    private long getDataBlockNr(long i) throws IOException {
+    public long getDataBlockNr(long i) throws IOException {
         if ((getFlags() & Ext2Constants.EXT4_INODE_EXTENTS_FLAG) != 0) {
             if (extentHeader == null) {
                 extentHeader = new ExtentHeader(getINodeBlockData());
