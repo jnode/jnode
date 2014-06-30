@@ -2463,7 +2463,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
         //private final void writeModRM(int rm, int disp, int reg) {
 
-        int rm = srcReg.getNr();
+        int rm = srcReg.getNr() & 7;
         int reg = dstReg.getNr() & 7;
         if ((rm < 0) || (rm > 7)) {
             throw new IllegalArgumentException("rm");
