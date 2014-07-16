@@ -100,6 +100,31 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
     }
 
     /**
+     * Gets the volume's ID.
+     *
+     * @return the volume ID.
+     * @throws IOException if an error occurs.
+     */
+    public byte[] getVolumeId() throws IOException {
+        NTFSEntry entry = (NTFSEntry) getRootEntry().getDirectory().getEntry("$Volume");
+        if (entry == null) {
+            return null;
+        }
+
+        NTFSAttribute attribute = entry.getFileRecord().findAttributeByType(NTFSAttribute.Types.OBJECT_ID);
+
+        if (attribute instanceof NTFSResidentAttribute) {
+            NTFSResidentAttribute residentAttribute = (NTFSResidentAttribute) attribute;
+            byte[] idBuffer = new byte[residentAttribute.getAttributeLength()];
+
+            residentAttribute.getData(residentAttribute.getAttributeOffset(), idBuffer, 0, idBuffer.length);
+            return idBuffer;
+        }
+
+        return null;
+    }
+
+    /**
      * Flush all data.
      */
     public void flush() throws IOException {
