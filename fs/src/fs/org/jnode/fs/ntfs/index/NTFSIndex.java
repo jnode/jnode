@@ -50,9 +50,6 @@ public final class NTFSIndex {
      */
     public NTFSIndex(FileRecord fileRecord) throws IOException {
         this.fileRecord = fileRecord;
-        if (!fileRecord.isDirectory()) {
-            throw new IOException("fileRecord is not a directory");
-        }
     }
 
     /**
