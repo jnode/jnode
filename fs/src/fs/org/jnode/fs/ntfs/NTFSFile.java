@@ -82,7 +82,9 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 
         if (!attributes.hasNext() && indexEntry != null) {
             // Fall back to the size stored in the index entry if the data attribute is not present (even possible??)
-            return indexEntry.getRealFileSize();
+            FileNameAttribute.Structure fileName = new FileNameAttribute.Structure(
+                indexEntry, IndexEntry.CONTENT_OFFSET);
+            return fileName.getRealSize();
         }
 
         return getFileRecord().getAttributeTotalSize(NTFSAttribute.Types.DATA, null);

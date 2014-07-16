@@ -96,7 +96,9 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
      */
     public String getName() {
         if (indexEntry != null) {
-            return indexEntry.getFileName();
+            FileNameAttribute.Structure fileName = new FileNameAttribute.Structure(
+                indexEntry, IndexEntry.CONTENT_OFFSET);
+            return fileName.getFileName();
         } else if (fileRecord != null) {
             return fileRecord.getFileName();
         }
@@ -132,7 +134,9 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
      */
     public boolean isFile() {
         if (indexEntry != null) {
-            return !indexEntry.isDirectory();
+            FileNameAttribute.Structure fileName = new FileNameAttribute.Structure(
+                indexEntry, IndexEntry.CONTENT_OFFSET);
+            return !fileName.isDirectory();
         } else {
             return !fileRecord.isDirectory();
         }
@@ -143,7 +147,9 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
      */
     public boolean isDirectory() {
         if (indexEntry != null) {
-            return indexEntry.isDirectory();
+            FileNameAttribute.Structure fileName = new FileNameAttribute.Structure(
+                indexEntry, IndexEntry.CONTENT_OFFSET);
+            return fileName.isDirectory();
         } else {
             return fileRecord.isDirectory();
         }

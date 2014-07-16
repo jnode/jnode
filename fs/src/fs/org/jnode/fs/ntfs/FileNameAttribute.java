@@ -20,6 +20,7 @@
  
 package org.jnode.fs.ntfs;
 
+import java.io.UnsupportedEncodingException;
 import org.jnode.fs.ntfs.attribute.NTFSResidentAttribute;
 
 /**
@@ -58,7 +59,7 @@ public final class FileNameAttribute extends NTFSResidentAttribute {
         public static final int WIN32_AND_DOS = 0x03;
     }
 
-    private String name;
+    private final Structure fileNameStructure;
 
     /**
      * @param fileRecord
@@ -66,6 +67,7 @@ public final class FileNameAttribute extends NTFSResidentAttribute {
      */
     public FileNameAttribute(FileRecord fileRecord, int offset) {
         super(fileRecord, offset);
+        fileNameStructure = new Structure(this, getAttributeOffset());
     }
 
     /**
@@ -74,10 +76,7 @@ public final class FileNameAttribute extends NTFSResidentAttribute {
      * @return
      */
     public String getFileName() {
-        if (name == null) {
-            name = new String(getFileNameAsCharArray());
-        }
-        return name;
+        return fileNameStructure.getFileName();
     }
 
     /**
@@ -86,8 +85,7 @@ public final class FileNameAttribute extends NTFSResidentAttribute {
      * @return
      */
     public boolean isCompressed() {
-        final int flags = getFlags();
-        return ((flags & 0x0800) != 0);
+        return fileNameStructure.isCompressed();
     }
 
     /**
@@ -96,8 +94,7 @@ public final class FileNameAttribute extends NTFSResidentAttribute {
      * @return the index of the parent MFT entry.
      */
     public long getParentMftIndex() {
-        final int attrOffset = getAttributeOffset();
-        return getInt48(attrOffset);
+        return fileNameStructure.getParentMftIndex();
     }
 
     /**
@@ -106,32 +103,28 @@ public final class FileNameAttribute extends NTFSResidentAttribute {
      * @return the parent sequence number.
      */
     public int getParentSequenceNumber() {
-        final int attrOffset = getAttributeOffset();
-        return getUInt16(attrOffset + 0x6);
+        return fileNameStructure.getParentSequenceNumber();
     }
 
     /**
      * Gets the allocated file size.
      */
     public long getAllocatedFileSize() {
-        final int attrOffset = getAttributeOffset();
-        return getInt64(attrOffset + 0x28);
+        return fileNameStructure.getAllocatedFileSize();
     }
 
     /**
      * Gets the real file size.
      */
     public long getRealSize() {
-        final int attrOffset = getAttributeOffset();
-        return getInt64(attrOffset + 0x30);
+        return fileNameStructure.getRealSize();
     }
 
     /**
      * Gets the flags.
      */
     public int getFlags() {
-        final int attrOffset = getAttributeOffset();
-        return getUInt32AsInt(attrOffset + 0x38);
+        return fileNameStructure.getFlags();
     }
 
     /**
@@ -141,8 +134,7 @@ public final class FileNameAttribute extends NTFSResidentAttribute {
      * @see NameSpace
      */
     public int getNameSpace() {
-        final int attrOffset = getAttributeOffset();
-        return getUInt8(attrOffset + 0x41);
+        return fileNameStructure.getNameSpace();
     }
 
     /**
@@ -151,7 +143,7 @@ public final class FileNameAttribute extends NTFSResidentAttribute {
      * @return the creation time, as a 64-bit NTFS filetime value.
      */
     public long getCreationTime() {
-        return getInt64(getAttributeOffset() + 0x08);
+        return fileNameStructure.getCreationTime();
     }
 
     /**
@@ -160,7 +152,7 @@ public final class FileNameAttribute extends NTFSResidentAttribute {
      * @return the modification time, as a 64-bit NTFS filetime value.
      */
     public long getModificationTime() {
-        return getInt64(getAttributeOffset() + 0x10);
+        return fileNameStructure.getModificationTime();
     }
 
     /**
@@ -169,7 +161,7 @@ public final class FileNameAttribute extends NTFSResidentAttribute {
      * @return the MFT change time, as a 64-bit NTFS filetime value.
      */
     public long getMftChangeTime() {
-        return getInt64(getAttributeOffset() + 0x18);
+        return fileNameStructure.getMftChangeTime();
     }
 
     /**
@@ -178,24 +170,151 @@ public final class FileNameAttribute extends NTFSResidentAttribute {
      * @return the access time, as a 64-bit NTFS filetime value.
      */
     public long getAccessTime() {
-        return getInt64(getAttributeOffset() + 0x20);
+        return fileNameStructure.getAccessTime();
     }
 
     /**
-     * Gets the name of this file as character array.
-     *
-     * @return
+     * The $FILE_NAME attribute structure. Also used in directory index records.
      */
-    private char[] getFileNameAsCharArray() {
-        final int attrOffset = getAttributeOffset();
-        final int fileNameLength = getUInt8(attrOffset + 0x40);
+    public static class Structure extends NTFSStructure {
 
-        final char[] name = new char[fileNameLength];
-        int ofs = attrOffset + 0x42;
-        for (int i = 0; i < fileNameLength; i++) {
-            name[i] = getChar16(ofs);
-            ofs += 2;
+        private String name;
+
+        public Structure(NTFSStructure parent, int offset) {
+            super(parent, offset);
         }
-        return name;
+
+        /**
+         * Gets the filename.
+         *
+         * @return
+         */
+        public String getFileName() {
+            if (name == null) {
+                try {
+                    //XXX: For Java 6, should use the version that accepts a Charset.
+                    name = new String(getFileNameAsByteArray(), "UTF-16LE");
+                } catch (UnsupportedEncodingException e) {
+                    throw new IllegalStateException("UTF-16LE charset missing from JRE", e);
+                }
+            }
+            return name;
+        }
+
+        /**
+         * Is this a compressed file.
+         *
+         * @return
+         */
+        public boolean isCompressed() {
+            final int flags = getFlags();
+            return ((flags & 0x0800) != 0);
+        }
+
+        /**
+         * Checks whether this file name corresponds to a directory.
+         *
+         * @return {@code true} if a directory.
+         */
+        public boolean isDirectory() {
+            return (getFlags() & 0x10000000L) != 0;
+        }
+
+        /**
+         * Gets the index of the parent MFT entry.
+         *
+         * @return the index of the parent MFT entry.
+         */
+        public long getParentMftIndex() {
+            return getInt48(0);
+        }
+
+        /**
+         * Gets the parent sequence number as recorded in the child record.
+         *
+         * @return the parent sequence number.
+         */
+        public int getParentSequenceNumber() {
+            return getUInt16(0x6);
+        }
+
+        /**
+         * Gets the allocated file size.
+         */
+        public long getAllocatedFileSize() {
+            return getInt64(0x28);
+        }
+
+        /**
+         * Gets the real file size.
+         */
+        public long getRealSize() {
+            return getInt64(0x30);
+        }
+
+        /**
+         * Gets the flags.
+         */
+        public int getFlags() {
+            return getUInt32AsInt(0x38);
+        }
+
+        /**
+         * Gets the filename namespace.
+         *
+         * @return
+         * @see NameSpace
+         */
+        public int getNameSpace() {
+            return getUInt8(0x41);
+        }
+
+        /**
+         * Gets the creation time.
+         *
+         * @return the creation time, as a 64-bit NTFS filetime value.
+         */
+        public long getCreationTime() {
+            return getInt64(0x08);
+        }
+
+        /**
+         * Gets the modification time.
+         *
+         * @return the modification time, as a 64-bit NTFS filetime value.
+         */
+        public long getModificationTime() {
+            return getInt64(0x10);
+        }
+
+        /**
+         * Gets the time when the MFT record last changed.
+         *
+         * @return the MFT change time, as a 64-bit NTFS filetime value.
+         */
+        public long getMftChangeTime() {
+            return getInt64(0x18);
+        }
+
+        /**
+         * Gets the access time.
+         *
+         * @return the access time, as a 64-bit NTFS filetime value.
+         */
+        public long getAccessTime() {
+            return getInt64(0x20);
+        }
+
+        /**
+         * Gets the name of this file as a byte array.
+         *
+         * @return the file name.
+         */
+        private byte[] getFileNameAsByteArray() {
+            final int len = getUInt8(0x40);
+            final byte[] bytes = new byte[len * 2];
+            getData(0x42, bytes, 0, bytes.length);
+            return bytes;
+        }
     }
 }
