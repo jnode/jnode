@@ -54,7 +54,7 @@ public class NTFSDirectory implements FSDirectory, FSDirectoryId {
      */
     public NTFSDirectory(NTFSFileSystem fs, FileRecord record) throws IOException {
         this.fs = fs;
-        this.index = new NTFSIndex(record);
+        this.index = new NTFSIndex(record, "$I30");
         id = Long.toString(record.getReferenceNumber());
     }
 

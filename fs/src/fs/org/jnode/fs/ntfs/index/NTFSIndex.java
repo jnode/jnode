@@ -37,6 +37,11 @@ public final class NTFSIndex {
 
     private final FileRecord fileRecord;
 
+    /**
+     * The name of the index root / allocation attributes to open.
+     */
+    private String attributeName;
+
     private IndexRootAttribute indexRootAttribute;
 
     private IndexAllocationAttribute indexAllocationAttribute;
@@ -45,11 +50,13 @@ public final class NTFSIndex {
 
     /**
      * Initialize this instance.
-     * 
-     * @param fileRecord
+     *
+     * @param fileRecord the file record holding the index streams.
+     * @param attributeName the name of the index root / allocation attributes to open.
      */
-    public NTFSIndex(FileRecord fileRecord) throws IOException {
+    public NTFSIndex(FileRecord fileRecord, String attributeName) throws IOException {
         this.fileRecord = fileRecord;
+        this.attributeName = attributeName;
     }
 
     /**
@@ -60,7 +67,7 @@ public final class NTFSIndex {
     public IndexRootAttribute getIndexRootAttribute() {
         if (indexRootAttribute == null) {
             indexRootAttribute = (IndexRootAttribute) 
-                    fileRecord.findAttributeByType(NTFSAttribute.Types.INDEX_ROOT);
+                    fileRecord.findAttributesByTypeAndName(NTFSAttribute.Types.INDEX_ROOT, attributeName).next();
             log.debug("getIndexRootAttribute: " + indexRootAttribute);
         }
         return indexRootAttribute;
@@ -74,7 +81,7 @@ public final class NTFSIndex {
     public IndexAllocationAttribute getIndexAllocationAttribute() {
         if (indexAllocationAttribute == null) {
             indexAllocationAttribute = (IndexAllocationAttribute) 
-                    fileRecord.findAttributeByType(NTFSAttribute.Types.INDEX_ALLOCATION);
+                    fileRecord.findAttributesByTypeAndName(NTFSAttribute.Types.INDEX_ALLOCATION, attributeName).next();
         }
         return indexAllocationAttribute;
     }
