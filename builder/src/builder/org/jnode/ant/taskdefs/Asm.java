@@ -311,6 +311,9 @@ public class Asm extends MatchingTask {
         for (int c = 0; c < files.length; c++) {
             File aFile = new File(srcdir, files[c]);
 
+            if (!aFile.getName().endsWith(".asm"))
+                continue;
+
             // get the path within the uriroot
             String fileDirString = aFile.getParentFile().toString();
             String rootDirString = srcdir.toString();

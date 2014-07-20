@@ -1089,6 +1089,7 @@ clean             Remove all intermediate build results.
 		<checkstyle config="jnode_checks.xml">
 			<fileset dir="../builder/src/builder" includes="**/*.java"/>
 			<fileset dir="../builder/src/configure" includes="**/*.java"/>
+			<fileset dir="../builder/src/test" includes="**/*.java"/>
 			<fileset dir="../cli/src/commands" includes="**/*.java"/>
 			<fileset dir="../core/src/core" includes="**/*.java"/>
 			<fileset dir="../core/src/driver" includes="**/*.java"/>
