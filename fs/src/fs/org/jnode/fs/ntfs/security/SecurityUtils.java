@@ -61,6 +61,11 @@ public class SecurityUtils {
             subAuthorities.add(structure.getUInt32(offset + 8 + (4 * i)));
         }
 
+        // Trim off any trailing zero in the sub-authorities
+        if (subAuthorities.get(subAuthorityCount - 1) == 0) {
+            subAuthorities.remove(subAuthorityCount - 1);
+        }
+
         return new SecurityIdentifier(authority, subAuthorities);
     }
 }

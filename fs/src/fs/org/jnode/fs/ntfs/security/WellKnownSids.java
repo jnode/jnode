@@ -36,7 +36,7 @@ public class WellKnownSids {
 
     // Global SIDs
     public static final SecurityIdentifier NULL = register("Null SID", "S-1-0");
-    public static final SecurityIdentifier WORLD = register("World SID", "S-1-1");
+    public static final SecurityIdentifier WORLD = register("Everyone", "S-1-1");
     public static final SecurityIdentifier LOCAL = register("Local SID", "S-1-2");
     public static final SecurityIdentifier CREATOR = register("Creator SID", "S-1-3");
     public static final SecurityIdentifier CREATOR_GROUP = register("Creator Group", "S-1-3-1");
