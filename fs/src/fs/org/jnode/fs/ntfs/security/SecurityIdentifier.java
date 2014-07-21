@@ -58,6 +58,15 @@ public class SecurityIdentifier {
             return wellKnownName;
         }
 
+        return toSidString();
+    }
+
+    /**
+     * Gets the SID as a string. E.g. 'S-1-5-32-500'.
+     *
+     * @return the SID as a string.
+     */
+    public String toSidString() {
         StringBuilder subAuthorityBuilder = new StringBuilder();
         subAuthorityBuilder.append(subAuthorities.get(0));
 
