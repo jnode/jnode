@@ -22,6 +22,7 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -532,6 +533,7 @@ public class FileRecord extends NTFSRecord {
         }
 
         // At this point we know that at least the first attribute is non-resident.
+        long initialisedSize = ((NTFSNonResidentAttribute) attr).getAttributeInitializedSize();
 
         // calculate start and end cluster
         final int clusterSize = getVolume().getClusterSize();
@@ -540,6 +542,7 @@ public class FileRecord extends NTFSRecord {
         final int nrClusters = (int) (endCluster - startCluster + 1);
         final byte[] tmp = new byte[nrClusters * clusterSize];
 
+        long clusterOffset = 0;
         long clusterWithinNresData = startCluster;
         int readClusters = 0;
         while (true) {
@@ -550,6 +553,22 @@ public class FileRecord extends NTFSRecord {
             final NTFSNonResidentAttribute nresData = (NTFSNonResidentAttribute) attr;
 
             readClusters += nresData.readVCN(clusterWithinNresData, tmp, 0, nrClusters);
+
+            if (readClusters > 0) {
+                // If if the data is past the 'initialised' part of the attribute. If it is uninitialised then it must
+                // be read as zeros. Annoyingly the initialised portion isn't even cluster aligned...
+                long endOffset = (clusterOffset + clusterWithinNresData + nrClusters) * clusterSize;
+
+                if (endOffset > initialisedSize) {
+                    int delta = (int)(endOffset - initialisedSize);
+                    int startIndex = Math.max((int)(tmp.length - delta), 0);
+
+                    if (startIndex < tmp.length) {
+                        Arrays.fill(tmp, startIndex, tmp.length, (byte) 0);
+                    }
+                }
+            }
+
             if (readClusters == nrClusters) {
                 // Already done.
                 break;
@@ -558,6 +577,7 @@ public class FileRecord extends NTFSRecord {
             // When there are multiple attributes, the data in each one claims to start at VCN 0.
             // Clearly this is not the case, so we need to offset when we read.
             clusterWithinNresData -= nresData.getNumberOfVCNs();
+            clusterOffset += nresData.getNumberOfVCNs();
 
             if (dataAttrs.hasNext()) {
                 attr = dataAttrs.next();

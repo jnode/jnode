@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import org.apache.log4j.Logger;
 import org.jnode.fs.ntfs.attribute.NTFSNonResidentAttribute;
-import org.jnode.fs.util.FSUtils;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -38,11 +37,6 @@ public final class DataRun implements DataRunInterface {
      * logger
      */
     protected static final Logger log = Logger.getLogger(DataRun.class);
-
-    /**
-     * The initialised attribute size (in clusters), or {@code 0} to ignore this value.
-     */
-    private int initialisedVcns;
 
     /**
      * Cluster number of first cluster of this run. If this is zero, the run
@@ -80,7 +74,6 @@ public final class DataRun implements DataRunInterface {
      * @param vcn     First VCN of this datarun.
      */
     public DataRun(long cluster, int length, boolean sparse, int size, long vcn) {
-        initialisedVcns = 0; // Assume all the data is present
         this.cluster = cluster;
         this.length = length;
         this.sparse = sparse;
@@ -98,12 +91,6 @@ public final class DataRun implements DataRunInterface {
      */
     public DataRun(NTFSNonResidentAttribute attr, int offset, long vcn, long previousLCN) {
         NTFSStructure dataRunStructure = new NTFSStructure(attr, offset);
-
-        long initialisedSize = attr.getAttributeInitializedSize();
-        if (initialisedSize != attr.getAttributeActualSize()) {
-            int clusterSize = attr.getFileRecord().getVolume().getClusterSize();
-            initialisedVcns = (int) (FSUtils.roundUpToBoundary(clusterSize, initialisedSize) / clusterSize);
-        }
 
         // read first byte in type attribute
         int type = dataRunStructure.getUInt8(0);
@@ -242,7 +229,6 @@ public final class DataRun implements DataRunInterface {
             return 0;
         }
 
-        final int initialisedCount;
         final long actCluster; // Starting cluster
         final int count; // #clusters to read
         final int actDstOffset; // Actual dst offset
@@ -259,12 +245,6 @@ public final class DataRun implements DataRunInterface {
             actCluster = getCluster() + vcnDelta;
         }
 
-        if (initialisedVcns > 0) {
-            initialisedCount = (int) Math.max(0, initialisedVcns - Math.max(vcn, myFirstVcn));
-        } else {
-            initialisedCount = count;
-        }
-
         if (log.isDebugEnabled()) {
             log.debug("cluster=" + cluster + ", length=" + length + ", dstOffset=" + dstOffset);
             log.debug("cnt=" + count + ", actclu=" + actCluster + ", actdstoff=" + actDstOffset);
@@ -274,11 +254,7 @@ public final class DataRun implements DataRunInterface {
         Arrays.fill(dst, actDstOffset, actDstOffset + count * clusterSize, (byte) 0);
 
         if (!isSparse()) {
-            int clustersToRead = Math.min(count, initialisedCount);
-
-            if (clustersToRead > 0) {
-                volume.readClusters(actCluster, dst, actDstOffset, clustersToRead);
-            }
+            volume.readClusters(actCluster, dst, actDstOffset, count);
         }
 
         return count;
