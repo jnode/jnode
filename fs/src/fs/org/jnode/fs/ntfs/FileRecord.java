@@ -45,6 +45,11 @@ import org.jnode.util.NumberUtils;
 public class FileRecord extends NTFSRecord {
 
     /**
+     * The volume this record is a part of.
+     */
+    private final NTFSVolume volume;
+
+    /**
      * Index of the file record within the MFT.
      */
     private long referenceNumber;
@@ -83,7 +88,24 @@ public class FileRecord extends NTFSRecord {
      * @param offset          offset into the buffer.
      */
     public FileRecord(NTFSVolume volume, long referenceNumber, byte[] buffer, int offset) throws IOException {
-        super(volume, buffer, offset);
+        this(volume, volume.getBootRecord().getBytesPerSector(), referenceNumber, buffer, offset);
+    }
+
+    /**
+     * Initialize this instance.
+     *
+     * @param volume          reference to the NTFS volume.
+     * @param bytesPerSector  the number of bytes-per-sector in this volume.
+     * @param referenceNumber the reference number of the file within the MFT.
+     * @param buffer          data buffer.
+     * @param offset          offset into the buffer.
+     */
+    public FileRecord(NTFSVolume volume, int bytesPerSector, long referenceNumber, byte[] buffer, int offset)
+        throws IOException {
+
+        super(bytesPerSector, buffer, offset);
+
+        this.volume = volume;
         this.referenceNumber = referenceNumber;
 
         storedAttributeList = readStoredAttributes();
@@ -91,7 +113,6 @@ public class FileRecord extends NTFSRecord {
         // Linux NTFS docs say there can only be one of these, so I'll believe them.
         attributeListAttribute = (AttributeListAttribute) findStoredAttributeByType(NTFSAttribute.Types.ATTRIBUTE_LIST);
     }
-
 
     /**
      * Checks if the record appears to be valid.
@@ -125,6 +146,13 @@ public class FileRecord extends NTFSRecord {
             throw new IOException("Stored reference number " + getStoredReferenceNumber()
                 + " does not match reference number " + referenceNumber);
         }
+    }
+
+    /**
+     * The volume this record is a part of
+     */
+    public NTFSVolume getVolume() {
+        return volume;
     }
 
     /**
