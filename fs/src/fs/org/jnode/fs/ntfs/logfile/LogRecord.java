@@ -315,6 +315,22 @@ public class LogRecord extends NTFSStructure {
         getData(0x30 + getRedoOffset(), buffer, 0, getRedoLength());
     }
 
+    /**
+     * Gets the undo data for the record.
+     *
+     * @param buffer the buffer to write into.
+     */
+    public void getUndoData(byte[] buffer) {
+        if (getCrossesPage()) {
+            int offsetWithinPage = getOffset() % pageSize + 0x30 + getUndoOffset();
+            if (offsetWithinPage + getUndoLength() > pageSize) {
+                throw new UnsupportedOperationException("Not implemented yet");
+            }
+        }
+
+        getData(0x30 + getUndoOffset(), buffer, 0, getUndoLength());
+    }
+
     @Override
     public String toString() {
         String type = "";
