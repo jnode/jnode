@@ -50,6 +50,11 @@ public class FileRecord extends NTFSRecord {
     private final NTFSVolume volume;
 
     /**
+     * The cluster size for the volume containing this record.
+     */
+    private final int clusterSize;
+
+    /**
      * Index of the file record within the MFT.
      */
     private long referenceNumber;
@@ -88,7 +93,8 @@ public class FileRecord extends NTFSRecord {
      * @param offset          offset into the buffer.
      */
     public FileRecord(NTFSVolume volume, long referenceNumber, byte[] buffer, int offset) throws IOException {
-        this(volume, volume.getBootRecord().getBytesPerSector(), referenceNumber, buffer, offset);
+        this(volume, volume.getBootRecord().getBytesPerSector(), volume.getClusterSize(), true, referenceNumber,
+            buffer, offset);
     }
 
     /**
@@ -96,16 +102,19 @@ public class FileRecord extends NTFSRecord {
      *
      * @param volume          reference to the NTFS volume.
      * @param bytesPerSector  the number of bytes-per-sector in this volume.
+     * @param clusterSize     the cluster size for the volume containing this record.
+     * @param strictFixUp     indicates whether an exception should be throw if fix-up values don't match.
      * @param referenceNumber the reference number of the file within the MFT.
      * @param buffer          data buffer.
      * @param offset          offset into the buffer.
      */
-    public FileRecord(NTFSVolume volume, int bytesPerSector, long referenceNumber, byte[] buffer, int offset)
-        throws IOException {
+    public FileRecord(NTFSVolume volume, int bytesPerSector, int clusterSize, boolean strictFixUp, long referenceNumber,
+                      byte[] buffer, int offset) throws IOException {
 
-        super(bytesPerSector, buffer, offset);
+        super(bytesPerSector, strictFixUp, buffer, offset);
 
         this.volume = volume;
+        this.clusterSize = clusterSize;
         this.referenceNumber = referenceNumber;
 
         storedAttributeList = readStoredAttributes();
@@ -153,6 +162,13 @@ public class FileRecord extends NTFSRecord {
      */
     public NTFSVolume getVolume() {
         return volume;
+    }
+
+    /**
+     * The cluster size for the volume containing this record.
+     */
+    public int getClusterSize() {
+        return clusterSize;
     }
 
     /**
@@ -564,7 +580,7 @@ public class FileRecord extends NTFSRecord {
         long initialisedSize = ((NTFSNonResidentAttribute) attr).getAttributeInitializedSize();
 
         // calculate start and end cluster
-        final int clusterSize = getVolume().getClusterSize();
+        final int clusterSize = getClusterSize();
         final long startCluster = fileOffset / clusterSize;
         final long endCluster = (fileOffset + len - 1) / clusterSize;
         final int nrClusters = (int) (endCluster - startCluster + 1);

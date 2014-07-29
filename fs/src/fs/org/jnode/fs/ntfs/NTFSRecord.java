@@ -71,26 +71,28 @@ public class NTFSRecord extends NTFSStructure {
      * Creates a new record.
      *
      * @param bytesPerSector the bytes-pre-sector in this NTFS volume.
+     * @param strictFixUp indicates whether an exception should be throw if fix-up values don't match.
      * @param buffer the buffer to read from.
      * @param offset the offset in the buffer to read from.
      */
-    public NTFSRecord(int bytesPerSector, byte[] buffer, int offset) throws IOException {
+    public NTFSRecord(int bytesPerSector, boolean strictFixUp, byte[] buffer, int offset) throws IOException {
         super(buffer, offset);
         this.bytesPerSector = bytesPerSector;
-        fixUp();
+        fixUp(strictFixUp);
     }
 
     /**
      * Creates a new record.
      *
      * @param bytesPerSector the bytes-pre-sector in this NTFS volume.
+     * @param strictFixUp indicates whether an exception should be throw if fix-up values don't match.
      * @param parent the parent structure.
      * @param offset the offset in the parent to read from.
      */
-    public NTFSRecord(int bytesPerSector, NTFSStructure parent, int offset) throws IOException {
+    public NTFSRecord(int bytesPerSector, boolean strictFixUp, NTFSStructure parent, int offset) throws IOException {
         super(parent, offset);
         this.bytesPerSector = bytesPerSector;
-        fixUp();
+        fixUp(strictFixUp);
     }
 
     /**
@@ -123,22 +125,32 @@ public class NTFSRecord extends NTFSStructure {
 
     /**
      * Perform the fixup of sector ends.
+     *
+     * @param strictFixUp indicates whether an exception should be throw if fix-up values don't match.
      */
-    private void fixUp() throws IOException {
-        final int updateSequenceOffset = getUpdateSequenceArrayOffset();
-        final int usn = getUInt16(updateSequenceOffset);
-        final int usnCount = getUpdateSequenceArrayCount();
+    private void fixUp(boolean strictFixUp) throws IOException {
+        try {
+            final int updateSequenceOffset = getUpdateSequenceArrayOffset();
+            final int usn = getUInt16(updateSequenceOffset);
+            final int usnCount = getUpdateSequenceArrayCount();
 
-        // check each sector if the last 2 bytes are equal with the USN from
-        // header
+            // check each sector if the last 2 bytes are equal with the USN from
+            // header
 
-        for (int i = 1/* intended */; i < usnCount; i++) {
-            final int bufOffset = (i * bytesPerSector) - 2;
-            final int usnOffset = updateSequenceOffset + (i * 2);
-            if (getUInt16(bufOffset) == usn) {
-                setUInt16(bufOffset, getUInt16(usnOffset));
+            for (int i = 1/* intended */; i < usnCount; i++) {
+                final int bufOffset = (i * bytesPerSector) - 2;
+                final int usnOffset = updateSequenceOffset + (i * 2);
+                if (getUInt16(bufOffset) == usn) {
+                    setUInt16(bufOffset, getUInt16(usnOffset));
+                } else if (strictFixUp) {
+                    throw new IOException("Fix-up error");
+                }
+            }
+        } catch (Exception e) {
+            if (strictFixUp) {
+                throw new IOException("Fix-up error", e);
             } else {
-                throw new IOException("Fixup error");
+                log.error("Fix-up error", e);
             }
         }
     }

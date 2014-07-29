@@ -235,7 +235,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         }
 
         // check the dataruns
-        final int clusterSize = getFileRecord().getVolume().getClusterSize();
+        final int clusterSize = getFileRecord().getClusterSize();
         // Rounds up but won't work for 0, which shouldn't occur here.
         final long allocatedVCNs = (getAttributeAllocatedSize() - 1) / clusterSize + 1;
         if (this.numberOfVCNs != allocatedVCNs) {

@@ -69,7 +69,7 @@ public final class IndexAllocationAttribute extends NTFSNonResidentAttribute {
 
         final int indexBlockSize = indexRoot.getIndexBlockSize();
         final int indexClusterSize = indexBlockSize / indexRoot.getClustersPerIndexBlock();
-        final int fsClusterSize = fileRecord.getVolume().getClusterSize();
+        final int fsClusterSize = fileRecord.getClusterSize();
         final long fsVcn = vcn * indexClusterSize / fsClusterSize;
         final int fsNrClusters = (indexBlockSize - 1) / fsClusterSize + 1;
         final int offsetIntoVcn = (int) ((vcn * indexClusterSize) % fsClusterSize);

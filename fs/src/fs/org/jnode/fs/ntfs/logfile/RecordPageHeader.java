@@ -35,7 +35,7 @@ public class RecordPageHeader extends NTFSRecord {
      * @throws IOException if an error occurs during fixup.
      */
     public RecordPageHeader(NTFSVolume volume, byte[] buffer, int offset) throws IOException {
-        super(volume.getBootRecord().getBytesPerSector(), buffer, offset);
+        super(volume.getBootRecord().getBytesPerSector(), true, buffer, offset);
     }
 
     /**
