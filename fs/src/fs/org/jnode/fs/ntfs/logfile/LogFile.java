@@ -31,7 +31,7 @@ public class LogFile {
     /**
      * The start of the normal area (in pages).
      */
-    private static final int NORMAL_AREA_START = 4;
+    public static final int NORMAL_AREA_START = 4;
 
     /**
      * The list of open log clients.

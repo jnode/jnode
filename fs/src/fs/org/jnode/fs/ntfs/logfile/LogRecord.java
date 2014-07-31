@@ -149,7 +149,7 @@ public class LogRecord extends NTFSStructure {
         if (getCrossesPage()) {
             int offsetWithinPage = getOffset() % pageSize + offset;
             if (offsetWithinPage + 2 > pageSize) {
-                return getUInt16(offset + logPageDataOffset);
+                return getUInt16(offsetWithinPage + logPageDataOffset);
             }
         }
 
@@ -166,11 +166,49 @@ public class LogRecord extends NTFSStructure {
         if (getCrossesPage()) {
             int offsetWithinPage = getOffset() % pageSize + offset;
             if (offsetWithinPage + 4 > pageSize) {
-                return getUInt32(offset + logPageDataOffset);
+                return getUInt32(offsetWithinPage + logPageDataOffset);
             }
         }
 
         return getUInt32(offset);
+    }
+
+    /**
+     * Copy (byte-array) data from a given offset which may or may not cross the log file page boundary.
+     *
+     * @param offset the offset to read from in this structure.
+     * @param dst the destination to write to.
+     * @param dstOffset the offset to write from.
+     * @param length the length.
+     */
+    public final void getDataAcrossPages(int offset, byte[] dst, int dstOffset, int length) {
+        if (getCrossesPage()) {
+            int baseOffset = getOffset() + offset;
+            int offsetWithinPage = baseOffset % pageSize;
+            int pageOffset = baseOffset / pageSize;
+
+            while (length > 0) {
+                if (pageOffset > getBuffer().length) {
+                    // Wrap back around to the start of the 'normal' area
+                    pageOffset = LogFile.NORMAL_AREA_START * pageSize;
+                }
+
+                int endOffset = Math.min(offsetWithinPage + length, pageSize);
+                int readLength = endOffset - offsetWithinPage;
+                getData(pageOffset + offsetWithinPage, dst, dstOffset, readLength);
+
+                length -= readLength;
+                offsetWithinPage += readLength;
+                dstOffset += readLength;
+
+                if (offsetWithinPage >= pageSize || readLength == 0) {
+                    offsetWithinPage = logPageDataOffset;
+                    pageOffset += pageSize;
+                }
+            }
+        }
+
+        getData(offset, dst, dstOffset, length);
     }
 
     /**
@@ -305,14 +343,7 @@ public class LogRecord extends NTFSStructure {
      * @param buffer the buffer to write into.
      */
     public void getRedoData(byte[] buffer) {
-        if (getCrossesPage()) {
-            int offsetWithinPage = getOffset() % pageSize + 0x30 + getRedoOffset();
-            if (offsetWithinPage + getRedoLength() > pageSize) {
-                throw new UnsupportedOperationException("Not implemented yet");
-            }
-        }
-
-        getData(0x30 + getRedoOffset(), buffer, 0, getRedoLength());
+        getDataAcrossPages(0x30 + getRedoOffset(), buffer, 0, getRedoLength());
     }
 
     /**
@@ -321,14 +352,7 @@ public class LogRecord extends NTFSStructure {
      * @param buffer the buffer to write into.
      */
     public void getUndoData(byte[] buffer) {
-        if (getCrossesPage()) {
-            int offsetWithinPage = getOffset() % pageSize + 0x30 + getUndoOffset();
-            if (offsetWithinPage + getUndoLength() > pageSize) {
-                throw new UnsupportedOperationException("Not implemented yet");
-            }
-        }
-
-        getData(0x30 + getUndoOffset(), buffer, 0, getUndoLength());
+        getDataAcrossPages(0x30 + getUndoOffset(), buffer, 0, getUndoLength());
     }
 
     @Override

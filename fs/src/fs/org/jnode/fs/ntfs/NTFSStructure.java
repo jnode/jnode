@@ -212,10 +212,10 @@ public class NTFSStructure {
     /**
      * Copy (byte-array) data from a given offset.
      *
-     * @param offset
-     * @param dst
-     * @param dstOffset
-     * @param length
+     * @param offset the offset to read from in this structure.
+     * @param dst the destination to write to.
+     * @param dstOffset the offset to write from.
+     * @param length the length.
      */
     public final void getData(int offset, byte[] dst, int dstOffset, int length) {
         System.arraycopy(buffer, this.offset + offset, dst, dstOffset, length);
