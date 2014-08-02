@@ -44,7 +44,8 @@ public class X86Core extends AbstractX86Module {
     public static final int ADD_ISN = ADC_ISN + 1;
     public static final int ALIGN_ISN = ADD_ISN + 1;
     public static final int AND_ISN = ALIGN_ISN + 1;
-    public static final int CALL_ISN = AND_ISN + 1;
+    public static final int BTS_ISN = AND_ISN + 1;
+    public static final int CALL_ISN = BTS_ISN + 1;
     public static final int CLD_ISN = CALL_ISN + 1;
     public static final int CLI_ISN = CLD_ISN + 1;
     public static final int CLTS_ISN = CLI_ISN + 1;
@@ -64,7 +65,8 @@ public class X86Core extends AbstractX86Module {
     public static final int INC_ISN = IN_ISN + 1;
     public static final int INT_ISN = INC_ISN + 1;
     public static final int IRET_ISN = INT_ISN + 1;
-    public static final int JA_ISN = IRET_ISN + 1;
+    public static final int IRETQ_ISN = IRET_ISN + 1;
+    public static final int JA_ISN = IRETQ_ISN + 1;
     public static final int JAE_ISN = JA_ISN + 1;
     public static final int JB_ISN = JAE_ISN + 1;
     public static final int JE_ISN = JB_ISN + 1;
@@ -110,7 +112,8 @@ public class X86Core extends AbstractX86Module {
     public static final int STMXCSR_ISN = STI_ISN + 1;
     public static final int STOSB_ISN = STMXCSR_ISN + 1;
     public static final int STOSD_ISN = STOSB_ISN + 1;
-    public static final int STOSW_ISN = STOSD_ISN + 1;
+    public static final int STOSQ_ISN = STOSD_ISN + 1;
+    public static final int STOSW_ISN = STOSQ_ISN + 1;
     public static final int SUB_ISN = STOSW_ISN + 1;
     public static final int TEST_ISN = SUB_ISN + 1;
     public static final int WRMSR_ISN = TEST_ISN + 1;
@@ -157,6 +160,9 @@ public class X86Core extends AbstractX86Module {
                 break;
             case AND_ISN:
                 emitAND();
+                break;
+            case BTS_ISN:
+                emitBTS();
                 break;
             case CALL_ISN:
                 emitCALL();
@@ -217,6 +223,9 @@ public class X86Core extends AbstractX86Module {
                 break;
             case IRET_ISN:
                 emitIRET();
+                break;
+            case IRETQ_ISN:
+                emitIRETQ();
                 break;
             case JA_ISN:
                 emitJCC(X86Assembler.JA);
@@ -356,6 +365,9 @@ public class X86Core extends AbstractX86Module {
             case STOSD_ISN:
                 emitSTOSD();
                 break;
+            case STOSQ_ISN:
+                emitSTOSQ();
+                break;
             case STOSW_ISN:
                 emitSTOSW();
                 break;
@@ -484,6 +496,17 @@ public class X86Core extends AbstractX86Module {
                 break;
             default:
                 reportAddressingError(AND_ISN, addr);
+        }
+    }
+
+    private void emitBTS() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RC_ADDR:
+                stream.writeBTS(getReg(0), getInt(1));
+                break;
+            default:
+                reportAddressingError(BTS_ISN, addr);
         }
     }
 
@@ -763,6 +786,10 @@ public class X86Core extends AbstractX86Module {
 
     private void emitIRET() {
         stream.writeIRET();
+    }
+
+    private void emitIRETQ() {
+        stream.writeIRETQ();
     }
 
     private void emitJCC(int jumpCode) {
@@ -1255,6 +1282,10 @@ public class X86Core extends AbstractX86Module {
 
     private void emitSTOSD() {
         stream.writeSTOSD();
+    }
+
+    private void emitSTOSQ() {
+        stream.writeSTOSQ();
     }
 
     private void emitSTOSW() {

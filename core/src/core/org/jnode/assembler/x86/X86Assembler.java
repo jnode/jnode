@@ -722,6 +722,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
     public abstract void writeBreakPoint();
 
     /**
+     * Write a bts reg, imm32.
+     *
+     * @param reg
+     * @param imm32
+     */
+    public abstract void writeBTS(GPR reg, int imm32);
+
+    /**
      * Create a call to address stored in the given register.
      *
      * @param reg
@@ -1357,6 +1365,10 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
      */
     public abstract void writeIRET();
 
+    /**
+     * Create a iretq
+     */
+    public abstract void writeIRETQ();
 
     /**
      * Create a conditional jump to a label The opcode sequence is: 0x0f
@@ -2530,6 +2542,12 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
      * Create a STOSD
      */
     public abstract void writeSTOSD();
+
+
+    /**
+     * Create a STOSQ
+     */
+    public abstract void writeSTOSQ();
 
     /**
      * Create a STOSW

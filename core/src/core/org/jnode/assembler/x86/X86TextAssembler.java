@@ -525,6 +525,11 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         println("\tint 3");
     }
 
+    @Override
+    public void writeBTS(GPR reg, int imm32) {
+        println("\tbts " + reg + "," + imm32);
+    }
+
     public void writeCALL(Label label) {
 
         println("\tcall " + label(label));
@@ -1012,6 +1017,10 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 
     public void writeIRET() {
         println("\tiret");
+    }
+
+    public void writeIRETQ() {
+        println("\tiretq");
     }
 
     public void writeJCC(Label label, int jumpOpcode) {
@@ -1774,6 +1783,10 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 
     public void writeSTOSD() {
         println("\tstosd");
+    }
+
+    public void writeSTOSQ() {
+        println("\tstosq");
     }
 
     public void writeSTOSW() {

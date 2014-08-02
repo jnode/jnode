@@ -1252,6 +1252,14 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write8(0xCC);
     }
 
+    @Override
+    public void writeBTS(GPR reg, int imm8) {
+        write8(0x0F);          //todo
+        write8(0xBA);
+        writeModRM(0, 0, reg.getNr());
+        write8(imm8);
+    }
+
     /**
      * Create a relative call to a given label
      *
@@ -2212,6 +2220,14 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
      *
      */
     public void writeIRET() {
+        write8(0xCF);
+    }
+
+    /**
+     *
+     */
+    public void writeIRETQ() {
+        write8(REX_W_PREFIX);
         write8(0xCF);
     }
 
@@ -4701,6 +4717,14 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
      *
      */
     public void writeSTOSD() {
+        write8(0xAB);
+    }
+
+    /**
+     *
+     */
+    public void writeSTOSQ() {
+        write8(REX_W_PREFIX);
         write8(0xAB);
     }
 

@@ -36,7 +36,8 @@ public class PseudoInstructions extends AssemblerModule {
     public static final int DB_ISN = BITS_ISN + 1;
     public static final int DW_ISN = DB_ISN + 1;
     public static final int DD_ISN = DW_ISN + 1;
-    public static final int RESB_ISN = DD_ISN + 1;
+    public static final int DQ_ISN = DD_ISN + 1;
+    public static final int RESB_ISN = DQ_ISN + 1;
     public static final int RESD_ISN = RESB_ISN + 1;
 
     static {
@@ -76,6 +77,9 @@ public class PseudoInstructions extends AssemblerModule {
                 break;
             case DD_ISN:
                 emitDD();
+                break;
+            case DQ_ISN:
+                emitDQ();
                 break;
             case RESB_ISN:
                 emitRESB();
@@ -138,6 +142,30 @@ public class PseudoInstructions extends AssemblerModule {
                     stream.write8(bytes[j]);
                 }
                 bln = (4 - bln % 4) % 4;
+                for (int j = 0; j < bln; j++) {
+                    stream.write8(0);
+                }
+            } else if (o instanceof Identifier) {
+                stream.writeObjectRef(new Label(((Identifier) o).name));
+            } else {
+                throw new IllegalArgumentException("Unknown data: " + o);
+            }
+        }
+    }
+
+    private void emitDQ() {
+        for (Object o : operands) {
+            if (o instanceof Integer) {
+                stream.write64((Integer) o);
+            } else if (o instanceof Long) {
+                stream.write64((Long) o);
+            } else if (o instanceof String) {
+                byte[] bytes = ((String) o).getBytes();
+                int bln = bytes.length;
+                for (int j = 0; j < bln; j++) {
+                    stream.write8(bytes[j]);
+                }
+                bln = (8 - bln % 8) % 8;
                 for (int j = 0; j < bln; j++) {
                     stream.write8(0);
                 }
