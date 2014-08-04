@@ -41,7 +41,7 @@ public class LogFile {
     /**
      * The map of offset to record page headers.
      */
-    private Map<Integer, RecordPageHeader> offsetPageMap = new HashMap<Integer, RecordPageHeader>();
+    private Map<Integer, RecordPageHeader> offsetPageMap = new LinkedHashMap<Integer, RecordPageHeader>();
 
     /**
      * The map of LSN to log record.
@@ -113,7 +113,7 @@ public class LogFile {
             LogClientRecord logClientRecord = new LogClientRecord(logFileBuffer, logClientOffset);
             logClients.add(logClientRecord);
 
-            for (int i = 1; i < logClientCount; i++) {
+            for (int i = 1; i <= logClientCount; i++) {
                 logClientOffset = restartAreaOffset + logClientRecord.getNextClientOffset();
                 logClientRecord = new LogClientRecord(logFileBuffer, logClientOffset);
                 logClients.add(logClientRecord);
@@ -125,12 +125,27 @@ public class LogFile {
         // The first whole record in the oldest page can start mid-page, so just skip all records in the first page and
         // use the last record to calculate the offset to the first record in the next page.
         RecordPageHeader oldestPage = offsetPageMap.get(offset);
-        int recordOffset = oldestPage.getNextRecordOffset();
+        long recordOffset = oldestPage.getNextRecordOffset();
         recordOffset = FSUtils.roundUpToBoundary(8, recordOffset);
-        LogRecord lastRecordOnFirstPage = new LogRecord(logFileBuffer, offset + recordOffset, logPageSize,
-            restartArea.getLogPageDataOffset());
+        LogRecord lastRecordOnFirstPage;
+        long lastRecordLength;
+        if (recordOffset + LogRecord.LENGTH_CALCULATION_OFFSET > logPageSize) {
+            // The first record we hit has overflowed to the next page
+            offset += logPageSize;
+            recordOffset = restartArea.getLogPageDataOffset();
+            lastRecordOnFirstPage = new LogRecord(logFileBuffer, (int)(offset + recordOffset), logPageSize,
+                restartArea.getLogPageDataOffset());
+            lastRecordLength = lastRecordOnFirstPage.getClientDataLength();
+        } else {
+            // Last record on this page with no overflow
+            lastRecordOnFirstPage = new LogRecord(logFileBuffer, (int)(offset + recordOffset), logPageSize,
+                restartArea.getLogPageDataOffset());
+            lastRecordLength = lastRecordOnFirstPage.getClientDataLength();
+            offset += logPageSize;
+            lastRecordLength -= logPageSize - restartArea.getLogPageDataOffset();
+        }
         recordOffset = getNextRecordOffset(lastRecordOnFirstPage, recordOffset);
-        offset += logPageSize;
+        long lastLsn = offsetPageMap.get(offset).getLastLsnOrFileOffset();
 
         int logPageCount = (int) ((logFileLength - NORMAL_AREA_START * logPageSize) / logPageSize);
 
@@ -139,8 +154,19 @@ public class LogFile {
             RecordPageHeader pageHeader = offsetPageMap.get(offset);
 
             if (pageHeader != null && pageHeader.isValid()) {
-                if (pageHeader.getLastEndLsn() == 0) {
-                    recordOffset += restartArea.getLogPageDataOffset();
+                if (pageHeader.getLastLsnOrFileOffset() < lastLsn ||
+                    pageHeader.getLastLsnOrFileOffset() - lastLsn > 0x8000) {
+                    // This page doesn't seem to continue on from the last page, so reset the offsets
+                    log.info(String.format("$LogFile discontinuous at 0x%x [%d -> %d]", offset, lastLsn,
+                        pageHeader.getLastLsnOrFileOffset()));
+                    recordOffset = 0;
+                    lastRecordLength = 0;
+                }
+
+                // Check if this page is filled with data from a previous record
+                if (lastRecordLength > logPageSize - restartArea.getLogPageDataOffset()) {
+                    recordOffset -= logPageSize - restartArea.getLogPageDataOffset();
+                    lastRecordLength -= logPageSize - restartArea.getLogPageDataOffset();
                 } else {
                     // Ensure that the record offset is within the page and beyond the page header
                     if (recordOffset < logPageSize) {
@@ -150,34 +176,53 @@ public class LogFile {
                         recordOffset += restartArea.getLogPageDataOffset();
                     }
 
+                    long lastRecordInPage = Math.min(pageHeader.getNextRecordOffset(), logPageSize);
+                    if (lastRecordInPage == 0) {
+                        lastRecordInPage = logPageSize;
+                    }
+
                     // Read in the page's log records
-                    while (recordOffset <= pageHeader.getNextRecordOffset()) {
+                    while (recordOffset <= lastRecordInPage) {
                         if (recordOffset + LogRecord.LENGTH_CALCULATION_OFFSET > logPageSize) {
-                            // No more room for records in this page, call again to search the next page
-                            recordOffset = restartArea.getLogPageDataOffset();
+                            // No more room for records in this page, move to the next page
+                            recordOffset = 0;
                             break;
                         }
 
                         // Get the offset to the next record in the buffer rounded up to an 8-byte boundary
                         recordOffset = FSUtils.roundUpToBoundary(8, recordOffset);
-                        LogRecord logRecord = new LogRecord(logFileBuffer, offset + recordOffset, logPageSize,
+                        LogRecord logRecord = new LogRecord(logFileBuffer, (int) (offset + recordOffset), logPageSize,
                             restartArea.getLogPageDataOffset());
 
                         recordOffset = getNextRecordOffset(logRecord, recordOffset);
+                        long lsn = logRecord.getLsn();
 
-                        if (logRecord.isValid()) {
-                            lsnLogRecordMap.put(logRecord.getLsn(), logRecord);
+                        if (logRecord.isValid() && lsn > 0 && lsn <= pageHeader.getLastLsnOrFileOffset()) {
+                            lsnLogRecordMap.put(lsn, logRecord);
+                            lastRecordLength = logRecord.getClientDataLength();
+
+                            // Account for the portion of the record on this page
+                            int start = (logRecord.getOffset()  % logPageSize) + LogRecord.LENGTH_CALCULATION_OFFSET;
+                            lastRecordLength -= logPageSize - start;
                         } else {
+                            if (lsn <= 0 || lsn > pageHeader.getLastLsnOrFileOffset()) {
+                                log.warn("Log record seems to be invalid: " + logRecord.toDebugString());
+                            }
                             // Seems to be the end of valid records for this page
+                            lastRecordLength = 0;
                             break;
                         }
                     }
                 }
+
+                lastLsn = pageHeader.getLastLsnOrFileOffset();
+            } else {
+                lastLsn = 0;
             }
 
             offset += logPageSize;
             if (offset >= logFileLength) {
-                // Wrap around to the start of the 'normal' area
+                // Wrap around to the start of the 'normal' area.
                 offset = NORMAL_AREA_START * logPageSize;
             }
         }
@@ -190,7 +235,7 @@ public class LogFile {
      * @param recordOffset the offset to the current record.
      * @return the offset to the next record.
      */
-    private int getNextRecordOffset(LogRecord logRecord, int recordOffset) {
+    private long getNextRecordOffset(LogRecord logRecord, long recordOffset) {
         if (logRecord.isValid()) {
             return recordOffset + LogRecord.LENGTH_CALCULATION_OFFSET + (int) logRecord.getClientDataLength();
         } else {
