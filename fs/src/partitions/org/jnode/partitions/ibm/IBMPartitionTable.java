@@ -165,6 +165,11 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
      * @return {@code true} if the data contains an IBM partition table, {@code false} otherwise.
      */
     public static boolean containsPartitionTable(byte[] bootSector) {
+        if (bootSector.length < 0x200) {
+            // Not enough data for detection
+            return false;
+        }
+
         if (LittleEndian.getUInt16(bootSector, 510) != 0xaa55) {
             log.debug("No aa55 magic");
             return false;

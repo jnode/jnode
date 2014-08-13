@@ -79,10 +79,16 @@ public class HfsWrapperFileSystemType implements BlockDeviceFileSystemType<HfsPl
     }
 
     @Override
-    public final boolean supports(final PartitionTableEntry pte, final byte[] firstSector,
+    public final boolean supports(final PartitionTableEntry pte, final byte[] firstSectors,
                                   final FSBlockDeviceAPI devApi) {
+
+        if (firstSectors.length < 0x400) {
+            // Not enough data for detection
+            return false;
+        }
+
         byte[] mdbData = new byte[MasterDirectoryBlock.LENGTH];
-        System.arraycopy(firstSector, 0x400, mdbData, 0, mdbData.length);
+        System.arraycopy(firstSectors, 0x400, mdbData, 0, mdbData.length);
         MasterDirectoryBlock mdb = new MasterDirectoryBlock(mdbData);
 
         return

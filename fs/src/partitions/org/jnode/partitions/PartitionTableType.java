@@ -38,16 +38,16 @@ public interface PartitionTableType {
      * blockdevice?
      * 
      * @param devApi
-     * @param firstSector
+     * @param firstSectors
      */
-    public boolean supports(byte[] firstSector, BlockDeviceAPI devApi);
+    public boolean supports(byte[] firstSectors, BlockDeviceAPI devApi);
 
     /**
      * Create a partition table for a given device.
      * 
      * @param device
-     * @param firstSector
+     * @param firstSectors
      */
-    public PartitionTable<?> create(byte[] firstSector, Device device) throws PartitionTableException;
+    public PartitionTable<?> create(byte[] firstSectors, Device device) throws PartitionTableException;
 
 }

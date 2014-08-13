@@ -38,7 +38,7 @@ public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSyste
         return "JFAT";
     }
 
-    public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
+    public boolean supports(PartitionTableEntry pte, byte[] firstSectors, FSBlockDeviceAPI devApi) {
 /*
         if (pte != null) {
             if (!pte.isValid())
@@ -58,24 +58,28 @@ public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSyste
             }
         }
 */
+        if (firstSectors.length < 86) {
+            // Not enough data for detection
+            return false;
+        }
 
         // Check for FAT-32
-        if (firstSector[66] == 0x29 &&
-            firstSector[82] == 'F' &&
-            firstSector[83] == 'A' &&
-            firstSector[84] == 'T' &&
-            firstSector[85] == '3' &&
-            firstSector[86] == '2') {
+        if (firstSectors[66] == 0x29 &&
+            firstSectors[82] == 'F' &&
+            firstSectors[83] == 'A' &&
+            firstSectors[84] == 'T' &&
+            firstSectors[85] == '3' &&
+            firstSectors[86] == '2') {
             return true;
         }
 
         // Check for FAT-16/12
-        return (firstSector[38] == 0x29 &&
-            firstSector[54] == 'F' &&
-            firstSector[55] == 'A' &&
-            firstSector[56] == 'T' &&
-            firstSector[57] == '1' &&
-            (firstSector[58] == '2' || firstSector[58] == '6'));
+        return (firstSectors[38] == 0x29 &&
+            firstSectors[54] == 'F' &&
+            firstSectors[55] == 'A' &&
+            firstSectors[56] == 'T' &&
+            firstSectors[57] == '1' &&
+            (firstSectors[58] == '2' || firstSectors[58] == '6'));
     }
 
     public FatFileSystem create(Device device, boolean readOnly) throws FileSystemException {

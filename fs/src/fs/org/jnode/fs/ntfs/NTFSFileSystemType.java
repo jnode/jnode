@@ -42,9 +42,14 @@ public class NTFSFileSystemType implements BlockDeviceFileSystemType<NTFSFileSys
      * @see org.jnode.fs.BlockDeviceFileSystemType#supports(org.jnode.partitions.PartitionTableEntry,
      * byte[], org.jnode.driver.block.FSBlockDeviceAPI) 
      */
-    public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
+    public boolean supports(PartitionTableEntry pte, byte[] firstSectors, FSBlockDeviceAPI devApi) {
+        if (firstSectors.length < 0x11) {
+            // Not enough data for detection
+            return false;
+        }
+
         // Intentionally not checking the PARTTYPE because that often lies.
-        return new String(firstSector, 0x03, 8).equals(TAG);
+        return new String(firstSectors, 0x03, 8).equals(TAG);
     }
 
     /**
