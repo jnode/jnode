@@ -180,7 +180,7 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
         }
 
         byte[] slackSpace = new byte[slackSpaceSize];
-        getFileRecord().readData(getLength(), slackSpace, 0, slackSpace.length);
+        getFileRecord().readData(NTFSAttribute.Types.DATA, null, getLength(), slackSpace, 0, slackSpace.length, false);
 
         return slackSpace;
     }
@@ -273,7 +273,8 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
                 throw new IOException("Attempt to read past the end of stream, offset: " + fileOffset);
             }
 
-            getFileRecord().readData(NTFSAttribute.Types.DATA, attributeName, fileOffset, destBuffer, 0, destBuffer.length);
+            getFileRecord().readData(NTFSAttribute.Types.DATA, attributeName, fileOffset, destBuffer, 0,
+                destBuffer.length, true);
             destByteArray.refreshByteBuffer();
         }
 

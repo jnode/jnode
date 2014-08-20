@@ -22,11 +22,15 @@ package org.jnode.test.fs.ntfs;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FileDevice;
+import org.jnode.fs.FSFileSlackSpace;
+import org.jnode.fs.ntfs.FileRecord;
+import org.jnode.fs.ntfs.NTFSEntry;
 import org.jnode.fs.ntfs.NTFSFileSystem;
 import org.jnode.fs.ntfs.NTFSFileSystemType;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.test.fs.DataStructureAsserts;
 import org.jnode.test.fs.FileSystemTestUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -210,5 +214,25 @@ public class NTFSFileSystemTest {
                 "    YESNO.MDB; 98304; e8de0c9ca68172048b56194d24f2845b\n";
 
         DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
+
+    @Test
+    public void testFileSlackSpace() throws Exception {
+
+        // Arrange
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/ntfs/compressed.dd"), "r");
+        NTFSFileSystemType type = fss.getFileSystemType(NTFSFileSystemType.ID);
+        NTFSFileSystem fs = type.create(device, true);
+
+        // Act
+        FileRecord fileRecord = fs.getNTFSVolume().getMFT().getRecordUnchecked(144); // XL3.XLS
+        NTFSEntry entry = new NTFSEntry(fs, fileRecord);
+        FSFileSlackSpace fileSlackSpace = (FSFileSlackSpace) entry.getFile();
+        byte[] slackSpace = fileSlackSpace.getSlackSpace();
+        String md5 = DataStructureAsserts.getMD5Digest(slackSpace);
+
+        // Assert
+        Assert.assertEquals("Wrong length", 650, slackSpace.length);
+        Assert.assertEquals("Wrong MD5", "5f7aec79cc32e8a3a64732e4652b3e32", md5);
     }
 }

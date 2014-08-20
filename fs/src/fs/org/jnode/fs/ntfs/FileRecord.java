@@ -524,7 +524,7 @@ public class FileRecord extends NTFSRecord {
      */
     public void readData(long fileOffset, byte[] dest, int off, int len) throws IOException {
         // Explicitly look for the attribute with no name, to avoid getting alternate streams.
-        readData(NTFSAttribute.Types.DATA, null, fileOffset, dest, off, len);
+        readData(NTFSAttribute.Types.DATA, null, fileOffset, dest, off, len, true);
     }
 
     /**
@@ -536,9 +536,12 @@ public class FileRecord extends NTFSRecord {
      * @param dest       the destination byte array into which to copy the file data.
      * @param off        the offset into the destination byte array.
      * @param len        the number of bytes of data to read.
+     * @param limitToInitialised {@code true} if the data read in should be limited to the initalised part of the
+     *                    attribute.
      * @throws IOException if an error occurs reading from the filesystem.
      */
-    public void readData(int attributeType, String streamName, long fileOffset, byte[] dest, int off, int len)
+    public void readData(int attributeType, String streamName, long fileOffset, byte[] dest, int off, int len,
+                         boolean limitToInitialised)
         throws IOException {
 
         if (log.isDebugEnabled()) {
@@ -603,7 +606,7 @@ public class FileRecord extends NTFSRecord {
                 // be read as zeros. Annoyingly the initialised portion isn't even cluster aligned...
                 long endOffset = (clusterOffset + clusterWithinNresData + nrClusters) * clusterSize;
 
-                if (endOffset > initialisedSize) {
+                if (endOffset > initialisedSize && limitToInitialised) {
                     int delta = (int)(endOffset - initialisedSize);
                     int startIndex = Math.max((int)(tmp.length - delta), 0);
 
