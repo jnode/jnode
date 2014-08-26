@@ -639,7 +639,7 @@ public class FileRecord extends NTFSRecord {
 
         if (readClusters != nrClusters) {
             throw new IOException("Requested " + nrClusters + " clusters but only read " + readClusters +
-                ", offset = " + off + ", file record = " + this);
+                ", file offset = " + fileOffset + ", file record = " + this);
         }
 
         System.arraycopy(tmp, (int) (fileOffset % clusterSize), dest, off, len);
