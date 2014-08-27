@@ -217,6 +217,58 @@ public class NTFSFileSystemTest {
     }
 
     @Test
+    public void testLinks() throws Exception {
+
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/ntfs/ntfs-links.dd"), "r");
+        NTFSFileSystemType type = fss.getFileSystemType(NTFSFileSystemType.ID);
+        NTFSFileSystem fs = type.create(device, true);
+
+        String expectedStructure =
+            "type: NTFS vol:links total:20971520 free:14782464\n" +
+            "  .; \n" +
+            "    $AttrDef; 2560; ad617ac3906958de35eacc3d90d31043\n" +
+            "    $BadClus; 0; d41d8cd98f00b204e9800998ecf8427e\n" +
+            "    $BadClus:$Bad; 20967424; 3880409d3ae930481b68e2c385e940d6\n" +
+            "    $Bitmap; 640; 18ff823cc06f5467c31c43fdfedf6052\n" +
+            "    $Boot; 8192; d1295f2004783b27bc5c4f22885146a4\n" +
+            "    $Extend; \n" +
+            "      $ObjId; 0; d41d8cd98f00b204e9800998ecf8427e\n" +
+            "      $Quota; 0; d41d8cd98f00b204e9800998ecf8427e\n" +
+            "      $Reparse; 0; d41d8cd98f00b204e9800998ecf8427e\n" +
+            "      $RmMetadata; \n" +
+            "        $Repair; 0; d41d8cd98f00b204e9800998ecf8427e\n" +
+            "        $Repair:$Config; 8; 39d997ae6b77dab1dfbabb6cf0e4783a\n" +
+            "        $Txf; \n" +
+            "        $TxfLog; \n" +
+            "          $Tops; 100; 4df1eb9ffd238625c60b930ef23ddf53\n" +
+            "          $Tops:$T; 1048576; b6d81b360a5672d80c27430f39153e2c\n" +
+            "          $TxfLog.blf; 65536; 1f070e71144dee6b3d873c034ff2defb\n" +
+            "          $TxfLogContainer00000000000000000001; 1048576; c40dd0ff838002801b52df410e3b21fd\n" +
+            "          $TxfLogContainer00000000000000000002; 1048576; b6d81b360a5672d80c27430f39153e2c\n" +
+            "    $LogFile; 2097152; e5e93f63a0a66996e9ed79cdf110978d\n" +
+            "    $MFT; 262144; e1c9dc6490312dda6b7f30d537e6d625\n" +
+            "    $MFTMirr; 4096; 5042a0445a0e41ae9ff5353d80ea5e36\n" +
+            "    $Secure; 0; d41d8cd98f00b204e9800998ecf8427e\n" +
+            "    $Secure:$SDS; 263068; 8f916bba912579e3cc0f2d5a5be6e8a2\n" +
+            "    $UpCase; 131072; 7ff498a44e45e77374cc7c962b1b92f2\n" +
+            "    $Volume; 0; d41d8cd98f00b204e9800998ecf8427e\n" +
+            "    dota2; \n" +
+            "      Dota_2_Gameplay_Sep_2013.jpg; 21770; 918f521e9923cc77952bbc460b4fb864\n" +
+            "      Dota_2_Gameplay_Sep_2013.jpg:Zone.Identifier; 26; fbccf14d504b7b2dbcb5a5bda75bd93b\n" +
+            "      valve; \n" +
+            "    half-life; \n" +
+            "      Gabe Newell.jpg; 90404; 49a76a9957889cc8b0fed8753aac04ec\n" +
+            "      Gabe Newell.jpg:Zone.Identifier; 26; fbccf14d504b7b2dbcb5a5bda75bd93b\n" +
+            "      Half-Life_Cover_Art.jpg; 56606; d7417d54a527669278499e118caac66f\n" +
+            "      Half-Life_Cover_Art.jpg:Zone.Identifier; 26; fbccf14d504b7b2dbcb5a5bda75bd93b\n" +
+            "    valve; \n" +
+            "      gaben.jpg; 90404; 49a76a9957889cc8b0fed8753aac04ec\n" +
+            "      gaben.jpg:Zone.Identifier; 26; fbccf14d504b7b2dbcb5a5bda75bd93b\n";
+
+        DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
+
+    @Test
     public void testFileSlackSpace() throws Exception {
 
         // Arrange
@@ -226,7 +278,7 @@ public class NTFSFileSystemTest {
 
         // Act
         FileRecord fileRecord = fs.getNTFSVolume().getMFT().getRecordUnchecked(144); // XL3.XLS
-        NTFSEntry entry = new NTFSEntry(fs, fileRecord);
+        NTFSEntry entry = new NTFSEntry(fs, fileRecord, -1);
         FSFileSlackSpace fileSlackSpace = (FSFileSlackSpace) entry.getFile();
         byte[] slackSpace = fileSlackSpace.getSlackSpace();
         String md5 = DataStructureAsserts.getMD5Digest(slackSpace);

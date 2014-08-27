@@ -21,6 +21,7 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
+import java.util.Iterator;
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -30,6 +31,7 @@ import org.jnode.fs.FSEntryLastChanged;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FSObject;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.ntfs.attribute.NTFSAttribute;
 import org.jnode.fs.ntfs.index.IndexEntry;
 
 /**
@@ -56,6 +58,16 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
     private FileRecord fileRecord;
 
     /**
+     * The parent reference number.
+     */
+    private long parentReferenceNumber = -1;
+
+    /**
+     * The cached file name.
+     */
+    private String name;
+
+    /**
      * The containing file system.
      */
     private final NTFSFileSystem fs;
@@ -77,8 +89,9 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
      *
      * @param fs         the file system.
      * @param fileRecord the file record.
+     * @param parentReferenceNumber the parent reference number.
      */
-    public NTFSEntry(NTFSFileSystem fs, FileRecord fileRecord) {
+    public NTFSEntry(NTFSFileSystem fs, FileRecord fileRecord, long parentReferenceNumber) {
         this.fs = fs;
         this.fileRecord = fileRecord;
         id = Long.toString(fileRecord.getReferenceNumber());
@@ -95,14 +108,47 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
      * @see org.jnode.fs.FSEntry#getName()
      */
     public String getName() {
+        if (name != null) {
+            return name;
+        }
+
         if (indexEntry != null) {
             FileNameAttribute.Structure fileName = new FileNameAttribute.Structure(
                 indexEntry, IndexEntry.CONTENT_OFFSET);
-            return fileName.getFileName();
+            name = fileName.getFileName();
         } else if (fileRecord != null) {
-            return fileRecord.getFileName();
+            if (parentReferenceNumber != -1) {
+                // The file name can be different for every hard-linked copy of the file. To find the correct name
+                // look for a matching parent MFT index
+                FileNameAttribute fileNameAttribute = null;
+                Iterator<NTFSAttribute> iterator = fileRecord.findAttributesByType(NTFSAttribute.Types.FILE_NAME);
+                while (iterator.hasNext()) {
+                    FileNameAttribute attribute = (FileNameAttribute) iterator.next();
+
+                    if (attribute.getParentMftIndex() != parentReferenceNumber) {
+                        // File name attribute doesn't match our current parent
+                        continue;
+                    }
+
+                    // Prefer the win32 namespace
+                    if (fileNameAttribute == null ||
+                        fileNameAttribute.getNameSpace() != FileNameAttribute.NameSpace.WIN32) {
+                        fileNameAttribute = attribute;
+                    }
+                }
+
+                if (fileNameAttribute != null) {
+                    name = fileNameAttribute.getFileName();
+                }
+            }
+
+            if (name == null) {
+                // Didn't find a matching parent, just return the 'best' name
+                name = fileRecord.getFileName();
+            }
         }
-        return null;
+
+        return name;
     }
 
     /**

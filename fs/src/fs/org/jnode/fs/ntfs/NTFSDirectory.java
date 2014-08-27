@@ -87,7 +87,8 @@ public class NTFSDirectory implements FSDirectory, FSDirectoryId {
     @Override
     public FSEntry getEntryById(String id) throws IOException {
         FileRecord fileRecord = fs.getNTFSVolume().getMFT().getRecord(Long.parseLong(id));
-        return new NTFSEntry(fs, fileRecord);
+        long parentId = Long.parseLong(this.id);
+        return new NTFSEntry(fs, fileRecord, parentId);
     }
 
     /**
