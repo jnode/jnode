@@ -59,6 +59,8 @@ public abstract class NTFSAttribute extends NTFSStructure {
 
         public static final int BITMAP = 0xB0;
 
+        public static final int SYMBOLIC_LINK = 0xC0;
+
         public static final int REPARSE_POINT = 0xC0;
 
         public static final int EA_INFORMATION = 0xD0;
