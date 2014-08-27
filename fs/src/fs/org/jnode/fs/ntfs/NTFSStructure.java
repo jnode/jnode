@@ -20,6 +20,7 @@
  
 package org.jnode.fs.ntfs;
 
+import java.io.UnsupportedEncodingException;
 import org.apache.log4j.Logger;
 import org.jnode.util.LittleEndian;
 
@@ -231,6 +232,25 @@ public class NTFSStructure {
         final int v0 = buffer[this.offset + offset] & 0xFF;
         final int v1 = buffer[this.offset + offset + 1] & 0xFF;
         return (char) ((v1 << 8) | v0);
+    }
+
+    /**
+     * Gets a UTF-16LE string.
+     *
+     * @param offset the offset.
+     * @param length the length of the data in characters.
+     * @return the string.
+     */
+    public String getUtf16LEString(int offset, int length) {
+        final byte[] bytes = new byte[length * 2];
+        getData(offset, bytes, 0, bytes.length);
+
+        try {
+            //XXX: For Java 6, should use the version that accepts a Charset.
+            return new String(bytes, "UTF-16LE");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("UTF-16LE charset missing from JRE", e);
+        }
     }
 
     /**

@@ -59,8 +59,6 @@ public abstract class NTFSAttribute extends NTFSStructure {
 
         public static final int BITMAP = 0xB0;
 
-        public static final int SYMBOLIC_LINK = 0xC0;
-
         public static final int REPARSE_POINT = 0xC0;
 
         public static final int EA_INFORMATION = 0xD0;
@@ -213,6 +211,8 @@ public abstract class NTFSAttribute extends NTFSStructure {
                 return new IndexRootAttribute(fileRecord, offset);
             case Types.INDEX_ALLOCATION:
                 return new IndexAllocationAttribute(fileRecord, offset, fallbackCompressionUnit);
+            case Types.REPARSE_POINT:
+                return new ReparsePointAttribute(fileRecord, offset);
         }
 
         // check the resident flag
