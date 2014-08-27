@@ -95,6 +95,7 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
         this.fs = fs;
         this.fileRecord = fileRecord;
         id = Long.toString(fileRecord.getReferenceNumber());
+        this.parentReferenceNumber = parentReferenceNumber;
     }
 
     @Override
