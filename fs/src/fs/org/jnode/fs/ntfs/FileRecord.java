@@ -747,7 +747,7 @@ public class FileRecord extends NTFSRecord {
 
                 int offsetToNextOffset = getUInt32AsInt(offset + 0x04);
                 if (offsetToNextOffset <= 0) {
-                    log.error("Non-positive offset, preventing infinite loop.  Data on disk may be corrupt.  "
+                    log.debug("Non-positive offset, preventing infinite loop.  Data on disk may be corrupt.  "
                         + "referenceNumber = " + referenceNumber);
                     break;
                 } else {
