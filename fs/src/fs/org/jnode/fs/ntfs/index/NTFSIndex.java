@@ -97,14 +97,19 @@ public final class NTFSIndex {
 
         while (rootIterator.hasNext()) {
             IndexEntry entry = rootIterator.next();
-            int compareResult = callback.visitAndCompareEntry(entry);
 
-            if (compareResult == 0) {
-                return entry;
-            } else if (compareResult < 0) {
+            if (entry.isLastIndexEntryInSubnode()) {
                 return searchSubTree(entry, callback);
             } else {
-                // Maybe in a subsequent node, continue iterating
+                int compareResult = callback.visitAndCompareEntry(entry);
+
+                if (compareResult == 0) {
+                    return entry;
+                } else if (compareResult < 0) {
+                    return searchSubTree(entry, callback);
+                } else {
+                    // Maybe in a subsequent node, continue iterating
+                }
             }
         }
 
@@ -137,14 +142,19 @@ public final class NTFSIndex {
 
         while (iterator.hasNext()) {
             IndexEntry entry = iterator.next();
-            int compareResult = callback.visitAndCompareEntry(entry);
 
-            if (compareResult == 0) {
-                return entry;
-            } else if (compareResult < 0) {
+            if (entry.isLastIndexEntryInSubnode()) {
                 return searchSubTree(entry, callback);
             } else {
-                // Maybe in a subsequent node, continue iterating
+                int compareResult = callback.visitAndCompareEntry(entry);
+
+                if (compareResult == 0) {
+                    return entry;
+                } else if (compareResult < 0) {
+                    return searchSubTree(entry, callback);
+                } else {
+                    // Maybe in a subsequent node, continue iterating
+                }
             }
         }
 
