@@ -75,10 +75,8 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
 
     @Override
     public String getVolumeName() throws IOException {
-        NTFSEntry entry = (NTFSEntry) getRootEntry().getDirectory().getEntry("$Volume");
-        if (entry == null) {
-            return "";
-        }
+        NTFSEntry entry = new NTFSEntry(this, getNTFSVolume().getMFT().getRecord(MasterFileTable.SystemFiles.VOLUME),
+            MasterFileTable.SystemFiles.ROOT);
 
         NTFSAttribute attribute = entry.getFileRecord().findAttributeByType(NTFSAttribute.Types.VOLUME_NAME);
 
