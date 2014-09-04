@@ -49,7 +49,7 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
         super(device, readOnly, type);
 
         try {
-            // initialize the NTFE volume
+            // initialize the NTFS volume
             volume = new NTFSVolume(getApi());
         } catch (IOException e) {
             throw new FileSystemException(e);
