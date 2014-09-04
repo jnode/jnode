@@ -86,6 +86,72 @@ public final class NTFSIndex {
         return indexAllocationAttribute;
     }
 
+    /**
+     * Searches the index for a value.
+     *
+     * @param callback the callback to pass each entry in the search to check for a match.
+     * @return the matching node, or {@code null} if no match is found.
+     */
+    public IndexEntry search(IndexSearchCallback callback) {
+        Iterator<IndexEntry> rootIterator = getIndexRootAttribute().iterator();
+
+        while (rootIterator.hasNext()) {
+            IndexEntry entry = rootIterator.next();
+            int compareResult = callback.visitAndCompareEntry(entry);
+
+            if (compareResult == 0) {
+                return entry;
+            } else if (compareResult < 0) {
+                return searchSubTree(entry, callback);
+            } else {
+                // Maybe in a subsequent node, continue iterating
+            }
+        }
+
+        // No match
+        return null;
+    }
+
+    /**
+     * Searches a sub-tree of the index for a value.
+     *
+     * @param topEntry the top entry in this sub-tree of the index.
+     * @param callback the callback to pass each entry in the search to check for a match.
+     * @return the matching node, or {@code null} if no match is found.
+     */
+    public IndexEntry searchSubTree(IndexEntry topEntry, IndexSearchCallback callback) {
+        if (!topEntry.hasSubNodes()) {
+            return null;
+        }
+
+        final IndexBlock indexBlock;
+        try {
+            IndexRoot indexRoot = getIndexRootAttribute().getRoot();
+            indexBlock = getIndexAllocationAttribute().getIndexBlock(indexRoot, topEntry.getSubnodeVCN());
+        } catch (IOException ex) {
+            log.error("Cannot read next index block during search", ex);
+            return null;
+        }
+
+        Iterator<IndexEntry> iterator = indexBlock.iterator();
+
+        while (iterator.hasNext()) {
+            IndexEntry entry = iterator.next();
+            int compareResult = callback.visitAndCompareEntry(entry);
+
+            if (compareResult == 0) {
+                return entry;
+            } else if (compareResult < 0) {
+                return searchSubTree(entry, callback);
+            } else {
+                // Maybe in a subsequent node, continue iterating
+            }
+        }
+
+        // No match
+        return null;
+    }
+
     public Iterator<IndexEntry> iterator() {
         log.debug("iterator");
         return new FullIndexEntryIterator();
