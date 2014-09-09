@@ -33,6 +33,27 @@ import org.jnode.partitions.PartitionTableType;
  */
 public class GptPartitionTableType implements PartitionTableType {
 
+    /**
+     * Indicates whether to require the protective MBR for detection.
+     */
+    private boolean requireProtectiveMbr;
+
+    /**
+     * Creates a new instance.
+     */
+    public GptPartitionTableType() {
+        this(true);
+    }
+
+    /**
+     * Creates a new instance.
+     *
+     * @param requireProtectiveMbr indicates whether to require the protective MBR for detection.
+     */
+    public GptPartitionTableType(boolean requireProtectiveMbr) {
+        this.requireProtectiveMbr = requireProtectiveMbr;
+    }
+
     @Override
     public PartitionTable<?> create(byte[] firstSector, Device device) throws PartitionTableException {
         return new GptPartitionTable(this, firstSector, device);
@@ -45,6 +66,6 @@ public class GptPartitionTableType implements PartitionTableType {
 
     @Override
     public boolean supports(byte[] first16KiB, BlockDeviceAPI devApi) {
-        return GptPartitionTable.containsPartitionTable(first16KiB);
+        return GptPartitionTable.containsPartitionTable(first16KiB, requireProtectiveMbr);
     }
 }

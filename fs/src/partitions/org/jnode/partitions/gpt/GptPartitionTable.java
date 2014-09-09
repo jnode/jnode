@@ -29,6 +29,9 @@ import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.partitions.PartitionTable;
 import org.jnode.partitions.PartitionTableType;
+import org.jnode.partitions.ibm.IBMPartitionTable;
+import org.jnode.partitions.ibm.IBMPartitionTableEntry;
+import org.jnode.partitions.ibm.IBMPartitionTypes;
 import org.jnode.util.LittleEndian;
 
 /**
@@ -112,9 +115,26 @@ public class GptPartitionTable implements PartitionTable<GptPartitionTableEntry>
      * Checks if the given boot sector contain a GPT partition table.
      *
      * @param first16KiB the first 16,384 bytes of the disk.
+     * @param requireProtectiveMbr {@code true} if the protective MBR must be present.
      * @return {@code true} if the boot sector contains a GPT partition table.
      */
-    public static boolean containsPartitionTable(byte[] first16KiB) {
+    public static boolean containsPartitionTable(byte[] first16KiB, boolean requireProtectiveMbr) {
+        if (requireProtectiveMbr) {
+            List<IBMPartitionTableEntry> entries = new ArrayList<IBMPartitionTableEntry>();
+            for (int partitionNumber = 0; partitionNumber < IBMPartitionTable.TABLE_SIZE; partitionNumber++) {
+                IBMPartitionTableEntry partition = new IBMPartitionTableEntry(null, first16KiB, partitionNumber);
+
+                if (partition.isValid()) {
+                    entries.add(partition);
+                }
+            }
+
+            if (entries.size() != 1 || entries.get(0).getSystemIndicator() != IBMPartitionTypes.PARTTYPE_EFI_GPT) {
+                log.debug("No protective MBR found: " + entries);
+                return false;
+            }
+        }
+
         return detectBlockSize(first16KiB) != -1;
     }
 

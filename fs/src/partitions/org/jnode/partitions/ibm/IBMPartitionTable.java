@@ -42,7 +42,7 @@ import org.jnode.util.LittleEndian;
  * @author epr
  */
 public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry> {
-    private static final int TABLE_SIZE = 4;
+    public static final int TABLE_SIZE = 4;
 
     /**
      * The set of known filesystem markers.
@@ -306,7 +306,7 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
         // Check if this looks like a filesystem instead of a partition table
         String oemName = new String(bootSector, 3, 8, Charset.forName("US-ASCII"));
         if (FILESYSTEM_OEM_NAMES.contains(oemName)) {
-            log.error("Looks like a file system instead of a partition table.");
+            log.debug("Looks like a file system instead of a partition table.");
             return false;
         }
 
