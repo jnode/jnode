@@ -23,6 +23,8 @@ package org.jnode.vm.x86.compiler.l2;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.facade.TypeSizeInfo;
 
 /**
  * @author Madhu Siddalingaiah
@@ -34,7 +36,8 @@ public class X86CodeGenerator extends GenericX86CodeGenerator<X86Register> imple
     /**
      * Initialize this instance
      */
-    public X86CodeGenerator(X86Assembler x86Stream, int length) {
-        super(x86Stream, new X86RegisterPool(), length);
+    public X86CodeGenerator(VmMethod method, X86Assembler os, int length, TypeSizeInfo typeSizeInfo,
+                            X86StackFrame stackFrame) {
+        super(os, new X86RegisterPool(), length, typeSizeInfo, stackFrame, method);
     }
 }

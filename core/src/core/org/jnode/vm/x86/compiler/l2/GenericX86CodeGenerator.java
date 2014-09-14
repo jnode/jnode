@@ -29,6 +29,7 @@ import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.compiler.ir.AddressingMode;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.Constant;
@@ -49,6 +50,7 @@ import org.jnode.vm.compiler.ir.quad.UnconditionalBranchQuad;
 import org.jnode.vm.compiler.ir.quad.VarReturnQuad;
 import org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad;
 import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
+import org.jnode.vm.facade.TypeSizeInfo;
 
 /**
  * @author Madhu Siddalingaiah
@@ -64,12 +66,16 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
     public static final int BYTESIZE = X86Constants.BITS8;
 
     public static final int WORDSIZE = X86Constants.BITS16;
+    protected final VmMethod currentMethod;
+    protected final X86StackFrame stackFrame;
+    protected final TypeSizeInfo typeSizeInfo;
 
-    private Variable<T>[] spilledVariables;
+    protected Variable<T>[] spilledVariables;
 
-    private X86Assembler os;
+    protected X86Assembler os;
+    protected int startOffset;
 
-    private int displacement;
+    private int displacement = -4;
 
     private String labelPrefix;
 
@@ -82,7 +88,8 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
     /**
      * Initialize this instance
      */
-    public GenericX86CodeGenerator(X86Assembler x86Stream, RegisterPool<T> pool, int lenght) {
+    public GenericX86CodeGenerator(X86Assembler x86Stream, RegisterPool<T> pool, int lenght, TypeSizeInfo typeSizeInfo,
+                                   X86StackFrame stackFrame, VmMethod method) {
         CodeGenerator.setCodeGenerator(this);
         this.registerPool = pool;
         this.os = x86Stream;
@@ -90,6 +97,9 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         labelPrefix = "label";
         instrLabelPrefix = labelPrefix + "_bci_";
         addressLabels = new Label[lenght];
+        this.typeSizeInfo = typeSizeInfo;
+        this.stackFrame = stackFrame;
+        this.currentMethod = method;
     }
 
     public final Label getInstrLabel(int address) {
@@ -109,48 +119,64 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         return false;
     }
 
-    public void setArgumentVariables(Variable<T>[] vars, int nArgs) {
-        displacement = 0;
-        for (int i = 0; i < nArgs; i += 1) {
-            // TODO this might not be right, check with Ewout
-            displacement = vars[i].getIndex() * 4;
-            vars[i].setLocation(new StackLocation<T>(displacement));
-        }
-        // not sure how big the last arg is...
-        displacement += 8;
-    }
+//    public void setArgumentVariables(Variable<T>[] vars, int nArgs) {
+//        displacement = 0;
+//        for (int i = 0; i < nArgs; i += 1) {
+//            // TODO this might not be right, check with Ewout
+//            displacement = vars[i].getIndex() * 4;
+//            vars[i].setLocation(new StackLocation<T>(displacement));
+//        }
+//        // not sure how big the last arg is...
+//        displacement += 8;
+//    }
 
-    public void setSpilledVariables(Variable<T>[] variables) {
+//    public void setSpilledVariables(Variable<T>[] variables) {
+//        this.spilledVariables = variables;
+//        int n = spilledVariables.length;
+//        for (int i = 0; i < n; i += 1) {
+//            StackLocation<T> loc = (StackLocation<T>) spilledVariables[i]
+//                .getLocation();
+//            loc.setDisplacement(displacement);
+//            switch (spilledVariables[i].getType()) {
+//                case Operand.BYTE:
+//                case Operand.CHAR:
+//                case Operand.SHORT:
+//                case Operand.INT:
+//                case Operand.FLOAT:
+//                case Operand.REFERENCE:
+//                    displacement -= 4;
+//                    break;
+//                case Operand.LONG:
+//                case Operand.DOUBLE:
+//                    displacement -= 8;
+//                    break;
+//            }
+//        }
+//    }
+
+    public void setSpilledVariables(Variable[] variables) {
         this.spilledVariables = variables;
         int n = spilledVariables.length;
+        int noArgs = currentMethod.getNoArguments();
         for (int i = 0; i < n; i += 1) {
-            StackLocation<T> loc = (StackLocation<T>) spilledVariables[i]
-                .getLocation();
-            loc.setDisplacement(displacement);
-            switch (spilledVariables[i].getType()) {
-                case Operand.BYTE:
-                case Operand.CHAR:
-                case Operand.SHORT:
-                case Operand.INT:
-                case Operand.FLOAT:
-                case Operand.REFERENCE:
-                    displacement += 4;
-                    break;
-                case Operand.LONG:
-                case Operand.DOUBLE:
-                    displacement += 8;
-                    break;
-            }
+            Variable<X86Register> var = (Variable<X86Register>) spilledVariables[i];
+            StackLocation loc = (StackLocation) var.getLocation();
+            loc.setDisplacement(stackFrame.getEbpOffset(typeSizeInfo, noArgs + i));
         }
     }
 
+//    public void emitHeader() {
+//        os.writePUSH(X86Register.EBP);
+//        // os.writePUSH(context.getMagic());
+//        // os.writePUSH(0); // PC, which is only used in interpreted methods
+//        /** EAX MUST contain the VmMethod structure upon entry of the method */
+//        // os.writePUSH(Register.EAX);
+//        os.writeMOV(X86Constants.BITS32, X86Register.EBP, X86Register.ESP);
+//    }
+
+    @Override
     public void emitHeader() {
-        os.writePUSH(X86Register.EBP);
-        // os.writePUSH(context.getMagic());
-        // os.writePUSH(0); // PC, which is only used in interpreted methods
-        /** EAX MUST contain the VmMethod structure upon entry of the method */
-        // os.writePUSH(Register.EAX);
-        os.writeMOV(X86Constants.BITS32, X86Register.EBP, X86Register.ESP);
+        this.startOffset = stackFrame.emitHeader();
     }
 
     public void generateCodeFor(ConditionalBranchQuad<T> quad) {
@@ -158,6 +184,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
     }
 
     public void generateCodeFor(ConstantRefAssignQuad<T> quad) {
+        checkLabel(quad.getAddress());
         Variable<T> lhs = quad.getLHS();
         if (lhs.getAddressingMode() == REGISTER) {
             T reg1 = ((RegisterLocation<T>) lhs
@@ -188,46 +215,45 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 
     public void generateCodeFor(UnconditionalBranchQuad<T> quad) {
         checkLabel(quad.getAddress());
+        if (quad.getTargetAddress() < quad.getAddress()) {
+            stackFrame.getHelper().writeYieldPoint(getInstrLabel(quad.getAddress()));
+        }
         os.writeJMP(getInstrLabel(quad.getTargetAddress()));
     }
 
     public void generateCodeFor(VariableRefAssignQuad<T> quad) {
+        checkLabel(quad.getAddress());
+
         Variable<T> lhs = quad.getLHS();
         if (lhs.getAddressingMode() == REGISTER) {
-            T reg1 = ((RegisterLocation<T>) lhs
-                .getLocation()).getRegister();
+            T reg1 = ((RegisterLocation<T>) lhs.getLocation()).getRegister();
             Operand<T> rhs = quad.getRHS();
             AddressingMode mode = rhs.getAddressingMode();
             if (mode == CONSTANT) {
-                // TODO throw new IllegalArgumentException("Unknown operation");
                 os.writeMOV_Const((GPR) reg1, ((IntConstant<T>) rhs).getValue());
             } else if (mode == REGISTER) {
-                T reg2 = ((RegisterLocation<T>) ((Variable<T>) rhs)
-                    .getLocation()).getRegister();
+                T reg2 = ((RegisterLocation<T>) ((Variable<T>) rhs).getLocation()).getRegister();
                 os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
             } else if (mode == STACK) {
-                int disp2 = ((StackLocation<T>) ((Variable<T>) rhs).getLocation())
-                    .getDisplacement();
-                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                    disp2);
+                int disp2 = ((StackLocation<T>) ((Variable<T>) rhs).getLocation()).getDisplacement();
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
             }
         } else if (lhs.getAddressingMode() == STACK) {
             int disp1 = ((StackLocation<T>) lhs.getLocation()).getDisplacement();
             Operand<T> rhs = quad.getRHS();
             AddressingMode mode = rhs.getAddressingMode();
             if (mode == CONSTANT) {
-                // TODO throw new IllegalArgumentException("Unknown operation");
-                // todo os.writeMOV_Const(X86Register.EBP, disp1,
-                // ((IntConstant)rhs).getValue());
+                os.writeMOV_Const(X86Constants.BITS32,  X86Register.EBP, disp1, ((IntConstant<T>) rhs).getValue());
             } else if (mode == REGISTER) {
-                T reg2 = ((RegisterLocation<T>) ((Variable<T>) rhs)
-                    .getLocation()).getRegister();
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    (GPR) reg2);
+                T reg2 = ((RegisterLocation<T>) ((Variable<T>) rhs).getLocation()).getRegister();
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
             } else if (mode == STACK) {
-                // int disp2 = ((StackLocation) ((Variable)
-                // rhs).getLocation()).getDisplacement();
-                throw new IllegalArgumentException("Unknown operation");
+                //todo optimize it
+                int disp2 = ((StackLocation) ((Variable) rhs).getLocation()).getDisplacement();
+                if (disp1 != disp2) {
+                    os.writePUSH(X86Register.EBP, disp2);
+                    os.writePOP(X86Register.EBP, disp1);
+                }
             }
         }
     }
@@ -256,20 +282,24 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
 
         // TODO: hack for testing
-        os.writeMOV(X86Constants.BITS32, X86Register.ESP, X86Register.EBP);
-        os.writePOP(X86Register.EBP);
+//        os.writeMOV(X86Constants.BITS32, X86Register.ESP, X86Register.EBP);
+//        os.writePOP(X86Register.EBP);
+//
+//        os.writeRET();
 
-        os.writeRET();
+        stackFrame.emitReturn();
     }
 
     public void generateCodeFor(VoidReturnQuad<T> quad) {
         checkLabel(quad.getAddress());
 
         // TODO: hack for testing
-        os.writeMOV(X86Constants.BITS32, X86Register.ESP, X86Register.EBP);
-        os.writePOP(X86Register.EBP);
+//        os.writeMOV(X86Constants.BITS32, X86Register.ESP, X86Register.EBP);
+//        os.writePOP(X86Register.EBP);
 
-        os.writeRET();
+//        os.writeRET();
+
+        stackFrame.emitReturn();
     }
 
     public void generateCodeFor(UnaryQuad<T> quad, Object lhsReg, UnaryOperation operation,
@@ -3632,16 +3662,16 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 
     /** ******** BRANCHES ************************************** */
     
-    public void generateCodeFor(ConditionalBranchQuad<T> quad, BranchCondition condition,
-                                Object reg) {
+    public void generateCodeFor(ConditionalBranchQuad<T> quad, BranchCondition condition, Object reg) {
         checkLabel(quad.getAddress());
+        yieldPoint(quad);
         os.writeTEST((GPR) reg, (GPR) reg);
         generateJumpForUnaryCondition(quad, condition);
     }
 
-    public void generateCodeFor(ConditionalBranchQuad<T> quad, BranchCondition condition,
-                                int disp) {
+    public void generateCodeFor(ConditionalBranchQuad<T> quad, BranchCondition condition, int disp) {
         checkLabel(quad.getAddress());
+        yieldPoint(quad);
         os.writeCMP_Const(BITS32, X86Register.EBP, disp, 0);
         generateJumpForUnaryCondition(quad, condition);
     }
@@ -3700,66 +3730,50 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 
     public void generateCodeFor(ConditionalBranchQuad<T> quad, BranchCondition condition,
                                 Constant<T> cons) {
-        switch (condition) {
-            case IFEQ:
-            case IFNE:
-            case IFGT:
-            case IFGE:
-            case IFLT:
-            case IFLE:
-            case IFNULL:
-            case IFNONNULL:
-            default:
-                throw new IllegalArgumentException("Unknown condition " + condition);
-        }
+        checkLabel(quad.getAddress());
+        yieldPoint(quad);
+        //todo optimize it, shouldn't get here
+        os.writePUSH(X86Register.EAX);
+        os.writeMOV_Const(X86Register.EAX, ((IntConstant) cons).getValue());
+        os.writeCMP_Const(X86Register.EAX, 0);
+        os.writePOP(X86Register.EAX);
+        generateJumpForUnaryCondition(quad, condition);
     }
 
     public void generateCodeFor(ConditionalBranchQuad<T> quad, Constant<T> c1,
                                 BranchCondition condition, Constant<T> c2) {
-        switch (condition) {
-            case IF_ICMPEQ:
-            case IF_ICMPNE:
-            case IF_ICMPGT:
-            case IF_ICMPGE:
-            case IF_ICMPLT:
-            case IF_ICMPLE:
-            case IF_ACMPEQ:
-            case IF_ACMPNE:
-            default:
-                throw new IllegalArgumentException("Unknown condition " + condition);
-        }
+        checkLabel(quad.getAddress());
+        yieldPoint(quad);
+        //todo optimize it, shouldn't get here
+        os.writePUSH(X86Register.EAX);
+        os.writeMOV_Const(X86Register.EAX, ((IntConstant) c1).getValue());
+        os.writeCMP_Const(X86Register.EAX, ((IntConstant) c2).getValue());
+        os.writePOP(X86Register.EAX);
+        generateJumpForBinaryCondition(quad, condition);
     }
 
     public void generateCodeFor(ConditionalBranchQuad<T> quad, Constant<T> c1,
                                 BranchCondition condition, int disp2) {
-        switch (condition) {
-            case IF_ICMPEQ:
-            case IF_ICMPNE:
-            case IF_ICMPGT:
-            case IF_ICMPGE:
-            case IF_ICMPLT:
-            case IF_ICMPLE:
-            case IF_ACMPEQ:
-            case IF_ACMPNE:
-            default:
-                throw new IllegalArgumentException("Unknown condition " + condition);
-        }
+        checkLabel(quad.getAddress());
+        yieldPoint(quad);
+        //todo optimize it
+        os.writePUSH(X86Register.EAX);
+        os.writeMOV_Const(X86Register.EAX, ((IntConstant) c1).getValue());
+        os.writeCMP(X86Register.EAX, X86Register.EBP, disp2);
+        os.writePOP(X86Register.EAX);
+        generateJumpForBinaryCondition(quad, condition);
     }
 
     public void generateCodeFor(ConditionalBranchQuad<T> quad, Constant<T> c1,
                                 BranchCondition condition, Object reg2) {
-        switch (condition) {
-            case IF_ICMPEQ:
-            case IF_ICMPNE:
-            case IF_ICMPGT:
-            case IF_ICMPGE:
-            case IF_ICMPLT:
-            case IF_ICMPLE:
-            case IF_ACMPEQ:
-            case IF_ACMPNE:
-            default:
-                throw new IllegalArgumentException("Unknown condition " + condition);
-        }
+        checkLabel(quad.getAddress());
+        yieldPoint(quad);
+        //todo optimize it
+        os.writePUSH(X86Register.EAX);
+        os.writeMOV_Const(X86Register.EAX, ((IntConstant) c1).getValue());
+        os.writeCMP(X86Register.EAX, (GPR) reg2);
+        os.writePOP(X86Register.EAX);
+        generateJumpForBinaryCondition(quad, condition);
     }
 
     public void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1,
@@ -3772,18 +3786,14 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 
     public void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1,
                                 BranchCondition condition, int disp2) {
-        switch (condition) {
-            case IF_ICMPEQ:
-            case IF_ICMPNE:
-            case IF_ICMPGT:
-            case IF_ICMPGE:
-            case IF_ICMPLT:
-            case IF_ICMPLE:
-            case IF_ACMPEQ:
-            case IF_ACMPNE:
-            default:
-                throw new IllegalArgumentException("Unknown condition " + condition);
-        }
+        //todo optimize it
+        checkLabel(quad.getAddress());
+        yieldPoint(quad);
+        os.writePUSH(X86Register.EAX);
+        os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp1);
+        os.writeCMP(X86Register.EAX, X86Register.EBP, disp2);
+        os.writePOP(X86Register.EAX);
+        generateJumpForBinaryCondition(quad, condition);
     }
 
     public void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1,
@@ -3803,6 +3813,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
     public void generateCodeFor(ConditionalBranchQuad<T> quad, Object reg1,
                                 BranchCondition condition, int disp2) {
         checkLabel(quad.getAddress());
+        yieldPoint(quad);
         os.writeCMP((GPR) reg1, X86Register.EBP, disp2);
         generateJumpForBinaryCondition(quad, condition);
     }
@@ -3810,6 +3821,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
     public void generateCodeFor(ConditionalBranchQuad<T> quad, Object reg1,
                                 BranchCondition condition, Object reg2) {
         checkLabel(quad.getAddress());
+        yieldPoint(quad);
         os.writeCMP((GPR) reg1, (GPR) reg2);
         generateJumpForBinaryCondition(quad, condition);
     }
@@ -3859,6 +3871,27 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 
             default:
                 throw new IllegalArgumentException("Unknown condition " + condition);
+        }
+    }
+
+    public void endMethod() {
+        stackFrame.emitTrailer(typeSizeInfo, currentMethod.getBytecode().getNoLocals());
+    }
+
+    public synchronized void startMethod(VmMethod method) {
+
+//        this.maxLocals = method.getBytecode().getNoLocals();
+//        this.loader = method.getDeclaringClass().getLoader();
+////        helper.reset();
+////        helper.setMethod(method);
+//        // this.startOffset = os.getLength();
+//
+//        this.startOffset = stackFrame.emitHeader();
+    }
+
+    private void yieldPoint(ConditionalBranchQuad<T> quad) {
+        if (quad.getTargetAddress() < quad.getAddress()) {
+            stackFrame.getHelper().writeYieldPoint(getInstrLabel(quad.getAddress()));
         }
     }
 }
