@@ -24,15 +24,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
+import java.net.URL;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.X86TextAssembler;
 import org.jnode.vm.VmImpl;
 import org.jnode.vm.BaseVmArchitecture;
 import org.jnode.vm.VmSystemClassLoader;
-import org.jnode.vm.bytecode.BytecodeParser;
-import org.jnode.vm.bytecode.BytecodeViewer;
-import org.jnode.vm.bytecode.ControlFlowGraph;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.NativeCodeCompiler;
@@ -41,6 +38,7 @@ import org.jnode.vm.x86.VmX86Architecture32;
 import org.jnode.vm.x86.VmX86Architecture64;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.l1a.X86Level1ACompiler;
+import org.jnode.vm.x86.compiler.l2.X86Level2Compiler;
 
 /**
  * Bytecode to native compiler test.
@@ -75,7 +73,10 @@ public class CompilerTest {
 //      "org.jnode.vm.VmStacReader",
 //        "org.jnode.vm.classmgr.VmType",
 //            "org.jnode.test.ArrayLongTest",
-        "org.jnode.test.ArrayTest",
+//        "org.jnode.test.ArrayTest",
+        "org.jnode.vm.compiler.ir.PrimitiveTest",
+//        "org.jnode.vm.compiler.ir.CompilerTest",
+//        "org.jnode.games.tetris.Tetris",
 //            "org.jnode.test.Linpack",
 //            "org.jnode.test.MultiANewArrayTest",
 //            "org.jnode.test.Sieve",
@@ -115,11 +116,10 @@ public class CompilerTest {
         } else {
             arch = new VmX86Architecture32();
         }
-        File classes = new File("./core/build/classes/").getCanonicalFile();
-        File classlib = new File("./all/lib/classlib.jar").getCanonicalFile();
         final VmSystemClassLoader cl = new VmSystemClassLoader(new java.net.URL[]{
-            classes.toURI().toURL(),
-            new java.net.URL("jar:" + classlib.toURI().toURL() + "!/"),
+            new File("./core/build/classes/").getCanonicalFile().toURI().toURL(),
+            new File("./distr/build/classes/").getCanonicalFile().toURI().toURL(),
+            new URL("jar:" + new File("./all/lib/classlib.jar").getCanonicalFile().toURI().toURL() + "!/"),
         }, arch);
 
         final VmImpl vm = new VmImpl("?", arch, cl.getSharedStatics(), false, cl, null);
@@ -130,8 +130,11 @@ public class CompilerTest {
         //final ObjectResolver resolver = new DummyResolver();
         final X86CpuID cpuId = X86CpuID.createID(processorId);
         //NativeCodeCompiler c = cs[0];
-        final NativeCodeCompiler[] cs = {//new X86Level1Compiler(),
-            new X86Level1ACompiler()};
+        final NativeCodeCompiler[] cs = {
+            //new X86Level1Compiler(),
+            new X86Level1ACompiler(),
+            new X86Level2Compiler()
+        };
         for (int i = 0; i < cs.length; i++) {
             cs[i].initialize(cl);
         }
@@ -147,9 +150,20 @@ public class CompilerTest {
                 final int cnt = type.getNoDeclaredMethods();
                 for (int i = 0; i < cnt; i++) {
                     final VmMethod method = type.getDeclaredMethod(i);
+                    if (
+                        "<init>".equals(method.getName()) ||
+                        "main".equals(method.getName()) ||
+                            !X86Level2Compiler.canCompile(method)
+                        )
+                        continue;
+
                     System.out.println("Compiling method " + clsName + "#" + method.getName());
                     counts[ci]++;
-                    compile(method, arch, cs[ci], cpuId, ci + 1);
+                    try {
+                        compile(method, arch, cs[ci], cpuId, ci + 1);
+                    } catch (Exception x) {
+                        x.printStackTrace();
+                    }
                 }
             }
             final long end = System.currentTimeMillis();
@@ -173,20 +187,22 @@ public class CompilerTest {
         final FileOutputStream out = new FileOutputStream(new File(outDir, fname));
 
         try {
-            if (!method.isAbstract()) {
-                final PrintStream ps = new PrintStream(out);
-                BytecodeViewer viewer = new BytecodeViewer(
-                    new ControlFlowGraph(method.getBytecode()), ps);
-                BytecodeParser.parse(method.getBytecode(), viewer);
-                ps.flush();
-            }
+//            if (!method.isAbstract()) {
+//                final PrintStream ps = new PrintStream(out);
+//                BytecodeViewer viewer = new BytecodeViewer(
+//                    new ControlFlowGraph(method.getBytecode()), ps);
+//                BytecodeParser.parse(method.getBytecode(), viewer);
+//                ps.flush();
+//            }
 
             X86TextAssembler os = new X86TextAssembler(new OutputStreamWriter(out),
                 cpuId, ((VmX86Architecture) arch).getMode(), method.getMangledName());
+//            X86BinaryAssembler os = new X86BinaryAssembler(cpuId, ((VmX86Architecture) arch).getMode(), 0);
             try {
                 c.compileBootstrap(method, os, level);
                 //c.compileRuntime(method, resolver, level, os);
             } finally {
+//                out.write(os.getBytes());
                 os.flush();
             }
         } catch (Throwable ex) {
