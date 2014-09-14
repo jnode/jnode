@@ -25,36 +25,44 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
-import java.util.Collection;
-import java.util.Map;
+import java.net.URL;
+import java.util.List;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86TextAssembler;
+import org.jnode.vm.VmImpl;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.compiler.CompiledMethod;
+import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.compiler.ir.quad.Quad;
-import org.jnode.vm.objects.BootableHashMap;
+import org.jnode.vm.facade.TypeSizeInfo;
+import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.x86.VmX86Architecture32;
 import org.jnode.vm.x86.X86CpuID;
-import org.jnode.vm.x86.compiler.l2.GenericX86CodeGenerator;
+import org.jnode.vm.x86.compiler.X86CompilerHelper;
 import org.jnode.vm.x86.compiler.l2.X86CodeGenerator;
+import org.jnode.vm.x86.compiler.l2.X86Level2Compiler;
+import org.jnode.vm.x86.compiler.l2.X86StackFrame;
 
 /**
  * @author Madhu Siddalingaiah
  * @author Levente S\u00e1ntha
  */
 public class IRTest {
-    public static void main(String args[]) throws SecurityException, IOException, ClassNotFoundException {
+    public static void main(String args[]) throws SecurityException, IOException, ClassNotFoundException,
+        InstantiationException {
 //        System.in.read();
         X86CpuID cpuId = X86CpuID.createID("p5");
         boolean binary = false;
 
         String className = "org.jnode.vm.compiler.ir.PrimitiveTest";
+//        String className = "org.jnode.games.tetris.Tetris";
         if (args.length > 0) {
             String arg0 = args[0];
             if ("-b".equals(arg0)) {
@@ -121,20 +129,62 @@ public class IRTest {
     }
 
     private static void generateCode(X86Assembler os, String className)
-        throws MalformedURLException, ClassNotFoundException {
+        throws MalformedURLException, ClassNotFoundException, InstantiationException {
         //VmByteCode code = loadByteCode(className, "discriminant");
         //VmByteCode code = loadByteCode(className, "arithOptIntx");
         //VmByteCode code = loadByteCode(className, "simpleWhile");
         //VmByteCode code = loadByteCode(className, "terniary2");
-        VmByteCode code = loadByteCode(className, "trivial");
+//        VmByteCode code = loadByteCode(className, "trivial1");
+//        VmByteCode code = loadByteCode(className, "discriminant");
+//        VmByteCode code = loadByteCode(className, "arithOptLoop");
+
+        //VmByteCode code = loadByteCode(className, "discriminant");
+        //VmByteCode code = loadByteCode(className, "arithOptIntx");
+        //VmByteCode code = loadByteCode(className, "simpleWhile");
+        //VmByteCode code = loadByteCode(className, "terniary2");
+
+        VmX86Architecture32 arch = new VmX86Architecture32();
+        VmSystemClassLoader loader = new VmSystemClassLoader(new URL[]{
+            new File("core/build/classes").toURL(),
+            new File("distr/build/classes").toURL(),
+            new File("local/classlib").toURL()
+        }, arch);
+        new VmImpl("?", arch, loader.getSharedStatics(), true, loader, null);
+        VmType.initializeForBootImage(loader);
+        VmType<?> type = loader.loadClass(className, true);
+        VmMethod arithMethod = null;
+        int nMethods = type.getNoDeclaredMethods();
+        for (int i = 0; i < nMethods; i += 1) {
+            VmMethod method1 = type.getDeclaredMethod(i);
+            if ("terniary22".equals(method1.getName())) {
+//            if ("darken".equals(method1.getName())) {
+                arithMethod = method1;
+                break;
+            }
+        }
+        VmMethod method = arithMethod;
+        VmByteCode code = method.getBytecode();
         //VmByteCode code = loadByteCode(className, "appel");
 
-        X86CodeGenerator x86cg = new X86CodeGenerator(os, code.getLength());
+        EntryPoints context = new EntryPoints(loader, VmUtils.getVm().getHeapManager(), 1);
+        X86CompilerHelper helper = new X86CompilerHelper(os, null, context, true);
+        CompiledMethod cm = new CompiledMethod(1);
+        TypeSizeInfo typeSizeInfo = loader.getArchitecture().getTypeSizeInfo();
+        helper.setMethod(method);
+        X86StackFrame stackFrame = new X86StackFrame(os, helper, method, context, cm);
+        X86CodeGenerator x86cg = new X86CodeGenerator(method, os, code.getLength(), typeSizeInfo, stackFrame);
 
-        generateCode(os, code, x86cg);
+        generateCode(os, code, x86cg, stackFrame, arithMethod, typeSizeInfo);
+
+
+//        X86CodeGenerator x86cg = null;//new X86CodeGenerator(os, code.getLength());
+//
+//        generateCode(os, code, x86cg);
     }
 
-    private static <T extends X86Register> void generateCode(X86Assembler os, VmByteCode code, CodeGenerator<T> cg)
+    private static <T extends X86Register> void generateCode(X86Assembler os, VmByteCode code, CodeGenerator<T> cg,
+                                                             X86StackFrame stackFrame, VmMethod arithMethod,
+                                                             TypeSizeInfo typeSizeInfo)
         throws MalformedURLException, ClassNotFoundException {
         IRControlFlowGraph<T> cfg = new IRControlFlowGraph<T>(code);
 
@@ -148,55 +198,43 @@ public class IRTest {
         IRGenerator<T> irg = new IRGenerator<T>(cfg);
         BytecodeParser.parse(code, irg);
 
+        X86Level2Compiler.initMethodArguments(arithMethod, stackFrame, typeSizeInfo, irg);
+
         cfg.constructSSA();
+        printCFG(cfg, "Constructed SSA");
+
         cfg.optimize();
+        printCFG(cfg, "Optimized SSA (pass 2)");
+
+        cfg.removeUnusedVars();
+        printCFG(cfg, "Unused vars removed SSA");
 
         cfg.deconstrucSSA();
         cfg.fixupAddresses();
+        printCFG(cfg, "Deconstructed SSA");
 
-        final Map<Variable<?>, Variable<T>> liveVariables = new BootableHashMap<Variable<?>, Variable<T>>();
+//        removeUnusedVars(cfg);
+//        printCFG(cfg, "Unused vars removed SSA");
 
-        for (IRBasicBlock<T> b : cfg) {
-            System.out.println();
-            System.out.println(b + ", stackOffset = " + b.getStackOffset());
-            for (Quad<T> q : b.getQuads()) {
-                if (!q.isDeadCode()) {
-                    q.computeLiveness(liveVariables);
-                    System.out.println(q);
-                }
-            }
-        }
-        System.out.println();
+        cfg.fixupAddresses();
+        List liveVariables = cfg.computeLiveVariables();
+//        System.out.println();
+
+//        cfg.optimize(liveVariables.values());
+//        printCFG(cfg, "Optimized SSA (pass 3)");
 
         System.out.println("Live ranges:");
-        Collection<Variable<T>> lv = liveVariables.values();
-        LiveRange<T>[] liveRanges = new LiveRange[lv.size()];
-        int i = 0;
-        for (Variable<T> var : lv) {
-            LiveRange<T> range = new LiveRange<T>(var);
-            liveRanges[i++] = range;
-        }
+        LiveRange<?>[] liveRanges = X86Level2Compiler.getLiveRanges(liveVariables);
 
-        LinearScanAllocator<T> lsa = new LinearScanAllocator<T>(liveRanges);
-        lsa.allocate();
+        LinearScanAllocator<?> lsa = X86Level2Compiler.allocate(liveRanges);
 
         for (LiveRange range : liveRanges) {
             System.out.println(range);
         }
 
-        GenericX86CodeGenerator<T> x86cg = (GenericX86CodeGenerator<T>) cg;
-        x86cg.setArgumentVariables(irg.getVariables(), irg.getNoArgs());
-        x86cg.setSpilledVariables(lsa.getSpilledVariables());
-        x86cg.emitHeader();
-        for (IRBasicBlock<T> b : cfg) {
-            System.out.println();
-            System.out.println(b);
-            for (Quad<T> q : b.getQuads()) {
-                if (!q.isDeadCode()) {
-                    q.generateCode(cg);
-                }
-            }
-        }
+        System.out.println();
+
+        X86Level2Compiler.generateCode(cg, cfg, irg, lsa);
 
         // TODO
         // 1. Fix method argument location, allocator leaves it null and breaks
@@ -240,9 +278,28 @@ public class IRTest {
 //        }
     }
 
+    private static <T extends X86Register> void printCFG(IRControlFlowGraph<T> cfg, String x) {
+        System.out.println(x);
+        for (IRBasicBlock<T> b : cfg) {
+            System.out.println(b + ", stackOffset = " + b.getStackOffset());
+            for (Quad<T> q : b.getQuads()) {
+                if (!q.isDeadCode()) {
+                    System.out.println(q);
+                }
+            }
+        }
+        System.out.println();
+    }
+
     private static VmByteCode loadByteCode(String className, String methodName)
-        throws MalformedURLException, ClassNotFoundException {
-        VmSystemClassLoader vmc = new VmSystemClassLoader(new File(".").toURL(), new VmX86Architecture32());
+        throws MalformedURLException, ClassNotFoundException, InstantiationException {
+        //VmSystemClassLoader vmc = new VmSystemClassLoader(new File(".").toURL(), new VmX86Architecture32());
+        VmX86Architecture32 arch = new VmX86Architecture32();
+        VmSystemClassLoader vmc = new VmSystemClassLoader(new URL[]{
+            new File("core/build/classes").toURL(),
+            new File("local/classlib").toURL()
+        }, arch);
+        new VmImpl("?", arch, vmc.getSharedStatics(), true, vmc, null);
         VmType<?> type = vmc.loadClass(className, true);
         VmMethod arithMethod = null;
         int nMethods = type.getNoDeclaredMethods();

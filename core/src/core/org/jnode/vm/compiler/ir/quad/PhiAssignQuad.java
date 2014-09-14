@@ -64,8 +64,7 @@ public class PhiAssignQuad<T> extends AssignQuad<T> {
     }
 
     public Operand<T>[] getReferencedOps() {
-        // TODO Auto-generated method stub
-        return null;
+        return phi.getSources().toArray(new Operand[phi.getSources().size()]);
     }
 
     public void doPass2() {

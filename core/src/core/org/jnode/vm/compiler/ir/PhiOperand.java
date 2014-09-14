@@ -21,6 +21,7 @@
 package org.jnode.vm.compiler.ir;
 
 import java.util.List;
+import org.jnode.vm.compiler.ir.quad.AssignQuad;
 import org.jnode.vm.objects.BootableArrayList;
 
 /**
@@ -98,7 +99,10 @@ public class PhiOperand<T> extends Operand<T> {
             if (op instanceof StackVariable || op instanceof LocalVariable) {
                 sources.set(i, op);
             } else {
-                src.getAssignQuad().setDeadCode(false);
+                AssignQuad<T> assignQuad = src.getAssignQuad();
+                if (assignQuad != null) {
+                    assignQuad.setDeadCode(false);
+                }
             }
         }
         return this;

@@ -20,7 +20,8 @@
  
 package org.jnode.vm.compiler.ir.quad;
 
-import java.util.Map;
+import java.util.Collection;
+import java.util.List;
 
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
@@ -109,7 +110,7 @@ public abstract class Quad<T> {
         return basicBlock;
     }
 
-    public void computeLiveness(Map<Variable<?>, Variable<T>> liveVariables) {
+    public void computeLiveness(List<Variable<?>> liveVariables) {
         Operand<T>[] refs = getReferencedOps();
         if (refs != null) {
             int n = refs.length;
@@ -117,7 +118,8 @@ public abstract class Quad<T> {
                 if (refs[i] instanceof Variable) {
                     Variable<T> v = (Variable<T>) refs[i];
                     v.setLastUseAddress(getAddress());
-                    liveVariables.put(v, v);
+                    if (!liveVariables.contains(v))
+                        liveVariables.add(v);
                 }
             }
         }
@@ -133,4 +135,8 @@ public abstract class Quad<T> {
     public abstract void doPass2();
 
     public abstract void generateCode(CodeGenerator<T> cg);
+
+    public void doPass3(Collection<Variable<T>> values){
+
+    };
 }

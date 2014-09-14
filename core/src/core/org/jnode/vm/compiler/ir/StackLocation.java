@@ -30,7 +30,7 @@ public class StackLocation<T> extends Location<T> {
      * @param displacement
      */
     public StackLocation(int displacement) {
-        super("local" + displacement);
+        super("local");
         this.displacement = displacement;
     }
 
@@ -46,7 +46,11 @@ public class StackLocation<T> extends Location<T> {
      *
      */
     public int getDisplacement() {
-        //TODO: remove the 8 here, hack for C compatibility while testing
-        return displacement + 8;
+        return displacement;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + displacement;
     }
 }

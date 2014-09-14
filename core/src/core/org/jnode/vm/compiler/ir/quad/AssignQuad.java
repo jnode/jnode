@@ -20,6 +20,7 @@
  
 package org.jnode.vm.compiler.ir.quad;
 
+import java.util.Collection;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 import org.jnode.vm.compiler.ir.Operand;
 import org.jnode.vm.compiler.ir.Variable;
@@ -93,5 +94,12 @@ public abstract class AssignQuad<T> extends Quad<T> {
     public void setLHS(Variable<T> lhs) {
         this.lhs = lhs;
         lhs.setAssignQuad(this);
+    }
+
+    @Override
+    public void doPass3(Collection<Variable<T>> values) {
+        if (!values.contains(lhs)) {
+            setDeadCode(true);
+        }
     }
 }

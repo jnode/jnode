@@ -46,18 +46,32 @@ public class PrimitiveTest {
         return j;
     }
 
-    public static int trivial1() {
-        return 35 + 17;
+    public static int trivial1(int a) {
+        int ret = 0;
+        if (a > ret) {
+            ret = a;
+        }
+        return ret;
+    }
+
+    public static int trivial1_(int a) {
+        int b = 1 + a;
+        int c = b + 1;
+        return a;
     }
 
     public static int trivial2() {
         return 1 == 1 ? 3 : 7;
     }
 
-    public static int trivial() {
+    public static int trivial1_() {
         int a = 0;
         while (a < 10) a++;
         return a;
+    }
+
+    public static void main(String[] argv) {
+        //System.out.println(trivial1());
     }
 
     public static int arithOptLoop(int a0, int a1, int a2) {
@@ -271,7 +285,12 @@ public class PrimitiveTest {
         return b;
     }
 
-    public static float terniary14(float a0, float a1) {
+//  todo
+//  public static float terniary14(float a0, float a1) {
+//        return 1 + a0 + a1;
+//    }
+
+    public static int terniary14(int a0, int a1) {
         return 1 + a0 + a1;
     }
 
@@ -355,32 +374,92 @@ public class PrimitiveTest {
         return a0 / a1;
     }
 
-    public static long ladd(long a0, long a1) {
+//    //todo
+//    public static long laddl(long a0, long a1) {
+//        long l = a0;
+//        return l + a1;
+//    }
+
+
+//    public static long ladd(long a0, long a1) {
+//        return a0 + a1;
+//    }
+//
+//    public static long lsub(long a0, long a1) {
+//        return a0 - a1;
+//    }
+//
+//    public static long lmul(long a0, long a1) {
+//        return a0 * a1;
+//    }
+//
+//    public static long ldiv(long a0, long a1) {
+//        return a0 / a1;
+//    }
+//
+//    public static long land(long a0, long a1) {
+//        return a0 & a1;
+//    }
+//
+//    public static long lor(long a0, long a1) {
+//        return a0 | a1;
+//    }
+//
+//    public static long lxor(long a0, long a1) {
+//        return a0 ^ a1;
+//    }
+
+    public static int add(int a0, int a1) {
         return a0 + a1;
     }
 
-    public static long lsub(long a0, long a1) {
+    public static int sub(int a0, int a1) {
         return a0 - a1;
     }
 
-    public static long lmul(long a0, long a1) {
+    public static int mul(int a0, int a1) {
         return a0 * a1;
     }
 
-    public static long ldiv(long a0, long a1) {
+    public static int div(int a0, int a1) {
         return a0 / a1;
     }
 
-    public static long land(long a0, long a1) {
+    public static int and(int a0, int a1) {
         return a0 & a1;
     }
 
-    public static long lor(long a0, long a1) {
+    public static int or(int a0, int a1) {
         return a0 | a1;
     }
 
-    public static long lxor(long a0, long a1) {
+    public static int xor(int a0, int a1) {
         return a0 ^ a1;
     }
 
+
+    //misc
+    public static int test1() {
+        return 1;
+    }
+
+    public int test2() {
+        return 1;
+    }
+
+    public static int sum1(int a) {
+        int sum =  0;
+        for (int i = 1; i <= a; i++) {
+            sum += i;
+        }
+        return sum;
+    }
+
+    public int sum2(int a) {
+        int sum =  0;
+        for (int i = 1; i <= a; i++) {
+            sum += i;
+        }
+        return sum;
+    }
 }

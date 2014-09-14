@@ -20,8 +20,13 @@
  
 package org.jnode.vm.compiler.ir;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.jnode.util.ObjectArrayIterator;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.classmgr.VmByteCode;
@@ -55,6 +60,78 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
         this.bblocks = bbf.createBasicBlocks();
         startBlock = bblocks[0];
         computeDominance();
+    }
+
+    //todo use set
+    public List<Variable<?>> computeLiveVariables() {
+        List<Variable<?>> liveVariables = new BootableArrayList<Variable<?>>();
+        for (IRBasicBlock<T> b : this) {
+//            System.out.println();
+//            System.out.println(b + ", stackOffset = " + b.getStackOffset());
+            for (Quad<T> q : b.getQuads()) {
+                if (!q.isDeadCode()) {
+                    q.computeLiveness(liveVariables);
+//                    System.out.println(q);
+                }
+            }
+        }
+        return liveVariables;
+    }
+
+    public void removeUnusedVars() {
+        Map<Variable, Integer> varUses = new HashMap<Variable, Integer>();
+        for (IRBasicBlock<T> b : this) {
+            for (Quad<T> q : b.getQuads()) {
+                if (!q.isDeadCode()) {
+                    if (q instanceof AssignQuad) {
+                        AssignQuad aq = (AssignQuad) q;
+                        Variable v = aq.getLHS();
+                        if (!varUses.containsKey(v)) {
+                            varUses.put(v, 0);
+                        }
+                    }
+                    Operand<T>[] refs = q.getReferencedOps();
+                    if (refs != null) {
+                        for (Operand<T> ref : refs) {
+                            if (ref instanceof Variable) {
+                                Variable<T> v = (Variable<T>) ref;
+                                Integer c = varUses.get(v);
+                                if (c == null) {
+                                    c = 0;
+                                }
+                                c++;
+                                varUses.put(v, c);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        boolean loop;
+        do {
+            loop = false;
+            for (Map.Entry<Variable, Integer> u : varUses.entrySet()) {
+                if (u.getValue() == 0 && !u.getKey().getAssignQuad().isDeadCode()) {
+                    AssignQuad dq = u.getKey().getAssignQuad();
+                    dq.setDeadCode(true);
+                    Operand<T>[] refs = dq.getReferencedOps();
+                    if (refs != null) {
+                        for (Operand<T> ref : refs) {
+                            if (ref instanceof Variable) {
+                                Variable<T> r = (Variable<T>) ref;
+                                Integer c = varUses.get(r);
+                                if (c > 0) {
+                                    c--;
+                                }
+                                varUses.put(r, c);
+                            }
+                        }
+                    }
+                    loop = true;
+                    break;
+                }
+            }
+        } while (loop);
     }
 
     /**
@@ -248,18 +325,78 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
         }
     }
 
+    public void optimize(Collection<Variable<T>> values) {
+        for (IRBasicBlock<T> b : bblocks) {
+            for (Quad<T> q : b.getQuads()) {
+                if (!q.isDeadCode()) {
+                    q.doPass3(values);
+                }
+            }
+        }
+    }
+
     public void deconstrucSSA() {
         final List<PhiAssignQuad<T>> phiQuads = new BootableArrayList<PhiAssignQuad<T>>();
         for (IRBasicBlock<T> b : bblocks) {
             for (Quad<T> q : b.getQuads()) {
-                if (q instanceof PhiAssignQuad) {
+                if (q instanceof PhiAssignQuad && !q.isDeadCode()) {
                     phiQuads.add((PhiAssignQuad<T>) q);
                 } else {
                     break;
                 }
             }
         }
-        int n = phiQuads.size();
+
+        Collections.sort(phiQuads, new Comparator<PhiAssignQuad<T>>() {
+            @Override
+            public int compare(PhiAssignQuad<T> o1, PhiAssignQuad<T> o2) {
+                return o2.getBasicBlock().getEndPC() - o1.getBasicBlock().getEndPC();
+            }
+        });
+        for (PhiAssignQuad<T> paq : phiQuads) {
+            Variable<T> lhs = paq.getLHS();
+            IRBasicBlock<T> firstBlock = null;
+            VariableRefAssignQuad<T> firstPhiMove = null;
+            for (Operand<T> o : paq.getPhiOperand().getSources()) {
+                Variable<T> rhs = (Variable<T>) o;
+                AssignQuad<T> assignQuad = rhs.getAssignQuad();
+                IRBasicBlock<T> ab;
+                if (assignQuad == null && rhs instanceof MethodArgument) {
+                    ab = startBlock;
+                } else {
+                    ab = assignQuad.getBasicBlock();
+                }
+                VariableRefAssignQuad<T> phiMove;
+                phiMove = new VariableRefAssignQuad<T>(0, ab, lhs, rhs);
+                phiMove.doPass2();
+                ab.add(phiMove);
+                if (firstBlock == null || ab.getStartPC() < firstBlock.getStartPC()) {
+                    firstBlock = ab;
+                    firstPhiMove = phiMove;
+                }
+            }
+            lhs.setAssignQuad(firstPhiMove);
+            paq.setDeadCode(true);
+        }
+    }
+
+    public void deconstrucSSA(Collection<Variable<T>> liveVariables) {
+        final List<PhiAssignQuad<T>> phiQuads = new BootableArrayList<PhiAssignQuad<T>>();
+        for (IRBasicBlock<T> b : bblocks) {
+            for (Quad<T> q : b.getQuads()) {
+                if (q instanceof PhiAssignQuad) {
+                    PhiAssignQuad<T> q1 = (PhiAssignQuad<T>) q;
+                    if (liveVariables.contains(q1.getLHS())) {
+                        phiQuads.add(q1);
+                    } else {
+                        q1.setDeadCode(true);
+                    }
+                }
+//                else {
+//                    break;
+//                }
+            }
+        }
         for (PhiAssignQuad<T> paq : phiQuads) {
             Variable<T> lhs = paq.getLHS();
             IRBasicBlock<T> firstBlock = null;
@@ -270,6 +407,8 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
                 VariableRefAssignQuad<T> phiMove;
                 phiMove = new VariableRefAssignQuad<T>(0, ab, lhs, rhs);
                 ab.add(phiMove);
+//                fixupAddresses();  //todo possible optimisation to remove assignment chains
+                phiMove.doPass2();
                 if (firstBlock == null || ab.getStartPC() < firstBlock.getStartPC()) {
                     firstBlock = ab;
                     firstPhiMove = phiMove;
@@ -332,14 +471,21 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
                 for (int i = 0; i < n; i += 1) {
                     SSAStack<T> st = getStack(refs[i]);
                     if (st != null) {
-                        refs[i] = st.peek();
+                        Variable[] vars = block.getVariables();
+                        Variable<T> peek = st.peek();
+                        vars[((Variable) refs[i]).getIndex()] = peek;
+                        refs[i] = peek;
                     }
                 }
             }
             if (q instanceof AssignQuad) {
                 AssignQuad<T> aq = (AssignQuad<T>) q;
                 SSAStack<T> st = getStack(aq.getLHS());
-                aq.setLHS(st.getNewVariable());
+                Variable var = aq.getLHS();
+                Variable[] vars = block.getVariables();
+                Variable<T> nvar = st.getNewVariable();
+                vars[var.getIndex()] = nvar;
+                aq.setLHS(nvar);
             }
         }
     }

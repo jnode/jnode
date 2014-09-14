@@ -44,7 +44,9 @@ public class MethodArgument<T> extends Variable<T> {
     }
 
     public Object clone() {
-        return new MethodArgument<T>(this);
+        MethodArgument<T> methodArgument = new MethodArgument<T>(this);
+        methodArgument.setLocation(this.getLocation());
+        return methodArgument;
     }
 
     /**

@@ -156,7 +156,7 @@ public class NativeTest {
 
         VmByteCode code = loadByteCode(className);
 
-        X86CodeGenerator x86cg = new X86CodeGenerator(os, code.getLength());
+        X86CodeGenerator x86cg = null; //new X86CodeGenerator(os, code.getLength());
 
         IRControlFlowGraph cfg = new IRControlFlowGraph(code);
 

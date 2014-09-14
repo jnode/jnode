@@ -329,7 +329,7 @@ public class BinaryQuad<T> extends AssignQuad<T> {
     public Operand<T> propagate(Variable<T> operand) {
         Quad<T> quad = foldConstants();
         if (quad instanceof ConstantRefAssignQuad) {
-            //setDeadCode(true);
+            setDeadCode(true);
             ConstantRefAssignQuad<T> cop = (ConstantRefAssignQuad<T>) quad;
             return cop.getRHS();
         }
@@ -346,6 +346,7 @@ public class BinaryQuad<T> extends AssignQuad<T> {
     public void doPass2() {
         refs[0] = refs[0].simplify();
         refs[1] = refs[1].simplify();
+        getLHS().setAssignQuad(this);
     }
 
     /**

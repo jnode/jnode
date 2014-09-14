@@ -21,6 +21,7 @@
 package org.jnode.vm.compiler.ir;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -48,6 +49,8 @@ public class LinearScanAllocator<T> {
     }
 
     public void allocate() {
+        Arrays.sort(liveRanges);
+
         int n = liveRanges.length;
         for (int i = 0; i < n; i += 1) {
             LiveRange<T> lr = liveRanges[i];
