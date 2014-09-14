@@ -2040,11 +2040,15 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         int compileCount = 0;
         if (mt != null) {
             final int count = mt.length;
+            int level = optLevel;
+            if (enableTestCompilers) {
+                //should match the strategy in LoadCompileService.doCompile()
+                level += LoadCompileService.getHighestOptimizationLevel(false) + 1;
+            }
             for (int i = 0; i < count; i++) {
                 final VmMethod method = mt[i];
-                if (optLevel > method.getNativeCodeOptLevel()) {
-                    LoadCompileService.compile(method, optLevel,
-                        enableTestCompilers);
+                if (level > method.getNativeCodeOptLevel()) {
+                    LoadCompileService.compile(method, optLevel, enableTestCompilers);
                     // method.setModifier(true, Modifier.ACC_COMPILED);
                     compileCount++;
                 }
