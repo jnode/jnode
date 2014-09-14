@@ -49,8 +49,8 @@
     <syntax alias="compile" description="Compile a class to native code">
       <sequence>
         <optionSet>
-          <option argLabel="test"  longName="test"/>
-          <option argLabel="level" longName="level"/>
+          <option argLabel="test" shortName="t" longName="test"/>
+          <option argLabel="level" shortName="l" longName="level"/>
         </optionSet>
         <argument argLabel="className"/>
       </sequence>
@@ -58,8 +58,8 @@
     <syntax alias="disasm" description="Disassemble a native code class">
       <sequence>
         <optionSet>
-          <option argLabel="test"  longName="test"/>
-          <option argLabel="level" longName="level"/>
+          <option argLabel="test" shortName="t" longName="test"/>
+          <option argLabel="level" shortName="l" longName="level"/>
         </optionSet>
         <argument argLabel="className"/>
         <optional>
