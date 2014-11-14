@@ -55,7 +55,8 @@ public class IBMPartitionTableTest {
 
         Collection<String> testFileNames = Arrays.asList(
             "linux-kernel.dd",
-            "random-data.dd");
+            "random-data.dd",
+            "sco.dd");
 
         for (String testFileName : testFileNames) {
             File testFile = FileSystemTestUtils.getTestFile("test/partitions/ibm/" + testFileName);
