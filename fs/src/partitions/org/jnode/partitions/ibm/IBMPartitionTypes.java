@@ -25,6 +25,7 @@ package org.jnode.partitions.ibm;
  */
 public enum IBMPartitionTypes {
     PARTTYPE_EMPTY(0x00, "Empty"),
+    PARTTYPE_UNKNOWN(-1, "Unknown"),
     PARTTYPE_DOS_FAT12(0x01, "DOS FAT12"),
     PARTTYPE_XENIX_ROOT(0x02, "XENIX root file system"),
     PARTTYPE_XENIX_USR(0x03, "XENIX /usr file system (obsolete)"),

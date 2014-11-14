@@ -112,13 +112,17 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
         LittleEndian.setInt8(bs, ofs + 3, chs.getCylinder() & 0xFF);
     }
 
+    public int getSystemIndicatorCode() {
+        return LittleEndian.getUInt8(bs, ofs + 4);
+    }
+
     public IBMPartitionTypes getSystemIndicator() {
-        int code = LittleEndian.getUInt8(bs, ofs + 4);
+        int code = getSystemIndicatorCode();
         try {
             return IBMPartitionTypes.valueOf(code);
         } catch (IllegalArgumentException e) {
-            log.warn("Invalid system indicator code: 0x" + Integer.toHexString(code));
-            return IBMPartitionTypes.PARTTYPE_EMPTY;
+            log.debug("Unknown or invalid system indicator code: 0x" + Integer.toHexString(code));
+            return IBMPartitionTypes.PARTTYPE_UNKNOWN;
         }
     }
 
