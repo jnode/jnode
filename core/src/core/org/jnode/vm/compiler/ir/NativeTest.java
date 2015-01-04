@@ -167,7 +167,7 @@ public class NativeTest {
         //System.out.println();
 
         System.out.println(cfg);
-        IRGenerator irg = new IRGenerator(cfg);
+        IRGenerator irg = null; //todo new IRGenerator(cfg, typeSizeInfo);
         BytecodeParser.parse(code, irg);
 
         // TODO fix this!

@@ -35,6 +35,7 @@ import org.jnode.assembler.x86.X86TextAssembler;
 import org.jnode.vm.VmImpl;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.bytecode.BytecodeParser;
+import org.jnode.vm.bytecode.BytecodeViewer;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
@@ -188,17 +189,18 @@ public class IRTest {
         throws MalformedURLException, ClassNotFoundException {
         IRControlFlowGraph<T> cfg = new IRControlFlowGraph<T>(code);
 
-        //BytecodeViewer bv = new BytecodeViewer();
-        //BytecodeParser.parse(code, bv);
+        BytecodeViewer bv = new BytecodeViewer();
+        BytecodeParser.parse(code, bv);
 
-        //System.out.println(cfg.toString());
-        //System.out.println();
+        System.out.println(cfg.toString());
+        System.out.println();
 
         //System.out.println(cfg);
-        IRGenerator<T> irg = new IRGenerator<T>(cfg);
+        IRGenerator<T> irg = new IRGenerator<T>(cfg, typeSizeInfo);
         BytecodeParser.parse(code, irg);
 
         X86Level2Compiler.initMethodArguments(arithMethod, stackFrame, typeSizeInfo, irg);
+        printCFG(cfg, "Initial IR");
 
         cfg.constructSSA();
         printCFG(cfg, "Constructed SSA");
@@ -212,6 +214,11 @@ public class IRTest {
         cfg.deconstrucSSA();
         cfg.fixupAddresses();
         printCFG(cfg, "Deconstructed SSA");
+
+        cfg.removeDefUseChains();
+        cfg.fixupAddresses();
+        printCFG(cfg, "Def-use chains removed SSA");
+
 
 //        removeUnusedVars(cfg);
 //        printCFG(cfg, "Unused vars removed SSA");
