@@ -30,7 +30,13 @@ import java.util.Map;
 import org.jnode.util.ObjectArrayIterator;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.classmgr.VmByteCode;
+import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
 import org.jnode.vm.compiler.ir.quad.AssignQuad;
+import org.jnode.vm.compiler.ir.quad.CallAssignQuad;
+import org.jnode.vm.compiler.ir.quad.NewAssignQuad;
+import org.jnode.vm.compiler.ir.quad.NewMultiArrayAssignQuad;
+import org.jnode.vm.compiler.ir.quad.NewObjectArrayAssignQuad;
+import org.jnode.vm.compiler.ir.quad.NewPrimitiveArrayAssignQuad;
 import org.jnode.vm.compiler.ir.quad.PhiAssignQuad;
 import org.jnode.vm.compiler.ir.quad.Quad;
 import org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad;
@@ -59,7 +65,7 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
         BytecodeParser.parse(bytecode, bbf);
         this.bblocks = bbf.createBasicBlocks();
         startBlock = bblocks[0];
-        computeDominance();
+        computeDominance(bytecode);
     }
 
     //todo use set
@@ -79,6 +85,68 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
     }
 
     public void removeUnusedVars() {
+        Map<Variable, Integer> varUses = getVariableUsage();
+        boolean loop;
+        do {
+            loop = false;
+            for (Map.Entry<Variable, Integer> u : varUses.entrySet()) {
+                if (u.getValue() == 0 && !u.getKey().getAssignQuad().isDeadCode()) {
+                    AssignQuad dq = u.getKey().getAssignQuad();
+                    if (dq instanceof CallAssignQuad ||
+                        dq instanceof NewAssignQuad ||
+                        dq instanceof NewObjectArrayAssignQuad ||
+                        dq instanceof NewPrimitiveArrayAssignQuad ||
+                        dq instanceof NewMultiArrayAssignQuad) {
+                        //todo optimize it, could be transformed to CallQuad
+                        continue;
+                    }
+                    dq.setDeadCode(true);
+                    Operand<T>[] refs = dq.getReferencedOps();
+                    if (refs != null) {
+                        for (Operand<T> ref : refs) {
+                            if (ref instanceof Variable) {
+                                Variable<T> r = (Variable<T>) ref;
+                                Integer c = varUses.get(r);
+                                if (c > 0) {
+                                    c--;
+                                }
+                                varUses.put(r, c);
+                            }
+                        }
+                    }
+                    loop = true;
+                    break;
+                }
+            }
+        } while (loop);
+    }
+
+    public void removeDefUseChains() {
+        Map<Variable, Integer> varUses = getVariableUsage();
+
+        for (Map.Entry<Variable, Integer> u : varUses.entrySet()) {
+            Variable var = u.getKey();
+            if (u.getValue() == 1 && !(var instanceof MethodArgument) && !var.getAssignQuad().isDeadCode()) {
+                for (IRBasicBlock<T> b : this) {
+                    for (Quad<T> q : b.getQuads()) {
+                        if (!q.isDeadCode()) {
+                            if (q instanceof VariableRefAssignQuad) {
+                                VariableRefAssignQuad vq = (VariableRefAssignQuad) q;
+                                if (vq.getRHS().equals(var) &&
+                                    vq.getBasicBlock().equals(var.getAssignQuad().getBasicBlock())) {
+                                    vq.setDeadCode(true);
+                                    var.getAssignQuad().setLHS(vq.getLHS());
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private Map<Variable, Integer> getVariableUsage() {
         Map<Variable, Integer> varUses = new HashMap<Variable, Integer>();
         for (IRBasicBlock<T> b : this) {
             for (Quad<T> q : b.getQuads()) {
@@ -107,31 +175,7 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
                 }
             }
         }
-        boolean loop;
-        do {
-            loop = false;
-            for (Map.Entry<Variable, Integer> u : varUses.entrySet()) {
-                if (u.getValue() == 0 && !u.getKey().getAssignQuad().isDeadCode()) {
-                    AssignQuad dq = u.getKey().getAssignQuad();
-                    dq.setDeadCode(true);
-                    Operand<T>[] refs = dq.getReferencedOps();
-                    if (refs != null) {
-                        for (Operand<T> ref : refs) {
-                            if (ref instanceof Variable) {
-                                Variable<T> r = (Variable<T>) ref;
-                                Integer c = varUses.get(r);
-                                if (c > 0) {
-                                    c--;
-                                }
-                                varUses.put(r, c);
-                            }
-                        }
-                    }
-                    loop = true;
-                    break;
-                }
-            }
-        } while (loop);
+        return varUses;
     }
 
     /**
@@ -169,10 +213,10 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
         return null;
     }
 
-    public void computeDominance() {
+    public void computeDominance(VmByteCode bytecode) {
         postOrderList = new BootableArrayList<IRBasicBlock<T>>();
         startBlock.computePostOrder(postOrderList);
-        doComputeDominance();
+        doComputeDominance(bytecode);
         computeDominanceFrontier();
         computeDominatedBlocks();
     }
@@ -193,7 +237,7 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
                  doms[b] = new_idom
                  Changed = true
      */
-    private void doComputeDominance() {
+    private void doComputeDominance(VmByteCode bytecode) {
         // This is critical, must be done in reverse postorder
         startBlock.setIDominator(startBlock);
         boolean changed = true;
@@ -229,6 +273,16 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
             }
         }
         startBlock.setIDominator(null);
+        for (VmInterpretedExceptionHandler eh : bytecode.getExceptionHandlers()) {
+            IRBasicBlock block = getBasicBlock(eh.getHandlerPC());
+            if (block != null && block.getIDominator() == null) {
+                IRBasicBlock pBlock = getBasicBlock(eh.getStartPC());
+                if (pBlock != null) {
+                    block.setIDominator(pBlock.getIDominator());
+                }
+            }
+
+        }
     }
 
     /**
@@ -350,13 +404,17 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
         Collections.sort(phiQuads, new Comparator<PhiAssignQuad<T>>() {
             @Override
             public int compare(PhiAssignQuad<T> o1, PhiAssignQuad<T> o2) {
-                return o2.getBasicBlock().getEndPC() - o1.getBasicBlock().getEndPC();
+                int i = o2.getBasicBlock().getEndPC() - o1.getBasicBlock().getEndPC();
+                if (i == 0) {
+                    i = o1.getLHS().getIndex() - o2.getLHS().getIndex();
+                }
+                return i;
             }
         });
         for (PhiAssignQuad<T> paq : phiQuads) {
             Variable<T> lhs = paq.getLHS();
             IRBasicBlock<T> firstBlock = null;
-            VariableRefAssignQuad<T> firstPhiMove = null;
+            AssignQuad<T> firstPhiMove = null;
             for (Operand<T> o : paq.getPhiOperand().getSources()) {
                 Variable<T> rhs = (Variable<T>) o;
                 AssignQuad<T> assignQuad = rhs.getAssignQuad();
@@ -366,7 +424,7 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
                 } else {
                     ab = assignQuad.getBasicBlock();
                 }
-                VariableRefAssignQuad<T> phiMove;
+                AssignQuad<T> phiMove;
                 phiMove = new VariableRefAssignQuad<T>(0, ab, lhs, rhs);
                 phiMove.doPass2();
                 ab.add(phiMove);

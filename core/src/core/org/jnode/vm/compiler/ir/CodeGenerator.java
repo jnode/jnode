@@ -20,15 +20,21 @@
  
 package org.jnode.vm.compiler.ir;
 
+import org.jnode.vm.compiler.ir.quad.ArrayAssignQuad;
 import org.jnode.vm.compiler.ir.quad.BinaryOperation;
 import org.jnode.vm.compiler.ir.quad.BranchCondition;
 import org.jnode.vm.compiler.ir.quad.ConditionalBranchQuad;
 import org.jnode.vm.compiler.ir.quad.ConstantRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.StaticCallAssignQuad;
+import org.jnode.vm.compiler.ir.quad.StaticCallQuad;
+import org.jnode.vm.compiler.ir.quad.StaticRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.StaticRefStoreQuad;
 import org.jnode.vm.compiler.ir.quad.UnaryOperation;
 import org.jnode.vm.compiler.ir.quad.UnaryQuad;
 import org.jnode.vm.compiler.ir.quad.UnconditionalBranchQuad;
 import org.jnode.vm.compiler.ir.quad.VarReturnQuad;
 import org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.VirtualCallQuad;
 import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
 
 /**
@@ -420,4 +426,42 @@ public abstract class CodeGenerator<T> {
      */
     public abstract void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1,
                                          BranchCondition condition, int disp2);
+
+    /**
+     *
+     * @param quad
+     */
+    public abstract void generateCodeFor(StaticRefAssignQuad<T> quad);
+
+    /**
+     *
+     * @param quad
+     */
+    public abstract void generateCodeFor(StaticRefStoreQuad<T> quad);
+
+    /**
+     *
+     * @param quad
+     */
+    public abstract void generateCodeFor(StaticCallAssignQuad<T> quad);
+
+    /**
+     *
+     * @param quad
+     */
+    public abstract void generateCodeFor(StaticCallQuad<T> quad);
+
+    /**
+     *
+     * @param quad
+     */
+    public abstract void generateCodeFor(VirtualCallQuad quad);
+
+    /**
+     *
+     * @param quad
+     */
+    public abstract void generateCodeFor(ArrayAssignQuad quad);
+
+
 }

@@ -21,11 +21,15 @@
 package org.jnode.vm.compiler.ir;
 
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.DADD;
+import static org.jnode.vm.compiler.ir.quad.BinaryOperation.DCMPG;
+import static org.jnode.vm.compiler.ir.quad.BinaryOperation.DCMPL;
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.DDIV;
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.DMUL;
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.DREM;
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.DSUB;
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.FADD;
+import static org.jnode.vm.compiler.ir.quad.BinaryOperation.FCMPG;
+import static org.jnode.vm.compiler.ir.quad.BinaryOperation.FCMPL;
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.FDIV;
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.FMUL;
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.FREM;
@@ -43,6 +47,7 @@ import static org.jnode.vm.compiler.ir.quad.BinaryOperation.IUSHR;
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.IXOR;
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.LADD;
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.LAND;
+import static org.jnode.vm.compiler.ir.quad.BinaryOperation.LCMP;
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.LDIV;
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.LMUL;
 import static org.jnode.vm.compiler.ir.quad.BinaryOperation.LOR;
@@ -68,6 +73,7 @@ import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ICMPGT;
 import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ICMPLE;
 import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ICMPLT;
 import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ICMPNE;
+import static org.jnode.vm.compiler.ir.quad.UnaryOperation.D2F;
 import static org.jnode.vm.compiler.ir.quad.UnaryOperation.D2I;
 import static org.jnode.vm.compiler.ir.quad.UnaryOperation.D2L;
 import static org.jnode.vm.compiler.ir.quad.UnaryOperation.DNEG;
@@ -89,8 +95,10 @@ import static org.jnode.vm.compiler.ir.quad.UnaryOperation.LNEG;
 
 import java.util.Iterator;
 
+import org.jnode.vm.JvmType;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.BytecodeVisitor;
+import org.jnode.vm.classmgr.Signature;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmConstFieldRef;
@@ -98,16 +106,46 @@ import org.jnode.vm.classmgr.VmConstIMethodRef;
 import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.compiler.ir.quad.ArrayAssignQuad;
+import org.jnode.vm.compiler.ir.quad.ArrayLengthAssignQuad;
+import org.jnode.vm.compiler.ir.quad.ArrayStoreQuad;
 import org.jnode.vm.compiler.ir.quad.BinaryOperation;
 import org.jnode.vm.compiler.ir.quad.BinaryQuad;
+import org.jnode.vm.compiler.ir.quad.BranchCondition;
+import org.jnode.vm.compiler.ir.quad.CheckcastQuad;
 import org.jnode.vm.compiler.ir.quad.ConditionalBranchQuad;
+import org.jnode.vm.compiler.ir.quad.ConstantClassAssignQuad;
 import org.jnode.vm.compiler.ir.quad.ConstantRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.ConstantStringAssignQuad;
+import org.jnode.vm.compiler.ir.quad.InstanceofAssignQuad;
+import org.jnode.vm.compiler.ir.quad.InterfaceCallAssignQuad;
+import org.jnode.vm.compiler.ir.quad.InterfaceCallQuad;
+import org.jnode.vm.compiler.ir.quad.MonitorenterQuad;
+import org.jnode.vm.compiler.ir.quad.MonitorexitQuad;
+import org.jnode.vm.compiler.ir.quad.NewMultiArrayAssignQuad;
+import org.jnode.vm.compiler.ir.quad.NewObjectArrayAssignQuad;
+import org.jnode.vm.compiler.ir.quad.NewPrimitiveArrayAssignQuad;
+import org.jnode.vm.compiler.ir.quad.NewAssignQuad;
 import org.jnode.vm.compiler.ir.quad.Quad;
+import org.jnode.vm.compiler.ir.quad.RefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.RefStoreQuad;
+import org.jnode.vm.compiler.ir.quad.SpecialCallAssignQuad;
+import org.jnode.vm.compiler.ir.quad.SpecialCallQuad;
+import org.jnode.vm.compiler.ir.quad.StaticCallAssignQuad;
+import org.jnode.vm.compiler.ir.quad.StaticCallQuad;
+import org.jnode.vm.compiler.ir.quad.StaticRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.StaticRefStoreQuad;
+import org.jnode.vm.compiler.ir.quad.LooukupswitchQuad;
+import org.jnode.vm.compiler.ir.quad.TableswitchQuad;
+import org.jnode.vm.compiler.ir.quad.ThrowQuad;
 import org.jnode.vm.compiler.ir.quad.UnaryQuad;
 import org.jnode.vm.compiler.ir.quad.UnconditionalBranchQuad;
 import org.jnode.vm.compiler.ir.quad.VarReturnQuad;
 import org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.VirtualCallAssignQuad;
+import org.jnode.vm.compiler.ir.quad.VirtualCallQuad;
 import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
+import org.jnode.vm.facade.TypeSizeInfo;
 
 /**
  * Intermediate Representation Generator.
@@ -124,10 +162,12 @@ public class IRGenerator<T> extends BytecodeVisitor {
     private int address;
     private Iterator<IRBasicBlock<T>> basicBlockIterator;
     private IRBasicBlock<T> currentBlock;
+    private TypeSizeInfo typeSizeInfo;
 
-    public IRGenerator(IRControlFlowGraph<T> cfg) {
+    public IRGenerator(IRControlFlowGraph<T> cfg, TypeSizeInfo typeSizeInfo) {
         basicBlockIterator = cfg.iterator();
         currentBlock = basicBlockIterator.next();
+        this.typeSizeInfo = typeSizeInfo;
     }
 
     public void setParser(BytecodeParser parser) {
@@ -168,6 +208,7 @@ public class IRGenerator<T> extends BytecodeVisitor {
                 if (currentBlock.isStartOfExceptionHandler()) {
                     stackOffset = nLocals + 1;
                     currentBlock.setStackOffset(stackOffset);
+                    currentBlock.setVariables(variables);
                     // TODO need to set variables also...
                 }
                 return;
@@ -229,17 +270,18 @@ public class IRGenerator<T> extends BytecodeVisitor {
 
     public void visit_dconst(double value) {
         Constant<T> c = Constant.getInstance(value);
-        currentBlock.add(new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset,
-            c));
+        currentBlock.add(new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset, c));
         stackOffset += 2;
     }
 
     public void visit_ldc(VmConstString value) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        currentBlock.add(new ConstantStringAssignQuad<T>(address, currentBlock, stackOffset, value));
+        stackOffset++;
     }
 
     public final void visit_ldc(VmConstClass value) {
-        throw new Error("Not implemented yet");
+        currentBlock.add(new ConstantClassAssignQuad<T>(address, currentBlock, stackOffset, value));
+        stackOffset++;
     }
 
     public void visit_iload(int index) {
@@ -283,35 +325,35 @@ public class IRGenerator<T> extends BytecodeVisitor {
     }
 
     public void visit_iaload() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayLoad(Operand.INT);
     }
 
     public void visit_laload() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayLoad(Operand.LONG);
     }
 
     public void visit_faload() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayLoad(Operand.FLOAT);
     }
 
     public void visit_daload() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayLoad(Operand.DOUBLE);
     }
 
     public void visit_aaload() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayLoad(Operand.REFERENCE);
     }
 
     public void visit_baload() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayLoad(Operand.BYTE);
     }
 
     public void visit_caload() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayLoad(Operand.CHAR);
     }
 
     public void visit_saload() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayLoad(Operand.SHORT);
     }
 
     public void visit_istore(int index) {
@@ -350,47 +392,50 @@ public class IRGenerator<T> extends BytecodeVisitor {
     }
 
     public void visit_iastore() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayStore(Operand.INT);
     }
 
     public void visit_lastore() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayStore(Operand.LONG);
     }
 
     public void visit_fastore() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayStore(Operand.FLOAT);
     }
 
     public void visit_dastore() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayStore(Operand.DOUBLE);
     }
 
     public void visit_aastore() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayStore(Operand.REFERENCE);
     }
 
     public void visit_bastore() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayStore(Operand.BYTE);
     }
 
     public void visit_castore() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayStore(Operand.CHAR);
     }
 
     public void visit_sastore() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        visitArrayStore(Operand.SHORT);
     }
 
     public void visit_pop() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
     }
 
     public void visit_pop2() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 2;
     }
 
     public void visit_dup() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        int index = stackOffset;
+        stackOffset -= 1;
+        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
+        stackOffset += 2;
     }
 
     public void visit_dup_x1() {
@@ -402,7 +447,20 @@ public class IRGenerator<T> extends BytecodeVisitor {
     }
 
     public void visit_dup2() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        int index = stackOffset;
+
+        Variable var = currentBlock.getVariables()[index - 2];
+        if (var.getType() == Operand.LONG || var.getType() == Operand.DOUBLE) {
+            stackOffset -= 2;
+            currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
+            stackOffset += 4;
+        } else {
+            stackOffset -= 1;
+            currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index + 1, stackOffset));
+            stackOffset -= 1;
+            currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
+            stackOffset += 4;
+        }
     }
 
     public void visit_dup2_x1() {
@@ -666,7 +724,10 @@ public class IRGenerator<T> extends BytecodeVisitor {
     }
 
     public void visit_d2f() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 2;
+        variables[stackOffset].setType(Operand.FLOAT);
+        currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, D2F, stackOffset));
+        stackOffset += 1;
     }
 
     public void visit_i2b() {
@@ -691,179 +752,79 @@ public class IRGenerator<T> extends BytecodeVisitor {
     }
 
     public void visit_lcmp() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        currentBlock.add(doBinaryQuad(LCMP, Operand.LONG));
     }
 
     public void visit_fcmpl() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        currentBlock.add(doBinaryQuad(FCMPL, Operand.FLOAT));
     }
 
     public void visit_fcmpg() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        currentBlock.add(doBinaryQuad(FCMPG, Operand.FLOAT));
     }
 
     public void visit_dcmpl() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        currentBlock.add(doBinaryQuad(DCMPL, Operand.DOUBLE));
     }
 
     public void visit_dcmpg() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        currentBlock.add(doBinaryQuad(DCMPG, Operand.DOUBLE));
     }
 
     public void visit_ifeq(int address) {
-        int s1 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.INT);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IFEQ, address));
-        stackOffset -= 1;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IFEQ, Operand.INT);
     }
 
     public void visit_ifne(int address) {
-        int s1 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.INT);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IFNE, address));
-        stackOffset -= 1;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IFNE, Operand.INT);
     }
 
     public void visit_iflt(int address) {
-        int s1 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.INT);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IFLT, address));
-        stackOffset -= 1;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IFLT, Operand.INT);
     }
 
     public void visit_ifge(int address) {
-        int s1 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.INT);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IFGE, address));
-        stackOffset -= 1;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IFGE, Operand.INT);
     }
 
     public void visit_ifgt(int address) {
-        int s1 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.INT);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IFGT, address));
-        stackOffset -= 1;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IFGT, Operand.INT);
     }
 
     public void visit_ifle(int address) {
-        int s1 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.INT);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IFLE, address));
-        stackOffset -= 1;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IFLE, Operand.INT);
     }
 
     public void visit_if_icmpeq(int address) {
-        int s1 = stackOffset - 2;
-        int s2 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.INT);
-        variables[s2].setType(Operand.INT);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IF_ICMPEQ, s2, address));
-        stackOffset -= 2;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IF_ICMPEQ, Operand.INT);
     }
 
     public void visit_if_icmpne(int address) {
-        int s1 = stackOffset - 2;
-        int s2 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.INT);
-        variables[s2].setType(Operand.INT);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IF_ICMPNE, s2, address));
-        stackOffset -= 2;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IF_ICMPNE, Operand.INT);
     }
 
     public void visit_if_icmplt(int address) {
-        int s1 = stackOffset - 2;
-        int s2 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.INT);
-        variables[s2].setType(Operand.INT);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IF_ICMPLT, s2, address));
-        stackOffset -= 2;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IF_ICMPLT, Operand.INT);
     }
 
     public void visit_if_icmpge(int address) {
-        int s1 = stackOffset - 2;
-        int s2 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.INT);
-        variables[s2].setType(Operand.INT);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IF_ICMPGE, s2, address));
-        stackOffset -= 2;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IF_ICMPGE, Operand.INT);
     }
 
     public void visit_if_icmpgt(int address) {
-        int s1 = stackOffset - 2;
-        int s2 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.INT);
-        variables[s2].setType(Operand.INT);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IF_ICMPGT, s2, address));
-        stackOffset -= 2;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IF_ICMPGT, Operand.INT);
     }
 
     public void visit_if_icmple(int address) {
-        int s1 = stackOffset - 2;
-        int s2 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.INT);
-        variables[s2].setType(Operand.INT);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IF_ICMPLE, s2, address));
-        stackOffset -= 2;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IF_ICMPLE, Operand.INT);
     }
 
     public void visit_if_acmpeq(int address) {
-        int s1 = stackOffset - 2;
-        int s2 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.REFERENCE);
-        variables[s2].setType(Operand.REFERENCE);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IF_ACMPEQ, s2, address));
-        stackOffset -= 2;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IF_ACMPEQ, Operand.REFERENCE);
     }
 
     public void visit_if_acmpne(int address) {
-        int s1 = stackOffset - 2;
-        int s2 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.REFERENCE);
-        variables[s2].setType(Operand.REFERENCE);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IF_ACMPNE, s2, address));
-        stackOffset -= 2;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IF_ACMPNE, Operand.REFERENCE);
     }
 
     public void visit_goto(int address) {
@@ -871,20 +832,16 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    public void visit_jsr(int address) {
-        throw new IllegalArgumentException("byte code not yet supported");
-    }
-
-    public void visit_ret(int index) {
-        throw new IllegalArgumentException("byte code not yet supported");
-    }
-
     public void visit_tableswitch(int defValue, int lowValue, int highValue, int[] addresses) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
+        currentBlock.add(new TableswitchQuad<T>(address, currentBlock, defValue, lowValue, highValue, addresses,
+            stackOffset));
     }
 
     public void visit_lookupswitch(int defValue, int[] matchValues, int[] addresses) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
+        currentBlock.add(new LooukupswitchQuad<T>(address, currentBlock, defValue, matchValues, addresses,
+            stackOffset));
     }
 
     public void visit_ireturn() {
@@ -922,95 +879,215 @@ public class IRGenerator<T> extends BytecodeVisitor {
     }
 
     public void visit_getstatic(VmConstFieldRef fieldRef) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        currentBlock.add(new StaticRefAssignQuad<T>(address, currentBlock, stackOffset, fieldRef));
+        stackOffset += 1;
     }
 
     public void visit_putstatic(VmConstFieldRef fieldRef) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
+        currentBlock.add(new StaticRefStoreQuad<T>(address, currentBlock, stackOffset, fieldRef));
     }
 
     public void visit_getfield(VmConstFieldRef fieldRef) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
+        currentBlock.add(new RefAssignQuad<T>(address, currentBlock, stackOffset, fieldRef, stackOffset));
+        stackOffset += 1;
     }
 
     public void visit_putfield(VmConstFieldRef fieldRef) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
+        int ref = stackOffset - 1;
+        currentBlock.add(new RefStoreQuad<T>(address, currentBlock, stackOffset, fieldRef, ref));
+        stackOffset -= 1;
     }
 
     public void visit_invokevirtual(VmConstMethodRef methodRef) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef.getSignature());
+        int returnType = JvmType.getReturnType(methodRef.getSignature());
+        if (JvmType.VOID == returnType) {
+            int[] varOffs = new int[argSlotCount + 1];
+            for (int i = 0; i < argSlotCount; i++) {
+                stackOffset--;
+                variables[stackOffset].setType(Operand.INT);
+                varOffs[i] = stackOffset;
+            }
+            stackOffset--;
+            variables[argSlotCount].setType(Operand.REFERENCE);
+            varOffs[argSlotCount] = stackOffset;
+            currentBlock.add(new VirtualCallQuad(address, currentBlock, methodRef, varOffs));
+        } else {
+            int[] varOffs = new int[argSlotCount + 1];
+            for (int i = 0; i < argSlotCount; i++) {
+                stackOffset--;
+                variables[stackOffset].setType(Operand.INT);
+                varOffs[i] = stackOffset;
+            }
+            stackOffset--;
+            variables[argSlotCount].setType(Operand.REFERENCE);
+            varOffs[argSlotCount] = stackOffset;
+            currentBlock.add(new VirtualCallAssignQuad(address, currentBlock, stackOffset, methodRef, varOffs));
+            stackOffset++;
+        }
     }
 
     public void visit_invokespecial(VmConstMethodRef methodRef) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef.getSignature());
+        int returnType = JvmType.getReturnType(methodRef.getSignature());
+        if (JvmType.VOID == returnType) {
+            int[] varOffs = new int[argSlotCount + 1];
+            for (int i = 0; i < argSlotCount; i++) {
+                stackOffset--;
+                variables[stackOffset].setType(Operand.INT);
+                varOffs[i] = stackOffset;
+            }
+            stackOffset--;
+            variables[argSlotCount].setType(Operand.REFERENCE);
+            varOffs[argSlotCount] = stackOffset;
+            currentBlock.add(new SpecialCallQuad(address, currentBlock, methodRef, varOffs));
+        } else {
+            int[] varOffs = new int[argSlotCount + 1];
+            for (int i = 0; i < argSlotCount; i++) {
+                stackOffset--;
+                variables[stackOffset].setType(Operand.INT);
+                varOffs[i] = stackOffset;
+            }
+            stackOffset--;
+            variables[argSlotCount].setType(Operand.REFERENCE);
+            varOffs[argSlotCount] = stackOffset;
+            currentBlock.add(new SpecialCallAssignQuad(address, currentBlock, stackOffset, methodRef, varOffs));
+            stackOffset++;
+        }
     }
 
     public void visit_invokestatic(VmConstMethodRef methodRef) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef.getSignature());
+        int returnType = JvmType.getReturnType(methodRef.getSignature());
+        if (JvmType.VOID == returnType) {
+            int[] varOffs = new int[argSlotCount];
+            for (int i = 0; i < argSlotCount; i++) {
+                stackOffset--;
+                variables[stackOffset].setType(Operand.INT);
+                varOffs[i] = stackOffset;
+            }
+            currentBlock.add(new StaticCallQuad<T>(address, currentBlock, methodRef, varOffs));
+        } else {
+            int[] varOffs = new int[argSlotCount];
+            for (int i = 0; i < argSlotCount; i++) {
+                stackOffset--;
+                variables[stackOffset].setType(Operand.INT);
+                varOffs[i] = stackOffset;
+            }
+            currentBlock.add(new StaticCallAssignQuad<T>(address, currentBlock, stackOffset, methodRef, varOffs));
+            stackOffset++;
+        }
     }
 
     public void visit_invokeinterface(VmConstIMethodRef methodRef, int count) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef.getSignature());
+        int returnType = JvmType.getReturnType(methodRef.getSignature());
+        if (JvmType.VOID == returnType) {
+            int[] varOffs = new int[argSlotCount + 1];
+            for (int i = 0; i < argSlotCount; i++) {
+                stackOffset--;
+                variables[stackOffset].setType(Operand.INT);
+                varOffs[i] = stackOffset;
+            }
+            stackOffset--;
+            variables[argSlotCount].setType(Operand.REFERENCE);
+            varOffs[argSlotCount] = stackOffset;
+            currentBlock.add(new InterfaceCallQuad(address, currentBlock, methodRef, varOffs));
+        } else {
+            int[] varOffs = new int[argSlotCount + 1];
+            for (int i = 0; i < argSlotCount; i++) {
+                stackOffset--;
+                variables[stackOffset].setType(Operand.INT);
+                varOffs[i] = stackOffset;
+            }
+            stackOffset--;
+            variables[argSlotCount].setType(Operand.REFERENCE);
+            varOffs[argSlotCount] = stackOffset;
+            currentBlock.add(new InterfaceCallAssignQuad(address, currentBlock, stackOffset, methodRef, varOffs));
+            stackOffset++;
+        }
     }
 
     public void visit_new(VmConstClass clazz) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        currentBlock.add(new NewAssignQuad<T>(address, currentBlock, stackOffset, clazz));
+        stackOffset++;
     }
 
     public void visit_newarray(int type) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
+        currentBlock.add(new NewPrimitiveArrayAssignQuad<T>(address, currentBlock, stackOffset, type, stackOffset));
+        stackOffset += 1;
     }
 
     public void visit_anewarray(VmConstClass clazz) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
+        currentBlock.add(new NewObjectArrayAssignQuad<T>(address, currentBlock, stackOffset, clazz, stackOffset));
+        stackOffset += 1;
     }
 
     public void visit_arraylength() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
+        currentBlock.add(new ArrayLengthAssignQuad(address, currentBlock, stackOffset, stackOffset));
+        stackOffset += 1;
     }
 
     public void visit_athrow() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
+        currentBlock.add(new ThrowQuad<T>(address, currentBlock, stackOffset));
+        stackOffset = nLocals + 1;
     }
 
     public void visit_checkcast(VmConstClass clazz) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
+        currentBlock.add(new CheckcastQuad<T>(address, currentBlock, clazz, stackOffset));
+        stackOffset += 1;
     }
 
     public void visit_instanceof(VmConstClass clazz) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
+        currentBlock.add(new InstanceofAssignQuad<T>(address, currentBlock, stackOffset, clazz, stackOffset));
+        stackOffset += 1;
     }
 
     public void visit_monitorenter() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
+        currentBlock.add(new MonitorenterQuad<T>(address, currentBlock, stackOffset));
     }
 
     public void visit_monitorexit() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
+        currentBlock.add(new MonitorexitQuad<T>(address, currentBlock, stackOffset));
     }
 
     public void visit_multianewarray(VmConstClass clazz, int dimensions) {
-        throw new IllegalArgumentException("byte code not yet supported");
+        stackOffset -= 1;
+        int[] sizes = new int[dimensions];
+        for (int i = dimensions - 1; i >= 0; i--) {
+            sizes[i] = stackOffset;
+            stackOffset -= 1;
+        }
+        stackOffset += 1;
+        currentBlock.add(new NewMultiArrayAssignQuad<T>(address, currentBlock, stackOffset, clazz, sizes));
+        stackOffset += 1;
     }
 
     public void visit_ifnull(int address) {
-        int s1 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.REFERENCE);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IFNULL, address));
-        stackOffset -= 1;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IFNULL, Operand.REFERENCE);
     }
 
     public void visit_ifnonnull(int address) {
-        int s1 = stackOffset - 1;
-        Variable[] variables = currentBlock.getVariables();
-        variables[s1].setType(Operand.REFERENCE);
-        currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
-            s1, IFNONNULL, address));
-        stackOffset -= 1;
-        setSuccessorStackOffset();
+        visitBranchCondition(address, IFNONNULL, Operand.REFERENCE);
+    }
+
+    public void visit_jsr(int address) {
+        throw new UnsupportedOperationException("Byte code not supported: jsr");
+    }
+
+    public void visit_ret(int index) {
+        throw new UnsupportedOperationException("Byte code not supported: ret");
     }
 
     // TODO
@@ -1025,6 +1102,9 @@ public class IRGenerator<T> extends BytecodeVisitor {
         variables[s1].setType(type);
         variables[stackOffset].setType(type);
         BinaryQuad<T> bop = new BinaryQuad<T>(address, currentBlock, s1, s1, op, stackOffset);
+        if (op == BinaryOperation.LCMP || op == BinaryOperation.DCMPL || op == BinaryOperation.DCMPG) {
+            stackOffset -= 1;
+        }
         return bop.foldConstants();
     }
 
@@ -1047,6 +1127,52 @@ public class IRGenerator<T> extends BytecodeVisitor {
         // same as our dominator
         for (IRBasicBlock b : currentBlock.getSuccessors()) {
             b.setStackOffset(stackOffset);
+        }
+    }
+
+    //*********************** HELPER METHODS *****************************//
+    private void visitArrayLoad(int arrayType) {
+        stackOffset -= 1;
+        int ind = stackOffset;
+        int ref = stackOffset - 1;
+        variables[ind].setType(Operand.INT);
+        variables[ref].setType(Operand.REFERENCE);
+        currentBlock.add(new ArrayAssignQuad(address, currentBlock, ref, ind, ref, arrayType));
+        if (arrayType ==  Operand.LONG || arrayType == Operand.DOUBLE) {
+            stackOffset += 1;
+        }
+    }
+
+    private void visitArrayStore(int arrayType) {
+        stackOffset -= 1;
+        int disp = arrayType == Operand.LONG || arrayType == Operand.DOUBLE ? 1 : 0;
+        int val = stackOffset - disp;
+        int ind = stackOffset - disp - 1;
+        int ref = stackOffset - disp - 2;
+        variables[ind].setType(Operand.INT);
+        variables[val].setType(arrayType);
+        variables[ref].setType(Operand.REFERENCE);
+        currentBlock.add(new ArrayStoreQuad(address, currentBlock, val, ind, ref, arrayType));
+        stackOffset -= disp + 2;
+    }
+
+    private void visitBranchCondition(int address, BranchCondition condition, int type) {
+        if (condition.isUnary()) {
+            int s1 = stackOffset - 1;
+            Variable[] variables1 = currentBlock.getVariables();
+            variables1[s1].setType(type);
+            currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock, s1, condition, address));
+            stackOffset -= 1;
+            setSuccessorStackOffset();
+        } else {
+            int s1 = stackOffset - 2;
+            int s2 = stackOffset - 1;
+            Variable[] variables1 = currentBlock.getVariables();
+            variables1[s1].setType(type);
+            variables1[s2].setType(type);
+            currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock, s1, condition, s2, address));
+            stackOffset -= 2;
+            setSuccessorStackOffset();
         }
     }
 }

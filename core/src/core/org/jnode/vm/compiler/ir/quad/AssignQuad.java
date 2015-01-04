@@ -21,6 +21,7 @@
 package org.jnode.vm.compiler.ir.quad;
 
 import java.util.Collection;
+import java.util.List;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 import org.jnode.vm.compiler.ir.Operand;
 import org.jnode.vm.compiler.ir.Variable;
@@ -100,6 +101,17 @@ public abstract class AssignQuad<T> extends Quad<T> {
     public void doPass3(Collection<Variable<T>> values) {
         if (!values.contains(lhs)) {
             setDeadCode(true);
+        }
+    }
+
+    @Override
+    public void computeLiveness(List<Variable<?>> liveVariables) {
+        super.computeLiveness(liveVariables);
+        if (lhs.getLastUseAddress() < getAddress()) {
+            lhs.setLastUseAddress(getAddress());
+        }
+        if (!liveVariables.contains(lhs)) {
+            liveVariables.add(lhs);
         }
     }
 }

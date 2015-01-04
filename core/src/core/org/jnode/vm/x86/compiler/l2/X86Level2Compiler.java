@@ -160,7 +160,7 @@ public class X86Level2Compiler extends AbstractX86Compiler {
 
                 VmByteCode bytecode = method.getBytecode();
                 IRControlFlowGraph cfg = new IRControlFlowGraph(bytecode);
-                IRGenerator irg = new IRGenerator(cfg);
+                IRGenerator irg = new IRGenerator(cfg, typeSizeInfo);
                 BytecodeParser.parse(bytecode, irg);
 
                 initMethodArguments(method, stackFrame, typeSizeInfo, irg);
@@ -169,6 +169,7 @@ public class X86Level2Compiler extends AbstractX86Compiler {
                 cfg.optimize();
                 cfg.removeUnusedVars();
                 cfg.deconstrucSSA();
+                cfg.removeDefUseChains();
                 cfg.fixupAddresses();
 
                 X86CodeGenerator x86cg = new X86CodeGenerator(method, (X86Assembler) os, bytecode.getLength(),

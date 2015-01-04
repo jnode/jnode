@@ -359,8 +359,8 @@ public final class X86StackFrame {
 
     private void emitSynchronizationCode(TypeSizeInfo typeSizeInfo, VmMethod monitorMethod) {
         if (method.isSynchronized()) {
-            final GPR aax = os.isCode32() ? (GPR) X86Register.EAX : X86Register.RAX;
-            final GPR adx = os.isCode32() ? (GPR) X86Register.EDX : X86Register.RDX;
+            final GPR aax = os.isCode32() ? X86Register.EAX : X86Register.RAX;
+            final GPR adx = os.isCode32() ? X86Register.EDX : X86Register.RDX;
 
             os.writePUSH(aax);
             os.writePUSH(adx);
@@ -405,5 +405,9 @@ public final class X86StackFrame {
 
     public X86CompilerHelper getHelper() {
         return helper;
+    }
+
+    public EntryPoints getEntryPoints() {
+        return entryPoints;
     }
 }

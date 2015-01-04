@@ -52,7 +52,12 @@ public enum BinaryOperation {
     IOR("|"),
     LOR("|"),
     IXOR("^"),
-    LXOR("^");
+    LXOR("^"),
+    LCMP("lcmp"),
+    FCMPG("fcmpg"),
+    FCMPL("fcmpl"),
+    DCMPG("dcmpg"),
+    DCMPL("dcmpl");
 
     private final String v;
 
