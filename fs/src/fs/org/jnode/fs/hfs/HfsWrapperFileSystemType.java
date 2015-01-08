@@ -44,9 +44,11 @@ public class HfsWrapperFileSystemType implements BlockDeviceFileSystemType<HfsPl
     public final HfsPlusFileSystem create(final Device device, final boolean readOnly) throws FileSystemException {
 
         ByteBuffer mdbData = ByteBuffer.allocate(MasterDirectoryBlock.LENGTH);
+        long deviceLength;
 
         try {
             device.getAPI(BlockDeviceAPI.class).read(0x400, mdbData);
+            deviceLength = device.getAPI(BlockDeviceAPI.class).getLength();
         } catch (ApiNotFoundException e) {
             throw new FileSystemException("Failed to find the block device API", e);
         } catch (IOException e) {
@@ -56,9 +58,11 @@ public class HfsWrapperFileSystemType implements BlockDeviceFileSystemType<HfsPl
         MasterDirectoryBlock mdb = new MasterDirectoryBlock(mdbData.array());
 
         // Calculate the offset and length of the embedded HFS+ file system
+        // Limit the length of the embedded file system to the size of the device; some wrappers seem to report the
+        // wrong length otherwise.
         long offset = mdb.getAllocationBlockStart() * 512 +
             mdb.getEmbeddedVolumeStartBlock() * mdb.getAllocationBlockSize();
-        long length = mdb.getEmbeddedVolumeBlockCount() * mdb.getAllocationBlockSize();
+        long length = Math.min(deviceLength - offset, mdb.getEmbeddedVolumeBlockCount() * mdb.getAllocationBlockSize());
 
         MappedBlockDeviceSupport subDevice;
         try {
