@@ -58,28 +58,40 @@ public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSyste
             }
         }
 */
-        if (firstSectors.length < 86) {
+        if (firstSectors.length < 512) {
             // Not enough data for detection
             return false;
         }
 
+        if (firstSectors[510] != (byte) 0x55 || firstSectors[511] != (byte) 0xaa) {
+            // Missing magic number
+            return false;
+        }
+
         // Check for FAT-32
-        if (firstSectors[66] == 0x29 &&
+        if (firstSectors[66] == (byte) 0x29 &&
             firstSectors[82] == 'F' &&
             firstSectors[83] == 'A' &&
             firstSectors[84] == 'T' &&
             firstSectors[85] == '3' &&
-            firstSectors[86] == '2') {
+            firstSectors[86] == '2' &&
+            firstSectors[87] == ' ' &&
+            firstSectors[88] == ' ' &&
+            firstSectors[89] == ' ') {
             return true;
         }
 
         // Check for FAT-16/12
-        return (firstSectors[38] == 0x29 &&
+        // The 'extended boot signature' at offset 0x26 is not always set, so don't bother checking it here
+        return (
             firstSectors[54] == 'F' &&
             firstSectors[55] == 'A' &&
             firstSectors[56] == 'T' &&
             firstSectors[57] == '1' &&
-            (firstSectors[58] == '2' || firstSectors[58] == '6'));
+            (firstSectors[58] == '2' || firstSectors[58] == '6') &&
+            firstSectors[59] == ' ' &&
+            firstSectors[60] == ' ' &&
+            firstSectors[61] == ' ');
     }
 
     public FatFileSystem create(Device device, boolean readOnly) throws FileSystemException {
