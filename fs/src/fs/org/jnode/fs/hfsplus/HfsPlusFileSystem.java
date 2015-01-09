@@ -55,6 +55,11 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
     private Extent extentOverflow;
 
     /**
+     * The HFS+ private data directory. Used by HFS+ to stored hard linked file data.
+     */
+    private HfsPlusDirectory privateDataDirectory;
+
+    /**
      * @param device
      * @param readOnly
      * @param type
@@ -145,6 +150,28 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
 
     public final SuperBlock getVolumeHeader() {
         return volumeHeader;
+    }
+
+    /**
+     * Gets the HFS+ private data directory. Used by HFS+ to stored hard linked file data.
+     *
+     * @return the private data directory, or {@code null} if it has not been initialised on this volume.
+     */
+    public HfsPlusDirectory getPrivateDataDirectory() {
+        if (privateDataDirectory == null) {
+            try {
+                FSDirectory rootDirectory = getRootEntry().getDirectory();
+                FSEntry privateDataEntry = rootDirectory.getEntry("\u0000\u0000\u0000\u0000HFS+ Private Data");
+
+                if (privateDataEntry != null) {
+                    privateDataDirectory = (HfsPlusDirectory) privateDataEntry.getDirectory();
+                }
+            } catch (IOException e) {
+                throw new IllegalStateException("Error getting private data directory", e);
+            }
+        }
+
+        return privateDataDirectory;
     }
 
     /**

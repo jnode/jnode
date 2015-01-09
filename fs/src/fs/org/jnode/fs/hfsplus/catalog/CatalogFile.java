@@ -37,6 +37,7 @@ public class CatalogFile {
 
     public static final int RECORD_TYPE_FILE = 0x0002;
     public static final int RECORD_TYPE_FILE_THREAD = 0x0004;
+    public static final int FLAGS_HARDLINK_CHAIN = 0x0020;
 
     public static final int CATALOG_FILE_SIZE = 248;
     /**

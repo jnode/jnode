@@ -68,6 +68,33 @@ public class HfsPlusFileSystemTest {
     }
 
     @Test
+    public void testReadDiskWithFileHardLinks() throws Exception {
+
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/hfsplus/hard-linked-files.dmg"), "r");
+        HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
+        HfsPlusFileSystem fs = type.create(device, true);
+
+        String expectedStructure =
+            "type: HFS+ vol:hard-links total:40960000 free:39436288\n" +
+                "  /; \n" +
+                "    .DS_Store; 6148; b5ae7323596898677123c65fcce1be07\n" +
+                "    .fseventsd; \n" +
+                "      00000000214eb5f7; 121; 45f770b87c4fb7773466ed4ea7333248\n" +
+                "      00000000214eb5f8; 72; 261dba091a629e61f127ed183b42ae01\n" +
+                "      fseventsd-uuid; 36; f4f9aca6866b93ba4ab04768132dbbf6\n" +
+                "    .HFS+ Private Directory Data\r; \n" +
+                "    .journal; 524288; 7d69775e76f5a59e0f8687f792df23dc\n" +
+                "    .journal_info_block; 4096; 469270564228a832e83d2ad16e6d8edc\n" +
+                "    .Trashes; \n" +
+                "    arrest.txt; 1933; bedea6f1277f61a924388fbb58281e4a\n" +
+                "    diapers.txt; 1933; bedea6f1277f61a924388fbb58281e4a\n" +
+                "    \u0000\u0000\u0000\u0000HFS+ Private Data; \n" +
+                "      iNode27; 1933; bedea6f1277f61a924388fbb58281e4a\n";
+
+        DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
+
+    @Test
     public void testCreate() throws Exception {
         HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
         HfsPlusFileSystem fs = new HfsPlusFileSystem(device, false, type);
