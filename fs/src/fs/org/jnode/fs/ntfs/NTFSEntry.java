@@ -161,19 +161,35 @@ public class NTFSEntry implements FSEntry, FSEntryCreated, FSEntryLastChanged, F
     }
 
     public long getCreated() throws IOException {
-        return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getCreationTime());
+        if (getFileRecord().getStandardInformationAttribute() == null) {
+            return 0;
+        } else {
+            return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getCreationTime());
+        }
     }
 
     public long getLastModified() throws IOException {
-        return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getModificationTime());
+        if (getFileRecord().getStandardInformationAttribute() == null) {
+            return 0;
+        } else {
+            return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getModificationTime());
+        }
     }
 
     public long getLastChanged() throws IOException {
-        return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getMftChangeTime());
+        if (getFileRecord().getStandardInformationAttribute() == null) {
+            return 0;
+        } else {
+            return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getMftChangeTime());
+        }
     }
 
     public long getLastAccessed() throws IOException {
-        return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getAccessTime());
+        if (getFileRecord().getStandardInformationAttribute() == null) {
+            return 0;
+        } else {
+            return NTFSUTIL.filetimeToMillis(getFileRecord().getStandardInformationAttribute().getAccessTime());
+        }
     }
 
     /**
