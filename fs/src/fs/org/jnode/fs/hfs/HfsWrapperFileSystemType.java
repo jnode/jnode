@@ -47,8 +47,9 @@ public class HfsWrapperFileSystemType implements BlockDeviceFileSystemType<HfsPl
         long deviceLength;
 
         try {
-            device.getAPI(BlockDeviceAPI.class).read(0x400, mdbData);
-            deviceLength = device.getAPI(BlockDeviceAPI.class).getLength();
+            BlockDeviceAPI blockDevice = device.getAPI(BlockDeviceAPI.class);
+            blockDevice.read(0x400, mdbData);
+            deviceLength = blockDevice.getLength();
         } catch (ApiNotFoundException e) {
             throw new FileSystemException("Failed to find the block device API", e);
         } catch (IOException e) {
