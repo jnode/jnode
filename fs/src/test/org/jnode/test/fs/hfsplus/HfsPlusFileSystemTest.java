@@ -68,6 +68,38 @@ public class HfsPlusFileSystemTest {
     }
 
     @Test
+    public void testReadDiskWithDirectoryHardLinks() throws Exception {
+
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/hfsplus/hard-linked-directories.dmg"), "r");
+        HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
+        HfsPlusFileSystem fs = type.create(device, true);
+
+        String expectedStructure =
+            "type: HFS+ vol:Hard linked directories total:40960000 free:39428096\n" +
+            "  /; \n" +
+            "    .DS_Store; 6148; cbdca44c18b8de8671b413b2023ef664\n" +
+            "    .fseventsd; \n" +
+            "      00000000214ea109; 231; 11618d6f301d3672e498609838d23a8c\n" +
+            "      00000000214ea10a; 72; 6f20b722869a82510ca98e99071c4aca\n" +
+            "      fseventsd-uuid; 36; 2b95938d530cb32e96dfc01671095522\n" +
+            "    .HFS+ Private Directory Data\r; \n" +
+            "      dir_25; \n" +
+            "        file.txt; 38; 23c1bd7263b9abbdbb879e6267d84ff8\n" +
+            "    .journal; 524288; 7c1d0a50a9738dd88572a9cee56c0270\n" +
+            "    .journal_info_block; 4096; 469270564228a832e83d2ad16e6d8edc\n" +
+            "    .Trashes; \n" +
+            "    dir1; \n" +
+            "      clone; \n" +
+            "        file.txt; 38; 23c1bd7263b9abbdbb879e6267d84ff8\n" +
+            "    dir2; \n" +
+            "      clone; \n" +
+            "        file.txt; 38; 23c1bd7263b9abbdbb879e6267d84ff8\n" +
+            "    \u0000\u0000\u0000\u0000HFS+ Private Data; \n";
+
+        DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
+
+    @Test
     public void testReadDiskWithFileHardLinks() throws Exception {
 
         device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/hfsplus/hard-linked-files.dmg"), "r");
