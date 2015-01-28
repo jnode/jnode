@@ -150,8 +150,9 @@ public class DataStructureAsserts {
 
         byte[] buffer = new byte[0x1000];
         long position = 0;
-        while (position < file.getLength()) {
-            int chunkLength = (int) Math.min(file.getLength() - position, buffer.length);
+        long length = file.getLength();
+        while (position < length) {
+            int chunkLength = (int) Math.min(length - position, buffer.length);
             file.read(position, ByteBuffer.wrap(buffer, 0, chunkLength));
             md5.update(buffer, 0, chunkLength);
             position += chunkLength;
