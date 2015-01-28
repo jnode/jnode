@@ -35,7 +35,9 @@
     <library name="jnode-fs.jar">
     <export name="org.jnode.fs.hfsplus.*"/>
     <exclude name="org.jnode.fs.hfsplus.*Test"/>
+    <export name="org.jnode.fs.hfsplus.attributes.*"/>
     <export name="org.jnode.fs.hfsplus.catalog.*"/>
+    <export name="org.jnode.fs.hfsplus.compression.*"/>
 	<export name="org.jnode.fs.hfsplus.extent.*"/>
 	<export name="org.jnode.fs.hfsplus.tree.*"/>
     </library>

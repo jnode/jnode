@@ -29,6 +29,7 @@ import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
+import org.jnode.fs.hfsplus.attributes.Attributes;
 import org.jnode.fs.hfsplus.catalog.Catalog;
 import org.jnode.fs.hfsplus.catalog.CatalogKey;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
@@ -53,6 +54,11 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
      * The extent overflow file.
      */
     private Extent extentOverflow;
+
+    /**
+     * The attributes file.
+     */
+    private Attributes attributes;
 
     /**
      * The HFS+ private data directory. Used by HFS+ to stored hard linked file data.
@@ -104,6 +110,11 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
         } catch (IOException e) {
             throw new FileSystemException(e);
         }
+        try {
+            attributes = new Attributes(this);
+        } catch (IOException e) {
+            throw new FileSystemException(e);
+        }
     }
 
     @Override
@@ -151,6 +162,10 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
 
     public final Extent getExtentOverflow() {
         return extentOverflow;
+    }
+
+    public final Attributes getAttributes() {
+        return attributes;
     }
 
     public final SuperBlock getVolumeHeader() {

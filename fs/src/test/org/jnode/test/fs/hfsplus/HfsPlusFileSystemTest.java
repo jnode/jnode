@@ -127,6 +127,34 @@ public class HfsPlusFileSystemTest {
     }
 
     @Test
+    public void testReadDiskWithCompressedFiles() throws Exception {
+
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/hfsplus/compressed.dd"), "r");
+        HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
+        HfsPlusFileSystem fs = type.create(device, true);
+
+        String expectedStructure =
+            "type: HFS+ vol:Disk Image total:102379520 free:99401728\n" +
+            "  /; \n" +
+            "    .DS_Store; 6148; 98cf7ff1fd8e81ba4839043e208fb63e\n" +
+            "    .fseventsd; \n" +
+            "      00000000219733ae; 158; f512a16c903a637e27f3e81a10f224a2\n" +
+            "      00000000219733af; 72; fa4d4f58441685c90841126fb5ea35e5\n" +
+            "      fseventsd-uuid; 36; 3495348c1edb3f39b3cd4222024723c0\n" +
+            "    .HFS+ Private Directory Data\r; \n" +
+            "    .journal; 524288; ba95a916b83c8478fb22c180893cffff\n" +
+            "    .journal_info_block; 4096; 469270564228a832e83d2ad16e6d8edc\n" +
+            "    .Trashes; \n" +
+            "    compression.html; 81757; 669bd8f30ae4c5c79be8182575f5148f\n" +
+            "    compression.html:rsrc; 21007; 6727899de0b20d7dcb92c68ecaa8bfe2\n" +
+            "    small.txt; 6; d15dbfcb847653913855e21370d83af1\n" +
+            "    zlib.txt; 6211; e63c9b3344d96dbd6c5ddd0debde06f0\n" +
+            "    \u0000\u0000\u0000\u0000HFS+ Private Data; \n";
+
+        DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
+
+    @Test
     public void testCreate() throws Exception {
         HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
         HfsPlusFileSystem fs = new HfsPlusFileSystem(device, false, type);

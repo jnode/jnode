@@ -28,8 +28,11 @@ import org.jnode.fs.FSFile;
 import org.jnode.fs.FSFileSlackSpace;
 import org.jnode.fs.FSFileStreams;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.hfsplus.attributes.AttributeData;
 import org.jnode.fs.hfsplus.catalog.CatalogFile;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
+import org.jnode.fs.hfsplus.compression.CompressedAttributeData;
+import org.jnode.fs.hfsplus.compression.DecmpfsDiskHeader;
 
 public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 
@@ -45,6 +48,11 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
      */
     private CatalogFile hardLinkFile;
 
+    /**
+     * The attribute which contains the compressed file data if this file is compressed.
+     */
+    private CompressedAttributeData compressedData;
+
     public HfsPlusFile(HfsPlusEntry entry) {
         this.entry = entry;
         this.file = new CatalogFile(entry.getData());
@@ -58,9 +66,10 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 
     @Override
     public final long getLength() {
-        int flags = file.getFlags();
-        if ((flags & CatalogFile.FLAGS_HARDLINK_CHAIN) != 0) {
+        if (isHardLinked()) {
             return getHardLinkFile().getDatas().getTotalSize();
+        } else if (isCompressed()) {
+            return getCompressedData().getSize();
         } else {
             return file.getDatas().getTotalSize();
         }
@@ -75,9 +84,10 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
     public final void read(final long fileOffset, final ByteBuffer dest) throws IOException {
         HfsPlusFileSystem fs = getFileSystem();
 
-        int flags = file.getFlags();
-        if ((flags & CatalogFile.FLAGS_HARDLINK_CHAIN) != 0) {
+        if (isHardLinked()) {
             getHardLinkFile().getDatas().read(fs, fileOffset, dest);
+        } else if (isCompressed()) {
+            getCompressedData().read(fs, fileOffset, dest);
         } else {
             file.getDatas().read(fs, fileOffset, dest);
         }
@@ -87,6 +97,48 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
     public void write(final long fileOffset, final ByteBuffer src) throws IOException {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * Checks whether the file is a hard-link.
+     *
+     * @return {@code true} if a hard-link.
+     */
+    public boolean isHardLinked() {
+        int flags = file.getFlags();
+        return (flags & CatalogFile.FLAGS_HARDLINK_CHAIN) != 0;
+    }
+
+    /**
+     * Checks whether the file is compressed.
+     *
+     * @return {@code true} if compressed.
+     */
+    public boolean isCompressed() {
+        int ownerFlags = file.getPermissions().getOwnerFlags();
+        return (ownerFlags & HfsPlusBSDInfo.USER_FLAG_COMPRESSED) != 0;
+    }
+
+    /**
+     * Gets the compressed data for this file.
+     *
+     * @return the compressed data, or {@code null} if no compressed data was found.
+     */
+    private CompressedAttributeData getCompressedData() {
+        if (compressedData == null) {
+            try {
+                AttributeData attributeData = getFileSystem().getAttributes().getAttribute(
+                    file.getFileId(), DecmpfsDiskHeader.DECMPFS_ATTRIBUTE_NAME);
+
+                if (attributeData != null) {
+                    compressedData = new CompressedAttributeData(getFileSystem(), this, attributeData);
+                }
+            } catch (IOException e) {
+                throw new IllegalStateException("Error getting compressed data attribute", e);
+            }
+        }
+
+        return compressedData;
     }
 
     /**
@@ -110,8 +162,7 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
             return file;
         }
 
-        int flags = file.getFlags();
-        if ((flags & CatalogFile.FLAGS_HARDLINK_CHAIN) == 0) {
+        if (!isHardLinked()) {
             throw new IllegalStateException("File is not hard linked");
         }
 

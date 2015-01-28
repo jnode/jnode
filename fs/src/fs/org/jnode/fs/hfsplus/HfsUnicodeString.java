@@ -79,4 +79,8 @@ public class HfsUnicodeString {
         return data;
     }
 
+    @Override
+    public String toString() {
+        return string;
+    }
 }

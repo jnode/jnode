@@ -23,6 +23,42 @@ package org.jnode.fs.hfsplus;
 import org.jnode.util.BigEndian;
 
 public class HfsPlusBSDInfo {
+
+    /**
+     * The flag indicating not to dump the file (UF_NODUMP).
+     */
+    public static final int USER_FLAG_NO_DUMP = 0x1;
+
+    /**
+     * The flag indicating that the file cannot be changed (UF_IMMUTABLE).
+     */
+    public static final int USER_FLAG_IMMUTABLE = 0x2;
+
+    /**
+     * The flag indicating that the file can only be appended to (UF_APPEND).
+     */
+    public static final int USER_FLAG_APPEND_ONLY = 0x4;
+
+    /**
+     * The flag indicating that the directory is opaque (UF_OPAQUE).
+     */
+    public static final int USER_FLAG_OPAQUE = 0x8;
+
+    /**
+     * The flag indicating that the file is compressed (UF_NOUNLINK).
+     */
+    public static final int USER_FLAG_NO_UNLINK = 0x10;
+
+    /**
+     * The flag indicating that the file is compressed (UF_COMPRESSED).
+     */
+    public static final int USER_FLAG_COMPRESSED = 0x20;
+
+    /**
+     * A flag hinting to the GUI that the item should not be displayed (UF_HIDDEN).
+     */
+    public static final int USER_FLAG_HIDDEN = 0x8000;
+
     private long ownerID;
     private long groupID;
     private int adminFlags;
