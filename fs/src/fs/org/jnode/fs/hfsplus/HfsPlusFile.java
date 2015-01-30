@@ -68,7 +68,7 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
     public final long getLength() {
         if (isHardLinked()) {
             return getHardLinkFile().getDatas().getTotalSize();
-        } else if (isCompressed()) {
+        } else if (isCompressed() && getCompressedData() != null) {
             return getCompressedData().getSize();
         } else {
             return file.getDatas().getTotalSize();
@@ -86,7 +86,7 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 
         if (isHardLinked()) {
             getHardLinkFile().getDatas().read(fs, fileOffset, dest);
-        } else if (isCompressed()) {
+        } else if (isCompressed() && getCompressedData() != null) {
             getCompressedData().read(fs, fileOffset, dest);
         } else {
             file.getDatas().read(fs, fileOffset, dest);

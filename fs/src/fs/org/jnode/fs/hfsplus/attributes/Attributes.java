@@ -97,6 +97,11 @@ public class Attributes {
      * @throws IOException if an error occurs.
      */
     public AttributeData getAttribute(CatalogNodeId fileId, String attributeName) throws IOException {
+        if (attributesFile.getExtent(0).isEmpty()) {
+            // No attributes
+            return null;
+        }
+
         long currentOffset;
         LeafRecord leafRecord = null;
         int nodeSize = bthr.getNodeSize();

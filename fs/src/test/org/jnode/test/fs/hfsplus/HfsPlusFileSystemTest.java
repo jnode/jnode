@@ -155,6 +155,24 @@ public class HfsPlusFileSystemTest {
     }
 
     @Test
+    public void testDiskWithIncorrectCompressedFileOnFile() throws Exception {
+        // This HFS+ image was created under Linux and it seems like the 'quote.txt' file has the UF_COMPRESSED
+        // flag set on it incorrectly
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/hfsplus/wrong-compressed-flag.dd"), "r");
+        HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
+        HfsPlusFileSystem fs = type.create(device, true);
+
+        String expectedStructure =
+            "type: HFS+ vol:untitled total:2097152 free:1904640\n" +
+                "  /; \n" +
+                "    quote.txt; 165; 357d31c02f4b9161d14182b57769ef7a\n" +
+                "    steve-jobs-holding-iphone.jpg; 107795; 17baa8a85e36a790df697a68362c227d\n" +
+                "    \u0000\u0000\u0000\u0000HFS+ Private Data; \n";
+
+        DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
+
+    @Test
     public void testCreate() throws Exception {
         HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
         HfsPlusFileSystem fs = new HfsPlusFileSystem(device, false, type);
