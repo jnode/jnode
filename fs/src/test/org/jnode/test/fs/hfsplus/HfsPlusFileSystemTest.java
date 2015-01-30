@@ -173,6 +173,32 @@ public class HfsPlusFileSystemTest {
     }
 
     @Test
+    public void testDiskCompressedHardlinks() throws Exception {
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/hfsplus/compressed-hardlinks.dd"), "r");
+        HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
+        HfsPlusFileSystem fs = type.create(device, true);
+
+        String expectedStructure =
+            "type: HFS+ vol:Will it work? total:40960000 free:39424000\n" +
+                "  /; \n" +
+                "    .fseventsd; \n" +
+                "      0000000021b70ddc; 134; c4bd63b946eb863f50b189f2cb253c8c\n" +
+                "      0000000021b70ddd; 72; 3bf09d08a28b8988cec8f4e3c166ee96\n" +
+                "      fseventsd-uuid; 36; 518c962c5c2852fd354b18650e198372\n" +
+                "    .HFS+ Private Directory Data\r; \n" +
+                "    .journal; 524288; b324e1aae290bc30297418b2c39cefa3\n" +
+                "    .journal_info_block; 4096; 469270564228a832e83d2ad16e6d8edc\n" +
+                "    .Trashes; \n" +
+                "    coffee-again.txt; 2573; 3a66504af332c4e6d9997e52cce98002\n" +
+                "    coffee.txt; 2573; 3a66504af332c4e6d9997e52cce98002\n" +
+                "    i-own-you.jpg; 24085; a1a91dfb9c2c0db6bec2f55b12a2e97f\n" +
+                "    \u0000\u0000\u0000\u0000HFS+ Private Data; \n" +
+                "      iNode24; 2573; 3a66504af332c4e6d9997e52cce98002\n";
+
+        DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
+
+    @Test
     public void testCreate() throws Exception {
         HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
         HfsPlusFileSystem fs = new HfsPlusFileSystem(device, false, type);

@@ -238,4 +238,9 @@ public class HfsPlusEntry implements FSEntry, FSEntryCreated, FSEntryLastAccesse
             return catalogFolder.getAccessDate();
         }
     }
+
+    @Override
+    public final String toString() {
+        return String.format("HfsPlusEntry:[cnid:%s %s:'%s']", getId(), isFile() ? "file" : "directory", getName());
+    }
 }

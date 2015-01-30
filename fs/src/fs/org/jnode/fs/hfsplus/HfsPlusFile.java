@@ -46,7 +46,7 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
     /**
      * The hardlink file which contains the actual file data if this file is a hard link.
      */
-    private CatalogFile hardLinkFile;
+    private HfsPlusFile hardLinkFile;
 
     /**
      * The attribute which contains the compressed file data if this file is compressed.
@@ -67,8 +67,8 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
     @Override
     public final long getLength() {
         if (isHardLinked()) {
-            return getHardLinkFile().getDatas().getTotalSize();
-        } else if (isCompressed() && getCompressedData() != null) {
+            return getHardLinkFile().getLength();
+        } else if (isCompressed()) {
             return getCompressedData().getSize();
         } else {
             return file.getDatas().getTotalSize();
@@ -85,8 +85,8 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
         HfsPlusFileSystem fs = getFileSystem();
 
         if (isHardLinked()) {
-            getHardLinkFile().getDatas().read(fs, fileOffset, dest);
-        } else if (isCompressed() && getCompressedData() != null) {
+            getHardLinkFile().read(fileOffset, dest);
+        } else if (isCompressed()) {
             getCompressedData().read(fs, fileOffset, dest);
         } else {
             file.getDatas().read(fs, fileOffset, dest);
@@ -100,13 +100,22 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
     }
 
     /**
+     * Checks whether the file has the hard-link flag set.
+     *
+     * @return {@code true} if the flag is set.
+     */
+    private boolean hasHardLinkFlag() {
+        int flags = file.getFlags();
+        return (flags & CatalogFile.FLAGS_HARDLINK_CHAIN) != 0;
+    }
+
+    /**
      * Checks whether the file is a hard-link.
      *
      * @return {@code true} if a hard-link.
      */
     public boolean isHardLinked() {
-        int flags = file.getFlags();
-        return (flags & CatalogFile.FLAGS_HARDLINK_CHAIN) != 0;
+        return hasHardLinkFlag() && getHardLinkFile() != null;
     }
 
     /**
@@ -116,7 +125,7 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
      */
     public boolean isCompressed() {
         int ownerFlags = file.getPermissions().getOwnerFlags();
-        return (ownerFlags & HfsPlusBSDInfo.USER_FLAG_COMPRESSED) != 0;
+        return (ownerFlags & HfsPlusBSDInfo.USER_FLAG_COMPRESSED) != 0 && getCompressedData() != null;
     }
 
     /**
@@ -146,7 +155,7 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
      *
      * @return the hardlink file.
      */
-    public CatalogFile getHardLinkFile() {
+    public HfsPlusFile getHardLinkFile() {
         if (hardLinkFile != null) {
             return hardLinkFile;
         }
@@ -159,10 +168,11 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
         if (entry.getParent() != null &&
             ((HfsPlusDirectory) entry.getParent()).getDirectoryId().equals(privateDataDirectory.getDirectoryId())) {
             // This file is already under the private data directory, so it should be the root file.
-            return file;
+            // Return null to fall through to the default reading logic.
+            return null;
         }
 
-        if (!isHardLinked()) {
+        if (!hasHardLinkFlag()) {
             throw new IllegalStateException("File is not hard linked");
         }
 
@@ -173,7 +183,7 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
             // Lookup the hardlink in the private data directory
             String nodeName = "iNode" + hardLinkRoot.getId();
             HfsPlusEntry hardLinkEntry = (HfsPlusEntry) privateDataDirectory.getEntry(nodeName);
-            hardLinkFile = hardLinkEntry.createCatalogFile();
+            hardLinkFile = new HfsPlusFile(hardLinkEntry);
         } catch (IOException e) {
             throw new IllegalStateException("Error looking up hardlink root record: " + hardLinkRoot + " for: " + file);
         }
@@ -225,6 +235,11 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
      */
     public CatalogFile getCatalogFile() {
         return file;
+    }
+
+    @Override
+    public final String toString() {
+        return String.format("HfsPlusFile:[%s '%s']", getCatalogFile().getFileId(), entry.getName());
     }
 
     /**
