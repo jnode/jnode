@@ -55,7 +55,7 @@ public class CheckcastQuad<T> extends Quad<T> {
 
     @Override
     public void generateCode(CodeGenerator<T> cg) {
-
+        cg.generateCodeFor(this);
     }
 
     public String toString() {

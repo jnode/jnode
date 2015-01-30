@@ -61,7 +61,7 @@ public class ConstantStringAssignQuad<T> extends AssignQuad <T> {
 
     @Override
     public void generateCode(CodeGenerator<T> cg) {
-
+        cg.generateCodeFor(this);
     }
 
     @Override

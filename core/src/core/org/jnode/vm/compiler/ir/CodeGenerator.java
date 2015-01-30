@@ -21,19 +21,41 @@
 package org.jnode.vm.compiler.ir;
 
 import org.jnode.vm.compiler.ir.quad.ArrayAssignQuad;
+import org.jnode.vm.compiler.ir.quad.ArrayLengthAssignQuad;
+import org.jnode.vm.compiler.ir.quad.ArrayStoreQuad;
 import org.jnode.vm.compiler.ir.quad.BinaryOperation;
 import org.jnode.vm.compiler.ir.quad.BranchCondition;
+import org.jnode.vm.compiler.ir.quad.CheckcastQuad;
 import org.jnode.vm.compiler.ir.quad.ConditionalBranchQuad;
+import org.jnode.vm.compiler.ir.quad.ConstantClassAssignQuad;
 import org.jnode.vm.compiler.ir.quad.ConstantRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.ConstantStringAssignQuad;
+import org.jnode.vm.compiler.ir.quad.InstanceofAssignQuad;
+import org.jnode.vm.compiler.ir.quad.InterfaceCallAssignQuad;
+import org.jnode.vm.compiler.ir.quad.InterfaceCallQuad;
+import org.jnode.vm.compiler.ir.quad.LooukupswitchQuad;
+import org.jnode.vm.compiler.ir.quad.MonitorenterQuad;
+import org.jnode.vm.compiler.ir.quad.MonitorexitQuad;
+import org.jnode.vm.compiler.ir.quad.NewAssignQuad;
+import org.jnode.vm.compiler.ir.quad.NewMultiArrayAssignQuad;
+import org.jnode.vm.compiler.ir.quad.NewObjectArrayAssignQuad;
+import org.jnode.vm.compiler.ir.quad.NewPrimitiveArrayAssignQuad;
+import org.jnode.vm.compiler.ir.quad.RefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.RefStoreQuad;
+import org.jnode.vm.compiler.ir.quad.SpecialCallAssignQuad;
+import org.jnode.vm.compiler.ir.quad.SpecialCallQuad;
 import org.jnode.vm.compiler.ir.quad.StaticCallAssignQuad;
 import org.jnode.vm.compiler.ir.quad.StaticCallQuad;
 import org.jnode.vm.compiler.ir.quad.StaticRefAssignQuad;
 import org.jnode.vm.compiler.ir.quad.StaticRefStoreQuad;
+import org.jnode.vm.compiler.ir.quad.TableswitchQuad;
+import org.jnode.vm.compiler.ir.quad.ThrowQuad;
 import org.jnode.vm.compiler.ir.quad.UnaryOperation;
 import org.jnode.vm.compiler.ir.quad.UnaryQuad;
 import org.jnode.vm.compiler.ir.quad.UnconditionalBranchQuad;
 import org.jnode.vm.compiler.ir.quad.VarReturnQuad;
 import org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.VirtualCallAssignQuad;
 import org.jnode.vm.compiler.ir.quad.VirtualCallQuad;
 import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
 
@@ -464,4 +486,47 @@ public abstract class CodeGenerator<T> {
     public abstract void generateCodeFor(ArrayAssignQuad quad);
 
 
+    public abstract void generateCodeFor(ArrayLengthAssignQuad quad);
+
+    public abstract void generateCodeFor(ArrayStoreQuad quad);
+
+    public abstract void generateCodeFor(CheckcastQuad<T> quad);
+
+    public abstract void generateCodeFor(ConstantClassAssignQuad<T> quad);
+
+    public abstract void generateCodeFor(ConstantStringAssignQuad<T> quad);
+
+    public abstract void generateCodeFor(InstanceofAssignQuad<T> quad);
+
+    public abstract void generateCodeFor(InterfaceCallAssignQuad quad);
+
+    public abstract void generateCodeFor(InterfaceCallQuad quad);
+
+    public abstract void generateCodeFor(LooukupswitchQuad<T> quad);
+
+    public abstract void generateCodeFor(MonitorenterQuad<T> quad);
+
+    public abstract void generateCodeFor(MonitorexitQuad<T> quad);
+
+    public abstract void generateCodeFor(NewAssignQuad<T> quad);
+
+    public abstract void generateCodeFor(NewMultiArrayAssignQuad<T> quad);
+
+    public abstract void generateCodeFor(NewObjectArrayAssignQuad<T> quad);
+
+    public abstract void generateCodeFor(NewPrimitiveArrayAssignQuad<T> quad);
+
+    public abstract void generateCodeFor(RefAssignQuad<T> quad);
+
+    public abstract void generateCodeFor(RefStoreQuad<T> quad);
+
+    public abstract void generateCodeFor(SpecialCallAssignQuad quad);
+
+    public abstract void generateCodeFor(SpecialCallQuad quad);
+
+    public abstract void generateCodeFor(TableswitchQuad<T> quad);
+
+    public abstract void generateCodeFor(ThrowQuad<T> quad);
+
+    public abstract void generateCodeFor(VirtualCallAssignQuad quad);
 }

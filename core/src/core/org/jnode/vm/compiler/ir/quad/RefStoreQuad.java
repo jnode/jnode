@@ -68,7 +68,7 @@ public class RefStoreQuad<T> extends Quad<T> {
     }
 
     public void generateCode(CodeGenerator<T> cg) {
-        //cg.generateCodeFor(this);
+        cg.generateCodeFor(this);
     }
 
     public StaticField getField() {

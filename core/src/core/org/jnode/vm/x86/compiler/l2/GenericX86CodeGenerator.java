@@ -51,19 +51,41 @@ import org.jnode.vm.compiler.ir.RegisterPool;
 import org.jnode.vm.compiler.ir.StackLocation;
 import org.jnode.vm.compiler.ir.Variable;
 import org.jnode.vm.compiler.ir.quad.ArrayAssignQuad;
+import org.jnode.vm.compiler.ir.quad.ArrayLengthAssignQuad;
+import org.jnode.vm.compiler.ir.quad.ArrayStoreQuad;
 import org.jnode.vm.compiler.ir.quad.BinaryOperation;
 import org.jnode.vm.compiler.ir.quad.BranchCondition;
+import org.jnode.vm.compiler.ir.quad.CheckcastQuad;
 import org.jnode.vm.compiler.ir.quad.ConditionalBranchQuad;
+import org.jnode.vm.compiler.ir.quad.ConstantClassAssignQuad;
 import org.jnode.vm.compiler.ir.quad.ConstantRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.ConstantStringAssignQuad;
+import org.jnode.vm.compiler.ir.quad.InstanceofAssignQuad;
+import org.jnode.vm.compiler.ir.quad.InterfaceCallAssignQuad;
+import org.jnode.vm.compiler.ir.quad.InterfaceCallQuad;
+import org.jnode.vm.compiler.ir.quad.LooukupswitchQuad;
+import org.jnode.vm.compiler.ir.quad.MonitorenterQuad;
+import org.jnode.vm.compiler.ir.quad.MonitorexitQuad;
+import org.jnode.vm.compiler.ir.quad.NewAssignQuad;
+import org.jnode.vm.compiler.ir.quad.NewMultiArrayAssignQuad;
+import org.jnode.vm.compiler.ir.quad.NewObjectArrayAssignQuad;
+import org.jnode.vm.compiler.ir.quad.NewPrimitiveArrayAssignQuad;
+import org.jnode.vm.compiler.ir.quad.RefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.RefStoreQuad;
+import org.jnode.vm.compiler.ir.quad.SpecialCallAssignQuad;
+import org.jnode.vm.compiler.ir.quad.SpecialCallQuad;
 import org.jnode.vm.compiler.ir.quad.StaticCallAssignQuad;
 import org.jnode.vm.compiler.ir.quad.StaticCallQuad;
 import org.jnode.vm.compiler.ir.quad.StaticRefAssignQuad;
 import org.jnode.vm.compiler.ir.quad.StaticRefStoreQuad;
+import org.jnode.vm.compiler.ir.quad.TableswitchQuad;
+import org.jnode.vm.compiler.ir.quad.ThrowQuad;
 import org.jnode.vm.compiler.ir.quad.UnaryOperation;
 import org.jnode.vm.compiler.ir.quad.UnaryQuad;
 import org.jnode.vm.compiler.ir.quad.UnconditionalBranchQuad;
 import org.jnode.vm.compiler.ir.quad.VarReturnQuad;
 import org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.VirtualCallAssignQuad;
 import org.jnode.vm.compiler.ir.quad.VirtualCallQuad;
 import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
 import org.jnode.vm.facade.TypeSizeInfo;
@@ -4344,5 +4366,173 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         if (quad.getTargetAddress() < quad.getAddress()) {
             stackFrame.getHelper().writeYieldPoint(getInstrLabel(quad.getAddress()));
         }
+    }
+
+    @Override
+    public void generateCodeFor(ArrayLengthAssignQuad quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(ArrayStoreQuad quad) {
+        checkLabel(quad.getAddress());
+
+        Variable ref = quad.getRef();
+        Operand ind = quad.getInd();
+        Variable rhs = quad.getRHS();
+
+        checkBounds(ref, ind, quad.getAddress());
+
+        final int slotSize = stackFrame.getHelper().SLOTSIZE;
+        int arrayDataOffset = VmArray.DATA_OFFSET * slotSize;
+
+        // Load data
+//        if (idx.isConstant()) {
+//            final int offset = idx.getValue() * scale;
+//            os.writeMOV(valSize, resultr, refr, offset + arrayDataOffset);
+//        } else {
+        int scale = 4;
+
+        // Verify
+        checkBounds(ref, ind, quad.getAddress());
+
+        //todo spec issue: add type compatibility check (elemType <- valueType), throw ArrayStoreException
+
+        // Store
+        if (ind.getAddressingMode() == CONSTANT) {
+            final int offset = ((IntConstant) ind).getValue() * scale;
+            os.writeMOV(BITS32, (GPR) ((RegisterLocation) ref.getLocation()).getRegister(), offset + arrayDataOffset,
+                (GPR) ((RegisterLocation) rhs.getLocation()).getRegister());
+        } else {
+//            GPR idxr = idx.getRegister();
+//            if (os.isCode64()) {
+//                final X86Register.GPR64 idxr64 = (X86Register.GPR64) pool.getRegisterInSameGroup(idxr, JvmType.LONG);
+//                os.writeMOVSXD(idxr64, (X86Register.GPR32) idxr);
+//                idxr = idxr64;
+//            }
+//            os.writeMOV(valSize, refr, idxr, scale, arrayDataOffset, valr);
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
+    public void generateCodeFor(CheckcastQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(ConstantClassAssignQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(ConstantStringAssignQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(InstanceofAssignQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(InterfaceCallAssignQuad quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(InterfaceCallQuad quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(LooukupswitchQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(MonitorenterQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(MonitorexitQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(NewAssignQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(NewMultiArrayAssignQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(NewObjectArrayAssignQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(NewPrimitiveArrayAssignQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(RefAssignQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(RefStoreQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(SpecialCallAssignQuad quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(SpecialCallQuad quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(TableswitchQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(ThrowQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(VirtualCallAssignQuad quad) {
+        //todo
+        throw new UnsupportedOperationException();
     }
 }

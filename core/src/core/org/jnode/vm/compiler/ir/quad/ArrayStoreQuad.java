@@ -23,6 +23,7 @@ package org.jnode.vm.compiler.ir.quad;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 import org.jnode.vm.compiler.ir.Operand;
+import org.jnode.vm.compiler.ir.Variable;
 
 /**
  * @author Levente S\u00e1ntha
@@ -39,6 +40,18 @@ public class ArrayStoreQuad extends Quad {
 
     public ArrayStoreQuad(int address, IRBasicBlock block) {
         super(address, block);
+    }
+
+    public Variable getRef() {
+        return (Variable) refs[2];
+    }
+
+    public Operand getInd() {
+        return refs[1];
+    }
+
+    public Variable getRHS() {
+        return (Variable) refs[0];
     }
 
     @Override
@@ -60,7 +73,7 @@ public class ArrayStoreQuad extends Quad {
 
     @Override
     public void generateCode(CodeGenerator cg) {
-
+        cg.generateCodeFor(this);
     }
 
     @Override

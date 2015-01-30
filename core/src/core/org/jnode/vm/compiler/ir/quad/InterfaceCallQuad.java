@@ -34,7 +34,7 @@ public class InterfaceCallQuad extends InstanceCallQuad {
 
     @Override
     public void generateCode(CodeGenerator cg) {
-
+        cg.generateCodeFor(this);
     }
 
     @Override

@@ -66,7 +66,7 @@ public class ArrayLengthAssignQuad extends AssignQuad {
 
     @Override
     public void generateCode(CodeGenerator cg) {
-
+        cg.generateCodeFor(this);
     }
 
     @Override

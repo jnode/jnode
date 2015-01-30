@@ -62,6 +62,6 @@ public class MonitorexitQuad<T> extends Quad<T> {
     }
 
     public void generateCode(CodeGenerator<T> cg) {
-//        cg.generateCodeFor(this);
+        cg.generateCodeFor(this);
     }
 }

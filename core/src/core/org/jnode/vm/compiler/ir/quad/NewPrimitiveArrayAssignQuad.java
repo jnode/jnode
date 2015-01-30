@@ -61,7 +61,7 @@ public class NewPrimitiveArrayAssignQuad<T> extends AssignQuad<T> {
 
     @Override
     public void generateCode(CodeGenerator<T> cg) {
-
+        cg.generateCodeFor(this);
     }
 
     public String toString() {

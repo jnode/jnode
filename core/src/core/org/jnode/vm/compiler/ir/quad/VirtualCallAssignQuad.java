@@ -36,7 +36,7 @@ public class VirtualCallAssignQuad extends InstanceCallAssignQuad {
 
     @Override
     public void generateCode(CodeGenerator cg) {
-
+        cg.generateCodeFor(this);
     }
 
     @Override

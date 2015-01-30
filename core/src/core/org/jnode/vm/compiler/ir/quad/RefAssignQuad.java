@@ -74,7 +74,7 @@ public class RefAssignQuad<T> extends AssignQuad<T> {
     }
 
     public void generateCode(CodeGenerator<T> cg) {
-
+        cg.generateCodeFor(this);
     }
 
     public int getLHSLiveAddress() {

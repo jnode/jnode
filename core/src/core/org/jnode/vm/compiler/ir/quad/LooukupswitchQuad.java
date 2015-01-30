@@ -106,7 +106,7 @@ public class LooukupswitchQuad<T> extends Quad<T> {
 
     @Override
     public void generateCode(CodeGenerator<T> cg) {
-
+        cg.generateCodeFor(this);
     }
 
     @Override
