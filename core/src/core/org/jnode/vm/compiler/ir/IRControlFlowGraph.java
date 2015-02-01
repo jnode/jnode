@@ -90,7 +90,14 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
         do {
             loop = false;
             for (Map.Entry<Variable, Integer> u : varUses.entrySet()) {
-                if (u.getValue() == 0 && !u.getKey().getAssignQuad().isDeadCode()) {
+                if (u.getValue() > 0 ||
+                    u.getKey() instanceof MethodArgument ||
+                    u.getKey().getAssignQuad().isDeadCode()) {
+
+                    continue;
+                }
+
+
                     AssignQuad dq = u.getKey().getAssignQuad();
                     if (dq instanceof CallAssignQuad ||
                         dq instanceof NewAssignQuad ||
@@ -100,6 +107,7 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
                         //todo optimize it, could be transformed to CallQuad
                         continue;
                     }
+
                     dq.setDeadCode(true);
                     Operand<T>[] refs = dq.getReferencedOps();
                     if (refs != null) {
@@ -116,7 +124,6 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
                     }
                     loop = true;
                     break;
-                }
             }
         } while (loop);
     }
