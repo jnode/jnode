@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 import java.util.Collection;
@@ -98,32 +98,32 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
                 }
 
 
-                    AssignQuad dq = u.getKey().getAssignQuad();
-                    if (dq instanceof CallAssignQuad ||
-                        dq instanceof NewAssignQuad ||
-                        dq instanceof NewObjectArrayAssignQuad ||
-                        dq instanceof NewPrimitiveArrayAssignQuad ||
-                        dq instanceof NewMultiArrayAssignQuad) {
-                        //todo optimize it, could be transformed to CallQuad
-                        continue;
-                    }
+                AssignQuad dq = u.getKey().getAssignQuad();
+                if (dq instanceof CallAssignQuad ||
+                    dq instanceof NewAssignQuad ||
+                    dq instanceof NewObjectArrayAssignQuad ||
+                    dq instanceof NewPrimitiveArrayAssignQuad ||
+                    dq instanceof NewMultiArrayAssignQuad) {
+                    //todo optimize it, could be transformed to CallQuad
+                    continue;
+                }
 
-                    dq.setDeadCode(true);
-                    Operand<T>[] refs = dq.getReferencedOps();
-                    if (refs != null) {
-                        for (Operand<T> ref : refs) {
-                            if (ref instanceof Variable) {
-                                Variable<T> r = (Variable<T>) ref;
-                                Integer c = varUses.get(r);
-                                if (c > 0) {
-                                    c--;
-                                }
-                                varUses.put(r, c);
+                dq.setDeadCode(true);
+                Operand<T>[] refs = dq.getReferencedOps();
+                if (refs != null) {
+                    for (Operand<T> ref : refs) {
+                        if (ref instanceof Variable) {
+                            Variable<T> r = (Variable<T>) ref;
+                            Integer c = varUses.get(r);
+                            if (c > 0) {
+                                c--;
                             }
+                            varUses.put(r, c);
                         }
                     }
-                    loop = true;
-                    break;
+                }
+                loop = true;
+                break;
             }
         } while (loop);
     }
