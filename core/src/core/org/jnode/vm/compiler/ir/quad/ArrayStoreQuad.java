@@ -50,8 +50,8 @@ public class ArrayStoreQuad extends Quad {
         return refs[1];
     }
 
-    public Variable getRHS() {
-        return (Variable) refs[0];
+    public Operand getRHS() {
+        return refs[0];
     }
 
     @Override

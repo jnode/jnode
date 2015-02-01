@@ -4259,17 +4259,50 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             }
         } else if (quad.getInd().getAddressingMode() == REGISTER) {
             GPR indr = (GPR) ((RegisterLocation) ((Variable) ind).getLocation()).getRegister();
-            GPR refr = (GPR) ((RegisterLocation) ref.getLocation()).getRegister();
             GPR resultr = (GPR) ((RegisterLocation) lhs.getLocation()).getRegister();
+            if (ref.getAddressingMode() == REGISTER) {
+                GPR refr = (GPR) ((RegisterLocation) ref.getLocation()).getRegister();
+                os.writeMOV(BITS32, resultr, refr, indr, scale,  arrayDataOffset);
+            } else if (ref.getAddressingMode() == STACK) {
+                os.writeMOV(BITS32, SR1, X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
+                os.writeMOV(BITS32, resultr, SR1, indr, scale,  arrayDataOffset);
+            } else {
+                throw new IllegalArgumentException();
+            }
 //            if (os.isCode64()) {
 //                final GPR64 idxr64 = (GPR64) eContext.getGPRPool().getRegisterInSameGroup(idxr, JvmType.LONG);
 //                os.writeMOVSXD(idxr64, (GPR32) idxr);
 //                idxr = idxr64;
 //            }
 
-            os.writeMOV(BITS32, resultr, refr, indr, scale, arrayDataOffset);
-        }
+            //os.writeMOV(BITS32, resultr, refr, indr, scale, arrayDataOffset);
+        } else if (quad.getInd().getAddressingMode() == STACK) {
+            int indDisp = ((StackLocation) ((Variable) ind).getLocation()).getDisplacement();
+            GPR resultr = (GPR) ((RegisterLocation) lhs.getLocation()).getRegister();
+            if (ref.getAddressingMode() == REGISTER) {
+                os.writeMOV(BITS32, SR1, X86Register.EBP, indDisp);
+                GPR refr = (GPR) ((RegisterLocation) ref.getLocation()).getRegister();
+                os.writeMOV(BITS32, resultr, refr, SR1, scale,  arrayDataOffset);
+            } else if (ref.getAddressingMode() == STACK) {
+                os.writeMOV(BITS32, SR1, X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
+                GPR sr2 = (resultr == X86Register.EDX) ? X86Register.EBX : X86Register.EDX;
+                os.writePUSH(sr2);
+                os.writeMOV(BITS32, sr2, X86Register.EBP, indDisp);
+                os.writeMOV(BITS32, resultr, SR1, sr2, scale,  arrayDataOffset);
+                os.writePOP(sr2);
+            } else {
+                throw new IllegalArgumentException();
+            }
+//            if (os.isCode64()) {
+//                final GPR64 idxr64 = (GPR64) eContext.getGPRPool().getRegisterInSameGroup(idxr, JvmType.LONG);
+//                os.writeMOVSXD(idxr64, (GPR32) idxr);
+//                idxr = idxr64;
+//            }
 
+            //os.writeMOV(BITS32, resultr, refr, indr, scale, arrayDataOffset);
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     final void checkBounds(Variable ref, Operand index, int address) {
@@ -4294,10 +4327,12 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 //        if (index.isConstant()) {
 //            os.writePUSH(index.getValue());
 //        } else {
-        if (index.getAddressingMode() == REGISTER) {
-            os.writePUSH((GPR) ((RegisterLocation) ((Variable) index).getLocation()).getRegister());
-        } else if (index.getAddressingMode() == CONSTANT) {
+        if (index.getAddressingMode() == CONSTANT) {
             os.writePUSH(((IntConstant) index).getValue());
+        } else if (index.getAddressingMode() == REGISTER) {
+            os.writePUSH((GPR) ((RegisterLocation) ((Variable) index).getLocation()).getRegister());
+        } else if (index.getAddressingMode() == STACK) {
+            os.writePUSH(X86Register.EBP, ((StackLocation) ((Variable) index).getLocation()).getDisplacement());
         } else {
             throw new UnsupportedOperationException();
         }
@@ -4315,7 +4350,18 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 //                .writeCMP_Const(BITS32, refr, arrayLengthOffset, index
 //                    .getValue());
 //        } else {
-        if (index.getAddressingMode() == REGISTER) {
+        if (index.getAddressingMode() == CONSTANT) {
+            if (ref.getAddressingMode() == REGISTER) {
+                os.writeCMP_Const(X86Constants.BITS32, (GPR) ((RegisterLocation) ref.getLocation()).getRegister(),
+                    arrayLengthOffset, ((IntConstant) index).getValue());
+            } else if (ref.getAddressingMode() == STACK) {
+                os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP,
+                    ((StackLocation) ref.getLocation()).getDisplacement());
+                os.writeCMP_Const(X86Constants.BITS32, SR1, arrayLengthOffset, ((IntConstant) index).getValue());
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } else if (index.getAddressingMode() == REGISTER) {
             if (ref.getAddressingMode() == REGISTER) {
                 os.writeCMP((GPR) ((RegisterLocation) ref.getLocation()).getRegister(),
                     arrayLengthOffset, (GPR) ((RegisterLocation) ((Variable) index).getLocation()).getRegister());
@@ -4328,14 +4374,16 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             } else {
                 throw new IllegalArgumentException();
             }
-        } else if (index.getAddressingMode() == CONSTANT) {
+        } else if (index.getAddressingMode() == STACK) {
             if (ref.getAddressingMode() == REGISTER) {
-                os.writeCMP_Const(X86Constants.BITS32, (GPR) ((RegisterLocation) ref.getLocation()).getRegister(),
-                    arrayLengthOffset, ((IntConstant) index).getValue());
+                os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP,
+                    ((StackLocation) ((Variable) index).getLocation()).getDisplacement());
+                os.writeCMP((GPR) ((RegisterLocation) ref.getLocation()).getRegister(), arrayLengthOffset, SR1);
             } else if (ref.getAddressingMode() == STACK) {
                 os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP,
                     ((StackLocation) ref.getLocation()).getDisplacement());
-                os.writeCMP_Const(X86Constants.BITS32, SR1, arrayLengthOffset, ((IntConstant) index).getValue());
+                os.writeADD(SR1, arrayLengthOffset);
+                os.writeCMP(SR1, X86Register.EBP, ((StackLocation) ((Variable) index).getLocation()).getDisplacement());
             } else {
                 throw new IllegalArgumentException();
             }
@@ -4380,7 +4428,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 
         Variable ref = quad.getRef();
         Operand ind = quad.getInd();
-        Variable rhs = quad.getRHS();
+        Operand rhs = quad.getRHS();
 
         checkBounds(ref, ind, quad.getAddress());
 
@@ -4395,23 +4443,133 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         int scale = 4;
 
         // Verify
-        checkBounds(ref, ind, quad.getAddress());
-
         //todo spec issue: add type compatibility check (elemType <- valueType), throw ArrayStoreException
 
-        // Store
-        if (ind.getAddressingMode() == CONSTANT) {
-            final int offset = ((IntConstant) ind).getValue() * scale;
-            os.writeMOV(BITS32, (GPR) ((RegisterLocation) ref.getLocation()).getRegister(), offset + arrayDataOffset,
-                (GPR) ((RegisterLocation) rhs.getLocation()).getRegister());
+
+        if (ref.getAddressingMode() == REGISTER) {
+            GPR dstReg = (GPR) ((RegisterLocation) ref.getLocation()).getRegister();
+            if (ind.getAddressingMode() == CONSTANT) {
+                final int offset = ((IntConstant) ind).getValue() * scale;
+                if (rhs.getAddressingMode() == CONSTANT) {
+                    os.writeMOV_Const(BITS32, dstReg, offset + arrayDataOffset, ((IntConstant) rhs).getValue());
+                } else if (rhs.getAddressingMode() == REGISTER) {
+                    os.writeMOV(BITS32, dstReg, offset + arrayDataOffset,
+                        (GPR) ((RegisterLocation) ((Variable) rhs).getLocation()).getRegister());
+                } else if (rhs.getAddressingMode() == STACK) {
+                    os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP,
+                        ((StackLocation) ((Variable) rhs).getLocation()).getDisplacement());
+                    os.writeMOV(BITS32, dstReg, offset + arrayDataOffset, SR1);
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if (ind.getAddressingMode() == REGISTER) {
+                GPR idxReg = (GPR) ((RegisterLocation) ((Variable) ind).getLocation()).getRegister();
+                if (rhs.getAddressingMode() == CONSTANT) {
+                    os.writeMOV_Const(BITS32, dstReg, idxReg, scale, arrayDataOffset, ((IntConstant) rhs).getValue());
+                } else if (rhs.getAddressingMode() == REGISTER) {
+                    os.writeMOV(BITS32, dstReg, idxReg, scale, arrayDataOffset,
+                        (GPR) ((RegisterLocation) ((Variable) rhs).getLocation()).getRegister());
+                } else if (rhs.getAddressingMode() == STACK) {
+                    os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP,
+                        ((StackLocation) ((Variable) rhs).getLocation()).getDisplacement());
+                    os.writeMOV(BITS32, dstReg, idxReg, scale, arrayDataOffset, SR1);
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if (ind.getAddressingMode() == STACK) {
+                os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP,
+                    ((StackLocation) ((Variable) ind).getLocation()).getDisplacement());
+                if (rhs.getAddressingMode() == CONSTANT) {
+                    os.writeMOV_Const(BITS32, dstReg, SR1, scale, arrayDataOffset, ((IntConstant) rhs).getValue());
+                } else if (rhs.getAddressingMode() == REGISTER) {
+                    os.writeMOV(BITS32, dstReg, SR1, scale, arrayDataOffset,
+                        (GPR) ((RegisterLocation) ((Variable) rhs).getLocation()).getRegister());
+                } else if (rhs.getAddressingMode() == STACK) {
+                    GPR sr2 = SR1 == X86Register.EAX ? X86Register.EBX : X86Register.EAX;
+                    os.writePUSH(sr2);
+                    os.writeMOV(BITS32, sr2, X86Register.EBP,
+                        ((StackLocation) ((Variable) rhs).getLocation()).getDisplacement());
+                    os.writeMOV(BITS32, dstReg, SR1, scale, arrayDataOffset, sr2);
+                    os.writePOP(sr2);
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } else if (ref.getAddressingMode() == STACK) {
+            os.writeMOV(BITS32, SR1, X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
+            if (ind.getAddressingMode() == CONSTANT) {
+                final int offset = ((IntConstant) ind).getValue() * scale;
+                if (rhs.getAddressingMode() == CONSTANT) {
+                    os.writeMOV_Const(BITS32, SR1, offset + arrayDataOffset, ((IntConstant) rhs).getValue());
+                } else if (rhs.getAddressingMode() == REGISTER) {
+                    os.writeMOV(BITS32, SR1, offset + arrayDataOffset,
+                        (GPR) ((RegisterLocation) ((Variable) rhs).getLocation()).getRegister());
+                } else if (rhs.getAddressingMode() == STACK) {
+                    GPR sr2 = SR1 == X86Register.EAX ? X86Register.EBX : X86Register.EAX;
+                    os.writePUSH(sr2);
+                    os.writeMOV(BITS32, sr2, X86Register.EBP,
+                        ((StackLocation) ((Variable) rhs).getLocation()).getDisplacement());
+                    os.writeMOV(BITS32, SR1, offset + arrayDataOffset, sr2);
+                    os.writePOP(sr2);
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if (ind.getAddressingMode() == REGISTER) {
+                GPR idxReg = (GPR) ((RegisterLocation) ((Variable) ind).getLocation()).getRegister();
+                if (rhs.getAddressingMode() == CONSTANT) {
+                    os.writeMOV_Const(BITS32, SR1, idxReg, scale, arrayDataOffset, ((IntConstant) rhs).getValue());
+                } else if (rhs.getAddressingMode() == REGISTER) {
+                    os.writeMOV(BITS32, SR1, idxReg, scale, arrayDataOffset,
+                        (GPR) ((RegisterLocation) ((Variable) rhs).getLocation()).getRegister());
+                } else if (rhs.getAddressingMode() == STACK) {
+                    GPR sr2 = SR1 == X86Register.EAX ? X86Register.EBX : X86Register.EAX;
+                    os.writePUSH(sr2);
+                    os.writeMOV(BITS32, sr2, X86Register.EBP,
+                        ((StackLocation) ((Variable) rhs).getLocation()).getDisplacement());
+                    os.writeMOV(BITS32, SR1, idxReg, scale, arrayDataOffset, sr2);
+                    os.writePOP(sr2);
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if (ind.getAddressingMode() == STACK) {
+                GPR sr2 = SR1 == X86Register.EAX ? X86Register.EBX : X86Register.EAX;
+                os.writePUSH(sr2);
+                os.writeMOV(BITS32, sr2, X86Register.EBP,
+                    ((StackLocation) ((Variable) ind).getLocation()).getDisplacement());
+                if (rhs.getAddressingMode() == CONSTANT) {
+                    os.writeMOV_Const(BITS32, SR1, sr2, scale, arrayDataOffset, ((IntConstant) rhs).getValue());
+                } else if (rhs.getAddressingMode() == REGISTER) {
+                    os.writeMOV(BITS32, SR1, sr2, scale, arrayDataOffset,
+                        (GPR) ((RegisterLocation) ((Variable) rhs).getLocation()).getRegister());
+                } else if (rhs.getAddressingMode() == STACK) {
+                    GPR sr3;
+                    if (SR1 != X86Register.ECX) {
+                        if (sr2 != X86Register.ECX) {
+                            sr3 = X86Register.ECX;
+                        } else if (SR1 != X86Register.EDX) {
+                            sr3 = X86Register.EDX;
+                        } else {
+                            sr3 = X86Register.EAX;
+                        }
+                    } else {
+                        sr3 = sr2 == X86Register.EDX ? X86Register.EBX : X86Register.EDX;
+                    }
+                    os.writePUSH(sr3);
+                    os.writeMOV(BITS32, sr3, X86Register.EBP,
+                        ((StackLocation) ((Variable) rhs).getLocation()).getDisplacement());
+                    os.writeMOV(BITS32, SR1, sr2, scale, arrayDataOffset, sr3);
+                    os.writePOP(sr3);
+                }
+                else {
+                    throw new IllegalArgumentException();
+                }
+                os.writePOP(sr2);
+            } else {
+                throw new IllegalArgumentException();
+            }
         } else {
-//            GPR idxr = idx.getRegister();
-//            if (os.isCode64()) {
-//                final X86Register.GPR64 idxr64 = (X86Register.GPR64) pool.getRegisterInSameGroup(idxr, JvmType.LONG);
-//                os.writeMOVSXD(idxr64, (X86Register.GPR32) idxr);
-//                idxr = idxr64;
-//            }
-//            os.writeMOV(valSize, refr, idxr, scale, arrayDataOffset, valr);
             throw new IllegalArgumentException();
         }
     }
