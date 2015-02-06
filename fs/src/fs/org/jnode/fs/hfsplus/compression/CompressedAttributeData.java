@@ -7,7 +7,6 @@ import java.util.zip.Inflater;
 import org.jnode.fs.hfsplus.HfsPlusFile;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
 import org.jnode.fs.hfsplus.attributes.AttributeData;
-import org.jnode.util.BigEndian;
 
 /**
  * An implementation of {@link org.jnode.fs.hfsplus.attributes.AttributeData} which reads out compressed data from
@@ -16,6 +15,11 @@ import org.jnode.util.BigEndian;
  * @author Luke Quinane
  */
 public class CompressedAttributeData extends AttributeData {
+
+    /**
+     * The zlib fork compression chunk size.
+     */
+    private static final int ZLIB_FORK_CHUNK_SIZE = 0x10000;
 
     /**
      * The HFS+ file.
@@ -36,6 +40,11 @@ public class CompressedAttributeData extends AttributeData {
      * The uncompressed copy of the data.
      */
     private ByteBuffer uncompressed;
+
+    /**
+     * The detail of the fork compression if it is being used.
+     */
+    private ZlibForkCompressionDetails zlibForkCompressionDetails;
 
     public CompressedAttributeData(HfsPlusFileSystem fs, HfsPlusFile file, AttributeData attributeData) {
         this.file = file;
@@ -67,13 +76,38 @@ public class CompressedAttributeData extends AttributeData {
     @Override
     public void read(HfsPlusFileSystem fs, long fileOffset, ByteBuffer dest) throws IOException {
         if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE1 ||
-            decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_ZLIB ||
-            decmpfsDiskHeader.getType() == DecmpfsDiskHeader.DATA_IN_FORK) {
+            decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_ZLIB) {
 
             getUncompressed(fs);
 
-            uncompressed.limit((int) (fileOffset + dest.remaining()));
             uncompressed.position((int) fileOffset);
+            uncompressed.limit(uncompressed.position() + dest.remaining());
+            dest.put(uncompressed);
+
+        } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.DATA_IN_FORK) {
+            if (zlibForkCompressionDetails == null) {
+                zlibForkCompressionDetails = new ZlibForkCompressionDetails(fs, file.getCatalogFile().getResources());
+            }
+
+            int chunk = (int) (fileOffset / ZLIB_FORK_CHUNK_SIZE);
+            int chunkLength = zlibForkCompressionDetails.getChunkLength(chunk);
+            long chunkOffset = zlibForkCompressionDetails.getChunkOffset(chunk);
+            ByteBuffer compressed = ByteBuffer.allocate(chunkLength);
+            file.getCatalogFile().getResources().read(fs, chunkOffset, compressed);
+
+            ByteBuffer uncompressed = ByteBuffer.allocate((int) decmpfsDiskHeader.getUncompressedSize());
+
+            Inflater inflater = new Inflater();
+            inflater.setInput(compressed.array());
+
+            try {
+                inflater.inflate(uncompressed.array());
+            } catch (DataFormatException e) {
+                throw new IllegalStateException("Error uncompressing data", e);
+            }
+
+            uncompressed.position((int) fileOffset % ZLIB_FORK_CHUNK_SIZE);
+            uncompressed.limit(uncompressed.position() + dest.remaining());
             dest.put(uncompressed);
 
         } else {
@@ -117,24 +151,6 @@ public class CompressedAttributeData extends AttributeData {
                 } catch (DataFormatException e) {
                     throw new IllegalStateException("Error uncompressing data", e);
                 }
-            }
-        } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.DATA_IN_FORK) {
-            ByteBuffer header = ByteBuffer.allocate(0x10);
-            file.getCatalogFile().getResources().read(fs, 0, header);
-
-            int compressedDataLength = (int) BigEndian.getUInt32(header.array(), 0x4);
-            ByteBuffer compressed = ByteBuffer.allocate(compressedDataLength);
-            file.getCatalogFile().getResources().read(fs, 0x118, compressed);
-
-            uncompressed = ByteBuffer.allocate((int) decmpfsDiskHeader.getUncompressedSize());
-
-            Inflater inflater = new Inflater();
-            inflater.setInput(compressed.array());
-
-            try {
-                inflater.inflate(uncompressed.array());
-            } catch (DataFormatException e) {
-                throw new IllegalStateException("Error uncompressing data", e);
             }
         }
     }

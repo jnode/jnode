@@ -145,7 +145,7 @@ public class HfsPlusFileSystemTest {
             "    .journal; 524288; ba95a916b83c8478fb22c180893cffff\n" +
             "    .journal_info_block; 4096; 469270564228a832e83d2ad16e6d8edc\n" +
             "    .Trashes; \n" +
-            "    compression.html; 81757; 669bd8f30ae4c5c79be8182575f5148f\n" +
+            "    compression.html; 81757; 64ae4e5007fdec27518d9073c72a1714\n" +
             "    compression.html:rsrc; 21007; 6727899de0b20d7dcb92c68ecaa8bfe2\n" +
             "    small.txt; 6; d15dbfcb847653913855e21370d83af1\n" +
             "    zlib.txt; 6211; e63c9b3344d96dbd6c5ddd0debde06f0\n" +
@@ -164,10 +164,10 @@ public class HfsPlusFileSystemTest {
 
         String expectedStructure =
             "type: HFS+ vol:untitled total:2097152 free:1904640\n" +
-                "  /; \n" +
-                "    quote.txt; 165; 357d31c02f4b9161d14182b57769ef7a\n" +
-                "    steve-jobs-holding-iphone.jpg; 107795; 17baa8a85e36a790df697a68362c227d\n" +
-                "    \u0000\u0000\u0000\u0000HFS+ Private Data; \n";
+            "  /; \n" +
+            "    quote.txt; 165; 357d31c02f4b9161d14182b57769ef7a\n" +
+            "    steve-jobs-holding-iphone.jpg; 107795; 17baa8a85e36a790df697a68362c227d\n" +
+            "    \u0000\u0000\u0000\u0000HFS+ Private Data; \n";
 
         DataStructureAsserts.assertStructure(fs, expectedStructure);
     }
@@ -180,20 +180,44 @@ public class HfsPlusFileSystemTest {
 
         String expectedStructure =
             "type: HFS+ vol:Will it work? total:40960000 free:39424000\n" +
-                "  /; \n" +
-                "    .fseventsd; \n" +
-                "      0000000021b70ddc; 134; c4bd63b946eb863f50b189f2cb253c8c\n" +
-                "      0000000021b70ddd; 72; 3bf09d08a28b8988cec8f4e3c166ee96\n" +
-                "      fseventsd-uuid; 36; 518c962c5c2852fd354b18650e198372\n" +
-                "    .HFS+ Private Directory Data\r; \n" +
-                "    .journal; 524288; b324e1aae290bc30297418b2c39cefa3\n" +
-                "    .journal_info_block; 4096; 469270564228a832e83d2ad16e6d8edc\n" +
-                "    .Trashes; \n" +
-                "    coffee-again.txt; 2573; 3a66504af332c4e6d9997e52cce98002\n" +
-                "    coffee.txt; 2573; 3a66504af332c4e6d9997e52cce98002\n" +
-                "    i-own-you.jpg; 24085; a1a91dfb9c2c0db6bec2f55b12a2e97f\n" +
-                "    \u0000\u0000\u0000\u0000HFS+ Private Data; \n" +
-                "      iNode24; 2573; 3a66504af332c4e6d9997e52cce98002\n";
+            "  /; \n" +
+            "    .fseventsd; \n" +
+            "      0000000021b70ddc; 134; c4bd63b946eb863f50b189f2cb253c8c\n" +
+            "      0000000021b70ddd; 72; 3bf09d08a28b8988cec8f4e3c166ee96\n" +
+            "      fseventsd-uuid; 36; 518c962c5c2852fd354b18650e198372\n" +
+            "    .HFS+ Private Directory Data\r; \n" +
+            "    .journal; 524288; b324e1aae290bc30297418b2c39cefa3\n" +
+            "    .journal_info_block; 4096; 469270564228a832e83d2ad16e6d8edc\n" +
+            "    .Trashes; \n" +
+            "    coffee-again.txt; 2573; 3a66504af332c4e6d9997e52cce98002\n" +
+            "    coffee.txt; 2573; 3a66504af332c4e6d9997e52cce98002\n" +
+            "    i-own-you.jpg; 24085; a1a91dfb9c2c0db6bec2f55b12a2e97f\n" +
+            "    \u0000\u0000\u0000\u0000HFS+ Private Data; \n" +
+            "      iNode24; 2573; 3a66504af332c4e6d9997e52cce98002\n";
+
+        DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
+
+    @Test
+    public void testDiskWithLargeCompressedFile() throws Exception {
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/hfsplus/large-compressed.dmg"), "r");
+        HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
+        HfsPlusFileSystem fs = type.create(device, true);
+
+        String expectedStructure =
+            "type: HFS+ vol:large compressed file total:40960000 free:39411712\n" +
+            "  /; \n" +
+            "    .fseventsd; \n" +
+            "      00000000220a3c77; 96; 52a732bebb5103be73aa89617d42a747\n" +
+            "      00000000220a3c78; 72; 54d11397f6d87faf48a42c82aa2df57d\n" +
+            "      fseventsd-uuid; 36; 81d67b0f96aea5c2a1567a28dfa32fb7\n" +
+            "    .HFS+ Private Directory Data\r; \n" +
+            "    .journal; 524288; 43c347a01dd468234a75c8f5f126858e\n" +
+            "    .journal_info_block; 4096; 469270564228a832e83d2ad16e6d8edc\n" +
+            "    .Trashes; \n" +
+            "    large-useless-text.txt; 122818; e33db0ee58f4f5413c721b3d99311215\n" +
+            "    large-useless-text.txt:rsrc; 36771; fba9ba66e57abb9e691a6fb62fcd7c17\n" +
+            "    \u0000\u0000\u0000\u0000HFS+ Private Data; \n";
 
         DataStructureAsserts.assertStructure(fs, expectedStructure);
     }

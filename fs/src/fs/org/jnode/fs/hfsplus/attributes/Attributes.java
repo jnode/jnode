@@ -97,32 +97,48 @@ public class Attributes {
      * @throws IOException if an error occurs.
      */
     public AttributeData getAttribute(CatalogNodeId fileId, String attributeName) throws IOException {
+        if (bthr == null) {
+            return null;
+        }
+
+        return getAttribute(fileId, attributeName, bthr.getRootNode());
+    }
+
+    /**
+     * Looks up an attribute in the attributes file.
+     *
+     * @param fileId the ID of the file to look up the attribute on.
+     * @param attributeName the name of the attribute to lookup.
+     * @param nodeNumber the index of node where the search begin.
+     * @return the leaf record, or possibly {code null}.
+     * @throws IOException if an error occurs.
+     */
+    public AttributeData getAttribute(CatalogNodeId fileId, String attributeName, long nodeNumber) throws IOException {
         if (attributesFile.getExtent(0).isEmpty()) {
             // No attributes
             return null;
         }
 
-        long currentOffset;
         LeafRecord leafRecord = null;
         int nodeSize = bthr.getNodeSize();
         ByteBuffer nodeData = ByteBuffer.allocate(nodeSize);
-        attributesFile.read(fs, (bthr.getRootNode() * nodeSize), nodeData);
+        attributesFile.read(fs, (nodeNumber * nodeSize), nodeData);
         nodeData.rewind();
         byte[] data = ByteBufferUtils.toArray(nodeData);
         NodeDescriptor nodeDescriptor = new NodeDescriptor(data, 0);
 
-        while (nodeDescriptor.isIndexNode()) {
+        if (nodeDescriptor.isIndexNode()) {
             AttributeIndexNode node = new AttributeIndexNode(data, nodeSize);
-            IndexRecord record = node.find(new AttributeKey(fileId, attributeName));
-            currentOffset = record.getIndex() * nodeSize;
-            nodeData = ByteBuffer.allocate(nodeSize);
-            attributesFile.read(fs, currentOffset, nodeData);
-            nodeData.rewind();
-            data = ByteBufferUtils.toArray(nodeData);
-            nodeDescriptor = new NodeDescriptor(nodeData.array(), 0);
-        }
+            IndexRecord[] records = node.findAll(new AttributeKey(fileId, attributeName));
 
-        if (nodeDescriptor.isLeafNode()) {
+            for (IndexRecord indexRecord : records) {
+                AttributeData attributeData = getAttribute(fileId, attributeName, indexRecord.getIndex());
+                if (attributeData != null) {
+                    return attributeData;
+                }
+            }
+
+        } else if (nodeDescriptor.isLeafNode()) {
             AttributeLeafNode node = new AttributeLeafNode(data, nodeSize);
             leafRecord = node.find(new AttributeKey(fileId, attributeName));
         }
