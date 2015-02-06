@@ -800,7 +800,9 @@ public class INode {
      * @return the size of the file in bytes
      */
     public synchronized long getSize() {
-        return Ext2Utils.get32(data, 4);
+        long sizeLow = Ext2Utils.get32(data, 4);
+        long sizeHigh = Ext2Utils.get32(data, 0x6C) << 32;
+        return sizeHigh | sizeLow;
     }
 
     public synchronized void setSize(long size) {
