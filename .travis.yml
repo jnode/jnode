@@ -6,5 +6,6 @@ install:
   - wget http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | sudo apt-key add -
   - sudo apt-get update
   - sudo apt-get -y install virtualbox-4.3
+  - sudo /etc/init.d/vboxdrv setup
 #script: "./build.sh clean cd-x86-lite"
 script: "VBoxManage -v"
