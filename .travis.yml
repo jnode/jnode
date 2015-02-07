@@ -1,15 +1,4 @@
 language: java
 jdk:
   - oraclejdk7
-install:
-  - sudo echo "deb http://download.virtualbox.org/virtualbox/debian trusty contrib" | sudo tee -a /etc/apt/sources.list
-  - wget http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | sudo apt-key add -
-  - sudo apt-get update
-  - wget http://download.openvz.org/kernel/branches/rhel6-2.6.32/042stab090.5/linux-headers-2.6.32-openvz-042stab090.5-amd64_1_amd64.deb
-  - sudo dpkg -i linux-headers-2.6.32-openvz-042stab090.5-amd64_1_amd64.deb
-  - sudo apt-get -y install virtualbox-4.3
-#  - sudo apt-get install build-essential module-assistant
-#  - sudo m-a prepare
-#  - sudo /etc/init.d/vboxdrv setup
-#script: "./build.sh clean cd-x86-lite"
-script: "VBoxManage -v"
+script: "./build.sh clean cd-x86-lite"
