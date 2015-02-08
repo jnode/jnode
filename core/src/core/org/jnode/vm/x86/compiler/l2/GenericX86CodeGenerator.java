@@ -232,8 +232,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         checkLabel(quad.getAddress());
         Variable<T> lhs = quad.getLHS();
         if (lhs.getAddressingMode() == REGISTER) {
-            T reg1 = ((RegisterLocation<T>) lhs
-                .getLocation()).getRegister();
+            T reg1 = ((RegisterLocation<T>) lhs.getLocation()).getRegister();
             IntConstant<T> rhs = (IntConstant<T>) quad.getRHS();
             os.writeMOV_Const((GPR) reg1, rhs.getValue());
         } else if (lhs.getAddressingMode() == STACK) {
@@ -323,8 +322,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 }
             } else {
                 StackLocation<T> stackLoc = (StackLocation<T>) loc;
-                os.writeMOV(X86Constants.BITS32, X86Register.EAX,
-                    X86Register.EBP, stackLoc.getDisplacement());
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, stackLoc.getDisplacement());
             }
         }
 
@@ -485,8 +483,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case INEG:
-                os.writeMOV(X86Constants.BITS32, (GPR) lhsReg, X86Register.EBP,
-                    rhsDisp);
+                os.writeMOV(X86Constants.BITS32, (GPR) lhsReg, X86Register.EBP, rhsDisp);
                 os.writeNEG((GPR) lhsReg);
                 break;
 
@@ -515,8 +512,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 throw new IllegalArgumentException("Unknown operation");
 
             case I2F:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp,
-                    (GPR) rhsReg);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, (GPR) rhsReg);
                 os.writeFILD32(X86Register.EBP, lhsDisp);
                 os.writeFSTP32(X86Register.EBP, lhsDisp);
                 break;
@@ -526,8 +522,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case L2F:
             case L2D:
             case F2I:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp,
-                    (GPR) rhsReg);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, (GPR) rhsReg);
                 os.writeFLD32(X86Register.EBP, lhsDisp);
                 os.writeFISTP32(X86Register.EBP, lhsDisp);
                 break;
@@ -561,8 +556,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case INEG:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp,
-                    (GPR) rhsReg);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, (GPR) rhsReg);
                 os.writeNEG(BITS32, X86Register.EBP, lhsDisp);
                 break;
 
@@ -570,8 +564,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 throw new IllegalArgumentException("Unknown operation");
 
             case FNEG:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp,
-                    (GPR) rhsReg);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, (GPR) rhsReg);
                 os.writeFLD32(X86Register.EBP, lhsDisp);
                 os.writeFCHS();
                 os.writeFSTP32(X86Register.EBP, lhsDisp);
@@ -697,8 +690,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else if (reg1 == X86Register.EDX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EDX,
-                        X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EDX, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else {
@@ -733,8 +725,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else if (reg1 == X86Register.EAX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX,
-                        X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else {
@@ -885,8 +876,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else if (reg1 == X86Register.EDX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EDX,
-                        X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EDX, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else {
@@ -897,8 +887,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case IMUL:
-                os.writeIMUL_3((GPR) reg1, X86Register.EBP, disp3, iconst2
-                    .getValue());
+                os.writeIMUL_3((GPR) reg1, X86Register.EBP, disp3, iconst2.getValue());
                 break;
 
             case IOR:
@@ -916,8 +905,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else if (reg1 == X86Register.EAX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX,
-                        X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else {
@@ -930,8 +918,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case ISHL: // not supported
                 os.writeMOV_Const((GPR) reg1, iconst2.getValue());
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSAL_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
@@ -939,8 +926,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case ISHR: // not supported
                 os.writeMOV_Const((GPR) reg1, iconst2.getValue());
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSAR_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
@@ -953,8 +939,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case IUSHR: // not supported
                 os.writeMOV_Const((GPR) reg1, iconst2.getValue());
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSHR_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
@@ -1062,8 +1047,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else if (reg1 == X86Register.EDX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EDX,
-                        X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EDX, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else {
@@ -1098,8 +1082,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else if (reg1 == X86Register.EAX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX,
-                        X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else {
@@ -1251,8 +1234,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else if (reg1 == X86Register.EDX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EDX,
-                        X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EDX, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else {
@@ -1294,8 +1276,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else if (reg1 == X86Register.EAX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX,
-                        X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else {
@@ -1461,8 +1442,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else if (reg1 == X86Register.EDX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EDX,
-                        X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EDX, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else {
@@ -1498,8 +1478,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else if (reg1 == X86Register.EAX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX,
-                        X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else {
@@ -1514,8 +1493,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSAL_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
@@ -1525,8 +1503,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSAR_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
@@ -1543,8 +1520,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSHR_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
@@ -1627,16 +1603,12 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         switch (operation) {
 
             case IADD:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeADD((GPR) reg1, iconst3.getValue());
                 break;
 
             case IAND:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeAND((GPR) reg1, iconst3.getValue());
                 break;
 
@@ -1644,8 +1616,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writePUSH(iconst3.getValue());
-                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP,
-                    disp2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 os.writePOP(X86Register.EDX);
@@ -1653,8 +1624,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else if (reg1 == X86Register.EDX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EDX,
-                        X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EDX, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else {
@@ -1665,14 +1635,11 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case IMUL:
-                os.writeIMUL_3((GPR) reg1, X86Register.EBP, disp2, iconst3
-                    .getValue());
+                os.writeIMUL_3((GPR) reg1, X86Register.EBP, disp2, iconst3.getValue());
                 break;
 
             case IOR:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeOR((GPR) reg1, iconst3.getValue());
                 break;
 
@@ -1680,8 +1647,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writePUSH(iconst3.getValue());
-                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP,
-                    disp2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 os.writePOP(X86Register.EAX);
@@ -1689,8 +1655,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else if (reg1 == X86Register.EAX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX,
-                        X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else {
@@ -1701,37 +1666,27 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case ISHL: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeSAL((GPR) reg1, iconst3.getValue());
                 break;
 
             case ISHR: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeSAR((GPR) reg1, iconst3.getValue());
                 break;
 
             case ISUB:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeSUB((GPR) reg1, iconst3.getValue());
                 break;
 
             case IUSHR: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeSHR((GPR) reg1, iconst3.getValue());
                 break;
 
             case IXOR:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeXOR((GPR) reg1, iconst3.getValue());
                 break;
 
@@ -1804,24 +1759,19 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                                  BinaryOperation operation, T reg3) {
         switch (operation) {
             case IADD:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeADD((GPR) reg1, (GPR) reg3);
                 break;
 
             case IAND:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeAND((GPR) reg1, (GPR) reg3);
                 break;
 
             case IDIV: // needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
-                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP,
-                    disp2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 if (reg3 == X86Register.EAX) {
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
@@ -1834,8 +1784,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else if (reg1 == X86Register.EDX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EDX,
-                        X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EDX, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else {
@@ -1846,24 +1795,19 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case IMUL:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeIMUL((GPR) reg1, (GPR) reg3);
                 break;
 
             case IOR:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeOR((GPR) reg1, (GPR) reg3);
                 break;
 
             case IREM: // needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
-                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP,
-                    disp2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 if (reg3 == X86Register.EAX) {
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
@@ -1876,8 +1820,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else if (reg1 == X86Register.EAX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX,
-                        X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else {
@@ -1888,9 +1831,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case ISHL: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 if (reg3 != X86Register.ECX) {
                     os.writePUSH(X86Register.ECX);
                     os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
@@ -1902,9 +1843,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case ISHR: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 if (reg3 != X86Register.ECX) {
                     os.writePUSH(X86Register.ECX);
                     os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
@@ -1916,16 +1855,12 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case ISUB:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeSUB((GPR) reg1, (GPR) reg3);
                 break;
 
             case IUSHR: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 if (reg3 != X86Register.ECX) {
                     os.writePUSH(X86Register.ECX);
                     os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
@@ -1937,9 +1872,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case IXOR:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeXOR((GPR) reg1, (GPR) reg3);
                 break;
 
@@ -2012,32 +1945,26 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                                  BinaryOperation operation, int disp3) {
         switch (operation) {
             case IADD:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeADD((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case IAND:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeAND((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case IDIV: // needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
-                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP,
-                    disp2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
                 if (reg1 == X86Register.EAX) {
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else if (reg1 == X86Register.EDX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EDX,
-                        X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EDX, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else {
@@ -2048,32 +1975,26 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case IMUL:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeIMUL((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case IOR: // not supported
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeOR((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case IREM: // needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
-                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP,
-                    disp2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
                 if (reg1 == X86Register.EDX) {
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 } else if (reg1 == X86Register.EAX) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX,
-                        X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 } else {
@@ -2084,49 +2005,36 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case ISHL: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSAL_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
 
             case ISHR: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSAR_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
 
             case ISUB:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeSUB((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case IUSHR: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSHR_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
 
             case IXOR:
-                os
-                    .writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP,
-                        disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writeXOR((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
@@ -2206,14 +2114,12 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         IntConstant<T> iconst2 = (IntConstant<T>) c2;
         switch (operation) {
             case IADD:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeADD(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
             case IAND:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeAND(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
@@ -2229,8 +2135,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 } else {
                     os.writeIDIV_EAX((GPR) reg3);
                 }
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EAX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
@@ -2238,15 +2143,12 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case IMUL:
                 os.writePUSH((GPR) reg3);
                 os.writeIMUL_3((GPR) reg3, (GPR) reg3, iconst2.getValue());
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writePOP((GPR) reg3);
                 break;
 
             case IOR:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeOR(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
@@ -2262,15 +2164,13 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 } else {
                     os.writeIDIV_EAX((GPR) reg3);
                 }
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EDX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
 
             case ISHL: // needs CL
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 if (reg3 != X86Register.ECX) {
                     os.writePUSH(X86Register.ECX);
                     os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
@@ -2282,8 +2182,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case ISHR: // needs CL
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 if (reg3 != X86Register.ECX) {
                     os.writePUSH(X86Register.ECX);
                     os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
@@ -2295,14 +2194,12 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case ISUB:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeSUB(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
             case IUSHR: // needs CL
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 if (reg3 != X86Register.ECX) {
                     os.writePUSH(X86Register.ECX);
                     os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
@@ -2314,8 +2211,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case IXOR: // not supported
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeXOR(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
@@ -2327,45 +2223,33 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 throw new IllegalArgumentException("Unknown operation");
 
             case FADD:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFADD32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FDIV:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFDIV32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FMUL:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFMUL32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FREM:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFPREM();
                 os.writeFSTP32(X86Register.EBP, disp1);
@@ -2373,12 +2257,9 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case FSUB:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFSUB32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
@@ -2425,8 +2306,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 os.writeMOV_Const(X86Register.EAX, iconst2.getValue());
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EAX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
@@ -2452,28 +2332,23 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 os.writeMOV_Const(X86Register.EAX, iconst2.getValue());
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EDX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
 
             case ISHL:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSAL_CL(BITS32, X86Register.EBP, disp1);
                 os.writePOP(X86Register.ECX);
                 break;
 
             case ISHR:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSAR_CL(BITS32, X86Register.EBP, disp1);
                 os.writePOP(X86Register.ECX);
                 break;
@@ -2487,11 +2362,9 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case IUSHR:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSHR_CL(BITS32, X86Register.EBP, disp1);
                 os.writePOP(X86Register.ECX);
                 break;
@@ -2512,32 +2385,28 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 throw new IllegalArgumentException("Unknown operation");
 
             case FADD:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFADD32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FDIV:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFDIV32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FMUL:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFMUL32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FREM:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFSUB32(X86Register.EBP, disp3);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFPREM();
@@ -2546,8 +2415,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case FSUB:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFSUB32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.EBP, disp1);
@@ -2575,16 +2443,12 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         switch (operation) {
 
             case IADD:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeADD(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
             case IAND:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeAND(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
@@ -2598,8 +2462,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 os.writePOP(X86Register.EDX);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EAX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
@@ -2607,16 +2470,12 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case IMUL:
                 os.writePUSH((GPR) reg2);
                 os.writeIMUL_3((GPR) reg2, (GPR) reg2, iconst3.getValue());
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writePOP((GPR) reg2);
                 break;
 
             case IOR:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeOR(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
@@ -2630,44 +2489,33 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 os.writePOP(X86Register.EAX);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EDX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
 
             case ISHL: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeSAL(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
             case ISHR: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeSAR(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
             case ISUB:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeSUB(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
             case IUSHR: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeSHR(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
             case IXOR:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeXOR(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
@@ -2679,45 +2527,33 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 throw new IllegalArgumentException("Unknown operation");
 
             case FADD:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFADD32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FDIV:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFDIV32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FMUL:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFMUL32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FREM:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFPREM();
                 os.writeFSTP32(X86Register.EBP, disp1);
@@ -2725,12 +2561,9 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case FSUB:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFSUB32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
@@ -2755,16 +2588,12 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                                  BinaryOperation operation, T reg3) {
         switch (operation) {
             case IADD:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeADD(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
             case IAND:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeAND(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
@@ -2782,8 +2611,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 } else {
                     os.writeIDIV_EAX((GPR) reg3);
                 }
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EAX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
@@ -2791,16 +2619,12 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case IMUL:
                 os.writePUSH((GPR) reg2);
                 os.writeIMUL((GPR) reg2, (GPR) reg3);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writePOP((GPR) reg2);
                 break;
 
             case IOR:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeOR(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
@@ -2818,16 +2642,13 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 } else {
                     os.writeIDIV_EAX((GPR) reg3);
                 }
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EDX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
 
             case ISHL: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 if (reg3 != X86Register.ECX) {
                     os.writePUSH(X86Register.ECX);
                     os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
@@ -2839,9 +2660,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case ISHR: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 if (reg3 != X86Register.ECX) {
                     os.writePUSH(X86Register.ECX);
                     os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
@@ -2853,16 +2672,12 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case ISUB:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeSUB(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
             case IUSHR: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 if (reg3 != X86Register.ECX) {
                     os.writePUSH(X86Register.ECX);
                     os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
@@ -2874,9 +2689,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case IXOR:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeXOR(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
@@ -2888,49 +2701,33 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 throw new IllegalArgumentException("Unknown operation");
 
             case FADD:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFADD32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FDIV:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFDIV32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FMUL:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFMUL32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FREM:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFPREM();
                 os.writeFSTP32(X86Register.EBP, disp1);
@@ -2938,13 +2735,9 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case FSUB:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFSUB32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
@@ -2965,24 +2758,19 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    public void generateBinaryOP(int disp1, T reg2,
-                                 BinaryOperation operation, int disp3) {
+    public void generateBinaryOP(int disp1, T reg2, BinaryOperation operation, int disp3) {
         switch (operation) {
             case IADD:
                 os.writePUSH((GPR) reg2);
                 os.writeADD((GPR) reg2, X86Register.EBP, disp3);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writePOP((GPR) reg2);
                 break;
 
             case IAND:
                 os.writePUSH((GPR) reg2);
                 os.writeAND((GPR) reg2, X86Register.EBP, disp3);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writePOP((GPR) reg2);
                 break;
 
@@ -2994,8 +2782,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 }
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EAX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
@@ -3003,18 +2790,14 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case IMUL:
                 os.writePUSH((GPR) reg2);
                 os.writeIMUL((GPR) reg2, X86Register.EBP, disp3);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writePOP((GPR) reg2);
                 break;
 
             case IOR:
                 os.writePUSH((GPR) reg2);
                 os.writeOR((GPR) reg2, X86Register.EBP, disp3);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writePOP((GPR) reg2);
                 break;
 
@@ -3026,30 +2809,23 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 }
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EDX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
 
             case ISHL: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSAL_CL(BITS32, X86Register.EBP, disp1);
                 os.writePOP(X86Register.ECX);
                 break;
 
             case ISHR: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSAR_CL(BITS32, X86Register.EBP, disp1);
                 os.writePOP(X86Register.ECX);
                 break;
@@ -3057,19 +2833,14 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case ISUB:
                 os.writePUSH((GPR) reg2);
                 os.writeSUB((GPR) reg2, X86Register.EBP, disp3);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writePOP((GPR) reg2);
                 break;
 
             case IUSHR: // needs CL
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSHR_CL(BITS32, X86Register.EBP, disp1);
                 os.writePOP(X86Register.ECX);
                 break;
@@ -3077,9 +2848,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case IXOR:
                 os.writePUSH((GPR) reg2);
                 os.writeXOR((GPR) reg2, X86Register.EBP, disp3);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writePOP((GPR) reg2);
                 break;
 
@@ -3091,36 +2860,28 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 throw new IllegalArgumentException("Unknown operation");
 
             case FADD:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFADD32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FDIV:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFDIV32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FMUL:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFMUL32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FREM:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp3);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFPREM();
@@ -3129,9 +2890,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case FSUB:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFSUB32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.EBP, disp1);
@@ -3153,8 +2912,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    public void generateBinaryOP(int disp1, int disp2,
-                                 BinaryOperation operation, Constant<T> c3) {
+    public void generateBinaryOP(int disp1, int disp2, BinaryOperation operation, Constant<T> c3) {
         IntConstant<T> iconst3 = (IntConstant<T>) c3;
         switch (operation) {
             case IADD: // not supported due to the move bellow
@@ -3177,13 +2935,11 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writePUSH(iconst3.getValue());
-                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP,
-                    disp2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 os.writePOP(X86Register.EDX);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EAX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
@@ -3207,13 +2963,11 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writePUSH(iconst3.getValue());
-                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP,
-                    disp2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 os.writePOP(X86Register.EAX);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EDX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
@@ -3266,32 +3020,28 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 throw new IllegalArgumentException("Unknown operation");
 
             case FADD:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFADD32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FDIV:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFDIV32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FMUL:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFMUL32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FREM:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFPREM();
@@ -3300,8 +3050,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case FSUB:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3
-                    .getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFSUB32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
@@ -3345,8 +3094,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case IDIV: // needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
-                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP,
-                    disp2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 if (reg3 == X86Register.EAX) {
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
@@ -3355,8 +3103,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 } else {
                     os.writeIDIV_EAX((GPR) reg3);
                 }
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EAX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
@@ -3364,9 +3111,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case IMUL:
                 os.writePUSH((GPR) reg3);
                 os.writeIMUL((GPR) reg3, X86Register.EBP, disp2);
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writePOP((GPR) reg3);
                 break;
 
@@ -3381,8 +3126,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case IREM: // needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
-                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP,
-                    disp2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 if (reg3 == X86Register.EAX) {
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
@@ -3391,8 +3135,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 } else {
                     os.writeIDIV_EAX((GPR) reg3);
                 }
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EDX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
@@ -3466,36 +3209,28 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 throw new IllegalArgumentException("Unknown operation");
 
             case FADD:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFADD32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FDIV:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFDIV32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FMUL:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFMUL32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FREM:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFPREM();
@@ -3504,9 +3239,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case FSUB:
-                os
-                    .writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                        (GPR) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFSUB32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
@@ -3528,8 +3261,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    public void generateBinaryOP(int disp1, int disp2,
-                                 BinaryOperation operation, int disp3) {
+    public void generateBinaryOP(int disp1, int disp2, BinaryOperation operation, int disp3) {
         switch (operation) {
             case IADD:
                 os.writePUSH(SR1);
@@ -3550,12 +3282,10 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case IDIV:
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
-                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP,
-                    disp2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EAX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
@@ -3579,12 +3309,10 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case IREM:
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
-                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP,
-                    disp2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1,
-                    X86Register.EDX);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
                 os.writePOP(X86Register.EAX);
                 os.writePOP(X86Register.EDX);
                 break;
@@ -3595,8 +3323,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EBP, disp1);
                 }
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSAL_CL(BITS32, X86Register.EBP, disp1);
                 os.writePOP(X86Register.ECX);
                 break;
@@ -3607,8 +3334,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EBP, disp1);
                 }
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSAR_CL(BITS32, X86Register.EBP, disp1);
                 os.writePOP(X86Register.ECX);
                 break;
@@ -3627,8 +3353,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePOP(X86Register.EBP, disp1);
                 }
                 os.writePUSH(X86Register.ECX);
-                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP,
-                    disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSHR_CL(BITS32, X86Register.EBP, disp1);
                 os.writePOP(X86Register.ECX);
                 break;
@@ -3737,51 +3462,38 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         generateJumpForUnaryCondition(quad, condition);
     }
 
-    private void generateJumpForUnaryCondition(ConditionalBranchQuad<T> quad,
-                                               BranchCondition condition) {
+    private void generateJumpForUnaryCondition(ConditionalBranchQuad<T> quad, BranchCondition condition) {
         switch (condition) {
             case IFEQ:
-                os
-                    .writeJCC(getInstrLabel(quad.getTargetAddress()),
-                        X86Constants.JE);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JE);
                 break;
 
             case IFNE:
-                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
-                    X86Constants.JNE);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JNE);
                 break;
 
             case IFGT:
-                os
-                    .writeJCC(getInstrLabel(quad.getTargetAddress()),
-                        X86Constants.JG);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JG);
                 break;
 
             case IFGE:
-                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
-                    X86Constants.JGE);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JGE);
                 break;
 
             case IFLT:
-                os
-                    .writeJCC(getInstrLabel(quad.getTargetAddress()),
-                        X86Constants.JL);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JL);
                 break;
 
             case IFLE:
-                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
-                    X86Constants.JLE);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JLE);
                 break;
 
             case IFNULL:
-                os
-                    .writeJCC(getInstrLabel(quad.getTargetAddress()),
-                        X86Constants.JE);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JE);
                 break;
 
             case IFNONNULL:
-                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
-                    X86Constants.JNE);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JNE);
                 break;
 
             default:
@@ -3789,8 +3501,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    public void generateCodeFor(ConditionalBranchQuad<T> quad, BranchCondition condition,
-                                Constant<T> cons) {
+    public void generateCodeFor(ConditionalBranchQuad<T> quad, BranchCondition condition, Constant<T> cons) {
         checkLabel(quad.getAddress());
         yieldPoint(quad);
         os.writeMOV_Const(SR1, ((IntConstant) cons).getValue());
@@ -3798,8 +3509,8 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         generateJumpForUnaryCondition(quad, condition);
     }
 
-    public void generateCodeFor(ConditionalBranchQuad<T> quad, Constant<T> c1,
-                                BranchCondition condition, Constant<T> c2) {
+    public void generateCodeFor(ConditionalBranchQuad<T> quad, Constant<T> c1, BranchCondition condition,
+                                Constant<T> c2) {
         checkLabel(quad.getAddress());
         yieldPoint(quad);
         os.writeMOV_Const(SR1, ((IntConstant) c1).getValue());
@@ -3807,8 +3518,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         generateJumpForBinaryCondition(quad, condition);
     }
 
-    public void generateCodeFor(ConditionalBranchQuad<T> quad, Constant<T> c1,
-                                BranchCondition condition, int disp2) {
+    public void generateCodeFor(ConditionalBranchQuad<T> quad, Constant<T> c1, BranchCondition condition, int disp2) {
         checkLabel(quad.getAddress());
         yieldPoint(quad);
         os.writeMOV_Const(SR1, ((IntConstant) c1).getValue());
@@ -3816,8 +3526,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         generateJumpForBinaryCondition(quad, condition);
     }
 
-    public void generateCodeFor(ConditionalBranchQuad<T> quad, Constant<T> c1,
-                                BranchCondition condition, Object reg2) {
+    public void generateCodeFor(ConditionalBranchQuad<T> quad, Constant<T> c1, BranchCondition condition, Object reg2) {
         checkLabel(quad.getAddress());
         yieldPoint(quad);
         os.writeMOV_Const(SR1, ((IntConstant) c1).getValue());
@@ -3825,16 +3534,13 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         generateJumpForBinaryCondition(quad, condition);
     }
 
-    public void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1,
-                                BranchCondition condition, Constant<T> c2) {
+    public void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1, BranchCondition condition, Constant<T> c2) {
         checkLabel(quad.getAddress());
-        os.writeCMP_Const(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c2)
-            .getValue());
+        os.writeCMP_Const(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c2).getValue());
         generateJumpForBinaryCondition(quad, condition);
     }
 
-    public void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1,
-                                BranchCondition condition, int disp2) {
+    public void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1, BranchCondition condition, int disp2) {
         checkLabel(quad.getAddress());
         yieldPoint(quad);
         os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP, disp1);
@@ -3842,77 +3548,64 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         generateJumpForBinaryCondition(quad, condition);
     }
 
-    public void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1,
-                                BranchCondition condition, Object reg2) {
+    public void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1, BranchCondition condition, Object reg2) {
         checkLabel(quad.getAddress());
         os.writeCMP(X86Register.EBP, disp1, (GPR) reg2);
         generateJumpForBinaryCondition(quad, condition);
     }
 
-    public void generateCodeFor(ConditionalBranchQuad<T> quad, Object reg1,
-                                BranchCondition condition, Constant<T> c2) {
+    public void generateCodeFor(ConditionalBranchQuad<T> quad, Object reg1, BranchCondition condition, Constant<T> c2) {
         checkLabel(quad.getAddress());
         os.writeCMP_Const((GPR) reg1, ((IntConstant<T>) c2).getValue());
         generateJumpForBinaryCondition(quad, condition);
     }
 
-    public void generateCodeFor(ConditionalBranchQuad<T> quad, Object reg1,
-                                BranchCondition condition, int disp2) {
+    public void generateCodeFor(ConditionalBranchQuad<T> quad, Object reg1, BranchCondition condition, int disp2) {
         checkLabel(quad.getAddress());
         yieldPoint(quad);
         os.writeCMP((GPR) reg1, X86Register.EBP, disp2);
         generateJumpForBinaryCondition(quad, condition);
     }
 
-    public void generateCodeFor(ConditionalBranchQuad<T> quad, Object reg1,
-                                BranchCondition condition, Object reg2) {
+    public void generateCodeFor(ConditionalBranchQuad<T> quad, Object reg1, BranchCondition condition, Object reg2) {
         checkLabel(quad.getAddress());
         yieldPoint(quad);
         os.writeCMP((GPR) reg1, (GPR) reg2);
         generateJumpForBinaryCondition(quad, condition);
     }
 
-    private void generateJumpForBinaryCondition(ConditionalBranchQuad<T> quad,
-                                                BranchCondition condition) {
+    private void generateJumpForBinaryCondition(ConditionalBranchQuad<T> quad, BranchCondition condition) {
         switch (condition) {
             case IF_ICMPEQ:
-                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
-                        X86Constants.JE);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JE);
                 break;
 
             case IF_ICMPNE:
-                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
-                    X86Constants.JNE);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JNE);
                 break;
 
             case IF_ICMPGT:
-                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
-                        X86Constants.JG);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JG);
                 break;
 
             case IF_ICMPGE:
-                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
-                    X86Constants.JGE);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JGE);
                 break;
 
             case IF_ICMPLT:
-                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
-                        X86Constants.JL);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JL);
                 break;
 
             case IF_ICMPLE:
-                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
-                    X86Constants.JLE);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JLE);
                 break;
 
             case IF_ACMPEQ:
-                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
-                        X86Constants.JE);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JE);
                 break;
 
             case IF_ACMPNE:
-                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
-                    X86Constants.JNE);
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JNE);
                 break;
 
             default:
@@ -4210,8 +3903,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 int tibOffset = ObjectLayout.TIB_SLOT * slotSize;
 
                 /* Get objectref -> EAX */
-                os.writeMOV(asize, stackFrame.getHelper().AAX, stackFrame.getHelper().SP, argSlotCount
-                    * slotSize);
+                os.writeMOV(asize, stackFrame.getHelper().AAX, stackFrame.getHelper().SP, argSlotCount * slotSize);
                 /* Get VMT of objectref -> EAX */
                 os.writeMOV(asize, stackFrame.getHelper().AAX, stackFrame.getHelper().AAX, tibOffset);
                 /* Get entry in VMT -> EAX */
