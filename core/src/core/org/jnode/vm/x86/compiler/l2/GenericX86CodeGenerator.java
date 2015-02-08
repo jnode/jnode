@@ -3613,309 +3613,177 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    @Override
-    public void generateCodeFor(StaticRefAssignQuad<T> quad) {
-        checkLabel(quad.getAddress());
-        VmConstFieldRef fieldRef = quad.getRHS().getFiledRef();
-        final Label curInstrLabel = getInstrLabel(quad.getAddress());
-        fieldRef.resolve(currentMethod.getDeclaringClass().getLoader());
-        final int type = JvmType.SignatureToType(fieldRef.getSignature());
-        final VmStaticField sf = (VmStaticField) fieldRef.getResolvedVmField();
-
-        // Initialize if needed
-//        if (!sf.getDeclaringClass().isAlwaysInitialized()) {
-//            writeInitializeClass(fieldRef);
-//        }
-
-        // Get static field object
-//        if (JvmType.isFloat(type)) {
-//            final boolean is32bit = !fieldRef.isWide();
-//            if (sf.isShared()) {
-//                stackFrame.getHelper().writeGetStaticsEntryToFPU(curInstrLabel, (VmSharedStaticsEntry) sf, is32bit);
-//            } else {
-//                final GPR tmp = (GPR) L1AHelper.requestRegister(eContext,
-//                    JvmType.REFERENCE, false);
-//                helper.writeGetStaticsEntryToFPU(curInstrLabel,
-//                    (VmIsolatedStaticsEntry) sf, is32bit, tmp);
-//                L1AHelper.releaseRegister(eContext, tmp);
-//            }
-//            final Item result = ifac.createFPUStack(type);
-//            pushFloat(result);
-//            vstack.push(result);
-//        } else
-        if (!fieldRef.isWide()) {
-            //final WordItem result = L1AHelper.requestWordRegister(eContext, type, false);
-            Variable<T> lhs = quad.getLHS();
-            //final GPR resultr = lhs result.getRegister();
-            if (os.isCode32() || (type != JvmType.REFERENCE)) {
-                if (sf.isShared()) {
-                    if (lhs.getAddressingMode() == REGISTER) {
-                        stackFrame.getHelper().writeGetStaticsEntry(curInstrLabel,
-                            (GPR) ((RegisterLocation) lhs.getLocation()).getRegister(), sf);
-                    } else {
-                        //todo
-                    }
-                } else {
-                    if (lhs.getAddressingMode() == REGISTER) {
-                        //todo ESI ??
-                        GPR tmp = GPR.ESI;
-                        stackFrame.getHelper().writeGetStaticsEntry(curInstrLabel,
-                            (GPR) ((RegisterLocation) lhs.getLocation()).getRegister(), sf, tmp);
-                    } else {
-                        //todo
-                    }
-                }
-            }
-//            else {
-//                if (sf.isShared()) {
-//                    stackFrame.getHelper().writeGetStaticsEntry64(curInstrLabel, (GPR64) resultr,
-// (VmSharedStaticsEntry) sf);
-//                } else {
-//                    stackFrame.getHelper().writeGetStaticsEntry64(curInstrLabel, (GPR64) resultr,
-// (VmIsolatedStaticsEntry) sf);
-//                }
-//            }
-        }
-//        else {
-//            final DoubleWordItem result = L1AHelper.requestDoubleWordRegisters(
-//                eContext, type);
-//            if (os.isCode32()) {
-//                final GPR lsb = result.getLsbRegister(eContext);
-//                final GPR msb = result.getMsbRegister(eContext);
-//                if (sf.isShared()) {
-//                    helper.writeGetStaticsEntry64(curInstrLabel, lsb, msb, (VmSharedStaticsEntry) sf);
-//                } else {
-//                    helper.writeGetStaticsEntry64(curInstrLabel, lsb, msb, (VmIsolatedStaticsEntry) sf);
-//                }
-//            } else {
-//                final GPR64 reg = result.getRegister(eContext);
-//                if (sf.isShared()) {
-//                    helper.writeGetStaticsEntry64(curInstrLabel, reg, (VmSharedStaticsEntry) sf);
-//                } else {
-//                    helper.writeGetStaticsEntry64(curInstrLabel, reg, (VmIsolatedStaticsEntry) sf);
-//                }
-//            }
-//            vstack.push(result);
-//        }
+    public void endMethod() {
+        stackFrame.emitTrailer(typeSizeInfo, currentMethod.getBytecode().getNoLocals());
     }
 
-    public void generateCodeFor(StaticRefStoreQuad<T> quad) {
-        checkLabel(quad.getAddress());
-        final Label curInstrLabel = getInstrLabel(quad.getAddress());
-        VmConstFieldRef fieldRef = quad.getField().getFiledRef();
-        fieldRef.resolve(currentMethod.getDeclaringClass().getLoader());
-        final int type = JvmType.SignatureToType(fieldRef.getSignature());
-        final VmStaticField sf = (VmStaticField) fieldRef.getResolvedVmField();
+    public synchronized void startMethod(VmMethod method) {
 
-        if (!fieldRef.isWide()) {
+//        this.maxLocals = method.getBytecode().getNoLocals();
+//        this.loader = method.getDeclaringClass().getLoader();
+////        helper.reset();
+////        helper.setMethod(method);
+//        // this.startOffset = os.getLength();
+//
+//        this.startOffset = stackFrame.emitHeader();
+    }
 
-            if (os.isCode32() || (type != JvmType.REFERENCE)) {
-                if (sf.isShared()) {
-                    if (quad.getOperand().getAddressingMode() == REGISTER) {
-                        stackFrame.getHelper().writePutStaticsEntry(curInstrLabel,
-                            (GPR) ((RegisterLocation) ((Variable) quad.getOperand()).getLocation()).getRegister(), sf);
-                    } else {
-                        //todo
-                    }
-                } else {
-                    if (quad.getOperand().getAddressingMode() == REGISTER) {
-                        //todo ESI ??
-                        GPR tmp = GPR.ESI;
-                        stackFrame.getHelper().writePutStaticsEntry(curInstrLabel,
-                            (GPR) ((RegisterLocation) ((Variable) quad.getOperand()).getLocation()).getRegister(),
-                            sf, tmp);
-                    } else {
-                        //todo
-                    }
-                }
-            }
-//            else {
-//                if (sf.isShared()) {
-//                    helper.writePutStaticsEntry64(curInstrLabel, (GPR64) valr, sf);
-//                } else {
-//                    final GPR tmp = (GPR) L1AHelper.requestRegister(eContext, JvmType.REFERENCE, false);
-//                    helper.writePutStaticsEntry64(curInstrLabel, (GPR64) valr, sf, tmp);
-//                    L1AHelper.releaseRegister(eContext, tmp);
-//                }
-//            }
-//            if (!sf.isPrimitive() && helper.needsWriteBarrier()) {
-//                final GPR tmp = (GPR) L1AHelper.requestRegister(eContext, JvmType.INT, false);
-//                helper.writePutstaticWriteBarrier(sf, valr, tmp);
-//                L1AHelper.releaseRegister(eContext, tmp);
-//            }
+    private void yieldPoint(ConditionalBranchQuad<T> quad) {
+        if (quad.getTargetAddress() < quad.getAddress()) {
+            stackFrame.getHelper().writeYieldPoint(getInstrLabel(quad.getAddress()));
         }
-
-//        else {
-//            final DoubleWordItem dval = (DoubleWordItem) val;
-//            if (os.isCode32()) {
-//                if (sf.isShared()) {
-//                    helper.writePutStaticsEntry64(curInstrLabel, dval.getLsbRegister(eContext), dval
-//                        .getMsbRegister(eContext), sf);
-//                } else {
-//                    final GPR tmp = (GPR) L1AHelper.requestRegister(eContext, JvmType.REFERENCE, false);
-//                    helper.writePutStaticsEntry64(curInstrLabel, dval.getLsbRegister(eContext),
-//                        dval.getMsbRegister(eContext), sf, tmp);
-//                    L1AHelper.releaseRegister(eContext, tmp);
-//                }
-//            } else {
-//                if (sf.isShared()) {
-//                    helper.writePutStaticsEntry64(curInstrLabel, dval.getRegister(eContext), sf);
-//                } else {
-//                    final GPR tmp = (GPR) L1AHelper.requestRegister(eContext, JvmType.REFERENCE, false);
-//                    helper.writePutStaticsEntry64(curInstrLabel, dval.getRegister(eContext), sf, tmp);
-//                    L1AHelper.releaseRegister(eContext, tmp);
-//                }
-//            }
-//        }
-
     }
 
     @Override
-    public void generateCodeFor(StaticCallAssignQuad<T> quad) {
-        checkLabel(quad.getAddress());
-        VmConstMethodRef methodRef = quad.getMethodRef();
-        methodRef.resolve(currentMethod.getDeclaringClass().getLoader());
-        final VmStaticMethod method = (VmStaticMethod) methodRef.getResolvedVmMethod();
-        if (method.getDeclaringClass().isMagicType()) {
-//todo            magicHelper.emitMagic(eContext, method, true, this, currentMethod);
+    public void generateCodeFor(NewPrimitiveArrayAssignQuad<T> quad) {
+        // Setup a call to SoftByteCodes.allocArray
+        X86CompilerHelper helper = stackFrame.getHelper();
+        helper.writePushStaticsEntry(getInstrLabel(quad.getAddress()),
+            helper.getMethod().getDeclaringClass()); /* currentClass */
+        os.writePUSH(quad.getType()); /* type */
+        Operand size = quad.getSize();
+        /* count */
+        if (size.getAddressingMode() == CONSTANT) {
+            os.writePUSH(((IntConstant) size).getValue());
+        } else if (size.getAddressingMode() == REGISTER) {
+            os.writePUSH((GPR) ((RegisterLocation) ((Variable) size).getLocation()).getRegister());
+        } else if (size.getAddressingMode() == STACK) {
+            os.writePUSH(X86Register.EBP,
+                ((StackLocation) ((Variable) size).getLocation()).getDisplacement());
         } else {
+            throw new IllegalArgumentException();
+        }
 
+        helper.invokeJavaMethod(stackFrame.getEntryPoints().getAllocPrimitiveArrayMethod());
+        Variable lhs = quad.getLHS();
+        if (lhs.getAddressingMode() == REGISTER) {
+            os.writeMOV(BITS32, (GPR) ((RegisterLocation) lhs.getLocation()).getRegister(), X86Register.EAX);
+        } else if (lhs.getAddressingMode() == STACK) {
+            os.writeMOV(BITS32, X86Register.EBP,
+                ((StackLocation) lhs.getLocation()).getDisplacement(), X86Register.EAX);
+        } else {
+            throw new IllegalArgumentException();
+        }
 
-            Operand<T>[] referencedOps = quad.getReferencedOps();
-            for (int i = referencedOps.length; i-- > 0; ) {
-                Operand operand = referencedOps[i];
-                if (operand.getAddressingMode() == REGISTER) {
-                    GPR reg = (GPR) ((RegisterLocation) ((Variable) operand).getLocation()).getRegister();
-                    os.writePUSH(reg);
-                } else if (operand.getAddressingMode() == STACK) {
-                    int disp = ((StackLocation) ((Variable) operand).getLocation()).getDisplacement();
-                    os.writePUSH(GPR.ESP, disp);
-                } else if (operand.getAddressingMode() == CONSTANT) {
-                    int c = ((IntConstant) operand).getValue();
-                    os.writePUSH(c);
-                }
-            }
+    }
 
-
-
-
-            //todo handle return types
-            final int offset = stackFrame.getHelper().getSharedStaticsOffset(method);
-            os.writeCALL(stackFrame.getHelper().STATICS, offset);
-            Variable lhs = quad.getLHS();
-            if (lhs.getAddressingMode() == REGISTER) {
-                GPR reg = (GPR) ((RegisterLocation) lhs.getLocation()).getRegister();
-                if (reg != GPR.EAX) {
-                    os.writeMOV(X86Constants.BITS32, reg, GPR.EAX);
-                }
-            } else if (lhs.getAddressingMode() == STACK) {
-                int disp = ((StackLocation) lhs.getLocation()).getDisplacement();
-                os.writeMOV(X86Constants.BITS32, GPR.ESP, disp, GPR.EAX);
-            }
+    @Override
+    public void generateCodeFor(NewObjectArrayAssignQuad<T> quad) {
+        VmConstClass clazz = quad.getComponentType();
+        Label label = getInstrLabel(quad.getAddress());
+        writeResolveAndLoadClassToReg(clazz, SR1, label);
+        os.writePUSH(SR1);
+        Operand sizeOp = quad.getSize();
+        if (sizeOp.getAddressingMode() == CONSTANT) {
+            os.writePUSH(((IntConstant) sizeOp).getValue());
+        } else if (sizeOp.getAddressingMode() == REGISTER) {
+            os.writePUSH((GPR) ((RegisterLocation) ((Variable) sizeOp).getLocation()).getRegister());
+        } else if (sizeOp.getAddressingMode() == STACK) {
+            os.writePUSH(X86Register.EBP, ((StackLocation) ((Variable) sizeOp).getLocation()).getDisplacement());
+        } else {
+            throw new IllegalArgumentException();
+        }
+        stackFrame.getHelper().invokeJavaMethod(stackFrame.getEntryPoints().getAnewarrayMethod());
+        Variable lhs = quad.getLHS();
+        if (lhs.getAddressingMode() == REGISTER) {
+            os.writeMOV(BITS32, (GPR) ((RegisterLocation) lhs.getLocation()).getRegister(), X86Register.EAX);
+        } else if (lhs.getAddressingMode() == STACK) {
+            os.writeMOV(BITS32, X86Register.EBP, ((StackLocation) lhs.getLocation()).getDisplacement(),
+                X86Register.EAX);
+        } else {
+            throw new IllegalArgumentException();
         }
     }
 
     @Override
-    public void generateCodeFor(StaticCallQuad<T> quad) {
-        checkLabel(quad.getAddress());
-        VmConstMethodRef methodRef = quad.getMethodRef();
-        methodRef.resolve(currentMethod.getDeclaringClass().getLoader());
-        final VmStaticMethod method = (VmStaticMethod) methodRef.getResolvedVmMethod();
-        if (method.getDeclaringClass().isMagicType()) {
-//todo            magicHelper.emitMagic(eContext, method, true, this, currentMethod);
-        } else {
-
-
-            Operand<T>[] referencedOps = quad.getReferencedOps();
-            for (int i = referencedOps.length; i-- > 0; ) {
-                Operand operand = referencedOps[i];
-                if (operand.getAddressingMode() == REGISTER) {
-                    GPR reg = (GPR) ((RegisterLocation) ((Variable) operand).getLocation()).getRegister();
-                    os.writePUSH(reg);
-                } else if (operand.getAddressingMode() == STACK) {
-                    int disp = ((StackLocation) ((Variable) operand).getLocation()).getDisplacement();
-                    os.writePUSH(GPR.ESP, disp);
-                } else if (operand.getAddressingMode() == CONSTANT) {
-                    int c = ((IntConstant) operand).getValue();
-                    os.writePUSH(c);
-                }
-            }
-
-            final int offset = stackFrame.getHelper().getSharedStaticsOffset(method);
-            os.writeCALL(stackFrame.getHelper().STATICS, offset);
+    public void generateCodeFor(NewMultiArrayAssignQuad<T> quad) {
+        // Create the dimensions array
+        Operand[] sizes = quad.getSizes();
+        Label label = getInstrLabel(quad.getAddress());
+        X86CompilerHelper helper = stackFrame.getHelper();
+        helper.writePushStaticsEntry(label, currentMethod.getDeclaringClass()); /* currentClass */
+        os.writePUSH(10); /* type=int */
+        os.writePUSH(sizes.length); /* elements */
+        helper.invokeJavaMethod(stackFrame.getEntryPoints().getAllocPrimitiveArrayMethod());
+        final GPR dimsr = SR1;
+        if (SR1 != X86Register.EAX) {
+            os.writeMOV(BITS32, SR1, X86Register.EAX);
         }
-    }
-
-    @Override
-    public void generateCodeFor(VirtualCallQuad quad) {
-        checkLabel(quad.getAddress());
-        VmConstMethodRef methodRef = quad.getMethodRef();
-        methodRef.resolve(currentMethod.getDeclaringClass().getLoader());
-        final VmMethod mts = methodRef.getResolvedVmMethod();
-
-        if (mts.isStatic()) {
-            throw new IncompatibleClassChangeError(
-                "Static method in invokevirtual");
-        }
-
-        final VmInstanceMethod method = (VmInstanceMethod) mts;
-        final VmType<?> declClass = method.getDeclaringClass();
-        if (declClass.isMagicType()) {
-//            magicHelper.emitMagic(eContext, method, false, this, currentMethod);
-        } else {
-            // TODO: port to ORP style (http://orp.sourceforge.net/)
-//            vstack.push(eContext);
-
-            Operand<T>[] referencedOps = quad.getReferencedOps();
-            for (int i = referencedOps.length; i-- > 0; ) {
-                Operand operand = referencedOps[i];
-                if (operand.getAddressingMode() == REGISTER) {
-                    GPR reg = (GPR) ((RegisterLocation) ((Variable) operand).getLocation()).getRegister();
-                    os.writePUSH(reg);
-                } else if (operand.getAddressingMode() == STACK) {
-                    int disp = ((StackLocation) ((Variable) operand).getLocation()).getDisplacement();
-                    os.writePUSH(GPR.ESP, disp);
-                } else if (operand.getAddressingMode() == CONSTANT) {
-                    int c = ((IntConstant) operand).getValue();
-                    os.writePUSH(c);
-                }
-            }
-//            dropParameters(mts, true);
-
-            if (method.isFinal() || method.isPrivate() || declClass.isFinal()) {
-                // Do a fast invocation
-//                counters.getCounter("virtual-final").inc();
-
-                // Call the methods native code from the statics table
-                stackFrame.getHelper().invokeJavaMethod(method);
-                // Result is already on the stack.
+        // Dimension array is now in dimsr
+        // Pop all dimensions (note the reverse order that allocMultiArray
+        // expects)
+        final int slotSize = stackFrame.getHelper().SLOTSIZE;
+        int arrayDataOffset = VmArray.DATA_OFFSET * slotSize;
+        for (int i = 0; i < sizes.length; i++) {
+            final int ofs = arrayDataOffset + (i * 4);
+            Operand size = sizes[i];
+            if (size.getAddressingMode() == CONSTANT) {
+                os.writeMOV_Const(BITS32, dimsr, ofs, ((IntConstant) size).getValue());
+            } else if (size.getAddressingMode() == REGISTER) {
+                os.writeMOV(BITS32, dimsr, ofs,
+                    (GPR) ((RegisterLocation) ((Variable) size).getLocation()).getRegister());
+            } else if (size.getAddressingMode() == STACK) {
+                GPR sr2 = SR1 == X86Register.EAX ? X86Register.EBX : X86Register.EAX;
+                os.writePUSH(sr2);
+                os.writeMOV(BITS32, sr2, X86Register.EBP,
+                    ((StackLocation) ((Variable) size).getLocation()).getDisplacement());
+                os.writeMOV(BITS32, dimsr, ofs, sr2);
+                os.writePOP(sr2);
             } else {
-                // Do a virtual method table invocation
-//                counters.getCounter("virtual-vmt").inc();
-
-                final int tibIndex = method.getTibOffset();
-                final int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef
-                    .getSignature());
-
-                final int slotSize = stackFrame.getHelper().SLOTSIZE;
-                final int asize = stackFrame.getHelper().ADDRSIZE;
-                int arrayDataOffset = VmArray.DATA_OFFSET * slotSize;
-                int tibOffset = ObjectLayout.TIB_SLOT * slotSize;
-
-                /* Get objectref -> EAX */
-                os.writeMOV(asize, stackFrame.getHelper().AAX, stackFrame.getHelper().SP, argSlotCount * slotSize);
-                /* Get VMT of objectref -> EAX */
-                os.writeMOV(asize, stackFrame.getHelper().AAX, stackFrame.getHelper().AAX, tibOffset);
-                /* Get entry in VMT -> EAX */
-                os.writeMOV(asize, stackFrame.getHelper().AAX, stackFrame.getHelper().AAX,
-                    arrayDataOffset + (tibIndex * slotSize));
-
-                /* Now invoke the method */
-                os.writeCALL(stackFrame.getHelper().AAX,
-                    stackFrame.getEntryPoints().getVmMethodNativeCodeField().getOffset());
-                stackFrame.getHelper().pushReturnValue(methodRef.getSignature());
-                // Result is already on the stack.
+                throw new IllegalArgumentException();
             }
+        }
+        os.writePUSH(dimsr);
+        VmConstClass clazz = quad.getComponentType();
+        // Resolve the array class
+        writeResolveAndLoadClassToReg(clazz, dimsr, label);
+        // Now call the multianewarrayhelper
+        os.writeXCHG(X86Register.ESP, 0, dimsr);
+        os.writePUSH(dimsr); // dimensions[]
+        helper.invokeJavaMethod(stackFrame.getEntryPoints().getAllocMultiArrayMethod());
+        Variable lhs = quad.getLHS();
+        if (lhs.getAddressingMode() == REGISTER) {
+            os.writeMOV(BITS32, (GPR) ((RegisterLocation) lhs.getLocation()).getRegister(), X86Register.EAX);
+        } else if (lhs.getAddressingMode() == STACK) {
+            os.writeMOV(BITS32, X86Register.EBP, ((StackLocation) lhs.getLocation()).getDisplacement(),
+                X86Register.EAX);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
+    public void generateCodeFor(ArrayLengthAssignQuad quad) {
+        Variable lhs = quad.getLHS();
+        final int slotSize = stackFrame.getHelper().SLOTSIZE;
+        int arrayLengthOffset = VmArray.LENGTH_OFFSET * slotSize;
+        if (lhs.getAddressingMode() == REGISTER) {
+            GPR dstReg = (GPR) ((RegisterLocation) lhs.getLocation()).getRegister();
+            Variable ref = quad.getRef();
+            if (ref.getAddressingMode() == REGISTER) {
+                os.writeMOV(INTSIZE, dstReg, (GPR) ((RegisterLocation) ref.getLocation()).getRegister(),
+                    arrayLengthOffset);
+            } else if (ref.getAddressingMode() == STACK) {
+                os.writeMOV(BITS32, SR1, X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
+                os.writeMOV(INTSIZE, dstReg, SR1, arrayLengthOffset);
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } else if (lhs.getAddressingMode() == STACK) {
+            Variable ref = quad.getRef();
+            if (ref.getAddressingMode() == REGISTER) {
+                os.writeMOV(INTSIZE, SR1, (GPR) ((RegisterLocation) ref.getLocation()).getRegister(),
+                    arrayLengthOffset);
+            } else if (ref.getAddressingMode() == STACK) {
+                GPR sr2 = SR1 == X86Register.EAX ? X86Register.EBX : X86Register.EAX;
+                os.writeMOV(BITS32, sr2, X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
+                os.writeMOV(INTSIZE, SR1, sr2, arrayLengthOffset);
+            } else {
+                throw new IllegalArgumentException();
+            }
+            os.writeMOV(BITS32, X86Register.EBP, ((StackLocation) lhs.getLocation()).getDisplacement(), SR1);
+        } else {
+            throw new IllegalArgumentException();
         }
     }
 
@@ -3999,152 +3867,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 //            }
 
             //os.writeMOV(BITS32, resultr, refr, indr, scale, arrayDataOffset);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    final void checkBounds(Variable ref, Operand index, int address) {
-//        counters.getCounter("checkbounds").inc();
-        final Label curInstrLabel = getInstrLabel(address);
-        final Label test = new Label(curInstrLabel + "$$cbtest");
-        final Label failed = new Label(curInstrLabel + "$$cbfailed");
-
-//        assertCondition(ref.isGPR(), "ref must be in a register");
-//        final GPR refr = (GPR) ((RegisterLocation) ref.getLocation()).getRegister();
-
-        os.writeJMP(test);
-        os.setObjectRef(failed);
-        // Call SoftByteCodes.throwArrayOutOfBounds
-        if (ref.getAddressingMode() == REGISTER) {
-            os.writePUSH((GPR) ((RegisterLocation) ref.getLocation()).getRegister());
-        } else if (ref.getAddressingMode() == STACK) {
-            os.writePUSH(X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
-        } else {
-            throw new IllegalArgumentException();
-        }
-//        if (index.isConstant()) {
-//            os.writePUSH(index.getValue());
-//        } else {
-        if (index.getAddressingMode() == CONSTANT) {
-            os.writePUSH(((IntConstant) index).getValue());
-        } else if (index.getAddressingMode() == REGISTER) {
-            os.writePUSH((GPR) ((RegisterLocation) ((Variable) index).getLocation()).getRegister());
-        } else if (index.getAddressingMode() == STACK) {
-            os.writePUSH(X86Register.EBP, ((StackLocation) ((Variable) index).getLocation()).getDisplacement());
-        } else {
-            throw new UnsupportedOperationException();
-        }
-//        }
-//        invokeJavaMethod(context.getThrowArrayOutOfBounds());
-        stackFrame.getHelper().invokeJavaMethod(stackFrame.getEntryPoints().getThrowArrayOutOfBounds());
-
-        final int slotSize = stackFrame.getHelper().SLOTSIZE;
-        int arrayLengthOffset = VmArray.LENGTH_OFFSET * slotSize;
-
-        // CMP length, index
-        os.setObjectRef(test);
-//        if (index.isConstant()) {
-//            os
-//                .writeCMP_Const(BITS32, refr, arrayLengthOffset, index
-//                    .getValue());
-//        } else {
-        if (index.getAddressingMode() == CONSTANT) {
-            if (ref.getAddressingMode() == REGISTER) {
-                os.writeCMP_Const(X86Constants.BITS32, (GPR) ((RegisterLocation) ref.getLocation()).getRegister(),
-                    arrayLengthOffset, ((IntConstant) index).getValue());
-            } else if (ref.getAddressingMode() == STACK) {
-                os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP,
-                    ((StackLocation) ref.getLocation()).getDisplacement());
-                os.writeCMP_Const(X86Constants.BITS32, SR1, arrayLengthOffset, ((IntConstant) index).getValue());
-            } else {
-                throw new IllegalArgumentException();
-            }
-        } else if (index.getAddressingMode() == REGISTER) {
-            if (ref.getAddressingMode() == REGISTER) {
-                os.writeCMP((GPR) ((RegisterLocation) ref.getLocation()).getRegister(),
-                    arrayLengthOffset, (GPR) ((RegisterLocation) ((Variable) index).getLocation()).getRegister());
-            } else if (ref.getAddressingMode() == STACK) {
-                os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP,
-                    ((StackLocation) ref.getLocation()).getDisplacement());
-                os.writeCMP(SR1, arrayLengthOffset,
-                    (GPR) ((RegisterLocation) ((Variable) index).getLocation()).getRegister());
-
-            } else {
-                throw new IllegalArgumentException();
-            }
-        } else if (index.getAddressingMode() == STACK) {
-            if (ref.getAddressingMode() == REGISTER) {
-                os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP,
-                    ((StackLocation) ((Variable) index).getLocation()).getDisplacement());
-                os.writeCMP((GPR) ((RegisterLocation) ref.getLocation()).getRegister(), arrayLengthOffset, SR1);
-            } else if (ref.getAddressingMode() == STACK) {
-                os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP,
-                    ((StackLocation) ref.getLocation()).getDisplacement());
-                os.writeADD(SR1, arrayLengthOffset);
-                os.writeCMP(SR1, X86Register.EBP, ((StackLocation) ((Variable) index).getLocation()).getDisplacement());
-            } else {
-                throw new IllegalArgumentException();
-            }
-        } else {
-            throw new UnsupportedOperationException();
-        }
-
-//        }
-        os.writeJCC(failed, X86Constants.JNA);
-    }
-
-    public void endMethod() {
-        stackFrame.emitTrailer(typeSizeInfo, currentMethod.getBytecode().getNoLocals());
-    }
-
-    public synchronized void startMethod(VmMethod method) {
-
-//        this.maxLocals = method.getBytecode().getNoLocals();
-//        this.loader = method.getDeclaringClass().getLoader();
-////        helper.reset();
-////        helper.setMethod(method);
-//        // this.startOffset = os.getLength();
-//
-//        this.startOffset = stackFrame.emitHeader();
-    }
-
-    private void yieldPoint(ConditionalBranchQuad<T> quad) {
-        if (quad.getTargetAddress() < quad.getAddress()) {
-            stackFrame.getHelper().writeYieldPoint(getInstrLabel(quad.getAddress()));
-        }
-    }
-
-    @Override
-    public void generateCodeFor(ArrayLengthAssignQuad quad) {
-        Variable lhs = quad.getLHS();
-        final int slotSize = stackFrame.getHelper().SLOTSIZE;
-        int arrayLengthOffset = VmArray.LENGTH_OFFSET * slotSize;
-        if (lhs.getAddressingMode() == REGISTER) {
-            GPR dstReg = (GPR) ((RegisterLocation) lhs.getLocation()).getRegister();
-            Variable ref = quad.getRef();
-            if (ref.getAddressingMode() == REGISTER) {
-                os.writeMOV(INTSIZE, dstReg, (GPR) ((RegisterLocation) ref.getLocation()).getRegister(),
-                    arrayLengthOffset);
-            } else if (ref.getAddressingMode() == STACK) {
-                os.writeMOV(BITS32, SR1, X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
-                os.writeMOV(INTSIZE, dstReg, SR1, arrayLengthOffset);
-            } else {
-                throw new IllegalArgumentException();
-            }
-        } else if (lhs.getAddressingMode() == STACK) {
-            Variable ref = quad.getRef();
-            if (ref.getAddressingMode() == REGISTER) {
-                os.writeMOV(INTSIZE, SR1, (GPR) ((RegisterLocation) ref.getLocation()).getRegister(),
-                    arrayLengthOffset);
-            } else if (ref.getAddressingMode() == STACK) {
-                GPR sr2 = SR1 == X86Register.EAX ? X86Register.EBX : X86Register.EAX;
-                os.writeMOV(BITS32, sr2, X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
-                os.writeMOV(INTSIZE, SR1, sr2, arrayLengthOffset);
-            } else {
-                throw new IllegalArgumentException();
-            }
-            os.writeMOV(BITS32, X86Register.EBP, ((StackLocation) lhs.getLocation()).getDisplacement(), SR1);
         } else {
             throw new IllegalArgumentException();
         }
@@ -4301,10 +4023,94 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    @Override
-    public void generateCodeFor(CheckcastQuad<T> quad) {
-        //todo
-        throw new UnsupportedOperationException();
+    private final void checkBounds(Variable ref, Operand index, int address) {
+//        counters.getCounter("checkbounds").inc();
+        final Label curInstrLabel = getInstrLabel(address);
+        final Label test = new Label(curInstrLabel + "$$cbtest");
+        final Label failed = new Label(curInstrLabel + "$$cbfailed");
+
+//        assertCondition(ref.isGPR(), "ref must be in a register");
+//        final GPR refr = (GPR) ((RegisterLocation) ref.getLocation()).getRegister();
+
+        os.writeJMP(test);
+        os.setObjectRef(failed);
+        // Call SoftByteCodes.throwArrayOutOfBounds
+        if (ref.getAddressingMode() == REGISTER) {
+            os.writePUSH((GPR) ((RegisterLocation) ref.getLocation()).getRegister());
+        } else if (ref.getAddressingMode() == STACK) {
+            os.writePUSH(X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
+        } else {
+            throw new IllegalArgumentException();
+        }
+//        if (index.isConstant()) {
+//            os.writePUSH(index.getValue());
+//        } else {
+        if (index.getAddressingMode() == CONSTANT) {
+            os.writePUSH(((IntConstant) index).getValue());
+        } else if (index.getAddressingMode() == REGISTER) {
+            os.writePUSH((GPR) ((RegisterLocation) ((Variable) index).getLocation()).getRegister());
+        } else if (index.getAddressingMode() == STACK) {
+            os.writePUSH(X86Register.EBP, ((StackLocation) ((Variable) index).getLocation()).getDisplacement());
+        } else {
+            throw new UnsupportedOperationException();
+        }
+//        }
+//        invokeJavaMethod(context.getThrowArrayOutOfBounds());
+        stackFrame.getHelper().invokeJavaMethod(stackFrame.getEntryPoints().getThrowArrayOutOfBounds());
+
+        final int slotSize = stackFrame.getHelper().SLOTSIZE;
+        int arrayLengthOffset = VmArray.LENGTH_OFFSET * slotSize;
+
+        // CMP length, index
+        os.setObjectRef(test);
+//        if (index.isConstant()) {
+//            os
+//                .writeCMP_Const(BITS32, refr, arrayLengthOffset, index
+//                    .getValue());
+//        } else {
+        if (index.getAddressingMode() == CONSTANT) {
+            if (ref.getAddressingMode() == REGISTER) {
+                os.writeCMP_Const(X86Constants.BITS32, (GPR) ((RegisterLocation) ref.getLocation()).getRegister(),
+                    arrayLengthOffset, ((IntConstant) index).getValue());
+            } else if (ref.getAddressingMode() == STACK) {
+                os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP,
+                    ((StackLocation) ref.getLocation()).getDisplacement());
+                os.writeCMP_Const(X86Constants.BITS32, SR1, arrayLengthOffset, ((IntConstant) index).getValue());
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } else if (index.getAddressingMode() == REGISTER) {
+            if (ref.getAddressingMode() == REGISTER) {
+                os.writeCMP((GPR) ((RegisterLocation) ref.getLocation()).getRegister(),
+                    arrayLengthOffset, (GPR) ((RegisterLocation) ((Variable) index).getLocation()).getRegister());
+            } else if (ref.getAddressingMode() == STACK) {
+                os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP,
+                    ((StackLocation) ref.getLocation()).getDisplacement());
+                os.writeCMP(SR1, arrayLengthOffset,
+                    (GPR) ((RegisterLocation) ((Variable) index).getLocation()).getRegister());
+
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } else if (index.getAddressingMode() == STACK) {
+            if (ref.getAddressingMode() == REGISTER) {
+                os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP,
+                    ((StackLocation) ((Variable) index).getLocation()).getDisplacement());
+                os.writeCMP((GPR) ((RegisterLocation) ref.getLocation()).getRegister(), arrayLengthOffset, SR1);
+            } else if (ref.getAddressingMode() == STACK) {
+                os.writeMOV(X86Constants.BITS32, SR1, X86Register.EBP,
+                    ((StackLocation) ref.getLocation()).getDisplacement());
+                os.writeADD(SR1, arrayLengthOffset);
+                os.writeCMP(SR1, X86Register.EBP, ((StackLocation) ((Variable) index).getLocation()).getDisplacement());
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } else {
+            throw new UnsupportedOperationException();
+        }
+
+//        }
+        os.writeJCC(failed, X86Constants.JNA);
     }
 
     @Override
@@ -4334,25 +4140,25 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
     }
 
     @Override
+    public void generateCodeFor(CheckcastQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void generateCodeFor(InstanceofAssignQuad<T> quad) {
         //todo
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void generateCodeFor(InterfaceCallAssignQuad quad) {
-        //todo
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void generateCodeFor(InterfaceCallQuad quad) {
-        //todo
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void generateCodeFor(LooukupswitchQuad<T> quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(TableswitchQuad<T> quad) {
         //todo
         throw new UnsupportedOperationException();
     }
@@ -4404,88 +4210,23 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
     }
 
     @Override
-    public void generateCodeFor(NewMultiArrayAssignQuad<T> quad) {
-        // Create the dimensions array
-        Operand[] sizes = quad.getSizes();
-        Label label = getInstrLabel(quad.getAddress());
-        X86CompilerHelper helper = stackFrame.getHelper();
-        helper.writePushStaticsEntry(label, currentMethod.getDeclaringClass()); /* currentClass */
-        os.writePUSH(10); /* type=int */
-        os.writePUSH(sizes.length); /* elements */
-        helper.invokeJavaMethod(stackFrame.getEntryPoints().getAllocPrimitiveArrayMethod());
-        final GPR dimsr = SR1;
-        if (SR1 != X86Register.EAX) {
-            os.writeMOV(BITS32, SR1, X86Register.EAX);
-        }
-        // Dimension array is now in dimsr
-        // Pop all dimensions (note the reverse order that allocMultiArray
-        // expects)
-        final int slotSize = stackFrame.getHelper().SLOTSIZE;
-        int arrayDataOffset = VmArray.DATA_OFFSET * slotSize;
-        for (int i = 0; i < sizes.length; i++) {
-            final int ofs = arrayDataOffset + (i * 4);
-            Operand size = sizes[i];
-            if (size.getAddressingMode() == CONSTANT) {
-                os.writeMOV_Const(BITS32, dimsr, ofs, ((IntConstant) size).getValue());
-            } else if (size.getAddressingMode() == REGISTER) {
-                os.writeMOV(BITS32, dimsr, ofs,
-                    (GPR) ((RegisterLocation) ((Variable) size).getLocation()).getRegister());
-            } else if (size.getAddressingMode() == STACK) {
-                GPR sr2 = SR1 == X86Register.EAX ? X86Register.EBX : X86Register.EAX;
-                os.writePUSH(sr2);
-                os.writeMOV(BITS32, sr2, X86Register.EBP,
-                    ((StackLocation) ((Variable) size).getLocation()).getDisplacement());
-                os.writeMOV(BITS32, dimsr, ofs, sr2);
-                os.writePOP(sr2);
-            } else {
-                throw new IllegalArgumentException();
+    public void generateCodeFor(ThrowQuad<T> quad) {
+        // Exception must be in EAX
+        Operand op = quad.getOperand();
+        if (op.getAddressingMode() == REGISTER) {
+            GPR reg = (GPR) ((RegisterLocation) ((Variable) op).getLocation()).getRegister();
+            if (reg != X86Register.EAX) {
+                os.writeMOV(BITS32, X86Register.EAX, reg);
             }
-        }
-        os.writePUSH(dimsr);
-        VmConstClass clazz = quad.getComponentType();
-        // Resolve the array class
-        writeResolveAndLoadClassToReg(clazz, dimsr, label);
-        // Now call the multianewarrayhelper
-        os.writeXCHG(X86Register.ESP, 0, dimsr);
-        os.writePUSH(dimsr); // dimensions[]
-        helper.invokeJavaMethod(stackFrame.getEntryPoints().getAllocMultiArrayMethod());
-        Variable lhs = quad.getLHS();
-        if (lhs.getAddressingMode() == REGISTER) {
-            os.writeMOV(BITS32, (GPR) ((RegisterLocation) lhs.getLocation()).getRegister(), X86Register.EAX);
-        } else if (lhs.getAddressingMode() == STACK) {
-            os.writeMOV(BITS32, X86Register.EBP, ((StackLocation) lhs.getLocation()).getDisplacement(),
-                X86Register.EAX);
+        } else if (op.getAddressingMode() == STACK) {
+            os.writeMOV(BITS32, X86Register.EAX, X86Register.EBP,
+                ((StackLocation) ((Variable) op).getLocation()).getDisplacement());
         } else {
             throw new IllegalArgumentException();
         }
-    }
 
-    @Override
-    public void generateCodeFor(NewObjectArrayAssignQuad<T> quad) {
-        VmConstClass clazz = quad.getComponentType();
-        Label label = getInstrLabel(quad.getAddress());
-        writeResolveAndLoadClassToReg(clazz, SR1, label);
-        os.writePUSH(SR1);
-        Operand sizeOp = quad.getSize();
-        if (sizeOp.getAddressingMode() == CONSTANT) {
-            os.writePUSH(((IntConstant) sizeOp).getValue());
-        } else if (sizeOp.getAddressingMode() == REGISTER) {
-            os.writePUSH((GPR) ((RegisterLocation) ((Variable) sizeOp).getLocation()).getRegister());
-        } else if (sizeOp.getAddressingMode() == STACK) {
-            os.writePUSH(X86Register.EBP, ((StackLocation) ((Variable) sizeOp).getLocation()).getDisplacement());
-        } else {
-            throw new IllegalArgumentException();
-        }
-        stackFrame.getHelper().invokeJavaMethod(stackFrame.getEntryPoints().getAnewarrayMethod());
-        Variable lhs = quad.getLHS();
-        if (lhs.getAddressingMode() == REGISTER) {
-            os.writeMOV(BITS32, (GPR) ((RegisterLocation) lhs.getLocation()).getRegister(), X86Register.EAX);
-        } else if (lhs.getAddressingMode() == STACK) {
-            os.writeMOV(BITS32, X86Register.EBP, ((StackLocation) lhs.getLocation()).getDisplacement(),
-                X86Register.EAX);
-        } else {
-            throw new IllegalArgumentException();
-        }
+        // Jump
+        stackFrame.getHelper().writeJumpTableCALL(X86JumpTable.VM_ATHROW_IDX);
     }
 
     /**
@@ -4510,35 +4251,159 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
     }
 
     @Override
-    public void generateCodeFor(NewPrimitiveArrayAssignQuad<T> quad) {
-        // Setup a call to SoftByteCodes.allocArray
-        X86CompilerHelper helper = stackFrame.getHelper();
-        helper.writePushStaticsEntry(getInstrLabel(quad.getAddress()),
-            helper.getMethod().getDeclaringClass()); /* currentClass */
-        os.writePUSH(quad.getType()); /* type */
-        Operand size = quad.getSize();
-        /* count */
-        if (size.getAddressingMode() == CONSTANT) {
-            os.writePUSH(((IntConstant) size).getValue());
-        } else if (size.getAddressingMode() == REGISTER) {
-            os.writePUSH((GPR) ((RegisterLocation) ((Variable) size).getLocation()).getRegister());
-        } else if (size.getAddressingMode() == STACK) {
-            os.writePUSH(X86Register.EBP,
-                ((StackLocation) ((Variable) size).getLocation()).getDisplacement());
-        } else {
-            throw new IllegalArgumentException();
+    public void generateCodeFor(StaticRefAssignQuad<T> quad) {
+        checkLabel(quad.getAddress());
+        VmConstFieldRef fieldRef = quad.getRHS().getFiledRef();
+        final Label curInstrLabel = getInstrLabel(quad.getAddress());
+        fieldRef.resolve(currentMethod.getDeclaringClass().getLoader());
+        final int type = JvmType.SignatureToType(fieldRef.getSignature());
+        final VmStaticField sf = (VmStaticField) fieldRef.getResolvedVmField();
+
+        // Initialize if needed
+//        if (!sf.getDeclaringClass().isAlwaysInitialized()) {
+//            writeInitializeClass(fieldRef);
+//        }
+
+        // Get static field object
+//        if (JvmType.isFloat(type)) {
+//            final boolean is32bit = !fieldRef.isWide();
+//            if (sf.isShared()) {
+//                stackFrame.getHelper().writeGetStaticsEntryToFPU(curInstrLabel, (VmSharedStaticsEntry) sf, is32bit);
+//            } else {
+//                final GPR tmp = (GPR) L1AHelper.requestRegister(eContext,
+//                    JvmType.REFERENCE, false);
+//                helper.writeGetStaticsEntryToFPU(curInstrLabel,
+//                    (VmIsolatedStaticsEntry) sf, is32bit, tmp);
+//                L1AHelper.releaseRegister(eContext, tmp);
+//            }
+//            final Item result = ifac.createFPUStack(type);
+//            pushFloat(result);
+//            vstack.push(result);
+//        } else
+        if (!fieldRef.isWide()) {
+            //final WordItem result = L1AHelper.requestWordRegister(eContext, type, false);
+            Variable<T> lhs = quad.getLHS();
+            //final GPR resultr = lhs result.getRegister();
+            if (os.isCode32() || (type != JvmType.REFERENCE)) {
+                if (sf.isShared()) {
+                    if (lhs.getAddressingMode() == REGISTER) {
+                        stackFrame.getHelper().writeGetStaticsEntry(curInstrLabel,
+                            (GPR) ((RegisterLocation) lhs.getLocation()).getRegister(), sf);
+                    } else {
+                        //todo
+                    }
+                } else {
+                    if (lhs.getAddressingMode() == REGISTER) {
+                        //todo ESI ??
+                        GPR tmp = GPR.ESI;
+                        stackFrame.getHelper().writeGetStaticsEntry(curInstrLabel,
+                            (GPR) ((RegisterLocation) lhs.getLocation()).getRegister(), sf, tmp);
+                    } else {
+                        //todo
+                    }
+                }
+            }
+//            else {
+//                if (sf.isShared()) {
+//                    stackFrame.getHelper().writeGetStaticsEntry64(curInstrLabel, (GPR64) resultr,
+// (VmSharedStaticsEntry) sf);
+//                } else {
+//                    stackFrame.getHelper().writeGetStaticsEntry64(curInstrLabel, (GPR64) resultr,
+// (VmIsolatedStaticsEntry) sf);
+//                }
+//            }
+        }
+//        else {
+//            final DoubleWordItem result = L1AHelper.requestDoubleWordRegisters(
+//                eContext, type);
+//            if (os.isCode32()) {
+//                final GPR lsb = result.getLsbRegister(eContext);
+//                final GPR msb = result.getMsbRegister(eContext);
+//                if (sf.isShared()) {
+//                    helper.writeGetStaticsEntry64(curInstrLabel, lsb, msb, (VmSharedStaticsEntry) sf);
+//                } else {
+//                    helper.writeGetStaticsEntry64(curInstrLabel, lsb, msb, (VmIsolatedStaticsEntry) sf);
+//                }
+//            } else {
+//                final GPR64 reg = result.getRegister(eContext);
+//                if (sf.isShared()) {
+//                    helper.writeGetStaticsEntry64(curInstrLabel, reg, (VmSharedStaticsEntry) sf);
+//                } else {
+//                    helper.writeGetStaticsEntry64(curInstrLabel, reg, (VmIsolatedStaticsEntry) sf);
+//                }
+//            }
+//            vstack.push(result);
+//        }
+    }
+
+    public void generateCodeFor(StaticRefStoreQuad<T> quad) {
+        checkLabel(quad.getAddress());
+        final Label curInstrLabel = getInstrLabel(quad.getAddress());
+        VmConstFieldRef fieldRef = quad.getField().getFiledRef();
+        fieldRef.resolve(currentMethod.getDeclaringClass().getLoader());
+        final int type = JvmType.SignatureToType(fieldRef.getSignature());
+        final VmStaticField sf = (VmStaticField) fieldRef.getResolvedVmField();
+
+        if (!fieldRef.isWide()) {
+
+            if (os.isCode32() || (type != JvmType.REFERENCE)) {
+                if (sf.isShared()) {
+                    if (quad.getOperand().getAddressingMode() == REGISTER) {
+                        stackFrame.getHelper().writePutStaticsEntry(curInstrLabel,
+                            (GPR) ((RegisterLocation) ((Variable) quad.getOperand()).getLocation()).getRegister(), sf);
+                    } else {
+                        //todo
+                    }
+                } else {
+                    if (quad.getOperand().getAddressingMode() == REGISTER) {
+                        //todo ESI ??
+                        GPR tmp = GPR.ESI;
+                        stackFrame.getHelper().writePutStaticsEntry(curInstrLabel,
+                            (GPR) ((RegisterLocation) ((Variable) quad.getOperand()).getLocation()).getRegister(),
+                            sf, tmp);
+                    } else {
+                        //todo
+                    }
+                }
+            }
+//            else {
+//                if (sf.isShared()) {
+//                    helper.writePutStaticsEntry64(curInstrLabel, (GPR64) valr, sf);
+//                } else {
+//                    final GPR tmp = (GPR) L1AHelper.requestRegister(eContext, JvmType.REFERENCE, false);
+//                    helper.writePutStaticsEntry64(curInstrLabel, (GPR64) valr, sf, tmp);
+//                    L1AHelper.releaseRegister(eContext, tmp);
+//                }
+//            }
+//            if (!sf.isPrimitive() && helper.needsWriteBarrier()) {
+//                final GPR tmp = (GPR) L1AHelper.requestRegister(eContext, JvmType.INT, false);
+//                helper.writePutstaticWriteBarrier(sf, valr, tmp);
+//                L1AHelper.releaseRegister(eContext, tmp);
+//            }
         }
 
-        helper.invokeJavaMethod(stackFrame.getEntryPoints().getAllocPrimitiveArrayMethod());
-        Variable lhs = quad.getLHS();
-        if (lhs.getAddressingMode() == REGISTER) {
-            os.writeMOV(BITS32, (GPR) ((RegisterLocation) lhs.getLocation()).getRegister(), X86Register.EAX);
-        } else if (lhs.getAddressingMode() == STACK) {
-            os.writeMOV(BITS32, X86Register.EBP,
-                ((StackLocation) lhs.getLocation()).getDisplacement(), X86Register.EAX);
-        } else {
-            throw new IllegalArgumentException();
-        }
+//        else {
+//            final DoubleWordItem dval = (DoubleWordItem) val;
+//            if (os.isCode32()) {
+//                if (sf.isShared()) {
+//                    helper.writePutStaticsEntry64(curInstrLabel, dval.getLsbRegister(eContext), dval
+//                        .getMsbRegister(eContext), sf);
+//                } else {
+//                    final GPR tmp = (GPR) L1AHelper.requestRegister(eContext, JvmType.REFERENCE, false);
+//                    helper.writePutStaticsEntry64(curInstrLabel, dval.getLsbRegister(eContext),
+//                        dval.getMsbRegister(eContext), sf, tmp);
+//                    L1AHelper.releaseRegister(eContext, tmp);
+//                }
+//            } else {
+//                if (sf.isShared()) {
+//                    helper.writePutStaticsEntry64(curInstrLabel, dval.getRegister(eContext), sf);
+//                } else {
+//                    final GPR tmp = (GPR) L1AHelper.requestRegister(eContext, JvmType.REFERENCE, false);
+//                    helper.writePutStaticsEntry64(curInstrLabel, dval.getRegister(eContext), sf, tmp);
+//                    L1AHelper.releaseRegister(eContext, tmp);
+//                }
+//            }
+//        }
 
     }
 
@@ -4961,33 +4826,161 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
     }
 
     @Override
-    public void generateCodeFor(TableswitchQuad<T> quad) {
+    public void generateCodeFor(VirtualCallAssignQuad quad) {
         //todo
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void generateCodeFor(ThrowQuad<T> quad) {
-        // Exception must be in EAX
-        Operand op = quad.getOperand();
-        if (op.getAddressingMode() == REGISTER) {
-            GPR reg = (GPR) ((RegisterLocation) ((Variable) op).getLocation()).getRegister();
-            if (reg != X86Register.EAX) {
-                os.writeMOV(BITS32, X86Register.EAX, reg);
-            }
-        } else if (op.getAddressingMode() == STACK) {
-            os.writeMOV(BITS32, X86Register.EAX, X86Register.EBP,
-                ((StackLocation) ((Variable) op).getLocation()).getDisplacement());
-        } else {
-            throw new IllegalArgumentException();
+    public void generateCodeFor(VirtualCallQuad quad) {
+        checkLabel(quad.getAddress());
+        VmConstMethodRef methodRef = quad.getMethodRef();
+        methodRef.resolve(currentMethod.getDeclaringClass().getLoader());
+        final VmMethod mts = methodRef.getResolvedVmMethod();
+
+        if (mts.isStatic()) {
+            throw new IncompatibleClassChangeError(
+                "Static method in invokevirtual");
         }
 
-        // Jump
-        stackFrame.getHelper().writeJumpTableCALL(X86JumpTable.VM_ATHROW_IDX);
+        final VmInstanceMethod method = (VmInstanceMethod) mts;
+        final VmType<?> declClass = method.getDeclaringClass();
+        if (declClass.isMagicType()) {
+//            magicHelper.emitMagic(eContext, method, false, this, currentMethod);
+        } else {
+            // TODO: port to ORP style (http://orp.sourceforge.net/)
+//            vstack.push(eContext);
+
+            Operand<T>[] referencedOps = quad.getReferencedOps();
+            for (int i = referencedOps.length; i-- > 0; ) {
+                Operand operand = referencedOps[i];
+                if (operand.getAddressingMode() == REGISTER) {
+                    GPR reg = (GPR) ((RegisterLocation) ((Variable) operand).getLocation()).getRegister();
+                    os.writePUSH(reg);
+                } else if (operand.getAddressingMode() == STACK) {
+                    int disp = ((StackLocation) ((Variable) operand).getLocation()).getDisplacement();
+                    os.writePUSH(GPR.ESP, disp);
+                } else if (operand.getAddressingMode() == CONSTANT) {
+                    int c = ((IntConstant) operand).getValue();
+                    os.writePUSH(c);
+                }
+            }
+//            dropParameters(mts, true);
+
+            if (method.isFinal() || method.isPrivate() || declClass.isFinal()) {
+                // Do a fast invocation
+//                counters.getCounter("virtual-final").inc();
+
+                // Call the methods native code from the statics table
+                stackFrame.getHelper().invokeJavaMethod(method);
+                // Result is already on the stack.
+            } else {
+                // Do a virtual method table invocation
+//                counters.getCounter("virtual-vmt").inc();
+
+                final int tibIndex = method.getTibOffset();
+                final int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef
+                    .getSignature());
+
+                final int slotSize = stackFrame.getHelper().SLOTSIZE;
+                final int asize = stackFrame.getHelper().ADDRSIZE;
+                int arrayDataOffset = VmArray.DATA_OFFSET * slotSize;
+                int tibOffset = ObjectLayout.TIB_SLOT * slotSize;
+
+                /* Get objectref -> EAX */
+                os.writeMOV(asize, stackFrame.getHelper().AAX, stackFrame.getHelper().SP, argSlotCount * slotSize);
+                /* Get VMT of objectref -> EAX */
+                os.writeMOV(asize, stackFrame.getHelper().AAX, stackFrame.getHelper().AAX, tibOffset);
+                /* Get entry in VMT -> EAX */
+                os.writeMOV(asize, stackFrame.getHelper().AAX, stackFrame.getHelper().AAX,
+                    arrayDataOffset + (tibIndex * slotSize));
+
+                /* Now invoke the method */
+                os.writeCALL(stackFrame.getHelper().AAX,
+                    stackFrame.getEntryPoints().getVmMethodNativeCodeField().getOffset());
+                stackFrame.getHelper().pushReturnValue(methodRef.getSignature());
+                // Result is already on the stack.
+            }
+        }
     }
 
     @Override
-    public void generateCodeFor(VirtualCallAssignQuad quad) {
+    public void generateCodeFor(StaticCallAssignQuad<T> quad) {
+        checkLabel(quad.getAddress());
+        VmConstMethodRef methodRef = quad.getMethodRef();
+        methodRef.resolve(currentMethod.getDeclaringClass().getLoader());
+        final VmStaticMethod method = (VmStaticMethod) methodRef.getResolvedVmMethod();
+        if (method.getDeclaringClass().isMagicType()) {
+//todo            magicHelper.emitMagic(eContext, method, true, this, currentMethod);
+        } else {
+            Operand<T>[] referencedOps = quad.getReferencedOps();
+            for (int i = referencedOps.length; i-- > 0; ) {
+                Operand operand = referencedOps[i];
+                if (operand.getAddressingMode() == REGISTER) {
+                    GPR reg = (GPR) ((RegisterLocation) ((Variable) operand).getLocation()).getRegister();
+                    os.writePUSH(reg);
+                } else if (operand.getAddressingMode() == STACK) {
+                    int disp = ((StackLocation) ((Variable) operand).getLocation()).getDisplacement();
+                    os.writePUSH(GPR.ESP, disp);
+                } else if (operand.getAddressingMode() == CONSTANT) {
+                    int c = ((IntConstant) operand).getValue();
+                    os.writePUSH(c);
+                }
+            }
+
+            //todo handle return types
+            final int offset = stackFrame.getHelper().getSharedStaticsOffset(method);
+            os.writeCALL(stackFrame.getHelper().STATICS, offset);
+            Variable lhs = quad.getLHS();
+            if (lhs.getAddressingMode() == REGISTER) {
+                GPR reg = (GPR) ((RegisterLocation) lhs.getLocation()).getRegister();
+                if (reg != GPR.EAX) {
+                    os.writeMOV(X86Constants.BITS32, reg, GPR.EAX);
+                }
+            } else if (lhs.getAddressingMode() == STACK) {
+                int disp = ((StackLocation) lhs.getLocation()).getDisplacement();
+                os.writeMOV(X86Constants.BITS32, GPR.ESP, disp, GPR.EAX);
+            }
+        }
+    }
+
+    @Override
+    public void generateCodeFor(StaticCallQuad<T> quad) {
+        checkLabel(quad.getAddress());
+        VmConstMethodRef methodRef = quad.getMethodRef();
+        methodRef.resolve(currentMethod.getDeclaringClass().getLoader());
+        final VmStaticMethod method = (VmStaticMethod) methodRef.getResolvedVmMethod();
+        if (method.getDeclaringClass().isMagicType()) {
+//todo            magicHelper.emitMagic(eContext, method, true, this, currentMethod);
+        } else {
+            Operand<T>[] referencedOps = quad.getReferencedOps();
+            for (int i = referencedOps.length; i-- > 0; ) {
+                Operand operand = referencedOps[i];
+                if (operand.getAddressingMode() == REGISTER) {
+                    GPR reg = (GPR) ((RegisterLocation) ((Variable) operand).getLocation()).getRegister();
+                    os.writePUSH(reg);
+                } else if (operand.getAddressingMode() == STACK) {
+                    int disp = ((StackLocation) ((Variable) operand).getLocation()).getDisplacement();
+                    os.writePUSH(GPR.ESP, disp);
+                } else if (operand.getAddressingMode() == CONSTANT) {
+                    int c = ((IntConstant) operand).getValue();
+                    os.writePUSH(c);
+                }
+            }
+
+            final int offset = stackFrame.getHelper().getSharedStaticsOffset(method);
+            os.writeCALL(stackFrame.getHelper().STATICS, offset);
+        }
+    }
+
+    @Override
+    public void generateCodeFor(InterfaceCallAssignQuad quad) {
+        //todo
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void generateCodeFor(InterfaceCallQuad quad) {
         //todo
         throw new UnsupportedOperationException();
     }
