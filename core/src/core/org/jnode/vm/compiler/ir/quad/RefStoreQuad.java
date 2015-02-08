@@ -43,6 +43,18 @@ public class RefStoreQuad<T> extends Quad<T> {
         field = new StaticField(fieldRef);
     }
 
+    public VmConstFieldRef getFieldRef() {
+        return field.getFiledRef();
+    }
+
+    public Operand getRef() {
+        return refs[0];
+    }
+
+    public Operand getValue() {
+        return refs[1];
+    }
+
     public Operand<T> getDefinedOp() {
         return null;
     }

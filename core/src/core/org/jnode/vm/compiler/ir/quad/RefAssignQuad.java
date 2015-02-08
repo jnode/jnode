@@ -47,22 +47,19 @@ public class RefAssignQuad<T> extends AssignQuad<T> {
         refs = new Operand[]{getOperand(refIndex)};
     }
 
+    public VmConstFieldRef getFieldRef() {
+        return rhs.getFiledRef();
+    }
+
+    public Operand getRef() {
+        return refs[0];
+    }
+
     /**
      * @see org.jnode.vm.compiler.ir.quad.Quad#getReferencedOps()
      */
     public Operand<T>[] getReferencedOps() {
         return refs;
-    }
-
-    public String toString() {
-        return getAddress() + ": " + getLHS().toString() + " = " + refs[0] + "." + rhs.toString();
-    }
-
-    /**
-     * @return the RHS of the assignment
-     */
-    public StaticField getRHS() {
-        return rhs;
     }
 
     public Operand<T> propagate(Variable<T> operand) {
@@ -79,5 +76,9 @@ public class RefAssignQuad<T> extends AssignQuad<T> {
 
     public int getLHSLiveAddress() {
         return this.getAddress() + 1;
+    }
+
+    public String toString() {
+        return getAddress() + ": " + getLHS().toString() + " = " + refs[0] + "." + rhs.toString();
     }
 }

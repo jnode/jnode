@@ -37,11 +37,7 @@ public class ArrayLengthAssignQuad extends AssignQuad {
     }
 
     public Variable getRef() {
-        return (Variable) refs[1];
-    }
-
-    public Operand getInd() {
-        return refs[0];
+        return (Variable) refs[0];
     }
 
     @Override

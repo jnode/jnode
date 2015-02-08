@@ -50,6 +50,14 @@ public class NewObjectArrayAssignQuad<T> extends AssignQuad<T> {
         return getAddress() + 1;
     }
 
+    public VmConstClass getComponentType() {
+        return clazz;
+    }
+
+    public Operand getSize() {
+        return refs[0];
+    }
+
     @Override
     public Operand<T>[] getReferencedOps() {
         return refs;

@@ -39,6 +39,10 @@ public class NewAssignQuad<T> extends AssignQuad<T> {
         refs = new Operand[0];
     }
 
+    public VmConstClass getType() {
+        return clazz;
+    }
+
     @Override
     public Operand<T> propagate(Variable<T> operand) {
         return operand;

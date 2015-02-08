@@ -39,6 +39,14 @@ public class NewPrimitiveArrayAssignQuad<T> extends AssignQuad<T> {
         refs = new Operand[]{getOperand(sizeIndex)};
     }
 
+    public Operand getSize() {
+        return refs[0];
+    }
+
+    public int getType() {
+        return type;
+    }
+
     @Override
     public Operand<T> propagate(Variable<T> operand) {
         return operand;

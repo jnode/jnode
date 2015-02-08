@@ -39,6 +39,10 @@ public class ConstantClassAssignQuad<T> extends AssignQuad <T> {
         this.constClass = constClass;
     }
 
+    public VmConstClass getConstClass() {
+        return constClass;
+    }
+
     @Override
     public Operand<T> propagate(Variable<T> operand) {
         return operand;

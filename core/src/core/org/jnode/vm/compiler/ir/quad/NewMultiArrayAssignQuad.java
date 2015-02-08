@@ -44,6 +44,14 @@ public class NewMultiArrayAssignQuad<T> extends AssignQuad<T> {
         }
     }
 
+    public VmConstClass getComponentType() {
+        return clazz;
+    }
+
+    public Operand<T>[] getSizes() {
+        return refs;
+    }
+
     @Override
     public Operand<T> propagate(Variable<T> operand) {
         return operand;
