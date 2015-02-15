@@ -23,7 +23,8 @@ package org.jnode.vm.compiler.ir;
 public enum AddressingMode {
     CONSTANT(0x01),
     REGISTER(0x02),
-    STACK(0x03);
+    STACK(0x03),
+    TOPS(0x04);
 
     final int value;
 

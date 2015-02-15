@@ -135,7 +135,7 @@ import org.jnode.vm.compiler.ir.quad.StaticCallAssignQuad;
 import org.jnode.vm.compiler.ir.quad.StaticCallQuad;
 import org.jnode.vm.compiler.ir.quad.StaticRefAssignQuad;
 import org.jnode.vm.compiler.ir.quad.StaticRefStoreQuad;
-import org.jnode.vm.compiler.ir.quad.LooukupswitchQuad;
+import org.jnode.vm.compiler.ir.quad.LookupswitchQuad;
 import org.jnode.vm.compiler.ir.quad.TableswitchQuad;
 import org.jnode.vm.compiler.ir.quad.ThrowQuad;
 import org.jnode.vm.compiler.ir.quad.UnaryQuad;
@@ -153,7 +153,7 @@ import org.jnode.vm.facade.TypeSizeInfo;
  * list of Quads.
  */
 public class IRGenerator<T> extends BytecodeVisitor {
-    private final Constant<T> NULL_CONSTANT = Constant.getInstance(null);
+    private final Constant<T> NULL_CONSTANT = Constant.getInstance(0); //Constant.getInstance(null);
     private int nArgs;
     private int nLocals;
     private int maxStack;
@@ -203,17 +203,20 @@ public class IRGenerator<T> extends BytecodeVisitor {
         this.address = address;
         if (address >= currentBlock.getEndPC()) {
             currentBlock = basicBlockIterator.next();
-            Iterator<IRBasicBlock<T>> pi = currentBlock.getPredecessors().iterator();
-            if (!pi.hasNext()) {
-                if (currentBlock.isStartOfExceptionHandler()) {
-                    stackOffset = nLocals + 1;
-                    currentBlock.setStackOffset(stackOffset);
-                    currentBlock.setVariables(variables);
-                    // TODO need to set variables also...
-                }
-                return;
+//            Iterator<IRBasicBlock<T>> pi = currentBlock.getPredecessors().iterator();
+//            if (!pi.hasNext()) {
+            if (currentBlock.isStartOfExceptionHandler()) {
+                stackOffset = nLocals;
+                currentBlock.setStackOffset(stackOffset);
+                currentBlock.setVariables(variables.clone());
+//                    currentBlock.getVariables()[stackOffset] = new ExceptionArgument(Operand.REFERENCE, stackOffset);
+                stackOffset++;
+                // TODO need to set variables also...
+            } else {
+//                return;
+//            }
+                stackOffset = currentBlock.getStackOffset();
             }
-            stackOffset = currentBlock.getStackOffset();
 //          while (pi.hasNext()) {
 //              IRBasicBlock irb = (IRBasicBlock) pi.next();
 //              Variable[] prevVars = irb.getVariables();
@@ -838,9 +841,9 @@ public class IRGenerator<T> extends BytecodeVisitor {
             stackOffset));
     }
 
-    public void visit_lookupswitch(int defValue, int[] matchValues, int[] addresses) {
+    public void visit_lookupswitch(int defAddress, int[] matchValues, int[] addresses) {
         stackOffset -= 1;
-        currentBlock.add(new LooukupswitchQuad<T>(address, currentBlock, defValue, matchValues, addresses,
+        currentBlock.add(new LookupswitchQuad<T>(address, currentBlock, defAddress, matchValues, addresses,
             stackOffset));
     }
 

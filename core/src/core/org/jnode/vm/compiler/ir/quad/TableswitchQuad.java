@@ -76,7 +76,23 @@ public class TableswitchQuad<T> extends Quad<T> {
         refs = new Operand[]{getOperand(indIndex)};
     }
 
-//    /**
+    public int getDefaultAddress() {
+        return defaultValue;
+    }
+
+    public int getLowValue() {
+        return lowValue;
+    }
+
+    public int getHighValue() {
+        return highValue;
+    }
+
+    public Operand getValue() {
+        return refs[0];
+    }
+
+    //    /**
 //     * @return the start address of the target block
 //     */
 //    public int getTargetAddress() {

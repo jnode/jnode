@@ -59,6 +59,11 @@ public class SSAStack<T> {
         return var;
     }
 
+//    public void replaceVariable(Variable<T> var) {
+//        Variable clone = (Variable) var.clone();
+//        this.variable = clone;
+//    }
+
     public Variable<T> pop() {
         Variable<T> var = stack.remove(stack.size() - 1);
         return var;

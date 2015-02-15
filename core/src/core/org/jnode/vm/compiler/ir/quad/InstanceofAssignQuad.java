@@ -39,6 +39,14 @@ public class InstanceofAssignQuad<T> extends AssignQuad<T> {
         refs = new Operand[] {getOperand(refIndex)};
     }
 
+    public VmConstClass getConstClass() {
+        return clazz;
+    }
+
+    public Operand getRef() {
+        return refs[0];
+    }
+
     @Override
     public Operand<T> propagate(Variable<T> operand) {
         return operand;

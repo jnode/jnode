@@ -136,6 +136,8 @@ public abstract class Variable<T> extends Operand<T> implements Cloneable {
             return AddressingMode.STACK;
         } else if (location instanceof RegisterLocation) {
             return AddressingMode.REGISTER;
+        } else if (location instanceof TopStackLocation) {
+            return AddressingMode.TOPS;
         } else {
             throw new IllegalArgumentException("Undefined location: " + toString());
         }

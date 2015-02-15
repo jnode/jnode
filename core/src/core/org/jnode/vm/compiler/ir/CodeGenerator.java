@@ -33,7 +33,7 @@ import org.jnode.vm.compiler.ir.quad.ConstantStringAssignQuad;
 import org.jnode.vm.compiler.ir.quad.InstanceofAssignQuad;
 import org.jnode.vm.compiler.ir.quad.InterfaceCallAssignQuad;
 import org.jnode.vm.compiler.ir.quad.InterfaceCallQuad;
-import org.jnode.vm.compiler.ir.quad.LooukupswitchQuad;
+import org.jnode.vm.compiler.ir.quad.LookupswitchQuad;
 import org.jnode.vm.compiler.ir.quad.MonitorenterQuad;
 import org.jnode.vm.compiler.ir.quad.MonitorexitQuad;
 import org.jnode.vm.compiler.ir.quad.NewAssignQuad;
@@ -502,7 +502,7 @@ public abstract class CodeGenerator<T> {
 
     public abstract void generateCodeFor(InterfaceCallQuad quad);
 
-    public abstract void generateCodeFor(LooukupswitchQuad<T> quad);
+    public abstract void generateCodeFor(LookupswitchQuad<T> quad);
 
     public abstract void generateCodeFor(MonitorenterQuad<T> quad);
 

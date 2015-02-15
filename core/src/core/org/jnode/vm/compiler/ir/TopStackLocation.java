@@ -18,29 +18,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.vm.compiler.ir.quad;
-
-import org.jnode.vm.classmgr.VmConstMethodRef;
-import org.jnode.vm.compiler.ir.IRBasicBlock;
+package org.jnode.vm.compiler.ir;
 
 /**
- * @author Levente S\u00e1ntha
+ * @author Madhu Siddalingaiah
  */
-public abstract class InstanceCallQuad<T> extends CallQuad<T> {
-    protected InstanceCallQuad(int address, IRBasicBlock<T> block, VmConstMethodRef methodRef, int[] offs) {
-        super(address, block, methodRef, offs);
-    }
-
-    @Override
-    public String toString() {
-        String s = getAddress() + ": " + refs[refs.length - 1] + "." + methodRef.getName() + '(';
-        for (int i = refs.length - 2; i >= 0; i--) {
-            if (i < refs.length - 2) {
-                s += ", ";
-            }
-            s += refs[i];
-        }
-        s += ')';
-        return s;
+public class TopStackLocation<T> extends Location<T> {
+    public TopStackLocation() {
+        super("TS");
     }
 }

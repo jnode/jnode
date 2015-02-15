@@ -293,8 +293,8 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
     }
 
     /**
-     * @param p
-     * @param newIdom
+     * @param b1
+     * @param b2
      * @return
      */
     /*
@@ -551,6 +551,21 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
                 Variable<T> nvar = st.getNewVariable();
                 vars[var.getIndex()] = nvar;
                 aq.setLHS(nvar);
+            }
+        }
+        if (block.isStartOfExceptionHandler()) {
+            if (block.getQuads().size() > 0) {
+                Quad q = block.getQuads().get(0);
+                Operand[] referencedOps = q.getReferencedOps();
+                for (int i = 0; i < referencedOps.length; i++) {
+                    Operand op = referencedOps[i];
+                    if (op instanceof StackVariable) {
+                        StackVariable sv = (StackVariable) op;
+                        if (sv.getIndex() == block.getStackOffset()) {
+                            referencedOps[i] = new ExceptionArgument(Operand.REFERENCE, block.getStackOffset());
+                        }
+                    }
+                }
             }
         }
     }

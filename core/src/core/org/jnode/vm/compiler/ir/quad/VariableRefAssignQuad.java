@@ -21,6 +21,7 @@
 package org.jnode.vm.compiler.ir.quad;
 
 import org.jnode.vm.compiler.ir.CodeGenerator;
+import org.jnode.vm.compiler.ir.ExceptionArgument;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 import org.jnode.vm.compiler.ir.Operand;
 import org.jnode.vm.compiler.ir.Variable;
@@ -67,14 +68,19 @@ public class VariableRefAssignQuad<T> extends AssignQuad<T> {
     }
 
     public Operand<T> propagate(Variable<T> operand) {
-        setDeadCode(true);
-        return refs[0];
+        if (!(refs[0] instanceof ExceptionArgument)) {
+            setDeadCode(true);
+            return refs[0];
+        } else {
+            return operand;
+        }
     }
 
     public void doPass2() {
         // This operation will almost always become dead code, but I wanted to play it
         // safe and compute liveness assuming it might survive.
-        refs[0] = refs[0].simplify();
+        if (!(refs[0] instanceof ExceptionArgument))
+            refs[0] = refs[0].simplify();
     }
 
     public void generateCode(CodeGenerator<T> cg) {

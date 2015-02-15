@@ -104,6 +104,16 @@ public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Com
         if (bbIndex != list.length) {
             throw new AssertionError("bbIndex != list.length");
         }
+
+        for (int i = 0; i < byteCode.getNoExceptionHandlers(); i++) {
+            VmInterpretedExceptionHandler eh = byteCode.getExceptionHandler(i);
+            IRBasicBlock<T> handlerBB = findBB(list, eh.getHandlerPC());
+            IRBasicBlock<T> tryBB = findBB(list, eh.getStartPC());
+            for (IRBasicBlock bb : tryBB.getPredecessors()) {
+                bb.addSuccessor(handlerBB);
+            }
+        }
+
         return list;
     }
 
@@ -129,7 +139,7 @@ public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Com
         // The exception handler also start a basic block
         for (int i = 0; i < bc.getNoExceptionHandlers(); i++) {
             VmInterpretedExceptionHandler eh = bc.getExceptionHandler(i);
-//            IRBasicBlock tryBlock = startTryBlock(eh.getStartPC());
+            IRBasicBlock tryBlock = startTryBlock(eh.getStartPC());
 //            IRBasicBlock endTryBlock = startTryBlockEnd(eh.getEndPC());
             IRBasicBlock catchBlock = startException(eh.getHandlerPC());
         }

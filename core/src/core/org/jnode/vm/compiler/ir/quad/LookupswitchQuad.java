@@ -28,23 +28,24 @@ import org.jnode.vm.compiler.ir.Operand;
 /**
  * @author Levente S\u00e1ntha
  */
-public class LooukupswitchQuad<T> extends Quad<T> {
+public class LookupswitchQuad<T> extends Quad<T> {
     private IRBasicBlock<T>[] targetBlocks;
     private Operand<T> refs[];
-    private int defaultValue;
+    private int defaultAddress;
     private int[] matchValues;
 
     /**
      * @param address
      * @param block
-     * @param defValue
+     * @param defAddress
      * @param matchValues
      * @param targetAddresses
      * @param key
      *
      */
-    public LooukupswitchQuad(int address, IRBasicBlock<T> block, int defValue, int[] matchValues, int[] targetAddresses,
-                             int key) {
+    public LookupswitchQuad(int address, IRBasicBlock<T> block, int defAddress, int[] matchValues,
+                            int[] targetAddresses,
+                            int key) {
 
         super(address, block);
         targetBlocks = new IRBasicBlock[targetAddresses.length + 1];
@@ -61,7 +62,7 @@ public class LooukupswitchQuad<T> extends Quad<T> {
         }
 
         for (IRBasicBlock<T> succ : block.getSuccessors()) {
-            if (succ.getStartPC() == defValue) {
+            if (succ.getStartPC() == defAddress) {
                 targetBlocks[targetAddresses.length] = succ;
                 break;
             }
@@ -70,12 +71,24 @@ public class LooukupswitchQuad<T> extends Quad<T> {
             throw new AssertionError("unable to find target block!");
         }
 
-        this.defaultValue = defValue;
+        this.defaultAddress = defAddress;
         this.matchValues = matchValues;
         refs = new Operand[]{getOperand(key)};
     }
 
-//    /**
+    public int[] getMatchValues() {
+        return matchValues;
+    }
+
+    public int getDefaultAddress() {
+        return defaultAddress;
+    }
+
+    public Operand getKey() {
+        return refs[0];
+    }
+
+    //    /**
 //     * @return the start address of the target block
 //     */
 //    public int getTargetAddress() {
@@ -111,7 +124,7 @@ public class LooukupswitchQuad<T> extends Quad<T> {
 
     @Override
     public String toString() {
-        return getAddress() + ": lookupswitch(" + refs[0] + ") , def=" + defaultValue +
+        return getAddress() + ": lookupswitch(" + refs[0] + ") , def=" + defaultAddress +
             ", matches=" + Arrays.toString(matchValues) + ", targets=" + Arrays.toString(targetBlocks);
     }
 }
