@@ -196,7 +196,7 @@ public class IRTest {
         System.out.println();
 
         //System.out.println(cfg);
-        IRGenerator<T> irg = new IRGenerator<T>(cfg, typeSizeInfo);
+        IRGenerator<T> irg = new IRGenerator<T>(cfg, typeSizeInfo, arithMethod.getDeclaringClass().getLoader());
         BytecodeParser.parse(code, irg);
 
         X86Level2Compiler.initMethodArguments(arithMethod, stackFrame, typeSizeInfo, irg);
