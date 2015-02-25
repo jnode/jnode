@@ -180,7 +180,7 @@ public class X86Level2Compiler extends AbstractX86Compiler {
 
                 VmByteCode bytecode = method.getBytecode();
                 IRControlFlowGraph cfg = new IRControlFlowGraph(bytecode);
-                IRGenerator irg = new IRGenerator(cfg, typeSizeInfo);
+                IRGenerator irg = new IRGenerator(cfg, typeSizeInfo, method.getDeclaringClass().getLoader());
                 BytecodeParser.parse(bytecode, irg);
 
                 initMethodArguments(method, stackFrame, typeSizeInfo, irg);
