@@ -100,12 +100,14 @@ import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.BytecodeVisitor;
 import org.jnode.vm.classmgr.Signature;
 import org.jnode.vm.classmgr.VmByteCode;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmConstFieldRef;
 import org.jnode.vm.classmgr.VmConstIMethodRef;
 import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.ir.quad.ArrayAssignQuad;
 import org.jnode.vm.compiler.ir.quad.ArrayLengthAssignQuad;
 import org.jnode.vm.compiler.ir.quad.ArrayStoreQuad;
@@ -163,11 +165,13 @@ public class IRGenerator<T> extends BytecodeVisitor {
     private Iterator<IRBasicBlock<T>> basicBlockIterator;
     private IRBasicBlock<T> currentBlock;
     private TypeSizeInfo typeSizeInfo;
+    private VmClassLoader vmClassLoader;
 
-    public IRGenerator(IRControlFlowGraph<T> cfg, TypeSizeInfo typeSizeInfo) {
+    public IRGenerator(IRControlFlowGraph<T> cfg, TypeSizeInfo typeSizeInfo, VmClassLoader loader) {
         basicBlockIterator = cfg.iterator();
         currentBlock = basicBlockIterator.next();
         this.typeSizeInfo = typeSizeInfo;
+        this.vmClassLoader = loader;
     }
 
     public void setParser(BytecodeParser parser) {
@@ -181,9 +185,34 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset = nLocals;
         variables = new Variable[nLocals + maxStack];
         int index = 0;
-        for (int i = 0; i < nArgs; i += 1) {
-            variables[index] = new MethodArgument<T>(Operand.UNKNOWN, index);
+        int argCount = method.getNoArguments();
+        if (!method.isStatic()) {
+            variables[index] = new MethodArgument<T>(Operand.REFERENCE, index);
             index += 1;
+        }
+        for (int i = 0; i < argCount; i++) {
+            VmType argType = method.getArgumentType(i);
+            int stackChange;
+            int jvmType;
+            if (argType.isPrimitive()) {
+                jvmType = argType.getJvmType();
+                if (jvmType == JvmType.LONG || jvmType == JvmType.DOUBLE) {
+                    stackChange = 2;
+                } else {
+                    stackChange = 1;
+                }
+            } else {
+                stackChange = 1;
+                jvmType = JvmType.REFERENCE;
+            }
+            variables[index] = new MethodArgument<T>(Operand.UNKNOWN, index);
+            variables[index].setTypeFromJvmType(jvmType);
+            index += 1;
+            if (stackChange == 2) {
+                variables[index] = new MethodArgument<T>(Operand.UNKNOWN, index);
+                variables[index].setTypeFromJvmType(jvmType);
+                index += 1;
+            }
         }
         for (int i = nArgs; i < nLocals; i += 1) {
             variables[index] = new LocalVariable<T>(Operand.UNKNOWN, index);
@@ -202,6 +231,7 @@ public class IRGenerator<T> extends BytecodeVisitor {
     public void startInstruction(int address) {
         this.address = address;
         if (address >= currentBlock.getEndPC()) {
+            IRBasicBlock lastBlock = currentBlock;
             currentBlock = basicBlockIterator.next();
 //            Iterator<IRBasicBlock<T>> pi = currentBlock.getPredecessors().iterator();
 //            if (!pi.hasNext()) {
@@ -215,7 +245,9 @@ public class IRGenerator<T> extends BytecodeVisitor {
             } else {
 //                return;
 //            }
-                stackOffset = currentBlock.getStackOffset();
+                if (lastBlock != currentBlock.getIDominator()) {
+                    stackOffset = currentBlock.getStackOffset();
+                }
             }
 //          while (pi.hasNext()) {
 //              IRBasicBlock irb = (IRBasicBlock) pi.next();
@@ -244,6 +276,7 @@ public class IRGenerator<T> extends BytecodeVisitor {
     }
 
     public void visit_aconst_null() {
+        variables[stackOffset].setType(Operand.REFERENCE);
         currentBlock.add(new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset,
             NULL_CONSTANT));
         stackOffset += 1;
@@ -442,7 +475,13 @@ public class IRGenerator<T> extends BytecodeVisitor {
     }
 
     public void visit_dup_x1() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        int index = stackOffset;
+        stackOffset -= 1;
+        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset - 1));
+        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 2, stackOffset));
+        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 1, stackOffset + 1));
+        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset - 1));
+        stackOffset += 2;
     }
 
     public void visit_dup_x2() {
@@ -905,84 +944,182 @@ public class IRGenerator<T> extends BytecodeVisitor {
     }
 
     public void visit_invokevirtual(VmConstMethodRef methodRef) {
-        int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef.getSignature());
+        methodRef.resolve(vmClassLoader);
+        VmMethod vmMethod = methodRef.getResolvedVmMethod();
+        int nrArguments = vmMethod.getNoArguments();
+        int[] varOffs = new int[nrArguments + 1];
+        for (int i = nrArguments; i-- > 0;) {
+            VmType argType = vmMethod.getArgumentType(i);
+            int stackChange;
+            int jvmType;
+            if (argType.isPrimitive()) {
+                jvmType = argType.getJvmType();
+                if (jvmType == JvmType.LONG || jvmType == JvmType.DOUBLE) {
+                    stackChange = 2;
+                } else {
+                    stackChange = 1;
+                }
+            } else {
+                stackChange = 1;
+                jvmType = JvmType.REFERENCE;
+            }
+            stackOffset -= stackChange;
+            variables[stackOffset].setTypeFromJvmType(jvmType);
+            varOffs[i + 1] = stackOffset;
+        }
+        stackOffset--;
+        variables[stackOffset].setType(Operand.REFERENCE);
+        varOffs[0] = stackOffset;
+
         int returnType = JvmType.getReturnType(methodRef.getSignature());
         if (JvmType.VOID == returnType) {
-            int[] varOffs = new int[argSlotCount + 1];
-            for (int i = 0; i < argSlotCount; i++) {
-                stackOffset--;
-                variables[stackOffset].setType(Operand.INT);
-                varOffs[i] = stackOffset;
-            }
-            stackOffset--;
-            variables[argSlotCount].setType(Operand.REFERENCE);
-            varOffs[argSlotCount] = stackOffset;
             currentBlock.add(new VirtualCallQuad(address, currentBlock, methodRef, varOffs));
         } else {
-            int[] varOffs = new int[argSlotCount + 1];
-            for (int i = 0; i < argSlotCount; i++) {
-                stackOffset--;
-                variables[stackOffset].setType(Operand.INT);
-                varOffs[i] = stackOffset;
-            }
-            stackOffset--;
-            variables[argSlotCount].setType(Operand.REFERENCE);
-            varOffs[argSlotCount] = stackOffset;
             currentBlock.add(new VirtualCallAssignQuad(address, currentBlock, stackOffset, methodRef, varOffs));
-            stackOffset++;
+            stackOffset += typeSizeInfo.getStackSlots(returnType);
         }
+//        int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef.getSignature());
+//        int returnType = JvmType.getReturnType(methodRef.getSignature());
+//        if (JvmType.VOID == returnType) {
+//            int[] varOffs = new int[argSlotCount + 1];
+//            for (int i = 0; i < argSlotCount; i++) {
+//                stackOffset--;
+//                variables[stackOffset].setType(Operand.INT);
+//                varOffs[i] = stackOffset;
+//            }
+//            stackOffset--;
+//            variables[argSlotCount].setType(Operand.REFERENCE);
+//            varOffs[argSlotCount] = stackOffset;
+//            currentBlock.add(new VirtualCallQuad(address, currentBlock, methodRef, varOffs));
+//        } else {
+//            int[] varOffs = new int[argSlotCount + 1];
+//            for (int i = 0; i < argSlotCount; i++) {
+//                stackOffset--;
+//                variables[stackOffset].setType(Operand.INT);
+//                varOffs[i] = stackOffset;
+//            }
+//            stackOffset--;
+//            variables[argSlotCount].setType(Operand.REFERENCE);
+//            varOffs[argSlotCount] = stackOffset;
+//            currentBlock.add(new VirtualCallAssignQuad(address, currentBlock, stackOffset, methodRef, varOffs));
+//            stackOffset += typeSizeInfo.getStackSlots(returnType);
+//        }
     }
 
     public void visit_invokespecial(VmConstMethodRef methodRef) {
-        int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef.getSignature());
+        methodRef.resolve(vmClassLoader);
+        VmMethod vmMethod = methodRef.getResolvedVmMethod();
+        int nrArguments = vmMethod.getNoArguments();
+        int[] varOffs = new int[nrArguments + 1];
+        for (int i = nrArguments; i-- > 0;) {
+            VmType argType = vmMethod.getArgumentType(i);
+            int stackChange;
+            int jvmType;
+            if (argType.isPrimitive()) {
+                jvmType = argType.getJvmType();
+                if (jvmType == JvmType.LONG || jvmType == JvmType.DOUBLE) {
+                    stackChange = 2;
+                } else {
+                    stackChange = 1;
+                }
+            } else {
+                stackChange = 1;
+                jvmType = JvmType.REFERENCE;
+            }
+            stackOffset -= stackChange;
+            variables[stackOffset].setTypeFromJvmType(jvmType);
+            varOffs[i + 1] = stackOffset;
+        }
+        stackOffset--;
+        variables[stackOffset].setType(Operand.REFERENCE);
+        varOffs[0] = stackOffset;
+
         int returnType = JvmType.getReturnType(methodRef.getSignature());
         if (JvmType.VOID == returnType) {
-            int[] varOffs = new int[argSlotCount + 1];
-            for (int i = 0; i < argSlotCount; i++) {
-                stackOffset--;
-                variables[stackOffset].setType(Operand.INT);
-                varOffs[i] = stackOffset;
-            }
-            stackOffset--;
-            variables[argSlotCount].setType(Operand.REFERENCE);
-            varOffs[argSlotCount] = stackOffset;
             currentBlock.add(new SpecialCallQuad(address, currentBlock, methodRef, varOffs));
         } else {
-            int[] varOffs = new int[argSlotCount + 1];
-            for (int i = 0; i < argSlotCount; i++) {
-                stackOffset--;
-                variables[stackOffset].setType(Operand.INT);
-                varOffs[i] = stackOffset;
-            }
-            stackOffset--;
-            variables[argSlotCount].setType(Operand.REFERENCE);
-            varOffs[argSlotCount] = stackOffset;
             currentBlock.add(new SpecialCallAssignQuad(address, currentBlock, stackOffset, methodRef, varOffs));
-            stackOffset++;
+            stackOffset += typeSizeInfo.getStackSlots(returnType);
         }
+//        int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef.getSignature());
+//        int returnType = JvmType.getReturnType(methodRef.getSignature());
+//        if (JvmType.VOID == returnType) {
+//            int[] varOffs = new int[argSlotCount + 1];
+//            for (int i = 0; i < argSlotCount; i++) {
+//                stackOffset--;
+//                variables[stackOffset].setType(Operand.INT);
+//                varOffs[i] = stackOffset;
+//            }
+//            stackOffset--;
+//            variables[argSlotCount].setType(Operand.REFERENCE);
+//            varOffs[argSlotCount] = stackOffset;
+//            currentBlock.add(new SpecialCallQuad(address, currentBlock, methodRef, varOffs));
+//        } else {
+//            int[] varOffs = new int[argSlotCount + 1];
+//            for (int i = 0; i < argSlotCount; i++) {
+//                stackOffset--;
+//                variables[stackOffset].setType(Operand.INT);
+//                varOffs[i] = stackOffset;
+//            }
+//            stackOffset--;
+//            variables[argSlotCount].setType(Operand.REFERENCE);
+//            varOffs[argSlotCount] = stackOffset;
+//            currentBlock.add(new SpecialCallAssignQuad(address, currentBlock, stackOffset, methodRef, varOffs));
+//            stackOffset++;
+//        }
     }
 
     public void visit_invokestatic(VmConstMethodRef methodRef) {
-        int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef.getSignature());
+        methodRef.resolve(vmClassLoader);
+        VmMethod vmMethod = methodRef.getResolvedVmMethod();
+        int nrArguments = vmMethod.getNoArguments();
+        int[] varOffs = new int[nrArguments];
+        for (int i = nrArguments; i-- > 0;) {
+            VmType argType = vmMethod.getArgumentType(i);
+            int stackChange;
+            int jvmType;
+            if (argType.isPrimitive()) {
+                jvmType = argType.getJvmType();
+                if (jvmType == JvmType.LONG || jvmType == JvmType.DOUBLE) {
+                    stackChange = 2;
+                } else {
+                    stackChange = 1;
+                }
+            } else {
+                stackChange = 1;
+                jvmType = JvmType.REFERENCE;
+            }
+            stackOffset -= stackChange;
+            variables[stackOffset].setTypeFromJvmType(jvmType);
+            varOffs[i] = stackOffset;
+        }
         int returnType = JvmType.getReturnType(methodRef.getSignature());
         if (JvmType.VOID == returnType) {
-            int[] varOffs = new int[argSlotCount];
-            for (int i = 0; i < argSlotCount; i++) {
-                stackOffset--;
-                variables[stackOffset].setType(Operand.INT);
-                varOffs[i] = stackOffset;
-            }
-            currentBlock.add(new StaticCallQuad<T>(address, currentBlock, methodRef, varOffs));
+            currentBlock.add(new StaticCallQuad(address, currentBlock, methodRef, varOffs));
         } else {
-            int[] varOffs = new int[argSlotCount];
-            for (int i = 0; i < argSlotCount; i++) {
-                stackOffset--;
-                variables[stackOffset].setType(Operand.INT);
-                varOffs[i] = stackOffset;
-            }
-            currentBlock.add(new StaticCallAssignQuad<T>(address, currentBlock, stackOffset, methodRef, varOffs));
-            stackOffset++;
+            currentBlock.add(new StaticCallAssignQuad(address, currentBlock, stackOffset, methodRef, varOffs));
+            stackOffset += typeSizeInfo.getStackSlots(returnType);
         }
+//        int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef.getSignature());
+//        int returnType = JvmType.getReturnType(methodRef.getSignature());
+//        if (JvmType.VOID == returnType) {
+//            int[] varOffs = new int[argSlotCount];
+//            for (int i = 0; i < argSlotCount; i++) {
+//                stackOffset--;
+//                variables[stackOffset].setType(Operand.INT);
+//                varOffs[i] = stackOffset;
+//            }
+//            currentBlock.add(new StaticCallQuad<T>(address, currentBlock, methodRef, varOffs));
+//        } else {
+//            int[] varOffs = new int[argSlotCount];
+//            for (int i = 0; i < argSlotCount; i++) {
+//                stackOffset--;
+//                variables[stackOffset].setType(Operand.INT);
+//                varOffs[i] = stackOffset;
+//            }
+//            currentBlock.add(new StaticCallAssignQuad<T>(address, currentBlock, stackOffset, methodRef, varOffs));
+//            stackOffset++;
+//        }
     }
 
     public void visit_invokeinterface(VmConstIMethodRef methodRef, int count) {

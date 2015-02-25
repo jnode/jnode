@@ -517,6 +517,14 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
             rewritePhiParams(b);
         }
 
+        if (block == startBlock) {
+            for (IRBasicBlock b : bblocks) {
+                if (b.getIDominator() == null && b != startBlock) {
+                    renameVariables(b);
+                }
+            }
+        }
+
         for (IRBasicBlock<T> b : block.getDominatedBlocks()) {
             if (b != block) {
                 renameVariables(b);
@@ -549,6 +557,7 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
                 Variable var = aq.getLHS();
                 Variable[] vars = block.getVariables();
                 Variable<T> nvar = st.getNewVariable();
+                nvar.setType(var.getType());
                 vars[var.getIndex()] = nvar;
                 aq.setLHS(nvar);
             }

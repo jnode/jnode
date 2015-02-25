@@ -296,6 +296,10 @@ public class BinaryQuad<T> extends AssignQuad<T> {
                     return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
                         this.getLHS().getIndex(), c1.fRem(c2));
 
+                case LCMP:
+                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS(), c1.lCmp(c2));
+
                 case DADD:
                     return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
                         this.getLHS().getIndex(), c1.dAdd(c2));
@@ -436,7 +440,7 @@ public class BinaryQuad<T> extends AssignQuad<T> {
                 cg.generateBinaryOP(reg1, reg2, operation, disp3);
                 break;
             case MODE_RSC:
-                cg.generateBinaryOP(reg1, disp2, operation, c3);
+                cg.generateBinaryOP(this, reg1, disp2, operation, c3);
                 break;
             case MODE_RSR:
                 if (reg1 == reg3 && commutative && !cg.supports3AddrOps()) {
@@ -456,7 +460,7 @@ public class BinaryQuad<T> extends AssignQuad<T> {
                 break;
             case MODE_SCS:
                 if (disp1 == disp3 && commutative && !cg.supports3AddrOps()) {
-                    cg.generateBinaryOP(disp1, disp3, operation, c2);
+                    cg.generateBinaryOP(this, disp1, disp3, operation, c2);
                 } else {
                     cg.generateBinaryOP(disp1, c2, operation, disp3);
                 }
@@ -475,16 +479,16 @@ public class BinaryQuad<T> extends AssignQuad<T> {
                 }
                 break;
             case MODE_SSC:
-                cg.generateBinaryOP(disp1, disp2, operation, c3);
+                cg.generateBinaryOP(this, disp1, disp2, operation, c3);
                 break;
             case MODE_SSR:
                 cg.generateBinaryOP(disp1, disp2, operation, reg3);
                 break;
             case MODE_SSS:
                 if (disp1 == disp3 && commutative && !cg.supports3AddrOps()) {
-                    cg.generateBinaryOP(disp1, disp3, operation, disp2);
+                    cg.generateBinaryOP(this, disp1, disp3, operation, disp2);
                 } else {
-                    cg.generateBinaryOP(disp1, disp2, operation, disp3);
+                    cg.generateBinaryOP(this, disp1, disp2, operation, disp3);
                 }
                 break;
             default:

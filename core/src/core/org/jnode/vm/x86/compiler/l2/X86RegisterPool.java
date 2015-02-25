@@ -35,7 +35,7 @@ public class X86RegisterPool extends RegisterPool<X86Register> {
 
     public X86RegisterPool() {
         registers = new BootableArrayList<X86Register>();
-        registers.add(X86Register.EDX);
+        //registers.add(X86Register.EDX); - long return
         registers.add(X86Register.ECX);
         registers.add(X86Register.EBX);
         //registers.add(X86Register.EAX);

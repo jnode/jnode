@@ -55,7 +55,7 @@ import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.Constant;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 import org.jnode.vm.compiler.ir.IntConstant;
-import org.jnode.vm.compiler.ir.Location;
+import org.jnode.vm.compiler.ir.LongConstant;
 import org.jnode.vm.compiler.ir.Operand;
 import org.jnode.vm.compiler.ir.RegisterLocation;
 import org.jnode.vm.compiler.ir.RegisterPool;
@@ -65,6 +65,7 @@ import org.jnode.vm.compiler.ir.quad.ArrayAssignQuad;
 import org.jnode.vm.compiler.ir.quad.ArrayLengthAssignQuad;
 import org.jnode.vm.compiler.ir.quad.ArrayStoreQuad;
 import org.jnode.vm.compiler.ir.quad.BinaryOperation;
+import org.jnode.vm.compiler.ir.quad.BinaryQuad;
 import org.jnode.vm.compiler.ir.quad.BranchCondition;
 import org.jnode.vm.compiler.ir.quad.CheckcastQuad;
 import org.jnode.vm.compiler.ir.quad.ConditionalBranchQuad;
@@ -302,7 +303,29 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             Operand<T> rhs = quad.getRHS();
             AddressingMode mode = rhs.getAddressingMode();
             if (mode == CONSTANT) {
-                os.writeMOV_Const(X86Constants.BITS32,  X86Register.EBP, disp1, ((IntConstant<T>) rhs).getValue());
+                //todo investigate lhs.getType() based checks
+//                if (lhs.getType() == Operand.INT) {
+//                    os.writeMOV_Const(X86Constants.BITS32,  X86Register.EBP, disp1, ((IntConstant<T>) rhs).getValue());
+//                } else if (lhs.getType() == Operand.LONG) {
+//                    long value = ((LongConstant<T>) rhs).getValue();
+//                    final int v_lsb = (int) (value & 0xFFFFFFFFL);
+//                    final int v_msb = (int) ((value >>> 32) & 0xFFFFFFFFL);
+//                    os.writeMOV_Const(BITS32,  X86Register.EBP, disp1 - stackFrame.getHelper().SLOTSIZE, v_lsb);
+//                    os.writeMOV_Const(BITS32,  X86Register.EBP, disp1, v_msb);
+//                } else {
+//                    throw new IllegalArgumentException("Type: " + lhs.getType());
+//                }
+                if (rhs instanceof IntConstant) {
+                    os.writeMOV_Const(X86Constants.BITS32,  X86Register.EBP, disp1, ((IntConstant<T>) rhs).getValue());
+                } else if (rhs instanceof LongConstant) {
+                    long value = ((LongConstant<T>) rhs).getValue();
+                    final int v_lsb = (int) (value & 0xFFFFFFFFL);
+                    final int v_msb = (int) ((value >>> 32) & 0xFFFFFFFFL);
+                    os.writeMOV_Const(BITS32,  X86Register.EBP, disp1 - stackFrame.getHelper().SLOTSIZE, v_lsb);
+                    os.writeMOV_Const(BITS32,  X86Register.EBP, disp1, v_msb);
+                } else {
+                    throw new IllegalArgumentException("Type: " + lhs.getType());
+                }
             } else if (mode == REGISTER) {
                 T reg2 = ((RegisterLocation<T>) ((Variable<T>) rhs).getLocation()).getRegister();
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
@@ -324,30 +347,46 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
     public void generateCodeFor(VarReturnQuad<T> quad) {
         checkLabel(quad.getAddress());
         Operand<T> op = quad.getOperand();
-        // TODO must deal with other types, see else case also
-        if (op instanceof IntConstant) {
-            IntConstant<T> iconst = (IntConstant<T>) op;
-            os.writeMOV_Const(X86Register.EAX, iconst.getValue());
-        } else if (op instanceof Variable) {
-            Variable<T> var = (Variable<T>) op;
-            Location<T> loc = var.getLocation();
-            if (loc instanceof RegisterLocation) {
-                RegisterLocation<T> regLoc = (RegisterLocation<T>) loc;
-                GPR src = (GPR) regLoc.getRegister();
-                if (!src.equals(X86Register.EAX)) {
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, src);
+        if (op.getAddressingMode() == CONSTANT) {
+            if (op instanceof IntConstant) {
+                IntConstant<T> iconst = (IntConstant<T>) op;
+                os.writeMOV_Const(X86Register.EAX, iconst.getValue());
+            } else if (op instanceof LongConstant) {
+                LongConstant<T> lconst = (LongConstant<T>) op;
+                long value = lconst.getValue();
+                if (value != 0) {
+                    final int lsbv = (int) (value & 0xFFFFFFFFL);
+                    final int msbv = (int) ((value >>> 32) & 0xFFFFFFFFL);
+
+                    os.writeMOV_Const(X86Register.EAX, lsbv);
+                    os.writeMOV_Const(X86Register.EDX, msbv);
+                } else {
+                    os.writeXOR(X86Register.EAX, X86Register.EAX);
+                    os.writeXOR(X86Register.EDX, X86Register.EDX);
                 }
             } else {
-                StackLocation<T> stackLoc = (StackLocation<T>) loc;
-                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, stackLoc.getDisplacement());
+                throw new IllegalArgumentException();
             }
+        } else if (op.getAddressingMode() == REGISTER) {
+            GPR src = (GPR) ((RegisterLocation<T>) ((Variable<T>) op).getLocation()).getRegister();
+            if (!src.equals(X86Register.EAX)) {
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, src);
+            }
+        } else if (op.getAddressingMode() == STACK) {
+            if (op.getType() != Operand.LONG && op.getType() != Operand.DOUBLE) {
+                StackLocation<T> stackLoc = (StackLocation<T>) ((Variable<T>) op).getLocation();
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, stackLoc.getDisplacement());
+            } else if (op.getType() == Operand.LONG) {
+                int disp1 = ((StackLocation<T>) ((Variable<T>) op).getLocation()).getDisplacement();
+                int disp2 = disp1 - stackFrame.getHelper().SLOTSIZE;
+                os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EDX, X86Register.EBP, disp1);
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } else {
+            throw new IllegalArgumentException();
         }
-
-        // TODO: hack for testing
-//        os.writeMOV(X86Constants.BITS32, X86Register.ESP, X86Register.EBP);
-//        os.writePOP(X86Register.EBP);
-//
-//        os.writeRET();
 
         stackFrame.emitReturn();
     }
@@ -369,12 +408,11 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         throw new IllegalArgumentException("Constants should be folded");
     }
 
-    public void generateCodeFor(UnaryQuad<T> quad, Object lhsReg, UnaryOperation operation,
-                                Object rhsReg) {
+    public void generateCodeFor(UnaryQuad<T> quad, Object lhsReg, UnaryOperation operation, Object rhsReg) {
         checkLabel(quad.getAddress());
         switch (operation) {
             case I2L:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case I2F:
                 os.writePUSH((GPR) rhsReg);
@@ -387,7 +425,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case L2I:
             case L2F:
             case L2D:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case F2I:
                 os.writePUSH((GPR) rhsReg);
@@ -401,7 +439,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case D2I:
             case D2L:
             case D2F:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case I2B: {
                 GPR lhsGpr = (GPR) lhsReg;
@@ -430,7 +468,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case LNEG:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FNEG:
                 os.writePUSH((GPR) rhsReg);
@@ -442,7 +480,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 
             case DNEG:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -451,7 +489,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         checkLabel(quad.getAddress());
         switch (operation) {
             case I2L:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case I2F:
                 os.writePUSH(X86Register.EBP, rhsDisp);
@@ -460,11 +498,13 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 os.writePOP((GPR) lhsReg);
                 break;
 
-            case I2D:
             case L2I:
+                os.writeMOV(BITS32, (GPR) lhsReg, X86Register.EBP, rhsDisp - stackFrame.getHelper().SLOTSIZE);
+                break;
+            case I2D:
             case L2F:
             case L2D:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case F2I:
                 os.writePUSH(X86Register.EBP, rhsDisp);
@@ -478,7 +518,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case D2I:
             case D2L:
             case D2F:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case I2B: {
                 GPR lhsGpr = (GPR) lhsReg;
@@ -505,7 +545,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case LNEG:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FNEG:
                 os.writePUSH(X86Register.EBP, rhsDisp);
@@ -517,7 +557,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 
             case DNEG:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -526,7 +566,15 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         checkLabel(quad.getAddress());
         switch (operation) {
             case I2L:
-                throw new IllegalArgumentException("Unknown operation");
+                os.writePUSH(X86Register.EAX);
+                os.writePUSH(X86Register.EDX);
+                os.writeMOV(BITS32, X86Register.EAX, (GPR) rhsReg);
+                os.writeCDQ(BITS32);
+                os.writeMOV(BITS32, X86Register.EBP, lhsDisp, X86Register.EDX);
+                os.writeMOV(BITS32, X86Register.EBP, lhsDisp - stackFrame.getHelper().SLOTSIZE, X86Register.EAX);
+                os.writePOP(X86Register.EDX);
+                os.writePOP(X86Register.EAX);
+                break;
 
             case I2F:
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, (GPR) rhsReg);
@@ -549,7 +597,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case D2I:
             case D2L:
             case D2F:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case I2B:
                 os.writePUSH(SR1);
@@ -578,7 +626,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case LNEG:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FNEG:
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, (GPR) rhsReg);
@@ -589,7 +637,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 
             case DNEG:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -598,7 +646,15 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         checkLabel(quad.getAddress());
         switch (operation) {
             case I2L:
-                throw new IllegalArgumentException("Unknown operation");
+                os.writePUSH(X86Register.EAX);
+                os.writePUSH(X86Register.EDX);
+                os.writeMOV(BITS32, X86Register.EAX, X86Register.EBP, rhsDisp);
+                os.writeCDQ(BITS32);
+                os.writeMOV(BITS32, X86Register.EBP, lhsDisp, X86Register.EDX);
+                os.writeMOV(BITS32, X86Register.EBP, lhsDisp - stackFrame.getHelper().SLOTSIZE, X86Register.EAX);
+                os.writePOP(X86Register.EDX);
+                os.writePOP(X86Register.EAX);
+                break;
 
             case I2F:
                 os.writeFILD32(X86Register.EBP, rhsDisp);
@@ -606,10 +662,14 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case I2D:
+                throw new IllegalArgumentException("Unknown operation: " + operation);
             case L2I:
+                os.writeMOV(BITS32, SR1, X86Register.EBP, rhsDisp - stackFrame.getHelper().SLOTSIZE);
+                os.writeMOV(BITS32, X86Register.EBP, lhsDisp, SR1);
+                break;
             case L2F:
             case L2D:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case F2I:
                 os.writeFLD32(X86Register.EBP, rhsDisp);
@@ -621,7 +681,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case D2I:
             case D2L:
             case D2F:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case I2B:
                 os.writePUSH(SR1);
@@ -653,7 +713,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case LNEG:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FNEG:
                 os.writeFLD32(X86Register.EBP, rhsDisp);
@@ -663,7 +723,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 
             case DNEG:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -803,7 +863,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
                 os.writePUSH(iconst2.getValue());
@@ -864,7 +924,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -971,7 +1031,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
                 os.writePUSH(iconst2.getValue());
@@ -1027,7 +1087,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -1149,7 +1209,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
                 os.writePUSH((GPR) reg2);
@@ -1210,7 +1270,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -1364,7 +1424,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
                 os.writePUSH((GPR) reg2);
@@ -1425,7 +1485,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -1554,7 +1614,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
                 os.writePUSH((GPR) reg2);
@@ -1610,29 +1670,27 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
-    public void generateBinaryOP(T reg1, int disp2,
+    public void generateBinaryOP(BinaryQuad<T> quad, T reg1, int disp2,
                                  BinaryOperation operation, Constant<T> c3) {
-        IntConstant<T> iconst3 = (IntConstant<T>) c3;
         switch (operation) {
-
             case IADD:
                 os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
-                os.writeADD((GPR) reg1, iconst3.getValue());
+                os.writeADD((GPR) reg1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case IAND:
                 os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
-                os.writeAND((GPR) reg1, iconst3.getValue());
+                os.writeAND((GPR) reg1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case IDIV: // needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
-                os.writePUSH(iconst3.getValue());
+                os.writePUSH(((IntConstant<T>) c3).getValue());
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
@@ -1652,18 +1710,18 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case IMUL:
-                os.writeIMUL_3((GPR) reg1, X86Register.EBP, disp2, iconst3.getValue());
+                os.writeIMUL_3((GPR) reg1, X86Register.EBP, disp2, ((IntConstant<T>) c3).getValue());
                 break;
 
             case IOR:
                 os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
-                os.writeOR((GPR) reg1, iconst3.getValue());
+                os.writeOR((GPR) reg1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case IREM: // needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
-                os.writePUSH(iconst3.getValue());
+                os.writePUSH(((IntConstant<T>) c3).getValue());
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
@@ -1684,27 +1742,27 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 
             case ISHL: // needs CL
                 os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
-                os.writeSAL((GPR) reg1, iconst3.getValue());
+                os.writeSAL((GPR) reg1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case ISHR: // needs CL
                 os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
-                os.writeSAR((GPR) reg1, iconst3.getValue());
+                os.writeSAR((GPR) reg1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case ISUB:
                 os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
-                os.writeSUB((GPR) reg1, iconst3.getValue());
+                os.writeSUB((GPR) reg1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case IUSHR: // needs CL
                 os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
-                os.writeSHR((GPR) reg1, iconst3.getValue());
+                os.writeSHR((GPR) reg1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case IXOR:
                 os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
-                os.writeXOR((GPR) reg1, iconst3.getValue());
+                os.writeXOR((GPR) reg1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case DADD:
@@ -1712,10 +1770,10 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
-                os.writePUSH(iconst3.getValue());
+                os.writePUSH(((IntConstant<T>) c3).getValue());
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFADD32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
@@ -1723,7 +1781,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case FDIV:
-                os.writePUSH(iconst3.getValue());
+                os.writePUSH(((IntConstant<T>) c3).getValue());
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFDIV32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
@@ -1731,7 +1789,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case FMUL:
-                os.writePUSH(iconst3.getValue());
+                os.writePUSH(((IntConstant<T>) c3).getValue());
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFMUL32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
@@ -1739,7 +1797,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case FREM:
-                os.writePUSH(iconst3.getValue());
+                os.writePUSH(((IntConstant<T>) c3).getValue());
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFPREM();
@@ -1749,13 +1807,50 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case FSUB:
-                os.writePUSH(iconst3.getValue());
+                os.writePUSH(((IntConstant<T>) c3).getValue());
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFSUB32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
                 os.writePOP((GPR) reg1);
                 break;
 
+            case LCMP: {
+                final Label curInstrLabel = getInstrLabel(quad.getAddress());
+                final Label ltLabel = new Label(curInstrLabel + "lt");
+                final Label endLabel = new Label(curInstrLabel + "end");
+                GPR gpr1 = (GPR) reg1;
+
+                // Calculate
+                if (os.isCode32()) {
+                    long value = ((LongConstant<T>) c3).getValue();
+                    final int v_lsb = (int) (value & 0xFFFFFFFFL);
+                    final int v_msb = (int) ((value >>> 32) & 0xFFFFFFFFL);
+                    int disp2lsb = disp2 - stackFrame.getHelper().SLOTSIZE;
+                    int disp2msb = disp2;
+                    os.writeXOR(gpr1, gpr1);
+                    os.writeSUB(BITS32, X86Register.EBP, disp2lsb, v_lsb);
+                    os.writeSBB(BITS32, X86Register.EBP, disp2msb, v_msb);
+                    os.writeJCC(ltLabel, X86Constants.JL); // JL
+                    os.writeMOV(BITS32, SR1, X86Register.EBP, disp2lsb);
+                    os.writeOR(SR1, X86Register.EBP, disp2msb);
+                }
+//                else {
+//                    final GPR64 v2r = v2.getRegister(eContext);
+//                    final GPR64 v1r = v1.getRegister(eContext);
+//                    os.writeCMP(v1r, v2r);
+//                    os.writeJCC(ltLabel, X86Constants.JL); // JL
+//                }
+
+                os.writeJCC(endLabel, X86Constants.JZ); // value1 == value2
+                /** GT */
+                os.writeINC(gpr1);
+                os.writeJMP(endLabel);
+                /** LT */
+                os.setObjectRef(ltLabel);
+                os.writeDEC(gpr1);
+                os.setObjectRef(endLabel);
+                break;
+            }
             case LADD:
             case LAND:
             case LDIV:
@@ -1768,7 +1863,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -1898,7 +1993,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
                 os.writePUSH((GPR) reg3);
@@ -1954,7 +2049,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -2060,7 +2155,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
                 os.writeFLD32(X86Register.EBP, disp2);
@@ -2116,7 +2211,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -2237,7 +2332,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
                 os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
@@ -2293,7 +2388,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -2399,7 +2494,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
                 os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst2.getValue());
@@ -2450,7 +2545,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -2541,7 +2636,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
@@ -2597,7 +2692,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -2715,7 +2810,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
@@ -2771,7 +2866,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -2874,7 +2969,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
@@ -2925,19 +3020,18 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
-    public void generateBinaryOP(int disp1, int disp2, BinaryOperation operation, Constant<T> c3) {
-        IntConstant<T> iconst3 = (IntConstant<T>) c3;
+    public void generateBinaryOP(BinaryQuad<T> quad, int disp1, int disp2, BinaryOperation operation, Constant<T> c3) {
         switch (operation) {
             case IADD: // not supported due to the move bellow
                 if (disp1 != disp2) {
                     os.writePUSH(X86Register.EBP, disp2);
                     os.writePOP(X86Register.EBP, disp1);
                 }
-                os.writeADD(BITS32, X86Register.EBP, disp1, iconst3.getValue());
+                os.writeADD(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case IAND:
@@ -2945,13 +3039,13 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePUSH(X86Register.EBP, disp2);
                     os.writePOP(X86Register.EBP, disp1);
                 }
-                os.writeAND(BITS32, X86Register.EBP, disp1, iconst3.getValue());
+                os.writeAND(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case IDIV: // needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
-                os.writePUSH(iconst3.getValue());
+                os.writePUSH(((IntConstant<T>) c3).getValue());
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
@@ -2963,7 +3057,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 
             case IMUL:
                 os.writePUSH(SR1);
-                os.writeIMUL_3(SR1, X86Register.EBP, disp2, iconst3.getValue());
+                os.writeIMUL_3(SR1, X86Register.EBP, disp2, ((IntConstant<T>) c3).getValue());
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, SR1);
                 os.writePOP(SR1);
                 break;
@@ -2973,13 +3067,13 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePUSH(X86Register.EBP, disp2);
                     os.writePOP(X86Register.EBP, disp1);
                 }
-                os.writeOR(BITS32, X86Register.EBP, disp1, iconst3.getValue());
+                os.writeOR(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case IREM: // needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
-                os.writePUSH(iconst3.getValue());
+                os.writePUSH(((IntConstant<T>) c3).getValue());
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
                 os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
@@ -2994,7 +3088,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePUSH(X86Register.EBP, disp2);
                     os.writePOP(X86Register.EBP, disp1);
                 }
-                os.writeSAL(BITS32, X86Register.EBP, disp1, iconst3.getValue());
+                os.writeSAL(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case ISHR: // needs CL
@@ -3002,7 +3096,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePUSH(X86Register.EBP, disp2);
                     os.writePOP(X86Register.EBP, disp1);
                 }
-                os.writeSAR(BITS32, X86Register.EBP, disp1, iconst3.getValue());
+                os.writeSAR(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case ISUB: // not supported
@@ -3010,7 +3104,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePUSH(X86Register.EBP, disp2);
                     os.writePOP(X86Register.EBP, disp1);
                 }
-                os.writeSUB(BITS32, X86Register.EBP, disp1, iconst3.getValue());
+                os.writeSUB(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case IUSHR: // needs CL
@@ -3018,7 +3112,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePUSH(X86Register.EBP, disp2);
                     os.writePOP(X86Register.EBP, disp1);
                 }
-                os.writeSHR(BITS32, X86Register.EBP, disp1, iconst3.getValue());
+                os.writeSHR(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case IXOR: // not supported
@@ -3026,7 +3120,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                     os.writePUSH(X86Register.EBP, disp2);
                     os.writePOP(X86Register.EBP, disp1);
                 }
-                os.writeXOR(BITS32, X86Register.EBP, disp1, iconst3.getValue());
+                os.writeXOR(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c3).getValue());
                 break;
 
             case DADD:
@@ -3034,31 +3128,31 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c3).getValue());
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFADD32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FDIV:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c3).getValue());
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFDIV32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FMUL:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c3).getValue());
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFMUL32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case FREM:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c3).getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFPREM();
@@ -3067,12 +3161,47 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case FSUB:
-                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, iconst3.getValue());
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, ((IntConstant<T>) c3).getValue());
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFSUB32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
+            case LCMP: {
+                final Label curInstrLabel = getInstrLabel(quad.getAddress());
+                final Label ltLabel = new Label(curInstrLabel + "lt");
+                final Label endLabel = new Label(curInstrLabel + "end");
+
+                // Calculate
+                if (os.isCode32()) {
+                    long value = ((LongConstant<T>) c3).getValue();
+                    final int v_lsb = (int) (value & 0xFFFFFFFFL);
+                    final int v_msb = (int) ((value >>> 32) & 0xFFFFFFFFL);
+                    int disp2lsb = disp2 - stackFrame.getHelper().SLOTSIZE;
+                    int disp2msb = disp2;
+                    os.writeSUB(BITS32, X86Register.EBP, disp2lsb, v_lsb);
+                    os.writeSBB(BITS32, X86Register.EBP, disp2msb, v_msb);
+                    os.writeJCC(ltLabel, X86Constants.JL); // JL
+                    os.writeMOV(BITS32, SR1, X86Register.EBP, disp2lsb);
+                    os.writeOR(SR1, X86Register.EBP, disp2msb);
+                }
+//                else {
+//                    final GPR64 v2r = v2.getRegister(eContext);
+//                    final GPR64 v1r = v1.getRegister(eContext);
+//                    os.writeCMP(v1r, v2r);
+//                    os.writeJCC(ltLabel, X86Constants.JL); // JL
+//                }
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, 0);
+                os.writeJCC(endLabel, X86Constants.JZ); // value1 == value2
+                /** GT */
+                os.writeINC(BITS32, X86Register.EBP, disp1);
+                os.writeJMP(endLabel);
+                /** LT */
+                os.setObjectRef(ltLabel);
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, -1);
+                os.setObjectRef(endLabel);
+                break;
+            }
             case LADD:
             case LAND:
             case LDIV:
@@ -3085,7 +3214,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -3223,7 +3352,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case DMUL:
             case DREM:
             case DSUB:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
 
             case FADD:
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
@@ -3274,11 +3403,11 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
-    public void generateBinaryOP(int disp1, int disp2, BinaryOperation operation, int disp3) {
+    public void generateBinaryOP(BinaryQuad<T> quad, int disp1, int disp2, BinaryOperation operation, int disp3) {
         switch (operation) {
             case IADD:
                 os.writePUSH(SR1);
@@ -3447,7 +3576,57 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
-            case LADD:
+            case LCMP: {
+                final Label curInstrLabel = getInstrLabel(quad.getAddress());
+                final Label ltLabel = new Label(curInstrLabel + "lt");
+                final Label endLabel = new Label(curInstrLabel + "end");
+
+                // Calculate
+                if (os.isCode32()) {
+                    int disp3lsb = disp3 - stackFrame.getHelper().SLOTSIZE;
+                    int disp3msb = disp3;
+                    int disp2lsb = disp2 - stackFrame.getHelper().SLOTSIZE;
+                    int disp2msb = disp2;
+                    os.writeMOV(BITS32, SR1, X86Register.EBP, disp2lsb);
+                    os.writeSUB(SR1, X86Register.EBP, disp3lsb);
+                    os.writeMOV(BITS32, X86Register.EBP, disp2lsb, SR1);
+                    os.writeMOV(BITS32, SR1, X86Register.EBP, disp2msb);
+                    os.writeSBB(SR1, X86Register.EBP, disp3msb);
+                    os.writeJCC(ltLabel, X86Constants.JL); // JL
+                    os.writeOR(X86Register.EBP, disp2lsb, SR1);
+                }
+//                else {
+//                    final GPR64 v2r = v2.getRegister(eContext);
+//                    final GPR64 v1r = v1.getRegister(eContext);
+//                    os.writeCMP(v1r, v2r);
+//                    os.writeJCC(ltLabel, X86Constants.JL); // JL
+//                }
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, 0);
+                os.writeJCC(endLabel, X86Constants.JZ); // value1 == value2
+                /** GT */
+                os.writeINC(BITS32, X86Register.EBP, disp1);
+                os.writeJMP(endLabel);
+                /** LT */
+                os.setObjectRef(ltLabel);
+                os.writeMOV_Const(BITS32, X86Register.EBP, disp1, -1);
+                os.setObjectRef(endLabel);
+                break;
+            }
+            case LADD: {
+                int disp3lsb = disp3 - stackFrame.getHelper().SLOTSIZE;
+                int disp3msb = disp3;
+                int disp2lsb = disp2 - stackFrame.getHelper().SLOTSIZE;
+                int disp2msb = disp2;
+                int disp1lsb = disp2 - stackFrame.getHelper().SLOTSIZE;
+                int disp1msb = disp2;
+                os.writeMOV(BITS32, SR1, X86Register.EBP, disp2lsb);
+                os.writeADD(SR1, X86Register.EBP, disp3lsb);
+                os.writeMOV(BITS32, X86Register.EBP, disp1lsb, SR1);
+                os.writeMOV(BITS32, SR1, X86Register.EBP, disp2msb);
+                os.writeADC(SR1, X86Register.EBP, disp3msb);
+                os.writeMOV(BITS32, X86Register.EBP, disp1msb, SR1);
+                break;
+            }
             case LAND:
             case LDIV:
             case LMUL:
@@ -3455,11 +3634,25 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             case LREM:
             case LSHL:
             case LSHR:
+                throw new IllegalArgumentException("Unknown operation: " + operation);
             case LSUB:
+                int disp3lsb = disp3 - stackFrame.getHelper().SLOTSIZE;
+                int disp3msb = disp3;
+                int disp2lsb = disp2 - stackFrame.getHelper().SLOTSIZE;
+                int disp2msb = disp2;
+                int disp1lsb = disp2 - stackFrame.getHelper().SLOTSIZE;
+                int disp1msb = disp2;
+                os.writeMOV(BITS32, SR1, X86Register.EBP, disp2lsb);
+                os.writeSUB(SR1, X86Register.EBP, disp3lsb);
+                os.writeMOV(BITS32, X86Register.EBP, disp1lsb, SR1);
+                os.writeMOV(BITS32, SR1, X86Register.EBP, disp2msb);
+                os.writeSBB(SR1, X86Register.EBP, disp3msb);
+                os.writeMOV(BITS32, X86Register.EBP, disp1msb, SR1);
+                break;
             case LUSHR:
             case LXOR:
             default:
-                throw new IllegalArgumentException("Unknown operation");
+                throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
 
@@ -3843,13 +4036,30 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             }
         } else if (quad.getInd().getAddressingMode() == REGISTER) {
             GPR indr = (GPR) ((RegisterLocation) ((Variable) ind).getLocation()).getRegister();
-            GPR resultr = (GPR) ((RegisterLocation) lhs.getLocation()).getRegister();
-            if (ref.getAddressingMode() == REGISTER) {
-                GPR refr = (GPR) ((RegisterLocation) ref.getLocation()).getRegister();
-                os.writeMOV(BITS32, resultr, refr, indr, scale,  arrayDataOffset);
-            } else if (ref.getAddressingMode() == STACK) {
-                os.writeMOV(BITS32, SR1, X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
-                os.writeMOV(BITS32, resultr, SR1, indr, scale,  arrayDataOffset);
+            if (lhs.getAddressingMode() == REGISTER) {
+                GPR resultr = (GPR) ((RegisterLocation) lhs.getLocation()).getRegister();
+                if (ref.getAddressingMode() == REGISTER) {
+                    GPR refr = (GPR) ((RegisterLocation) ref.getLocation()).getRegister();
+                    os.writeMOV(BITS32, resultr, refr, indr, scale,  arrayDataOffset);
+                } else if (ref.getAddressingMode() == STACK) {
+                    os.writeMOV(BITS32, SR1, X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
+                    os.writeMOV(BITS32, resultr, SR1, indr, scale,  arrayDataOffset);
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if (lhs.getAddressingMode() == STACK) {
+                int rdisp = ((StackLocation) lhs.getLocation()).getDisplacement();
+                if (ref.getAddressingMode() == REGISTER) {
+                    GPR refr = (GPR) ((RegisterLocation) ref.getLocation()).getRegister();
+                    os.writeMOV(BITS32, SR1, refr, indr, scale,  arrayDataOffset);
+                    os.writeMOV(BITS32, X86Register.EBP, rdisp, SR1);
+                } else if (ref.getAddressingMode() == STACK) {
+                    os.writeMOV(BITS32, SR1, X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
+                    os.writePUSH(SR1, indr, scale, arrayDataOffset);
+                    os.writePOP(X86Register.EBP, rdisp);
+                } else {
+                    throw new IllegalArgumentException();
+                }
             } else {
                 throw new IllegalArgumentException();
             }
@@ -3862,21 +4072,44 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             //os.writeMOV(BITS32, resultr, refr, indr, scale, arrayDataOffset);
         } else if (quad.getInd().getAddressingMode() == STACK) {
             int indDisp = ((StackLocation) ((Variable) ind).getLocation()).getDisplacement();
-            GPR resultr = (GPR) ((RegisterLocation) lhs.getLocation()).getRegister();
-            if (ref.getAddressingMode() == REGISTER) {
-                os.writeMOV(BITS32, SR1, X86Register.EBP, indDisp);
-                GPR refr = (GPR) ((RegisterLocation) ref.getLocation()).getRegister();
-                os.writeMOV(BITS32, resultr, refr, SR1, scale,  arrayDataOffset);
-            } else if (ref.getAddressingMode() == STACK) {
-                os.writeMOV(BITS32, SR1, X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
-                GPR sr2 = (resultr == X86Register.EDX) ? X86Register.EBX : X86Register.EDX;
-                os.writePUSH(sr2);
-                os.writeMOV(BITS32, sr2, X86Register.EBP, indDisp);
-                os.writeMOV(BITS32, resultr, SR1, sr2, scale,  arrayDataOffset);
-                os.writePOP(sr2);
+            if (lhs.getAddressingMode() == REGISTER) {
+                GPR resultr = (GPR) ((RegisterLocation) lhs.getLocation()).getRegister();
+                if (ref.getAddressingMode() == REGISTER) {
+                    os.writeMOV(BITS32, SR1, X86Register.EBP, indDisp);
+                    GPR refr = (GPR) ((RegisterLocation) ref.getLocation()).getRegister();
+                    os.writeMOV(BITS32, resultr, refr, SR1, scale,  arrayDataOffset);
+                } else if (ref.getAddressingMode() == STACK) {
+                    os.writeMOV(BITS32, SR1, X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
+                    GPR sr2 = (resultr == X86Register.EDX) ? X86Register.EBX : X86Register.EDX;
+                    os.writePUSH(sr2);
+                    os.writeMOV(BITS32, sr2, X86Register.EBP, indDisp);
+                    os.writeMOV(BITS32, resultr, SR1, sr2, scale,  arrayDataOffset);
+                    os.writePOP(sr2);
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if (lhs.getAddressingMode() == STACK) {
+                int rdisp = ((StackLocation) lhs.getLocation()).getDisplacement();
+                if (ref.getAddressingMode() == REGISTER) {
+                    os.writeMOV(BITS32, SR1, X86Register.EBP, indDisp);
+                    GPR refr = (GPR) ((RegisterLocation) ref.getLocation()).getRegister();
+                    os.writePUSH(refr, SR1, scale,  arrayDataOffset);
+                    os.writePOP(X86Register.EBP, rdisp);
+                } else if (ref.getAddressingMode() == STACK) {
+                    os.writeMOV(BITS32, SR1, X86Register.EBP, ((StackLocation) ref.getLocation()).getDisplacement());
+                    GPR sr2 = (SR1 == X86Register.EDX) ? X86Register.EBX : X86Register.EDX;
+                    os.writePUSH(sr2);
+                    os.writeMOV(BITS32, sr2, X86Register.EBP, indDisp);
+                    os.writePUSH(SR1, sr2, scale,  arrayDataOffset);
+                    os.writePOP(X86Register.EBP, rdisp);
+                    os.writePOP(sr2);
+                } else {
+                    throw new IllegalArgumentException();
+                }
             } else {
                 throw new IllegalArgumentException();
             }
+
 //            if (os.isCode64()) {
 //                final GPR64 idxr64 = (GPR64) eContext.getGPRPool().getRegisterInSameGroup(idxr, JvmType.LONG);
 //                os.writeMOVSXD(idxr64, (GPR32) idxr);
@@ -5494,7 +5727,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
 
     private void writeParameters(Quad quad) {
         Operand<T>[] referencedOps = quad.getReferencedOps();
-        for (int i = referencedOps.length; i-- > 0; ) {
+        for (int i = 0; i < referencedOps.length; i++) {
             Operand operand = referencedOps[i];
             if (operand.getAddressingMode() == CONSTANT) {
                 //todo handle other types
@@ -5506,6 +5739,9 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
             } else if (operand.getAddressingMode() == STACK) {
                 int disp = ((StackLocation) ((Variable) operand).getLocation()).getDisplacement();
                 os.writePUSH(GPR.EBP, disp);
+                if (operand.getType() == Operand.LONG) {
+                    os.writePUSH(GPR.EBP, disp - stackFrame.getHelper().SLOTSIZE);
+                }
             } else {
                 throw new IllegalArgumentException();
             }

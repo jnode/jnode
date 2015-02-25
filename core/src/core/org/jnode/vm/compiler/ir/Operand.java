@@ -64,6 +64,14 @@ public abstract class Operand<T> {
         this.type = type;
     }
 
+    /**
+     * @param type
+     */
+    public void setTypeFromJvmType(int type) {
+        //operand type and JVM type are the same
+        this.type = type;
+    }
+
     public abstract Operand<T> simplify();
 
     /**

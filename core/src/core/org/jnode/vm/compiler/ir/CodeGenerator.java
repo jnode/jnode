@@ -24,6 +24,7 @@ import org.jnode.vm.compiler.ir.quad.ArrayAssignQuad;
 import org.jnode.vm.compiler.ir.quad.ArrayLengthAssignQuad;
 import org.jnode.vm.compiler.ir.quad.ArrayStoreQuad;
 import org.jnode.vm.compiler.ir.quad.BinaryOperation;
+import org.jnode.vm.compiler.ir.quad.BinaryQuad;
 import org.jnode.vm.compiler.ir.quad.BranchCondition;
 import org.jnode.vm.compiler.ir.quad.CheckcastQuad;
 import org.jnode.vm.compiler.ir.quad.ConditionalBranchQuad;
@@ -237,12 +238,13 @@ public abstract class CodeGenerator<T> {
                                           BinaryOperation operation, int disp3);
 
     /**
+     * @param quad
      * @param reg1
      * @param disp2
      * @param operation
      * @param c3
      */
-    public abstract void generateBinaryOP(T reg1, int disp2,
+    public abstract void generateBinaryOP(BinaryQuad<T> quad, T reg1, int disp2,
                                           BinaryOperation operation, Constant<T> c3);
 
     /**
@@ -323,7 +325,7 @@ public abstract class CodeGenerator<T> {
      * @param operation
      * @param c3
      */
-    public abstract void generateBinaryOP(int disp1, int disp2,
+    public abstract void generateBinaryOP(BinaryQuad<T> quad, int disp1, int disp2,
                                           BinaryOperation operation, Constant<T> c3);
 
     /**
@@ -336,12 +338,13 @@ public abstract class CodeGenerator<T> {
                                           BinaryOperation operation, T reg3);
 
     /**
+     * @param quad
      * @param disp1
      * @param disp2
      * @param operation
      * @param disp3
      */
-    public abstract void generateBinaryOP(int disp1, int disp2,
+    public abstract void generateBinaryOP(BinaryQuad<T> quad, int disp1, int disp2,
                                           BinaryOperation operation, int disp3);
 
     /**

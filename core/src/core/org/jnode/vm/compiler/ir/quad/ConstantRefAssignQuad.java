@@ -44,6 +44,17 @@ public class ConstantRefAssignQuad<T> extends AssignQuad<T> {
     }
 
     /**
+     * @param address
+     * @param block
+     * @param lhs
+     */
+    public ConstantRefAssignQuad(int address, IRBasicBlock<T> block, Variable<T> lhs,
+                                 Constant<T> rhs) {
+        super(address, block, lhs);
+        this.rhs = rhs;
+    }
+
+    /**
      * @see org.jnode.vm.compiler.ir.quad.Quad#getReferencedOps()
      */
     public Operand<T>[] getReferencedOps() {

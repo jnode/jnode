@@ -33,9 +33,9 @@ public abstract class InstanceCallQuad<T> extends CallQuad<T> {
 
     @Override
     public String toString() {
-        String s = getAddress() + ": " + refs[refs.length - 1] + "." + methodRef.getName() + '(';
-        for (int i = refs.length - 2; i >= 0; i--) {
-            if (i < refs.length - 2) {
+        String s = getAddress() + ": " + refs[0] + "." + methodRef.getName() + '(';
+        for (int i = 1; i < refs.length; i++) {
+            if (i < refs.length - 1) {
                 s += ", ";
             }
             s += refs[i];

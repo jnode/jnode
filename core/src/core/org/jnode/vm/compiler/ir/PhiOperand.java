@@ -50,9 +50,11 @@ public class PhiOperand<T> extends Operand<T> {
             setType(source.getType());
             Variable<T> v = source;
             varIndex = v.getIndex();
-        } else if (type != source.getType()) {
-            throw new AssertionError("phi operand source types don't match");
         }
+        //todo investigate this case
+//        else if (type != source.getType()) {
+//            throw new AssertionError("phi operand source types don't match");
+//        }
     }
 
     public String toString() {

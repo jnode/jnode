@@ -99,6 +99,12 @@ public class LinearScanAllocator<T> {
      * @param lr
      */
     private void spillRange(LiveRange<T> lr) {
+        if (active.isEmpty() || lr.getVariable().getType() == Operand.LONG ||
+            lr.getVariable().getType() == Operand.DOUBLE) {
+            lr.setLocation(new StackLocation<T>());
+            this.spilledVariableList.add(lr.getVariable());
+            return;
+        }
         LiveRange<T> spill = active.get(active.size() - 1);
         if (spill.getLastUseAddress() > lr.getLastUseAddress()) {
             lr.setLocation(spill.getLocation());

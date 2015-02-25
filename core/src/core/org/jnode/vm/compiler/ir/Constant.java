@@ -279,6 +279,12 @@ public abstract class Constant<T> extends Operand<T> {
         return new LongConstant<T>(l1 >>> l2);
     }
 
+    public Constant<T> lCmp(Constant<T> c2) {
+        long l1 = ((LongConstant<T>) this).getValue();
+        long l2 = ((LongConstant<T>) c2).getValue();
+        return new IntConstant<T>(l1 < l2 ? -1 : l1 > l2 ? 1 : 0);
+    }
+
     public Constant<T> fAdd(Constant<T> c2) {
         float f1 = ((FloatConstant<T>) this).getValue();
         float f2 = ((FloatConstant<T>) c2).getValue();
