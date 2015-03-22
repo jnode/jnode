@@ -691,7 +691,10 @@ public class FileRecord extends NTFSRecord {
 
                     attribute = holdingRecord.findStoredAttributeByID(entry.getAttributeID());
 
-                    if (!attribute.isResident() && attribute.isCompressedAttribute() &&
+                    if (attribute == null) {
+                        log.error(String.format("Failed to find an attribute matching entry '%s' in the holding record", entry));
+                        continue;
+                    } else if (!attribute.isResident() && attribute.isCompressedAttribute() &&
                         compressedByType.containsKey(attribute.getAttributeType())) {
 
                         // Get the fallback compression unit
