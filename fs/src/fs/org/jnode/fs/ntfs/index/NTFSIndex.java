@@ -23,7 +23,6 @@ package org.jnode.fs.ntfs.index;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
 import org.apache.log4j.Logger;
 import org.jnode.fs.ntfs.FileRecord;
 import org.jnode.fs.ntfs.attribute.NTFSAttribute;
@@ -134,8 +133,7 @@ public final class NTFSIndex {
             IndexRoot indexRoot = getIndexRootAttribute().getRoot();
             indexBlock = getIndexAllocationAttribute().getIndexBlock(indexRoot, topEntry.getSubnodeVCN());
         } catch (IOException ex) {
-            log.error("Cannot read next index block during search", ex);
-            return null;
+            throw new IllegalStateException("Cannot read next index block during search", ex);
         }
 
         Iterator<IndexEntry> iterator = indexBlock.iterator();
