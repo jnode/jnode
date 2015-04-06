@@ -95,8 +95,7 @@ public class BootFloppyBuilder extends Task {
             newFd.setLength(getDeviceLength());
             formatDevice(newFd);
             final Device sysDev = getSystemDevice(newFd);
-            final BlockDeviceAPI sysDevApi = sysDev
-                .getAPI(BlockDeviceAPI.class);
+            final BlockDeviceAPI sysDevApi = sysDev.getAPI(BlockDeviceAPI.class);
             copySystemFiles(sysDev);
             sysDevApi.flush();
         } catch (ApiNotFoundException ex) {

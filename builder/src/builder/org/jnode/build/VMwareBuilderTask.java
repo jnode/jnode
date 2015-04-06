@@ -173,17 +173,14 @@ public class VMwareBuilderTask extends Task {
                     }
                     Matcher matcher = propertyPattern.matcher(line);
                     if (!matcher.find()) {
-                        throw new BuildException(
-                                "Cannot parse this VMX override: '" + line + "'");
+                        throw new BuildException("Cannot parse this VMX override: '" + line + "'");
                     }
                     props.put(matcher.group(1), matcher.group(2));
                 }
             } catch (FileNotFoundException ex) {
-                throw new BuildException(
-                        "Cannot open the VMX override file: " + overrideFile, ex);
+                throw new BuildException("Cannot open the VMX override file: " + overrideFile, ex);
             } catch (IOException ex) {
-                throw new BuildException(
-                        "Problem reading the VMX override file: " + overrideFile, ex);
+                throw new BuildException("Problem reading the VMX override file: " + overrideFile, ex);
             } finally {
                 if (br != null) {
                     try {
@@ -246,8 +243,7 @@ public class VMwareBuilderTask extends Task {
                     os.write(buffer);
                     os.flush();
                 } catch (IOException ex) {
-                    throw new BuildException("Cannot copy the saved 'JNode.nvram' file: " +
-                            ex.getMessage());
+                    throw new BuildException("Cannot copy the saved 'JNode.nvram' file: " + ex.getMessage());
                 } finally {
                     if (is != null) {
                         try {
@@ -294,8 +290,7 @@ public class VMwareBuilderTask extends Task {
         props.put("MemTrimRate", "-1");  
 
         final String osName = System.getProperty("os.name").toLowerCase(); 
-        if (osName.contains("linux") || osName.contains("unix") || 
-                osName.contains("bsd")) {
+        if (osName.contains("linux") || osName.contains("unix") || osName.contains("bsd")) {
             props.put("ethernet0.connectionType", "bridged");
             props.put("ethernet0.vnet", "/dev/vmnet1");
         }

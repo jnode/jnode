@@ -148,8 +148,8 @@ public abstract class AbstractPluginTask extends Task {
         if (libAlias == null) {
             f = new File(srcDir, lib.getName());
             if (!f.exists()) {
-                throw new BuildException(
-                    "file not found " + f.getAbsoluteFile() + " because " + lib.getName() + " has no alias");
+                throw new BuildException("file not found " + f.getAbsoluteFile() + " because " + lib.getName()
+                    + " has no alias");
             }
         } else {
             f = libAlias.getAlias();

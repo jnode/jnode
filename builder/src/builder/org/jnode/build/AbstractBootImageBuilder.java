@@ -113,8 +113,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
     protected static final Label initialStack = new Label("$$initialStack");
 
-    protected static final Label initialStackPtr = new Label(
-        "$$initialStackPtr");
+    protected static final Label initialStackPtr = new Label("$$initialStackPtr");
 
     private static final String zero8 = "00000000";
 
@@ -239,33 +238,28 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                     final int mcnt;
                     final int startLength = os.getLength();
                     if (compHigh) {
-                        log("Full Compile " + vmClass.getName(),
-                            Project.MSG_VERBOSE);
+                        log("Full Compile " + vmClass.getName(), Project.MSG_VERBOSE);
                         mcnt = vmClass.compileBootstrap(compiler, os, optLevel);
                         totalHighMethods += mcnt;
                         totalHighMethodSize += (os.getLength() - startLength);
                     } else {
-                        log("Min. Compile " + vmClass.getName(),
-                            Project.MSG_VERBOSE);
+                        log("Min. Compile " + vmClass.getName(), Project.MSG_VERBOSE);
                         mcnt = vmClass.compileBootstrap(compilers[0], os, 0);
                         totalLowMethods += mcnt;
                         totalLowMethodSize += (os.getLength() - startLength);
                     }
                     again |= (mcnt > 0);
                 } catch (Throwable ex) {
-                    throw new BuildException("Compile of " + vmClass.getName()
-                        + " failed", ex);
+                    throw new BuildException("Compile of " + vmClass.getName() + " failed", ex);
                 }
                 if (!vmClass.isCompiled()) {
-                    throw new BuildException(
-                        "Class should have been compiled by now");
+                    throw new BuildException("Class should have been compiled by now");
                 }
 
             }
             newCount = clsMgr.getLoadedClassCount();
             if (false) {
-                log("oldCount " + oldCount + ", newCount " + newCount,
-                    Project.MSG_INFO);
+                log("oldCount " + oldCount + ", newCount " + newCount, Project.MSG_INFO);
             }
         } while ((oldCount != newCount) || again);
         log("End of compileClasses", Project.MSG_VERBOSE);
@@ -326,8 +320,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @return The loaded resource names
      * @throws BuildException
      */
-    protected final Map<String, byte[]> loadSystemResource(PluginRegistryModel piRegistry)
-        throws BuildException {
+    protected final Map<String, byte[]> loadSystemResource(PluginRegistryModel piRegistry) throws BuildException {
 
         final BootableHashMap<String, byte[]> resources = new BootableHashMap<String, byte[]>();
 
@@ -365,7 +358,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @throws BuildException
      */
     protected void compileKernel(NativeStream os, AsmSourceInfo sourceInfo) throws BuildException {
-        // TODO be implemented by Levente
         throw new BuildException("Not implemented");
     }
 
@@ -379,9 +371,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @throws ClassNotFoundException
      * @throws UnresolvedObjectRefException
      */
-    protected abstract void createInitialStack(NativeStream os,
-                                               Label stackLabel, Label stackPtrLabel) throws BuildException,
-        ClassNotFoundException, UnresolvedObjectRefException;
+    protected abstract void createInitialStack(NativeStream os, Label stackLabel, Label stackPtrLabel)
+        throws BuildException, ClassNotFoundException, UnresolvedObjectRefException;
 
     /**
      * Create a platform specific native stream.
@@ -457,8 +448,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             /* Now create the processor */
             final BaseVmArchitecture arch = getArchitecture();
             final NativeStream os = createNativeStream();
-            clsMgr = new VmSystemClassLoader(null/*classesURL*/, arch,
-                new BuildObjectResolver(os, this));
+            clsMgr = new VmSystemClassLoader(null/*classesURL*/, arch, new BuildObjectResolver(os, this));
             blockedObjects.add(clsMgr);
             blockedObjects.add(clsMgr.getSharedStatics());
             blockedObjects.add(clsMgr.getSharedStatics().getTable());
@@ -479,15 +469,13 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             blockedObjects.add(vm);
             blockedObjects.add(VmUtils.getVm().getCompiledMethods());
 
-            final VmProcessor proc = createProcessor(vm, clsMgr.getSharedStatics(),
-                clsMgr.getIsolatedStatics());
+            final VmProcessor proc = createProcessor(vm, clsMgr.getSharedStatics(), clsMgr.getIsolatedStatics());
             log("Building for " + proc.getCPUID());
 
             final Label clInitCaller = new Label("$$clInitCaller");
             VmType<?> systemClasses[] = VmType.initializeForBootImage(clsMgr);
             for (int i = 0; i < systemClasses.length; i++) {
-                clsMgr.addLoadedClass(systemClasses[i].getName(),
-                    systemClasses[i]);
+                clsMgr.addLoadedClass(systemClasses[i].getName(), systemClasses[i]);
             }
 
             // First copy the native kernel file
@@ -541,8 +529,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                     os.getObjectRef(cmp);
                 }
             }
-            log("Compiling using " + cmps[0].getName() + " and "
-                + cmps[cmps.length - 1].getName() + " compilers");
+            log("Compiling using " + cmps[0].getName() + " and " + cmps[cmps.length - 1].getName() + " compilers");
             // Initialize the IMT compiler.
             arch.getIMTCompiler().initialize(clsMgr);
 
@@ -603,16 +590,14 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             // Verify no methods have been compiled after we wrote the
             // CompiledCodeList.
             if (VmUtils.getVm().getCompiledMethods().size() != compiledMethods) {
-                throw new BuildException(
-                    "Method have been compiled after CompiledCodeList was written.");
+                throw new BuildException("Method have been compiled after CompiledCodeList was written.");
             }
 
             /* Write static initializer code */
             emitStaticInitializerCalls(os, bootClasses, clInitCaller);
 
             // This is the end of the image
-            X86BinaryAssembler.ObjectInfo dummyObjectAtEnd =
-                os.startObject(loadClass(VmMethodCode.class));
+            X86BinaryAssembler.ObjectInfo dummyObjectAtEnd = os.startObject(loadClass(VmMethodCode.class));
             pageAlign(os);
             dummyObjectAtEnd.markEnd();
             os.setObjectRef(imageEnd);
@@ -638,8 +623,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             final int bootHeapSize = os.getObjectRef(bootHeapEnd).getOffset()
                 - os.getObjectRef(bootHeapStart).getOffset();
             final int bootHeapBitmapSize = (bootHeapSize / ObjectLayout.OBJECT_ALIGN) >> 3;
-            log("Boot heap size " + (bootHeapSize >>> 10) + "K bitmap size "
-                + (bootHeapBitmapSize >>> 10) + "K");
+            log("Boot heap size " + (bootHeapSize >>> 10) + "K bitmap size " + (bootHeapBitmapSize >>> 10) + "K");
             log("Shared statics");
             PrintWriter out = new PrintWriter(new OutputStreamWriter(System.out));
             clsMgr.getSharedStatics().dumpStatistics(out);
@@ -652,12 +636,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             BytecodeParser.dumpStatistics();
 
             log("Optimized methods     : " + totalHighMethods + ", avg size "
-                + (totalHighMethodSize / totalHighMethods) + ", tot size "
-                + totalHighMethodSize);
-            log("Ondemand comp. methods: " + totalLowMethods + ", avg size "
-                + (totalLowMethodSize / totalLowMethods) + ", tot size "
-                + totalLowMethodSize);
-
+                + (totalHighMethodSize / totalHighMethods) + ", tot size " + totalHighMethodSize);
+            log("Ondemand comp. methods: " + totalLowMethods + ", avg size " + (totalLowMethodSize / totalLowMethods)
+                + ", tot size " + totalLowMethodSize);
             log("Done.");
 
             os.clear();
@@ -687,8 +668,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             if (debug) {
                 debugOut = new PrintWriter(new FileWriter(debugFile, true));
             }
-            final ObjectEmitter emitter = new ObjectEmitter(clsMgr, os,
-                debugOut, legalInstanceClasses);
+            final ObjectEmitter emitter = new ObjectEmitter(clsMgr, os, debugOut, legalInstanceClasses);
             final long start = System.currentTimeMillis();
             int cnt = 0;
             int lastUnresolved = -1;
@@ -697,11 +677,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 loops++;
                 compileClasses(os, arch);
                 if (!skipCopyStatics) {
-                    copyStaticFields(clsMgr, clsMgr.getSharedStatics(), clsMgr
-                        .getIsolatedStatics(), os, emitter);
+                    copyStaticFields(clsMgr, clsMgr.getSharedStatics(), clsMgr.getIsolatedStatics(), os, emitter);
                 }
-                final Collection<ObjectRef> objectRefs = new ArrayList<ObjectRef>(
-                    os.getObjectRefs());
+                final Collection<ObjectRef> objectRefs = new ArrayList<ObjectRef>(os.getObjectRefs());
                 int unresolvedFound = 0; // Number of unresolved references
                 // found in the following
                 // loop
@@ -709,8 +687,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 // following
                 // loop
                 for (Iterator<ObjectRef> i = objectRefs.iterator(); i.hasNext();) {
-                    X86BinaryAssembler.ObjectRef ref = i
-                        .next();
+                    X86BinaryAssembler.ObjectRef ref = i.next();
                     if (!ref.isResolved()) {
                         final Object obj = ref.getObject();
                         if (!(obj instanceof Label)) {
@@ -747,11 +724,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                                 // if (obj != skipMe) {
                                 emitter.emitObject(obj);
                                 emitted++;
-                                X86BinaryAssembler.ObjectRef newRef = os
-                                    .getObjectRef(obj);
+                                X86BinaryAssembler.ObjectRef newRef = os.getObjectRef(obj);
                                 if (ref != newRef) {
-                                    throw new RuntimeException(
-                                        "Object has changed during emitObject! type="
+                                    throw new RuntimeException("Object has changed during emitObject! type="
                                             + obj.getClass().getName());
                                 }
                                 if (!ref.isResolved()) {
@@ -782,8 +757,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 cnt += emitted;
             }
             final long end = System.currentTimeMillis();
-            log("Emitted " + cnt + " objects, took " + (end - start) + "ms in "
-                + loops + " loops");
+            log("Emitted " + cnt + " objects, took " + (end - start) + "ms in " + loops + " loops");
             if (debugOut != null) {
                 debugOut.close();
                 debugOut = null;
@@ -798,8 +772,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         }
     }
 
-    protected abstract void emitStaticInitializerCalls(NativeStream os,
-                                                       VmType<?>[] bootClasses, Object clInitCaller)
+    protected abstract void emitStaticInitializerCalls(NativeStream os, VmType<?>[] bootClasses, Object clInitCaller)
         throws ClassNotFoundException;
 
     public final void execute() throws BuildException {
@@ -984,8 +957,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @param pluginRegistry
      * @throws BuildException
      */
-    protected abstract void initImageHeader(NativeStream os,
-                                            Label clInitCaller, Vm vm, PluginRegistry pluginRegistry)
+    protected abstract void initImageHeader(NativeStream os, Label clInitCaller, Vm vm, PluginRegistry pluginRegistry)
         throws BuildException;
 
     /**
@@ -1029,8 +1001,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @throws ClassNotFoundException
      * @throws UnresolvedObjectRefException
      */
-    protected abstract void linkNativeSymbols(NativeStream os)
-        throws ClassNotFoundException, UnresolvedObjectRefException;
+    protected abstract void linkNativeSymbols(NativeStream os) throws ClassNotFoundException,
+        UnresolvedObjectRefException;
 
     /**
      * Load a VmClass for a given java.lang.Class.
@@ -1062,8 +1034,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             } else if ("double".equals(name)) {
                 cls = VmType.getPrimitiveClass('D');
             } else {
-                throw new ClassNotFoundException(name
-                    + " is not a primitive type");
+                throw new ClassNotFoundException(name + " is not a primitive type");
             }
             clsMgr.addLoadedClass(name, cls);
             return cls;
@@ -1079,8 +1050,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @return The loaded class
      * @throws ClassNotFoundException
      */
-    public final VmType<?> loadClass(String name)
-        throws ClassNotFoundException {
+    public final VmType<?> loadClass(String name) throws ClassNotFoundException {
         return loadClass(name, true);
     }
 
@@ -1092,8 +1062,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @return The loaded class
      * @throws ClassNotFoundException
      */
-    public final VmType<?> loadClass(String name, boolean resolve)
-        throws ClassNotFoundException {
+    public final VmType<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         /*
          * if (clsMgr == null) { clsMgr = new VmClassLoader(classesURL);
          */
@@ -1107,12 +1076,10 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         ClassNotFoundException {
         for (String eName : new ArrayList<String>(resourceNames)) {
             if (eName.endsWith(".class")) {
-                final String cName = eName.substring(0,
-                    eName.length() - ".class".length()).replace('/', '.');
+                final String cName = eName.substring(0, eName.length() - ".class".length()).replace('/', '.');
                 final int lastDotIdx = cName.lastIndexOf('.');
                 final String pkg = (lastDotIdx > 0) ? cName.substring(0, lastDotIdx) : "";
-                if (isCompileHighOptLevel(cName) ||
-                    preloadPackages.contains(cName) || preloadPackages.contains(pkg)) {
+                if (isCompileHighOptLevel(cName) || preloadPackages.contains(cName) || preloadPackages.contains(pkg)) {
                     loadClass(cName, true);
                 }
             }
@@ -1146,8 +1113,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @throws BuildException
      * @throws UnresolvedObjectRefException
      */
-    protected final void printLabels(NativeStream os, VmType<?>[] bootClasses,
-                                     VmSharedStatics statics) throws BuildException,
+    protected final void printLabels(NativeStream os, VmType<?>[] bootClasses, VmSharedStatics statics)
+        throws BuildException,
         UnresolvedObjectRefException {
         if (System.getProperty("bootimage.log") == null) {
             return;
@@ -1164,15 +1131,13 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 w.print(": ");
                 w.print(vmClass.getName());
                 if (vmClass instanceof VmClassType) {
-                    final int cnt = ((VmClassType<?>) vmClass)
-                        .getInstanceCount();
+                    final int cnt = ((VmClassType<?>) vmClass).getInstanceCount();
                     if (cnt > 0) {
                         w.print(", ");
                         w.print(cnt);
                         w.print(" instances");
                         if (vmClass instanceof VmNormalClass) {
-                            long objSize = ((VmNormalClass<?>) vmClass)
-                                .getObjectSize();
+                            long objSize = ((VmNormalClass<?>) vmClass).getObjectSize();
                             long totalSize = objSize * cnt;
                             w.print(", ");
                             w.print(objSize);
@@ -1180,26 +1145,21 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                             w.print(totalSize);
                             w.print(" totsize");
                             if (totalSize > 200000) {
-                                log(vmClass.getName() + " is large ("
-                                    + totalSize + " , #" + cnt + ")",
+                                log(vmClass.getName() + " is large (" + totalSize + " , #" + cnt + ")",
                                     Project.MSG_WARN);
                             }
                         }
                     }
                 }
                 if (vmClass.isArray()) {
-                    final long len = ((VmArrayClass<?>) vmClass)
-                        .getTotalLength();
+                    final long len = ((VmArrayClass<?>) vmClass).getTotalLength();
                     if (len > 0) {
                         w.print(", ");
                         w.print(len);
                         w.print(" total length ");
-                        w.print(len
-                            / ((VmArrayClass<?>) vmClass)
-                            .getInstanceCount());
+                        w.print(len / ((VmArrayClass<?>) vmClass).getInstanceCount());
                         w.print(" avg length ");
-                        w.print(((VmArrayClass<?>) vmClass)
-                            .getMaximumLength());
+                        w.print(((VmArrayClass<?>) vmClass).getMaximumLength());
                         w.print(" max length ");
                     }
                 }
@@ -1243,8 +1203,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             }
 
             if (unresolvedCount > 0) {
-                throw new BuildException("There are " + unresolvedCount
-                    + " unresolved labels");
+                throw new BuildException("There are " + unresolvedCount + " unresolved labels");
             } // Print the
             // listing
             // file.
@@ -1256,8 +1215,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 w.print(object);
                 w.print(" (");
                 if (object instanceof VmSystemObject) {
-                    final String info = ((VmSystemObject) object)
-                        .getExtraInfo();
+                    final String info = ((VmSystemObject) object).getExtraInfo();
                     if (info != null) {
                         w.print(info);
                         w.print(", ");
@@ -1450,9 +1408,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         }
     }
 
-    protected void copyStaticFields(VmSystemClassLoader cl,
-                                    VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
-                                    NativeStream os, ObjectEmitter emitter)
+    protected void copyStaticFields(VmSystemClassLoader cl, VmSharedStatics sharedStatics,
+                                    VmIsolatedStatics isolatedStatics, NativeStream os, ObjectEmitter emitter)
         throws ClassNotFoundException {
         for (VmType<?> type : cl.getLoadedClasses()) {
             final String name = type.getName();
@@ -1470,9 +1427,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                             final VmField f = fieldInfo.getJNodeStaticField(k);
                             if (!f.isTransient()) {
                                 try {
-                                    copyStaticField(type, f, jdkField,
-                                        sharedStatics, isolatedStatics, os,
-                                        emitter);
+                                    copyStaticField(type, f, jdkField, sharedStatics, isolatedStatics, os, emitter);
                                 } catch (IllegalAccessException ex) {
                                     throw new BuildException(ex);
                                 }
@@ -1489,9 +1444,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         }
     }
 
-    private void copyStaticField(VmType<?> type, VmField f, Field jf,
-                                 VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
-                                 NativeStream os, ObjectEmitter emitter)
+    private void copyStaticField(VmType<?> type, VmField f, Field jf, VmSharedStatics sharedStatics,
+                                 VmIsolatedStatics isolatedStatics, NativeStream os, ObjectEmitter emitter)
         throws IllegalAccessException, JNodeClassNotFoundException {
         jf.setAccessible(true);
         final Object val = jf.get(null);
@@ -1512,35 +1466,32 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 final long lval;
                 switch (fType) {
                     case JvmType.LONG:
-                        lval = ((Long) val).longValue();
+                        lval = (Long) val;
                         break;
                     case JvmType.DOUBLE:
-                        lval = Double.doubleToRawLongBits(((Double) val)
-                            .doubleValue());
+                        lval = Double.doubleToRawLongBits((Double) val);
                         break;
                     default:
-                        throw new IllegalArgumentException("Unknown wide type "
-                            + fType);
+                        throw new IllegalArgumentException("Unknown wide type " + fType);
                 }
                 statics.setLong(idx, lval);
             } else {
                 final int ival;
                 final Class<?> jfType = jf.getType();
                 if (jfType == boolean.class) {
-                    ival = ((Boolean) val).booleanValue() ? 1 : 0;
+                    ival = (Boolean) val ? 1 : 0;
                 } else if (jfType == byte.class) {
-                    ival = ((Byte) val).byteValue();
+                    ival = (Byte) val;
                 } else if (jfType == char.class) {
-                    ival = ((Character) val).charValue();
+                    ival = (Character) val;
                 } else if (jfType == short.class) {
-                    ival = ((Short) val).shortValue();
+                    ival = (Short) val;
                 } else if (jfType == int.class) {
                     ival = ((Number) val).intValue();
                 } else if (jfType == float.class) {
-                    ival = Float.floatToRawIntBits(((Float) val).floatValue());
+                    ival = Float.floatToRawIntBits((Float) val);
                 } else {
-                    throw new IllegalArgumentException("Unknown wide type "
-                        + fType);
+                    throw new IllegalArgumentException("Unknown wide type " + fType);
                 }
                 statics.setInt(idx, ival);
             }

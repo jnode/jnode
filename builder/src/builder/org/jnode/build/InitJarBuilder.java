@@ -112,8 +112,7 @@ public class InitJarBuilder extends AbstractPluginsTask {
             for (URL url : systemPlugins) {
                 final BuildPluginJar piJar = new BuildPluginJar(url);
                 if (!piJar.getDescriptor().isSystemPlugin()) {
-                    log("Non-system plugin " + piJar.getDescriptor().getId()
-                        + " in plugin-list will be ignored",
+                    log("Non-system plugin " + piJar.getDescriptor().getId() + " in plugin-list will be ignored",
                         Project.MSG_WARN);
                 } else {
                     pluginJars.add(piJar);
@@ -124,8 +123,7 @@ public class InitJarBuilder extends AbstractPluginsTask {
             for (URL url : pluginList) {
                 final BuildPluginJar piJar = new BuildPluginJar(url);
                 if (piJar.getDescriptor().isSystemPlugin()) {
-                    log("System plugin " + piJar.getDescriptor().getId()
-                        + " in plugin-list will be ignored",
+                    log("System plugin " + piJar.getDescriptor().getId() + " in plugin-list will be ignored",
                         Project.MSG_WARN);
                 } else {
                     pluginJars.add(piJar);
@@ -218,21 +216,16 @@ public class InitJarBuilder extends AbstractPluginsTask {
 
                 boolean satisfied = false;
                 if (versions != null) {
-                    satisfied = !versionSpecified || 
-                        versions.contains(required.getPluginReference().getVersion());
+                    satisfied = !versionSpecified ||
+                        versions.contains(required.getPluginReference().getVersion().toString());
                 }
                 
                 if (!satisfied) {
-                    String reqVersionStr =  versionSpecified ? "" : " version " + 
+                    String reqVersionStr =  versionSpecified ? "" : " version " +
                             required.getPluginReference().getVersion();
-                    
-                    String versionStr =  (descr.getVersion()  == null) ? "" : " version " + 
-                            descr.getVersion();
-                    
-                    throw new BuildException("Cannot find plugin "
-                        + required.getPluginReference().getId() + reqVersionStr 
-                        + ", which is required by " + descr.getId() 
-                        + versionStr);
+                    String versionStr =  (descr.getVersion()  == null) ? "" : " version " + descr.getVersion();
+                    throw new BuildException("Cannot find plugin " + required.getPluginReference().getId()
+                        + reqVersionStr + ", which is required by " + descr.getId() + versionStr);
                 }
             }
         }

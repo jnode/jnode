@@ -31,8 +31,8 @@ import java.io.OutputStream;
  */
 public class Disasm {
 
-    private static final String NDISASM = (System.getProperty("os.name")
-        .toLowerCase().indexOf("win") >= 0) ? "ndisasmw" : "ndisasm";
+    private static final String NDISASM = System.getProperty("os.name").toLowerCase().contains("win")
+        ? "ndisasmw" : "ndisasm";
 
     private static final String UDIS86 = "udis86";
 
