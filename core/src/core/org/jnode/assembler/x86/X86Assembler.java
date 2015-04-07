@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 
+import org.jnode.assembler.BootImageNativeStream;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
@@ -42,7 +43,7 @@ import org.jnode.vm.x86.X86CpuID;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
-public abstract class X86Assembler extends NativeStream implements X86Constants {
+public abstract class X86Assembler extends NativeStream implements BootImageNativeStream, X86Constants {
 
     /**
      * Current mode is 32-bit
@@ -116,7 +117,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
     }
 
     /**
-     * Get the length in bytes of valid data
+     * Get the length in bytes of valid data.
      *
      * @return the length of valid data
      */
@@ -140,11 +141,18 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
     public abstract ObjectRef getObjectRef(Object keyObj);
 
     /**
-     * Gets all references of objects as instanceof ObjectRef
+     * Gets all references of objects as instanceof ObjectRef.
      *
      * @return Collection
      */
     public abstract Collection<? extends ObjectRef> getObjectRefs();
+
+    /**
+     * Gets the number of all references of objects.
+     *
+     * @return Collection
+     */
+    public abstract int getObjectRefsCount();
 
     /**
      * @return ObjectResolver
@@ -152,7 +160,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
     public abstract ObjectResolver getResolver();
 
     /**
-     * Gets all unresolved references of objects as instanceof ObjectRef
+     * Gets all unresolved references of objects as instanceof ObjectRef.
      *
      * @return Collection
      */

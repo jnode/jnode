@@ -68,6 +68,34 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
             return true;
         }
 
+
+        @Override
+        public boolean isPublic() {
+            //todo
+            return false;
+        }
+
+        @Override
+        public boolean isRelJump() {
+            //todo
+            return false;
+        }
+
+        @Override
+        public void setPublic() {
+            //todo
+        }
+
+        @Override
+        public void setRelJump() {
+            //todo
+        }
+
+        @Override
+        public void setOffset(int offset) {
+            //todo
+        }
+
         public void addUnresolvedLink(int offset, int patchSize) {
             // TODO Auto-generated method stub
 
@@ -1965,5 +1993,22 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 
     public void writeWRMSR() {
         println("\twrmsr");
+    }
+
+    @Override
+    public void setObjectRef(int offset, Object object) {
+        //todo
+    }
+
+    @Override
+    public int allocate(int size) {
+        //todo
+        return 0;
+    }
+
+    @Override
+    public int getObjectRefsCount() {
+        //todo
+        return 0;
     }
 }

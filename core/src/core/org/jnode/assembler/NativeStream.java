@@ -257,6 +257,16 @@ public abstract class NativeStream {
          */
         public abstract boolean isResolved();
 
+        public abstract boolean isPublic();
+
+        public abstract boolean isRelJump();
+
+        public abstract void setPublic();
+
+        public abstract void setRelJump();
+
+        public abstract void setOffset(int offset);
+
         /**
          * Link this objectref to the given objectref. That is, the offset of this
          * objectref will be set to the offset of the given objectref.

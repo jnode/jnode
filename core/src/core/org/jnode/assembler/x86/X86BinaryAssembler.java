@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import org.jnode.assembler.BootImageNativeStream;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
@@ -58,8 +57,7 @@ import static org.jnode.assembler.x86.X86Register.SS;
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  * @author Patrik Reali (patrik_reali@users.sourceforge.net)
  */
-public class X86BinaryAssembler extends X86Assembler implements X86Constants,
-    BootImageNativeStream, X86Operation {
+public class X86BinaryAssembler extends X86Assembler implements X86Operation {
 
 
     static final class Key {
@@ -591,6 +589,11 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         return objectRefs.values();
     }
 
+    /**
+     * Gets the number of all references of objects.
+     *
+     * @return Collection
+     */
     public final int getObjectRefsCount() {
         if (objectRefs != null) {
             return objectRefs.size();

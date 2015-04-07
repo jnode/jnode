@@ -24,7 +24,7 @@ import java.io.IOException;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
-import org.jnode.assembler.x86.X86BinaryAssembler;
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.build.BuildException;
 
 /**
@@ -32,13 +32,13 @@ import org.jnode.build.BuildException;
  * combined with the precompiled Java classes.
  */
 public class ElfLinker {
-    private X86BinaryAssembler os;
+    private X86Assembler os;
 
     private int start;
 
     private int baseAddr;
 
-    public ElfLinker(X86BinaryAssembler os) {
+    public ElfLinker(X86Assembler os) {
         this.os = os;
         baseAddr = (int) os.getBaseAddr();
     }
@@ -83,8 +83,7 @@ public class ElfLinker {
             final Section sec = sym.getSection();
             if (sec == text) {
                 // System.out.println(sym);
-                X86BinaryAssembler.X86ObjectRef ref = (X86BinaryAssembler.X86ObjectRef) os.getObjectRef(
-                    new Label(sym.getName()));
+                NativeStream.ObjectRef ref = os.getObjectRef(new Label(sym.getName()));
                 ref.setPublic();
                 if (!sym.isUndef()) {
                     // System.out.println("Defined symbol at " + sym.getValue()
