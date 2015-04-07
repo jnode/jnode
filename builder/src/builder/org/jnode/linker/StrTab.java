@@ -57,7 +57,7 @@ public class StrTab {
                 size++;
             }
             final String s = new String(data, addr, size);
-            final Integer index = new Integer(addr);
+            final Integer index = addr;
             str2addr.put(s, index);
             addr2str.put(index, s);
             addr += (size + 1);
@@ -75,7 +75,7 @@ public class StrTab {
         if (addr < 0) {
             addr = maxIndex;
             maxIndex += (v.length() + 1);
-            final Integer index = new Integer(addr);
+            final Integer index = addr;
             str2addr.put(v, index);
             addr2str.put(index, v);
         }
@@ -88,16 +88,16 @@ public class StrTab {
      * @param index
      */
     public String getString(int index) {
-        return (String) addr2str.get(new Integer(index));
+        return addr2str.get(new Integer(index));
     }
 
     /**
      * Return the index of a given string, or -1 if not found.
      */
     public int findString(String v) {
-        final Integer addr = (Integer) str2addr.get(v);
+        final Integer addr = str2addr.get(v);
         if (addr != null) {
-            return addr.intValue();
+            return addr;
         } else {
             return -1;
         }
@@ -112,7 +112,7 @@ public class StrTab {
         final byte[] data = new byte[maxIndex];
         for (Map.Entry<Integer, String> entry : addr2str.entrySet()) {
             final String str = entry.getValue();
-            final int addr = entry.getKey().intValue();
+            final int addr = entry.getKey();
             for (int k = 0; k < str.length(); k++) {
                 data[addr + k] = (byte) str.charAt(k);
             }

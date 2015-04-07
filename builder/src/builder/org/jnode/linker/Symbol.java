@@ -210,14 +210,10 @@ public class Symbol {
     public void print() {
         System.out.println("  ----- Symbol -----");
         System.out.println("  st_name       : " + getName());
-        System.out.println("  st_value      : "
-            + Long.toString(st_value, 16));
-        System.out
-            .println("  st_size       : " + Long.toString(st_size, 16));
-        System.out
-            .println("  st_info       : " + Integer.toString(st_info, 16));
-        System.out.println("  st_other      : "
-            + Integer.toString(st_other, 16));
+        System.out.println("  st_value      : " + Long.toString(st_value, 16));
+        System.out.println("  st_size       : " + Long.toString(st_size, 16));
+        System.out.println("  st_info       : " + Integer.toString(st_info, 16));
+        System.out.println("  st_other      : " + Integer.toString(st_other, 16));
         System.out.println("  st_section    : " + st_shndx /* + getSection().getName() */);
     }
 }

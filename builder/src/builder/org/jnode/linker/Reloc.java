@@ -43,83 +43,58 @@ public class Reloc {
         R_386_32, R_386_PC32, R_386_GOT32, R_386_PLT32, R_386_GOTOFF, R_386_GOTPC
     };
 
-    public static final Type R_X86_64_NONE = new Type(
-        "R_X86_64_NONE", 0); /* No reloc */
+    public static final Type R_X86_64_NONE = new Type("R_X86_64_NONE", 0); /* No reloc */
 
-    public static final Type R_X86_64_64 = new Type(
-        "R_X86_64_64", 1); /* Direct 64 bit */
+    public static final Type R_X86_64_64 = new Type("R_X86_64_64", 1); /* Direct 64 bit */
 
-    public static final Type R_X86_64_PC32 = new Type(
-        "R_X86_64_PC32", 2); /* PC relative 32 bit signed */
+    public static final Type R_X86_64_PC32 = new Type("R_X86_64_PC32", 2); /* PC relative 32 bit signed */
 
-    public static final Type R_X86_64_GOT32 = new Type(
-        "R_X86_64_GOT32", 3); /* 32 bit GOT entry */
+    public static final Type R_X86_64_GOT32 = new Type("R_X86_64_GOT32", 3); /* 32 bit GOT entry */
 
-    public static final Type R_X86_64_PLT32 = new Type(
-        "R_X86_64_PLT32", 4); /* 32 bit PLT address */
+    public static final Type R_X86_64_PLT32 = new Type("R_X86_64_PLT32", 4); /* 32 bit PLT address */
 
-    public static final Type R_X86_64_COPY = new Type(
-        "R_X86_64_COPY", 5); /* Copy symbol at runtime */
+    public static final Type R_X86_64_COPY = new Type("R_X86_64_COPY", 5); /* Copy symbol at runtime */
 
-    public static final Type R_X86_64_GLOB_DAT = new Type(
-        "R_X86_64_GLOB_DAT", 6); /* Create GOT entry */
+    public static final Type R_X86_64_GLOB_DAT = new Type("R_X86_64_GLOB_DAT", 6); /* Create GOT entry */
 
-    public static final Type R_X86_64_JUMP_SLOT = new Type(
-        "R_X86_64_JUMP_SLOT", 7); /* Create PLT entry */
+    public static final Type R_X86_64_JUMP_SLOT = new Type("R_X86_64_JUMP_SLOT", 7); /* Create PLT entry */
 
-    public static final Type R_X86_64_RELATIVE = new Type(
-        "R_X86_64_RELATIVE", 8); /* Adjust by program base */
+    public static final Type R_X86_64_RELATIVE = new Type("R_X86_64_RELATIVE", 8); /* Adjust by program base */
 
-    public static final Type R_X86_64_GOTPCREL = new Type(
-        "R_X86_64_GOTPCREL", 9); /*
+    public static final Type R_X86_64_GOTPCREL = new Type("R_X86_64_GOTPCREL", 9); /*
                                     * 32 bit signed pc relative offset
                                     * to GOT
                                     */
 
-    public static final Type R_X86_64_32 = new Type(
-        "R_X86_64_32", 10); /* Direct 32 bit zero extended */
+    public static final Type R_X86_64_32 = new Type("R_X86_64_32", 10); /* Direct 32 bit zero extended */
 
-    public static final Type R_X86_64_32S = new Type(
-        "R_X86_64_32S", 11); /* Direct 32 bit sign extended */
+    public static final Type R_X86_64_32S = new Type("R_X86_64_32S", 11); /* Direct 32 bit sign extended */
 
-    public static final Type R_X86_64_16 = new Type(
-        "R_X86_64_16", 12); /* Direct 16 bit zero extended */
+    public static final Type R_X86_64_16 = new Type("R_X86_64_16", 12); /* Direct 16 bit zero extended */
 
-    public static final Type R_X86_64_PC16 = new Type(
-        "R_X86_64_PC16", 13); /* 16 bit sign extended pc relative */
+    public static final Type R_X86_64_PC16 = new Type("R_X86_64_PC16", 13); /* 16 bit sign extended pc relative */
 
-    public static final Type R_X86_64_8 = new Type(
-        "R_X86_64_8", 14); /* Direct 8 bit sign extended */
+    public static final Type R_X86_64_8 = new Type("R_X86_64_8", 14); /* Direct 8 bit sign extended */
 
-    public static final Type R_X86_64_PC8 = new Type(
-        "R_X86_64_PC8", 15); /* 8 bit sign extended pc relative */
+    public static final Type R_X86_64_PC8 = new Type("R_X86_64_PC8", 15); /* 8 bit sign extended pc relative */
 
-    public static final Type R_X86_64_DTPMOD64 = new Type(
-        "R_X86_64_DTPMOD64", 16); /* ID of module containing symbol */
+    public static final Type R_X86_64_DTPMOD64 = new Type("R_X86_64_DTPMOD64", 16); /* ID of module containing symbol*/
 
-    public static final Type R_X86_64_DTPOFF64 = new Type(
-        "R_X86_64_DTPOFF64", 17); /* Offset in TLS block */
+    public static final Type R_X86_64_DTPOFF64 = new Type("R_X86_64_DTPOFF64", 17); /* Offset in TLS block */
 
-    public static final Type R_X86_64_TPOFF64 = new Type(
-        "R_X86_64_TPOFF64", 18); /* Offset in initial TLS block */
+    public static final Type R_X86_64_TPOFF64 = new Type("R_X86_64_TPOFF64", 18); /* Offset in initial TLS block */
 
-    public static final Type R_X86_64_TLSGD = new Type(
-        "R_X86_64_TLSGD", 19); /* PC relative offset to GD GOT block */
+    public static final Type R_X86_64_TLSGD = new Type("R_X86_64_TLSGD", 19); /* PC relative offset to GD GOT block */
 
-    public static final Type R_X86_64_TLSLD = new Type(
-        "R_X86_64_TLSLD", 20); /* PC relative offset to LD GOT block */
+    public static final Type R_X86_64_TLSLD = new Type("R_X86_64_TLSLD", 20); /* PC relative offset to LD GOT block */
 
-    public static final Type R_X86_64_DTPOFF32 = new Type(
-        "R_X86_64_DTPOFF32", 21); /* Offset in TLS block */
+    public static final Type R_X86_64_DTPOFF32 = new Type("R_X86_64_DTPOFF32", 21); /* Offset in TLS block */
 
-    public static final Type R_X86_64_GOTTPOFF = new Type(
-        "R_X86_64_GOTTPOFF", 22); /*
-                                    * PC relative offset to IE GOT
+    public static final Type R_X86_64_GOTTPOFF = new Type("R_X86_64_GOTTPOFF", 22); /* PC relative offset to IE GOT
                                     * entry
                                     */
 
-    public static final Type R_X86_64_TPOFF32 = new Type(
-        "R_X86_64_TPOFF32", 23); /* Offset in initial TLS block */
+    public static final Type R_X86_64_TPOFF32 = new Type("R_X86_64_TPOFF32", 23); /* Offset in initial TLS block */
 
     public static final Type[] x86_64_RelocNumbers = {
         R_X86_64_NONE,           /* No reloc */
