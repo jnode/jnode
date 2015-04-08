@@ -241,11 +241,9 @@ public final class NTFSIndex {
                 final IndexRoot indexRoot = getIndexRootAttribute().getRoot();
                 final IndexBlock indexBlock;
                 try {
-                    indexBlock = getIndexAllocationAttribute().getIndexBlock(
-                            indexRoot, entry.getSubnodeVCN());
+                    indexBlock = getIndexAllocationAttribute().getIndexBlock(indexRoot, entry.getSubnodeVCN());
                 } catch (IOException ex) {
-                    log.error("Cannot read next index block", ex);
-                    return;
+                    throw new RuntimeException("Cannot read next index block", ex);
                 }
                 currentIterator = indexBlock.iterator();
             }
