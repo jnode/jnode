@@ -45,7 +45,7 @@ public class HfsPlusBSDInfo {
     public static final int USER_FLAG_OPAQUE = 0x8;
 
     /**
-     * The flag indicating that the file is compressed (UF_NOUNLINK).
+     * The flag indicating that the file may not be removed or renamed (UF_NOUNLINK).
      */
     public static final int USER_FLAG_NO_UNLINK = 0x10;
 
