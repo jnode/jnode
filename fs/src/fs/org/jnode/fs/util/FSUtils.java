@@ -284,4 +284,21 @@ public class FSUtils {
         int rounding = value % boundary == 0 ? 0 : boundary - value % boundary;
         return rounding + value;
     }
+
+    /**
+     * Returns the value as an integer where it is safe to convert.
+     *
+     * @param value the value to convert.
+     * @return the value as an integer.
+     * @throws java.lang.IllegalArgumentException if the value is too large to convert to an integer.
+     */
+    public static int checkedCast(long value) {
+        int result = (int) value;
+
+        if (result != value) {
+            throw new IllegalArgumentException("Overflow converting to int: " + value);
+        }
+
+        return result;
+    }
 }

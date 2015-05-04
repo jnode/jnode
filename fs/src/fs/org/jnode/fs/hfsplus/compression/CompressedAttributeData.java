@@ -2,8 +2,6 @@ package org.jnode.fs.hfsplus.compression;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.zip.DataFormatException;
-import java.util.zip.Inflater;
 import org.jnode.fs.hfsplus.HfsPlusFile;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
 import org.jnode.fs.hfsplus.attributes.AttributeData;
@@ -15,11 +13,6 @@ import org.jnode.fs.hfsplus.attributes.AttributeData;
  * @author Luke Quinane
  */
 public class CompressedAttributeData extends AttributeData {
-
-    /**
-     * The zlib fork compression chunk size.
-     */
-    private static final int ZLIB_FORK_CHUNK_SIZE = 0x10000;
 
     /**
      * The HFS+ file.
@@ -37,14 +30,9 @@ public class CompressedAttributeData extends AttributeData {
     private DecmpfsDiskHeader decmpfsDiskHeader;
 
     /**
-     * The uncompressed copy of the data.
+     * The decompressor to use to read back the data.
      */
-    private ByteBuffer uncompressed;
-
-    /**
-     * The detail of the fork compression if it is being used.
-     */
-    private ZlibForkCompressionDetails zlibForkCompressionDetails;
+    private HfsPlusCompression decompressor;
 
     public CompressedAttributeData(HfsPlusFileSystem fs, HfsPlusFile file, AttributeData attributeData) {
         this.file = file;
@@ -70,88 +58,27 @@ public class CompressedAttributeData extends AttributeData {
      * @return {@code true} if compressed in the resource fork.
      */
     public boolean isCompressedInFork() {
-        return decmpfsDiskHeader.getType() == DecmpfsDiskHeader.DATA_IN_FORK;
+        return
+            decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_ZLIB_FORK ||
+            decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_LZVN;
     }
 
     @Override
     public void read(HfsPlusFileSystem fs, long fileOffset, ByteBuffer dest) throws IOException {
-        if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE1 ||
-            decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_ZLIB) {
-
-            getUncompressed(fs);
-
-            uncompressed.position((int) fileOffset);
-            uncompressed.limit(uncompressed.position() + dest.remaining());
-            dest.put(uncompressed);
-
-        } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.DATA_IN_FORK) {
-            if (zlibForkCompressionDetails == null) {
-                zlibForkCompressionDetails = new ZlibForkCompressionDetails(fs, file.getCatalogFile().getResources());
-            }
-
-            int chunk = (int) (fileOffset / ZLIB_FORK_CHUNK_SIZE);
-            int chunkLength = zlibForkCompressionDetails.getChunkLength(chunk);
-            long chunkOffset = zlibForkCompressionDetails.getChunkOffset(chunk);
-            ByteBuffer compressed = ByteBuffer.allocate(chunkLength);
-            file.getCatalogFile().getResources().read(fs, chunkOffset, compressed);
-
-            ByteBuffer uncompressed = ByteBuffer.allocate((int) decmpfsDiskHeader.getUncompressedSize());
-
-            Inflater inflater = new Inflater();
-            inflater.setInput(compressed.array());
-
-            try {
-                inflater.inflate(uncompressed.array());
-            } catch (DataFormatException e) {
-                throw new IllegalStateException("Error uncompressing data", e);
-            }
-
-            uncompressed.position((int) fileOffset % ZLIB_FORK_CHUNK_SIZE);
-            uncompressed.limit(uncompressed.position() + dest.remaining());
-            dest.put(uncompressed);
-
-        } else {
-            throw new UnsupportedOperationException("Unsupported compression type: " + decmpfsDiskHeader);
-        }
-    }
-
-    /**
-     * Gets the uncompressed buffer for inline compression types.
-     *
-     * @param fs the file system to read from.
-     * @throws IOException if an error occurs.
-     */
-    private void getUncompressed(HfsPlusFileSystem fs) throws IOException {
-        if (uncompressed != null) {
-            return;
-        }
-
-        if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE1) {
-            // 'Type1' is no compression, just copy the data out
-            uncompressed = ByteBuffer.allocate((int) attributeData.getSize() - DecmpfsDiskHeader.LENGTH);
-            attributeData.read(fs, DecmpfsDiskHeader.LENGTH, uncompressed);
-
-        } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_ZLIB) {
-            ByteBuffer compressed = ByteBuffer.allocate((int) attributeData.getSize() - DecmpfsDiskHeader.LENGTH);
-            attributeData.read(fs, DecmpfsDiskHeader.LENGTH, compressed);
-            uncompressed = ByteBuffer.allocate((int) decmpfsDiskHeader.getUncompressedSize());
-
-            if (compressed.array()[0] == (byte) 0xff) {
-                // 0xff seems to be a marker for uncompressed data. Skip this byte any just copy the data out.
-                // I have no idea why they didn't use 'CMP_Type1' which is meant for uncompressed data according to the
-                // headers
-                compressed.position(1);
-                uncompressed.put(compressed);
+        if (decompressor == null) {
+            if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE1) {
+                decompressor = new AttributeType1Compression(attributeData);
+            } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_ZLIB) {
+                decompressor = new AttributeZlibCompression(attributeData, decmpfsDiskHeader);
+            } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_ZLIB_FORK) {
+                decompressor = new ZlibForkCompression(file);
+            } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_LZVN) {
+                decompressor = new LzvnForkCompression(file);
             } else {
-                Inflater inflater = new Inflater();
-                inflater.setInput(compressed.array());
-
-                try {
-                    inflater.inflate(uncompressed.array());
-                } catch (DataFormatException e) {
-                    throw new IllegalStateException("Error uncompressing data", e);
-                }
+                throw new UnsupportedOperationException("Unsupported compression type: " + decmpfsDiskHeader);
             }
         }
+
+        decompressor.read(fs, fileOffset, dest);
     }
 }

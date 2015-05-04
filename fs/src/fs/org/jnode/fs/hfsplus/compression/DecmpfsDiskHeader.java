@@ -25,9 +25,14 @@ public class DecmpfsDiskHeader {
     public static final int COMPRESSION_TYPE_ZLIB = 3;
 
     /**
-     * The compressed data is stored in the resource fork.
+     * The ZLIB compressed data is stored in the resource fork.
      */
-    public static final int DATA_IN_FORK = 4;
+    public static final int COMPRESSION_TYPE_ZLIB_FORK = 4;
+
+    /**
+     * The data is stored with consecutive zero bytes stored with LZVN.
+     */
+    public static final int COMPRESSION_TYPE_LZVN = 8;
 
     /**
      * The name of the attribute which holds the compressed data.
