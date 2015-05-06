@@ -101,7 +101,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
 
             newINode.setLinksCount(newINode.getLinksCount() + 1);
 
-            newEntry = new Ext2Entry(newINode, name, Ext2Constants.EXT2_FT_DIR, fs, this);
+            newEntry = new Ext2Entry(newINode, dr.getFileOffset(), name, Ext2Constants.EXT2_FT_DIR, fs, this);
 
             //add "."
             Ext2Directory newDir = new Ext2Directory(newEntry);
@@ -167,7 +167,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
             ioe.initCause(ex);
             throw ioe;
         }
-        return new Ext2Entry(newINode, name, Ext2Constants.EXT2_FT_REG_FILE, fs, this);
+        return new Ext2Entry(newINode, dr.getFileOffset(), name, Ext2Constants.EXT2_FT_REG_FILE, fs, this);
     }
 
     /**
@@ -197,7 +197,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
 
             linkedINode.setLinksCount(linkedINode.getLinksCount() + 1);
 
-            return new Ext2Entry(linkedINode, linkName, fileType, fs, this);
+            return new Ext2Entry(linkedINode, dr.getFileOffset(), linkName, fileType, fs, this);
 
         } catch (FileSystemException ex) {
             final IOException ioe = new IOException();
@@ -395,7 +395,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
             current = null;
             try {
                 return new Ext2Entry(((Ext2FileSystem) getFileSystem()).getINode(dr.getINodeNr()),
-                    dr.getName(), dr.getType(), fs, Ext2Directory.this);
+                    dr.getFileOffset(), dr.getName(), dr.getType(), fs, Ext2Directory.this);
             } catch (IOException e) {
                 throw new NoSuchElementException("Root cause: " + e.getMessage());
             } catch (FileSystemException e) {

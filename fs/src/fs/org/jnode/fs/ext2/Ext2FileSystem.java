@@ -335,7 +335,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
      */
     public Ext2Entry createRootEntry() throws IOException {
         try {
-            return new Ext2Entry(getINode(Ext2Constants.EXT2_ROOT_INO), "/", Ext2Constants.EXT2_FT_DIR, this, null);
+            return new Ext2Entry(getINode(Ext2Constants.EXT2_ROOT_INO), 0, "/", Ext2Constants.EXT2_FT_DIR, this, null);
         } catch (FileSystemException ex) {
             final IOException ioe = new IOException();
             ioe.initCause(ex);
@@ -917,7 +917,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
 
         modifyUsedDirsCount(0, 1);
 
-        Ext2Entry rootEntry = new Ext2Entry(iNode, "/", Ext2Constants.EXT2_FT_DIR, this, null);
+        Ext2Entry rootEntry = new Ext2Entry(iNode, 0, "/", Ext2Constants.EXT2_FT_DIR, this, null);
         ((Ext2Directory) rootEntry.getDirectory())
             .addINode(Ext2Constants.EXT2_ROOT_INO, ".", Ext2Constants.EXT2_FT_DIR);
         ((Ext2Directory) rootEntry.getDirectory()).addINode(Ext2Constants.EXT2_ROOT_INO, "..",
