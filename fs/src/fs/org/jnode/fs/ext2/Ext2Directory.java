@@ -372,8 +372,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
                     //TODO optimize it also to use ByteBuffer at lower level            
                     dr = new Ext2DirectoryRecord(fs, data.array(), index, index);
                     index += dr.getRecLen();
-                } while (dr.getINodeNr() == 0); //inode nr=0 means the entry is
-                // unused
+                } while (dr.getINodeNr() == 0); //inode nr=0 means the entry is unused
             } catch (Exception e) {
                 fs.handleFSError(e);
                 return false;

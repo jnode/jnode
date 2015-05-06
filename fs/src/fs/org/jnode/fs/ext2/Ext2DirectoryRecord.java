@@ -79,7 +79,6 @@ public class Ext2DirectoryRecord {
         setName(name);
         setINodeNr(iNodeNr);
         setType(type);
-        setNameLen(name.length());
         int newLength = name.length() + 8;
         // record length is padded to n*4 bytes
         if (newLength % 4 != 0)
@@ -127,8 +126,8 @@ public class Ext2DirectoryRecord {
      * 
      * @return long
      */
-    public synchronized int getINodeNr() {
-        return (int) LittleEndian.getUInt32(data, offset);
+    public synchronized long getINodeNr() {
+        return LittleEndian.getUInt32(data, offset);
     }
 
     private synchronized void setINodeNr(long nr) {
@@ -141,19 +140,18 @@ public class Ext2DirectoryRecord {
      * @return StringBuffer
      */
     public synchronized String getName() {
-        StringBuffer name = new StringBuffer();
+        String name = "";
         if (getINodeNr() != 0) {
-            // TODO: character conversion??
-            for (int i = 0; i < getNameLen(); i++)
-                name.append((char) LittleEndian.getUInt8(data, offset + 8 + i));
+            name = new String(data, offset + 8, getNameLen(), Ext2FileSystem.ENTRY_NAME_CHARSET);
             log.debug("Ext2DirectoryRecord(): iNode=" + getINodeNr() + ", name=" + name);
         }
-        return name.toString();
+        return name;
     }
 
     private synchronized void setName(String name) {
-        for (int i = 0; i < name.length(); i++)
-            Ext2Utils.set8(data, offset + 8 + i, name.charAt(i));
+        byte[] nameData = name.getBytes(Ext2FileSystem.ENTRY_NAME_CHARSET);
+        System.arraycopy(nameData, 0, data, offset + 8, nameData.length);
+        setNameLen(nameData.length);
     }
 
     /**
