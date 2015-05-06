@@ -20,7 +20,7 @@
  
 package org.jnode.fs.ext4;
 
-import org.jnode.fs.ext2.Ext2Utils;
+import org.jnode.util.LittleEndian;
 
 /**
  * An ext4 extent index.
@@ -54,15 +54,15 @@ public class ExtentIndex {
     }
 
     public long getBlockIndex() {
-        return Ext2Utils.get32(data, 0);
+        return LittleEndian.getUInt32(data, 0);
     }
 
     public long getLeafLow() {
-        return Ext2Utils.get32(data, 4);
+        return LittleEndian.getUInt32(data, 4);
     }
 
     public int getLeafHigh() {
-        return Ext2Utils.get16(data, 8);
+        return LittleEndian.getUInt16(data, 8);
     }
 
     @Override

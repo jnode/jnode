@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.jnode.util.LittleEndian;
 
 /**
  * @author Andras Nagy
@@ -148,7 +149,7 @@ public class GroupDescriptor {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getBlockBitmap() {
-        return Ext2Utils.get32(data, 0);
+        return LittleEndian.getUInt32(data, 0);
     }
 
     public void setBlockBitmap(long l) {
@@ -159,7 +160,7 @@ public class GroupDescriptor {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getInodeBitmap() {
-        return Ext2Utils.get32(data, 4);
+        return LittleEndian.getUInt32(data, 4);
     }
 
     public void setInodeBitmap(long l) {
@@ -170,7 +171,7 @@ public class GroupDescriptor {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getInodeTable() {
-        return Ext2Utils.get32(data, 8);
+        return LittleEndian.getUInt32(data, 8);
     }
 
     public void setInodeTable(long l) {
@@ -179,29 +180,29 @@ public class GroupDescriptor {
     }
 
     public synchronized int getFreeBlocksCount() {
-        return Ext2Utils.get16(data, 12);
+        return LittleEndian.getUInt16(data, 12);
     }
 
     public synchronized void setFreeBlocksCount(int count) {
-        Ext2Utils.set16(data, 12, count);
+        LittleEndian.setInt16(data, 12, count);
         setDirty(true);
     }
 
     public synchronized int getFreeInodesCount() {
-        return Ext2Utils.get16(data, 14);
+        return LittleEndian.getUInt16(data, 14);
     }
 
     public synchronized void setFreeInodesCount(int count) {
-        Ext2Utils.set16(data, 14, count);
+        LittleEndian.setInt16(data, 14, count);
         setDirty(true);
     }
 
     public synchronized int getUsedDirsCount() {
-        return Ext2Utils.get16(data, 16);
+        return LittleEndian.getUInt16(data, 16);
     }
 
     public synchronized void setUsedDirsCount(int count) {
-        Ext2Utils.set16(data, 16, count);
+        LittleEndian.setInt16(data, 16, count);
         setDirty(true);
     }
 

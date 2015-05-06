@@ -205,7 +205,7 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getINodesCount() {
-        return Ext2Utils.get32(data, 0);
+        return LittleEndian.getUInt32(data, 0);
     }
 
     public void setINodesCount(long count) {
@@ -216,7 +216,7 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getBlocksCount() {
-        return Ext2Utils.get32(data, 4);
+        return LittleEndian.getUInt32(data, 4);
     }
 
     public void setBlocksCount(long count) {
@@ -227,7 +227,7 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getRBlocksCount() {
-        return Ext2Utils.get32(data, 8);
+        return LittleEndian.getUInt32(data, 8);
     }
 
     public void setRBlocksCount(long count) {
@@ -236,7 +236,7 @@ public class Superblock {
     }
 
     public synchronized long getFreeBlocksCount() {
-        return Ext2Utils.get32(data, 12);
+        return LittleEndian.getUInt32(data, 12);
     }
 
     public synchronized void setFreeBlocksCount(long count) {
@@ -245,7 +245,7 @@ public class Superblock {
     }
 
     public synchronized long getFreeInodesCount() {
-        return Ext2Utils.get32(data, 16);
+        return LittleEndian.getUInt32(data, 16);
     }
 
     public synchronized void setFreeInodesCount(long count) {
@@ -256,7 +256,7 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getFirstDataBlock() {
-        return Ext2Utils.get32(data, 20);
+        return LittleEndian.getUInt32(data, 20);
     }
 
     public void setFirstDataBlock(long i) {
@@ -267,7 +267,7 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     private long getLogBlockSize() {
-        return Ext2Utils.get32(data, 24);
+        return LittleEndian.getUInt32(data, 24);
     }
 
     private void setLogBlockSize(long i) {
@@ -300,7 +300,7 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     private long getLogFragSize() {
-        return Ext2Utils.get32(data, 28);
+        return LittleEndian.getUInt32(data, 28);
     }
 
     private void setLogFragSize(long i) {
@@ -344,7 +344,7 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getBlocksPerGroup() {
-        return Ext2Utils.get32(data, 32);
+        return LittleEndian.getUInt32(data, 32);
     }
 
     public void setBlocksPerGroup(long i) {
@@ -355,7 +355,7 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getFragsPerGroup() {
-        return Ext2Utils.get32(data, 36);
+        return LittleEndian.getUInt32(data, 36);
     }
 
     public void setFragsPerGroup(long i) {
@@ -366,7 +366,7 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getINodesPerGroup() {
-        return Ext2Utils.get32(data, 40);
+        return LittleEndian.getUInt32(data, 40);
     }
 
     public void setINodesPerGroup(long i) {
@@ -377,7 +377,7 @@ public class Superblock {
     // this field is only written during mounting (so no synchronization issues
     // here)
     public long getMTime() {
-        return Ext2Utils.get32(data, 44);
+        return LittleEndian.getUInt32(data, 44);
     }
 
     public void setMTime(long time) {
@@ -386,7 +386,7 @@ public class Superblock {
     }
 
     public synchronized long getWTime() {
-        return Ext2Utils.get32(data, 48);
+        return LittleEndian.getUInt32(data, 48);
     }
 
     public synchronized void setWTime(long time) {
@@ -397,71 +397,71 @@ public class Superblock {
     // this field is only written during mounting (so no synchronization issues
     // here)
     public int getMntCount() {
-        return Ext2Utils.get16(data, 52);
+        return LittleEndian.getUInt16(data, 52);
     }
 
     public void setMntCount(int i) {
-        Ext2Utils.set16(data, 52, i);
+        LittleEndian.setInt16(data, 52, i);
         setDirty(true);
     }
 
     // this field is only written during format (so no synchronization issues
     // here)
     public int getMaxMntCount() {
-        return Ext2Utils.get16(data, 54);
+        return LittleEndian.getUInt16(data, 54);
     }
 
     public void setMaxMntCount(int i) {
-        Ext2Utils.set16(data, 54, i);
+        LittleEndian.setInt16(data, 54, i);
         setDirty(true);
     }
 
     // this field is only written during format (so no synchronization issues
     // here)
     public int getMagic() {
-        return Ext2Utils.get16(data, 56);
+        return LittleEndian.getUInt16(data, 56);
     }
 
     public void setMagic(int i) {
-        Ext2Utils.set16(data, 56, i);
+        LittleEndian.setInt16(data, 56, i);
         setDirty(true);
     }
 
     public synchronized int getState() {
-        return Ext2Utils.get16(data, 58);
+        return LittleEndian.getUInt16(data, 58);
     }
 
     public synchronized void setState(int state) {
-        Ext2Utils.set16(data, 58, state);
+        LittleEndian.setInt16(data, 58, state);
         setDirty(true);
     }
 
     // this field is only written during format (so no synchronization issues
     // here)
     public int getErrors() {
-        return Ext2Utils.get16(data, 60);
+        return LittleEndian.getUInt16(data, 60);
     }
 
     public void setErrors(int i) {
-        Ext2Utils.set16(data, 60, i);
+        LittleEndian.setInt16(data, 60, i);
         setDirty(true);
     }
 
     // this field is only written during format (so no synchronization issues
     // here)
     public int getMinorRevLevel() {
-        return Ext2Utils.get16(data, 62);
+        return LittleEndian.getUInt16(data, 62);
     }
 
     public void setMinorRevLevel(int i) {
-        Ext2Utils.set16(data, 62, i);
+        LittleEndian.setInt16(data, 62, i);
         setDirty(true);
     }
 
     // this field is only written during filesystem check (so no synchronization
     // issues here)
     public long getLastCheck() {
-        return Ext2Utils.get32(data, 64);
+        return LittleEndian.getUInt32(data, 64);
     }
 
     public void setLastCheck(long i) {
@@ -472,7 +472,7 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getCheckInterval() {
-        return Ext2Utils.get32(data, 68);
+        return LittleEndian.getUInt32(data, 68);
     }
 
     public void setCheckInterval(long i) {
@@ -483,7 +483,7 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getCreatorOS() {
-        return Ext2Utils.get32(data, 72);
+        return LittleEndian.getUInt32(data, 72);
     }
 
     public void setCreatorOS(long i) {
@@ -494,7 +494,7 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getRevLevel() {
-        return Ext2Utils.get32(data, 76);
+        return LittleEndian.getUInt32(data, 76);
     }
 
     public void setRevLevel(long i) {
@@ -505,22 +505,22 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     public int getDefResuid() {
-        return Ext2Utils.get16(data, 80);
+        return LittleEndian.getUInt16(data, 80);
     }
 
     public void setDefResuid(int i) {
-        Ext2Utils.set16(data, 80, i);
+        LittleEndian.setInt16(data, 80, i);
         setDirty(true);
     }
 
     // this field is only written during format (so no synchronization issues
     // here)
     public int getDefResgid() {
-        return Ext2Utils.get16(data, 82);
+        return LittleEndian.getUInt16(data, 82);
     }
 
     public void setDefResgid(int i) {
-        Ext2Utils.set16(data, 82, i);
+        LittleEndian.setInt16(data, 82, i);
         setDirty(true);
     }
 
@@ -528,7 +528,7 @@ public class Superblock {
     // here)
     public long getFirstInode() {
         if (getRevLevel() == Ext2Constants.EXT2_DYNAMIC_REV)
-            return Ext2Utils.get32(data, 84);
+            return LittleEndian.getUInt32(data, 84);
         else
             return 11;
     }
@@ -542,26 +542,26 @@ public class Superblock {
     // here)
     public long getINodeSize() {
         if (getRevLevel() == Ext2Constants.EXT2_DYNAMIC_REV)
-            return Ext2Utils.get16(data, 88);
+            return LittleEndian.getUInt16(data, 88);
         else
             return INode.INODE_LENGTH;
     }
 
     public void setINodeSize(int i) {
-        Ext2Utils.set16(data, 88, i);
+        LittleEndian.setInt16(data, 88, i);
         setDirty(true);
     }
 
     // XXX what to return for old versions?
     public synchronized long getBlockGroupNr() {
         if (getRevLevel() == Ext2Constants.EXT2_DYNAMIC_REV)
-            return Ext2Utils.get16(data, 90);
+            return LittleEndian.getUInt16(data, 90);
         else
             return 0;
     }
 
     public synchronized void setBlockGroupNr(int i) {
-        Ext2Utils.set16(data, 90, i);
+        LittleEndian.setInt16(data, 90, i);
         setDirty(true);
     }
 
@@ -569,7 +569,7 @@ public class Superblock {
     // here)
     public long getFeatureCompat() {
         if (getRevLevel() == Ext2Constants.EXT2_DYNAMIC_REV)
-            return Ext2Utils.get32(data, 92);
+            return LittleEndian.getUInt32(data, 92);
         else
             return 0;
     }
@@ -583,7 +583,7 @@ public class Superblock {
     // here)
     public long getFeatureIncompat() {
         if (getRevLevel() == Ext2Constants.EXT2_DYNAMIC_REV)
-            return Ext2Utils.get32(data, 96);
+            return LittleEndian.getUInt32(data, 96);
         else
             return 0;
     }
@@ -597,7 +597,7 @@ public class Superblock {
     // here)
     public long getFeatureROCompat() {
         if (getRevLevel() == Ext2Constants.EXT2_DYNAMIC_REV)
-            return Ext2Utils.get32(data, 100);
+            return LittleEndian.getUInt32(data, 100);
         else
             return 0;
     }
@@ -650,14 +650,14 @@ public class Superblock {
     //not sure this is the correct byte-order for this field
     public long getAlgoBitmap() {
         if (getRevLevel() == Ext2Constants.EXT2_DYNAMIC_REV)
-            return Ext2Utils.get32(data, 200);
+            return LittleEndian.getUInt32(data, 200);
         else
             return 11;
     }
 
     //this field is only written during format (so no synchronization issues here)
     public int getPreallocBlocks() {
-        return Ext2Utils.get8(data, 204);
+        return LittleEndian.getUInt8(data, 204);
     }
 
     public void setPreallocBlocks(int i) {
@@ -667,7 +667,7 @@ public class Superblock {
 
     //this field is only written during format (so no synchronization issues here)
     public int getPreallocDirBlocks() {
-        return Ext2Utils.get8(data, 205);
+        return LittleEndian.getUInt8(data, 205);
     }
 
     public void setPreallocDirBlocks(int i) {
@@ -682,15 +682,15 @@ public class Superblock {
     }
 
     public long getJournalINum() {
-        return Ext2Utils.get32(data, 224);
+        return LittleEndian.getUInt32(data, 224);
     }
 
     public long getJournalDev() {
-        return Ext2Utils.get32(data, 228);
+        return LittleEndian.getUInt32(data, 228);
     }
 
     public long getLastOrphan() {
-        return Ext2Utils.get8(data, 232);
+        return LittleEndian.getUInt8(data, 232);
     }
 
     /**
@@ -703,7 +703,7 @@ public class Superblock {
     }
 
     public long getBlocksPerFlex() {
-        int logBlocksPerFlex = Ext2Utils.get8(data, 372);
+        int logBlocksPerFlex = LittleEndian.getUInt8(data, 372);
         return 1L << logBlocksPerFlex;
     }
 
