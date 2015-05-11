@@ -57,7 +57,7 @@ public class Ext2DirectoryRecord {
 
         // make a copy of the data
         synchronized (data) {
-            byte[] newData = new byte[getRecLen()];
+            byte[] newData = new byte[Math.max(8, getRecLen())];
             System.arraycopy(data, offset, newData, 0, getRecLen());
             this.data = newData;
             setOffset(0);
@@ -167,7 +167,7 @@ public class Ext2DirectoryRecord {
         LittleEndian.setInt16(data, offset + 4, len);
     }
 
-    private synchronized int getNameLen() {
+    public synchronized int getNameLen() {
         return LittleEndian.getUInt8(data, offset + 6);
     }
 

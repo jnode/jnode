@@ -40,9 +40,9 @@ import org.jnode.fs.util.FSUtils;
  */
 public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId {
 
-    INode iNode;
+    protected INode iNode;
 
-    private Ext2Entry entry;
+    protected Ext2Entry entry;
 
     private final Logger log = Logger.getLogger(getClass());
 
@@ -456,5 +456,11 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
     protected void writeEntries(FSEntryTable table) throws IOException {
         //nothing to do because createFileEntry and createDirectoryEntry do the
         // job
+    }
+
+    @Override
+    public String toString() {
+        return String.format("directory-%d['%s' entries:%d]", iNode.getINodeNr(), entry.getName(),
+            getEntryTable().size());
     }
 }
