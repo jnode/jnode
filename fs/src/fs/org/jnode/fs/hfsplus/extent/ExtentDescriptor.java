@@ -122,6 +122,15 @@ public class ExtentDescriptor {
     }
 
     /**
+     * Returns the block count.
+     *
+     * @return the block count.
+     */
+    public long getBlockCount() {
+        return blockCount;
+    }
+
+    /**
      * Returns <tt>true</tt> if the extent is empty.
      * 
      * @return <tt>true</tt> if the extent is empty.
