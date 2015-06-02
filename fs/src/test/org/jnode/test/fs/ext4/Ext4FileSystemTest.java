@@ -152,5 +152,22 @@ public class Ext4FileSystemTest {
 
         DataStructureAsserts.assertStructure(fs, expectedStructure);
     }
+
+    @Test
+    public void testReadExt4MetaBG() throws Exception {
+
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/ext4/ext4-meta-bg.dd"), "r");
+        Ext2FileSystemType type = fss.getFileSystemType(Ext2FileSystemType.ID);
+        Ext2FileSystem fs = type.create(device, true);
+
+        String expectedStructure =
+            "type: EXT2 vol: total:4997120 free:3680256\n" +
+                "  /; \n" +
+                "    lost+found; \n" +
+                "    Fairy-Penguin.jpg; 60472; 78da81a8cf672de95d27214d44a5ea59\n" +
+                "    why.jpg; 30965; 9b82ac413bb4204a4cf6d3e801af38fd\n";
+
+        DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
 }
 
