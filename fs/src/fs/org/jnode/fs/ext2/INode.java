@@ -802,8 +802,14 @@ public class INode {
      */
     public synchronized long getSize() {
         long sizeLow = LittleEndian.getUInt32(data, 4);
-        long sizeHigh = LittleEndian.getUInt32(data, 0x6C) << 32;
-        return sizeHigh | sizeLow;
+        long sizeHigh = LittleEndian.getUInt32(data, 0x6C);
+
+        if ((getFlags() & Ext2Constants.EXT4_HUGE_FILE_FL) != 0) {
+            return (sizeHigh + sizeLow) << 32;
+        } else {
+            sizeHigh = sizeHigh << 32;
+            return sizeHigh | sizeLow;
+        }
     }
 
     public synchronized void setSize(long size) {
