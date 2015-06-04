@@ -97,7 +97,7 @@ public class INodeTable {
      * safe to synchronize to it
      */
     public synchronized byte[] getInodeData(int index) throws IOException, FileSystemException {
-        int iNodeSize = (int) fs.getSuperblock().getINodeSize();
+        int iNodeSize = fs.getSuperblock().getINodeSize();
         byte data[] = new byte[iNodeSize];
 
         int indexCopied = 0;
@@ -116,13 +116,14 @@ public class INodeTable {
      * For each inode table, only one instance of INodeTable exists, so it is
      * safe to synchronize to it
      */
-    public synchronized void writeInodeData(int index, byte[] data)
-        throws IOException, FileSystemException {
+    public synchronized void writeInodeData(int index, byte[] data) throws IOException, FileSystemException {
+        int iNodeSize = fs.getSuperblock().getINodeSize();
+
         int indexCopied = 0;
-        while (indexCopied < INode.INODE_LENGTH) {
-            int blockNo = (index * INode.INODE_LENGTH + indexCopied) / blockSize;
-            int blockOffset = (index * INode.INODE_LENGTH + indexCopied) % blockSize;
-            int copyLength = Math.min(blockSize - blockOffset, INode.INODE_LENGTH);
+        while (indexCopied < iNodeSize) {
+            int blockNo = (index * iNodeSize + indexCopied) / blockSize;
+            int blockOffset = (index * iNodeSize + indexCopied) % blockSize;
+            int copyLength = Math.min(blockSize - blockOffset, iNodeSize);
             byte[] originalBlock = getINodeTableBlock(blockNo);
             System.arraycopy(data, indexCopied, originalBlock, blockOffset, copyLength);
             indexCopied += copyLength;

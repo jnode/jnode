@@ -21,7 +21,6 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.util.LittleEndian;
@@ -83,8 +82,8 @@ public class GroupDescriptor {
         setInodeBitmap(getBlockBitmap() + 1);
         setInodeTable(getBlockBitmap() + 2);
 
-        long inodeTableSize =
-                Ext2Utils.ceilDiv(superblock.getINodesPerGroup() * INode.INODE_LENGTH, fs.getBlockSize());
+        int iNodeSize = fs.getSuperblock().getINodeSize();
+        long inodeTableSize = Ext2Utils.ceilDiv(superblock.getINodesPerGroup() * iNodeSize, fs.getBlockSize());
         long blockCount;
         if (groupNr == fs.getGroupCount() - 1)
             blockCount =

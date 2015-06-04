@@ -36,7 +36,7 @@ import org.jnode.util.LittleEndian;
  * @author Andras Nagy
  */
 public class INode {
-    public static final int INODE_LENGTH = 128;
+    public static final int EXT2_GOOD_OLD_INODE_SIZE = 128;
 
     private final Logger log = Logger.getLogger(getClass());
 
@@ -74,13 +74,13 @@ public class INode {
     public INode(Ext2FileSystem fs, INodeDescriptor desc) {
         this.fs = fs;
         this.desc = desc;
-        this.data = new byte[INODE_LENGTH];
+        this.data = new byte[fs.getSuperblock().getINodeSize()];
         locked = 0;
         log.setLevel(Level.INFO);
     }
 
     public void read(byte[] data) {
-        System.arraycopy(data, 0, this.data, 0, INODE_LENGTH);
+        System.arraycopy(data, 0, this.data, 0, fs.getSuperblock().getINodeSize());
         setDirty(false);
     }
 
@@ -156,6 +156,20 @@ public class INode {
 
     public Ext2FileSystem getExt2FileSystem() {
         return fs;
+    }
+
+    /**
+     * Gets the extra inode size.
+     *
+     * @return the extra size.
+     */
+    public int getExtraISize() {
+        if (getExt2FileSystem().hasROFeature(Ext2Constants.EXT4_FEATURE_RO_COMPAT_EXTRA_ISIZE)) {
+            return LittleEndian.getInt16(data, 0x80);
+        }
+
+        // Extra isize not supported
+        return 0;
     }
 
     /**

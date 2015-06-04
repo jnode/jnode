@@ -119,7 +119,7 @@ public class Superblock {
         long bbSize = 1; // block bitmap is 1 block fixed
         long ibSize = 1; // inode bitmap is 1 block fixed
         long inodeTableSize =
-                Ext2Utils.ceilDiv(inodesPerGroup * INode.INODE_LENGTH, blockSize.getSize());
+                Ext2Utils.ceilDiv(inodesPerGroup * INode.EXT2_GOOD_OLD_INODE_SIZE, blockSize.getSize());
         int groupsWithMetadata = 0;
         for (int i = 0; i < groupCount; i++)
             if (fs.groupHasDescriptors(i))
@@ -141,7 +141,7 @@ public class Superblock {
         setState(Ext2Constants.EXT2_VALID_FS);
         setErrors(Ext2Constants.EXT2_ERRORS_DEFAULT);
 
-        setINodeSize(INode.INODE_LENGTH);
+        setINodeSize(INode.EXT2_GOOD_OLD_INODE_SIZE);
 
         setBlockGroupNr(0);
 
@@ -540,11 +540,11 @@ public class Superblock {
 
     // this field is only written during format (so no synchronization issues
     // here)
-    public long getINodeSize() {
+    public int getINodeSize() {
         if (getRevLevel() == Ext2Constants.EXT2_DYNAMIC_REV)
             return LittleEndian.getUInt16(data, 88);
         else
-            return INode.INODE_LENGTH;
+            return INode.EXT2_GOOD_OLD_INODE_SIZE;
     }
 
     public void setINodeSize(int i) {
