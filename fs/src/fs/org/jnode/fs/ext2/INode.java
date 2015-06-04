@@ -21,11 +21,15 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.ext2.exception.UnallocatedBlockException;
+import org.jnode.fs.ext2.xattr.XAttrEntry;
+import org.jnode.fs.ext2.xattr.XAttrHeader;
 import org.jnode.fs.ext4.ExtentHeader;
 import org.jnode.util.LittleEndian;
 
@@ -170,6 +174,35 @@ public class INode {
 
         // Extra isize not supported
         return 0;
+    }
+
+    /**
+     * Gets a list of attributes associated with this inode.
+     *
+     * @return the list of attributes.
+     */
+    public List<XAttrEntry> getAttributes() {
+        List<XAttrEntry> attributes = new ArrayList<XAttrEntry>();
+
+        int inodeSize = getExt2FileSystem().getSuperblock().getINodeSize();
+        int xattrAvailableSize = inodeSize - (EXT2_GOOD_OLD_INODE_SIZE + getExtraISize());
+        byte[] xattrBuffer = new byte[xattrAvailableSize];
+
+        System.arraycopy(data, EXT2_GOOD_OLD_INODE_SIZE + getExtraISize(), xattrBuffer, 0, xattrAvailableSize);
+        XAttrHeader xAttrHeader = new XAttrHeader(xattrBuffer);
+
+        if (xAttrHeader.getMagic() == XAttrHeader.MAGIC) {
+            int offset = XAttrHeader.SIZE;
+
+            for (int count = 0; count < xAttrHeader.getRefCount(); count++) {
+                XAttrEntry entry = new XAttrEntry(data, offset);
+                attributes.add(entry);
+
+                offset += entry.getNameLength() + XAttrEntry.MINIMUM_SIZE;
+            }
+        }
+
+        return attributes;
     }
 
     /**
