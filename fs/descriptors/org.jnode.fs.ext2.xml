@@ -36,6 +36,7 @@
       <export name="org.jnode.fs.ext2.*"/>
       <export name="org.jnode.fs.ext2.cache.*"/>
       <export name="org.jnode.fs.ext2.exception.*"/>
+      <export name="org.jnode.fs.ext2.xattr.*"/>
       <export name="org.jnode.fs.ext4.*"/>
     </library>
   </runtime>

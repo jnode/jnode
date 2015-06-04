@@ -31,6 +31,7 @@ import org.jnode.fs.ext2.exception.UnallocatedBlockException;
 import org.jnode.fs.ext2.xattr.XAttrEntry;
 import org.jnode.fs.ext2.xattr.XAttrHeader;
 import org.jnode.fs.ext4.ExtentHeader;
+import org.jnode.fs.util.FSUtils;
 import org.jnode.util.LittleEndian;
 
 /**
@@ -177,28 +178,89 @@ public class INode {
     }
 
     /**
+     * Gets the extra attribute block.
+     *
+     * @return the extra attribute block.
+     */
+    public long getXAttrBlock() {
+        long blockLow = LittleEndian.getUInt32(data, 0x68);
+        long blockHigh = LittleEndian.getUInt16(data, 0x76);
+        return blockLow | blockHigh << 32;
+    }
+
+    /**
      * Gets a list of attributes associated with this inode.
      *
      * @return the list of attributes.
      */
     public List<XAttrEntry> getAttributes() {
         List<XAttrEntry> attributes = new ArrayList<XAttrEntry>();
+        attributes.addAll(getInlineAttributes());
+        attributes.addAll(getAttributesInBlock());
+        return attributes;
+    }
 
+    /**
+     * Gets a list of inline attributes associated with this inode.
+     *
+     * @return the list of attributes.
+     */
+    public List<XAttrEntry> getInlineAttributes() {
+        List<XAttrEntry> attributes = new ArrayList<XAttrEntry>();
         int inodeSize = getExt2FileSystem().getSuperblock().getINodeSize();
         int xattrAvailableSize = inodeSize - (EXT2_GOOD_OLD_INODE_SIZE + getExtraISize());
-        byte[] xattrBuffer = new byte[xattrAvailableSize];
 
-        System.arraycopy(data, EXT2_GOOD_OLD_INODE_SIZE + getExtraISize(), xattrBuffer, 0, xattrAvailableSize);
-        XAttrHeader xAttrHeader = new XAttrHeader(xattrBuffer);
+        if (xattrAvailableSize > 0) {
+            byte[] xattrBuffer = new byte[xattrAvailableSize];
 
-        if (xAttrHeader.getMagic() == XAttrHeader.MAGIC) {
-            int offset = XAttrHeader.SIZE;
+            System.arraycopy(data, EXT2_GOOD_OLD_INODE_SIZE + getExtraISize(), xattrBuffer, 0, xattrAvailableSize);
+            XAttrHeader xAttrHeader = new XAttrHeader(xattrBuffer);
 
-            for (int count = 0; count < xAttrHeader.getRefCount(); count++) {
-                XAttrEntry entry = new XAttrEntry(data, offset);
-                attributes.add(entry);
+            if (xAttrHeader.getMagic() == XAttrHeader.MAGIC) {
+                for (int offset = XAttrHeader.SIZE; offset + XAttrEntry.MINIMUM_SIZE < xattrBuffer.length; ) {
+                    if (LittleEndian.getUInt32(xattrBuffer, offset) == 0) {
+                        break;
+                    }
 
-                offset += entry.getNameLength() + XAttrEntry.MINIMUM_SIZE;
+                    XAttrEntry entry = new XAttrEntry(xattrBuffer, offset);
+                    attributes.add(entry);
+
+                    offset += FSUtils.roundUpToBoundary(4, entry.getNameLength() + XAttrEntry.MINIMUM_SIZE);
+                }
+            }
+        }
+
+        return attributes;
+    }
+
+    /**
+     * Gets a list of attributes stored off in the extra attribute block.
+     *
+     * @return the list of attributes.
+     */
+    public List<XAttrEntry> getAttributesInBlock() {
+        List<XAttrEntry> attributes = new ArrayList<XAttrEntry>();
+        long xAttrBlockNumber = getXAttrBlock();
+
+        if (xAttrBlockNumber != 0) {
+            try {
+                byte[] xattrBuffer = fs.getBlock(xAttrBlockNumber);
+                XAttrHeader xAttrHeader = new XAttrHeader(xattrBuffer);
+
+                if (xAttrHeader.getMagic() == XAttrHeader.MAGIC) {
+                    for (int offset = XAttrHeader.SIZE; offset + XAttrEntry.MINIMUM_SIZE < xattrBuffer.length; ) {
+                        if (LittleEndian.getUInt32(xattrBuffer, offset) == 0) {
+                            break;
+                        }
+
+                        XAttrEntry entry = new XAttrEntry(xattrBuffer, offset);
+                        attributes.add(entry);
+
+                        offset += FSUtils.roundUpToBoundary(4, entry.getNameLength() + XAttrEntry.MINIMUM_SIZE);
+                    }
+                }
+            } catch (IOException e) {
+                throw new IllegalStateException("Error reading extra attributes block: " + xAttrBlockNumber, e);
             }
         }
 

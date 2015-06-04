@@ -135,4 +135,21 @@ public class XAttrEntry {
 
         return name;
     }
+
+    /**
+     * Gets the attribute value.
+     *
+     * @return the value.
+     */
+    public byte[] getValue() {
+        long valueBlockNumber = getValueBlock();
+
+        if (valueBlockNumber != 0) {
+            throw new UnsupportedOperationException("Value is stored in another block and that is not implemented yet");
+        }
+
+        byte[] value = new byte[(int) getValueSize()];
+        System.arraycopy(data, getValueOffset(), value, 0, value.length);
+        return value;
+    }
 }
