@@ -131,8 +131,6 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
         // at all)
         if (hasIncompatFeature(Ext2Constants.EXT2_FEATURE_INCOMPAT_COMPRESSION)) throw new FileSystemException(
             getDevice().getId() + " Unsupported filesystem feature (COMPRESSION) disallows mounting");
-        if (hasIncompatFeature(Ext2Constants.EXT2_FEATURE_INCOMPAT_META_BG)) throw new FileSystemException(
-            getDevice().getId() + " Unsupported filesystem feature (META_BG) disallows mounting");
         if (hasIncompatFeature(Ext2Constants.EXT3_FEATURE_INCOMPAT_JOURNAL_DEV)) throw new FileSystemException(
             getDevice().getId() + " Unsupported filesystem feature (JOURNAL_DEV) disallows mounting");
         // if (hasIncompatFeature(Ext2Constants.EXT3_FEATURE_INCOMPAT_RECOVER))
@@ -162,9 +160,15 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
             }
         }
 
+        if (hasIncompatFeature(Ext2Constants.EXT2_FEATURE_INCOMPAT_META_BG)) {
+            log.info(getDevice().getId() + " Unsupported filesystem feature (META_BG) forces readonly mode");
+            setReadOnly(true);
+        }
+
         if (hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_FLEX_BG)) {
             log.info(getDevice().getId() + " filesystem feature (FLEX_BG) is currently only implemented for reading, " +
                 "forcing readonly mode");
+            setReadOnly(true);
         }
 
         // an unsupported RO_COMPAT feature means that the filesystem can only

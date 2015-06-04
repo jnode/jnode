@@ -246,6 +246,15 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
      * A file for the resource fork stream.
      */
     public class ResourceForkFile implements FSFile {
+        /**
+         * Gets the catalog file for the resource fork file.
+         *
+         * @return the catalog file.
+         */
+        public CatalogFile getCatalogFile() {
+            return file;
+        }
+
         @Override
         public long getLength() {
             return file.getResources().getTotalSize();
