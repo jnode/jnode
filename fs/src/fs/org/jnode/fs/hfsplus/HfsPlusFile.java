@@ -203,6 +203,10 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 
     @Override
     public byte[] getSlackSpace() throws IOException {
+        if (isCompressed()) {
+            return new byte[0];
+        }
+
         int blockSize = getFileSystem().getVolumeHeader().getBlockSize();
 
         int slackSpaceSize = blockSize - (int) (getLength() % blockSize);
