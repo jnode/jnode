@@ -129,7 +129,7 @@ public class GptPartitionTable implements PartitionTable<GptPartitionTableEntry>
                 }
             }
 
-            if (entries.size() != 1 || entries.get(0).getSystemIndicator() != IBMPartitionTypes.PARTTYPE_EFI_GPT) {
+            if (entries.isEmpty() || entries.get(0).getSystemIndicator() != IBMPartitionTypes.PARTTYPE_EFI_GPT) {
                 log.debug("No protective MBR found: " + entries);
                 return false;
             }
