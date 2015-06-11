@@ -118,15 +118,23 @@ public class FatFile extends FatEntry implements FSFile, FSFileSlackSpace {
     @Override
     public byte[] getSlackSpace() throws IOException {
         int clusterSize = ((FatFileSystem) getFileSystem()).getClusterSize();
+        Fat fat = ((FatFileSystem) getFileSystem()).getFat();
 
-        int slackSpaceSize = clusterSize - (int) (getLength() % clusterSize);
+        int offset = (int) (getLength() % clusterSize);
+        int slackSpaceSize = clusterSize - offset;
 
         if (slackSpaceSize == clusterSize) {
             slackSpaceSize = 0;
         }
 
         byte[] slackSpace = new byte[slackSpaceSize];
-        getChain().read(getLength(), ByteBuffer.wrap(slackSpace));
+
+        if (getEntry().isFreeDirEntry()) {
+            int cluster = getStartCluster() + (int) (getLength() / clusterSize);
+            fat.readCluster(cluster, offset, ByteBuffer.wrap(slackSpace));
+        } else {
+            getChain().read(getLength(), ByteBuffer.wrap(slackSpace));
+        }
 
         return slackSpace;
     }
