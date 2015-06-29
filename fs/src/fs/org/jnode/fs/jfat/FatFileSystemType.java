@@ -69,8 +69,8 @@ public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSyste
         }
 
         // Check for FAT-32
-        if (firstSectors[66] == (byte) 0x29 &&
-            firstSectors[82] == 'F' &&
+        // The 'extended boot signature' at offset 0x42 is not always set, so don't bother checking it here
+        if (firstSectors[82] == 'F' &&
             firstSectors[83] == 'A' &&
             firstSectors[84] == 'T' &&
             firstSectors[85] == '3' &&
