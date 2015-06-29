@@ -402,6 +402,18 @@ public class BootSector {
         return BPB_RootEntCnt;
     }
 
+    public String getVolumeLabel() {
+        return BS_VolLab;
+    }
+
+    public long getVolumeId() {
+        return BS_VolID;
+    }
+
+    public String getOEMName() {
+        return BS_OEMName;
+    }
+
     /**
      * The Setting methods are writing here.
      *
