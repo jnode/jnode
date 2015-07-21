@@ -131,7 +131,8 @@ public class WellKnownSids {
     public static final SecurityIdentifier ACCESS_CONTROL_ASSISTANCE_OPS =
                                                                       register("S-1-5-32-579", "Access Control Assistance Operators");
     public static final SecurityIdentifier REMOTE_MANAGEMENT_USERS =  register("S-1-5-32-580", "Remote Management Users");
-    public static final SecurityIdentifier WRITE_RESTRICTED_CODE =    register("S-1-5-32-580", "Write Restricted Code");
+
+    public static final SecurityIdentifier WRITE_RESTRICTED_CODE =    register("S-1-5-33", "Write Restricted Code");
 
 
     public static final SecurityIdentifier NTLM_AUTHENTICATION =      register("S-1-5-64-10", "NTLM Authentication");
