@@ -22,8 +22,8 @@ package org.jnode.fs.exfat;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSDirectoryId;
@@ -33,23 +33,31 @@ import org.jnode.fs.spi.AbstractFSObject;
 /**
  * @author Matthias Treydte &lt;waldheinz at gmail.com&gt;
  */
-final class NodeDirectory extends AbstractFSObject implements FSDirectory, FSDirectoryId {
+public class NodeDirectory extends AbstractFSObject implements FSDirectory, FSDirectoryId {
 
     private final Node node;
     private final Map<String, NodeEntry> nameToNode;
+    private final Map<String, NodeEntry> idToNode;
     private final UpcaseTable upcase;
 
     public NodeDirectory(ExFatFileSystem fs, Node node)
+        throws IOException {
+
+        this(fs, node, false);
+    }
+
+    public NodeDirectory(ExFatFileSystem fs, Node node, boolean showDeleted)
         throws IOException {
 
         super(fs);
 
         this.node = node;
         this.upcase = fs.getUpcase();
-        this.nameToNode = new HashMap<String, NodeEntry>();
+        this.nameToNode = new LinkedHashMap<String, NodeEntry>();
+        this.idToNode = new LinkedHashMap<String, NodeEntry>();
 
         DirectoryParser.
-            create(node).
+            create(node, showDeleted).
             setUpcase(this.upcase).
             parse(new VisitorImpl());
 
@@ -63,7 +71,7 @@ final class NodeDirectory extends AbstractFSObject implements FSDirectory, FSDir
     @Override
     public Iterator<FSEntry> iterator() {
         return Collections.<FSEntry>unmodifiableCollection(
-            nameToNode.values()).iterator();
+            idToNode.values()).iterator();
     }
 
     @Override
@@ -73,10 +81,10 @@ final class NodeDirectory extends AbstractFSObject implements FSDirectory, FSDir
 
     @Override
     public FSEntry getEntryById(String id) throws IOException {
-        for (NodeEntry nodeEntry : nameToNode.values()) {
-            if (nodeEntry.getId().equals(id)) {
-                return nodeEntry;
-            }
+        NodeEntry nodeEntry = idToNode.get(id);
+
+        if (nodeEntry != null) {
+            return nodeEntry;
         }
 
         throw new IOException("Failed to find entry with ID:" + id);
@@ -127,9 +135,9 @@ final class NodeDirectory extends AbstractFSObject implements FSDirectory, FSDir
         public void foundNode(Node node, int index) throws IOException {
             final String upcaseName = upcase.toUpperCase(node.getName());
 
-            nameToNode.put(upcaseName,
-                new NodeEntry((ExFatFileSystem) getFileSystem(), node, NodeDirectory.this, index));
-
+            NodeEntry nodeEntry = new NodeEntry((ExFatFileSystem) getFileSystem(), node, NodeDirectory.this, index);
+            nameToNode.put(upcaseName, nodeEntry);
+            idToNode.put(nodeEntry.getId(), nodeEntry);
         }
 
     }
