@@ -579,8 +579,14 @@ public class FileRecord extends NTFSRecord {
             return;
         }
 
-        // At this point we know that at least the first attribute is non-resident.
+        // At this point we know that at least the first attribute is non-resident...
+
+        // Grab the initialised size (if that is itself initialised)
         long initialisedSize = ((NTFSNonResidentAttribute) attr).getAttributeInitializedSize();
+        if (initialisedSize == 0)
+        {
+            limitToInitialised = false;
+        }
 
         // calculate start and end cluster
         final int clusterSize = getClusterSize();
@@ -605,6 +611,7 @@ public class FileRecord extends NTFSRecord {
                 // If if the data is past the 'initialised' part of the attribute. If it is uninitialised then it must
                 // be read as zeros. Annoyingly the initialised portion isn't even cluster aligned...
                 long endOffset = (clusterOffset + clusterWithinNresData + nrClusters) * clusterSize;
+
 
                 if (endOffset > initialisedSize && limitToInitialised) {
                     int delta = (int)(endOffset - initialisedSize);
