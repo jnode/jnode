@@ -29,7 +29,7 @@ import org.jnode.fs.spi.AbstractFSObject;
 /**
  * @author Matthias Treydte &lt;waldheinz at gmail.com&gt;
  */
-final class NodeFile extends AbstractFSObject implements FSFile {
+public class NodeFile extends AbstractFSObject implements FSFile {
 
     private final Node node;
 

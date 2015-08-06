@@ -110,6 +110,15 @@ public class NodeDirectory extends AbstractFSObject implements FSDirectory, FSDi
         /* nothing to do */
     }
 
+    /**
+     * Gets the node associated with this directory.
+     *
+     * @return the node.
+     */
+    public Node getNode() {
+        return node;
+    }
+
     private class VisitorImpl implements DirectoryParser.Visitor {
 
         @Override
