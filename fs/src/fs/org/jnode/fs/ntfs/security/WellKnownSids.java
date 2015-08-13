@@ -239,6 +239,11 @@ public class WellKnownSids {
             else if (sidString.startsWith("S-1-5-5-")) {
                 name = WELL_KNOWN_1_5_5_SID_NAME;
             }
+
+            if (name != null) {
+                // If the name was in the well known subset then add the side on to the end.
+                name = name + " (" + sidString + ")";
+            }
         }
 
         return name;
