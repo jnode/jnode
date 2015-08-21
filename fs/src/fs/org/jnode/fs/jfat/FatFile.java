@@ -124,7 +124,7 @@ public class FatFile extends FatEntry implements FSFile, FSFileSlackSpace {
         int slackSpaceSize = clusterSize - offset;
 
         if (slackSpaceSize == clusterSize) {
-            slackSpaceSize = 0;
+            return new byte[0];
         }
 
         byte[] slackSpace = new byte[slackSpaceSize];
