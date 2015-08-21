@@ -47,7 +47,7 @@ public final class Node {
 
     public static Node create(
         ExFatSuperBlock sb, long startCluster, int flags,
-        String name, boolean isContiguous, long size, EntryTimes times) {
+        String name, boolean isContiguous, long size, EntryTimes times, boolean deleted) {
 
         final Node result = new Node(sb, startCluster, times);
 
@@ -55,6 +55,7 @@ public final class Node {
         result.isContiguous = isContiguous;
         result.size = size;
         result.flags = flags;
+        result.deleted = deleted;
 
         return result;
     }
@@ -69,6 +70,7 @@ public final class Node {
     private int flags;
     private String name;
     private long size;
+    private boolean deleted;
 
     private Node(ExFatSuperBlock sb, long startCluster, EntryTimes times) {
         this.sb = sb;
@@ -121,6 +123,10 @@ public final class Node {
 
     public long getSize() {
         return size;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
     }
 
     /**

@@ -27,7 +27,7 @@ import java.nio.ByteOrder;
 /**
  * @author Matthias Treydte &lt;waldheinz at gmail.com&gt;
  */
-final class DirectoryParser {
+public class DirectoryParser {
 
     private static final int ENTRY_SIZE = 32;
     private static final int ENAME_MAX_LEN = 15;
@@ -43,17 +43,21 @@ final class DirectoryParser {
     private static final int BITMAP = (0x01 | VALID);
     private static final int UPCASE = (0x02 | VALID);
     private static final int LABEL = (0x03 | VALID);
-    private static final int FILE = (0x05 | VALID);
-    private static final int FILE_INFO = (0x00 | VALID | CONTINUED);
-    private static final int FILE_NAME = (0x01 | VALID | CONTINUED);
+    private static final int FILE = (0x05);
+    private static final int FILE_INFO = (0x00 | CONTINUED);
+    private static final int FILE_NAME = (0x01 | CONTINUED);
 
     private static final int FLAG_FRAGMENTED = 1;
     private static final int FLAG_CONTIGUOUS = 3;
 
     public static DirectoryParser create(Node node) throws IOException {
+        return create(node, false);
+    }
+
+    public static DirectoryParser create(Node node, boolean showDeleted) throws IOException {
         assert (node.isDirectory()) : "not a directory"; //NOI18N
 
-        final DirectoryParser result = new DirectoryParser(node);
+        final DirectoryParser result = new DirectoryParser(node, showDeleted);
         result.init();
         return result;
     }
@@ -61,12 +65,14 @@ final class DirectoryParser {
     private final ExFatSuperBlock sb;
     private final ByteBuffer chunk;
     private final Node node;
+    private boolean showDeleted;
     private long cluster;
     private UpcaseTable upcase;
     private int index;
 
-    private DirectoryParser(Node node) {
+    private DirectoryParser(Node node, boolean showDeleted) {
         this.node = node;
+        this.showDeleted = showDeleted;
         this.sb = node.getSuperBlock();
         this.chunk = ByteBuffer.allocate(sb.getBytesPerCluster());
         this.chunk.order(ByteOrder.LITTLE_ENDIAN);
@@ -117,33 +123,33 @@ final class DirectoryParser {
         while (true) {
             final int entryType = DeviceAccess.getUint8(chunk);
 
-            switch (entryType) {
-                case LABEL:
-                    parseLabel(v);
-                    break;
+            if (entryType == LABEL) {
+                parseLabel(v);
 
-                case BITMAP:
-                    parseBitmap(v);
-                    break;
+            } else if (entryType == BITMAP) {
+                parseBitmap(v);
 
-                case UPCASE:
-                    parseUpcaseTable(v);
-                    break;
+            } else if (entryType == UPCASE) {
+                parseUpcaseTable(v);
 
-                case FILE:
-                    parseFile(v);
-                    break;
+            } else if ((entryType & FILE) == FILE) {
+                boolean deleted = (entryType & VALID) == 0;
+                if (showDeleted || !deleted) {
+                    parseFile(v, deleted);
+                } else {
+                    skip(ENTRY_SIZE - 1);
+                }
 
-                case EOD:
-                    return;
+            } else if (entryType == EOD) {
+                return;
 
-                default:
-                    if ((entryType & VALID) != 0) {
-                        throw new IOException(
-                            "unknown entry type " + entryType);
-                    } else {
-                        skip(ENTRY_SIZE - 1);
-                    }
+            } else {
+                if ((entryType & VALID) != 0) {
+                    throw new IOException(
+                        "unknown entry type " + entryType);
+                } else {
+                    skip(ENTRY_SIZE - 1);
+                }
             }
 
             if (!advance()) {
@@ -193,7 +199,7 @@ final class DirectoryParser {
         v.foundUpcaseTable(this, startCluster, size, checksum);
     }
 
-    private void parseFile(Visitor v) throws IOException {
+    private void parseFile(Visitor v, boolean deleted) throws IOException {
         int actualChecksum = startChecksum();
 
         int conts = DeviceAccess.getUint8(chunk);
@@ -212,8 +218,13 @@ final class DirectoryParser {
 
         actualChecksum = addChecksum(actualChecksum);
 
-        if (DeviceAccess.getUint8(chunk) != FILE_INFO) {
+        if ((DeviceAccess.getUint8(chunk) & FILE_INFO) != FILE_INFO) {
             throw new IOException("expected file info");
+        }
+
+        if (deleted) {
+            // Keep the index consistent with the index when not recovering deleted files
+            index++;
         }
 
         final int flag = DeviceAccess.getUint8(chunk);
@@ -239,8 +250,13 @@ final class DirectoryParser {
             advance();
             actualChecksum = addChecksum(actualChecksum);
 
-            if (DeviceAccess.getUint8(chunk) != FILE_NAME) {
+            if ((DeviceAccess.getUint8(chunk) & FILE_NAME) != FILE_NAME) {
                 throw new IOException("expected file name");
+            }
+
+            if (deleted) {
+                // Keep the index consistent with the index when not recovering deleted files
+                index++;
             }
 
             skip(1); /* unknown */
@@ -260,7 +276,7 @@ final class DirectoryParser {
             }
         }
 
-        if (referenceChecksum != actualChecksum) {
+        if (!deleted && referenceChecksum != actualChecksum) {
             throw new IOException("checksum mismatch");
         }
 
@@ -272,7 +288,8 @@ final class DirectoryParser {
                 " != " + Integer.toHexString(nameHash) + ")");
         }
 
-        v.foundNode(Node.create(sb, startCluster, attrib, name, (flag == FLAG_CONTIGUOUS), realSize, times), index);
+        v.foundNode(Node.create(sb, startCluster, attrib, name, (flag == FLAG_CONTIGUOUS), realSize, times, deleted),
+            index);
     }
 
     private int hashName(String name) throws IOException {
