@@ -62,7 +62,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
             readOnly = true; //force readonly
 
             if ((iNode.getFlags() & Ext2Constants.EXT4_INODE_EXTENTS_FLAG) != 0)
-                log.info("inode uses extents: " + entry);
+                log.debug("inode uses extents: " + entry);
             if ((iNode.getFlags() & Ext2Constants.EXT4_HUGE_FILE_FL) != 0)
                 log.info("inode is for a huge-file: " + entry);
             if ((iNode.getFlags() & Ext2Constants.EXT2_INDEX_FL) != 0)
@@ -329,7 +329,12 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
         return (int) (index % iNode.getExt2FileSystem().getBlockSize());
     }
 
-    private INode getINode() {
+    /**
+     * Gets the inode for this directory.
+     *
+     * @return the inode.
+     */
+    public INode getINode() {
         return iNode;
     }
 
