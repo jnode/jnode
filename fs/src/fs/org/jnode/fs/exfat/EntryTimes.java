@@ -20,6 +20,7 @@
  
 package org.jnode.fs.exfat;
 
+import com.enterprisedt.util.debug.Logger;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Date;
@@ -63,55 +64,59 @@ final class EntryTimes {
 
     private static final int EXFAT_EPOCH = 1980;
 
-    private static Date exfatToUnix(
-        int date, int time, int cs, int tzOffset) throws IOException {
+    private static Date exfatToUnix(int date, int time, int cs, int tzOffset)  {
 
-        final GregorianCalendar cal =
-            new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        try {
+            final GregorianCalendar cal =
+                new GregorianCalendar(TimeZone.getTimeZone("UTC"));
 
-        cal.setTimeInMillis(0);
+            cal.setTimeInMillis(0);
 
-        final int day = date & 0x1f;
-        final int month = ((date >> 5) & 0x0f);
-        final int year = ((date >> 9) & 0x7f) + EXFAT_EPOCH;
+            final int day = date & 0x1f;
+            final int month = ((date >> 5) & 0x0f);
+            final int year = ((date >> 9) & 0x7f) + EXFAT_EPOCH;
 
-        if ((day == 0) || (month <= 0) || (month > 12)) {
-            throw new IOException(
-                "bad day (" + day + ") or month ("
-                    + month + ") value");
+            if ((day == 0) || (month <= 0) || (month > 12)) {
+                throw new IllegalStateException(
+                    "bad day (" + day + ") or month ("
+                        + month + ") value");
+            }
+
+            cal.set(year, month - 1, day);
+
+            final int twoSec = (time & 0x1f);
+            final int min = ((time >> 5) & 0x0f);
+            final int hour = (time >> 11);
+
+            if ((hour > 23) || (min > 59) || (twoSec > 29)) {
+                throw new IllegalStateException("bad hour ("
+                    + hour + ") or minute ("
+                    + min + ") value");
+            }
+
+            if (cs > 199) {
+                throw new IllegalStateException("bad centiseconds value");
+            }
+
+            cal.add(GregorianCalendar.HOUR_OF_DAY, hour);
+            cal.add(GregorianCalendar.MINUTE, min);
+            cal.add(GregorianCalendar.SECOND, twoSec * 2);
+
+            cal.setTimeInMillis(cal.getTimeInMillis() + (cs * 10));
+
+            /* adjust for TZ offset */
+
+            final boolean tzNeg = ((tzOffset & 0x40) != 0);
+            tzOffset &= 0x3f;
+            tzOffset *= tzNeg ? -15 : 15;
+
+            cal.add(GregorianCalendar.MINUTE, tzOffset);
+
+            return cal.getTime();
+        } catch (Exception e) {
+            Logger.getLogger(EntryTimes.class).error("Error getting entry times", e);
+            return null;
         }
-
-        cal.set(year, month - 1, day);
-
-        final int twoSec = (time & 0x1f);
-        final int min = ((time >> 5) & 0x0f);
-        final int hour = (time >> 11);
-
-        if ((hour > 23) || (min > 59) || (twoSec > 29)) {
-            throw new IOException("bad hour ("
-                + hour + ") or minute ("
-                + min + ") value");
-        }
-
-        if (cs > 199) {
-            throw new IOException("bad centiseconds value");
-        }
-
-        cal.add(GregorianCalendar.HOUR_OF_DAY, hour);
-        cal.add(GregorianCalendar.MINUTE, min);
-        cal.add(GregorianCalendar.SECOND, twoSec * 2);
-
-        cal.setTimeInMillis(cal.getTimeInMillis() + (cs * 10));
-        
-        /* adjust for TZ offset */
-
-        final boolean tzNeg = ((tzOffset & 0x40) != 0);
-        tzOffset &= 0x3f;
-        tzOffset *= tzNeg ? -15 : 15;
-
-        cal.add(GregorianCalendar.MINUTE, tzOffset);
-
-        return cal.getTime();
     }
 
     private final Date created;
@@ -125,15 +130,15 @@ final class EntryTimes {
     }
 
     public Date getCreated() {
-        return (Date) created.clone();
+        return created == null ? null : (Date) created.clone();
     }
 
     public Date getModified() {
-        return (Date) modified.clone();
+        return modified == null ? null :  (Date) modified.clone();
     }
 
     public Date getAccessed() {
-        return (Date) accessed.clone();
+        return accessed == null ? null :  (Date) accessed.clone();
     }
 
 }
