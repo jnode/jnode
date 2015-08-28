@@ -125,7 +125,7 @@ public class NTFSVolume {
             if (bytesPerFileRecord < clusterSize) {
                 nrClusters = 1;
             } else {
-                nrClusters = bytesPerFileRecord / clusterSize;
+                nrClusters = (bytesPerFileRecord + clusterSize - 1) / clusterSize;
             }
             final byte[] data = new byte[nrClusters * clusterSize];
             readClusters(bootRecord.getMftLcn(), data, 0, nrClusters);
