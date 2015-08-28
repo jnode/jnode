@@ -150,7 +150,7 @@ public class NTFSRecord extends NTFSStructure {
             if (strictFixUp) {
                 throw new IOException("Fix-up error", e);
             } else {
-                log.error("Fix-up error", e);
+                log.debug("Fix-up error", e);
             }
         }
     }
