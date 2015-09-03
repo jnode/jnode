@@ -60,7 +60,7 @@ public class CompressedAttributeData extends AttributeData {
     public boolean isCompressedInFork() {
         return
             decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_ZLIB_FORK ||
-            decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_LZVN;
+            decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_LZVN_FORK;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class CompressedAttributeData extends AttributeData {
                 decompressor = new AttributeZlibCompression(attributeData, decmpfsDiskHeader);
             } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_ZLIB_FORK) {
                 decompressor = new ZlibForkCompression(file);
-            } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_LZVN) {
+            } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_LZVN_FORK) {
                 decompressor = new LzvnForkCompression(file);
             } else {
                 throw new UnsupportedOperationException("Unsupported compression type: " + decmpfsDiskHeader);

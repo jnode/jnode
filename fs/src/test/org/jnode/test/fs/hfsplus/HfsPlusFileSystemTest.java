@@ -223,6 +223,30 @@ public class HfsPlusFileSystemTest {
     }
 
     @Test
+    public void testDiskWithLzvnCompression() throws Exception {
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/hfsplus/rle-compression.dmg"), "r");
+        HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
+        HfsPlusFileSystem fs = type.create(device, true);
+
+        String expectedStructure =
+            "type: HFS+ vol:rle-compression total:40960000 free:39092224\n" +
+            "  /; \n" +
+            "    .fseventsd; \n" +
+            "      000000000039ce79; 109; 151712afa50c634d4e796e06025b6779\n" +
+            "      000000000039ce7a; 71; e659b5b401cb15e01fb9b5dd65b733ef\n" +
+            "      fseventsd-uuid; 36; c2c77c331f977e1b274da06abc7c778a\n" +
+            "    .HFS+ Private Directory Data\r; \n" +
+            "    .journal; 524288; b7106768943c0ae7b09e84b5bf75e62f\n" +
+            "    .journal_info_block; 4096; 469270564228a832e83d2ad16e6d8edc\n" +
+            "    .Trashes; \n" +
+            "    bash; 628640; f81cce1751382506604e244039bf4724\n" +
+            "    bash:rsrc; 352797; 699818770c06dc378bb2dd13ca159b33\n" +
+            "    \u0000\u0000\u0000\u0000HFS+ Private Data; \n";
+
+        DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
+
+    @Test
     public void testCreate() throws Exception {
         HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
         HfsPlusFileSystem fs = new HfsPlusFileSystem(device, false, type);
