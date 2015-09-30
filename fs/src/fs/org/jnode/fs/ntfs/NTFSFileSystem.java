@@ -61,7 +61,7 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
      */
     public FSEntry getRootEntry() throws IOException {
         if (root == null) {
-            root = new NTFSEntry(this, volume.getRootDirectory(), -1);
+            root = new NTFSEntry(this, getNTFSVolume().getRootDirectory(), -1);
         }
         return root;
     }
@@ -154,7 +154,7 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
     }
 
     public long getFreeSpace() throws IOException {
-        FileRecord bitmapRecord = volume.getMFT().getRecord(MasterFileTable.SystemFiles.BITMAP);
+        FileRecord bitmapRecord = getNTFSVolume().getMFT().getRecord(MasterFileTable.SystemFiles.BITMAP);
 
         int bitmapSize = (int) bitmapRecord.getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
         byte[] buffer = new byte[bitmapSize];
@@ -172,15 +172,15 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
             }
         }
 
-        long usedSpace = (long) usedBlocks * volume.getClusterSize();
+        long usedSpace = (long) usedBlocks * getNTFSVolume().getClusterSize();
 
         return getTotalSpace() - usedSpace;
     }
 
     public long getTotalSpace() throws IOException {
-        FileRecord bitmapRecord = volume.getMFT().getRecord(MasterFileTable.SystemFiles.BITMAP);
+        FileRecord bitmapRecord = getNTFSVolume().getMFT().getRecord(MasterFileTable.SystemFiles.BITMAP);
         long bitmapSize = bitmapRecord.getFileNameAttribute().getRealSize();
-        return bitmapSize * 8 * volume.getClusterSize();
+        return bitmapSize * 8 * getNTFSVolume().getClusterSize();
     }
 
     public long getUsableSpace() {
