@@ -27,7 +27,7 @@ import org.jnode.fs.ntfs.index.IndexEntry;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class MasterFileTable extends FileRecord {
+public class MasterFileTable extends FileRecord {
 
     /**
      * MFT indexes of system files
