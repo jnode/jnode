@@ -20,12 +20,12 @@
  
 package org.jnode.fs.exfat;
 
-import com.enterprisedt.util.debug.Logger;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import org.apache.log4j.Logger;
 
 /**
  * @author Matthias Treydte &lt;waldheinz at gmail.com&gt;
