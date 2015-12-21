@@ -842,25 +842,52 @@ clean             Remove all intermediate build results.
 	<target name="hotswap" depends="check-debugger-properties,assemble-projects" description="hotswap the modified classes">
 		<taskdef name="hotswap" classname="org.jnode.ant.taskdefs.Hotswap" classpathref="cp-jnode" />
 		<hotswap verbose="true" host="${jnode.debugger.host}" port="${jnode.debugger.port}">
+			<fileset dir="../cli/build/classes/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
+			<fileset dir="../cli/build/testclasses/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
 			<fileset dir="../core/build/classes/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
+			<fileset dir="../core/build/testclasses/" includes="**/*.class">
 				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
 			</fileset>
 			<fileset dir="../distr/build/classes/" includes="**/*.class">
 				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
 			</fileset>
+			<fileset dir="../distr/build/testclasses/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
 			<fileset dir="../fs/build/classes/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
+			<fileset dir="../fs/build/testclasses/" includes="**/*.class">
 				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
 			</fileset>
 			<fileset dir="../gui/build/classes/" includes="**/*.class">
 				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
 			</fileset>
+			<fileset dir="../gui/build/testclasses/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
 			<fileset dir="../net/build/classes/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
+			<fileset dir="../net/build/testclasses/" includes="**/*.class">
 				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
 			</fileset>
 			<fileset dir="../shell/build/classes/" includes="**/*.class">
 				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
 			</fileset>
+			<fileset dir="../shell/build/testclasses/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
 			<fileset dir="../textui/build/classes/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
+			<fileset dir="../textui/build/testclasses/" includes="**/*.class">
 				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
 			</fileset>
 		</hotswap>
