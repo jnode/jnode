@@ -21,6 +21,7 @@
 package org.jnode.vm.classmgr;
 
 import java.lang.reflect.Field;
+import org.jnode.annotation.PrivilegedActionPragma;
 import org.jnode.vm.isolate.VmIsolateLocal;
 import sun.reflect.ReflectionFactory;
 
@@ -115,6 +116,7 @@ public abstract class VmField extends VmMember {
      *
      * @return Field
      */
+    @PrivilegedActionPragma
     public final Field asField() {
         if (javaFieldHolder == null) {
             javaFieldHolder = new VmIsolateLocal<Field>();
