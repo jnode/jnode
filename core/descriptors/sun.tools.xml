@@ -74,5 +74,7 @@
       <permission class="java.util.PropertyPermission" name="sun.boot.class.path" actions="read"/>
       <permission class="java.util.PropertyPermission" name="java.ext.dirs" actions="read"/>
       <permission class="java.util.PropertyPermission" name="env.class.path" actions="read"/>
+      <permission class="java.util.PropertyPermission" name="jconsole.showOutputViewer" actions="read"/>
+      <permission class="java.util.PropertyPermission" name="jconsole.showUnsupported" actions="read"/>
   </extension>
 </plugin>
