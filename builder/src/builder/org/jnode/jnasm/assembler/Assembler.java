@@ -110,7 +110,7 @@ public abstract class Assembler {
     public void performTwoPasses(Reader reader, NativeStream asm) throws Exception {
         String data = readToString(reader);
 
-        new RandomAccessFile("jnode.lst", "rw").write(data.getBytes());
+        //new RandomAccessFile("jnode.lst", "rw").write(data.getBytes());
 
         //1st pass
         ReInit(new StringReader(data));
@@ -125,7 +125,7 @@ public abstract class Assembler {
         jnasmInput();
         emit(asm);
 
-        asm.writeTo(new FileOutputStream("jnode.out"));
+        //asm.writeTo(new FileOutputStream("jnode.out"));
     }
 
     private static String readToString(Reader reader) throws IOException {
