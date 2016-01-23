@@ -263,6 +263,7 @@ public class TaskBar extends JPanel {
         @Override
         public void run() {
             ((JNodeToolkit) Toolkit.getDefaultToolkit()).changeScreenSize(config);
+            desktop.desktopFrame.getAwtRoot().repaint();
             AccessController.doPrivileged(new SetPropertyAction("jnode.awt.screensize", config.toString()));
         }
 
