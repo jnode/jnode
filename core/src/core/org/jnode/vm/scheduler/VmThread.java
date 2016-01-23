@@ -429,7 +429,6 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
     /**
      * Stop the thread permanently.
      *
-     * @param ex
      * @throws UninterruptiblePragma
      */
     @Uninterruptible
@@ -810,7 +809,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      * Setup this thread to wait for the given monitor
      *
      * @param monitor
-     * @param One     of the Thread WAITING_XYZ states.
+     * @param waitState One of the Thread WAITING_XYZ states.
      */
     @Uninterruptible
     final void prepareWait(Monitor monitor, int waitState) {
