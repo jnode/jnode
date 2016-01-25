@@ -38,10 +38,6 @@ public class FSUtils {
 
     private static final Logger log = Logger.getLogger(FSUtils.class);
 
-    private static final int MAX_DUMP_SIZE = 256;
-
-    private static final int LINE_SIZE = 16;
-
     protected static DateFormat dateFormat = new SimpleDateFormat();
 
     /**
@@ -198,32 +194,40 @@ public class FSUtils {
      * @return a rendering of the bytes
      */
     public static String toString(byte[] data, int offset, int length) {
-        StringBuilder sb = new StringBuilder(1024);
-        StringBuilder chars = new StringBuilder(LINE_SIZE);
+        StringBuilder builder = new StringBuilder();
 
-        int l = Math.min(Math.min(length - offset, data.length - offset), MAX_DUMP_SIZE);
-        int mod = l % LINE_SIZE;
-        if (mod != 0)
-            l += LINE_SIZE - mod;
+        for (int i = offset; i < length; i += 16) {
+            int bytes = Math.min(16, length - i);
 
-        for (int i = 0; i < l; i++) {
-            if ((i % 16) == 0) {
-                sb.append(lpad(Integer.toHexString(i), 4)).append(" - ");
-                chars.setLength(0); // empty
+            builder.append(String.format("0x%08x - ", i));
+
+            for (int j = 0; j < 16; j++) {
+                if (j < bytes) {
+                    int value = data[i + j] & 0xFF;
+                    if (value < 16) {
+                        builder.append('0');
+                    }
+                    builder.append(Integer.toHexString(value)).append(' ');
+                } else {
+                    builder.append("   ");
+                }
             }
 
-            int idx = offset + i;
-            boolean end = (idx >= data.length);
-            if (!end) {
-                sb.append(lpad(Integer.toHexString(data[idx]), 2)).append(' ');
-                chars.append((char) data[idx]);
+            builder.append("  ");
+
+            for (int j = 0; j < bytes; j++) {
+                int value = data[i + j] & 0xFF;
+                if (value >= 32 && value <= 126) {
+                    builder.append((char)value);
+                } else {
+                    builder.append('.');
+                }
             }
 
-            if (((i % 16) == 15) || end) {
-                sb.append("   ").append(chars.toString()).append('\n');
-            }
+            builder.append('\n');
         }
-        return sb.toString();
+
+        return builder.toString();
     }
 
     /**
