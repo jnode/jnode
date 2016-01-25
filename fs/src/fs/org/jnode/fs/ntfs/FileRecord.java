@@ -752,7 +752,7 @@ public class FileRecord extends NTFSRecord {
                 NTFSAttribute attribute = NTFSAttribute.getAttribute(FileRecord.this, offset);
 
                 if (log.isDebugEnabled()) {
-                    log.debug("Attribute: " + attribute);
+                    log.debug("Attribute: " + attribute.toDebugString());
                 }
 
                 int offsetToNextOffset = getUInt32AsInt(offset + 0x04);

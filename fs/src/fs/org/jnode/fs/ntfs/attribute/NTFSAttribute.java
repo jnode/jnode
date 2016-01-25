@@ -174,6 +174,13 @@ public abstract class NTFSAttribute extends NTFSStructure {
     }
 
     /**
+     * Generates a debug string for the attribute.
+     *
+     * @return the debug string.
+     */
+    public abstract String toDebugString();
+
+    /**
      * Create an NTFSAttribute instance suitable for the given attribute data.
      * 
      * @param fileRecord the containing file record.

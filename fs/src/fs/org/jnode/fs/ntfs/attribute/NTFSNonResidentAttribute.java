@@ -28,6 +28,7 @@ import org.jnode.fs.ntfs.DataRun;
 import org.jnode.fs.ntfs.DataRunInterface;
 import org.jnode.fs.ntfs.FileRecord;
 import org.jnode.fs.ntfs.NTFSVolume;
+import org.jnode.fs.util.FSUtils;
 
 /**
  * An NTFS file attribute that has its data stored outside the attribute.
@@ -111,7 +112,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      * @return the size allocated to the attribute.
      */
     public long getAttributeAllocatedSize() {
-        return getUInt32(0x28);
+        return getInt64(0x28);
     }
 
     /**
@@ -157,6 +158,10 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
 
         while (getUInt8(offset) != 0x0) {
             final DataRun dataRun = new DataRun(this, offset, vcn, previousLCN);
+
+            if (log.isDebugEnabled()) {
+                log.debug("Data run at offset: " + offset  + " " + dataRun);
+            }
 
             if (compressed) {
                 if (dataRun.isSparse() && (expectingSparseRunNext || firstDataRun)) {
@@ -297,25 +302,37 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         return numberOfVCNs;
     }
 
+    /**
+     * Generates a hex dump of the attribute's data.
+     *
+     * @return the hex dump.
+     */
+    public String hexDump() {
+        int length = getBuffer().length - getOffset();
+        byte[] data = new byte[length];
+        getData(0, data, 0, data.length);
+        return FSUtils.toString(data);
+    }
+
     @Override
     public String toString() {
         return String.format("[attribute (non-res) type=x%x name'%s' size=%d runs=%d]", getAttributeType(),
             getAttributeName(), getAttributeActualSize(), getDataRuns().size());
     }
 
-    /**
-     * Gets a debug string for the attribute.
-     *
-     * @return the debug string.
-     */
+    @Override
     public String toDebugString() {
         StringBuilder builder = new StringBuilder();
 
-        for (DataRunInterface dataRun : getDataRuns()) {
-            builder.append(dataRun);
-            builder.append("\n");
+        try {
+            for (DataRunInterface dataRun : getDataRuns()) {
+                builder.append(dataRun);
+                builder.append("\n");
+            }
+        } catch (Exception e) {
+            builder.append("Error: " + e);
         }
 
-        return String.format("%s\nData runs:\n%s", toString(), builder.toString());
+        return String.format("%s\nData runs:\n%s\nData: %s", toString(), builder.toString(), hexDump());
     }
 }
