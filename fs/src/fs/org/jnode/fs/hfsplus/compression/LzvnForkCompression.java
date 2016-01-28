@@ -112,7 +112,7 @@ public class LzvnForkCompression implements HfsPlusCompression {
             // Copy the data into the destination buffer
             uncompressed.position((int) fileOffset % LZVN_FORK_CHUNK_SIZE);
             int copySize = Math.min(dest.remaining(), decodedLength);
-            uncompressed.limit(uncompressed.position() + copySize);
+            uncompressed.limit(Math.min(uncompressed.capacity(), uncompressed.position() + copySize));
             dest.put(uncompressed);
 
             fileOffset += copySize;

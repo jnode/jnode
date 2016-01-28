@@ -40,7 +40,7 @@ public class AttributeType1Compression implements HfsPlusCompression {
         }
 
         uncompressed.position((int) fileOffset);
-        uncompressed.limit(uncompressed.position() + dest.remaining());
+        uncompressed.limit(Math.min(uncompressed.capacity(), uncompressed.position() + dest.remaining()));
         dest.put(uncompressed);
     }
 }

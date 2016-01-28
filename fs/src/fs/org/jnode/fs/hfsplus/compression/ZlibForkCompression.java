@@ -53,17 +53,23 @@ public class ZlibForkCompression implements HfsPlusCompression {
 
         ByteBuffer uncompressed = ByteBuffer.allocate(ZLIB_FORK_CHUNK_SIZE);
 
-        Inflater inflater = new Inflater();
-        inflater.setInput(compressed.array());
+        if (compressed.array()[0] == (byte) 0xff) {
+            // 0xff seems to be a marker for uncompressed data. Skip this byte any just copy the data out.
+            compressed.position(1);
+            uncompressed.put(compressed);
+        } else {
+            Inflater inflater = new Inflater();
+            inflater.setInput(compressed.array());
 
-        try {
-            inflater.inflate(uncompressed.array());
-        } catch (DataFormatException e) {
-            throw new IllegalStateException("Error uncompressing data", e);
+            try {
+                inflater.inflate(uncompressed.array());
+            } catch (DataFormatException e) {
+                throw new IllegalStateException("Error uncompressing data", e);
+            }
         }
 
         uncompressed.position((int) fileOffset % ZLIB_FORK_CHUNK_SIZE);
-        uncompressed.limit(uncompressed.position() + dest.remaining());
+        uncompressed.limit(Math.min(uncompressed.capacity(), uncompressed.position() + dest.remaining()));
         dest.put(uncompressed);
     }
 }
