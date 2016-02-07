@@ -580,6 +580,7 @@ public final class SwingToolkit extends JNodeToolkit {
         // Create the desktop
         desktopFrame = new DesktopFrame(getScreenSize());
         desktopFrame.show();
+        desktopFrame.getContentPane().repaint();
     }
 
     protected void onResize() {
