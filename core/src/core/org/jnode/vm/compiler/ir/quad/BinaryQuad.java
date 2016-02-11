@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir.quad;
 
 import org.jnode.vm.compiler.ir.AddressingMode;
@@ -442,46 +442,13 @@ public class BinaryQuad<T> extends AssignQuad<T> {
         }
 
         final Mode aMode = Mode.valueOf(lhsMode, op1Mode, op2Mode);
-        if (aMode == Mode.MODE_RCC || aMode == Mode.MODE_SCC) {
-            cg.generateCodeFor(foldConstants2());
-            return;
-        }
-
-        switch (operation) {
-            case FCMPG:
-            case FCMPL:
-            case DCMPG:
-            case DCMPL:
-                cg.generateBinaryFPOP(this);
-                return;
-        }
-
-        switch (operation) {
-            case LADD:
-            case LSUB:
-            case LMUL:
-            case LDIV:
-            case LREM:
-            case LAND:
-            case LOR:
-            case LXOR:
-            case LSHL:
-            case LSHR:
-            case LUSHR:
-            case LCMP:
-                cg.generateBinaryLongOP(this);
-                return;
-        }
-
-
         switch (aMode) {
-//handled above
-//            case MODE_RCC:
-//                cg.generateBinaryOP(reg1, c2, operation, c3);
-//                break;
+            case MODE_RCC:
+                cg.generateBinaryOP(reg1, c2, operation, c3);
+                break;
             case MODE_RCR:
                 if (reg1 == reg3 && commutative && !cg.supports3AddrOps()) {
-                    cg.generateBinaryOP(this, reg1, reg3, operation, c2);
+                    cg.generateBinaryOP(reg1, reg3, operation, c2);
                 } else {
                     cg.generateBinaryOP(reg1, c2, operation, reg3);
                 }
@@ -490,63 +457,62 @@ public class BinaryQuad<T> extends AssignQuad<T> {
                 cg.generateBinaryOP(reg1, c2, operation, disp3);
                 break;
             case MODE_RRC:
-                cg.generateBinaryOP(this, reg1, reg2, operation, c3);
+                cg.generateBinaryOP(reg1, reg2, operation, c3);
                 break;
             case MODE_RRR:
                 if (reg1 == reg3 && commutative && !cg.supports3AddrOps()) {
-                    cg.generateBinaryOP(this, reg1, reg3, operation, reg2);
+                    cg.generateBinaryOP(reg1, reg3, operation, reg2);
                 } else {
-                    cg.generateBinaryOP(this, reg1, reg2, operation, reg3);
+                    cg.generateBinaryOP(reg1, reg2, operation, reg3);
                 }
                 break;
             case MODE_RRS:
-                cg.generateBinaryOP(this, reg1, reg2, operation, disp3);
+                cg.generateBinaryOP(reg1, reg2, operation, disp3);
                 break;
             case MODE_RSC:
                 cg.generateBinaryOP(this, reg1, disp2, operation, c3);
                 break;
             case MODE_RSR:
                 if (reg1 == reg3 && commutative && !cg.supports3AddrOps()) {
-                    cg.generateBinaryOP(this, reg1, reg3, operation, disp2);
+                    cg.generateBinaryOP(reg1, reg3, operation, disp2);
                 } else {
                     cg.generateBinaryOP(reg1, disp2, operation, reg3);
                 }
                 break;
             case MODE_RSS:
-                cg.generateBinaryOP(this, reg1, disp2, operation, disp3);
+                cg.generateBinaryOP(reg1, disp2, operation, disp3);
                 break;
-//handled above
-//            case MODE_SCC:
-//                cg.generateBinaryOP(disp1, c2, operation, c3);
-//                break;
+            case MODE_SCC:
+                cg.generateBinaryOP(disp1, c2, operation, c3);
+                break;
             case MODE_SCR:
-                cg.generateBinaryOP(this, disp1, c2, operation, reg3);
+                cg.generateBinaryOP(disp1, c2, operation, reg3);
                 break;
             case MODE_SCS:
                 if (disp1 == disp3 && commutative && !cg.supports3AddrOps()) {
                     cg.generateBinaryOP(this, disp1, disp3, operation, c2);
                 } else {
-                    cg.generateBinaryOP(this, disp1, c2, operation, disp3);
+                    cg.generateBinaryOP(disp1, c2, operation, disp3);
                 }
                 break;
             case MODE_SRC:
                 cg.generateBinaryOP(disp1, reg2, operation, c3);
                 break;
             case MODE_SRR:
-                cg.generateBinaryOP(this, disp1, reg2, operation, reg3);
+                cg.generateBinaryOP(disp1, reg2, operation, reg3);
                 break;
             case MODE_SRS:
                 if (disp1 == disp3 && commutative && !cg.supports3AddrOps()) {
-                    cg.generateBinaryOP(this, disp1, disp3, operation, reg2);
+                    cg.generateBinaryOP(disp1, disp3, operation, reg2);
                 } else {
-                    cg.generateBinaryOP(this, disp1, reg2, operation, disp3);
+                    cg.generateBinaryOP(disp1, reg2, operation, disp3);
                 }
                 break;
             case MODE_SSC:
                 cg.generateBinaryOP(this, disp1, disp2, operation, c3);
                 break;
             case MODE_SSR:
-                cg.generateBinaryOP(this, disp1, disp2, operation, reg3);
+                cg.generateBinaryOP(disp1, disp2, operation, reg3);
                 break;
             case MODE_SSS:
                 if (disp1 == disp3 && commutative && !cg.supports3AddrOps()) {
