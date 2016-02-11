@@ -45,6 +45,7 @@ public class RefAssignQuad<T> extends AssignQuad<T> {
         super(address, block, lhsIndex);
         this.rhs = new StaticField(fieldRef);
         refs = new Operand[]{getOperand(refIndex)};
+        getLHS().setTypeFromJvmType(fieldRef.getResolvedVmField().getType().getJvmType());
     }
 
     public VmConstFieldRef getFieldRef() {

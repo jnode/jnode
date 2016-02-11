@@ -20,6 +20,8 @@
  
 package org.jnode.vm.compiler.ir.quad;
 
+import org.jnode.vm.JvmType;
+import org.jnode.vm.classmgr.Signature;
 import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 import org.jnode.vm.compiler.ir.Operand;
@@ -39,6 +41,7 @@ public abstract class CallAssignQuad<T> extends AssignQuad<T> {
         for (int i = 0; i < offs.length; i++) {
             refs[i] = getOperand(offs[i]);
         }
+        getLHS().setTypeFromJvmType(JvmType.getReturnType(methodRef.getSignature()));
     }
 
     public VmConstMethodRef getMethodRef() {

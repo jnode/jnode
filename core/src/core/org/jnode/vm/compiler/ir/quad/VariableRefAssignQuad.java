@@ -41,6 +41,7 @@ public class VariableRefAssignQuad<T> extends AssignQuad<T> {
     public VariableRefAssignQuad(int address, IRBasicBlock<T> block, int lhsIndex, int rhsIndex) {
         super(address, block, lhsIndex);
         refs = new Operand[]{getOperand(rhsIndex)};
+        getLHS().setType(refs[0].getType());
     }
 
     /**
@@ -50,6 +51,7 @@ public class VariableRefAssignQuad<T> extends AssignQuad<T> {
     public VariableRefAssignQuad(int address, IRBasicBlock<T> block, Variable<T> lhs, Variable<T> rhs) {
         super(address, block, lhs);
         refs = new Operand[]{rhs};
+        getLHS().setType(refs[0].getType());
     }
 
     public Operand<T>[] getReferencedOps() {
@@ -69,8 +71,31 @@ public class VariableRefAssignQuad<T> extends AssignQuad<T> {
 
     public Operand<T> propagate(Variable<T> operand) {
         if (!(refs[0] instanceof ExceptionArgument)) {
-            setDeadCode(true);
-            return refs[0];
+            boolean found = false;
+            int address = getAddress();
+            //check if operand is used in dominance frontier blocks possibly in a phi quad
+            out:
+            for(IRBasicBlock<T> bb : this.getBasicBlock().getDominanceFrontier()) {
+                for (Quad quad : bb.getQuads()) {
+                    if (!quad.isDeadCode()) {
+                        Operand[] referencedOps = quad.getReferencedOps();
+                        if (referencedOps != null) {
+                            for (Operand op : referencedOps) {
+                                if (op.equals(operand)) {
+                                    found = true;
+                                    break out;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (!found) {
+                setDeadCode(true);
+                return refs[0];
+            } else {
+                return operand;
+            }
         } else {
             return operand;
         }

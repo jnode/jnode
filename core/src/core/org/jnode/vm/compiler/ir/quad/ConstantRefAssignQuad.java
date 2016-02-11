@@ -41,6 +41,7 @@ public class ConstantRefAssignQuad<T> extends AssignQuad<T> {
                                  Constant<T> rhs) {
         super(address, block, lhsIndex);
         this.rhs = rhs;
+        getLHS().setType(rhs.getType());
     }
 
     /**
@@ -52,7 +53,21 @@ public class ConstantRefAssignQuad<T> extends AssignQuad<T> {
                                  Constant<T> rhs) {
         super(address, block, lhs);
         this.rhs = rhs;
+        getLHS().setType(rhs.getType());
     }
+
+    /**
+     * @param address
+     * @param block
+     * @param lhs
+     */
+    public ConstantRefAssignQuad(int address, int bytecodeAddress, IRBasicBlock<T> block, Variable<T> lhs,
+                                 Constant<T> rhs) {
+        super(address, bytecodeAddress, block, lhs);
+        this.rhs = rhs;
+        getLHS().setType(rhs.getType());
+    }
+
 
     /**
      * @see org.jnode.vm.compiler.ir.quad.Quad#getReferencedOps()

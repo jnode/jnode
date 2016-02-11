@@ -38,6 +38,7 @@ public class NewObjectArrayAssignQuad<T> extends AssignQuad<T> {
         super(address, block, lhsIndex);
         this.clazz = clazz;
         refs = new Operand[]{getOperand(sizeIndex)};
+        getLHS().setType(Operand.REFERENCE);
     }
 
     @Override

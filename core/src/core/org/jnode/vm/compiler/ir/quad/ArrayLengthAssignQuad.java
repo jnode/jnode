@@ -34,6 +34,7 @@ public class ArrayLengthAssignQuad extends AssignQuad {
     public ArrayLengthAssignQuad(int address, IRBasicBlock block, int lhsIndex, int refIndex) {
         super(address, block, lhsIndex);
         this.refs = new Operand[]{getOperand(refIndex)};
+        getLHS().setType(Operand.INT);
     }
 
     public Variable getRef() {

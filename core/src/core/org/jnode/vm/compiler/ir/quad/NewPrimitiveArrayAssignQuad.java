@@ -37,6 +37,7 @@ public class NewPrimitiveArrayAssignQuad<T> extends AssignQuad<T> {
         super(address, block, lhsIndex);
         this.type = type;
         refs = new Operand[]{getOperand(sizeIndex)};
+        getLHS().setType(Operand.REFERENCE);
     }
 
     public Operand getSize() {

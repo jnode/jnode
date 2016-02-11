@@ -37,6 +37,7 @@ public class ConstantClassAssignQuad<T> extends AssignQuad <T> {
         super(address, block, lhsIndex);
         refs = new Operand[0];
         this.constClass = constClass;
+        getLHS().setType(Operand.INT);
     }
 
     public VmConstClass getConstClass() {

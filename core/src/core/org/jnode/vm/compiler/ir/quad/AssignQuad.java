@@ -40,6 +40,11 @@ public abstract class AssignQuad<T> extends Quad<T> {
         setLHS(lhs);
     }
 
+    public AssignQuad(int address, int byteCodeAddress, IRBasicBlock<T> block, Variable<T> lhs) {
+        super(address, byteCodeAddress, block);
+        setLHS(lhs);
+    }
+
     public AssignQuad(int address, IRBasicBlock<T> block, int lhsIndex) {
         this(address, block, (Variable<T>) block.getVariables()[lhsIndex].clone());
     }

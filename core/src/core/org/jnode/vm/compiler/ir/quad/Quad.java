@@ -36,11 +36,20 @@ import org.jnode.vm.compiler.ir.Variable;
  */
 public abstract class Quad<T> {
     private int address;
+    private final int byteCodeAddress;
     private boolean deadCode;
     private IRBasicBlock<T> basicBlock;
 
     public Quad(int address, IRBasicBlock<T> block) {
         this.address = address;
+        this.byteCodeAddress = address;
+        this.basicBlock = block;
+        this.deadCode = false;
+    }
+
+    public Quad(int address, int byteCodeAddress, IRBasicBlock<T> block) {
+        this.address = address;
+        this.byteCodeAddress = byteCodeAddress;
         this.basicBlock = block;
         this.deadCode = false;
     }
@@ -63,6 +72,10 @@ public abstract class Quad<T> {
      */
     public void setAddress(int i) {
         address = i;
+    }
+
+    public int getByteCodeAddress() {
+        return byteCodeAddress;
     }
 
     /**

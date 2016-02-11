@@ -48,6 +48,14 @@ public class CheckcastQuad<T> extends Quad<T> {
         return refs;
     }
 
+    public VmConstClass getConstClass() {
+        return clazz;
+    }
+
+    public Operand getRef() {
+        return refs[0];
+    }
+
     @Override
     public void doPass2() {
         refs[0] = refs[0].simplify();

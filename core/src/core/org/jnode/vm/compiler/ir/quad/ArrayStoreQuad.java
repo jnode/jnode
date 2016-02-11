@@ -64,6 +64,10 @@ public class ArrayStoreQuad extends Quad {
         return refs;
     }
 
+    public int getType() {
+        return type;
+    }
+
     @Override
     public void doPass2() {
         refs[0] = refs[0].simplify();

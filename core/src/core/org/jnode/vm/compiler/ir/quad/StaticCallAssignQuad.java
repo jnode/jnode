@@ -20,6 +20,7 @@
  
 package org.jnode.vm.compiler.ir.quad;
 
+import org.jnode.vm.JvmType;
 import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
@@ -32,6 +33,7 @@ public class StaticCallAssignQuad<T> extends CallAssignQuad<T> {
     public StaticCallAssignQuad(int address, IRBasicBlock<T> block, int lhsIndex, VmConstMethodRef methodRef,
                                 int[] offs) {
         super(address, block, lhsIndex, methodRef, offs);
+        getLHS().setTypeFromJvmType(methodRef.getResolvedVmMethod().getReturnType().getJvmType());
     }
 
     @Override
@@ -41,10 +43,9 @@ public class StaticCallAssignQuad<T> extends CallAssignQuad<T> {
 
     @Override
     public String toString() {
-        String s = getAddress() + ": " + getLHS() + " = "
-            + methodRef.getClassName() + "." + methodRef.getName() + '(';
-        for (int i = refs.length - 1; i >= 0; i--) {
-            if (i < refs.length - 1) {
+        String s = getAddress() + ": " + getLHS() + " = " + methodRef.getClassName() + "." + methodRef.getName() + '(';
+        for (int i = 0; i < refs.length; i++) {
+            if (i > 0) {
                 s += ", ";
             }
             s += refs[i];
@@ -52,5 +53,4 @@ public class StaticCallAssignQuad<T> extends CallAssignQuad<T> {
         s += ')';
         return s;
     }
-
 }

@@ -42,6 +42,7 @@ public class NewMultiArrayAssignQuad<T> extends AssignQuad<T> {
         for (int i = 0; i < sizeIndexes.length; i++) {
             refs[i] = getOperand(sizeIndexes[i]);
         }
+        getLHS().setType(Operand.REFERENCE);
     }
 
     public VmConstClass getComponentType() {

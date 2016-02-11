@@ -37,6 +37,11 @@ public class ConstantStringAssignQuad<T> extends AssignQuad <T> {
         super(address, block, lhsIndex);
         refs = new Operand[0];
         this.constString = constString;
+        getLHS().setType(Operand.REFERENCE);
+    }
+
+    public VmConstString getConstString() {
+        return constString;
     }
 
     @Override

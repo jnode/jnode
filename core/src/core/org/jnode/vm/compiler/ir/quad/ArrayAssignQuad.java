@@ -36,6 +36,7 @@ public class ArrayAssignQuad extends AssignQuad {
         super(address, block, lhsIndex);
         this.type = type;
         this.refs = new Operand[]{getOperand(indIndex), getOperand(refIndex)};
+        getLHS().setTypeFromJvmType(type);
     }
 
     public Variable getRef() {

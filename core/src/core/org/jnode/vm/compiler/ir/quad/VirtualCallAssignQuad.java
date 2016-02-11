@@ -20,6 +20,7 @@
  
 package org.jnode.vm.compiler.ir.quad;
 
+import org.jnode.vm.JvmType;
 import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
@@ -32,6 +33,8 @@ public class VirtualCallAssignQuad extends InstanceCallAssignQuad {
     public VirtualCallAssignQuad(int address, IRBasicBlock block, int lhsIndex,
                                  VmConstMethodRef methodRef, int[] offs) {
         super(address, block, lhsIndex, methodRef, offs);
+        int returnType = JvmType.getReturnType(methodRef.getSignature());
+        getLHS().setTypeFromJvmType(returnType);
     }
 
     @Override

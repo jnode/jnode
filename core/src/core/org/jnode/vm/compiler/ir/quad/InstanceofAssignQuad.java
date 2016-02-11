@@ -37,6 +37,7 @@ public class InstanceofAssignQuad<T> extends AssignQuad<T> {
         super(address, block, lhsIndex);
         this.clazz = clazz;
         refs = new Operand[] {getOperand(refIndex)};
+        getLHS().setType(Operand.INT);
     }
 
     public VmConstClass getConstClass() {

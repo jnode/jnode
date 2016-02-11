@@ -35,10 +35,10 @@ public abstract class InstanceCallQuad<T> extends CallQuad<T> {
     public String toString() {
         String s = getAddress() + ": " + refs[0] + "." + methodRef.getName() + '(';
         for (int i = 1; i < refs.length; i++) {
+            s += refs[i];
             if (i < refs.length - 1) {
                 s += ", ";
             }
-            s += refs[i];
         }
         s += ')';
         return s;
