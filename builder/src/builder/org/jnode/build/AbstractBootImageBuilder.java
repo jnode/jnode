@@ -100,20 +100,20 @@ import org.vmmagic.unboxed.UnboxedObject;
  */
 public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
-    protected static final Label bootHeapEnd = new Label("$$bootHeapEnd");
+    protected static final Label bootHeapEnd = new Label("_$$bootHeapEnd");
 
-    protected static final Label bootHeapStart = new Label("$$bootHeapStart");
+    protected static final Label bootHeapStart = new Label("_$$bootHeapStart");
 
     /**
      * System property set to indicate build time.
      */
     public static final String BUILDTIME_PROPERTY = "org.jnode.buildtime";
 
-    protected static final Label imageEnd = new Label("$$image_end");
+    protected static final Label imageEnd = new Label("_$$image_end");
 
-    protected static final Label initialStack = new Label("$$initialStack");
+    protected static final Label initialStack = new Label("_$$initialStack");
 
-    protected static final Label initialStackPtr = new Label("$$initialStackPtr");
+    protected static final Label initialStackPtr = new Label("_$$initialStackPtr");
 
     private static final String zero8 = "00000000";
 
@@ -472,7 +472,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             final VmProcessor proc = createProcessor(vm, clsMgr.getSharedStatics(), clsMgr.getIsolatedStatics());
             log("Building for " + proc.getCPUID());
 
-            final Label clInitCaller = new Label("$$clInitCaller");
+            final Label clInitCaller = new Label("_$$clInitCaller");
             VmType<?> systemClasses[] = VmType.initializeForBootImage(clsMgr);
             for (int i = 0; i < systemClasses.length; i++) {
                 clsMgr.addLoadedClass(systemClasses[i].getName(), systemClasses[i]);

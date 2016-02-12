@@ -163,7 +163,7 @@ final class X86StackFrame implements X86CompilerConstants {
      */
     public void emitTrailer(TypeSizeInfo typeSizeInfo, int maxLocals) {
         final int argSlotCount = method.getArgSlotCount();
-        final Label stackOverflowLabel = helper.genLabel("$$stack-overflow");
+        final Label stackOverflowLabel = helper.genLabel("$$stack_overflow");
         final GPR asp = helper.SP;
         final GPR abp = helper.BP;
         final GPR aax = helper.AAX;
@@ -254,7 +254,7 @@ final class X86StackFrame implements X86CompilerConstants {
         CompiledExceptionHandler[] ceh = new CompiledExceptionHandler[count];
         for (int i = 0; i < count; i++) {
             final VmInterpretedExceptionHandler eh = bc.getExceptionHandler(i);
-            final Label handlerLabel = helper.genLabel("$$ex-handler" + i);
+            final Label handlerLabel = helper.genLabel("$$ex_handler" + i);
 
             final ObjectRef handlerRef = os.setObjectRef(handlerLabel);
 
@@ -280,7 +280,7 @@ final class X86StackFrame implements X86CompilerConstants {
         cm.setExceptionHandlers(ceh);
 
         // Now create the default exception handler
-        Label handlerLabel = helper.genLabel("$$def-ex-handler");
+        Label handlerLabel = helper.genLabel("$$def_ex_handler");
         cm.setDefExceptionHandler(os.setObjectRef(handlerLabel));
         emitSynchronizationCode(typeSizeInfo, entryPoints.getMonitorExitMethod());
         os.writeLEA(asp, abp, EbpFrameRefOffset);
@@ -294,7 +294,7 @@ final class X86StackFrame implements X86CompilerConstants {
         //os.writeJMP(helper.VM_ATHROW_NOTRACE);
 
         codeObject.markEnd();
-        cm.setCodeEnd(os.setObjectRef(helper.genLabel("$$end-code-object")));
+        cm.setCodeEnd(os.setObjectRef(helper.genLabel("$$end_code_object")));
     }
 
     /**
