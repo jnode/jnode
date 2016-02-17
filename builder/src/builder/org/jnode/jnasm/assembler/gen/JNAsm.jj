@@ -21,7 +21,7 @@ import org.jnode.jnasm.assembler.Identifier;
 public class JNAsm extends Assembler{
 
     protected final boolean isRegister(Token t) {
-        return (t.kind == JNAsmConstants.IDENT) && hwSupport.isRegister(t.image);
+        return (t.kind == JNAsmConstants.IDENT || t.kind == JNAsmConstants.FS ) && hwSupport.isRegister(t.image);
     }
 
     protected static final int getNumber(Token t) {
@@ -95,6 +95,7 @@ TOKEN :
 |   <GLOBAL: "global">
 |   <NEAR: "near">
 |   <FAR: "far">
+|   <FS: "fs">
 |   <LOCK: "lock">
 |   <REP:  "rep">
 |   <TIMES: "times">
@@ -106,14 +107,15 @@ TOKEN :
 TOKEN :
 {
     <#LETTER: ["a"-"z","A"-"Z","_"] >
+|   <#SPECIAL: ["$", "@", "."] >
 |   <#DIGIT: ["0"-"9"] >
 |   <#HEXDIGIT: ["0"-"9","A"-"F","a"-"f"] >
-|    <LABEL: ( <LETTER> | <DIGIT> ) + <COLON> >
+|    <LABEL: ( <LETTER> | <DIGIT> | <SPECIAL>) + <COLON> >
     {
         String s = matchedToken.image;
         matchedToken.image = s.substring(0, s.length() - 1);
     }
-|   <IDENT: <LETTER> ( <LETTER> | <DIGIT> ) * >
+|   <IDENT: <LETTER> ( <LETTER> | <DIGIT> | <SPECIAL>) * >
 |   <DECNUMBER: ["1"-"9"] (<DIGIT>) * | "0">
 |   <HEXNUMBER: ( "0x" (<HEXDIGIT>) + ) | <DIGIT> (<HEXDIGIT>) * ("h" | "H") >
 |   <BINNUMBER: ( ["0","1"] ) + ("b" | "B") >
@@ -139,6 +141,7 @@ void line() :
     (
     LOOKAHEAD(2)
     [ t=<LABEL> ]
+    [ <FS> { prefix |= Instruction.FS_PREFIX; } ]
     [ <LOCK> { prefix |= Instruction.LOCK_PREFIX; } ]
     [ <REP> { prefix |= Instruction.REP_PREFIX; } ]
     [ ins=instruction() ] [ <COMMENT> ] <LINE_END>
@@ -233,7 +236,7 @@ List operandList() :
 (
     (
     LOOKAHEAD(2)
-    t=<IDENT>
+    (t=<IDENT> | t=<FS>)
     {
         if(isRegister(t)){
             operands.add(new Register(t.image));

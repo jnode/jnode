@@ -28,6 +28,7 @@ import java.util.List;
 public class Instruction {
     public static final int LOCK_PREFIX = 1;
     public static final int REP_PREFIX = 2;
+    public static final int FS_PREFIX = 4;
     private int times;
     private int prefix;
     private int lineNumber;
@@ -93,7 +94,7 @@ public class Instruction {
 
     @SuppressWarnings("unused")
     public void addPrefix(int prefix) {
-        if (prefix == LOCK_PREFIX || prefix == REP_PREFIX) {
+        if (prefix == LOCK_PREFIX || prefix == REP_PREFIX || prefix == FS_PREFIX) {
             this.prefix |= prefix;
         } else {
             throw new RuntimeException("Invalid prefix: " + prefix);
