@@ -255,9 +255,9 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
             }
 
             final X86Assembler os86 = (X86Assembler) os;
-            final Label introCode = new Label("$$introCode");
+            final Label introCode = new Label("_$$introCode");
 
-            os86.setObjectRef(new Label("$$jmp-introCode"));
+            os86.setObjectRef(new Label("_$$jmp_introCode"));
             os86.writeJMP(introCode);
             initObject.markEnd();
 
@@ -281,7 +281,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
             // initHeapManager(os86, vm);
             initVmThread(os86);
 
-            os.setObjectRef(new Label("$$Initial call to clInitCaller"));
+            os.setObjectRef(new Label("_$$Initial_call_to_clInitCaller"));
             os86.writeCALL(clInitCaller);
 
             initCallMain(os86);
@@ -406,7 +406,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
         final GPR adx = os.isCode32() ? X86Register.EDX : X86Register.RDX;
         final int slotSize = arch.getReferenceSize();
 
-        os.setObjectRef(new Label("$$Setup initial thread"));
+        os.setObjectRef(new Label("_$$Setup_initial_thread"));
         os.writeMOV_Const(abx, initialThread);
 
         /** Initialize initialStack.stack to Luser_stack */
@@ -459,7 +459,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      * @throws ClassNotFoundException
      */
     protected void initVm(X86Assembler os, Vm vm) throws BuildException, ClassNotFoundException {
-        os.setObjectRef(new Label("$$Initialize Vm"));
+        os.setObjectRef(new Label("_$$Initialize_Vm"));
         VmType<?> vmClass = loadClass(VmUtils.class);
         VmStaticField vmField = (VmStaticField) vmClass.getField("VM_INSTANCE");
 
@@ -486,7 +486,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      * @throws ClassNotFoundException
      */
     protected void initMain(X86Assembler os, PluginRegistry registry) throws BuildException, ClassNotFoundException {
-        os.setObjectRef(new Label("$$Initialize Main"));
+        os.setObjectRef(new Label("_$$Initialize_Main"));
         final VmType<?> mainClass = loadClass(Main.class);
         final VmStaticField registryField = (VmStaticField) mainClass.getField(Main.REGISTRY_FIELD_NAME);
 
