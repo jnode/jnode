@@ -86,7 +86,7 @@ public class FatShortDirEntry extends FatDirEntry {
         setLength(0);
     }
 
-    private void decodeName() {
+    protected void decodeName() {
         lName = entry.getBytes(0, 11);
         /*
          * handle the special character 0x05 (page 23) 0xE5 is a valid KANJI
@@ -117,7 +117,7 @@ public class FatShortDirEntry extends FatDirEntry {
         entry.setBytes(0, 11, lName);
     }
 
-    private void decodeBase() {
+    protected void decodeBase() {
         String baseName;
 
         byte[] basebuf = new byte[8];
@@ -137,7 +137,7 @@ public class FatShortDirEntry extends FatDirEntry {
             base = baseName.trim().toUpperCase();
     }
 
-    private void decodeExt() {
+    protected void decodeExt() {
         String extName;
 
         byte[] extbuf = new byte[3];
@@ -157,7 +157,7 @@ public class FatShortDirEntry extends FatDirEntry {
             ext = extName.trim().toUpperCase();
     }
 
-    private void decodeAttr() {
+    protected void decodeAttr() {
         lAttr = entry.getUInt8(11);
         attr = new FatAttr(lAttr);
     }
@@ -167,7 +167,7 @@ public class FatShortDirEntry extends FatDirEntry {
         entry.setUInt8(11, lAttr);
     }
 
-    private void decodeNameCase() {
+    protected void decodeNameCase() {
         lNTRes = entry.getUInt8(12);
         ncase = new FatCase(lNTRes);
     }
@@ -177,7 +177,7 @@ public class FatShortDirEntry extends FatDirEntry {
         entry.setUInt8(12, lNTRes);
     }
 
-    private void decodeCreated() {
+    protected void decodeCreated() {
         lCrtTimeTenth = entry.getUInt8(13);
         lCrtTime = entry.getUInt16(14);
         lCrtDate = entry.getUInt16(16);
@@ -200,7 +200,7 @@ public class FatShortDirEntry extends FatDirEntry {
         entry.setUInt16(16, lCrtDate);
     }
 
-    private void decodeAccessed() {
+    protected void decodeAccessed() {
         lLstAccDate = entry.getUInt16(18);
 
         accessed = FatUtils.decodeDateTime(lLstAccDate, 0);
@@ -211,7 +211,7 @@ public class FatShortDirEntry extends FatDirEntry {
         entry.setUInt16(18, lLstAccDate);
     }
 
-    private void decodeModified() {
+    protected void decodeModified() {
         lWrtTime = entry.getUInt16(22);
         lWrtDate = entry.getUInt16(24);
 
@@ -226,7 +226,7 @@ public class FatShortDirEntry extends FatDirEntry {
         entry.setUInt16(24, lWrtDate);
     }
 
-    private void decodeCluster() {
+    protected void decodeCluster() {
         lFstClusHi = entry.getUInt16(20);
         lFstClusLo = entry.getUInt16(26);
 
@@ -265,7 +265,7 @@ public class FatShortDirEntry extends FatDirEntry {
         entry.setUInt16(26, lFstClusLo);
     }
 
-    private void decodeLength() {
+    protected void decodeLength() {
         lFileSize = entry.getUInt32(28);
         length = lFileSize;
     }
@@ -278,7 +278,7 @@ public class FatShortDirEntry extends FatDirEntry {
         entry.setUInt32(28, lFileSize);
     }
 
-    private void decode() {
+    protected void decode() {
         decodeNameCase();
         decodeAttr();
         decodeName();

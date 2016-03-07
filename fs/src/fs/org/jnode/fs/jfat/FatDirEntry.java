@@ -20,7 +20,6 @@
  
 package org.jnode.fs.jfat;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 
@@ -30,12 +29,12 @@ import java.nio.ByteBuffer;
 public class FatDirEntry {
     public static final int LENGTH = 32;
 
-    protected static final int EOD = 0x00;
-    protected static final int FREE = 0xE5;
-    protected static final int INVALID = 0xFF;
-    protected static final int KANJI = 0x05;
+    public static final int EOD = 0x00;
+    public static final int FREE = 0xE5;
+    public static final int INVALID = 0xFF;
+    public static final int KANJI = 0x05;
 
-    protected static final int NO_INDEX = -1;
+    public static final int NO_INDEX = -1;
 
     protected final FatFileSystem fs;
     protected final FatMarshal entry;
@@ -44,61 +43,19 @@ public class FatDirEntry {
     private boolean lastDirEntry = false;
     private boolean freeDirEntry = false;
 
-    protected FatDirEntry(FatFileSystem fs, FatMarshal entry, int index) {
+    public FatDirEntry(FatFileSystem fs, FatMarshal entry, int index) {
         this.fs = fs;
         this.entry = entry;
         this.index = index;
     }
 
-    private FatDirEntry(FatFileSystem fs, FatMarshal entry, int index, int flag) {
+    public FatDirEntry(FatFileSystem fs, FatMarshal entry, int index, int flag) {
         this(fs, entry, index);
 
         if (flag == FREE)
             this.freeDirEntry = true;
         else
             this.lastDirEntry = true;
-    }
-
-    /*
-     * FatDirEntry factory from a FatMarshal buffer
-     */
-    public static FatDirEntry create(FatFileSystem fs, FatMarshal entry, int index, boolean allowDeleted)
-        throws IOException {
-        int flag;
-        FatAttr attr;
-
-        flag = entry.getUInt8(0);
-        attr = new FatAttr(entry.getUInt8(11));
-        boolean free = flag == FREE;
-
-        switch (flag) {
-            case EOD:
-                return new FatDirEntry(fs, entry, index, flag);
-            case FREE:
-                if (!allowDeleted) {
-                    return new FatDirEntry(fs, entry, index, flag);
-                } else {
-                    // Fall through...
-                    break;
-                }
-            case INVALID:
-                throw new IOException("Invalid entry for index: " + index);
-        }
-
-        FatDirEntry fatDirEntry;
-        // 0xffffffff is the end of long file name marker
-        if (attr.isLong() || entry.getUInt32(28) == 0xffffffffL) {
-            fatDirEntry = new FatLongDirEntry(fs, entry, index);
-        } else {
-            fatDirEntry = new FatShortDirEntry(fs, entry, index);
-        }
-
-        if (free) {
-            // Still mark deleted entries as deleted.
-            fatDirEntry.freeDirEntry = true;
-        }
-
-        return fatDirEntry;
     }
 
     public void delete() {
@@ -149,6 +106,10 @@ public class FatDirEntry {
 
     public void flush() {
         entry.flush();
+    }
+
+    public void setFreeDirEntry(boolean freeDirEntry) {
+        this.freeDirEntry = freeDirEntry;
     }
 
     @Override
