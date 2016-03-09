@@ -21,7 +21,6 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.util.LittleEndian;
 
@@ -40,7 +39,6 @@ public class GroupDescriptor {
 
     public GroupDescriptor() {
         data = new byte[GROUPDESCRIPTOR_LENGTH];
-        log.setLevel(Level.INFO);
     }
 
     /*

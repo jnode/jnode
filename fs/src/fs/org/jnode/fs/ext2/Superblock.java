@@ -21,8 +21,6 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
-
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
 import org.jnode.util.LittleEndian;
@@ -57,7 +55,6 @@ public class Superblock {
 
     public Superblock() {
         data = new byte[SUPERBLOCK_LENGTH];
-        log.setLevel(Level.INFO);
     }
 
     public void read(byte src[], Ext2FileSystem fs) throws FileSystemException {

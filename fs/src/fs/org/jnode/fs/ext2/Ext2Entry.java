@@ -21,7 +21,6 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntryLastAccessed;
@@ -52,7 +51,6 @@ public class Ext2Entry extends AbstractFSEntry implements FSEntryLastChanged, FS
         this.directoryRecordId = directoryRecordId;
         this.type = type;
 
-        log.setLevel(Level.INFO);
         log.debug("Ext2Entry(iNode, name): name=" + name +
             (isDirectory() ? " is a directory " : "") + (isFile() ? " is a file " : ""));
     }

@@ -22,7 +22,6 @@ package org.jnode.fs.ext2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSFileSlackSpace;
 import org.jnode.fs.FileSystemException;
@@ -48,7 +47,6 @@ public class Ext2File extends AbstractFSFile implements FSFileSlackSpace {
         super(fs);
         this.iNode = iNode;
         this.name = name;
-        log.setLevel(Level.DEBUG);
     }
 
     @Override

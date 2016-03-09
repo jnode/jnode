@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.fs.FSDirectory;
@@ -85,7 +84,6 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
      */
     public Ext2FileSystem(Device device, boolean readOnly, Ext2FileSystemType type) throws FileSystemException {
         super(device, readOnly, type);
-        log.setLevel(Level.DEBUG);
 
         blockCache = new BlockCache(50, (float) 0.75);
         inodeCache = new INodeCache(50, (float) 0.75);

@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.ext2.exception.UnallocatedBlockException;
@@ -81,7 +80,6 @@ public class INode {
         this.desc = desc;
         this.data = new byte[fs.getSuperblock().getINodeSize()];
         locked = 0;
-        log.setLevel(Level.INFO);
     }
 
     public void read(byte[] data) {
@@ -108,8 +106,6 @@ public class INode {
         //TODO: set other persistent parameters?
 
         setDirty(true);
-
-        log.setLevel(Level.DEBUG);
     }
 
     public long getINodeNr() {

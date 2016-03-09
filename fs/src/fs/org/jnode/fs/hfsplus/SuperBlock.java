@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Calendar;
 import java.util.Date;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
@@ -76,7 +75,6 @@ public class SuperBlock extends HfsPlusObject {
      */
     public SuperBlock(final HfsPlusFileSystem fs, boolean create) throws FileSystemException {
         super(fs);
-        log.setLevel(Level.INFO);
         data = new byte[SUPERBLOCK_LENGTH];
         try {
             if (!create) {

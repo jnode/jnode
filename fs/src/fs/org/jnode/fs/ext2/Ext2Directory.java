@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectoryId;
 import org.jnode.fs.FSEntry;
@@ -54,7 +53,6 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
         this.iNode = entry.getINode();
         Ext2FileSystem fs = (Ext2FileSystem) entry.getFileSystem();
         this.entry = entry;
-        log.setLevel(Level.DEBUG);
         boolean readOnly;
         if ((iNode.getFlags() & Ext2Constants.EXT2_INDEX_FL) != 0 ||
             (iNode.getFlags() & Ext2Constants.EXT4_HUGE_FILE_FL) != 0 ||
