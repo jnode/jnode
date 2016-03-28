@@ -36,10 +36,6 @@ public class L2ByteCodeSupportChecker extends BytecodeVisitorSupport {
     private boolean supported = true;
 
 
-    public void visit_ldc(VmConstString value) {
-        notSupported();
-    }
-
     public final void visit_ldc(VmConstClass value) {
         notSupported();
     }
@@ -113,10 +109,6 @@ public class L2ByteCodeSupportChecker extends BytecodeVisitorSupport {
     }
 
     public void visit_pop2() {
-        notSupported();
-    }
-
-    public void visit_dup() {
         notSupported();
     }
 
@@ -208,10 +200,6 @@ public class L2ByteCodeSupportChecker extends BytecodeVisitorSupport {
         notSupported();
     }
 
-    public void visit_invokestatic(VmConstMethodRef methodRef) {
-        notSupported();
-    }
-
     public void visit_invokeinterface(VmConstIMethodRef methodRef, int count) {
         notSupported();
     }
@@ -260,7 +248,6 @@ public class L2ByteCodeSupportChecker extends BytecodeVisitorSupport {
         supported = false;
         throw new UnsupportedOperationException();
     }
-
 
     //unsupported in GenericX86CodeGenerator
 
@@ -343,61 +330,4 @@ public class L2ByteCodeSupportChecker extends BytecodeVisitorSupport {
     public void visit_dsub() {
         notSupported();
     }
-
-    @Override
-    public void visit_land() {
-        notSupported();
-    }
-
-    @Override
-    public void visit_ladd() {
-        notSupported();
-    }
-
-    @Override
-    public void visit_ldiv() {
-        notSupported();
-    }
-
-    @Override
-    public void visit_lmul() {
-        notSupported();
-    }
-
-    @Override
-    public void visit_lor() {
-        notSupported();
-    }
-
-    @Override
-    public void visit_lrem() {
-        notSupported();
-    }
-
-    @Override
-    public void visit_lshl() {
-        notSupported();
-    }
-
-    @Override
-    public void visit_lshr() {
-        notSupported();
-    }
-
-    @Override
-    public void visit_lsub() {
-        notSupported();
-    }
-
-    @Override
-    public void visit_lushr() {
-        notSupported();
-    }
-
-    @Override
-    public void visit_lxor() {
-        notSupported();
-    }
-
-
 }
