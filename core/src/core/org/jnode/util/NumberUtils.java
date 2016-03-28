@@ -114,12 +114,12 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a byte array to a string of hex-numbers
+     * Convert a byte array to a string of hex-numbers adding a space between bytes.
      *
-     * @param data
-     * @param offset
-     * @param length
-     * @return String
+     * @param data the byte array to convert
+     * @param offset start offset
+     * @param length the number of bytes to convert
+     * @return String the result
      */
     public static String hex(byte[] data, int offset, int length) {
         final StringBuilder buf = new StringBuilder(length * 3);
@@ -137,12 +137,12 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a byte array to a string of hex-numbers
+     * Convert a byte array to a string of hex-numbers without spaces.
      *
-     * @param data
-     * @param offset
-     * @param length
-     * @return String
+     * @param data the byte array to convert
+     * @param offset start offset
+     * @param length the number of bytes to convert
+     * @return String the result
      */
     public static String hexCompact(byte[] data, int offset, int length) {
         final StringBuilder buf = new StringBuilder(length * 2);
