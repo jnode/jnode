@@ -35,6 +35,10 @@ public class FloatConstant<T> extends Constant<T> {
         return value;
     }
 
+    public int getIntBits() {
+        return Float.floatToRawIntBits(value);
+    }
+
     public String toString() {
         return Float.toString(value);
     }

@@ -38,4 +38,12 @@ public class LongConstant<T> extends Constant<T> {
     public String toString() {
         return Long.toString(value);
     }
+
+    public int getLSInt() {
+        return (int) (value & 0xFFFFFFFFL);
+    }
+
+    public int getMSInt() {
+        return (int) ((value >>> 32) & 0xFFFFFFFFL);
+    }
 }
