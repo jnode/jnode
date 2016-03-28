@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -129,6 +129,27 @@ public class NumberUtils {
                     buf.append('\n');
                 } else {
                     buf.append(' ');
+                }
+            }
+            buf.append(hex(data[offset + i] & 0xFF, 2));
+        }
+        return buf.toString();
+    }
+
+    /**
+     * Convert a byte array to a string of hex-numbers
+     *
+     * @param data
+     * @param offset
+     * @param length
+     * @return String
+     */
+    public static String hexCompact(byte[] data, int offset, int length) {
+        final StringBuilder buf = new StringBuilder(length * 2);
+        for (int i = 0; i < length; i++) {
+            if (i > 0) {
+                if ((i % 16) == 0) {
+                    buf.append('\n');
                 }
             }
             buf.append(hex(data[offset + i] & 0xFF, 2));
