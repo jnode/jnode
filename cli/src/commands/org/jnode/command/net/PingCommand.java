@@ -49,7 +49,7 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
     
     private static final String help_host = "the target host";
     private static final String help_super = "Ping the specified host";
-    private static final String fmt_unknown_host = "Unknown host: %s";
+    private static final String fmt_unknown_host = "Unknown host: %s\n";
     private static final String fmt_ping = "Ping %s attempt %d%n";
     private static final String fmt_reply = "Reply from %s: %d bytes of data ttl=%d seq=%d time=%dms%n";
     private static final String fmt_stats = "-> Packet statistics%n%s%n";
