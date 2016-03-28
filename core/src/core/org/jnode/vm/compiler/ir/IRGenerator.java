@@ -95,6 +95,7 @@ import static org.jnode.vm.compiler.ir.quad.UnaryOperation.LNEG;
 
 import java.util.Iterator;
 
+import java.util.List;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.BytecodeVisitor;
@@ -111,6 +112,7 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.ir.quad.ArrayAssignQuad;
 import org.jnode.vm.compiler.ir.quad.ArrayLengthAssignQuad;
 import org.jnode.vm.compiler.ir.quad.ArrayStoreQuad;
+import org.jnode.vm.compiler.ir.quad.AssignQuad;
 import org.jnode.vm.compiler.ir.quad.BinaryOperation;
 import org.jnode.vm.compiler.ir.quad.BinaryQuad;
 import org.jnode.vm.compiler.ir.quad.BranchCondition;
@@ -192,23 +194,11 @@ public class IRGenerator<T> extends BytecodeVisitor {
         }
         for (int i = 0; i < argCount; i++) {
             VmType argType = method.getArgumentType(i);
-            int stackChange;
-            int jvmType;
-            if (argType.isPrimitive()) {
-                jvmType = argType.getJvmType();
-                if (jvmType == JvmType.LONG || jvmType == JvmType.DOUBLE) {
-                    stackChange = 2;
-                } else {
-                    stackChange = 1;
-                }
-            } else {
-                stackChange = 1;
-                jvmType = JvmType.REFERENCE;
-            }
+            int jvmType = argType.isPrimitive() ? argType.getJvmType() : JvmType.REFERENCE;
             variables[index] = new MethodArgument<T>(Operand.UNKNOWN, index);
             variables[index].setTypeFromJvmType(jvmType);
             index += 1;
-            if (stackChange == 2) {
+            if (isCategory2(jvmType)) {
                 variables[index] = new MethodArgument<T>(Operand.UNKNOWN, index);
                 variables[index].setTypeFromJvmType(jvmType);
                 index += 1;
@@ -292,8 +282,9 @@ public class IRGenerator<T> extends BytecodeVisitor {
 
     public void visit_lconst(long value) {
         Constant<T> c = Constant.getInstance(value);
-        currentBlock.add(new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset,
-            c));
+        variables[stackOffset].setType(Operand.LONG);
+        variables[stackOffset + 1].setType(Operand.LONG);
+        currentBlock.add(new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset, c));
         stackOffset += 2;
     }
 
@@ -332,6 +323,7 @@ public class IRGenerator<T> extends BytecodeVisitor {
     public void visit_lload(int index) {
         variables[index].setType(Operand.LONG);
         variables[stackOffset].setType(Operand.LONG);
+        variables[stackOffset + 1].setType(Operand.LONG);
         currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock,
             stackOffset, index));
         stackOffset += 2;
@@ -471,21 +463,71 @@ public class IRGenerator<T> extends BytecodeVisitor {
         int index = stackOffset;
         stackOffset -= 1;
         currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
+        fixType(); //todo fix type for other dups like here
         stackOffset += 2;
     }
 
+    private void fixType() {
+        List<Quad<T>> quadList = currentBlock.getQuads();
+        VariableRefAssignQuad<T> currentQuad = (VariableRefAssignQuad<T>) quadList.get(quadList.size() - 1);
+        if (currentQuad.getLHS().getType() == JvmType.UNKNOWN) {
+            Operand<T> rhs = currentQuad.getRHS();
+            List<Quad<T>> quads = quadList;
+            for (int i = quads.size(); i -- > 0;){
+                Quad q = quads.get(i);
+                if (q instanceof AssignQuad) {
+                    AssignQuad a = (AssignQuad) q;
+                    Variable lhs = a.getLHS();
+                    if (lhs.equals(rhs)) {
+                        rhs.setType(lhs.getType());
+                        currentQuad.getLHS().setType(lhs.getType());
+                        break;
+                    }
+                }
+            }
+            if (currentQuad.getLHS().getType() == JvmType.UNKNOWN) {
+                //todo throw exception here when types should be ok
+            }
+        }
+    }
+
     public void visit_dup_x1() {
+//        int index = stackOffset;
+//        stackOffset -= 1;
+//        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset - 1));
+//        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 2, stackOffset));
+//        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 1, stackOffset + 1));
+//        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset - 1));
+//        stackOffset += 2;
         int index = stackOffset;
         stackOffset -= 1;
-        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset - 1));
-        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 2, stackOffset));
-        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 1, stackOffset + 1));
-        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset - 1));
+        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
+        fixType();
+        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 1, stackOffset - 1));
+        fixType();
+        currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 2, stackOffset + 1));
+        fixType();
         stackOffset += 2;
     }
 
     public void visit_dup_x2() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        //form 1
+        if (!isCategory2(getVariables()[stackOffset - 1].getType()) &&
+            !isCategory2(getVariables()[stackOffset - 2].getType())) {
+            int index = stackOffset;
+            stackOffset -= 1;
+            currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
+            fixType();
+            currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 1, stackOffset - 1));
+            fixType();
+            currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 2, stackOffset - 2));
+            fixType();
+            currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 3, stackOffset + 1));
+            fixType();
+            stackOffset += 2;
+        } else {
+            throw new IllegalArgumentException("byte code not yet supported");
+        }
     }
 
     public void visit_dup2() {
@@ -495,18 +537,38 @@ public class IRGenerator<T> extends BytecodeVisitor {
         if (var.getType() == Operand.LONG || var.getType() == Operand.DOUBLE) {
             stackOffset -= 2;
             currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
+            fixType();
             stackOffset += 4;
         } else {
             stackOffset -= 1;
             currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index + 1, stackOffset));
+            fixType();
             stackOffset -= 1;
             currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
+            fixType();
             stackOffset += 4;
         }
     }
 
     public void visit_dup2_x1() {
-        throw new IllegalArgumentException("byte code not yet supported");
+        //todo
+        //form 2;
+        if (isCategory2(getVariables()[stackOffset - 1].getType()) &&
+            !isCategory2(getVariables()[stackOffset - 3].getType())) {
+            int index = stackOffset;
+            stackOffset -= 2;
+            currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
+            fixType();
+            //currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 1, stackOffset - 1));
+            currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 1, stackOffset - 1));
+            fixType();
+            currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 3, stackOffset + 2));
+            fixType();
+            //currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index - 4, stackOffset + 1));
+            stackOffset += 4;
+        } else {
+            throw new IllegalArgumentException("byte code not yet supported");
+        }
     }
 
     public void visit_dup2_x2() {
@@ -652,9 +714,11 @@ public class IRGenerator<T> extends BytecodeVisitor {
     public void visit_lushr() {
         stackOffset -= 2;
         int s1 = stackOffset - 1;
-        variables[s1].setType(Operand.INT);
-        variables[stackOffset].setType(Operand.LONG);
-        currentBlock.add(new BinaryQuad<T>(address, currentBlock, s1, s1, LUSHR, stackOffset));
+        variables[s1].setType(Operand.LONG);
+        variables[s1 + 1].setType(Operand.LONG);
+        variables[stackOffset + 1].setType(Operand.INT);
+        currentBlock.add(new BinaryQuad<T>(address, currentBlock, s1, s1, LUSHR, stackOffset + 1));
+        stackOffset += 1;
     }
 
     public void visit_iand() {
@@ -878,12 +942,14 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset -= 1;
         currentBlock.add(new TableswitchQuad<T>(address, currentBlock, defValue, lowValue, highValue, addresses,
             stackOffset));
+        setSuccessorStackOffset();
     }
 
     public void visit_lookupswitch(int defAddress, int[] matchValues, int[] addresses) {
         stackOffset -= 1;
         currentBlock.add(new LookupswitchQuad<T>(address, currentBlock, defAddress, matchValues, addresses,
             stackOffset));
+        setSuccessorStackOffset();
     }
 
     public void visit_ireturn() {
@@ -921,23 +987,33 @@ public class IRGenerator<T> extends BytecodeVisitor {
     }
 
     public void visit_getstatic(VmConstFieldRef fieldRef) {
+        fieldRef.resolve(vmClassLoader);
+        int jvmType = fieldRef.getResolvedVmField().getType().getJvmType();
+        variables[stackOffset].setTypeFromJvmType(jvmType);
         currentBlock.add(new StaticRefAssignQuad<T>(address, currentBlock, stackOffset, fieldRef));
-        stackOffset += 1;
+        stackOffset += getCategory(jvmType);
     }
 
     public void visit_putstatic(VmConstFieldRef fieldRef) {
-        stackOffset -= 1;
+        fieldRef.resolve(vmClassLoader);
+        int jvmType = fieldRef.getResolvedVmField().getType().getJvmType();
+        stackOffset -= getCategory(jvmType);
         currentBlock.add(new StaticRefStoreQuad<T>(address, currentBlock, stackOffset, fieldRef));
     }
 
     public void visit_getfield(VmConstFieldRef fieldRef) {
+        fieldRef.resolve(vmClassLoader);
         stackOffset -= 1;
+        int jvmType = fieldRef.getResolvedVmField().getType().getJvmType();
+        variables[stackOffset].setTypeFromJvmType(jvmType);
         currentBlock.add(new RefAssignQuad<T>(address, currentBlock, stackOffset, fieldRef, stackOffset));
-        stackOffset += 1;
+        stackOffset += getCategory(jvmType);
     }
 
     public void visit_putfield(VmConstFieldRef fieldRef) {
-        stackOffset -= 1;
+        fieldRef.resolve(vmClassLoader);
+        int jvmType = fieldRef.getResolvedVmField().getType().getJvmType();
+        stackOffset -= getCategory(jvmType);
         int ref = stackOffset - 1;
         currentBlock.add(new RefStoreQuad<T>(address, currentBlock, stackOffset, fieldRef, ref));
         stackOffset -= 1;
@@ -954,11 +1030,7 @@ public class IRGenerator<T> extends BytecodeVisitor {
             int jvmType;
             if (argType.isPrimitive()) {
                 jvmType = argType.getJvmType();
-                if (jvmType == JvmType.LONG || jvmType == JvmType.DOUBLE) {
-                    stackChange = 2;
-                } else {
-                    stackChange = 1;
-                }
+                stackChange = getCategory(jvmType);
             } else {
                 stackChange = 1;
                 jvmType = JvmType.REFERENCE;
@@ -1017,11 +1089,7 @@ public class IRGenerator<T> extends BytecodeVisitor {
             int jvmType;
             if (argType.isPrimitive()) {
                 jvmType = argType.getJvmType();
-                if (jvmType == JvmType.LONG || jvmType == JvmType.DOUBLE) {
-                    stackChange = 2;
-                } else {
-                    stackChange = 1;
-                }
+                stackChange = getCategory(jvmType);
             } else {
                 stackChange = 1;
                 jvmType = JvmType.REFERENCE;
@@ -1080,11 +1148,7 @@ public class IRGenerator<T> extends BytecodeVisitor {
             int jvmType;
             if (argType.isPrimitive()) {
                 jvmType = argType.getJvmType();
-                if (jvmType == JvmType.LONG || jvmType == JvmType.DOUBLE) {
-                    stackChange = 2;
-                } else {
-                    stackChange = 1;
-                }
+                stackChange = getCategory(jvmType);
             } else {
                 stackChange = 1;
                 jvmType = JvmType.REFERENCE;
@@ -1123,32 +1187,64 @@ public class IRGenerator<T> extends BytecodeVisitor {
     }
 
     public void visit_invokeinterface(VmConstIMethodRef methodRef, int count) {
-        int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef.getSignature());
+        methodRef.resolve(vmClassLoader);
+        VmMethod vmMethod = methodRef.getResolvedVmMethod();
+        int nrArguments = vmMethod.getNoArguments();
+        int[] varOffs = new int[nrArguments + 1];
+        for (int i = nrArguments; i-- > 0;) {
+            VmType argType = vmMethod.getArgumentType(i);
+            int stackChange;
+            int jvmType;
+            if (argType.isPrimitive()) {
+                jvmType = argType.getJvmType();
+                stackChange = getCategory(jvmType);
+            } else {
+                stackChange = 1;
+                jvmType = JvmType.REFERENCE;
+            }
+            stackOffset -= stackChange;
+            variables[stackOffset].setTypeFromJvmType(jvmType);
+            varOffs[i + 1] = stackOffset;
+        }
+        stackOffset--;
+        variables[stackOffset].setType(Operand.REFERENCE);
+        varOffs[0] = stackOffset;
+
         int returnType = JvmType.getReturnType(methodRef.getSignature());
         if (JvmType.VOID == returnType) {
-            int[] varOffs = new int[argSlotCount + 1];
-            for (int i = 0; i < argSlotCount; i++) {
-                stackOffset--;
-                variables[stackOffset].setType(Operand.INT);
-                varOffs[i] = stackOffset;
-            }
-            stackOffset--;
-            variables[argSlotCount].setType(Operand.REFERENCE);
-            varOffs[argSlotCount] = stackOffset;
             currentBlock.add(new InterfaceCallQuad(address, currentBlock, methodRef, varOffs));
         } else {
-            int[] varOffs = new int[argSlotCount + 1];
-            for (int i = 0; i < argSlotCount; i++) {
-                stackOffset--;
-                variables[stackOffset].setType(Operand.INT);
-                varOffs[i] = stackOffset;
-            }
-            stackOffset--;
-            variables[argSlotCount].setType(Operand.REFERENCE);
-            varOffs[argSlotCount] = stackOffset;
             currentBlock.add(new InterfaceCallAssignQuad(address, currentBlock, stackOffset, methodRef, varOffs));
-            stackOffset++;
+            stackOffset += typeSizeInfo.getStackSlots(returnType);
         }
+
+
+//        int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef.getSignature());
+//        int returnType = JvmType.getReturnType(methodRef.getSignature());
+//        if (JvmType.VOID == returnType) {
+//            int[] varOffs = new int[argSlotCount + 1];
+//            for (int i = 0; i < argSlotCount; i++) {
+//                stackOffset--;
+//                variables[stackOffset].setType(Operand.INT);
+//                varOffs[i] = stackOffset;
+//            }
+//            stackOffset--;
+//            variables[argSlotCount].setType(Operand.REFERENCE);
+//            varOffs[argSlotCount] = stackOffset;
+//            currentBlock.add(new InterfaceCallQuad(address, currentBlock, methodRef, varOffs));
+//        } else {
+//            int[] varOffs = new int[argSlotCount + 1];
+//            for (int i = 0; i < argSlotCount; i++) {
+//                stackOffset--;
+//                variables[stackOffset].setType(Operand.INT);
+//                varOffs[i] = stackOffset;
+//            }
+//            stackOffset--;
+//            variables[argSlotCount].setType(Operand.REFERENCE);
+//            varOffs[argSlotCount] = stackOffset;
+//            currentBlock.add(new InterfaceCallAssignQuad(address, currentBlock, stackOffset, methodRef, varOffs));
+//            stackOffset += typeSizeInfo.getStackSlots(returnType);
+//        }
     }
 
     public void visit_new(VmConstClass clazz) {
@@ -1205,7 +1301,7 @@ public class IRGenerator<T> extends BytecodeVisitor {
     public void visit_multianewarray(VmConstClass clazz, int dimensions) {
         stackOffset -= 1;
         int[] sizes = new int[dimensions];
-        for (int i = dimensions - 1; i >= 0; i--) {
+        for (int i = 0; i < dimensions; i++) {
             sizes[i] = stackOffset;
             stackOffset -= 1;
         }
@@ -1314,5 +1410,14 @@ public class IRGenerator<T> extends BytecodeVisitor {
             stackOffset -= 2;
             setSuccessorStackOffset();
         }
+    }
+
+    //todo review useage; move this method to VmType ?
+    private int getCategory(int jvmType) {
+        return isCategory2(jvmType) ? 2 : 1;
+    }
+
+    private boolean isCategory2(int jvmType) {
+        return jvmType == JvmType.LONG || jvmType == JvmType.DOUBLE;
     }
 }
