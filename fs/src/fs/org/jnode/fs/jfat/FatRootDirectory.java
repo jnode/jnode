@@ -21,6 +21,8 @@
 package org.jnode.fs.jfat;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.NoSuchElementException;
 
 
 public class FatRootDirectory extends FatDirectory {
@@ -36,6 +38,30 @@ public class FatRootDirectory extends FatDirectory {
             throw new UnsupportedOperationException("Unknown Fat Type");
         }
         scanDirectory();
+    }
+
+    @Override
+    public FatDirEntry getFatDirEntry(int index, boolean allowDeleted) throws IOException {
+        if (getFatFileSystem().getFat().isFat32()) {
+            // FAT32 uses the FAT to allocate space to the root directory too, so no special handling is required
+            return super.getFatDirEntry(index, allowDeleted);
+        }
+
+        BootSector bootSector = getFatFileSystem().getBootSector();
+
+        // Check if this is the end of the root entires
+        if (index > bootSector.getNrRootDirEntries()) {
+            throw new NoSuchElementException();
+        }
+
+        FatMarshal entry = new FatMarshal(32);
+        ByteBuffer dest = entry.getByteBuffer();
+        long rootDirectoryOffset = bootSector.getFirstDataSector() * bootSector.getBytesPerSector();
+
+        dest.limit(dest.position() + entry.length());
+        getFatFileSystem().getApi().read(rootDirectoryOffset + 32 * index, dest);
+
+        return createDirEntry(entry, index, allowDeleted);
     }
 
     public String getShortName() {
