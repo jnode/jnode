@@ -27,6 +27,7 @@ import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ClassNameArgument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.IntegerArgument;
+import org.jnode.shell.syntax.StringArgument;
 import org.jnode.vm.LoadCompileService;
 import org.jnode.vm.classmgr.VmType;
 
@@ -37,6 +38,7 @@ import org.jnode.vm.classmgr.VmType;
 public class CompileCommand extends AbstractCommand {
     
     private static final String help_class = "the class file to compile";
+    private static final String help_method = "the method to compile";
     private static final String help_level = "the optimization level";
     private static final String help_test = "use the test version of the compiler";
     private static final String help_super = "compile a Java class (bytecodes) to native code";
@@ -51,15 +53,17 @@ public class CompileCommand extends AbstractCommand {
     private final int maxLevel = Math.max(maxTestLevel, maxNontestLevel);
 
     private final ClassNameArgument argClass;
+    private final StringArgument argMethod;
     private final IntegerArgument argLevel;
     private final FlagArgument argTest;
 
     public CompileCommand() {
         super(help_super);
         argClass = new ClassNameArgument("className", Argument.MANDATORY, help_class);
+        argMethod = new StringArgument("methodName", Argument.OPTIONAL, help_method);
         argLevel = new IntegerArgument("level", Argument.OPTIONAL, 0, maxLevel, help_level);
         argTest  = new FlagArgument("test", Argument.OPTIONAL, help_test);
-        registerArguments(argClass, argLevel, argTest);
+        registerArguments(argClass, argMethod, argLevel, argTest);
     }
 
     public static void main(String[] args) throws Exception {
@@ -69,6 +73,7 @@ public class CompileCommand extends AbstractCommand {
     @Override
     public void execute() throws Exception {
         final String className = argClass.getValue();
+        final String methodName = argMethod.isSet() ? argMethod.getValue() : null;
         final int level = argLevel.isSet() ? argLevel.getValue() : 0;
         final boolean test = argTest.isSet();
         PrintWriter out = getOutput().getPrintWriter();
@@ -92,7 +97,12 @@ public class CompileCommand extends AbstractCommand {
             cls = cl.loadClass(className);
             final VmType<?> type = VmType.fromClass((Class<?>) cls);
             final long start = System.currentTimeMillis();
-            final int count = type.compileRuntime(level, test);
+            final int count;
+            if (methodName == null) {
+                count = type.compileRuntime(level, test);
+            } else {
+                count = type.compileRuntime(methodName, level, test);
+            }
             final long end = System.currentTimeMillis();
             out.format(fmt_out, count, (end - start));
         } catch (ClassNotFoundException ex) {

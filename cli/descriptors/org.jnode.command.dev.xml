@@ -53,6 +53,9 @@
           <option argLabel="level" shortName="l" longName="level"/>
         </optionSet>
         <argument argLabel="className"/>
+        <optional>
+          <argument argLabel="methodName"/>
+        </optional>
       </sequence>
     </syntax>
     <syntax alias="disasm" description="Disassemble a native code class">
