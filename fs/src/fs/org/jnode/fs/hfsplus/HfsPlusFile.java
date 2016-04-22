@@ -133,7 +133,7 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
      *
      * @return the compressed data, or {@code null} if no compressed data was found.
      */
-    private CompressedAttributeData getCompressedData() {
+    public CompressedAttributeData getCompressedData() {
         if (compressedData == null) {
             try {
                 AttributeData attributeData = getFileSystem().getAttributes().getAttribute(

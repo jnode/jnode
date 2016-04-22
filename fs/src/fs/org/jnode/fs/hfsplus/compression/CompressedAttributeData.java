@@ -63,6 +63,15 @@ public class CompressedAttributeData extends AttributeData {
             decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_LZVN_FORK;
     }
 
+    /**
+     * Gets the compression type.
+     *
+     * @return the compression type.
+     */
+    public long getCompressionType() {
+        return decmpfsDiskHeader.getType();
+    }
+
     @Override
     public void read(HfsPlusFileSystem fs, long fileOffset, ByteBuffer dest) throws IOException {
         if (decompressor == null) {
