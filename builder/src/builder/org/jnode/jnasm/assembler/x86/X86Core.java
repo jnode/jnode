@@ -69,7 +69,8 @@ public class X86Core extends AbstractX86Module {
     public static final int JA_ISN = IRETQ_ISN + 1;
     public static final int JAE_ISN = JA_ISN + 1;
     public static final int JB_ISN = JAE_ISN + 1;
-    public static final int JE_ISN = JB_ISN + 1;
+    public static final int JBE_ISN = JB_ISN + 1;
+    public static final int JE_ISN = JBE_ISN + 1;
     public static final int JGE_ISN = JE_ISN + 1;
     public static final int JL_ISN = JGE_ISN + 1;
     public static final int JLE_ISN = JL_ISN + 1;
@@ -235,6 +236,9 @@ public class X86Core extends AbstractX86Module {
                 break;
             case JB_ISN:
                 emitJCC(X86Assembler.JB);
+                break;
+            case JBE_ISN:
+                emitJCC(X86Assembler.JBE);
                 break;
             case JE_ISN:
                 emitJCC(X86Assembler.JE);
