@@ -315,7 +315,13 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         println(";\n; " + msg + "\n;");
     }
 
-    protected final int println(String msg) {
+    public int print(String msg) {
+        final int rc = idx + buf.length();
+        buf.append(msg);
+        return rc;
+    }
+
+    public int println(String msg) {
         final int rc = idx + buf.length();
         buf.append(msg);
         buf.append('\n');
