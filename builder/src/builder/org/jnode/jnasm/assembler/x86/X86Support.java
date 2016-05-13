@@ -88,11 +88,11 @@ public class X86Support extends HardwareSupport {
             //handle prefixes
             int prefix = ins.getPrefix();
             if ((prefix & Instruction.LOCK_PREFIX) != 0) {
-                nativeStream.write8(X86Constants.LOCK_PREFIX);
+                nativeStream.writePrefix(X86Constants.LOCK_PREFIX);
             } else if ((prefix & Instruction.REP_PREFIX) != 0) {
-                nativeStream.write8(X86Constants.REP_PREFIX);
+                nativeStream.writePrefix(X86Constants.REP_PREFIX);
             } else if ((prefix & Instruction.FS_PREFIX) != 0) {
-                nativeStream.write8(X86Constants.FS_PREFIX);
+                nativeStream.writePrefix(X86Constants.FS_PREFIX);
             }
             String label = ins.getLabel();
             if (label != null) {
