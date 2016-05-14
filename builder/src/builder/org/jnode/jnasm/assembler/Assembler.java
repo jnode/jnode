@@ -183,7 +183,34 @@ public abstract class Assembler {
                 throw x;
             } else {
                 if (pass == 2) {
-                    //x.printStackTrace();
+                    //todo verify these conversions
+                    if (name.startsWith("0x")) {
+                        try {
+                            return Integer.parseInt(name.substring(2), 16);
+                        } catch (NumberFormatException nfe) {
+                            //ignore
+                        }
+                    }
+                    try {
+                        return Integer.parseInt(name, 16);
+                    } catch (NumberFormatException nfe) {
+                        //ignore
+                    }
+                    try {
+                        return Integer.parseInt(name);
+                    } catch (NumberFormatException nfe) {
+                        //ignore
+                    }
+                    try {
+                        return Integer.parseInt(name, 8);
+                    } catch (NumberFormatException nfe) {
+                        //ignore
+                    }
+                    try {
+                        return Integer.parseInt(name, 2);
+                    } catch (NumberFormatException nfe) {
+                        //ignore
+                    }
                     System.out.println(x.getMessage());
                     throw new UndefinedConstantException(name);
                 }
