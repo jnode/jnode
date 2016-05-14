@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2016 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -57,6 +57,13 @@ public abstract class X86Assembler extends NativeStream implements BootImageNati
     protected final X86CpuID cpuId;
 
     protected final Mode mode;
+
+    protected X86Assembler() {
+        this.cpuId = X86CpuID.createID("pentium");
+        this.mode = X86Constants.Mode.CODE32;
+        this.code32 = mode.is32();
+        this.code64 = mode.is64();
+    }
 
     /**
      * Initialize this instance
@@ -117,7 +124,7 @@ public abstract class X86Assembler extends NativeStream implements BootImageNati
     }
 
     /**
-     * Get the length in bytes of valid data.
+     * Get the length in bytes of valid data
      *
      * @return the length of valid data
      */
