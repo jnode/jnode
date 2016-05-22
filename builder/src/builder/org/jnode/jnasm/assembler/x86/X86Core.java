@@ -46,11 +46,13 @@ public class X86Core extends AbstractX86Module {
     public static final int AND_ISN = ALIGN_ISN + 1;
     public static final int BTS_ISN = AND_ISN + 1;
     public static final int CALL_ISN = BTS_ISN + 1;
-    public static final int CLD_ISN = CALL_ISN + 1;
+    public static final int CDQ_ISN = CALL_ISN + 1;
+    public static final int CLD_ISN = CDQ_ISN + 1;
     public static final int CLI_ISN = CLD_ISN + 1;
     public static final int CLTS_ISN = CLI_ISN + 1;
     public static final int CMP_ISN = CLTS_ISN + 1;
-    public static final int CPUID_ISN = CMP_ISN + 1;
+    public static final int CMPXCHG_ISN = CMP_ISN + 1;
+    public static final int CPUID_ISN = CMPXCHG_ISN + 1;
     public static final int DEC_ISN = CPUID_ISN + 1;
     public static final int DIV_ISN = DEC_ISN + 1;
     public static final int FLDCW_ISN = DIV_ISN + 1;
@@ -61,7 +63,9 @@ public class X86Core extends AbstractX86Module {
     public static final int FXRSTOR_ISN = FSTCW_ISN + 1;
     public static final int FXSAVE_ISN = FXRSTOR_ISN + 1;
     public static final int HLT_ISN = FXSAVE_ISN + 1;
-    public static final int IN_ISN = HLT_ISN + 1;
+    public static final int IDIV_ISN = HLT_ISN + 1;
+    public static final int IMUL_ISN = IDIV_ISN + 1;
+    public static final int IN_ISN = IMUL_ISN + 1;
     public static final int INC_ISN = IN_ISN + 1;
     public static final int INT_ISN = INC_ISN + 1;
     public static final int IRET_ISN = INT_ISN + 1;
@@ -71,7 +75,8 @@ public class X86Core extends AbstractX86Module {
     public static final int JB_ISN = JAE_ISN + 1;
     public static final int JBE_ISN = JB_ISN + 1;
     public static final int JE_ISN = JBE_ISN + 1;
-    public static final int JGE_ISN = JE_ISN + 1;
+    public static final int JG_ISN = JE_ISN + 1;
+    public static final int JGE_ISN = JG_ISN + 1;
     public static final int JL_ISN = JGE_ISN + 1;
     public static final int JLE_ISN = JL_ISN + 1;
     public static final int JMP_ISN = JLE_ISN + 1;
@@ -92,10 +97,13 @@ public class X86Core extends AbstractX86Module {
     public static final int MOVSB_ISN = MOV_ISN + 1;
     public static final int MOVSW_ISN = MOVSB_ISN + 1;
     public static final int MOVSD_ISN = MOVSW_ISN + 1;
-    public static final int MOVZX_ISN = MOVSD_ISN + 1;
-    public static final int NEG_ISN = MOVZX_ISN + 1;
+    public static final int MOVSX_ISN = MOVSD_ISN + 1;
+    public static final int MOVZX_ISN = MOVSX_ISN + 1;
+    public static final int MUL_ISN = MOVZX_ISN + 1;
+    public static final int NEG_ISN = MUL_ISN + 1;
     public static final int NOP_ISN = NEG_ISN + 1;
-    public static final int OR_ISN = NOP_ISN + 1;
+    public static final int NOT_ISN = NOP_ISN + 1;
+    public static final int OR_ISN = NOT_ISN + 1;
     public static final int OUT_ISN = OR_ISN + 1;
     public static final int POP_ISN = OUT_ISN + 1;
     public static final int POPA_ISN = POP_ISN + 1;
@@ -106,9 +114,21 @@ public class X86Core extends AbstractX86Module {
     public static final int RDMSR_ISN = PUSHF_ISN + 1;
     public static final int RDTSC_ISN = RDMSR_ISN + 1;
     public static final int RET_ISN = RDTSC_ISN + 1;
-    public static final int SHL_ISN = RET_ISN + 1;
-    public static final int SHR_ISN = SHL_ISN + 1;
-    public static final int STD_ISN = SHR_ISN + 1;
+    public static final int SBB_ISN = RET_ISN + 1;
+    public static final int SETE_ISN = SBB_ISN + 1;
+    public static final int SAHF_ISN = SETE_ISN + 1;
+    public static final int SAL_ISN = SAHF_ISN + 1;
+    public static final int SAR_ISN = SAL_ISN + 1;
+    public static final int SHL_ISN = SAR_ISN + 1;
+    public static final int SETA_ISN = SHL_ISN + 1;
+    public static final int SETAE_ISN = SETA_ISN + 1;
+    public static final int SETB_ISN = SETAE_ISN + 1;
+    public static final int SETBE_ISN = SETB_ISN + 1;
+    public static final int SETNE_ISN = SETBE_ISN + 1;
+    public static final int SHLD_ISN = SETNE_ISN + 1;
+    public static final int SHR_ISN = SHLD_ISN + 1;
+    public static final int SHRD_ISN = SHR_ISN + 1;
+    public static final int STD_ISN = SHRD_ISN + 1;
     public static final int STI_ISN = STD_ISN + 1;
     public static final int STMXCSR_ISN = STI_ISN + 1;
     public static final int STOSB_ISN = STMXCSR_ISN + 1;
@@ -168,6 +188,9 @@ public class X86Core extends AbstractX86Module {
             case CALL_ISN:
                 emitCALL();
                 break;
+            case CDQ_ISN:
+                emitCDQ();
+                break;
             case CLD_ISN:
                 emitCLD();
                 break;
@@ -179,6 +202,9 @@ public class X86Core extends AbstractX86Module {
                 break;
             case CMP_ISN:
                 emitCMP();
+                break;
+            case CMPXCHG_ISN:
+                emitCMPXCHG();
                 break;
             case CPUID_ISN:
                 emitCPUID();
@@ -213,6 +239,12 @@ public class X86Core extends AbstractX86Module {
             case HLT_ISN:
                 emitHLT();
                 break;
+            case IDIV_ISN:
+                emitIDIV();
+                break;
+            case IMUL_ISN:
+                emitIMUL();
+                break;
             case IN_ISN:
                 emitIN();
                 break;
@@ -245,6 +277,9 @@ public class X86Core extends AbstractX86Module {
                 break;
             case JECXZ_ISN:
                 emitJECXZ();
+                break;
+            case JG_ISN:
+                emitJCC(X86Assembler.JG);
                 break;
             case JGE_ISN:
                 emitJCC(X86Assembler.JGE);
@@ -306,14 +341,23 @@ public class X86Core extends AbstractX86Module {
             case MOVSD_ISN:
                 emitMOVSD();
                 break;
+            case MOVSX_ISN:
+                emitMOVSX();
+                break;
             case MOVZX_ISN:
                 emitMOVZX();
+                break;
+            case MUL_ISN:
+                emitMUL();
                 break;
             case NEG_ISN:
                 emitNEG();
                 break;
             case NOP_ISN:
                 emitNOP();
+                break;
+            case NOT_ISN:
+                emitNOT();
                 break;
             case OR_ISN:
                 emitOR();
@@ -348,11 +392,47 @@ public class X86Core extends AbstractX86Module {
             case RET_ISN:
                 emitRET();
                 break;
+            case SBB_ISN:
+                emitSBB();
+                break;
+            case SETE_ISN:
+                emitSETE();
+                break;
+            case SAHF_ISN:
+                emitSAHF();
+                break;
+            case SAL_ISN:
+                emitSAL();
+                break;
+            case SAR_ISN:
+                emitSAR();
+                break;
             case SHL_ISN:
                 emitSHL();
                 break;
+            case SETA_ISN:
+                emitSETA();
+                break;
+            case SETAE_ISN:
+                emitSETAE();
+                break;
+            case SETB_ISN:
+                emitSETB();
+                break;
+            case SETBE_ISN:
+                emitSETBE();
+                break;
+            case SETNE_ISN:
+                emitSETNE();
+                break;
+            case SHLD_ISN:
+                emitSHLD();
+                break;
             case SHR_ISN:
                 emitSHR();
+                break;
+            case SHRD_ISN:
+                emitSHRD();
                 break;
             case STD_ISN:
                 emitSTD();
@@ -543,6 +623,10 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
+    private void emitCDQ() {
+        stream.writeCDQ(operandSize);
+    }
+
     private void emitCLD() {
         stream.writeCLD();
     }
@@ -594,6 +678,19 @@ public class X86Core extends AbstractX86Module {
                 break;
             default:
                 reportAddressingError(CMP_ISN, addr);
+        }
+    }
+
+    private void emitCMPXCHG() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case ER_ADDR:
+                Address ind = getAddress(0);
+                //prefix is already written
+                stream.writeCMPXCHG_EAX(getRegister(ind.getImg()), ind.disp, getReg(1), false);
+                break;
+            default:
+                reportAddressingError(CMPXCHG_ISN, addr);
         }
     }
 
@@ -705,6 +802,56 @@ public class X86Core extends AbstractX86Module {
 
     private void emitHLT() {
         stream.writeHLT();
+    }
+
+    private void emitIDIV() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                GPR reg = getReg(0);
+                stream.writeIDIV_EAX(reg);
+                break;
+            case E_ADDR:
+                Address ind = getAddress(0);
+                stream.writeIDIV_EAX(operandSize, getRegister(ind.getImg()), ind.disp);
+                break;
+            default:
+                reportAddressingError(IDIV_ISN, addr);
+        }
+    }
+
+    private void emitIMUL() {
+        int addr = getAddressingMode(3);
+        switch (addr) {
+            case R_ADDR:
+                GPR reg = getReg(0);
+                stream.writeIMUL_EAX(reg);
+                break;
+            case RR_ADDR:
+                GPR reg1 = getReg(0);
+                GPR reg2 = getReg(1);
+                stream.writeIMUL(reg1, reg2);
+                break;
+            case RE_ADDR:
+                reg = getReg(0);
+                Address ind = getAddress(1);
+                stream.writeIMUL(reg, getRegister(ind.getImg()), ind.disp);
+                break;
+            case RRC_ADDR:
+                reg1 = getReg(0);
+                reg2 = getReg(1);
+                int imm = getInt(2);
+                stream.writeIMUL_3(reg1, reg2, imm);
+                break;
+            case REC_ADDR:
+                reg = getReg(0);
+                ind = getAddress(0);
+                imm = getInt(2);
+                stream.writeIMUL_3(reg, getRegister(ind.getImg()), ind.disp, imm);
+                break;
+            default:
+                reportAddressingError(IMUL_ISN, addr);
+        }
     }
 
     private void emitIN() {
@@ -984,6 +1131,11 @@ public class X86Core extends AbstractX86Module {
                 ind = getAddress(1);
                 stream.writeMOV(getReg(0), (SR) X86Register.getRegister(ind.getImg()), ind.disp);
                 break;
+            case RS_ADDR:
+                ind = getAddress(1);
+                stream.writeMOV(operandSize, getReg(0), getRegister(ind.getImg()), getRegister(ind.sreg), ind.scale,
+                    ind.disp);
+                break;
             case ER_ADDR:
                 ind = getAddress(0);
                 int oSize = operandSize;
@@ -1032,12 +1184,29 @@ public class X86Core extends AbstractX86Module {
         stream.writeMOVSD();
     }
 
+    private void emitMOVSX() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                GPR reg2 = getReg(1);
+                stream.writeMOVSX(getReg(0), reg2, operandSize);
+                break;
+            case RE_ADDR:
+                Address ind = getAddress(1);
+                stream.writeMOVSX(getReg(0), getRegister(ind.getImg()), ind.disp, operandSize);
+                break;
+            default:
+                reportAddressingError(MOVSX_ISN, addr);
+        }
+    }
+
     private void emitMOVZX() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
                 GPR reg2 = getReg(1);
-                stream.writeMOVZX(getReg(0), reg2, reg2.getSize());
+                int os = operandSize == X86Constants.BITS32 ? reg2.getSize() : operandSize;
+                stream.writeMOVZX(getReg(0), reg2, os);
                 break;
             case RE_ADDR:
                 Address ind = getAddress(1);
@@ -1045,6 +1214,17 @@ public class X86Core extends AbstractX86Module {
                 break;
             default:
                 reportAddressingError(MOVZX_ISN, addr);
+        }
+    }
+
+    private void emitMUL() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writeMUL_EAX(getReg(0));
+                break;
+            default:
+                reportAddressingError(MUL_ISN, addr);
         }
     }
 
@@ -1065,6 +1245,21 @@ public class X86Core extends AbstractX86Module {
 
     private void emitNOP() {
         stream.writeNOP();
+    }
+
+    private void emitNOT() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writeNOT(getReg(0));
+                break;
+            case E_ADDR:
+                Address ind = getAddress(0);
+                stream.writeNOT(operandSize, getRegister(ind.getImg()), ind.disp);
+                break;
+            default:
+                reportAddressingError(NOT_ISN, addr);
+        }
     }
 
     private void emitOR() {
@@ -1106,7 +1301,8 @@ public class X86Core extends AbstractX86Module {
             case RR_ADDR:
                 GPR reg1 = getReg(0);
                 if (reg1 != X86Register.DX) {
-                    throw new IllegalArgumentException("Invalid second operand for OUT: " + reg1);
+                    throw new IllegalArgumentException("Invalid second operand for OUT: " + reg1 +
+                        ", must be " + X86Register.DX);
                 }
                 GPR reg2 = getReg(1);
                 if (reg2 == X86Register.AL) {
@@ -1230,9 +1426,99 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
+    private void emitSBB() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                stream.writeSBB(getReg(0), getReg(1));
+                break;
+            case RE_ADDR:
+                Address ind = getAddress(1);
+                stream.writeSBB(getReg(0), getRegister(ind.getImg()), ind.disp);
+                break;
+            case RC_ADDR:
+                stream.writeSBB(getReg(0), getInt(1));
+                break;
+            default:
+                reportAddressingError(SBB_ISN, addr);
+        }
+    }
+
+    private void emitSETE() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writeSETCC(getReg(0), X86Constants.JE);
+                break;
+            default:
+                reportAddressingError(SETE_ISN, addr);
+        }
+    }
+
+    private void emitSAHF() {
+        stream.writeSAHF();
+    }
+
+    private void emitSAL() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                GPR reg = getReg(1);
+                if (reg.equals(X86Register.CL)) {
+                    stream.writeSAL_CL(getReg(0));
+                } else {
+                    throw new IllegalArgumentException("Invalid second operand for SAL: " + reg +
+                        ", must be " + X86Register.CL);
+                }
+                break;
+            case RC_ADDR:
+                stream.writeSAL(getReg(0), getInt(1));
+                break;
+            case EC_ADDR:
+                Address ind = getAddress(0);
+                stream.writeSAL(operandSize, getRegister(ind.getImg()), ind.disp, getInt(1));
+                break;
+            default:
+                reportAddressingError(SAL_ISN, addr);
+        }
+    }
+
+    private void emitSAR() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                GPR reg = getReg(1);
+                if (reg.equals(X86Register.CL)) {
+                    stream.writeSAR_CL(getReg(0));
+                } else {
+                    throw new IllegalArgumentException("Invalid second operand for SAR: " + reg +
+                        ", must be " + X86Register.CL);
+                }
+                break;
+            case RC_ADDR:
+                stream.writeSAR(getReg(0), getInt(1));
+                break;
+            case EC_ADDR:
+                Address ind = getAddress(0);
+                stream.writeSAR(operandSize, getRegister(ind.getImg()), ind.disp, getInt(1));
+                break;
+            default:
+                reportAddressingError(SAR_ISN, addr);
+        }
+    }
+
     private void emitSHL() {
         int addr = getAddressingMode(2);
         switch (addr) {
+            case RR_ADDR:
+                GPR reg = getReg(1);
+                if (reg.equals(X86Register.CL)) {
+                    stream.writeSHL_CL(getReg(0));
+                } else {
+                    throw new IllegalArgumentException("Invalid second operand for SHL: " + reg +
+                        ", must be " + X86Register.CL);
+                }
+                break;
             case RC_ADDR:
                 stream.writeSHL(getReg(0), getInt(1));
                 break;
@@ -1245,9 +1531,84 @@ public class X86Core extends AbstractX86Module {
         }
     }
 
+    private void emitSETA() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writeSETCC(getReg(0), X86Constants.JA);
+                break;
+            default:
+                reportAddressingError(SETA_ISN, addr);
+        }
+    }
+
+    private void emitSETAE() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writeSETCC(getReg(0), X86Constants.JAE);
+                break;
+            default:
+                reportAddressingError(SETAE_ISN, addr);
+        }
+    }
+
+    private void emitSETB() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writeSETCC(getReg(0), X86Constants.JB);
+                break;
+            default:
+                reportAddressingError(SETB_ISN, addr);
+        }
+    }
+
+    private void emitSETBE() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writeSETCC(getReg(0), X86Constants.JBE);
+                break;
+            default:
+                reportAddressingError(SETBE_ISN, addr);
+        }
+    }
+
+    private void emitSETNE() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writeSETCC(getReg(0), X86Constants.JNE);
+                break;
+            default:
+                reportAddressingError(SETNE_ISN, addr);
+        }
+    }
+
+    private void emitSHLD() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                stream.writeSHLD_CL(getReg(0), getReg(1));
+                break;
+            default:
+                reportAddressingError(SHLD_ISN, addr);
+        }
+    }
+
     private void emitSHR() {
         int addr = getAddressingMode(2);
         switch (addr) {
+            case RR_ADDR:
+                GPR reg = getReg(1);
+                if (reg.equals(X86Register.CL)) {
+                    stream.writeSHR_CL(getReg(0));
+                } else {
+                    throw new IllegalArgumentException("Invalid second operand for SHR: " + reg +
+                        ", must be " + X86Register.CL);
+                }
+                break;
             case RC_ADDR:
                 stream.writeSHR(getReg(0), getInt(1));
                 break;
@@ -1257,6 +1618,23 @@ public class X86Core extends AbstractX86Module {
                 break;
             default:
                 reportAddressingError(SHR_ISN, addr);
+        }
+    }
+
+    private void emitSHRD() {
+        int addr = getAddressingMode(3);
+        switch (addr) {
+            case RRR_ADDR:
+                GPR reg = getReg(2);
+                if (reg.equals(X86Register.CL)) {
+                    stream.writeSHRD_CL(getReg(0), getReg(1));
+                } else {
+                    throw new IllegalArgumentException("Invalid second operand for SHRD: " + reg +
+                        ", must be " + X86Register.CL);
+                }
+                break;
+            default:
+                reportAddressingError(SHRD_ISN, addr);
         }
     }
 

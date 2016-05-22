@@ -52,9 +52,11 @@ public abstract class AbstractX86Module extends AssemblerModule {
     static final int C_ADDR = CON_ARG;
     static final int R_ADDR = REG_ARG;
     static final int RR_ADDR = REG_ARG | REG_ARG << DISP;
+    static final int RRR_ADDR = REG_ARG | REG_ARG << DISP | REG_ARG << 2 * DISP;
     static final int RRC_ADDR = REG_ARG | REG_ARG << DISP | CON_ARG << 2 * DISP;
     static final int RC_ADDR = REG_ARG | CON_ARG << DISP;
     static final int RE_ADDR = REG_ARG | REL_ARG << DISP;
+    static final int REC_ADDR = REG_ARG | REL_ARG << DISP | CON_ARG << 2 * DISP;
     static final int RA_ADDR = REG_ARG | ABS_ARG << DISP;
     static final int RS_ADDR = REG_ARG | SCL_ARG << DISP;
     static final int RZ_ADDR = REG_ARG | ZSC_ARG << DISP;
@@ -154,11 +156,15 @@ public abstract class AbstractX86Module extends AssemblerModule {
             "Unknown addressing mode " + addressing + " (" + err + " ) for " + getMnemonics()[instruction]);
     }
 
-    static final X86Register.GPR getRegister(String name) {
+    static X86Register.GPR getRegister(String name) {
         return X86Register.getGPR(name);
     }
 
-    static final X86Register.MMX getRegisterMMX(String name) {
+    static X86Register.MMX getRegisterMMX(String name) {
         return (X86Register.MMX) X86Register.getRegister(name);
+    }
+
+    static X86Register.FPU getRegisterFPU(String name) {
+        return (X86Register.FPU) X86Register.getRegister(name);
     }
 }
