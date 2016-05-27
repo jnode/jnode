@@ -126,7 +126,7 @@ public class LzvnForkCompression implements HfsPlusCompression {
      * @param decompressedByteBuffer the buffer to write to.
      * @return the number of bytes written to the decompressed buffer.
      */
-    int lzvnDecode(ByteBuffer compressedByteBuffer, ByteBuffer decompressedByteBuffer) {
+    public static int lzvnDecode(ByteBuffer compressedByteBuffer, ByteBuffer decompressedByteBuffer) {
         long destOffset = 0;
         byte[] uncompressedBuffer = decompressedByteBuffer.array();
         byte[] compressedBuffer = compressedByteBuffer.array();
@@ -483,7 +483,7 @@ public class LzvnForkCompression implements HfsPlusCompression {
      * @param value the value to switch.
      * @return the switched value.
      */
-    private long ReverseInt64(long value) {
+    private static long ReverseInt64(long value) {
         byte[] swapBuffer = new byte[8];
         LittleEndian.setInt64(swapBuffer, 0, value);
         return BigEndian.getInt64(swapBuffer, 0);

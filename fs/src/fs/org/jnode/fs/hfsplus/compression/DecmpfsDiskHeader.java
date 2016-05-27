@@ -29,7 +29,12 @@ public class DecmpfsDiskHeader {
      */
     public static final int COMPRESSION_TYPE_ZLIB_FORK = 4;
 
-    // 7, 9, and 10 also seem to be LZVN: http://reverseengineering.stackexchange.com/a/8233/3294
+    // 9, and 10 also seem to be LZVN: http://reverseengineering.stackexchange.com/a/8233/3294
+
+    /**
+     * The LZVN compressed.
+     */
+    public static final int COMPRESSION_TYPE_LZVN = 7;
 
     /**
      * The LZVN compressed data is stored in the resource fork.

@@ -81,6 +81,8 @@ public class CompressedAttributeData extends AttributeData {
                 decompressor = new AttributeZlibCompression(attributeData, decmpfsDiskHeader);
             } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_ZLIB_FORK) {
                 decompressor = new ZlibForkCompression(file);
+            } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_LZVN) {
+                decompressor = new AttributeLzvnCompression(attributeData, decmpfsDiskHeader);
             } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_LZVN_FORK) {
                 decompressor = new LzvnForkCompression(file);
             } else {
