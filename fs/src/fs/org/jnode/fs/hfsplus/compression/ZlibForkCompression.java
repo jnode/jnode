@@ -6,6 +6,7 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 import org.jnode.fs.hfsplus.HfsPlusFile;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
+import org.jnode.fs.hfsplus.attributes.AttributeData;
 import org.jnode.fs.util.FSUtils;
 
 /**
@@ -75,6 +76,17 @@ public class ZlibForkCompression implements HfsPlusCompression {
             dest.put(uncompressed);
 
             fileOffset += copySize;
+        }
+    }
+
+    /**
+     * The factory for this compression type.
+     */
+    public static class Factory implements HfsPlusCompressionFactory {
+        @Override
+        public HfsPlusCompression createDecompressor(HfsPlusFile file, AttributeData attributeData,
+                                                     DecmpfsDiskHeader decmpfsDiskHeader) {
+            return new ZlibForkCompression(file);
         }
     }
 }

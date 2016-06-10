@@ -2,6 +2,7 @@ package org.jnode.fs.hfsplus.compression;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import org.jnode.fs.hfsplus.HfsPlusFile;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
 import org.jnode.fs.hfsplus.attributes.AttributeData;
 
@@ -42,5 +43,16 @@ public class AttributeType1Compression implements HfsPlusCompression {
         uncompressed.position((int) fileOffset);
         uncompressed.limit(Math.min(uncompressed.capacity(), uncompressed.position() + dest.remaining()));
         dest.put(uncompressed);
+    }
+
+    /**
+     * The factory for this compression type.
+     */
+    public static class Factory implements HfsPlusCompressionFactory {
+        @Override
+        public HfsPlusCompression createDecompressor(HfsPlusFile file, AttributeData attributeData,
+                                                     DecmpfsDiskHeader decmpfsDiskHeader) {
+            return new AttributeType1Compression(attributeData);
+        }
     }
 }

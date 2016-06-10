@@ -17,29 +17,29 @@ public class DecmpfsDiskHeader {
     /**
      * 'Type1' - no compression.
      */
-    public static final int COMPRESSION_TYPE1 = 1;
+    public static final long COMPRESSION_TYPE1 = 1;
 
     /**
      * ZLIB compression.
      */
-    public static final int COMPRESSION_TYPE_ZLIB = 3;
+    public static final long COMPRESSION_TYPE_ZLIB = 3;
 
     /**
      * The ZLIB compressed data is stored in the resource fork.
      */
-    public static final int COMPRESSION_TYPE_ZLIB_FORK = 4;
+    public static final long COMPRESSION_TYPE_ZLIB_FORK = 4;
 
     // 9, and 10 also seem to be LZVN: http://reverseengineering.stackexchange.com/a/8233/3294
 
     /**
      * The LZVN compressed.
      */
-    public static final int COMPRESSION_TYPE_LZVN = 7;
+    public static final long COMPRESSION_TYPE_LZVN = 7;
 
     /**
      * The LZVN compressed data is stored in the resource fork.
      */
-    public static final int COMPRESSION_TYPE_LZVN_FORK = 8;
+    public static final long COMPRESSION_TYPE_LZVN_FORK = 8;
 
     /**
      * The name of the attribute which holds the compressed data.

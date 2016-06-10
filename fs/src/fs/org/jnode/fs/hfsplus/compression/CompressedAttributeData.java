@@ -2,6 +2,8 @@ package org.jnode.fs.hfsplus.compression;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.jnode.fs.hfsplus.HfsPlusFile;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
 import org.jnode.fs.hfsplus.attributes.AttributeData;
@@ -75,21 +77,30 @@ public class CompressedAttributeData extends AttributeData {
     @Override
     public void read(HfsPlusFileSystem fs, long fileOffset, ByteBuffer dest) throws IOException {
         if (decompressor == null) {
-            if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE1) {
-                decompressor = new AttributeType1Compression(attributeData);
-            } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_ZLIB) {
-                decompressor = new AttributeZlibCompression(attributeData, decmpfsDiskHeader);
-            } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_ZLIB_FORK) {
-                decompressor = new ZlibForkCompression(file);
-            } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_LZVN) {
-                decompressor = new AttributeLzvnCompression(attributeData, decmpfsDiskHeader);
-            } else if (decmpfsDiskHeader.getType() == DecmpfsDiskHeader.COMPRESSION_TYPE_LZVN_FORK) {
-                decompressor = new LzvnForkCompression(file);
-            } else {
+
+            if (!fs.getRegisteredCompressionTypes().containsKey(decmpfsDiskHeader.getType())) {
                 throw new UnsupportedOperationException("Unsupported compression type: " + decmpfsDiskHeader);
             }
+
+            HfsPlusCompressionFactory factory = fs.getRegisteredCompressionTypes().get(decmpfsDiskHeader.getType());
+            decompressor = factory.createDecompressor(file, attributeData, decmpfsDiskHeader);
         }
 
         decompressor.read(fs, fileOffset, dest);
+    }
+
+    /**
+     * Gets the map of the default supported compression types.
+     *
+     * @return the map.
+     */
+    public static Map<Long, HfsPlusCompressionFactory> getDefaultTypes() {
+        Map<Long, HfsPlusCompressionFactory> compressionTypeMap = new LinkedHashMap<Long, HfsPlusCompressionFactory>();
+        compressionTypeMap.put(DecmpfsDiskHeader.COMPRESSION_TYPE1, new AttributeType1Compression.Factory());
+        compressionTypeMap.put(DecmpfsDiskHeader.COMPRESSION_TYPE_ZLIB, new AttributeZlibCompression.Factory());
+        compressionTypeMap.put(DecmpfsDiskHeader.COMPRESSION_TYPE_ZLIB_FORK, new ZlibForkCompression.Factory());
+        compressionTypeMap.put(DecmpfsDiskHeader.COMPRESSION_TYPE_LZVN, new AttributeLzvnCompression.Factory());
+        compressionTypeMap.put(DecmpfsDiskHeader.COMPRESSION_TYPE_LZVN_FORK, new LzvnForkCompression.Factory());
+        return compressionTypeMap;
     }
 }

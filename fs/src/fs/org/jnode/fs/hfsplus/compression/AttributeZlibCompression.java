@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
+import org.jnode.fs.hfsplus.HfsPlusFile;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
 import org.jnode.fs.hfsplus.attributes.AttributeData;
 
@@ -68,5 +69,16 @@ public class AttributeZlibCompression implements HfsPlusCompression {
         uncompressed.position((int) fileOffset);
         uncompressed.limit(Math.min(uncompressed.capacity(), uncompressed.position() + dest.remaining()));
         dest.put(uncompressed);
+    }
+
+    /**
+     * The factory for this compression type.
+     */
+    public static class Factory implements HfsPlusCompressionFactory {
+        @Override
+        public HfsPlusCompression createDecompressor(HfsPlusFile file, AttributeData attributeData,
+                                                     DecmpfsDiskHeader decmpfsDiskHeader) {
+            return new AttributeZlibCompression(attributeData, decmpfsDiskHeader);
+        }
     }
 }

@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import org.apache.log4j.Logger;
 import org.jnode.fs.hfsplus.HfsPlusFile;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
+import org.jnode.fs.hfsplus.attributes.AttributeData;
 import org.jnode.fs.util.FSUtils;
 import org.jnode.util.BigEndian;
 import org.jnode.util.LittleEndian;
@@ -487,5 +488,16 @@ public class LzvnForkCompression implements HfsPlusCompression {
         byte[] swapBuffer = new byte[8];
         LittleEndian.setInt64(swapBuffer, 0, value);
         return BigEndian.getInt64(swapBuffer, 0);
+    }
+
+    /**
+     * The factory for this compression type.
+     */
+    public static class Factory implements HfsPlusCompressionFactory {
+        @Override
+        public HfsPlusCompression createDecompressor(HfsPlusFile file, AttributeData attributeData,
+                                                     DecmpfsDiskHeader decmpfsDiskHeader) {
+            return new LzvnForkCompression(file);
+        }
     }
 }

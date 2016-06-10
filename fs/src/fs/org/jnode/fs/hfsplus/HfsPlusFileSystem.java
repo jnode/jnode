@@ -21,6 +21,8 @@
 package org.jnode.fs.hfsplus;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.fs.FSDirectory;
@@ -33,6 +35,8 @@ import org.jnode.fs.hfsplus.attributes.Attributes;
 import org.jnode.fs.hfsplus.catalog.Catalog;
 import org.jnode.fs.hfsplus.catalog.CatalogKey;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
+import org.jnode.fs.hfsplus.compression.CompressedAttributeData;
+import org.jnode.fs.hfsplus.compression.HfsPlusCompressionFactory;
 import org.jnode.fs.hfsplus.extent.Extent;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.AbstractFileSystem;
@@ -69,6 +73,12 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
      * The HFS+ private directory data directory. Used by HFS+ to stored hard linked directories.
      */
     private HfsPlusDirectory privateDirectoryDataDirectory;
+
+    /**
+     * The map of registered compression types.
+     */
+    private Map<Long, HfsPlusCompressionFactory> registeredCompressionTypes =
+        new LinkedHashMap<Long, HfsPlusCompressionFactory>(CompressedAttributeData.getDefaultTypes());
 
     /**
      * @param device
@@ -214,6 +224,15 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
         }
 
         return privateDirectoryDataDirectory;
+    }
+
+    /**
+     * Gets the map of register compression type factories.
+     *
+     * @return the map.
+     */
+    public Map<Long, HfsPlusCompressionFactory> getRegisteredCompressionTypes() {
+        return registeredCompressionTypes;
     }
 
     /**
