@@ -1,5 +1,6 @@
 package org.jnode.fs.hfsplus.compression;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.LinkedHashMap;
@@ -14,7 +15,7 @@ import org.jnode.fs.hfsplus.attributes.AttributeData;
  *
  * @author Luke Quinane
  */
-public class CompressedAttributeData extends AttributeData {
+public class CompressedAttributeData extends AttributeData implements AutoCloseable {
 
     /**
      * The HFS+ file.
@@ -87,6 +88,13 @@ public class CompressedAttributeData extends AttributeData {
         }
 
         decompressor.read(fs, fileOffset, dest);
+    }
+
+    @Override
+    public void close() throws Exception {
+        if (decompressor instanceof Closeable) {
+            ((Closeable) decompressor).close();
+        }
     }
 
     /**
