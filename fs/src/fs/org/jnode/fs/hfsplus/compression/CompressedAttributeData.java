@@ -15,7 +15,7 @@ import org.jnode.fs.hfsplus.attributes.AttributeData;
  *
  * @author Luke Quinane
  */
-public class CompressedAttributeData extends AttributeData implements AutoCloseable {
+public class CompressedAttributeData extends AttributeData implements Closeable {
 
     /**
      * The HFS+ file.
@@ -91,7 +91,7 @@ public class CompressedAttributeData extends AttributeData implements AutoClosea
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         if (decompressor instanceof Closeable) {
             ((Closeable) decompressor).close();
         }
