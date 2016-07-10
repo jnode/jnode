@@ -190,6 +190,7 @@
 		<pathelement location="${jnode-gui-test.jar}"/>
 		<pathelement location="${jnode-cli-test.jar}"/>
 		<pathelement location="${jnode-textui-test.jar}"/>
+		<pathelement location="${root.dir}/builder/build/testclasses"/>
 		<pathelement location="${root.dir}/shell/lib/nanoxml-2.2.3.jar"/>
 		<path refid="cp-jnode"/>
 	</path>
@@ -1180,6 +1181,10 @@ clean             Remove all intermediate build results.
 			<class location="./build/plugins/org.jnode.security_${jnode-ver}.jar"/>
 			<class location="./build/plugins/org.jnode.system.repository_${jnode-ver}.jar"/>
 		</findbugs>
+	</target>
+
+	<target name="regression-tests" depends="assemble-plugins">
+		<ant target="regression-tests" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
 	</target>
 
 	<!-- TODO Create a patch create replacement SVN task -->

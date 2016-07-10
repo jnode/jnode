@@ -1,4 +1,4 @@
 language: java
 jdk:
   - oraclejdk7
-script: "./build.sh clean cd-x86-lite"
+script: "./build.sh clean cd-x86-lite regression-tests"
