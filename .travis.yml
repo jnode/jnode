@@ -3,4 +3,4 @@ jdk:
   - oraclejdk7
 install:
   - sudo apt-get -y install nasm
-script: "./build.sh clean cd-x86-lite regression-tests;cat builder/build/reports/junit/TEST-org.jnode.jnasm.JNAsmTest.xml"
+script: "./build.sh clean cd-x86-lite regression-tests"
