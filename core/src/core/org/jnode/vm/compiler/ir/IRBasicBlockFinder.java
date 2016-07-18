@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -23,8 +23,7 @@ package org.jnode.vm.compiler.ir;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import org.jnode.vm.bytecode.BytecodeFlags;
 import org.jnode.vm.bytecode.BytecodeVisitorSupport;
 import org.jnode.vm.classmgr.VmByteCode;
@@ -43,7 +42,7 @@ public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Com
     private byte[] branchFlags;
 
     private final ArrayList<IRBasicBlock<T>> blocks = new ArrayList<IRBasicBlock<T>>();
-    private final HashMap<Integer, Integer> branchTargets = new HashMap<Integer, Integer>();
+    private final List<int[]> branchTargets = new ArrayList<int[]>();
     private VmByteCode byteCode;
     private static final byte CONDITIONAL_BRANCH = 1;
     private static final byte UNCONDITIONAL_BRANCH = 2;
@@ -92,9 +91,9 @@ public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Com
             }
         }
         // TODO this is O(n^2), but it works...
-        for (Map.Entry<Integer, Integer> entry : branchTargets.entrySet()) {
-            final int from = entry.getKey();
-            final int to = entry.getValue();
+        for (int[] entry : branchTargets) {
+            final int from = entry[0];
+            final int to = entry[1];
             IRBasicBlock<T> pred = findBB(list, from);
             IRBasicBlock<T> succ = findBB(list, to);
             if (pred == null || succ == null) {
@@ -105,6 +104,16 @@ public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Com
         if (bbIndex != list.length) {
             throw new AssertionError("bbIndex != list.length");
         }
+
+        for (int i = 0; i < byteCode.getNoExceptionHandlers(); i++) {
+            VmInterpretedExceptionHandler eh = byteCode.getExceptionHandler(i);
+            IRBasicBlock<T> handlerBB = findBB(list, eh.getHandlerPC());
+            IRBasicBlock<T> tryBB = findBB(list, eh.getStartPC());
+            for (IRBasicBlock bb : tryBB.getPredecessors()) {
+                bb.addSuccessor(handlerBB);
+            }
+        }
+
         return list;
     }
 
@@ -131,7 +140,7 @@ public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Com
         for (int i = 0; i < bc.getNoExceptionHandlers(); i++) {
             VmInterpretedExceptionHandler eh = bc.getExceptionHandler(i);
             IRBasicBlock tryBlock = startTryBlock(eh.getStartPC());
-            IRBasicBlock endTryBlock = startTryBlockEnd(eh.getEndPC());
+//            IRBasicBlock endTryBlock = startTryBlockEnd(eh.getEndPC());
             IRBasicBlock catchBlock = startException(eh.getHandlerPC());
         }
     }
@@ -277,7 +286,7 @@ public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Com
     private final void addBranch(int target, byte flags) {
         IRBasicBlock pred = this.currentBlock;
         IRBasicBlock succ = startBB(target);
-        branchTargets.put(getInstructionAddress(), target);
+        branchTargets.add(new int[]{getInstructionAddress(), target});
         endBB(flags);
     }
 

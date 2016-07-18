@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
+ 
 package org.jnode.build;
 
 import java.io.File;
@@ -212,12 +212,36 @@ public class PluginTask extends AbstractPluginTask {
         if (rt != null) {
             for (Library lib : rt.getLibraries()) {
                 File libFile = getLibraryFile(lib, getPluginDir());
-                if (libFile.lastModified() > destLastModified)
+                long lastModified = getLastModified(libFile);
+                if (lastModified > destLastModified)
                     return false;
             }
         }
 
         return true;
+    }
+
+    private long getLastModified(File libFile) {
+        if (libFile.isDirectory()) {
+            return getDeepLastModified(libFile, Long.MIN_VALUE);
+        } else {
+            return libFile.lastModified();
+        }
+    }
+
+    private long getDeepLastModified(File libFile, long maxLastModified) {
+        long localMaxLastModified = maxLastModified;
+        if (libFile.isDirectory()) {
+            File[] files = libFile.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    localMaxLastModified = Math.max(maxLastModified, getDeepLastModified(f, localMaxLastModified));
+                }
+            }
+        } else {
+            localMaxLastModified = libFile.lastModified();
+        }
+        return Math.max(localMaxLastModified, maxLastModified);
     }
 
     /**

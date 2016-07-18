@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -156,7 +156,7 @@ public class NativeTest {
 
         VmByteCode code = loadByteCode(className);
 
-        X86CodeGenerator x86cg = new X86CodeGenerator(os, code.getLength());
+        X86CodeGenerator x86cg = null; //new X86CodeGenerator(os, code.getLength());
 
         IRControlFlowGraph cfg = new IRControlFlowGraph(code);
 
@@ -167,7 +167,7 @@ public class NativeTest {
         //System.out.println();
 
         System.out.println(cfg);
-        IRGenerator irg = new IRGenerator(cfg);
+        IRGenerator irg = null; //todo new IRGenerator(cfg, typeSizeInfo);
         BytecodeParser.parse(code, irg);
 
         // TODO fix this!

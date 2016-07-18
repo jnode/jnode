@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -22,6 +22,9 @@ package org.jnode.test.gui;
 
 import java.awt.Menu;
 import java.awt.MenuBar;
+import java.awt.MenuItem;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -29,19 +32,26 @@ import java.awt.MenuBar;
 @SuppressWarnings("serial")
 public class AWTMenuTest extends AWTTest {
 
-    /**
-     * @param title
-     */
     public AWTMenuTest(String title) {
         super(title);
         MenuBar mb = new MenuBar();
-        mb.add(new Menu("Window"));
+        Menu file = new Menu("File");
+        MenuItem exit = new MenuItem("Exit");
+        exit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
+        file.add(exit);
+        mb.add(file);
+        Menu window = new Menu("Window");
+        MenuItem test = new MenuItem("Test");
+        window.add(test);
+        mb.add(window);
         setMenuBar(mb);
     }
 
-    /**
-     * @param args
-     */
     public static void main(String[] args) {
         try {
             final AWTMenuTest wnd = new AWTMenuTest("AWTTest");

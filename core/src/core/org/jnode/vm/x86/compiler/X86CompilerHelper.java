@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -352,7 +352,7 @@ public class X86CompilerHelper {
             final VmType<?> cls = method.getDeclaringClass();
             if (!cls.isAlwaysInitialized()) {
                 final GPR aax = this.AAX;
-                final Label label = genLabel("$$class-init");
+                final Label label = genLabel("$$class_init");
 
                 // Save eax
                 os.writePUSH(aax);
@@ -387,9 +387,9 @@ public class X86CompilerHelper {
                                            GPR tmpReg, VmType<?> cls) {
         if (!cls.isAlwaysInitialized()) {
             // Create jump labels
-            final Label testIsolated = new Label(curInstrLabel + "$$testiso-cinit");
-            final Label doInit = new Label(curInstrLabel + "$$do-cinit-ex");
-            final Label done = new Label(curInstrLabel + "$$done-cinit-ex");
+            final Label testIsolated = new Label(curInstrLabel + "$$testiso_cinit");
+            final Label doInit = new Label(curInstrLabel + "$$do_cinit_ex");
+            final Label done = new Label(curInstrLabel + "$$done_cinit_ex");
 
             // Test declaringClass.modifiers (mostly true)
             os.writeTEST(BITS32, classReg, entryPoints.getVmTypeState()
@@ -404,7 +404,7 @@ public class X86CompilerHelper {
 
                 // Test isolated class state
                 os.setObjectRef(testIsolated);
-                writeLoadIsolatedStatics(curInstrLabel, "$$ld-is-stat", tmpReg);
+                writeLoadIsolatedStatics(curInstrLabel, "$$ld_is_stat", tmpReg);
                 final int offset = getIsolatedStaticsOffset(cls);
                 os.writeTEST(BITS32, tmpReg, offset, VmTypeState.IST_INITIALIZED);
             }
@@ -423,7 +423,7 @@ public class X86CompilerHelper {
             Label initializer = classInitLabels.get(cls);
             if (initializer == null) {
                 // create one
-                initializer = genLabel("$$init-" + cls.getName());
+                initializer = genLabel("$$init_" + cls.getName());
                 classInitLabels.put(cls, initializer);
             }
             // Setup call to class initializer code
@@ -505,7 +505,7 @@ public class X86CompilerHelper {
         // int 0x31
         // vm_invoke_testStackOverflowDone:
         final int offset = entryPoints.getVmProcessorStackEnd().getOffset();
-        final Label doneLabel = new Label(labelPrefix + "$$stackof-done");
+        final Label doneLabel = new Label(labelPrefix + "$$stackof_done");
         final Label intLabel = new Label(labelPrefix + "$$stovf");
         if (os.isCode32()) {
             os.writePrefix(X86Constants.FS_PREFIX);

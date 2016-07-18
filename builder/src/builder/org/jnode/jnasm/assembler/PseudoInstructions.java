@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -36,7 +36,8 @@ public class PseudoInstructions extends AssemblerModule {
     public static final int DB_ISN = BITS_ISN + 1;
     public static final int DW_ISN = DB_ISN + 1;
     public static final int DD_ISN = DW_ISN + 1;
-    public static final int RESB_ISN = DD_ISN + 1;
+    public static final int DQ_ISN = DD_ISN + 1;
+    public static final int RESB_ISN = DQ_ISN + 1;
     public static final int RESD_ISN = RESB_ISN + 1;
 
     static {
@@ -57,14 +58,14 @@ public class PseudoInstructions extends AssemblerModule {
         this.stream = stream;
     }
 
-    public boolean emit(String mnemonic, List<Object> operands, int operandSize) {
+    public boolean emit(String mnemonic, List<Object> operands, int operandSize, Instruction instruction) {
         this.operands = operands;
 
-        Integer key = (Integer) INSTRUCTION_MAP.get(mnemonic);
+        Integer key = INSTRUCTION_MAP.get(mnemonic);
 
         if (key == null) return false;
 
-        switch (key.intValue()) {
+        switch (key) {
             case BITS_ISN:
                 emitBITS();
                 break;
@@ -77,6 +78,9 @@ public class PseudoInstructions extends AssemblerModule {
             case DD_ISN:
                 emitDD();
                 break;
+            case DQ_ISN:
+                emitDQ();
+                break;
             case RESB_ISN:
                 emitRESB();
                 break;
@@ -84,7 +88,7 @@ public class PseudoInstructions extends AssemblerModule {
                 emitRESD();
                 break;
             default:
-                throw new Error("Invalid instruction binding " + key.intValue() + " for " + mnemonic);
+                throw new Error("Invalid instruction binding " + key + " for " + mnemonic);
         }
 
         return true;
@@ -95,16 +99,13 @@ public class PseudoInstructions extends AssemblerModule {
     }
 
     private void emitDB() {
-        int ln = operands.size();
-        for (int i = 0; i < ln; i++) {
-            Object o = operands.get(i);
+        for (Object o : operands) {
             if (o instanceof Integer) {
-                stream.write8(((Integer) o).intValue());
+                stream.write8((Integer) o);
             } else if (o instanceof String) {
                 byte[] bytes = ((String) o).getBytes();
-                int bln = bytes.length;
-                for (int j = 0; j < bln; j++) {
-                    stream.write8(bytes[j]);
+                for (byte aByte : bytes) {
+                    stream.write8(aByte);
                 }
             } else {
                 throw new IllegalArgumentException("Unknown data: " + o);
@@ -113,16 +114,14 @@ public class PseudoInstructions extends AssemblerModule {
     }
 
     private void emitDW() {
-        int ln = operands.size();
-        for (int i = 0; i < ln; i++) {
-            Object o = operands.get(i);
+        for (Object o : operands) {
             if (o instanceof Integer) {
-                stream.write16(((Integer) o).intValue());
+                stream.write16((Integer) o);
             } else if (o instanceof String) {
                 byte[] bytes = ((String) o).getBytes();
                 int bln = bytes.length;
-                for (int j = 0; j < bln; j++) {
-                    stream.write8(bytes[j]);
+                for (byte aByte : bytes) {
+                    stream.write8(aByte);
                 }
                 if (bln % 2 == 1)
                     stream.write8(0);
@@ -133,11 +132,9 @@ public class PseudoInstructions extends AssemblerModule {
     }
 
     private void emitDD() {
-        int ln = operands.size();
-        for (int i = 0; i < ln; i++) {
-            Object o = operands.get(i);
+        for (Object o : operands) {
             if (o instanceof Integer) {
-                stream.write32(((Integer) o).intValue());
+                stream.write32((Integer) o);
             } else if (o instanceof String) {
                 byte[] bytes = ((String) o).getBytes();
                 int bln = bytes.length;
@@ -156,11 +153,41 @@ public class PseudoInstructions extends AssemblerModule {
         }
     }
 
+    private void emitDQ() {
+        for (Object o : operands) {
+            if (o instanceof Integer) {
+                stream.write64((Integer) o);
+            } else if (o instanceof Long) {
+                stream.write64((Long) o);
+            } else if (o instanceof String) {
+                byte[] bytes = ((String) o).getBytes();
+                int bln = bytes.length;
+                for (int j = 0; j < bln; j++) {
+                    stream.write8(bytes[j]);
+                }
+                bln = (8 - bln % 8) % 8;
+                for (int j = 0; j < bln; j++) {
+                    stream.write8(0);
+                }
+            } else if (o instanceof Identifier) {
+                stream.writeObjectRef(new Label(((Identifier) o).name));
+            } else {
+                throw new IllegalArgumentException("Unknown data: " + o);
+            }
+        }
+    }
+
     private void emitRESB() {
-        for (int i = ((Integer) operands.get(0)).intValue(); i-- > 0; stream.write8(0)) ;
+        int i = (Integer) operands.get(0);
+        while (i-- > 0) {
+            stream.write8(0);
+        }
     }
 
     private void emitRESD() {
-        for (int i = 4 * ((Integer) operands.get(0)).intValue(); i-- > 0; stream.write8(0)) ;
+        int i = 4 * (Integer) operands.get(0);
+        while (i-- > 0) {
+            stream.write8(0);
+        }
     }
 }

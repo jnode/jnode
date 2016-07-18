@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -58,6 +58,11 @@ public class SSAStack<T> {
         stack.add(var);
         return var;
     }
+
+//    public void replaceVariable(Variable<T> var) {
+//        Variable clone = (Variable) var.clone();
+//        this.variable = clone;
+//    }
 
     public Variable<T> pop() {
         Variable<T> var = stack.remove(stack.size() - 1);

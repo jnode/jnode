@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -36,6 +36,7 @@ public class Macro {
         return name;
     }
 
+    @SuppressWarnings("unused")
     public int getParamCount() {
         return paramCount;
     }
@@ -67,8 +68,8 @@ public class Macro {
     public String expand(String[] params) {
         //if(paramCount != params.length) return null;
         String exp = body;
-        for (int i = 0; i < localLabels.length; i++) {
-            exp = exp.replaceAll(localLabels[i], "__jnasm_macro_local_label_" + localLabelCount++);
+        for (String localLabel : localLabels) {
+            exp = exp.replaceAll(localLabel, "__jnasm_macro_local_label_" + localLabelCount++);
         }
 
         for (int i = 0; i < params.length; i++) {

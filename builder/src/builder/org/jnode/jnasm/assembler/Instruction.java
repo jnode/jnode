@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -28,12 +28,14 @@ import java.util.List;
 public class Instruction {
     public static final int LOCK_PREFIX = 1;
     public static final int REP_PREFIX = 2;
+    public static final int FS_PREFIX = 4;
     private int times;
     private int prefix;
     private int lineNumber;
     private String sizeInfo;
     private String label;
     private String mnemonic;
+    private String jumpType;
     private List<Object> operands;
 
     public Instruction(String label) {
@@ -90,8 +92,9 @@ public class Instruction {
         return prefix;
     }
 
+    @SuppressWarnings("unused")
     public void addPrefix(int prefix) {
-        if (prefix == LOCK_PREFIX || prefix == REP_PREFIX) {
+        if (prefix == LOCK_PREFIX || prefix == REP_PREFIX || prefix == FS_PREFIX) {
             this.prefix |= prefix;
         } else {
             throw new RuntimeException("Invalid prefix: " + prefix);
@@ -108,5 +111,15 @@ public class Instruction {
 
     public void setTimes(int times) {
         this.times = times;
+    }
+
+    public String getJumpType() {
+        return jumpType;
+    }
+
+    public void setJumpType(String jumpType) {
+        if (jumpType != null && jumpType.trim().length() > 0) {
+            this.jumpType = jumpType.trim().toLowerCase();
+        }
     }
 }

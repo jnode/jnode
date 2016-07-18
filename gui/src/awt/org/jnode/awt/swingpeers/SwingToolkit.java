@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -580,6 +580,7 @@ public final class SwingToolkit extends JNodeToolkit {
         // Create the desktop
         desktopFrame = new DesktopFrame(getScreenSize());
         desktopFrame.show();
+        desktopFrame.getContentPane().repaint();
     }
 
     protected void onResize() {

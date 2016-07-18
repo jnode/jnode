@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -64,8 +64,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
      * @throws DriverException
      * @throws FileSystemException
      */
-    public void createImage() throws IOException, DriverException,
-        FileSystemException {
+    public void createImage() throws IOException, DriverException, FileSystemException {
         super.createImage();
 
         FileWriter fw = new FileWriter(plnFile);
@@ -75,8 +74,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
         pw.println("HEADS     " + geom.getHeads());
         pw.println("SECTORS   " + geom.getSectors());
         pw.println("CAPACITY  " + geom.getTotalSectors());
-        pw.println("ACCESS    \"" + getDestFile().getCanonicalPath()
-            + "\" 0 102400");
+        pw.println("ACCESS    \"" + getDestFile().getCanonicalPath() + "\" 0 102400");
         pw.flush();
         fw.flush();
         pw.close();
@@ -93,8 +91,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
     protected void formatDevice(Device device) throws IOException {
 
         /* Format the MBR & partitiontable */
-        GrubBootSector mbr = (GrubBootSector) (createFormatter()
-            .getBootSector());
+        GrubBootSector mbr = (GrubBootSector) (createFormatter().getBootSector());
 
         IBMPartitionTableEntry pte = mbr.initPartitions(geom, IBMPartitionTypes.PARTTYPE_DOS_FAT16_LT32M);
 
@@ -104,8 +101,8 @@ public class BootDiskBuilder extends BootFloppyBuilder {
          */
 
         /* Format partition 0 */
-        part0 = new MappedFSBlockDeviceSupport(device, pte.getStartLba()
-            * bytesPerSector, pte.getNrSectors() * bytesPerSector);
+        part0 = new MappedFSBlockDeviceSupport(device, pte.getStartLba() * bytesPerSector, pte.getNrSectors()
+            * bytesPerSector);
         GrubFatFormatter ff = createFormatter();
         ff.setInstallPartition(0x0000FFFF);
         ff.format(part0);
@@ -129,8 +126,8 @@ public class BootDiskBuilder extends BootFloppyBuilder {
      * @see org.jnode.build.BootFloppyBuilder#createFormatter()
      */
     protected GrubFatFormatter createFormatter() throws IOException {
-        return new GrubFatFormatter(bytesPerSector, spc, geom, FatType.FAT16, 1,
-            getStage1ResourceName(), getStage2ResourceName());
+        return new GrubFatFormatter(bytesPerSector, spc, geom, FatType.FAT16, 1, getStage1ResourceName(),
+            getStage2ResourceName());
     }
 
     /**
@@ -176,14 +173,11 @@ public class BootDiskBuilder extends BootFloppyBuilder {
         try {
             log("Setting bootdisk geometry to " + geometryString, Project.MSG_VERBOSE);
             StringTokenizer tokenizer = new StringTokenizer(geometryString, "/");
-            geom = new Geometry(Integer.parseInt(tokenizer.nextToken()),
-                Integer.parseInt(tokenizer.nextToken()), Integer
-                .parseInt(tokenizer.nextToken()));
+            geom = new Geometry(Integer.parseInt(tokenizer.nextToken()), Integer.parseInt(tokenizer.nextToken()),
+                Integer.parseInt(tokenizer.nextToken()));
         } catch (Exception e) {
-            throw new IllegalArgumentException(
-                "Invalid geometry "
-                    + geometryString
-                    + ". Must correspond to pattern '<cylinders>/<heads>/<sectors>' e.g. '64/16/32'.");
+            throw new IllegalArgumentException("Invalid geometry " + geometryString
+                + ". Must correspond to pattern '<cylinders>/<heads>/<sectors>' e.g. '64/16/32'.");
         }
     }
 }

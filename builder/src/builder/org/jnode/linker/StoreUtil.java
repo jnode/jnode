@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -122,8 +122,7 @@ public class StoreUtil {
      * @return the number of bytes stored
      * @throws IOException
      */
-    public static int storeAddr(OutputStream out, byte[] e_ident,
-                                long address) throws IOException {
+    public static int storeAddr(OutputStream out, byte[] e_ident, long address) throws IOException {
         if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
             return little32(out, (int) address);
         } else {
@@ -140,8 +139,7 @@ public class StoreUtil {
      * @return the number of bytes stored
      * @throws IOException
      */
-    public static int storeOff(OutputStream out, byte[] e_ident,
-                               long off) throws IOException {
+    public static int storeOff(OutputStream out, byte[] e_ident, long off) throws IOException {
         if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
             return little32(out, (int) off);
         } else {
@@ -158,8 +156,7 @@ public class StoreUtil {
      * @return the number of bytes stored
      * @throws IOException
      */
-    public static int storeXword(OutputStream out, byte[] e_ident,
-                                 long xword) throws IOException {
+    public static int storeXword(OutputStream out, byte[] e_ident, long xword) throws IOException {
         if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
             return little32(out, (int) xword);
         } else {

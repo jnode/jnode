@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -20,10 +20,13 @@
  
 package org.jnode.vm.compiler.ir.quad;
 
+import java.util.List;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
+import org.jnode.vm.compiler.ir.LocalVariable;
 import org.jnode.vm.compiler.ir.Operand;
 import org.jnode.vm.compiler.ir.PhiOperand;
+import org.jnode.vm.compiler.ir.StackVariable;
 import org.jnode.vm.compiler.ir.Variable;
 
 /**
@@ -64,12 +67,29 @@ public class PhiAssignQuad<T> extends AssignQuad<T> {
     }
 
     public Operand<T>[] getReferencedOps() {
-        // TODO Auto-generated method stub
-        return null;
+        return phi.getSources().toArray(new Operand[phi.getSources().size()]);
     }
 
     public void doPass2() {
-        phi.simplify();
+        //phi.simplify();
+
+        //todo phi.simplify(); was replaced with bellow, try to improve code
+        List<Operand<T>> sources = phi.getSources();
+        int n = sources.size();
+        for (int i = 0; i < n; i += 1) {
+            Variable<T> src = (Variable<T>) sources.get(i);
+            if (src.getAssignAddress() < getAddress()) {
+                Operand<T> op = src.simplify();
+                if (op instanceof StackVariable || op instanceof LocalVariable) {
+                    sources.set(i, op);
+                } else {
+                    AssignQuad<T> assignQuad = src.getAssignQuad();
+                    if (assignQuad != null) {
+                        assignQuad.setDeadCode(false);
+                    }
+                }
+            }
+        }
     }
 
     public void generateCode(CodeGenerator cg) {

@@ -16,8 +16,8 @@
         <entry key="check-test-classes" value="true" />
         <entry key="config-file" value="$PROJECT_DIR$/all/jnode_checks.xml" />
         <entry key="location-0" value="CLASSPATH:/sun_checks.xml:The default CheckStyle rules" />
-        <entry key="location-1" value="CLASSPATH:/sun_checks.xml:The default CheckStyle rules." />
-        <entry key="location-2" value="PROJECT_RELATIVE:$PRJ_DIR$/all/jnode_checks.xml:JNode" />
+        <entry key="location-1" value="PROJECT_RELATIVE:$PRJ_DIR$/all/jnode_checks.xml:JNode" />
+        <entry key="location-2" value="CLASSPATH:/sun_checks.xml:The default CheckStyle rules." />
         <entry key="suppress-errors" value="false" />
         <entry key="thirdparty-classpath" value="" />
       </map>
@@ -177,6 +177,8 @@
       <entry name="?*.png" />
       <entry name="?*.jpeg" />
       <entry name="?*.jpg" />
+      <entry name="?*.txt" />
+      <entry name="?*.asm" />
     </wildcardResourcePatterns>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="false">
@@ -224,6 +226,20 @@
   </component>
   <component name="IdProvider" IDEtalkID="435AAC2234C36B0F2257FA7F02C447FB" />
   <component name="InspectionProjectProfileManager">
+    <profiles>
+      <profile version="1.0" is_locked="false">
+        <option name="myName" value="Project Default" />
+        <option name="myLocal" value="false" />
+        <inspection_tool class="FieldCanBeLocal" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+        <inspection_tool class="FinalStaticMethod" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+        <inspection_tool class="PointlessArithmeticExpression" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+          <option name="m_ignoreExpressionsContainingConstants" value="false" />
+        </inspection_tool>
+      </profile>
+    </profiles>
+    <option name="PROJECT_PROFILE" value="Project Default" />
+    <option name="USE_PROJECT_PROFILE" value="true" />
+    <version value="1.0" />
     <list size="6">
       <item index="0" class="java.lang.String" itemvalue="SERVER PROBLEM" />
       <item index="1" class="java.lang.String" itemvalue="WEAK WARNING" />
@@ -425,19 +441,33 @@
         <XML>
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>
-        <ADDITIONAL_INDENT_OPTIONS fileType="gsp">
-          <option name="INDENT_SIZE" value="2" />
-        </ADDITIONAL_INDENT_OPTIONS>
-        <ADDITIONAL_INDENT_OPTIONS fileType="scala">
-          <option name="INDENT_SIZE" value="2" />
-          <option name="TAB_SIZE" value="2" />
-        </ADDITIONAL_INDENT_OPTIONS>
-        <ADDITIONAL_INDENT_OPTIONS fileType="sql">
-          <option name="INDENT_SIZE" value="2" />
-        </ADDITIONAL_INDENT_OPTIONS>
-        <ADDITIONAL_INDENT_OPTIONS fileType="yml">
-          <option name="INDENT_SIZE" value="2" />
-        </ADDITIONAL_INDENT_OPTIONS>
+        <codeStyleSettings language="CFML">
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="TERNARY_OPERATION_WRAP" value="1" />
+          <option name="ASSIGNMENT_WRAP" value="1" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
+        <codeStyleSettings language="CoffeeScript">
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
+        <codeStyleSettings language="ECMA Script Level 4">
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="EXTENDS_KEYWORD_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="TERNARY_OPERATION_WRAP" value="1" />
+          <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+          <option name="ASSIGNMENT_WRAP" value="1" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
+        <codeStyleSettings language="GSP">
+          <indentOptions>
+            <option name="INDENT_SIZE" value="2" />
+          </indentOptions>
+        </codeStyleSettings>
         <codeStyleSettings language="Groovy">
           <option name="CALL_PARAMETERS_WRAP" value="1" />
           <option name="METHOD_PARAMETERS_WRAP" value="1" />
@@ -468,6 +498,32 @@
           <indentOptions>
             <option name="CONTINUATION_INDENT_SIZE" value="4" />
             <option name="LABEL_INDENT_SIZE" value="-4" />
+          </indentOptions>
+        </codeStyleSettings>
+        <codeStyleSettings language="JavaScript">
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="TERNARY_OPERATION_WRAP" value="1" />
+          <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+          <option name="ASSIGNMENT_WRAP" value="1" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
+        <codeStyleSettings language="SQL">
+          <indentOptions>
+            <option name="CONTINUATION_INDENT_SIZE" value="8" />
+            <option name="TAB_SIZE" value="4" />
+          </indentOptions>
+        </codeStyleSettings>
+        <codeStyleSettings language="Scala">
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="EXTENDS_KEYWORD_WRAP" value="1" />
+          <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+          <indentOptions>
+            <option name="CONTINUATION_INDENT_SIZE" value="8" />
           </indentOptions>
         </codeStyleSettings>
       </value>

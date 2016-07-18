@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -25,6 +25,7 @@ import java.util.Map;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.jnasm.assembler.Address;
+import org.jnode.jnasm.assembler.Instruction;
 import org.jnode.jnasm.assembler.InstructionUtils;
 import org.jnode.jnasm.assembler.Register;
 
@@ -65,14 +66,14 @@ public class MMX extends AbstractX86Module {
         return MNEMONICS;
     }
 
-    public boolean emit(String mnemonic, List<Object> operands, int operandSize) {
+    public boolean emit(String mnemonic, List<Object> operands, int operandSize, Instruction instruction) {
         this.operands = operands;
         this.operandSize = operandSize;
-        Integer key = (Integer) INSTRUCTION_MAP.get(mnemonic);
+        Integer key = INSTRUCTION_MAP.get(mnemonic);
 
         if (key == null) return false;
 
-        switch (key.intValue()) {
+        switch (key) {
             case EMMS_ISN:
                 emitEMMS();
                 break;
@@ -113,7 +114,7 @@ public class MMX extends AbstractX86Module {
                 emitPXOR();
                 break;
             default:
-                throw new Error("Invalid instruction binding " + key.intValue() + " for " + mnemonic);
+                throw new Error("Invalid instruction binding " + key + " for " + mnemonic);
 
         }
         return true;

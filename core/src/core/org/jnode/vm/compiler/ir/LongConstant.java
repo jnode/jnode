@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -37,5 +37,13 @@ public class LongConstant<T> extends Constant<T> {
 
     public String toString() {
         return Long.toString(value);
+    }
+
+    public int getLSInt() {
+        return (int) (value & 0xFFFFFFFFL);
+    }
+
+    public int getMSInt() {
+        return (int) ((value >>> 32) & 0xFFFFFFFFL);
     }
 }

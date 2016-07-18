@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -32,6 +32,8 @@ import org.jnode.util.NumberUtils;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmAccessControlContext;
 import org.jnode.vm.VmAccessController;
+import org.jnode.vm.VmExit;
+import org.jnode.vm.VmIOContext;
 import org.jnode.vm.VmImpl;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmStackFrame;
@@ -427,7 +429,6 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
     /**
      * Stop the thread permanently.
      *
-     * @param ex
      * @throws UninterruptiblePragma
      */
     @Uninterruptible
@@ -764,7 +765,15 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
         } catch (Throwable ex) {
             try {
                 t = ex;
-                ex.printStackTrace();
+
+                if ((ex instanceof VmExit)) {
+                    //print VmExit stacktrace when jnode.debug system property is set to true
+                    if ("true".equals(VmIOContext.getGlobalProperties().getProperty("jnode.debug"))) {
+                        ex.printStackTrace();
+                    }
+                } else {
+                    ex.printStackTrace();
+                }
             } catch (Throwable ex2) {
                 /* Ignore */
             }
@@ -800,7 +809,7 @@ public abstract class VmThread extends VmSystemObject implements org.jnode.vm.fa
      * Setup this thread to wait for the given monitor
      *
      * @param monitor
-     * @param One     of the Thread WAITING_XYZ states.
+     * @param waitState One of the Thread WAITING_XYZ states.
      */
     @Uninterruptible
     final void prepareWait(Monitor monitor, int waitState) {

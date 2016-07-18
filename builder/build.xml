@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2014 JNode.org
+    Copyright (C) 2003-2015 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -40,6 +40,10 @@
 		<pathelement location="${bcel-5.1.jar}"/>
 		<pathelement location="${nanoxml-java.jar}"/>
 		<path refid="cp"/>
+	</path>
+
+	<path id="my-testsources">
+		<pathelement location="${my-src.dir}/test"/>
 	</path>
 
 	<target name="prepare" description="Initialize all subproject directories.">
@@ -124,6 +128,28 @@
 		<jar jarfile="${jnode-configure.jar}"
         basedir="${my-classes.dir}"
         includes="org/jnode/configure/**"/>
+	</target>
+
+
+	<target name="compile-regression-tests">
+		<jnode.compile.test>
+			<src refid="my-testsources" />
+			<classpath refid="my-cp"/>
+		</jnode.compile.test>
+		<copy todir="${my-testclasses.dir}">
+			<fileset dir="${my-src.dir}/test" excludes="${my-non-resources}"/>
+		</copy>
+	</target>
+
+	<target name="regression-tests" depends="compile-regression-tests">
+		<delete dir="${basedir}/build/reports/junit"/>
+		<mkdir dir="${basedir}/build/reports/junit"/>
+		<junit showoutput="off" printsummary="on" fork="on" haltonfailure="on">
+			<classpath refid="cp-test"/>
+			<formatter type="xml"/>
+			<test name="org.jnode.jnasm.DualAssemblerTest" todir="${basedir}/build/reports/junit"/>
+			<!--<test name="org.jnode.jnasm.JNAsmTest" todir="${basedir}/build/reports/junit"/> //todo failing on travis-ci -->
+		</junit>
 	</target>
 
 	<!-- Do it all -->

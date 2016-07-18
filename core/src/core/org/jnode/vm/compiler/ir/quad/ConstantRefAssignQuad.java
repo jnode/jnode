@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -41,7 +41,33 @@ public class ConstantRefAssignQuad<T> extends AssignQuad<T> {
                                  Constant<T> rhs) {
         super(address, block, lhsIndex);
         this.rhs = rhs;
+        getLHS().setType(rhs.getType());
     }
+
+    /**
+     * @param address
+     * @param block
+     * @param lhs
+     */
+    public ConstantRefAssignQuad(int address, IRBasicBlock<T> block, Variable<T> lhs,
+                                 Constant<T> rhs) {
+        super(address, block, lhs);
+        this.rhs = rhs;
+        getLHS().setType(rhs.getType());
+    }
+
+    /**
+     * @param address
+     * @param block
+     * @param lhs
+     */
+    public ConstantRefAssignQuad(int address, int bytecodeAddress, IRBasicBlock<T> block, Variable<T> lhs,
+                                 Constant<T> rhs) {
+        super(address, bytecodeAddress, block, lhs);
+        this.rhs = rhs;
+        getLHS().setType(rhs.getType());
+    }
+
 
     /**
      * @see org.jnode.vm.compiler.ir.quad.Quad#getReferencedOps()

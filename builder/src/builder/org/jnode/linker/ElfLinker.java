@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -24,7 +24,7 @@ import java.io.IOException;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
-import org.jnode.assembler.x86.X86BinaryAssembler;
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.build.BuildException;
 
 /**
@@ -32,13 +32,13 @@ import org.jnode.build.BuildException;
  * combined with the precompiled Java classes.
  */
 public class ElfLinker {
-    private X86BinaryAssembler os;
+    private X86Assembler os;
 
     private int start;
 
     private int baseAddr;
 
-    public ElfLinker(X86BinaryAssembler os) {
+    public ElfLinker(X86Assembler os) {
         this.os = os;
         baseAddr = (int) os.getBaseAddr();
     }
@@ -83,8 +83,7 @@ public class ElfLinker {
             final Section sec = sym.getSection();
             if (sec == text) {
                 // System.out.println(sym);
-                X86BinaryAssembler.X86ObjectRef ref = (X86BinaryAssembler.X86ObjectRef) os
-                    .getObjectRef(new Label(sym.getName()));
+                NativeStream.ObjectRef ref = os.getObjectRef(new Label(sym.getName()));
                 ref.setPublic();
                 if (!sym.isUndef()) {
                     // System.out.println("Defined symbol at " + sym.getValue()
@@ -94,10 +93,7 @@ public class ElfLinker {
                     System.out.println("Undefined symbol: " + sym.getName());
                 }
             } else if ((sec != null) && !sym.isUndef()) {
-                System.out
-                    .println("Symbol '" + sym.getName()
-                        + "' refers to unknown section '"
-                        + sec.getName() + "'");
+                System.out.println("Symbol '" + sym.getName() + "' refers to unknown section '" + sec.getName() + "'");
             }
         }
 
@@ -127,8 +123,7 @@ public class ElfLinker {
                     } else if ((relocType == Reloc.R_X86_64_64) && hasAddEnd) {
                         resolve_R_X86_64_64(addr, addend, symName, hasSymName);
                     } else {
-                        throw new BuildException("Unknown relocation type "
-                            + relocType);
+                        throw new BuildException("Unknown relocation type " + relocType);
                     }
                 } catch (UnresolvedObjectRefException ex) {
                     throw new BuildException(ex);
@@ -145,13 +140,11 @@ public class ElfLinker {
      * @param hasSymName
      * @throws UnresolvedObjectRefException
      */
-    private final void resolve_R386_32(long addr, String symName,
-                                       boolean hasSymName) throws UnresolvedObjectRefException {
+    private void resolve_R386_32(long addr, String symName, boolean hasSymName) throws UnresolvedObjectRefException {
         if (!hasSymName) {
             os.set32((int) addr, os.get32((int) addr) + start + baseAddr);
         } else {
-            final NativeStream.ObjectRef ref = os.getObjectRef(new Label(
-                symName));
+            final NativeStream.ObjectRef ref = os.getObjectRef(new Label(symName));
             if (ref.isResolved()) {
                 os.set32((int) addr, ref.getOffset() + baseAddr);
             } else {
@@ -169,8 +162,7 @@ public class ElfLinker {
      * @param hasSymName
      * @throws UnresolvedObjectRefException
      */
-    private final void resolve_R386_PC32(long addr, String symName,
-                                         boolean hasSymName) throws UnresolvedObjectRefException {
+    private void resolve_R386_PC32(long addr, String symName, boolean hasSymName) throws UnresolvedObjectRefException {
         final NativeStream.ObjectRef ref = os.getObjectRef(new Label(symName));
         if (ref.isResolved()) {
             os.set32((int) addr, (int) (ref.getOffset() - (addr + 4)));
@@ -187,17 +179,14 @@ public class ElfLinker {
      * @param hasSymName
      * @throws UnresolvedObjectRefException
      */
-    private final void resolve_R_X86_64_32(long addr, long addend,
-                                           String symName, boolean hasSymName)
+    private void resolve_R_X86_64_32(long addr, long addend, String symName, boolean hasSymName)
         throws UnresolvedObjectRefException {
         if (!hasSymName) {
             os.set32((int) addr, (int) (addend + start + baseAddr));
         } else {
-            final NativeStream.ObjectRef ref = os.getObjectRef(new Label(
-                symName));
+            final NativeStream.ObjectRef ref = os.getObjectRef(new Label(symName));
             if (ref.isResolved()) {
-                os.set32((int) addr,
-                    (int) (ref.getOffset() + baseAddr + addend));
+                os.set32((int) addr, (int) (ref.getOffset() + baseAddr + addend));
             } else {
                 os.set32((int) addr, (int) -(baseAddr + addend));
                 ref.addUnresolvedLink((int) addr, 4);
@@ -213,14 +202,12 @@ public class ElfLinker {
      * @param hasSymName
      * @throws UnresolvedObjectRefException
      */
-    private final void resolve_R_X86_64_64(long addr, long addend,
-                                           String symName, boolean hasSymName)
+    private void resolve_R_X86_64_64(long addr, long addend, String symName, boolean hasSymName)
         throws UnresolvedObjectRefException {
         if (!hasSymName) {
             os.set64((int) addr, addend + start + baseAddr);
         } else {
-            final NativeStream.ObjectRef ref = os.getObjectRef(new Label(
-                symName));
+            final NativeStream.ObjectRef ref = os.getObjectRef(new Label(symName));
             if (ref.isResolved()) {
                 os.set64((int) addr, ref.getOffset() + baseAddr + addend);
             } else {
@@ -229,5 +216,4 @@ public class ElfLinker {
             }
         }
     }
-
 }

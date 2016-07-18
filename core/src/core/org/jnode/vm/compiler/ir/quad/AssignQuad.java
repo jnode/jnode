@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,8 @@
  
 package org.jnode.vm.compiler.ir.quad;
 
+import java.util.Collection;
+import java.util.List;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 import org.jnode.vm.compiler.ir.Operand;
 import org.jnode.vm.compiler.ir.Variable;
@@ -38,8 +40,13 @@ public abstract class AssignQuad<T> extends Quad<T> {
         setLHS(lhs);
     }
 
+    public AssignQuad(int address, int byteCodeAddress, IRBasicBlock<T> block, Variable<T> lhs) {
+        super(address, byteCodeAddress, block);
+        setLHS(lhs);
+    }
+
     public AssignQuad(int address, IRBasicBlock<T> block, int lhsIndex) {
-        this(address, block, block.getVariables()[lhsIndex]);
+        this(address, block, (Variable<T>) block.getVariables()[lhsIndex].clone());
     }
 
     /**
@@ -93,5 +100,23 @@ public abstract class AssignQuad<T> extends Quad<T> {
     public void setLHS(Variable<T> lhs) {
         this.lhs = lhs;
         lhs.setAssignQuad(this);
+    }
+
+    @Override
+    public void doPass3(Collection<Variable<T>> values) {
+        if (!values.contains(lhs)) {
+            setDeadCode(true);
+        }
+    }
+
+    @Override
+    public void computeLiveness(List<Variable<?>> liveVariables) {
+        super.computeLiveness(liveVariables);
+        if (lhs.getLastUseAddress() < getAddress()) {
+            lhs.setLastUseAddress(getAddress());
+        }
+        if (!liveVariables.contains(lhs)) {
+            liveVariables.add(lhs);
+        }
     }
 }

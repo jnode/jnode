@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -148,8 +148,8 @@ public abstract class AbstractPluginTask extends Task {
         if (libAlias == null) {
             f = new File(srcDir, lib.getName());
             if (!f.exists()) {
-                throw new BuildException(
-                    "file not found " + f.getAbsoluteFile() + " because " + lib.getName() + " has no alias");
+                throw new BuildException("file not found " + f.getAbsoluteFile() + " because " + lib.getName()
+                    + " has no alias");
             }
         } else {
             f = libAlias.getAlias();

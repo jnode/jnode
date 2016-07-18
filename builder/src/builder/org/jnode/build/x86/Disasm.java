@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -31,8 +31,8 @@ import java.io.OutputStream;
  */
 public class Disasm {
 
-    private static final String NDISASM = (System.getProperty("os.name")
-        .toLowerCase().indexOf("win") >= 0) ? "ndisasmw" : "ndisasm";
+    private static final String NDISASM = System.getProperty("os.name").toLowerCase().contains("win")
+        ? "ndisasmw" : "ndisasm";
 
     private static final String UDIS86 = "udis86";
 

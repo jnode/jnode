@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -95,8 +95,7 @@ public class BootFloppyBuilder extends Task {
             newFd.setLength(getDeviceLength());
             formatDevice(newFd);
             final Device sysDev = getSystemDevice(newFd);
-            final BlockDeviceAPI sysDevApi = sysDev
-                .getAPI(BlockDeviceAPI.class);
+            final BlockDeviceAPI sysDevApi = sysDev.getAPI(BlockDeviceAPI.class);
             copySystemFiles(sysDev);
             sysDevApi.flush();
         } catch (ApiNotFoundException ex) {

@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -41,7 +41,7 @@ public abstract class AssemblerModule {
     }
 
     public abstract boolean emit(String mnemonic, List<Object> operands,
-                                 int operandSize);
+                                 int operandSize, Instruction instruction);
 
     public abstract void setNativeStream(NativeStream stream);
 }
