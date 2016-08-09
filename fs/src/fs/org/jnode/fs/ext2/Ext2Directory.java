@@ -33,6 +33,7 @@ import org.jnode.fs.spi.AbstractFSDirectory;
 import org.jnode.fs.spi.AbstractFileSystem;
 import org.jnode.fs.spi.FSEntryTable;
 import org.jnode.fs.util.FSUtils;
+import org.jnode.util.LittleEndian;
 
 /**
  * @author Andras Nagy
@@ -374,6 +375,10 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
                 do {
                     if (index >= iNode.getSize())
                         return false;
+
+                    if (data.capacity() < 8 || LittleEndian.getUInt16(data.array(), index + 4) == 0) {
+                        return false;
+                    }
 
                     //TODO optimize it also to use ByteBuffer at lower level            
                     dr = new Ext2DirectoryRecord(fs, data.array(), index, index);

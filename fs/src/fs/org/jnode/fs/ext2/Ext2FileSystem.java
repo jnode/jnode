@@ -223,6 +223,8 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
     }
 
     public void create(BlockSize blockSize) throws FileSystemException {
+        log.info("Creating a new ext2 file system: " + blockSize);
+
         try {
             // create the superblock
             superblock = new Superblock();
@@ -938,6 +940,8 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
     }
 
     protected void handleFSError(Exception e) {
+        log.error("File system error", e);
+
         // mark the fs as having errors
         superblock.setState(Ext2Constants.EXT2_ERROR_FS);
         if (superblock.getErrors() == Ext2Constants.EXT2_ERRORS_RO) setReadOnly(true); // remount readonly
