@@ -118,7 +118,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
             newDir.addDirectoryRecord(drParent);
 
             //increase the reference count for the parent directory
-            INode parentINode = fs.getINode((int) parentINodeNr);
+            INode parentINode = fs.getINode(parentINodeNr);
             parentINode.setLinksCount(parentINode.getLinksCount() + 1);
 
             //update the number of used directories in the block group
@@ -180,7 +180,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
      * @return @throws
      * IOException
      */
-    protected FSEntry addINode(int iNodeNr, String linkName, int fileType) throws IOException {
+    protected FSEntry addINode(long iNodeNr, String linkName, int fileType) throws IOException {
         if (!canWrite())
             throw new IOException("Filesystem or directory is mounted read-only!");
 

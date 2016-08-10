@@ -925,7 +925,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
 
         // add the inode to the inode cache
         synchronized (inodeCache) {
-            inodeCache.put(Integer.valueOf(Ext2Constants.EXT2_ROOT_INO), iNode);
+            inodeCache.put(Long.valueOf(Ext2Constants.EXT2_ROOT_INO), iNode);
         }
 
         modifyUsedDirsCount(0, 1);
