@@ -23,6 +23,7 @@ package org.jnode.fs.ntfs;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -76,13 +77,14 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 
     @Override
     public long getLength() {
-        FileRecord.AttributeIterator attributes =
+        Iterator<NTFSAttribute> attributes =
             getFileRecord().findAttributesByTypeAndName(NTFSAttribute.Types.DATA, null);
-        NTFSAttribute attribute = attributes.next();
 
-        if (attribute == null && indexEntry != null) {
+        if (!attributes.hasNext() && indexEntry != null) {
             // Fall back to the size stored in the index entry if the data attribute is not present (even possible??)
-            return indexEntry.getRealFileSize();
+            FileNameAttribute.Structure fileName = new FileNameAttribute.Structure(
+                indexEntry, IndexEntry.CONTENT_OFFSET);
+            return fileName.getRealSize();
         }
 
         return getFileRecord().getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
@@ -159,9 +161,9 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 
     @Override
     public byte[] getSlackSpace() throws IOException {
-        FileRecord.AttributeIterator dataAttributes = getFileRecord().findAttributesByTypeAndName(
+        Iterator<NTFSAttribute> dataAttributes = getFileRecord().findAttributesByTypeAndName(
             NTFSAttribute.Types.DATA, null);
-        NTFSAttribute attribute = dataAttributes.next();
+        NTFSAttribute attribute = dataAttributes.hasNext() ? dataAttributes.next() : null;
 
         if (attribute == null || attribute.isResident()) {
             // If the data attribute is missing there is no slack space. If it is resident then another attribute might
@@ -178,7 +180,7 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
         }
 
         byte[] slackSpace = new byte[slackSpaceSize];
-        getFileRecord().readData(getLength(), slackSpace, 0, slackSpace.length);
+        getFileRecord().readData(NTFSAttribute.Types.DATA, null, getLength(), slackSpace, 0, slackSpace.length, false);
 
         return slackSpace;
     }
@@ -196,18 +198,16 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
     public Map<String, FSFile> getStreams() {
         Set<String> streamNames = new LinkedHashSet<String>();
 
-        FileRecord.AttributeIterator dataAttributes = getFileRecord().findAttributesByType(NTFSAttribute.Types.DATA);
-        NTFSAttribute attribute = dataAttributes.next();
+        Iterator<NTFSAttribute> dataAttributes = getFileRecord().findAttributesByType(NTFSAttribute.Types.DATA);
 
-        while (attribute != null) {
+        while (dataAttributes.hasNext()) {
+            NTFSAttribute attribute = dataAttributes.next();
             String attributeName = attribute.getAttributeName();
 
             // The unnamed data attribute is the main file data, so ignore it
             if (attributeName != null) {
                 streamNames.add(attributeName);
             }
-
-            attribute = dataAttributes.next();
         }
 
         Map<String, FSFile> streams = new HashMap<String, FSFile>();
@@ -273,7 +273,8 @@ public class NTFSFile implements FSFile, FSFileSlackSpace, FSFileStreams {
                 throw new IOException("Attempt to read past the end of stream, offset: " + fileOffset);
             }
 
-            getFileRecord().readData(attributeName, fileOffset, destBuffer, 0, destBuffer.length);
+            getFileRecord().readData(NTFSAttribute.Types.DATA, attributeName, fileOffset, destBuffer, 0,
+                destBuffer.length, true);
             destByteArray.refreshByteBuffer();
         }
 

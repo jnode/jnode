@@ -49,7 +49,7 @@ public class INodeReservation {
         this.index = index;
     }
 
-    public int getINodeNr(int iNodesPerGroup) {
+    public long getINodeNr(int iNodesPerGroup) {
         // iNodes start with 1
         return iNodesPerGroup * group + index + 1;
     }

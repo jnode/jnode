@@ -29,9 +29,20 @@ public class CatalogFolder {
     public static final int RECORD_TYPE_FOLDER = 0x0001;
     public static final int RECORD_TYPE_FOLDER_THREAD = 0x0003;
 
+    /**
+     * The folder type set on hardlinks - 'fdrp'.
+     */
+    public static final int HARDLINK_FOLDER_TYPE = 0x66647270;
+
+    /**
+     * The creator set on hardlinks - 'MACS'.
+     */
+    public static final int HARDLINK_CREATOR = 0x4d414353;
+
     public static final int CATALOG_FOLDER_SIZE = 88;
 
     private int recordType;
+    private int flags;
     private long valence;
     private CatalogNodeId folderId;
     private long createDate;
@@ -48,7 +59,7 @@ public class CatalogFolder {
         byte[] data = new byte[88];
         System.arraycopy(src, 0, data, 0, CATALOG_FOLDER_SIZE);
         recordType = BigEndian.getInt16(data, 0);
-        // UInt16 flags - offset 2
+        flags = BigEndian.getUInt16(data, 2);
         valence = BigEndian.getUInt32(data, 4);
         folderId = new CatalogNodeId(data, 8);
         createDate = BigEndian.getUInt32(data, 12);
@@ -108,6 +119,10 @@ public class CatalogFolder {
 
     public int getRecordType() {
         return recordType;
+    }
+
+    public int getFlags() {
+        return flags;
     }
 
     public long getValence() {

@@ -27,6 +27,7 @@ import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.fs.FileSystemException;
 import org.jnode.partitions.PartitionTableEntry;
+import org.jnode.util.LittleEndian;
 
 /**
  * @author Andras Nagy
@@ -74,7 +75,7 @@ public class Ext2FileSystemType implements BlockDeviceFileSystemType<Ext2FileSys
             return false;
         }
         return
-            (Ext2Utils.get16(magic.array(), 0) == 0xEF53) &&
-            (Ext2Utils.get32(revLevel.array(), 0) == 0 || Ext2Utils.get32(revLevel.array(), 0) == 1);
+            (LittleEndian.getUInt16(magic.array(), 0) == 0xEF53) &&
+            (LittleEndian.getUInt32(revLevel.array(), 0) == 0 || LittleEndian.getUInt32(revLevel.array(), 0) == 1);
     }
 }

@@ -62,7 +62,7 @@ public class Extent {
     private ByteBuffer buffer;
 
     public Extent(HFSPlusParams params) {
-        log.info("Create B-Tree extent file.");
+        log.debug("Create B-Tree extent file.");
         btnd = new NodeDescriptor(0, 0, NodeDescriptor.BT_HEADER_NODE, 0, 3);
         //
         int totalNodes = params.getExtentClumpSize() / params.getExtentNodeSize();
@@ -139,8 +139,7 @@ public class Extent {
                 return node.getOverflowExtents(key);
 
             } else {
-                log.info(
-                    String.format("Node %d wasn't a leaf or index: %s\n%s", nodeNumber, nd, NumberUtils.hex(data)));
+                log.info(String.format("Node %d wasn't a leaf or index: %s\n%s", nodeNumber, nd, NumberUtils.hex(data)));
                 return new ExtentDescriptor[0];
             }
 

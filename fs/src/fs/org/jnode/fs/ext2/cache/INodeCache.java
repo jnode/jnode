@@ -27,7 +27,7 @@ import org.jnode.fs.ext2.INode;
 /**
  * @author Andras Nagy
  */
-public class INodeCache extends Hashtable<Object, INode> {
+public class INodeCache extends Hashtable<Long, INode> {
     private static final long serialVersionUID = 1L;
 
     public INodeCache(int initialCapacity, float loadFactor) {

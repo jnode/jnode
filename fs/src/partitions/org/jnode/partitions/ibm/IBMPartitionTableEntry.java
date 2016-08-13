@@ -30,6 +30,8 @@ import org.jnode.util.NumberUtils;
  * @author epr
  */
 public class IBMPartitionTableEntry implements PartitionTableEntry {
+    private static final int BOOTABLE = 0x80;
+
     private final Logger log = Logger.getLogger(getClass());
 
     private final byte[] bs;
@@ -45,7 +47,12 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
     }
 
     public boolean isValid() {
-        return !isEmpty();
+        int bootIndicatorValue = getBootIndicatorValue();
+
+        return
+            !isEmpty() &&
+            (bootIndicatorValue == 0 || bootIndicatorValue == BOOTABLE) &&
+            getNrSectors() > 0;
     }
 
     /**
@@ -70,16 +77,22 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
         final IBMPartitionTypes id = getSystemIndicator();
         // pgwiasda
         // there are more than one type of extended Partitions
-        return (id == IBMPartitionTypes.PARTTYPE_WIN95_FAT32_EXTENDED ||
-                id == IBMPartitionTypes.PARTTYPE_LINUX_EXTENDED || id == IBMPartitionTypes.PARTTYPE_DOS_EXTENDED);
+        return
+            id == IBMPartitionTypes.PARTTYPE_WIN95_FAT32_EXTENDED ||
+            id == IBMPartitionTypes.PARTTYPE_LINUX_EXTENDED ||
+            id == IBMPartitionTypes.PARTTYPE_DOS_EXTENDED;
     }
 
     public boolean getBootIndicator() {
-        return (LittleEndian.getUInt8(bs, ofs + 0) == 0x80);
+        return getBootIndicatorValue() == BOOTABLE;
+    }
+
+    public int getBootIndicatorValue() {
+        return LittleEndian.getUInt8(bs, ofs + 0);
     }
 
     public void setBootIndicator(boolean active) {
-        LittleEndian.setInt8(bs, ofs + 0, (active) ? 0x80 : 0);
+        LittleEndian.setInt8(bs, ofs + 0, (active) ? BOOTABLE : 0);
     }
 
     public CHS getStartCHS() {
@@ -99,13 +112,17 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
         LittleEndian.setInt8(bs, ofs + 3, chs.getCylinder() & 0xFF);
     }
 
+    public int getSystemIndicatorCode() {
+        return LittleEndian.getUInt8(bs, ofs + 4);
+    }
+
     public IBMPartitionTypes getSystemIndicator() {
-        int code = LittleEndian.getUInt8(bs, ofs + 4);
+        int code = getSystemIndicatorCode();
         try {
             return IBMPartitionTypes.valueOf(code);
         } catch (IllegalArgumentException e) {
-            log.warn("Invalid system indicator code: 0x" + Integer.toHexString(code));
-            return IBMPartitionTypes.PARTTYPE_EMPTY;
+            log.debug("Unknown or invalid system indicator code: 0x" + Integer.toHexString(code));
+            return IBMPartitionTypes.PARTTYPE_UNKNOWN;
         }
     }
 
@@ -182,8 +199,9 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
      */
     public String toString() {
         StringBuilder b = new StringBuilder(32);
-        b.append('[').append(getBootIndicator() ? 'A' : ' ').append(' ');
-        b.append(NumberUtils.hex(getSystemIndicator().getCode(), 2)).append(' ');
+        b.append('[').append(getBootIndicator() ? 'A' : '-').append(' ');
+        b.append(NumberUtils.hex(getSystemIndicatorCode(), 2)).append(" \'");
+        b.append(getSystemIndicator().getName()).append("\' ");
         b.append("s:").append(getStartLba()).append(' ');
         b.append("e:").append(getStartLba() + getNrSectors() - 1).append(']');
         return b.toString();

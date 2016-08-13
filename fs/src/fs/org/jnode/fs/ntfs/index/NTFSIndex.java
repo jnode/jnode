@@ -23,7 +23,6 @@ package org.jnode.fs.ntfs.index;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
 import org.apache.log4j.Logger;
 import org.jnode.fs.ntfs.FileRecord;
 import org.jnode.fs.ntfs.attribute.NTFSAttribute;
@@ -37,6 +36,11 @@ public final class NTFSIndex {
 
     private final FileRecord fileRecord;
 
+    /**
+     * The name of the index root / allocation attributes to open.
+     */
+    private String attributeName;
+
     private IndexRootAttribute indexRootAttribute;
 
     private IndexAllocationAttribute indexAllocationAttribute;
@@ -45,14 +49,13 @@ public final class NTFSIndex {
 
     /**
      * Initialize this instance.
-     * 
-     * @param fileRecord
+     *
+     * @param fileRecord the file record holding the index streams.
+     * @param attributeName the name of the index root / allocation attributes to open.
      */
-    public NTFSIndex(FileRecord fileRecord) throws IOException {
+    public NTFSIndex(FileRecord fileRecord, String attributeName) throws IOException {
         this.fileRecord = fileRecord;
-        if (!fileRecord.isDirectory()) {
-            throw new IOException("fileRecord is not a directory");
-        }
+        this.attributeName = attributeName;
     }
 
     /**
@@ -63,7 +66,7 @@ public final class NTFSIndex {
     public IndexRootAttribute getIndexRootAttribute() {
         if (indexRootAttribute == null) {
             indexRootAttribute = (IndexRootAttribute) 
-                    fileRecord.findAttributeByType(NTFSAttribute.Types.INDEX_ROOT);
+                    fileRecord.findAttributesByTypeAndName(NTFSAttribute.Types.INDEX_ROOT, attributeName).next();
             log.debug("getIndexRootAttribute: " + indexRootAttribute);
         }
         return indexRootAttribute;
@@ -77,9 +80,84 @@ public final class NTFSIndex {
     public IndexAllocationAttribute getIndexAllocationAttribute() {
         if (indexAllocationAttribute == null) {
             indexAllocationAttribute = (IndexAllocationAttribute) 
-                    fileRecord.findAttributeByType(NTFSAttribute.Types.INDEX_ALLOCATION);
+                    fileRecord.findAttributesByTypeAndName(NTFSAttribute.Types.INDEX_ALLOCATION, attributeName).next();
         }
         return indexAllocationAttribute;
+    }
+
+    /**
+     * Searches the index for a value.
+     *
+     * @param callback the callback to pass each entry in the search to check for a match.
+     * @return the matching node, or {@code null} if no match is found.
+     */
+    public IndexEntry search(IndexSearchCallback callback) {
+        Iterator<IndexEntry> rootIterator = getIndexRootAttribute().iterator();
+
+        while (rootIterator.hasNext()) {
+            IndexEntry entry = rootIterator.next();
+
+            if (entry.isLastIndexEntryInSubnode()) {
+                return searchSubTree(entry, callback);
+            } else {
+                int compareResult = callback.visitAndCompareEntry(entry);
+
+                if (compareResult == 0) {
+                    return entry;
+                } else if (compareResult < 0) {
+                    return searchSubTree(entry, callback);
+                } else {
+                    // Maybe in a subsequent node, continue iterating
+                }
+            }
+        }
+
+        // No match
+        return null;
+    }
+
+    /**
+     * Searches a sub-tree of the index for a value.
+     *
+     * @param topEntry the top entry in this sub-tree of the index.
+     * @param callback the callback to pass each entry in the search to check for a match.
+     * @return the matching node, or {@code null} if no match is found.
+     */
+    public IndexEntry searchSubTree(IndexEntry topEntry, IndexSearchCallback callback) {
+        if (!topEntry.hasSubNodes()) {
+            return null;
+        }
+
+        final IndexBlock indexBlock;
+        try {
+            IndexRoot indexRoot = getIndexRootAttribute().getRoot();
+            indexBlock = getIndexAllocationAttribute().getIndexBlock(indexRoot, topEntry.getSubnodeVCN());
+        } catch (IOException ex) {
+            throw new IllegalStateException("Cannot read next index block during search", ex);
+        }
+
+        Iterator<IndexEntry> iterator = indexBlock.iterator();
+
+        while (iterator.hasNext()) {
+            IndexEntry entry = iterator.next();
+
+            if (entry.isLastIndexEntryInSubnode()) {
+                return searchSubTree(entry, callback);
+            } else {
+                int compareResult = callback.visitAndCompareEntry(entry);
+
+                if (compareResult == 0) {
+                    return entry;
+                } else if (compareResult < 0) {
+                    return searchSubTree(entry, callback);
+                } else {
+                    // Maybe in a subsequent node, continue iterating
+                }
+            }
+        }
+
+        // No match
+        return null;
     }
 
     public Iterator<IndexEntry> iterator() {
@@ -163,11 +241,9 @@ public final class NTFSIndex {
                 final IndexRoot indexRoot = getIndexRootAttribute().getRoot();
                 final IndexBlock indexBlock;
                 try {
-                    indexBlock = getIndexAllocationAttribute().getIndexBlock(
-                            indexRoot, entry.getSubnodeVCN());
+                    indexBlock = getIndexAllocationAttribute().getIndexBlock(indexRoot, entry.getSubnodeVCN());
                 } catch (IOException ex) {
-                    log.error("Cannot read next index block", ex);
-                    return;
+                    throw new RuntimeException("Cannot read next index block", ex);
                 }
                 currentIterator = indexBlock.iterator();
             }

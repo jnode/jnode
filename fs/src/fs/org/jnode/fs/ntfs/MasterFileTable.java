@@ -27,7 +27,7 @@ import org.jnode.fs.ntfs.index.IndexEntry;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class MasterFileTable extends FileRecord {
+public class MasterFileTable extends FileRecord {
 
     /**
      * MFT indexes of system files
@@ -139,12 +139,29 @@ public final class MasterFileTable extends FileRecord {
     }
 
     /**
+     * Creates a new MFT instance.
+     *
+     * @param volume the NTFS volume.
+     * @param bytesPerSector the bytes per-sector.
+     * @param clusterSize the cluster size.
+     * @param strictFixUp indicates whether to throw an exception if a fix-up error is detected.
+     * @param buffer the buffer to read from.
+     * @param offset the offset to read at.
+     * @throws IOException if an error occurs creating the MFT.
+     */
+    public MasterFileTable(NTFSVolume volume, int bytesPerSector, int clusterSize, boolean strictFixUp, byte[] buffer, int offset) throws IOException {
+        super(volume, bytesPerSector, clusterSize, strictFixUp, SystemFiles.MFT, buffer, offset);
+    }
+
+    /**
      * Gets the length of the MFT.
      *
      * @return the length.
      */
     public long getMftLength() {
         if (mftLength == 0) {
+            // The MFT doesn't update the FileRecord file-size for itself, so fall back to check the size of the DATA
+            // attribute.
             mftLength = getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
         }
 
@@ -162,10 +179,6 @@ public final class MasterFileTable extends FileRecord {
         final int bytesPerFileRecord = volume.getBootRecord().getFileRecordSize();
         final long offset = bytesPerFileRecord * index;
 
-        if (offset + bytesPerFileRecord > getMftLength()) {
-            throw new IOException("Attempt to read past the end of the MFT, offset: " + offset);
-        }
-
         // read the buffer
         final byte[] buffer = new byte[bytesPerFileRecord];
         readData(offset, buffer, 0, bytesPerFileRecord);
@@ -173,7 +186,7 @@ public final class MasterFileTable extends FileRecord {
     }
 
     /**
-     * Gets an MFT record with a given index but does not check if it is a valid file record.
+     * Gets a MFT record with a given index but does not check if it is a valid file record.
      *
      * @param index the index to get.
      * @return the file record.
@@ -189,13 +202,21 @@ public final class MasterFileTable extends FileRecord {
     }
 
     /**
-     * Gets an MFT record with a given index.
+     * Gets a MFT record with a given index.
      *
      * @param index the index to get.
      * @return the file record.
      * @throws IOException if the record at the index is not valid or there is an error reading in the data.
      */
     public FileRecord getRecord(long index) throws IOException {
+        final NTFSVolume volume = getVolume();
+        final int bytesPerFileRecord = volume.getBootRecord().getFileRecordSize();
+        final long offset = bytesPerFileRecord * index;
+
+        if (offset + bytesPerFileRecord > getMftLength()) {
+            throw new IOException("Attempt to read past the end of the MFT, offset: " + offset);
+        }
+
         FileRecord fileRecord = getRecordUnchecked(index);
         fileRecord.checkIfValid();
         return fileRecord;

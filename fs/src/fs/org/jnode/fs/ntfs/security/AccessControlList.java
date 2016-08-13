@@ -81,7 +81,7 @@ public class AccessControlList extends NTFSStructure {
     public List<AccessControlEntry> getAces() {
         if (aces == null) {
             aces = new ArrayList<AccessControlEntry>();
-            int offset = 0;
+            int offset = 8;
 
             for (int i = 0; i < getAceCount(); i++) {
                 AccessControlEntry entry = new AccessControlEntry(this, offset);

@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectoryId;
 import org.jnode.fs.FSEntry;
@@ -34,15 +33,16 @@ import org.jnode.fs.spi.AbstractFSDirectory;
 import org.jnode.fs.spi.AbstractFileSystem;
 import org.jnode.fs.spi.FSEntryTable;
 import org.jnode.fs.util.FSUtils;
+import org.jnode.util.LittleEndian;
 
 /**
  * @author Andras Nagy
  */
 public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId {
 
-    INode iNode;
+    protected INode iNode;
 
-    private Ext2Entry entry;
+    protected Ext2Entry entry;
 
     private final Logger log = Logger.getLogger(getClass());
 
@@ -54,14 +54,16 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
         this.iNode = entry.getINode();
         Ext2FileSystem fs = (Ext2FileSystem) entry.getFileSystem();
         this.entry = entry;
-        log.setLevel(Level.DEBUG);
         boolean readOnly;
         if ((iNode.getFlags() & Ext2Constants.EXT2_INDEX_FL) != 0 ||
+            (iNode.getFlags() & Ext2Constants.EXT4_HUGE_FILE_FL) != 0 ||
             (iNode.getFlags() & Ext2Constants.EXT4_INODE_EXTENTS_FLAG) != 0) {
             readOnly = true; //force readonly
 
             if ((iNode.getFlags() & Ext2Constants.EXT4_INODE_EXTENTS_FLAG) != 0)
-                log.info("inode uses extents: " + entry);
+                log.debug("inode uses extents: " + entry);
+            if ((iNode.getFlags() & Ext2Constants.EXT4_HUGE_FILE_FL) != 0)
+                log.info("inode is for a huge-file: " + entry);
             if ((iNode.getFlags() & Ext2Constants.EXT2_INDEX_FL) != 0)
                 log.info("inode uses index: " + entry);
         } else {
@@ -101,7 +103,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
 
             newINode.setLinksCount(newINode.getLinksCount() + 1);
 
-            newEntry = new Ext2Entry(newINode, name, Ext2Constants.EXT2_FT_DIR, fs, this);
+            newEntry = new Ext2Entry(newINode, dr.getFileOffset(), name, Ext2Constants.EXT2_FT_DIR, fs, this);
 
             //add "."
             Ext2Directory newDir = new Ext2Directory(newEntry);
@@ -116,7 +118,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
             newDir.addDirectoryRecord(drParent);
 
             //increase the reference count for the parent directory
-            INode parentINode = fs.getINode((int) parentINodeNr);
+            INode parentINode = fs.getINode(parentINodeNr);
             parentINode.setLinksCount(parentINode.getLinksCount() + 1);
 
             //update the number of used directories in the block group
@@ -167,7 +169,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
             ioe.initCause(ex);
             throw ioe;
         }
-        return new Ext2Entry(newINode, name, Ext2Constants.EXT2_FT_REG_FILE, fs, this);
+        return new Ext2Entry(newINode, dr.getFileOffset(), name, Ext2Constants.EXT2_FT_REG_FILE, fs, this);
     }
 
     /**
@@ -178,7 +180,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
      * @return @throws
      * IOException
      */
-    protected FSEntry addINode(int iNodeNr, String linkName, int fileType) throws IOException {
+    protected FSEntry addINode(long iNodeNr, String linkName, int fileType) throws IOException {
         if (!canWrite())
             throw new IOException("Filesystem or directory is mounted read-only!");
 
@@ -197,7 +199,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
 
             linkedINode.setLinksCount(linkedINode.getLinksCount() + 1);
 
-            return new Ext2Entry(linkedINode, linkName, fileType, fs, this);
+            return new Ext2Entry(linkedINode, dr.getFileOffset(), linkName, fileType, fs, this);
 
         } catch (FileSystemException ex) {
             final IOException ioe = new IOException();
@@ -213,7 +215,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
         synchronized (((Ext2FileSystem) getFileSystem()).getInodeCache()) {
             //reread the inode before synchronizing to it to make sure
             //all threads use the same instance
-            int iNodeNr = iNode.getINodeNr();
+            long iNodeNr = iNode.getINodeNr();
             iNode = ((Ext2FileSystem) getFileSystem()).getINode(iNodeNr);
 
             //lock the inode into the cache so it is not flushed before synchronizing to it
@@ -326,13 +328,18 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
         return (int) (index % iNode.getExt2FileSystem().getBlockSize());
     }
 
-    private INode getINode() {
+    /**
+     * Gets the inode for this directory.
+     *
+     * @return the inode.
+     */
+    public INode getINode() {
         return iNode;
     }
 
     @Override
     public String getDirectoryId() {
-        return Integer.toString(iNode.getINodeNr());
+        return Long.toString(iNode.getINodeNr());
     }
 
     @Override
@@ -369,11 +376,14 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
                     if (index >= iNode.getSize())
                         return false;
 
+                    if (data.capacity() < 8 || LittleEndian.getUInt16(data.array(), index + 4) == 0) {
+                        return false;
+                    }
+
                     //TODO optimize it also to use ByteBuffer at lower level            
                     dr = new Ext2DirectoryRecord(fs, data.array(), index, index);
                     index += dr.getRecLen();
-                } while (dr.getINodeNr() == 0); //inode nr=0 means the entry is
-                // unused
+                } while (dr.getINodeNr() == 0); //inode nr=0 means the entry is unused
             } catch (Exception e) {
                 fs.handleFSError(e);
                 return false;
@@ -395,7 +405,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
             current = null;
             try {
                 return new Ext2Entry(((Ext2FileSystem) getFileSystem()).getINode(dr.getINodeNr()),
-                    dr.getName(), dr.getType(), fs, Ext2Directory.this);
+                    dr.getFileOffset(), dr.getName(), dr.getType(), fs, Ext2Directory.this);
             } catch (IOException e) {
                 throw new NoSuchElementException("Root cause: " + e.getMessage());
             } catch (FileSystemException e) {
@@ -457,5 +467,11 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
     protected void writeEntries(FSEntryTable table) throws IOException {
         //nothing to do because createFileEntry and createDirectoryEntry do the
         // job
+    }
+
+    @Override
+    public String toString() {
+        return String.format("directory-%d['%s' entries:%d]", iNode.getINodeNr(), entry.getName(),
+            getEntryTable().size());
     }
 }

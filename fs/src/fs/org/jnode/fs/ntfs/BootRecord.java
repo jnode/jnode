@@ -41,6 +41,11 @@ public final class BootRecord extends NTFSStructure {
     private final long totalSectors;
 
     /**
+     * The volume serial number.
+     */
+    private final String serialNumber;
+
+    /**
      * Size of a filerecord in bytes
      */
     private final int fileRecordSize;
@@ -65,12 +70,13 @@ public final class BootRecord extends NTFSStructure {
         this.systemID = new String(buffer, 0x03, 8);
         this.bytesPerSector = getUInt16(0x0B);
         this.sectorsPerCluster = getUInt8(0x0D);
-        this.mftLcn = getUInt32(0x30);
         this.mediaDescriptor = getUInt8(0x15);
         this.sectorsPerTrack = getUInt16(0x18);
+        this.totalSectors = getUInt32(0x28);
+        this.mftLcn = getUInt32(0x30);
         final int clustersPerMFTRecord = getInt8(0x40);
         final int clustersPerIndexRecord = getInt8(0x44);
-        this.totalSectors = getUInt32(0x28);
+        this.serialNumber = String.format("%02X%02X-%02X%02X", buffer[0x4b], buffer[0x4a], buffer[0x49], buffer[0x48]);
 
         this.clusterSize = sectorsPerCluster * bytesPerSector;
         this.fileRecordSize = calcByteSize(clustersPerMFTRecord);
@@ -123,6 +129,15 @@ public final class BootRecord extends NTFSStructure {
      */
     public String getSystemID() {
         return this.systemID;
+    }
+
+    /**
+     * Gets the system serial number.
+     *
+     * @return the serial number.
+     */
+    public String getSerialNumber() {
+        return this.serialNumber;
     }
 
     /**

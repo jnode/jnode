@@ -73,9 +73,9 @@ public class FileFSTest extends AbstractFSTest {
 
             ByteBuffer data2 = ByteBuffer.allocate(data.capacity());
             log.debug(
-                getFs().getClass().getName() + ": buffer after alloc\n" + FSUtils.toString(data2.array(), 0, 512));
+                getFs().getClass().getName() + ": buffer after alloc\n" + FSUtils.toString(data2.array(), 0, data.capacity()));
             file2.read(0, data2);
-            log.debug(getFs().getClass().getName() + ": buffer after read\n" + FSUtils.toString(data2.array(), 0, 512));
+            log.debug(getFs().getClass().getName() + ": buffer after read\n" + FSUtils.toString(data2.array(), 0, data.capacity()));
             assertTrue("read and written data are differents", TestUtils.equals(data.array(), data2.array()));
         }
     }

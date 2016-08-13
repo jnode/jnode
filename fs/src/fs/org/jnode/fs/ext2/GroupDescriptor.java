@@ -21,9 +21,8 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
-
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.jnode.util.LittleEndian;
 
 /**
  * @author Andras Nagy
@@ -40,7 +39,6 @@ public class GroupDescriptor {
 
     public GroupDescriptor() {
         data = new byte[GROUPDESCRIPTOR_LENGTH];
-        log.setLevel(Level.INFO);
     }
 
     /*
@@ -49,14 +47,10 @@ public class GroupDescriptor {
      */
     public void read(int groupNr, Ext2FileSystem fs) throws IOException {
         // read the group descriptors from the main copy in block group 0
-        // byte[] blockData = fs.getBlock(
-        // fs.getSuperblock().getFirstDataBlock() + 1);
         long baseBlock = fs.getSuperblock().getFirstDataBlock() + 1;
         long blockOffset = (groupNr * GROUPDESCRIPTOR_LENGTH) / fs.getBlockSize();
         long offset = (groupNr * GROUPDESCRIPTOR_LENGTH) % fs.getBlockSize();
         byte[] blockData = fs.getBlock(baseBlock + blockOffset);
-
-        // data = new byte[GROUPDESCRIPTOR_LENGTH];
         System.arraycopy(blockData, (int) offset, data, 0, GROUPDESCRIPTOR_LENGTH);
         this.groupNr = groupNr;
         this.fs = fs;
@@ -86,8 +80,8 @@ public class GroupDescriptor {
         setInodeBitmap(getBlockBitmap() + 1);
         setInodeTable(getBlockBitmap() + 2);
 
-        long inodeTableSize =
-                Ext2Utils.ceilDiv(superblock.getINodesPerGroup() * INode.INODE_LENGTH, fs.getBlockSize());
+        int iNodeSize = fs.getSuperblock().getINodeSize();
+        long inodeTableSize = Ext2Utils.ceilDiv(superblock.getINodesPerGroup() * iNodeSize, fs.getBlockSize());
         long blockCount;
         if (groupNr == fs.getGroupCount() - 1)
             blockCount =
@@ -152,7 +146,7 @@ public class GroupDescriptor {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getBlockBitmap() {
-        return Ext2Utils.get32(data, 0);
+        return LittleEndian.getUInt32(data, 0);
     }
 
     public void setBlockBitmap(long l) {
@@ -163,7 +157,7 @@ public class GroupDescriptor {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getInodeBitmap() {
-        return Ext2Utils.get32(data, 4);
+        return LittleEndian.getUInt32(data, 4);
     }
 
     public void setInodeBitmap(long l) {
@@ -174,7 +168,7 @@ public class GroupDescriptor {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getInodeTable() {
-        return Ext2Utils.get32(data, 8);
+        return LittleEndian.getUInt32(data, 8);
     }
 
     public void setInodeTable(long l) {
@@ -183,29 +177,29 @@ public class GroupDescriptor {
     }
 
     public synchronized int getFreeBlocksCount() {
-        return Ext2Utils.get16(data, 12);
+        return LittleEndian.getUInt16(data, 12);
     }
 
     public synchronized void setFreeBlocksCount(int count) {
-        Ext2Utils.set16(data, 12, count);
+        LittleEndian.setInt16(data, 12, count);
         setDirty(true);
     }
 
     public synchronized int getFreeInodesCount() {
-        return Ext2Utils.get16(data, 14);
+        return LittleEndian.getUInt16(data, 14);
     }
 
     public synchronized void setFreeInodesCount(int count) {
-        Ext2Utils.set16(data, 14, count);
+        LittleEndian.setInt16(data, 14, count);
         setDirty(true);
     }
 
     public synchronized int getUsedDirsCount() {
-        return Ext2Utils.get16(data, 16);
+        return LittleEndian.getUInt16(data, 16);
     }
 
     public synchronized void setUsedDirsCount(int count) {
-        Ext2Utils.set16(data, 16, count);
+        LittleEndian.setInt16(data, 16, count);
         setDirty(true);
     }
 

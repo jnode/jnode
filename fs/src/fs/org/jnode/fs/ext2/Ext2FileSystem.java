@@ -22,9 +22,9 @@ package org.jnode.fs.ext2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.fs.FSDirectory;
@@ -35,12 +35,21 @@ import org.jnode.fs.ReadOnlyFileSystemException;
 import org.jnode.fs.ext2.cache.Block;
 import org.jnode.fs.ext2.cache.BlockCache;
 import org.jnode.fs.ext2.cache.INodeCache;
+import org.jnode.fs.ext4.MultipleMountProtection;
 import org.jnode.fs.spi.AbstractFileSystem;
 
 /**
  * @author Andras Nagy
  */
 public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
+
+    /**
+     * The charset used to decode the file and directory names, assuming a default of UTF-8 for now.
+     * See: http://unix.stackexchange.com/a/2111
+     */
+    public static final Charset ENTRY_NAME_CHARSET = Charset.forName(
+        System.getProperty("org.jnode.fs.ext2.entryNameCharset", "UTF-8"));
+
     private Superblock superblock;
 
     private GroupDescriptor groupDescriptors[];
@@ -52,6 +61,8 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
     private BlockCache blockCache;
 
     private INodeCache inodeCache;
+
+    private MultipleMountProtection multipleMountProtection;
 
     private final Logger log = Logger.getLogger(getClass());
 
@@ -73,7 +84,6 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
      */
     public Ext2FileSystem(Device device, boolean readOnly, Ext2FileSystemType type) throws FileSystemException {
         super(device, readOnly, type);
-        log.setLevel(Level.DEBUG);
 
         blockCache = new BlockCache(50, (float) 0.75);
         inodeCache = new INodeCache(50, (float) 0.75);
@@ -119,22 +129,45 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
         // at all)
         if (hasIncompatFeature(Ext2Constants.EXT2_FEATURE_INCOMPAT_COMPRESSION)) throw new FileSystemException(
             getDevice().getId() + " Unsupported filesystem feature (COMPRESSION) disallows mounting");
-        if (hasIncompatFeature(Ext2Constants.EXT2_FEATURE_INCOMPAT_META_BG)) throw new FileSystemException(
-            getDevice().getId() + " Unsupported filesystem feature (META_BG) disallows mounting");
         if (hasIncompatFeature(Ext2Constants.EXT3_FEATURE_INCOMPAT_JOURNAL_DEV)) throw new FileSystemException(
             getDevice().getId() + " Unsupported filesystem feature (JOURNAL_DEV) disallows mounting");
         // if (hasIncompatFeature(Ext2Constants.EXT3_FEATURE_INCOMPAT_RECOVER))
         // throw new FileSystemException(getDevice().getId() +
         // " Unsupported filesystem feature (RECOVER) disallows mounting");
-        // if (hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_EXTENTS))
-        // throw new FileSystemException(getDevice().getId() +
-        // " Unsupported filesystem feature (EXTENTS) disallows mounting");
+
         if (hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_64BIT)) throw new FileSystemException(
             getDevice().getId() + " Unsupported filesystem feature (64BIT) disallows mounting");
-        if (hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_MMP)) throw new FileSystemException(
-            getDevice().getId() + " Unsupported filesystem feature (MMP) disallows mounting");
-        if (hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_FLEX_BG)) throw new FileSystemException(
-            getDevice().getId() + " Unsupported filesystem feature (FLEX_BG) disallows mounting");
+
+        if (hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_MMP)) {
+            // TODO: this should really update the MMP block now, and periodically, to indicate that the filesystem is in use
+            log.info(getDevice().getId() + " file system has multi-mount protection, forcing readonly mode");
+            setReadOnly(true);
+
+            try {
+                ByteBuffer mmpBuffer = ByteBuffer.allocate(MultipleMountProtection.MMP_LENGTH);
+                getApi().read(superblock.getMultiMountProtectionBlock() * superblock.getBlockSize(), mmpBuffer);
+
+                multipleMountProtection = new MultipleMountProtection(mmpBuffer.array());
+
+                if (multipleMountProtection.isInUse()) {
+                    log.warn(getDevice().getId() + " file system appears to be in use");
+                }
+
+            } catch (Exception e) {
+                throw new FileSystemException("Error reading checking multi-mount protection (MMP)", e);
+            }
+        }
+
+        if (hasIncompatFeature(Ext2Constants.EXT2_FEATURE_INCOMPAT_META_BG)) {
+            log.info(getDevice().getId() + " Unsupported filesystem feature (META_BG) forces readonly mode");
+            setReadOnly(true);
+        }
+
+        if (hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_FLEX_BG)) {
+            log.info(getDevice().getId() + " filesystem feature (FLEX_BG) is currently only implemented for reading, " +
+                "forcing readonly mode");
+            setReadOnly(true);
+        }
 
         // an unsupported RO_COMPAT feature means that the filesystem can only
         // be mounted readonly
@@ -190,6 +223,8 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
     }
 
     public void create(BlockSize blockSize) throws FileSystemException {
+        log.info("Creating a new ext2 file system: " + blockSize);
+
         try {
             // create the superblock
             superblock = new Superblock();
@@ -313,7 +348,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
      */
     public Ext2Entry createRootEntry() throws IOException {
         try {
-            return new Ext2Entry(getINode(Ext2Constants.EXT2_ROOT_INO), "/", Ext2Constants.EXT2_FT_DIR, this, null);
+            return new Ext2Entry(getINode(Ext2Constants.EXT2_ROOT_INO), 0, "/", Ext2Constants.EXT2_FT_DIR, this, null);
         } catch (FileSystemException ex) {
             final IOException ioe = new IOException();
             ioe.initCause(ex);
@@ -335,6 +370,15 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
      */
     public GroupDescriptor[] getGroupDescriptors() {
         return groupDescriptors;
+    }
+
+    /**
+     * Gets the multiple mount protection information for the file system.
+     *
+     * @return the MMP information.
+     */
+    public MultipleMountProtection getMultipleMountProtection() {
+        return multipleMountProtection;
     }
 
     /**
@@ -474,11 +518,11 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
      * the file/directory operations are synchronized to the inodes, so at any point in time it has to be sure that only
      * one instance of any inode is present in the filesystem.
      */
-    public INode getINode(int iNodeNr) throws IOException, FileSystemException {
+    public INode getINode(long iNodeNr) throws IOException, FileSystemException {
         if ((iNodeNr < 1) || (iNodeNr > superblock.getINodesCount())) throw new FileSystemException("INode number ("
             + iNodeNr + ") out of range (0-" + superblock.getINodesCount() + ")");
 
-        Integer key = Integer.valueOf(iNodeNr);
+        Long key = Long.valueOf(iNodeNr);
 
         log.debug("iNodeCache size: " + inodeCache.size());
 
@@ -585,7 +629,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
         // inode table
         INodeTable iNodeTable = iNodeTables[preferredBlockBroup];
         // byte[] iNodeData = new byte[INode.INODE_LENGTH];
-        int iNodeNr = res.getINodeNr((int) superblock.getINodesPerGroup());
+        long iNodeNr = res.getINodeNr((int) superblock.getINodesPerGroup());
         INode iNode = new INode(this, new INodeDescriptor(iNodeTable, iNodeNr, groupNr, res.getIndex()));
         iNode.create(fileFormat, accessRights, uid, gid);
         // trigger a write to disk
@@ -595,7 +639,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
 
         // put the inode into the cache
         synchronized (inodeCache) {
-            Integer key = Integer.valueOf(iNodeNr);
+            Long key = Long.valueOf(iNodeNr);
             if (inodeCache.containsKey(key)) throw new FileSystemException(
                 "Newly allocated inode is already in the inode cache!?");
             else inodeCache.put(key, iNode);
@@ -881,12 +925,12 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
 
         // add the inode to the inode cache
         synchronized (inodeCache) {
-            inodeCache.put(Integer.valueOf(Ext2Constants.EXT2_ROOT_INO), iNode);
+            inodeCache.put(Long.valueOf(Ext2Constants.EXT2_ROOT_INO), iNode);
         }
 
         modifyUsedDirsCount(0, 1);
 
-        Ext2Entry rootEntry = new Ext2Entry(iNode, "/", Ext2Constants.EXT2_FT_DIR, this, null);
+        Ext2Entry rootEntry = new Ext2Entry(iNode, 0, "/", Ext2Constants.EXT2_FT_DIR, this, null);
         ((Ext2Directory) rootEntry.getDirectory())
             .addINode(Ext2Constants.EXT2_ROOT_INO, ".", Ext2Constants.EXT2_FT_DIR);
         ((Ext2Directory) rootEntry.getDirectory()).addINode(Ext2Constants.EXT2_ROOT_INO, "..",
@@ -896,6 +940,8 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
     }
 
     protected void handleFSError(Exception e) {
+        log.error("File system error", e);
+
         // mark the fs as having errors
         superblock.setState(Ext2Constants.EXT2_ERROR_FS);
         if (superblock.getErrors() == Ext2Constants.EXT2_ERRORS_RO) setReadOnly(true); // remount readonly

@@ -20,8 +20,6 @@
  
 package org.jnode.fs.ntfs.index;
 
-import java.io.UnsupportedEncodingException;
-
 import org.jnode.fs.ntfs.FileRecord;
 import org.jnode.fs.ntfs.NTFSStructure;
 
@@ -32,6 +30,11 @@ import org.jnode.fs.ntfs.NTFSStructure;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class IndexEntry extends NTFSStructure {
+
+    /**
+     * The offset to the index entry content.
+     */
+    public static final int CONTENT_OFFSET = 0x10;
 
     private final FileRecord parentFileRecord;
 
@@ -70,6 +73,14 @@ public final class IndexEntry extends NTFSStructure {
     }
 
     /**
+     * Gets the content length of this index entry in bytes.
+     * @return
+     */
+    public int getContentSize() {
+        return getUInt16(0x0A);
+    }
+
+    /**
      * Gets the flags of this index entry.
      * @return
      */
@@ -81,38 +92,8 @@ public final class IndexEntry extends NTFSStructure {
         return (getIndexFlags() & 0x02) != 0;
     }
 
-    /**
-     * Gets the filename namespace.
-     * @see org.jnode.fs.ntfs.FileNameAttribute.NameSpace
-     * @return
-     */
-    public int getNameSpace() {
-        return getUInt8(0x51);
-    }
-
-    public boolean isDirectory() {
-        return (getFileFlags() & 0x10000000L) != 0;
-    }
-
-    public String getFileName() {
-        try {
-            //XXX: For Java 6, should use the version that accepts a Charset.
-            return new String(this.getFileNameAsByteArray(), "UTF-16LE");
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("UTF-16LE charset missing from JRE", e);
-        }
-    }
-
     public long getFileReferenceNumber() {
         return getUInt48(0x00);
-    }
-
-    public long getFileFlags() {
-        return getInt64(0x48);
-    }
-
-    public long getRealFileSize() {
-        return getInt64(0x40);
     }
 
     /**
@@ -127,18 +108,9 @@ public final class IndexEntry extends NTFSStructure {
         //return getUInt32(getSize() - 8);
     }
 
-    private byte[] getFileNameAsByteArray() {
-        final int len = getUInt8(0x50);
-        final byte[] bytes = new byte[len * 2];
-        getData(0x52, bytes, 0, bytes.length);
-        return bytes;
-    }
-
     @Override
     public String toString() {
-        return super.toString() +
-               "[fileName=" + getFileName() +
-               ",indexFlags=" + getIndexFlags() +
-               ",fileFlags=" + getFileFlags() + "]";
+        return String.format("index-entry:[flags: %d size:%d content-size:%d]", getIndexFlags(), getSize(),
+            getContentSize());
     }
 }

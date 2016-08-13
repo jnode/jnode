@@ -79,6 +79,11 @@ public class ApmPartitionTable implements PartitionTable<ApmPartitionTableEntry>
      * @return {@code true} if the boot sector contains a APM partition table.
      */
     public static boolean containsPartitionTable(byte[] first16KiB) {
+        if (first16KiB.length < 0x250) {
+            // Not enough data for detection
+            return false;
+        }
+
         if ((first16KiB[0x200] & 0xFF) != 0x50) {
             return false;
         }

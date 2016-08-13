@@ -39,7 +39,7 @@ public class ExFatFileSystemType implements BlockDeviceFileSystemType<ExFatFileS
 
     @Override
     public String getName() {
-        return "ExFAT";
+        return "exFAT";
     }
 
     @Override

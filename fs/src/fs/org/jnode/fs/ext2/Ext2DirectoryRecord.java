@@ -24,6 +24,7 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
+import org.jnode.util.LittleEndian;
 
 /**
  * A single directory record, i.e. the inode number and name of an entry in a
@@ -56,7 +57,7 @@ public class Ext2DirectoryRecord {
 
         // make a copy of the data
         synchronized (data) {
-            byte[] newData = new byte[getRecLen()];
+            byte[] newData = new byte[Math.max(8, getRecLen())];
             System.arraycopy(data, offset, newData, 0, getRecLen());
             this.data = newData;
             setOffset(0);
@@ -78,7 +79,6 @@ public class Ext2DirectoryRecord {
         setName(name);
         setINodeNr(iNodeNr);
         setType(type);
-        setNameLen(name.length());
         int newLength = name.length() + 8;
         // record length is padded to n*4 bytes
         if (newLength % 4 != 0)
@@ -112,7 +112,7 @@ public class Ext2DirectoryRecord {
      * @return short
      */
     public synchronized int getType() {
-        return Ext2Utils.get8(data, offset + 7);
+        return LittleEndian.getUInt8(data, offset + 7);
     }
 
     private synchronized void setType(int type) {
@@ -126,8 +126,8 @@ public class Ext2DirectoryRecord {
      * 
      * @return long
      */
-    public synchronized int getINodeNr() {
-        return (int) Ext2Utils.get32(data, offset);
+    public synchronized long getINodeNr() {
+        return LittleEndian.getUInt32(data, offset);
     }
 
     private synchronized void setINodeNr(long nr) {
@@ -140,19 +140,18 @@ public class Ext2DirectoryRecord {
      * @return StringBuffer
      */
     public synchronized String getName() {
-        StringBuffer name = new StringBuffer();
+        String name = "";
         if (getINodeNr() != 0) {
-            // TODO: character conversion??
-            for (int i = 0; i < getNameLen(); i++)
-                name.append((char) Ext2Utils.get8(data, offset + 8 + i));
+            name = new String(data, offset + 8, getNameLen(), Ext2FileSystem.ENTRY_NAME_CHARSET);
             log.debug("Ext2DirectoryRecord(): iNode=" + getINodeNr() + ", name=" + name);
         }
-        return name.toString();
+        return name;
     }
 
     private synchronized void setName(String name) {
-        for (int i = 0; i < name.length(); i++)
-            Ext2Utils.set8(data, offset + 8 + i, name.charAt(i));
+        byte[] nameData = name.getBytes(Ext2FileSystem.ENTRY_NAME_CHARSET);
+        System.arraycopy(nameData, 0, data, offset + 8, nameData.length);
+        setNameLen(nameData.length);
     }
 
     /**
@@ -161,15 +160,15 @@ public class Ext2DirectoryRecord {
      * @return int
      */
     public synchronized int getRecLen() {
-        return Ext2Utils.get16(data, offset + 4);
+        return LittleEndian.getUInt16(data, offset + 4);
     }
 
     private synchronized void setRecLen(int len) {
-        Ext2Utils.set16(data, offset + 4, len);
+        LittleEndian.setInt16(data, offset + 4, len);
     }
 
-    private synchronized int getNameLen() {
-        return Ext2Utils.get8(data, offset + 6);
+    public synchronized int getNameLen() {
+        return LittleEndian.getUInt8(data, offset + 6);
     }
 
     private synchronized void setNameLen(int len) {

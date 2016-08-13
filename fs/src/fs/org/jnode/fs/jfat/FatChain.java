@@ -91,11 +91,11 @@ public class FatChain {
         dirty = false;
     }
 
-    private ChainIterator listIterator() {
+    public ChainIterator listIterator() {
         return new ChainIterator();
     }
 
-    private ChainIterator listIterator(int index) throws IOException {
+    public ChainIterator listIterator(int index) throws IOException {
         return new ChainIterator(index);
     }
 
@@ -620,7 +620,7 @@ public class FatChain {
         }
     }
 
-    private class ChainIterator {
+    public class ChainIterator {
         private int address;
         private int cursor;
         private int index;
@@ -692,11 +692,11 @@ public class FatChain {
             cursor = startCluster;
         }
 
-        private boolean hasNext() {
+        public boolean hasNext() {
             return (fat.hasNext(cursor));
         }
 
-        private int next() throws IOException {
+        public int next() throws IOException {
             if (!hasNext())
                 throw new NoSuchElementException();
 

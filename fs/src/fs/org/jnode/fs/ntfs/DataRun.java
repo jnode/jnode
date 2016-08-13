@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
@@ -250,17 +250,23 @@ public final class DataRun implements DataRunInterface {
             log.debug("cnt=" + count + ", actclu=" + actCluster + ", actdstoff=" + actDstOffset);
         }
 
-        if (isSparse()) {
-            // Not really stored on disk -- sparse files, etc.
-            Arrays.fill(dst, actDstOffset, actDstOffset + count * clusterSize, (byte) 0);
-        } else {
+        // Zero the area
+        Arrays.fill(dst, actDstOffset, actDstOffset + count * clusterSize, (byte) 0);
+
+        if (!isSparse()) {
             volume.readClusters(actCluster, dst, actDstOffset, count);
         }
 
         return count;
     }
 
-    @Override
+    /**
+     * Maps a virtual cluster to a logical cluster.
+     *
+     * @param vcn the virtual cluster number to map.
+     * @return the logical cluster number or -1 if this cluster is not stored (e.g. for a sparse cluster).
+     * @throws ArrayIndexOutOfBoundsException if the VCN doesn't belong to this data run.
+     */
     public long mapVcnToLcn(long vcn) {
         long myLastVcn = getFirstVcn() + getLength() - 1;
 
@@ -275,11 +281,13 @@ public final class DataRun implements DataRunInterface {
             return -1;
         }
 
-        return cluster + vcn;
+        final int vcnDelta = (int) (vcn - getFirstVcn());
+        return cluster + vcnDelta;
     }
 
     @Override
     public String toString() {
-        return String.format("[%s-run vcn:%d-%d]", isSparse() ? "sparse" : "data", getFirstVcn(), getLastVcn());
+        return String.format("[%s-run vcn:%d-%d cluster:%d]", isSparse() ? "sparse" : "data", getFirstVcn(),
+                             getLastVcn(), getCluster());
     }
 }

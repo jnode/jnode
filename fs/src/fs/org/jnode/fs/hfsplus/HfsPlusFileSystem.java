@@ -21,6 +21,8 @@
 package org.jnode.fs.hfsplus;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.fs.FSDirectory;
@@ -29,9 +31,12 @@ import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
+import org.jnode.fs.hfsplus.attributes.Attributes;
 import org.jnode.fs.hfsplus.catalog.Catalog;
 import org.jnode.fs.hfsplus.catalog.CatalogKey;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
+import org.jnode.fs.hfsplus.compression.CompressedAttributeData;
+import org.jnode.fs.hfsplus.compression.HfsPlusCompressionFactory;
 import org.jnode.fs.hfsplus.extent.Extent;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.AbstractFileSystem;
@@ -53,6 +58,27 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
      * The extent overflow file.
      */
     private Extent extentOverflow;
+
+    /**
+     * The attributes file.
+     */
+    private Attributes attributes;
+
+    /**
+     * The HFS+ private data directory. Used by HFS+ to stored hard linked file data.
+     */
+    private HfsPlusDirectory privateDataDirectory;
+
+    /**
+     * The HFS+ private directory data directory. Used by HFS+ to stored hard linked directories.
+     */
+    private HfsPlusDirectory privateDirectoryDataDirectory;
+
+    /**
+     * The map of registered compression types.
+     */
+    private Map<Long, HfsPlusCompressionFactory> registeredCompressionTypes =
+        new LinkedHashMap<Long, HfsPlusCompressionFactory>(CompressedAttributeData.getDefaultTypes());
 
     /**
      * @param device
@@ -94,6 +120,11 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
         } catch (IOException e) {
             throw new FileSystemException(e);
         }
+        try {
+            attributes = new Attributes(this);
+        } catch (IOException e) {
+            throw new FileSystemException(e);
+        }
     }
 
     @Override
@@ -107,8 +138,8 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
     }
 
     @Override
-    protected final HfsPlusEntry createRootEntry() throws IOException {
-        log.info("Create root entry.");
+    public final HfsPlusEntry createRootEntry() throws IOException {
+        log.debug("Create root entry.");
         LeafRecord record = catalog.getRecord(CatalogNodeId.HFSPLUS_POR_CNID);
         if (record != null) {
             return new HfsPlusEntry(this, null, "/", record);
@@ -143,8 +174,65 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
         return extentOverflow;
     }
 
+    public final Attributes getAttributes() {
+        return attributes;
+    }
+
     public final SuperBlock getVolumeHeader() {
         return volumeHeader;
+    }
+
+    /**
+     * Gets the HFS+ private data directory. Used by HFS+ to stored hard linked file data.
+     *
+     * @return the private data directory, or {@code null} if it has not been initialised on this volume.
+     */
+    public HfsPlusDirectory getPrivateDataDirectory() {
+        if (privateDataDirectory == null) {
+            try {
+                FSDirectory rootDirectory = getRootEntry().getDirectory();
+                FSEntry privateDataEntry = rootDirectory.getEntry("\u0000\u0000\u0000\u0000HFS+ Private Data");
+
+                if (privateDataEntry != null) {
+                    privateDataDirectory = (HfsPlusDirectory) privateDataEntry.getDirectory();
+                }
+            } catch (IOException e) {
+                throw new IllegalStateException("Error getting private data directory", e);
+            }
+        }
+
+        return privateDataDirectory;
+    }
+
+    /**
+     * Gets the HFS+ private directory data directory. Used by HFS+ to stored hard linked directories.
+     *
+     * @return the private directory data directory, or {@code null} if it has not been initialised on this volume.
+     */
+    public HfsPlusDirectory getPrivateDirectoryDataDirectory() {
+        if (privateDirectoryDataDirectory == null) {
+            try {
+                FSDirectory rootDirectory = getRootEntry().getDirectory();
+                FSEntry privateDirectoryDataEntry = rootDirectory.getEntry(".HFS+ Private Directory Data\r");
+
+                if (privateDirectoryDataEntry != null) {
+                    privateDirectoryDataDirectory = (HfsPlusDirectory) privateDirectoryDataEntry.getDirectory();
+                }
+            } catch (IOException e) {
+                throw new IllegalStateException("Error getting private directory data directory", e);
+            }
+        }
+
+        return privateDirectoryDataDirectory;
+    }
+
+    /**
+     * Gets the map of register compression type factories.
+     *
+     * @return the map.
+     */
+    public Map<Long, HfsPlusCompressionFactory> getRegisteredCompressionTypes() {
+        return registeredCompressionTypes;
     }
 
     /**

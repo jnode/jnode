@@ -87,7 +87,7 @@ public class SecurityDescriptorStream {
      * @return the entry or {@code null} if the end of the entries is reached.
      * @throws java.io.IOException if an error occurs reading the entry.
      */
-    private SecurityDescriptorStreamEntry readOneEntry(long offset) throws IOException {
+    public SecurityDescriptorStreamEntry readOneEntry(long offset) throws IOException {
         // First read in the size of the entry
         byte[] sizeBuffer = new byte[0x4];
         sdsFile.read(offset + 0x10, ByteBuffer.wrap(sizeBuffer));

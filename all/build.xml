@@ -115,6 +115,7 @@
 	<property name="asm.jar" value="${root.dir}/core/lib/asm-1.5.3.jar"/>
 	<property name="asm-attrs.jar" value="${root.dir}/core/lib/asm-attrs-1.5.3.jar"/>
 	<property name="asm-util.jar" value="${root.dir}/core/lib/asm-util-1.5.3.jar"/>
+	<property name="mockito-all.jar" value="${root.dir}/core/lib/mockito-all-1.8.5.jar"/>
 
 	<property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
 	<property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b5.jar"/>
@@ -149,6 +150,7 @@
 		<pathelement location="${asm-attrs.jar}"/>
 		<pathelement location="${asm-util.jar}"/>
 		<pathelement location="${cglib.jar}"/>
+		<pathelement location="${mockito-all.jar}"/>
 		<pathelement location="${log4j.jar}"/>
 		<pathelement location="${root.dir}/all/conf"/>
 		<pathelement location="${beanshell.jar}"/>
@@ -410,6 +412,7 @@
 			<libalias name="asm-util.jar" alias="${asm-util.jar}"/>
 			<libalias name="cglib.jar" alias="${cglib.jar}"/>
 			<libalias name="mauve.jar" alias="${mauve.jar}"/>
+			<libalias name="mockito-all-1.8.5.jar" alias="${mockito-all.jar}"/>
 
 			<libalias name="ant.jar" alias="${ant.jar}"/>
 			<libalias name="ant-launcher.jar" alias="${ant-launcher.jar}"/>

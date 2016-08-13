@@ -21,8 +21,6 @@
 package org.jnode.fs.ext2.cache;
 
 import java.io.IOException;
-
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.ext2.Ext2FileSystem;
 
@@ -41,7 +39,6 @@ public class Block {
         this.data = data;
         this.fs = fs;
         this.blockNr = blockNr;
-        log.setLevel(Level.DEBUG);
     }
 
     /**

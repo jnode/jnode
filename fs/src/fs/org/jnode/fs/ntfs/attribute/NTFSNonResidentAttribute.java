@@ -28,6 +28,7 @@ import org.jnode.fs.ntfs.DataRun;
 import org.jnode.fs.ntfs.DataRunInterface;
 import org.jnode.fs.ntfs.FileRecord;
 import org.jnode.fs.ntfs.NTFSVolume;
+import org.jnode.fs.util.FSUtils;
 
 /**
  * An NTFS file attribute that has its data stored outside the attribute.
@@ -44,10 +45,14 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
     private final List<DataRunInterface> dataRuns = new ArrayList<DataRunInterface>();
 
     /**
-     * @param fileRecord
-     * @param offset
+     * Creates a new non-resident attribute and reads in the associated data runs.
+     *
+     * @param fileRecord the file record that owns this attribute.
+     * @param offset the offset to read from.
+     * @param fallbackCompressionUnit the fallback compression unit to use if the attribute is compressed but doesn't
+     *   have a compression unit stored.
      */
-    public NTFSNonResidentAttribute(FileRecord fileRecord, int offset) {
+    public NTFSNonResidentAttribute(FileRecord fileRecord, int offset, int fallbackCompressionUnit) {
         super(fileRecord, offset);
         /*
          * process the dataruns...all non resident attributes have their data
@@ -55,17 +60,9 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
          */
         final int dataRunsOffset = getDataRunsOffset();
         if (dataRunsOffset > 0) {
-            readDataRuns(dataRunsOffset);
+            readDataRuns(dataRunsOffset, fallbackCompressionUnit);
         }
     }
-
-    /**
-     * @see NTFSAttribute#processAttributeData(byte[])
-     */
-    /*
-     * public void processAttributeData(byte[] buffer) { // TODO Auto-generated
-     * method stub }
-     */
 
     /**
      * @return Returns the startVCN.
@@ -91,8 +88,21 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      *
      * @return the compression unit size.
      */
-    public int getCompressionUnitSize() {
+    public int getStoredCompressionUnitSize() {
         return getUInt16(0x22);
+    }
+
+    private int getCompressionUnitSize(int fallbackCompressionUnit) {
+        int compressionUnitSize = getStoredCompressionUnitSize();
+
+        if (compressionUnitSize == 0) {
+            // It seems like in some situations the compression unit size is only stored onto the first attribute of a
+            // certain type in the list. For example if there are three compressed DATA attributes, the second and third
+            // attributes may not have this set. In that situation use the first attribute's compression unit size.
+            return fallbackCompressionUnit;
+        }
+
+        return 1 << compressionUnitSize;
     }
 
     /**
@@ -102,7 +112,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      * @return the size allocated to the attribute.
      */
     public long getAttributeAllocatedSize() {
-        return getUInt32(0x28);
+        return getInt64(0x28);
     }
 
     /**
@@ -115,9 +125,23 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
     }
 
     /**
-     * Read the dataruns. It is called only for non resident attributes.
+     * Gets the size that has been initialized by the attribute data. It is possible ot non-resident attribute to
+     * allocate data runs that it hasn't yet used.
+     *
+     * @return the size that has been initialized by the attribute so far.
      */
-    private void readDataRuns(int parentoffset) {
+    public long getAttributeInitializedSize() {
+        return getInt64(0x38);
+    }
+
+    /**
+     * Read the data runs.
+     *
+     * @param parentoffset
+     * @param fallbackCompressionUnit the fallback compression unit to use if the attribute is compressed but doesn't
+     *   have a compression unit stored.
+     */
+    private void readDataRuns(int parentoffset, int fallbackCompressionUnit) {
         int offset = parentoffset;
 
         long previousLCN = 0;
@@ -126,16 +150,21 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
 
         // If this attribute is compressed we will coalesce compressed/sparse
         // data run pairs into a single data run object for convenience when reading.
-        boolean compressed = (getFlags() & 0x0001) != 0;
+        boolean compressed = isCompressedAttribute();
         boolean expectingSparseRunNext = false;
+        boolean firstDataRun = true;
         int lastCompressedSize = 0;
-        int compUnitSize = 1 << getCompressionUnitSize();
+        int compUnitSize = compressed ? getCompressionUnitSize(fallbackCompressionUnit) : 1;
 
         while (getUInt8(offset) != 0x0) {
             final DataRun dataRun = new DataRun(this, offset, vcn, previousLCN);
 
+            if (log.isDebugEnabled()) {
+                log.debug("Data run at offset: " + offset  + " " + dataRun);
+            }
+
             if (compressed) {
-                if (dataRun.isSparse() && expectingSparseRunNext) {
+                if (dataRun.isSparse() && (expectingSparseRunNext || firstDataRun)) {
                     // This is the sparse run which follows a compressed run.
                     // The number of runs it contains does not count towards the total
                     // as the compressed run reports holding all the runs for the pair.
@@ -207,10 +236,11 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
             }
 
             offset += dataRun.getSize();
+            firstDataRun = false;
         }
 
         // check the dataruns
-        final int clusterSize = getFileRecord().getVolume().getClusterSize();
+        final int clusterSize = getFileRecord().getClusterSize();
         // Rounds up but won't work for 0, which shouldn't occur here.
         final long allocatedVCNs = (getAttributeAllocatedSize() - 1) / clusterSize + 1;
         if (this.numberOfVCNs != allocatedVCNs) {
@@ -272,9 +302,37 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         return numberOfVCNs;
     }
 
+    /**
+     * Generates a hex dump of the attribute's data.
+     *
+     * @return the hex dump.
+     */
+    public String hexDump() {
+        int length = getBuffer().length - getOffset();
+        byte[] data = new byte[length];
+        getData(0, data, 0, data.length);
+        return FSUtils.toString(data);
+    }
+
     @Override
     public String toString() {
         return String.format("[attribute (non-res) type=x%x name'%s' size=%d runs=%d]", getAttributeType(),
             getAttributeName(), getAttributeActualSize(), getDataRuns().size());
+    }
+
+    @Override
+    public String toDebugString() {
+        StringBuilder builder = new StringBuilder();
+
+        try {
+            for (DataRunInterface dataRun : getDataRuns()) {
+                builder.append(dataRun);
+                builder.append("\n");
+            }
+        } catch (Exception e) {
+            builder.append("Error: " + e);
+        }
+
+        return String.format("%s\nData runs:\n%s\nData: %s", toString(), builder.toString(), hexDump());
     }
 }

@@ -98,7 +98,11 @@ public class FSEntryTable extends AbstractFSObject {
                 final String name = normalizeName(entry.getName());
                 log.debug("FSEntryTable: adding entry " + name + " (length=+" + name.length() + ")");
                 entries.put(name, entry);
-                entriesById.put(entry.getId(), entry);
+                FSEntry existingEntry = entriesById.put(entry.getId(), entry);
+                if (existingEntry != null) {
+                    log.error(String.format("Duplicate entries for ID: '%s' old:%s new:%s", entry.getId(),
+                        existingEntry, entry));
+                }
                 entryNames.add(name);
             }
         }

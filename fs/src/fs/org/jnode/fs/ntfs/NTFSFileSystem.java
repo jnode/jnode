@@ -49,7 +49,7 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
         super(device, readOnly, type);
 
         try {
-            // initialize the NTFE volume
+            // initialize the NTFS volume
             volume = new NTFSVolume(getApi());
         } catch (IOException e) {
             throw new FileSystemException(e);
@@ -61,7 +61,7 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
      */
     public FSEntry getRootEntry() throws IOException {
         if (root == null) {
-            root = new NTFSDirectory(this, volume.getRootDirectory()).getEntry(".");
+            root = new NTFSEntry(this, getNTFSVolume().getRootDirectory(), -1);
         }
         return root;
     }
@@ -75,10 +75,8 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
 
     @Override
     public String getVolumeName() throws IOException {
-        NTFSEntry entry = (NTFSEntry) getRootEntry().getDirectory().getEntry("$Volume");
-        if (entry == null) {
-            return "";
-        }
+        NTFSEntry entry = new NTFSEntry(this, getNTFSVolume().getMFT().getRecord(MasterFileTable.SystemFiles.VOLUME),
+            MasterFileTable.SystemFiles.ROOT);
 
         NTFSAttribute attribute = entry.getFileRecord().findAttributeByType(NTFSAttribute.Types.VOLUME_NAME);
 
@@ -97,6 +95,31 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
         }
 
         return "";
+    }
+
+    /**
+     * Gets the volume's ID.
+     *
+     * @return the volume ID.
+     * @throws IOException if an error occurs.
+     */
+    public byte[] getVolumeId() throws IOException {
+        NTFSEntry entry = (NTFSEntry) getRootEntry().getDirectory().getEntry("$Volume");
+        if (entry == null) {
+            return null;
+        }
+
+        NTFSAttribute attribute = entry.getFileRecord().findAttributeByType(NTFSAttribute.Types.OBJECT_ID);
+
+        if (attribute instanceof NTFSResidentAttribute) {
+            NTFSResidentAttribute residentAttribute = (NTFSResidentAttribute) attribute;
+            byte[] idBuffer = new byte[residentAttribute.getAttributeLength()];
+
+            residentAttribute.getData(residentAttribute.getAttributeOffset(), idBuffer, 0, idBuffer.length);
+            return idBuffer;
+        }
+
+        return null;
     }
 
     /**
@@ -131,7 +154,7 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
     }
 
     public long getFreeSpace() throws IOException {
-        FileRecord bitmapRecord = volume.getMFT().getRecord(MasterFileTable.SystemFiles.BITMAP);
+        FileRecord bitmapRecord = getNTFSVolume().getMFT().getRecord(MasterFileTable.SystemFiles.BITMAP);
 
         int bitmapSize = (int) bitmapRecord.getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
         byte[] buffer = new byte[bitmapSize];
@@ -149,15 +172,15 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
             }
         }
 
-        long usedSpace = (long) usedBlocks * volume.getClusterSize();
+        long usedSpace = (long) usedBlocks * getNTFSVolume().getClusterSize();
 
         return getTotalSpace() - usedSpace;
     }
 
     public long getTotalSpace() throws IOException {
-        FileRecord bitmapRecord = volume.getMFT().getRecord(MasterFileTable.SystemFiles.BITMAP);
+        FileRecord bitmapRecord = getNTFSVolume().getMFT().getRecord(MasterFileTable.SystemFiles.BITMAP);
         long bitmapSize = bitmapRecord.getFileNameAttribute().getRealSize();
-        return bitmapSize * 8 * volume.getClusterSize();
+        return bitmapSize * 8 * getNTFSVolume().getClusterSize();
     }
 
     public long getUsableSpace() {

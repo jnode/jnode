@@ -63,7 +63,7 @@ public class FatFileSystemTest {
     @Test
     public void testReadFat16Disk() throws Exception {
 
-        device = new FileDevice(FileSystemTestUtils.getTestFile("jfat/test.fat16"), "r");
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/jfat/test.fat16"), "r");
         FatFileSystemType type = fss.getFileSystemType(FatFileSystemType.ID);
         FatFileSystem fs = type.create(device, true);
 

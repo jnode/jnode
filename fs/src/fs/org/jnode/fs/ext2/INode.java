@@ -21,12 +21,17 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import org.apache.log4j.Level;
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.ext2.exception.UnallocatedBlockException;
+import org.jnode.fs.ext2.xattr.XAttrEntry;
+import org.jnode.fs.ext2.xattr.XAttrHeader;
 import org.jnode.fs.ext4.ExtentHeader;
+import org.jnode.fs.util.FSUtils;
+import org.jnode.util.LittleEndian;
 
 /**
  * This class represents an inode. Once they are allocated, inodes are read and
@@ -35,7 +40,7 @@ import org.jnode.fs.ext4.ExtentHeader;
  * @author Andras Nagy
  */
 public class INode {
-    public static final int INODE_LENGTH = 128;
+    public static final int EXT2_GOOD_OLD_INODE_SIZE = 128;
 
     private final Logger log = Logger.getLogger(getClass());
 
@@ -73,13 +78,12 @@ public class INode {
     public INode(Ext2FileSystem fs, INodeDescriptor desc) {
         this.fs = fs;
         this.desc = desc;
-        this.data = new byte[INODE_LENGTH];
+        this.data = new byte[fs.getSuperblock().getINodeSize()];
         locked = 0;
-        log.setLevel(Level.INFO);
     }
 
     public void read(byte[] data) {
-        System.arraycopy(data, 0, this.data, 0, INODE_LENGTH);
+        System.arraycopy(data, 0, this.data, 0, fs.getSuperblock().getINodeSize());
         setDirty(false);
     }
 
@@ -102,11 +106,9 @@ public class INode {
         //TODO: set other persistent parameters?
 
         setDirty(true);
-
-        log.setLevel(Level.DEBUG);
     }
 
-    public int getINodeNr() {
+    public long getINodeNr() {
         return desc.getINodeNr();
     }
 
@@ -158,6 +160,110 @@ public class INode {
     }
 
     /**
+     * Gets the extra inode size.
+     *
+     * @return the extra size.
+     */
+    public int getExtraISize() {
+        if (getExt2FileSystem().hasROFeature(Ext2Constants.EXT4_FEATURE_RO_COMPAT_EXTRA_ISIZE)) {
+            return LittleEndian.getInt16(data, 0x80);
+        }
+
+        // Extra isize not supported
+        return 0;
+    }
+
+    /**
+     * Gets the extra attribute block.
+     *
+     * @return the extra attribute block.
+     */
+    public long getXAttrBlock() {
+        long blockLow = LittleEndian.getUInt32(data, 0x68);
+        long blockHigh = LittleEndian.getUInt16(data, 0x76);
+        return blockLow | blockHigh << 32;
+    }
+
+    /**
+     * Gets a list of attributes associated with this inode.
+     *
+     * @return the list of attributes.
+     */
+    public List<XAttrEntry> getAttributes() {
+        List<XAttrEntry> attributes = new ArrayList<XAttrEntry>();
+        attributes.addAll(getInlineAttributes());
+        attributes.addAll(getAttributesInBlock());
+        return attributes;
+    }
+
+    /**
+     * Gets a list of inline attributes associated with this inode.
+     *
+     * @return the list of attributes.
+     */
+    public List<XAttrEntry> getInlineAttributes() {
+        List<XAttrEntry> attributes = new ArrayList<XAttrEntry>();
+        int inodeSize = getExt2FileSystem().getSuperblock().getINodeSize();
+        int xattrAvailableSize = inodeSize - (EXT2_GOOD_OLD_INODE_SIZE + getExtraISize());
+
+        if (xattrAvailableSize > 0) {
+            byte[] xattrBuffer = new byte[xattrAvailableSize];
+
+            System.arraycopy(data, EXT2_GOOD_OLD_INODE_SIZE + getExtraISize(), xattrBuffer, 0, xattrAvailableSize);
+            XAttrHeader xAttrHeader = new XAttrHeader(xattrBuffer);
+
+            if (xAttrHeader.getMagic() == XAttrHeader.MAGIC) {
+                for (int offset = XAttrHeader.SIZE; offset + XAttrEntry.MINIMUM_SIZE < xattrBuffer.length; ) {
+                    if (LittleEndian.getUInt32(xattrBuffer, offset) == 0) {
+                        break;
+                    }
+
+                    XAttrEntry entry = new XAttrEntry(xattrBuffer, offset);
+                    attributes.add(entry);
+
+                    offset += FSUtils.roundUpToBoundary(4, entry.getNameLength() + XAttrEntry.MINIMUM_SIZE);
+                }
+            }
+        }
+
+        return attributes;
+    }
+
+    /**
+     * Gets a list of attributes stored off in the extra attribute block.
+     *
+     * @return the list of attributes.
+     */
+    public List<XAttrEntry> getAttributesInBlock() {
+        List<XAttrEntry> attributes = new ArrayList<XAttrEntry>();
+        long xAttrBlockNumber = getXAttrBlock();
+
+        if (xAttrBlockNumber != 0) {
+            try {
+                byte[] xattrBuffer = fs.getBlock(xAttrBlockNumber);
+                XAttrHeader xAttrHeader = new XAttrHeader(xattrBuffer);
+
+                if (xAttrHeader.getMagic() == XAttrHeader.MAGIC) {
+                    for (int offset = XAttrHeader.SIZE; offset + XAttrEntry.MINIMUM_SIZE < xattrBuffer.length; ) {
+                        if (LittleEndian.getUInt32(xattrBuffer, offset) == 0) {
+                            break;
+                        }
+
+                        XAttrEntry entry = new XAttrEntry(xattrBuffer, offset);
+                        attributes.add(entry);
+
+                        offset += FSUtils.roundUpToBoundary(4, entry.getNameLength() + XAttrEntry.MINIMUM_SIZE);
+                    }
+                }
+            } catch (IOException e) {
+                throw new IllegalStateException("Error reading extra attributes block: " + xAttrBlockNumber, e);
+            }
+        }
+
+        return attributes;
+    }
+
+    /**
      * return the number of direct blocks that an indirect block can point to
      *
      * @return the count
@@ -184,11 +290,11 @@ public class INode {
         byte[] data = fs.getBlock(dataBlockNr);
         if (indirectionLevel == 1)
             //data is a (simple) indirect block
-            return Ext2Utils.get32(data, (int) offset * 4);
+            return LittleEndian.getUInt32(data, (int) offset * 4);
 
         long blockIndex = offset / (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
         long blockOffset = offset % (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
-        long blockNr = Ext2Utils.get32(data, (int) blockIndex * 4);
+        long blockNr = LittleEndian.getUInt32(data, (int) blockIndex * 4);
 
         return indirectRead(blockNr, blockOffset, indirectionLevel - 1);
     }
@@ -226,7 +332,7 @@ public class INode {
             Arrays.fill(zeroes, 0, fs.getBlockSize(), (byte) 0);
             fs.writeBlock(blockNr, zeroes, false);
         } else {
-            blockNr = Ext2Utils.get32(data, (int) blockIndex * 4);
+            blockNr = LittleEndian.getUInt32(data, (int) blockIndex * 4);
         }
 
         indirectWrite(blockNr, blockOffset, allocatedBlocks, value, indirectionLevel - 1);
@@ -253,7 +359,7 @@ public class INode {
 
         long blockIndex = offset / (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
         long blockOffset = offset % (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
-        long blockNr = Ext2Utils.get32(data, (int) blockIndex * 4);
+        long blockNr = LittleEndian.getUInt32(data, (int) blockIndex * 4);
 
         indirectFree(blockNr, blockOffset, indirectionLevel - 1);
 
@@ -292,7 +398,7 @@ public class INode {
      * @return the block number
      * @throws IOException
      */
-    private long getDataBlockNr(long i) throws IOException {
+    public long getDataBlockNr(long i) throws IOException {
         if ((getFlags() & Ext2Constants.EXT4_INODE_EXTENTS_FLAG) != 0) {
             if (extentHeader == null) {
                 extentHeader = new ExtentHeader(getINodeBlockData());
@@ -328,22 +434,22 @@ public class INode {
 
         //get the direct blocks (0; 11)
         if (i < 12) {
-            log.debug("getDataBlockNr(): block nr: " + Ext2Utils.get32(data, 40 + (int) i * 4));
-            return Ext2Utils.get32(data, 40 + (int) i * 4);
+            log.debug("getDataBlockNr(): block nr: " + LittleEndian.getUInt32(data, 40 + (int) i * 4));
+            return LittleEndian.getUInt32(data, 40 + (int) i * 4);
         }
 
         //see the indirect blocks (12; indirectCount-1)
         i -= 12;
         if (i < indirectCount) {
             //the 12th index points to the indirect block
-            return indirectRead(Ext2Utils.get32(data, 40 + 12 * 4), i, 1);
+            return indirectRead(LittleEndian.getUInt32(data, 40 + 12 * 4), i, 1);
         }
 
         //see the double indirect blocks (indirectCount; doubleIndirectCount-1)
         i -= indirectCount;
         if (i < indirectCount * indirectCount) {
             //the 13th index points to the double indirect block
-            return indirectRead(Ext2Utils.get32(data, 40 + 13 * 4), i, 2);
+            return indirectRead(LittleEndian.getUInt32(data, 40 + 13 * 4), i, 2);
         }
 
         //see the triple indirect blocks (doubleIndirectCount;
@@ -351,7 +457,7 @@ public class INode {
         i -= indirectCount * indirectCount;
         if (i < indirectCount * indirectCount * indirectCount) {
             //the 14th index points to the triple indirect block
-            return indirectRead(Ext2Utils.get32(data, 40 + 14 * 4), i, 3);
+            return indirectRead(LittleEndian.getUInt32(data, 40 + 14 * 4), i, 3);
         }
 
         //shouldn't get here
@@ -422,7 +528,7 @@ public class INode {
                 fs.writeBlock(indirectBlockNr, zeroes, false);
             } else {
                 //the indirect block has already been used
-                indirectBlockNr = Ext2Utils.get32(data, 40 + 12 * 4);
+                indirectBlockNr = LittleEndian.getUInt32(data, 40 + 12 * 4);
             }
 
             indirectWrite(indirectBlockNr, i, allocatedBlocks, blockNr, 1);
@@ -449,7 +555,7 @@ public class INode {
                 Arrays.fill(zeroes, 0, fs.getBlockSize(), (byte) 0);
                 fs.writeBlock(doubleIndirectBlockNr, zeroes, false);
             } else {
-                doubleIndirectBlockNr = Ext2Utils.get32(data, 40 + 13 * 4);
+                doubleIndirectBlockNr = LittleEndian.getUInt32(data, 40 + 13 * 4);
             }
 
             indirectWrite(doubleIndirectBlockNr, i, allocatedBlocks, blockNr, 2);
@@ -477,7 +583,7 @@ public class INode {
                 Arrays.fill(zeroes, 0, fs.getBlockSize(), (byte) 0);
                 fs.writeBlock(tripleIndirectBlockNr, zeroes, false);
             } else {
-                tripleIndirectBlockNr = Ext2Utils.get32(data, 40 + 14 * 4);
+                tripleIndirectBlockNr = LittleEndian.getUInt32(data, 40 + 14 * 4);
             }
 
             indirectWrite(tripleIndirectBlockNr, i, allocatedBlocks, blockNr, 3);
@@ -543,7 +649,7 @@ public class INode {
 
         //see the direct blocks (0; 11)
         if (i < 12) {
-            indirectFree(Ext2Utils.get32(data, 40 + (int) i * 4), 0, 0);
+            indirectFree(LittleEndian.getUInt32(data, 40 + (int) i * 4), 0, 0);
             Ext2Utils.set32(data, 40 + (int) i * 4, 0);
             return;
         }
@@ -552,7 +658,7 @@ public class INode {
         i -= 12;
         if (i < indirectCount) {
             //the 12th index points to the indirect block
-            indirectFree(Ext2Utils.get32(data, 40 + 12 * 4), i, 1);
+            indirectFree(LittleEndian.getUInt32(data, 40 + 12 * 4), i, 1);
             //if this was the last block on the indirect block, then delete the
             // record of
             //the indirect block from the inode
@@ -566,7 +672,7 @@ public class INode {
         i -= indirectCount;
         if (i < indirectCount * indirectCount) {
             //the 13th index points to the double indirect block
-            indirectFree(Ext2Utils.get32(data, 40 + 13 * 4), i, 2);
+            indirectFree(LittleEndian.getUInt32(data, 40 + 13 * 4), i, 2);
             //if this was the last block on the double indirect block, then
             // delete the record of
             //the double indirect block from the inode
@@ -581,7 +687,7 @@ public class INode {
         i -= indirectCount * indirectCount;
         if (i < indirectCount * indirectCount * indirectCount) {
             //the 14th index points to the triple indirect block
-            indirectFree(Ext2Utils.get32(data, 40 + 14 * 4), i, 3);
+            indirectFree(LittleEndian.getUInt32(data, 40 + 14 * 4), i, 3);
             //if this was the last block on the triple indirect block, then
             // delete the record of
             //the triple indirect block from the inode
@@ -775,22 +881,22 @@ public class INode {
 
     // **************** other persistent inode data *******************
     public synchronized int getMode() {
-        int iMode = Ext2Utils.get16(data, 0);
+        int iMode = LittleEndian.getUInt16(data, 0);
         //log.debug("INode.getIMode(): "+Ext2Print.hexFormat(iMode));
         return iMode;
     }
 
     public synchronized void setMode(int imode) {
-        Ext2Utils.set16(data, 0, imode);
+        LittleEndian.setInt16(data, 0, imode);
         setDirty(true);
     }
 
     public synchronized int getUid() {
-        return Ext2Utils.get16(data, 2);
+        return LittleEndian.getUInt16(data, 2);
     }
 
     public synchronized void setUid(int uid) {
-        Ext2Utils.set16(data, 2, uid);
+        LittleEndian.setInt16(data, 2, uid);
         setDirty(true);
     }
 
@@ -800,7 +906,15 @@ public class INode {
      * @return the size of the file in bytes
      */
     public synchronized long getSize() {
-        return Ext2Utils.get32(data, 4);
+        long sizeLow = LittleEndian.getUInt32(data, 4);
+        long sizeHigh = LittleEndian.getUInt32(data, 0x6C);
+
+        if ((getFlags() & Ext2Constants.EXT4_HUGE_FILE_FL) != 0) {
+            return (sizeHigh + sizeLow) << 32;
+        } else {
+            sizeHigh = sizeHigh << 32;
+            return sizeHigh | sizeLow;
+        }
     }
 
     public synchronized void setSize(long size) {
@@ -819,7 +933,7 @@ public class INode {
     }
 
     public synchronized long getAtime() {
-        return Ext2Utils.get32(data, 8);
+        return LittleEndian.getUInt32(data, 8);
     }
 
     public synchronized void setAtime(long atime) {
@@ -828,7 +942,7 @@ public class INode {
     }
 
     public synchronized long getCtime() {
-        return Ext2Utils.get32(data, 12);
+        return LittleEndian.getUInt32(data, 12);
     }
 
     public synchronized void setCtime(long ctime) {
@@ -837,7 +951,7 @@ public class INode {
     }
 
     public synchronized long getMtime() {
-        return Ext2Utils.get32(data, 16);
+        return LittleEndian.getUInt32(data, 16);
     }
 
     public synchronized void setMtime(long mtime) {
@@ -846,7 +960,7 @@ public class INode {
     }
 
     public synchronized long getDtime() {
-        return Ext2Utils.get32(data, 20);
+        return LittleEndian.getUInt32(data, 20);
     }
 
     public synchronized void setDtime(long dtime) {
@@ -855,20 +969,20 @@ public class INode {
     }
 
     public synchronized int getGid() {
-        return Ext2Utils.get16(data, 24);
+        return LittleEndian.getUInt16(data, 24);
     }
 
     public synchronized void setGid(int gid) {
-        Ext2Utils.set16(data, 24, gid);
+        LittleEndian.setInt16(data, 24, gid);
         setDirty(true);
     }
 
     public synchronized int getLinksCount() {
-        return Ext2Utils.get16(data, 26);
+        return LittleEndian.getUInt16(data, 26);
     }
 
     public synchronized void setLinksCount(int lc) {
-        Ext2Utils.set16(data, 26, lc);
+        LittleEndian.setInt16(data, 26, lc);
         setDirty(true);
     }
 
@@ -876,7 +990,7 @@ public class INode {
      * Return the size in 512-byte blocks.
      */
     public synchronized long getBlocks() {
-        return Ext2Utils.get32(data, 28);
+        return LittleEndian.getUInt32(data, 28);
     }
 
     public synchronized void setBlocks(long count) {
@@ -888,7 +1002,7 @@ public class INode {
     //this value is set by setSize
 
     public synchronized long getFlags() {
-        return Ext2Utils.get32(data, 32);
+        return LittleEndian.getUInt32(data, 32);
     }
 
     public synchronized void setFlags(long flags) {
@@ -897,7 +1011,7 @@ public class INode {
     }
 
     public synchronized long getOSD1() {
-        return Ext2Utils.get32(data, 36);
+        return LittleEndian.getUInt32(data, 36);
     }
 
     public synchronized void setOSD1(long osd1) {
@@ -906,7 +1020,7 @@ public class INode {
     }
 
     public synchronized long getGeneration() {
-        return Ext2Utils.get32(data, 100);
+        return LittleEndian.getUInt32(data, 100);
     }
 
     public synchronized void setGeneration(long gen) {
@@ -915,7 +1029,7 @@ public class INode {
     }
 
     public synchronized long getFileACL() {
-        return Ext2Utils.get32(data, 104);
+        return LittleEndian.getUInt32(data, 104);
     }
 
     public synchronized void setFileACL(long acl) {
@@ -924,7 +1038,7 @@ public class INode {
     }
 
     public synchronized long getDirACL() {
-        return Ext2Utils.get32(data, 108);
+        return LittleEndian.getUInt32(data, 108);
     }
 
     public synchronized void setDirACL(long acl) {
@@ -933,7 +1047,7 @@ public class INode {
     }
 
     public synchronized long getFAddr() {
-        return Ext2Utils.get32(data, 112);
+        return LittleEndian.getUInt32(data, 112);
     }
 
     public synchronized void setFAddr(long faddr) {

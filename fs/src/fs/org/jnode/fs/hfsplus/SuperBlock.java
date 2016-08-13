@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Calendar;
 import java.util.Date;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
@@ -76,11 +75,10 @@ public class SuperBlock extends HfsPlusObject {
      */
     public SuperBlock(final HfsPlusFileSystem fs, boolean create) throws FileSystemException {
         super(fs);
-        log.setLevel(Level.INFO);
         data = new byte[SUPERBLOCK_LENGTH];
         try {
             if (!create) {
-                log.info("load HFS+ volume header.");
+                log.debug("load HFS+ volume header.");
                 // skip the first 1024 bytes (boot sector) and read the volume
                 // header.
                 ByteBuffer b = ByteBuffer.allocate(SUPERBLOCK_LENGTH);
@@ -105,7 +103,7 @@ public class SuperBlock extends HfsPlusObject {
      * @throws IOException
      */
     public void create(HFSPlusParams params) throws IOException {
-        log.info("Create new HFS+ volume header (" + params.getVolumeName() +
+        log.debug("Create new HFS+ volume header (" + params.getVolumeName() +
             ") with block size of " + params.getBlockSize() + " bytes.");
         int burnedBlocksBeforeVH = 0;
         int burnedBlocksAfterAltVH = 0;
@@ -140,7 +138,7 @@ public class SuperBlock extends HfsPlusObject {
         this.setDataClumpSize(params.getDataClumpSize());
         this.setNextCatalogId(CatalogNodeId.HFSPLUS_FIRSTUSER_CNID.getId());
         // Allocation file creation
-        log.info("Init allocation file.");
+        log.debug("Init allocation file.");
         long allocationClumpSize = getClumpSize(params.getBlockCount());
         long bitmapBlocks = allocationClumpSize / blockSize;
         long blockUsed = 2 + burnedBlocksBeforeVH + burnedBlocksAfterAltVH + bitmapBlocks;
@@ -165,7 +163,7 @@ public class SuperBlock extends HfsPlusObject {
             nextBlock = desc.getNext();
         }
         // Extent B-Tree initialization
-        log.info("Init extent file.");
+        log.debug("Init extent file.");
         forkdata =
             new HfsPlusForkData(CatalogNodeId.HFSPLUS_EXT_CNID, params.getExtentClumpSize(),
                 params.getExtentClumpSize(), (params.getExtentClumpSize() / blockSize));
@@ -175,7 +173,7 @@ public class SuperBlock extends HfsPlusObject {
         blockUsed += forkdata.getTotalBlocks();
         nextBlock = desc.getNext();
         // Catalog B-Tree initialization
-        log.info("Init catalog file.");
+        log.debug("Init catalog file.");
         int totalBlocks = params.getCatalogClumpSize() / blockSize;
         forkdata =
             new HfsPlusForkData(CatalogNodeId.HFSPLUS_CAT_CNID, params.getCatalogClumpSize(),
@@ -186,8 +184,8 @@ public class SuperBlock extends HfsPlusObject {
         blockUsed += totalBlocks;
 
         this.setFreeBlocks(this.getFreeBlocks() - (int) blockUsed);
-        this.setNextAllocation((int) blockUsed - 1 - burnedBlocksAfterAltVH + 10 *
-            (this.getCatalogFile().getClumpSize() / this.getBlockSize()));
+        this.setNextAllocation((int) (blockUsed - 1 - burnedBlocksAfterAltVH + 10 *
+            (this.getCatalogFile().getClumpSize() / this.getBlockSize())));
     }
 
     /**
@@ -210,7 +208,7 @@ public class SuperBlock extends HfsPlusObject {
     // Getters/setters
 
     public final int getMagic() {
-        return BigEndian.getInt16(data, 0);
+        return BigEndian.getUInt16(data, 0);
     }
 
     public final void setMagic(final int value) {
@@ -219,7 +217,7 @@ public class SuperBlock extends HfsPlusObject {
 
     //
     public final int getVersion() {
-        return BigEndian.getInt16(data, 2);
+        return BigEndian.getUInt16(data, 2);
     }
 
     public final void setVersion(final int value) {
@@ -227,18 +225,18 @@ public class SuperBlock extends HfsPlusObject {
     }
 
     //
-    public final int getAttributes() {
+    public final long getAttributes() {
 
-        return BigEndian.getInt32(data, 4);
+        return BigEndian.getUInt32(data, 4);
     }
 
     public final void setAttribute(final int attributeMaskBit) {
-        BigEndian.setInt32(data, 4, getAttributes() | (1 << attributeMaskBit));
+        BigEndian.setInt32(data, 4, (int)(getAttributes() | (1 << attributeMaskBit)));
     }
 
     //
-    public final int getLastMountedVersion() {
-        return BigEndian.getInt32(data, 8);
+    public final long getLastMountedVersion() {
+        return BigEndian.getUInt32(data, 8);
     }
 
     public final void setLastMountedVersion(final int value) {
@@ -246,8 +244,8 @@ public class SuperBlock extends HfsPlusObject {
     }
 
     //
-    public final int getJournalInfoBlock() {
-        return BigEndian.getInt32(data, 12);
+    public final long getJournalInfoBlock() {
+        return BigEndian.getUInt32(data, 12);
     }
 
     public final void setJournalInfoBlock(final long value) {
@@ -288,8 +286,8 @@ public class SuperBlock extends HfsPlusObject {
     }
 
     //
-    public final int getFileCount() {
-        return BigEndian.getInt32(data, 32);
+    public final long getFileCount() {
+        return BigEndian.getUInt32(data, 32);
     }
 
     public final void setFileCount(final int value) {
@@ -297,12 +295,12 @@ public class SuperBlock extends HfsPlusObject {
     }
 
     //
-    public final int getFolderCount() {
-        return BigEndian.getInt32(data, 36);
+    public final long getFolderCount() {
+        return BigEndian.getUInt32(data, 36);
     }
 
-    public final void setFolderCount(final int value) {
-        BigEndian.setInt32(data, 36, value);
+    public final void setFolderCount(final long value) {
+        BigEndian.setInt32(data, 36, (int) value);
     }
 
     //
@@ -315,8 +313,8 @@ public class SuperBlock extends HfsPlusObject {
     }
 
     //
-    public final int getTotalBlocks() {
-        return BigEndian.getInt32(data, 44);
+    public final long getTotalBlocks() {
+        return BigEndian.getUInt32(data, 44);
     }
 
     public final void setTotalBlocks(final int value) {
@@ -324,17 +322,17 @@ public class SuperBlock extends HfsPlusObject {
     }
 
     //
-    public final int getFreeBlocks() {
-        return BigEndian.getInt32(data, 48);
+    public final long getFreeBlocks() {
+        return BigEndian.getUInt32(data, 48);
     }
 
-    public final void setFreeBlocks(final int value) {
-        BigEndian.setInt32(data, 48, value);
+    public final void setFreeBlocks(final long value) {
+        BigEndian.setInt32(data, 48, (int) value);
     }
 
     //
-    public final int getNextAllocation() {
-        return BigEndian.getInt32(data, 52);
+    public final long getNextAllocation() {
+        return BigEndian.getUInt32(data, 52);
     }
 
     public final void setNextAllocation(final int value) {
@@ -342,31 +340,31 @@ public class SuperBlock extends HfsPlusObject {
     }
 
     public final long getRsrcClumpSize() {
-        return BigEndian.getInt32(data, 56);
+        return BigEndian.getUInt32(data, 56);
     }
 
     public final void setRsrcClumpSize(final int value) {
         BigEndian.setInt32(data, 56, value);
     }
 
-    public final int getDataClumpSize() {
-        return BigEndian.getInt32(data, 60);
+    public final long getDataClumpSize() {
+        return BigEndian.getUInt32(data, 60);
     }
 
     public final void setDataClumpSize(final int value) {
         BigEndian.setInt32(data, 60, value);
     }
 
-    public final int getNextCatalogId() {
-        return BigEndian.getInt32(data, 64);
+    public final long getNextCatalogId() {
+        return BigEndian.getUInt32(data, 64);
     }
 
     public final void setNextCatalogId(final long value) {
         BigEndian.setInt32(data, 64, (int) value);
     }
 
-    public final int getWriteCount() {
-        return BigEndian.getInt32(data, 68);
+    public final long getWriteCount() {
+        return BigEndian.getUInt32(data, 68);
     }
 
     public final void setWriteCount(final int value) {

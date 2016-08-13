@@ -150,12 +150,35 @@ public class DataStructureAsserts {
 
         byte[] buffer = new byte[0x1000];
         long position = 0;
-        while (position < file.getLength()) {
-            int chunkLength = (int) Math.min(file.getLength() - position, buffer.length);
+        long length = file.getLength();
+        while (position < length) {
+            int chunkLength = (int) Math.min(length - position, buffer.length);
             file.read(position, ByteBuffer.wrap(buffer, 0, chunkLength));
             md5.update(buffer, 0, chunkLength);
             position += chunkLength;
         }
+
+        byte[] digest = md5.digest();
+        return Hexdump.toHexString(digest, 0, digest.length * 2).toLowerCase();
+    }
+
+    /**
+     * Gets the MD5 string for the contents of the given buffer.
+     *
+     * @param buffer the buffer to compute the MD5 for.
+     * @return the MD5 string.
+     * @throws IOException if an error occurs reading the file.
+     */
+    public static String getMD5Digest(byte[] buffer) throws IOException {
+        MessageDigest md5;
+
+        try {
+            md5 = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Couldn't find MD5");
+        }
+
+        md5.update(buffer, 0, buffer.length);
 
         byte[] digest = md5.digest();
         return Hexdump.toHexString(digest, 0, digest.length * 2).toLowerCase();

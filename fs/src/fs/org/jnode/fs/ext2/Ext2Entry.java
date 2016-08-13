@@ -21,7 +21,6 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntryLastAccessed;
@@ -42,14 +41,16 @@ public class Ext2Entry extends AbstractFSEntry implements FSEntryLastChanged, FS
 
     private final Logger log = Logger.getLogger(getClass());
     private INode iNode = null;
+    private long directoryRecordId;
     private int type;
 
-    public Ext2Entry(INode iNode, String name, int type, Ext2FileSystem fs, FSDirectory parent) {
+    public Ext2Entry(INode iNode, long directoryRecordId, String name, int type, Ext2FileSystem fs,
+                     FSDirectory parent) {
         super(fs, null, parent, name, getFSEntryType(name, iNode));
         this.iNode = iNode;
+        this.directoryRecordId = directoryRecordId;
         this.type = type;
 
-        log.setLevel(Level.INFO);
         log.debug("Ext2Entry(iNode, name): name=" + name +
             (isDirectory() ? " is a directory " : "") + (isFile() ? " is a file " : ""));
     }
@@ -60,7 +61,7 @@ public class Ext2Entry extends AbstractFSEntry implements FSEntryLastChanged, FS
 
     @Override
     public String getId() {
-        return Integer.toString(iNode.getINodeNr());
+        return Long.toString(iNode.getINodeNr()) + '-' + Long.toString(directoryRecordId);
     }
 
     public long getLastModified() throws IOException {

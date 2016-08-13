@@ -69,7 +69,16 @@ public class HfsPlusEntry implements FSEntry, FSEntryCreated, FSEntryLastAccesse
         } else if (mode == CatalogFolder.RECORD_TYPE_FOLDER) {
             return AbstractFSEntry.DIR_ENTRY;
         } else if (mode == CatalogFile.RECORD_TYPE_FILE) {
-            return AbstractFSEntry.FILE_ENTRY;
+            CatalogFile catalogFile = new CatalogFile(getData());
+
+            if (catalogFile.getUserInfo().getFileType() == CatalogFolder.HARDLINK_FOLDER_TYPE &&
+                catalogFile.getUserInfo().getFileCreator() == CatalogFolder.HARDLINK_CREATOR) {
+                // The file type and creator match the folder hardlink constants, this file is a placeholder for a
+                // hard-linked directory
+                return AbstractFSEntry.DIR_ENTRY;
+            } else {
+                return AbstractFSEntry.FILE_ENTRY;
+            }
         } else {
             return AbstractFSEntry.OTHER_ENTRY;
         }
@@ -228,5 +237,10 @@ public class HfsPlusEntry implements FSEntry, FSEntryCreated, FSEntryLastAccesse
             CatalogFolder catalogFolder = new CatalogFolder(getData());
             return catalogFolder.getAccessDate();
         }
+    }
+
+    @Override
+    public final String toString() {
+        return String.format("HfsPlusEntry:[cnid:%s %s:'%s']", getId(), isFile() ? "file" : "directory", getName());
     }
 }

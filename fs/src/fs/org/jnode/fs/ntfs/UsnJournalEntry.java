@@ -78,7 +78,7 @@ public class UsnJournalEntry extends NTFSStructure {
      * @return the MFT reference.
      */
     public long getMftReference() {
-        return getInt64(0x8); // TODO: getUInt64AsInt
+        return getInt48(0x8);
     }
 
     /**
@@ -87,7 +87,7 @@ public class UsnJournalEntry extends NTFSStructure {
      * @return the parent MFT reference.
      */
     public long getParentMtfReference() {
-        return getInt64(0x10); // TODO: getUInt64AsInt
+        return getInt48(0x10);
     }
 
     /**
