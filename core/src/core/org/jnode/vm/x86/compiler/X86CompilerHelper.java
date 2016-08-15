@@ -533,8 +533,7 @@ public class X86CompilerHelper {
             .getOffset();
         if (isTestOnly) {
             if (debug) {
-                final Label ok = new Label(curInstrLabel + labelPrefix
-                    + "$$ediok");
+                final Label ok = new Label(curInstrLabel + labelPrefix + "_" + (os.getLength() % 256) + "$$ediok");
                 if (os.isCode32()) {
                     os.writePrefix(X86Constants.FS_PREFIX);
                     os.writeCMP_MEM(this.STATICS, offset);

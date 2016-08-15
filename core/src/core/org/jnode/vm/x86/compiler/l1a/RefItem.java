@@ -104,7 +104,7 @@ final class RefItem extends WordItem {
             os.writeXOR(reg, reg);
         } else {
             X86CompilerHelper helper = ec.getHelper();
-            final Label l = new Label(Long.toString(labelCounter++));
+            final Label l = new Label(ec.getHelper().getLabelPrefix() + "ref_" + labelCounter++ + "_");
             if (os.isCode32()) {
                 helper.writeGetStaticsEntry(l, reg, value);
             } else {
@@ -136,7 +136,7 @@ final class RefItem extends WordItem {
             os.writePUSH(0);
         } else {
             X86CompilerHelper helper = ec.getHelper();
-            Label l = new Label(Long.toString(labelCounter++));
+            Label l = new Label(ec.getHelper().getLabelPrefix() + "ref_" + labelCounter+++ "_");
             helper.writePushStaticsEntry(l, value);
         }
     }
