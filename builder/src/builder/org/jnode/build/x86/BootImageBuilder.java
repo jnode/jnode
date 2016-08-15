@@ -20,8 +20,10 @@
  
 package org.jnode.build.x86;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,11 +38,13 @@ import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.assembler.x86.X86TextAssembler;
 import org.jnode.boot.Main;
 import org.jnode.build.AbstractBootImageBuilder;
 import org.jnode.build.AsmSourceInfo;
 import org.jnode.build.BuildException;
 import org.jnode.jnasm.JNAsm;
+import org.jnode.jnasm.util.X86DualAssemblerFactory;
 import org.jnode.linker.Elf;
 import org.jnode.linker.ElfLinker;
 import org.jnode.plugin.PluginRegistry;
@@ -146,8 +150,23 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      */
     protected NativeStream createNativeStream() {
         X86Constants.Mode mode = ((VmX86Architecture) getArchitecture()).getMode();
-        return new X86BinaryAssembler(getCPUID(), mode, LOAD_ADDR, INITIAL_OBJREFS_CAPACITY, INITIAL_SIZE,
-            INITIAL_SIZE);
+        X86BinaryAssembler x86BinaryAssembler = new X86BinaryAssembler(getCPUID(), mode, LOAD_ADDR,
+            INITIAL_OBJREFS_CAPACITY, INITIAL_SIZE, INITIAL_SIZE);
+
+        if (!debug) {
+            return x86BinaryAssembler;
+        } else {
+            //in debug mode write bootimage also in text format
+            try {
+                x86BinaryAssembler.setByteValueEnabled(true);
+                x86BinaryAssembler.setRelJumpEnabled(false);
+                X86TextAssembler x86TextAssembler = new X86TextAssembler(new BufferedWriter(
+                    new FileWriter(getTextFile())), getCPUID(), mode);
+                return X86DualAssemblerFactory.create(x86TextAssembler, x86BinaryAssembler);
+            } catch (IOException x) {
+                throw new RuntimeException(x);
+            }
+        }
     }
 
     /**

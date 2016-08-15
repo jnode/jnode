@@ -140,6 +140,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
     private File destFile;
 
+    private File textFile;
+
     private String jnodeCompiler;
 
     private File kernelFile;
@@ -427,6 +429,10 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
         if (debugFile != null) {
             debugFile.delete();
+        }
+
+        if (textFile != null) {
+            textFile.delete();
         }
 
         try {
@@ -1307,6 +1313,21 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      */
     public void setListFile(File listFile) {
         this.listFile = listFile;
+    }
+
+
+    /**
+     * Returns the textFile which is the bootimage in text format.
+     */
+    public File getTextFile() {
+        return textFile;
+    }
+
+    /**
+     * Sets the textFile which is the bootimage in text format.
+     */
+    public void setTextFile(File textFile) {
+        this.textFile = textFile;
     }
 
     /**

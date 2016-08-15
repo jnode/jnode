@@ -200,8 +200,9 @@
 		<bootimage 
 			destfile="${build.bootimage.dir}/bootimage.bin" 
 			listfile="${build.bootimage.dir}/bootimage.lst" 
-			debugfile="${build.bootimage.dir}/bootimage.debug" 
-			kernelfile="${build.native.dir}/output/jnode.o" 
+			debugfile="${build.bootimage.dir}/bootimage.debug"
+			textfile="${build.bootimage.dir}/bootimage.txt"
+			kernelfile="${build.native.dir}/output/jnode.o"
 			pluginList="${system-plugin-list}"
 			pluginDir="${plugins.dir}" 
 			coreClassListFile="${jnode-core-class-list}"
