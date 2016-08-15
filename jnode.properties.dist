@@ -130,3 +130,9 @@ jnode.user.home=/jnode/home
 # -----------------------------------------------
 
 #jnode.enable.jnasm=false
+
+# -----------------------------------------------
+# Uncomment the next line to build JNasm in debug mode.
+# -----------------------------------------------
+
+#jnode.debug = true
