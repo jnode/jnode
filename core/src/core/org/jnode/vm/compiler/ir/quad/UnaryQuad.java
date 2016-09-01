@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -75,10 +75,9 @@ public class UnaryQuad<T> extends AssignQuad<T> {
     }
 
     public Operand<T> propagate(Variable<T> operand) {
-        // TODO should fold constants, see BinaryQuad::propagate(...)
         Quad<T> quad = foldConstants();
         if (quad instanceof ConstantRefAssignQuad) {
-            //setDeadCode(true);
+            setDeadCode(true);
             ConstantRefAssignQuad<T> cop = (ConstantRefAssignQuad<T>) quad;
             return cop.getRHS();
         }
@@ -88,94 +87,118 @@ public class UnaryQuad<T> extends AssignQuad<T> {
     private Quad<T> foldConstants() {
         if (refs[0] instanceof Constant) {
             Constant<T> c = (Constant<T>) refs[0];
-
-            switch (operation) {
-                case I2L:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.i2l());
-
-                case I2F:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.i2f());
-
-                case I2D:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.i2d());
-
-                case L2I:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.l2i());
-
-                case L2F:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.l2f());
-
-                case L2D:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.l2d());
-
-                case F2I:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.f2i());
-
-                case F2L:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.f2l());
-
-                case F2D:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.f2d());
-
-                case D2I:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.d2i());
-
-                case D2L:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.d2l());
-
-                case D2F:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.d2f());
-
-                case I2B:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.i2b());
-
-                case I2C:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.i2c());
-
-                case I2S:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.i2s());
-
-                case INEG:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.iNeg());
-
-                case LNEG:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.lNeg());
-
-                case FNEG:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.fNeg());
-
-                case DNEG:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c.dNeg());
-
-                default:
-                    throw new IllegalArgumentException("Don't know how to fold those yet...");
-            }
+            Constant<T> c2 = compute(c);
+            int address = this.getAddress();
+            IRBasicBlock<T> basicBlock = this.getBasicBlock();
+            int index = this.getLHS().getIndex();
+            return new ConstantRefAssignQuad<T>(address, basicBlock, index, c2);
         }
         return this;
+    }
+
+    private ConstantRefAssignQuad<T> foldConstants2() {
+        if (refs[0] instanceof Constant) {
+            Constant<T> c = (Constant<T>) refs[0];
+            Constant<T> c2 = compute(c);
+            int address = this.getAddress();
+            int byteCodeAddress = this.getByteCodeAddress();
+            IRBasicBlock<T> basicBlock = this.getBasicBlock();
+            Variable<T> lhs = this.getLHS();
+            return new ConstantRefAssignQuad<T>(address, byteCodeAddress, basicBlock, lhs, c2);
+        } else {
+            throw new IllegalArgumentException("Unary quad has a non-constant: " + this);
+        }
+    }
+
+    private Constant<T> compute(Constant<T> c) {
+        Constant<T> c2;
+        switch (operation) {
+            case I2L:
+                c2 = c.i2l();
+                break;
+
+            case I2F:
+                c2 = c.i2f();
+                break;
+
+            case I2D:
+                c2 = c.i2d();
+                break;
+
+            case L2I:
+                c2 = c.l2i();
+                break;
+
+            case L2F:
+                c2 = c.l2f();
+                break;
+
+            case L2D:
+                c2 = c.l2d();
+                break;
+
+            case F2I:
+                c2 = c.f2i();
+                break;
+
+            case F2L:
+                c2 = c.f2l();
+                break;
+
+            case F2D:
+                c2 = c.f2d();
+                break;
+
+            case D2I:
+                c2 = c.d2i();
+                break;
+
+            case D2L:
+                c2 = c.d2l();
+                break;
+
+            case D2F:
+                c2 = c.d2f();
+                break;
+
+            case I2B:
+                c2 = c.i2b();
+                break;
+
+            case I2C:
+                c2 = c.i2c();
+                break;
+
+            case I2S:
+                c2 = c.i2s();
+                break;
+
+            case INEG:
+                c2 = c.iNeg();
+                break;
+
+            case LNEG:
+                c2 = c.lNeg();
+                break;
+
+            case FNEG:
+                c2 = c.fNeg();
+                break;
+
+            case DNEG:
+                c2 = c.dNeg();
+                break;
+
+            default:
+                throw new IllegalArgumentException("Don't know how to fold those yet...");
+        }
+        return c2;
     }
 
 
     public void doPass2() {
         refs[0] = refs[0].simplify();
+        getLHS().setAssignQuad(this);
     }
 
     public void generateCode(CodeGenerator<T> cg) {
@@ -198,8 +221,7 @@ public class UnaryQuad<T> extends AssignQuad<T> {
                 }
             } else if (refs[0] instanceof Constant) {
                 // this probably won't happen, is should be folded earlier
-                Constant<T> con = (Constant<T>) refs[0];
-                cg.generateCodeFor(this, lhsReg, operation, con);
+                cg.generateCodeFor(foldConstants2());
             } else {
                 throw new IllegalArgumentException("Unknown operand: " + refs[0]);
             }
@@ -219,8 +241,8 @@ public class UnaryQuad<T> extends AssignQuad<T> {
                     throw new IllegalArgumentException("Unknown location: " + varLoc);
                 }
             } else if (refs[0] instanceof Constant) {
-                Constant<T> con = (Constant<T>) refs[0];
-                cg.generateCodeFor(this, lhsDisp, operation, con);
+                // this probably won't happen, is should be folded earlier
+                cg.generateCodeFor(foldConstants2());
             } else {
                 throw new IllegalArgumentException("Unknown operand: " + refs[0]);
             }

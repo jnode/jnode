@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
+ 
 package org.jnode.vm.x86;
 
 import java.nio.ByteOrder;
@@ -44,6 +44,7 @@ import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmScheduler;
 import org.jnode.vm.x86.compiler.l1a.X86Level1ACompiler;
 import org.jnode.vm.x86.compiler.l1b.X86Level1BCompiler;
+import org.jnode.vm.x86.compiler.l2.X86Level2Compiler;
 import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
@@ -170,7 +171,8 @@ public abstract class VmX86Architecture extends BaseVmArchitecture {
             BootLogInstance.get().warn("JNode native compiler defaulting to 'L1A'");
             this.compilers[1] = new X86Level1ACompiler();
         }
-        this.testCompilers = null;
+        this.testCompilers = new NativeCodeCompiler[1];
+        this.testCompilers[0] = new X86Level2Compiler();
     }
 
     /**

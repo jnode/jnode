@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -2040,13 +2040,62 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         int compileCount = 0;
         if (mt != null) {
             final int count = mt.length;
+            int level = optLevel;
+            if (enableTestCompilers) {
+                //should match the strategy in LoadCompileService.doCompile()
+                level += LoadCompileService.getHighestOptimizationLevel(false) + 1;
+            }
             for (int i = 0; i < count; i++) {
                 final VmMethod method = mt[i];
-                if (optLevel > method.getNativeCodeOptLevel()) {
-                    LoadCompileService.compile(method, optLevel,
-                        enableTestCompilers);
+                if (level > method.getNativeCodeOptLevel()) {
+                    LoadCompileService.compile(method, optLevel, enableTestCompilers);
                     // method.setModifier(true, Modifier.ACC_COMPILED);
                     compileCount++;
+                }
+            }
+        }
+        this.state |= VmTypeState.ST_COMPILED;
+        return compileCount;
+    }
+
+    /**
+     * Compile all the methods in this class during runtime having the specified name.
+     *
+     * @param  method the name of the method to compile
+     * @param optLevel The optimization level
+     * @return The number of compiled methods
+     */
+    public final int compileRuntime(String method, int optLevel, boolean enableTestCompilers) {
+        if (!isPrepared()) {
+            throw new IllegalStateException("VmType must have been prepared");
+        }
+        return doCompileRuntime(method, optLevel, enableTestCompilers);
+    }
+
+    /**
+     * Compile all the methods in this class during runtime having the specified name.
+     *
+     * @param optLevel The optimization level
+     * @return The number of compiled methods
+     */
+    private final int doCompileRuntime(String methodName, int optLevel, boolean enableTestCompilers) {
+        final VmMethod[] mt = this.methodTable;
+        int compileCount = 0;
+        if (mt != null) {
+            final int count = mt.length;
+            int level = optLevel;
+            if (enableTestCompilers) {
+                //should match the strategy in LoadCompileService.doCompile()
+                level += LoadCompileService.getHighestOptimizationLevel(false) + 1;
+            }
+            for (int i = 0; i < count; i++) {
+                final VmMethod method = mt[i];
+                if (method.getName().equals(methodName)) {
+                    if (level > method.getNativeCodeOptLevel()) {
+                        LoadCompileService.compile(method, optLevel, enableTestCompilers);
+                        // method.setModifier(true, Modifier.ACC_COMPILED);
+                        compileCount++;
+                    }
                 }
             }
         }

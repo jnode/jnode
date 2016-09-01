@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -277,6 +277,12 @@ public abstract class Constant<T> extends Operand<T> {
         long l1 = ((LongConstant<T>) this).getValue();
         long l2 = ((LongConstant<T>) c2).getValue();
         return new LongConstant<T>(l1 >>> l2);
+    }
+
+    public Constant<T> lCmp(Constant<T> c2) {
+        long l1 = ((LongConstant<T>) this).getValue();
+        long l2 = ((LongConstant<T>) c2).getValue();
+        return new IntConstant<T>(l1 < l2 ? -1 : l1 > l2 ? 1 : 0);
     }
 
     public Constant<T> fAdd(Constant<T> c2) {

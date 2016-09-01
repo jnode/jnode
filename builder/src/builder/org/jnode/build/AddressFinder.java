@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -39,23 +39,20 @@ public class AddressFinder {
 
     private static final int MAXWIDTH = 75;
 
-    private static final String NDISASM = (System.getProperty("os.name")
-        .toLowerCase().indexOf("win") >= 0) ? "ndisasmw" : "ndisasm";
+    private static final String NDISASM = System.getProperty("os.name").toLowerCase().contains("win") ? "ndisasmw" :
+        "ndisasm";
 
     private static final ArchInfo[] archs = {
         new ArchInfo("x86", "all/build/x86/32bits/bootimage/bootimage.bin",
-            "all/build/x86/bootimage/32bits/bootimage.lst", NDISASM
-            + " -u -o "),
-        new ArchInfo("x86_64",
-            "all/build/x86/64bits/bootimage/bootimage.bin",
-            "all/build/x86/64bits/bootimage/bootimage.lst",
-            "udis86 --code64 --offset --origin ")};
+            "all/build/x86/bootimage/32bits/bootimage.lst", NDISASM + " -u -o "),
+        new ArchInfo("x86_64", "all/build/x86/64bits/bootimage/bootimage.bin",
+            "all/build/x86/64bits/bootimage/bootimage.lst", "udis86 --code64 --offset --origin ")};
 
-    public static void main(String[] args) throws IllegalArgumentException,
-        SecurityException, IOException, InterruptedException {
+    public static void main(String[] args) throws IllegalArgumentException, SecurityException, IOException,
+        InterruptedException {
 
         long loadAddress = BootImageBuilder.LOAD_ADDR;
-        long address = 0;
+        long address;
         boolean disasm = false;
         int disasmLength = 128;
 
@@ -84,8 +81,7 @@ public class AddressFinder {
             final long labelAddress = findLabel(listFileName, address);
 
             if (disasm) {
-                disasm(arch, imageFileName, labelAddress, disasmLength,
-                    loadAddress);
+                disasm(arch, imageFileName, labelAddress, disasmLength, loadAddress);
             }
         } else {
             usage();
@@ -103,8 +99,7 @@ public class AddressFinder {
     }
 
     private static void usage() {
-        System.out
-            .println("Usage: findaddress architecture [-d] [-l length] address");
+        System.out.println("Usage: findaddress architecture [-d] [-l length] address");
         System.exit(1);
     }
 
@@ -119,8 +114,7 @@ public class AddressFinder {
             while ((line = in.readLine()) != null) {
                 if (line.startsWith("$")) {
                     final int idx = line.indexOf('\t');
-                    final long laddr = Long.parseLong(line.substring(1, idx),
-                        16);
+                    final long laddr = Long.parseLong(line.substring(1, idx), 16);
                     if (laddr <= address) {
                         lastAddress = laddr;
                         lastLabel = line.substring(idx + 1);
@@ -180,8 +174,7 @@ public class AddressFinder {
         return v;
     }
 
-    private static void disasm(ArchInfo arch, String imageFileName,
-                               long address, int length, long loadAddress)
+    private static void disasm(ArchInfo arch, String imageFileName, long address, int length, long loadAddress)
         throws IllegalArgumentException, SecurityException, IOException,
         InterruptedException {
         final RandomAccessFile raf = new RandomAccessFile(imageFileName, "r");
@@ -196,8 +189,7 @@ public class AddressFinder {
             os.write(data);
             os.close();
 
-            final String cmdLine = arch.getDisasmCmd() + address + " "
-                + tmpFile.getAbsolutePath();
+            final String cmdLine = arch.getDisasmCmd() + address + " " + tmpFile.getAbsolutePath();
             exec(cmdLine);
             //tmpFile.delete();
         } finally {
@@ -229,8 +221,7 @@ public class AddressFinder {
          * @param listFile
          * @param disasmCmd
          */
-        public ArchInfo(String arch, String bootImageFile,
-                        final String listFile, final String disasmCmd) {
+        public ArchInfo(String arch, String bootImageFile, final String listFile, final String disasmCmd) {
             this.arch = arch;
             this.bootImageFile = bootImageFile;
             this.listFile = listFile;

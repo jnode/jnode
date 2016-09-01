@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
+ 
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
@@ -223,6 +223,8 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
     }
 
     public void create(BlockSize blockSize) throws FileSystemException {
+        log.info("Creating a new ext2 file system: " + blockSize);
+
         try {
             // create the superblock
             superblock = new Superblock();
@@ -923,7 +925,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
 
         // add the inode to the inode cache
         synchronized (inodeCache) {
-            inodeCache.put(Integer.valueOf(Ext2Constants.EXT2_ROOT_INO), iNode);
+            inodeCache.put(Long.valueOf(Ext2Constants.EXT2_ROOT_INO), iNode);
         }
 
         modifyUsedDirsCount(0, 1);
@@ -938,6 +940,8 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
     }
 
     protected void handleFSError(Exception e) {
+        log.error("File system error", e);
+
         // mark the fs as having errors
         superblock.setState(Ext2Constants.EXT2_ERROR_FS);
         if (superblock.getErrors() == Ext2Constants.EXT2_ERRORS_RO) setReadOnly(true); // remount readonly

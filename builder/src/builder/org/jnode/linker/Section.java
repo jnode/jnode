@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -77,9 +77,8 @@ public class Section {
 
     public static final int SHF_MASKPROC = 0xf0000000;
 
-    static String typename[] = {"NULL", "PROGBITS", "SYMTAB", "STRTAB",
-        "RELA", "HASH", "DYNAMIC", "NOTE", "NOBITS", "REL", "SHLIB",
-        "DYNSYM", "NUM"};
+    static String typename[] = {"NULL", "PROGBITS", "SYMTAB", "STRTAB", "RELA", "HASH", "DYNAMIC", "NOTE", "NOBITS",
+        "REL", "SHLIB", "DYNSYM", "NUM"};
 
     int sh_name;
 
@@ -140,10 +139,8 @@ public class Section {
         return s;
     }
 
-    public static Section newRelTabSection(Elf elf, Section symtabSection,
-                                           Section contentSection) {
-        Section s = new Section(elf, SHT_REL,
-            ".rel" + contentSection.getName(), SHF_ALLOC);
+    public static Section newRelTabSection(Elf elf, Section symtabSection, Section contentSection) {
+        Section s = new Section(elf, SHT_REL, ".rel" + contentSection.getName(), SHF_ALLOC);
         s.sh_entsize = 0x08;
         s.sh_link = elf.getSectionIndex(symtabSection);
         s.sh_info = elf.getSectionIndex(contentSection);
@@ -151,9 +148,7 @@ public class Section {
     }
 
     public static Section newStrTabSection(Elf elf) {
-        return new Section(elf, SHT_STRTAB,
-            (elf.getSHStrSection() == null) ? ".shstrtab" : ".strtab",
-            SHF_ALLOC);
+        return new Section(elf, SHT_STRTAB, (elf.getSHStrSection() == null) ? ".shstrtab" : ".strtab", SHF_ALLOC);
     }
 
     public static Section newSymTabSection(Elf elf) {
@@ -166,8 +161,7 @@ public class Section {
     }
 
     public static Section newTextSection(Elf elf) {
-        return new Section(elf, SHT_PROGBITS, ".text", SHF_ALLOC
-            | SHF_EXECINSTR);
+        return new Section(elf, SHT_PROGBITS, ".text", SHF_ALLOC | SHF_EXECINSTR);
     }
 
     public static Section newDataSection(Elf elf) {
@@ -284,7 +278,7 @@ public class Section {
     public Reloc getReloc(int index) {
         if (!(isRelTab() || isRelaTab()))
             throw new RuntimeException("Only valid to reloc table sections");
-        return (Reloc) m_reltab.elementAt(index);
+        return m_reltab.elementAt(index);
     }
 
     public void addAbsReloc(Symbol symbol, int address) {
@@ -311,10 +305,10 @@ public class Section {
         if (!isSymTab()) {
             throw new RuntimeException("Only valid to symbol table sections");
         }
-        return (Symbol) m_symtab.elementAt(index);
+        return m_symtab.elementAt(index);
     }
 
-    public Symbol getSymbolByAddress(int address) {
+    public Symbol getSymbolByAddress(int address) {   //todo investigate: if statement buggy?
         if (!isSymTab())
             throw new RuntimeException("Only valid to symbol table sections");
         int i;
@@ -362,22 +356,16 @@ public class Section {
 
     public void print() {
         System.out.println("  ----- Section Header -----");
-        System.out.println("  sh_name       : " + Integer.toString(sh_name, 16)
-            + "(" + getName() + ")");
-        System.out.println("  sh_type       : " + Integer.toString(sh_type, 16)
-            + "(" + typename[sh_type] + ")");
+        System.out.println("  sh_name       : " + Integer.toString(sh_name, 16) + "(" + getName() + ")");
+        System.out.println("  sh_type       : " + Integer.toString(sh_type, 16) + "(" + typename[sh_type] + ")");
         System.out.println("  sh_flags      : " + Long.toString(sh_flags, 16));
         System.out.println("  sh_addr       : " + Long.toString(sh_addr, 16));
         System.out.println("  sh_offset     : " + Long.toString(sh_offset, 16));
         System.out.println("  sh_size       : " + Long.toString(sh_size, 16));
-        System.out
-            .println("  sh_link       : " + Integer.toString(sh_link, 16));
-        System.out
-            .println("  sh_info       : " + Integer.toString(sh_info, 16));
-        System.out.println("  sh_addralign  : "
-            + Long.toString(sh_addralign, 16));
-        System.out
-            .println("  sh_entsize    : " + Long.toString(sh_entsize, 16));
+        System.out.println("  sh_link       : " + Integer.toString(sh_link, 16));
+        System.out.println("  sh_info       : " + Integer.toString(sh_info, 16));
+        System.out.println("  sh_addralign  : " + Long.toString(sh_addralign, 16));
+        System.out.println("  sh_entsize    : " + Long.toString(sh_entsize, 16));
     }
 
     protected long get_brk() {
@@ -441,8 +429,7 @@ public class Section {
 
     private void loadRelTab() throws IOException {
         if (!isRelTab()) {
-            throw new RuntimeException(
-                "Only valid for relocation table sections");
+            throw new RuntimeException("Only valid for relocation table sections");
         }
 
         ByteArrayInputStream in = new ByteArrayInputStream(m_body);
@@ -455,8 +442,7 @@ public class Section {
 
     private void loadRelaTab() throws IOException {
         if (!isRelaTab()) {
-            throw new RuntimeException(
-                "Only valid for relocation table sections");
+            throw new RuntimeException("Only valid for relocation table sections");
         }
 
         final ByteArrayInputStream in = new ByteArrayInputStream(m_body);
@@ -469,8 +455,7 @@ public class Section {
 
     private void storeRelTab() throws IOException {
         if (!isRelTab())
-            throw new RuntimeException(
-                "Only valid for relocation table sections");
+            throw new RuntimeException("Only valid for relocation table sections");
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 

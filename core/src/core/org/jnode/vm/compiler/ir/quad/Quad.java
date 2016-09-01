@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -20,7 +20,8 @@
  
 package org.jnode.vm.compiler.ir.quad;
 
-import java.util.Map;
+import java.util.Collection;
+import java.util.List;
 
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
@@ -35,11 +36,20 @@ import org.jnode.vm.compiler.ir.Variable;
  */
 public abstract class Quad<T> {
     private int address;
+    private final int byteCodeAddress;
     private boolean deadCode;
     private IRBasicBlock<T> basicBlock;
 
     public Quad(int address, IRBasicBlock<T> block) {
         this.address = address;
+        this.byteCodeAddress = address;
+        this.basicBlock = block;
+        this.deadCode = false;
+    }
+
+    public Quad(int address, int byteCodeAddress, IRBasicBlock<T> block) {
+        this.address = address;
+        this.byteCodeAddress = byteCodeAddress;
         this.basicBlock = block;
         this.deadCode = false;
     }
@@ -62,6 +72,10 @@ public abstract class Quad<T> {
      */
     public void setAddress(int i) {
         address = i;
+    }
+
+    public int getByteCodeAddress() {
+        return byteCodeAddress;
     }
 
     /**
@@ -109,7 +123,7 @@ public abstract class Quad<T> {
         return basicBlock;
     }
 
-    public void computeLiveness(Map<Variable<?>, Variable<T>> liveVariables) {
+    public void computeLiveness(List<Variable<?>> liveVariables) {
         Operand<T>[] refs = getReferencedOps();
         if (refs != null) {
             int n = refs.length;
@@ -117,7 +131,8 @@ public abstract class Quad<T> {
                 if (refs[i] instanceof Variable) {
                     Variable<T> v = (Variable<T>) refs[i];
                     v.setLastUseAddress(getAddress());
-                    liveVariables.put(v, v);
+                    if (!liveVariables.contains(v))
+                        liveVariables.add(v);
                 }
             }
         }
@@ -133,4 +148,8 @@ public abstract class Quad<T> {
     public abstract void doPass2();
 
     public abstract void generateCode(CodeGenerator<T> cg);
+
+    public void doPass3(Collection<Variable<T>> values){
+
+    };
 }

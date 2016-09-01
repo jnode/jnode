@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir.quad;
 
 import org.jnode.vm.compiler.ir.AddressingMode;
@@ -187,140 +187,174 @@ public class BinaryQuad<T> extends AssignQuad<T> {
         if (refs[0] instanceof Constant && refs[1] instanceof Constant) {
             Constant<T> c1 = (Constant<T>) refs[0];
             Constant<T> c2 = (Constant<T>) refs[1];
-            switch (operation) {
-                case IADD:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.iAdd(c2));
-
-                case ISUB:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.iSub(c2));
-
-                case IMUL:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.iMul(c2));
-
-                case IDIV:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.iDiv(c2));
-
-                case IREM:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.iRem(c2));
-
-                case IAND:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.iAnd(c2));
-
-                case IOR:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.iOr(c2));
-
-                case IXOR:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.iXor(c2));
-
-                case ISHL:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.iShl(c2));
-
-                case ISHR:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.iShr(c2));
-
-                case IUSHR:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.iUshr(c2));
-
-                case LADD:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.lAdd(c2));
-
-                case LSUB:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.lSub(c2));
-
-                case LMUL:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.lMul(c2));
-
-                case LDIV:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.lDiv(c2));
-
-                case LREM:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.lRem(c2));
-
-                case LAND:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.lAnd(c2));
-
-                case LOR:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.lOr(c2));
-
-                case LXOR:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.lXor(c2));
-
-                case LSHL:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.lShl(c2));
-
-                case LSHR:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.lShr(c2));
-
-                case LUSHR:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.lUshr(c2));
-
-                case FADD:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.fAdd(c2));
-
-                case FSUB:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.fSub(c2));
-
-                case FMUL:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.fMul(c2));
-
-                case FDIV:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.fDiv(c2));
-
-                case FREM:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.fRem(c2));
-
-                case DADD:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.dAdd(c2));
-
-                case DSUB:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.dSub(c2));
-
-                case DMUL:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.dMul(c2));
-
-                case DDIV:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.dDiv(c2));
-
-                case DREM:
-                    return new ConstantRefAssignQuad<T>(this.getAddress(), this.getBasicBlock(),
-                        this.getLHS().getIndex(), c1.dRem(c2));
-
-                default:
-                    throw new IllegalArgumentException("Don't know how to fold those yet...");
-            }
+            Constant<T> c3 = compute(c1, c2);
+            int address = this.getAddress();
+            IRBasicBlock<T> basicBlock = this.getBasicBlock();
+            int index = this.getLHS().getIndex();
+            return new ConstantRefAssignQuad<T>(address, basicBlock, index, c3);
         }
         return this;
+    }
+    /**
+     * If refs[0] and refs[1] are both Constants, then fold them.
+     *
+     * @return resulting Quad after folding
+     */
+    public ConstantRefAssignQuad<T> foldConstants2() {
+        if (refs[0] instanceof Constant && refs[1] instanceof Constant) {
+            Constant<T> c1 = (Constant<T>) refs[0];
+            Constant<T> c2 = (Constant<T>) refs[1];
+            Constant<T> c3 = compute(c1, c2);
+            int address = this.getAddress();
+            int byteCodeAddress = this.getByteCodeAddress();
+            IRBasicBlock<T> basicBlock = this.getBasicBlock();
+            Variable<T> lhs = this.getLHS();
+            return new ConstantRefAssignQuad<T>(address, byteCodeAddress, basicBlock, lhs, c3);
+        } else {
+            throw new IllegalArgumentException("Binary quad has a non-constant operand: " + this);
+        }
+    }
+
+
+    private Constant<T> compute(Constant<T> c1, Constant<T> c2) {
+        Constant<T> c3;
+        switch (operation) {
+            case IADD:
+                c3 = c1.iAdd(c2);
+                break;
+
+            case ISUB:
+                c3 = c1.iSub(c2);
+                break;
+
+            case IMUL:
+                c3 = c1.iMul(c2);
+                break;
+
+            case IDIV:
+                c3 = c1.iDiv(c2);
+                break;
+
+            case IREM:
+                c3 = c1.iRem(c2);
+                break;
+
+            case IAND:
+                c3 = c1.iAnd(c2);
+                break;
+
+            case IOR:
+                c3 = c1.iOr(c2);
+                break;
+
+            case IXOR:
+                c3 = c1.iXor(c2);
+                break;
+
+            case ISHL:
+                c3 = c1.iShl(c2);
+                break;
+
+            case ISHR:
+                c3 = c1.iShr(c2);
+                break;
+
+            case IUSHR:
+                c3 = c1.iUshr(c2);
+                break;
+
+            case LADD:
+                c3 = c1.lAdd(c2);
+                break;
+
+            case LSUB:
+                c3 = c1.lSub(c2);
+                break;
+
+            case LMUL:
+                c3 = c1.lMul(c2);
+                break;
+
+            case LDIV:
+                c3 = c1.lDiv(c2);
+                break;
+
+            case LREM:
+                c3 = c1.lRem(c2);
+                break;
+
+            case LAND:
+                c3 = c1.lAnd(c2);
+                break;
+
+            case LOR:
+                c3 = c1.lOr(c2);
+                break;
+
+            case LXOR:
+                c3 = c1.lXor(c2);
+                break;
+
+            case LSHL:
+                c3 = c1.lShl(c2);
+                break;
+
+            case LSHR:
+                c3 = c1.lShr(c2);
+                break;
+
+            case LUSHR:
+                c3 = c1.lUshr(c2);
+                break;
+
+            case FADD:
+                c3 = c1.fAdd(c2);
+                break;
+
+            case FSUB:
+                c3 = c1.fSub(c2);
+                break;
+
+            case FMUL:
+                c3 = c1.fMul(c2);
+                break;
+
+            case FDIV:
+                c3 = c1.fDiv(c2);
+                break;
+
+            case FREM:
+                c3 = c1.fRem(c2);
+                break;
+
+            case LCMP:
+                c3 = c1.lCmp(c2);
+                break;
+
+            case DADD:
+                c3 = c1.dAdd(c2);
+                break;
+
+            case DSUB:
+                c3 = c1.dSub(c2);
+                break;
+
+            case DMUL:
+                c3 = c1.dMul(c2);
+                break;
+
+            case DDIV:
+                c3 = c1.dDiv(c2);
+                break;
+
+            case DREM:
+                c3 = c1.dRem(c2);
+                break;
+
+            default:
+                throw new IllegalArgumentException("Don't know how to fold those yet...");
+        }
+        return c3;
     }
 
     /**
@@ -329,7 +363,7 @@ public class BinaryQuad<T> extends AssignQuad<T> {
     public Operand<T> propagate(Variable<T> operand) {
         Quad<T> quad = foldConstants();
         if (quad instanceof ConstantRefAssignQuad) {
-            //setDeadCode(true);
+            setDeadCode(true);
             ConstantRefAssignQuad<T> cop = (ConstantRefAssignQuad<T>) quad;
             return cop.getRHS();
         }
@@ -346,6 +380,7 @@ public class BinaryQuad<T> extends AssignQuad<T> {
     public void doPass2() {
         refs[0] = refs[0].simplify();
         refs[1] = refs[1].simplify();
+        getLHS().setAssignQuad(this);
     }
 
     /**
@@ -435,7 +470,7 @@ public class BinaryQuad<T> extends AssignQuad<T> {
                 cg.generateBinaryOP(reg1, reg2, operation, disp3);
                 break;
             case MODE_RSC:
-                cg.generateBinaryOP(reg1, disp2, operation, c3);
+                cg.generateBinaryOP(this, reg1, disp2, operation, c3);
                 break;
             case MODE_RSR:
                 if (reg1 == reg3 && commutative && !cg.supports3AddrOps()) {
@@ -455,7 +490,7 @@ public class BinaryQuad<T> extends AssignQuad<T> {
                 break;
             case MODE_SCS:
                 if (disp1 == disp3 && commutative && !cg.supports3AddrOps()) {
-                    cg.generateBinaryOP(disp1, disp3, operation, c2);
+                    cg.generateBinaryOP(this, disp1, disp3, operation, c2);
                 } else {
                     cg.generateBinaryOP(disp1, c2, operation, disp3);
                 }
@@ -474,16 +509,16 @@ public class BinaryQuad<T> extends AssignQuad<T> {
                 }
                 break;
             case MODE_SSC:
-                cg.generateBinaryOP(disp1, disp2, operation, c3);
+                cg.generateBinaryOP(this, disp1, disp2, operation, c3);
                 break;
             case MODE_SSR:
                 cg.generateBinaryOP(disp1, disp2, operation, reg3);
                 break;
             case MODE_SSS:
                 if (disp1 == disp3 && commutative && !cg.supports3AddrOps()) {
-                    cg.generateBinaryOP(disp1, disp3, operation, disp2);
+                    cg.generateBinaryOP(this, disp1, disp3, operation, disp2);
                 } else {
-                    cg.generateBinaryOP(disp1, disp2, operation, disp3);
+                    cg.generateBinaryOP(this, disp1, disp2, operation, disp3);
                 }
                 break;
             default:

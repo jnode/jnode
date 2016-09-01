@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -19,8 +19,7 @@
  */
  
 package org.jnode.plugin.model;
-//TODO FIX THIS TO NOT BREAK THE BUILD
-/*
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -33,7 +32,6 @@ import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.PluginReference;
 import org.junit.Before;
 import org.junit.Test;
-
 
 public class PluginDescriptorModelTest {
 
@@ -134,4 +132,4 @@ public class PluginDescriptorModelTest {
         assertEquals("version", reference.getVersion());
     }
 }
-*/
+

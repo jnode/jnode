@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -80,7 +80,6 @@ public final class PluginList {
         }
 
         for (Iterator<?> i = root.getChildren().iterator(); i.hasNext();) {
-
             final XMLElement e = (XMLElement) i.next();
             if (e.getName().equals("plugin")) {
                 final String id = e.getStringAttribute("id");
@@ -134,8 +133,8 @@ public final class PluginList {
         
         if (pluginList.contains(pluginUrl)) {
             String versionStr = (version == null) ? "unspecified" : version;
-            throw new PluginException("can't use the same id(" + id + 
-                    ") and version(" + versionStr + ") for multiple plugins");
+            throw new PluginException("can't use the same id(" + id + ") and version(" + versionStr
+                + ") for multiple plugins");
         }
 
         descrList.add(descrUrl);
@@ -154,8 +153,7 @@ public final class PluginList {
         });
 
         if (names.length == 0) {
-            throw new IllegalArgumentException("Cannot find plugin " + id
-                + " in " + dir + " for list " + this.name);
+            throw new IllegalArgumentException("Cannot find plugin " + id + " in " + dir + " for list " + this.name);
         }
 
         String filename = null;
@@ -200,8 +198,8 @@ public final class PluginList {
         return mf;
     }
 
-    private void parseInclude(XMLElement e, File curDir, File defaultDir,
-                              String targetArch, List<URL> descrList, List<URL> pluginList)
+    private void parseInclude(XMLElement e, File curDir, File defaultDir, String targetArch, List<URL> descrList,
+                              List<URL> pluginList)
         throws MalformedURLException, PluginException {
         File file = new File(e.getStringAttribute("file"));
         if (!file.isAbsolute()) {

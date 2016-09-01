@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -33,6 +33,7 @@ import org.jnode.fs.spi.AbstractFSDirectory;
 import org.jnode.fs.spi.AbstractFileSystem;
 import org.jnode.fs.spi.FSEntryTable;
 import org.jnode.fs.util.FSUtils;
+import org.jnode.util.LittleEndian;
 
 /**
  * @author Andras Nagy
@@ -117,7 +118,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
             newDir.addDirectoryRecord(drParent);
 
             //increase the reference count for the parent directory
-            INode parentINode = fs.getINode((int) parentINodeNr);
+            INode parentINode = fs.getINode(parentINodeNr);
             parentINode.setLinksCount(parentINode.getLinksCount() + 1);
 
             //update the number of used directories in the block group
@@ -179,7 +180,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
      * @return @throws
      * IOException
      */
-    protected FSEntry addINode(int iNodeNr, String linkName, int fileType) throws IOException {
+    protected FSEntry addINode(long iNodeNr, String linkName, int fileType) throws IOException {
         if (!canWrite())
             throw new IOException("Filesystem or directory is mounted read-only!");
 
@@ -374,6 +375,10 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
                 do {
                     if (index >= iNode.getSize())
                         return false;
+
+                    if (data.capacity() < 8 || LittleEndian.getUInt16(data.array(), index + 4) == 0) {
+                        return false;
+                    }
 
                     //TODO optimize it also to use ByteBuffer at lower level            
                     dr = new Ext2DirectoryRecord(fs, data.array(), index, index);

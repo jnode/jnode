@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -256,6 +256,16 @@ public abstract class NativeStream {
          * @return boolean
          */
         public abstract boolean isResolved();
+
+        public abstract boolean isPublic();
+
+        public abstract boolean isRelJump();
+
+        public abstract void setPublic();
+
+        public abstract void setRelJump();
+
+        public abstract void setOffset(int offset);
 
         /**
          * Link this objectref to the given objectref. That is, the offset of this

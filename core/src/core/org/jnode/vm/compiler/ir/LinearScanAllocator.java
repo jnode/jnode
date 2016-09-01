@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,6 +21,7 @@
 package org.jnode.vm.compiler.ir;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -48,6 +49,8 @@ public class LinearScanAllocator<T> {
     }
 
     public void allocate() {
+        Arrays.sort(liveRanges);
+
         int n = liveRanges.length;
         for (int i = 0; i < n; i += 1) {
             LiveRange<T> lr = liveRanges[i];
@@ -96,6 +99,12 @@ public class LinearScanAllocator<T> {
      * @param lr
      */
     private void spillRange(LiveRange<T> lr) {
+        if (active.isEmpty() || lr.getVariable().getType() == Operand.LONG ||
+            lr.getVariable().getType() == Operand.DOUBLE) {
+            lr.setLocation(new StackLocation<T>());
+            this.spilledVariableList.add(lr.getVariable());
+            return;
+        }
         LiveRange<T> spill = active.get(active.size() - 1);
         if (spill.getLastUseAddress() > lr.getLastUseAddress()) {
             lr.setLocation(spill.getLocation());

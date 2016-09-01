@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2016 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 
+import org.jnode.assembler.BootImageNativeStream;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
@@ -42,7 +43,7 @@ import org.jnode.vm.x86.X86CpuID;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
-public abstract class X86Assembler extends NativeStream implements X86Constants {
+public abstract class X86Assembler extends NativeStream implements BootImageNativeStream, X86Constants {
 
     /**
      * Current mode is 32-bit
@@ -56,6 +57,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
     protected final X86CpuID cpuId;
 
     protected final Mode mode;
+
+    protected X86Assembler() {
+        this.cpuId = X86CpuID.createID("pentium");
+        this.mode = X86Constants.Mode.CODE32;
+        this.code32 = mode.is32();
+        this.code64 = mode.is64();
+    }
 
     /**
      * Initialize this instance
@@ -140,11 +148,18 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
     public abstract ObjectRef getObjectRef(Object keyObj);
 
     /**
-     * Gets all references of objects as instanceof ObjectRef
+     * Gets all references of objects as instanceof ObjectRef.
      *
      * @return Collection
      */
     public abstract Collection<? extends ObjectRef> getObjectRefs();
+
+    /**
+     * Gets the number of all references of objects.
+     *
+     * @return Collection
+     */
+    public abstract int getObjectRefsCount();
 
     /**
      * @return ObjectResolver
@@ -152,7 +167,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
     public abstract ObjectResolver getResolver();
 
     /**
-     * Gets all unresolved references of objects as instanceof ObjectRef
+     * Gets all unresolved references of objects as instanceof ObjectRef.
      *
      * @return Collection
      */
@@ -722,6 +737,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
     public abstract void writeBreakPoint();
 
     /**
+     * Write a bts reg, imm32.
+     *
+     * @param reg
+     * @param imm32
+     */
+    public abstract void writeBTS(GPR reg, int imm32);
+
+    /**
      * Create a call to address stored in the given register.
      *
      * @param reg
@@ -757,6 +780,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
      * @param offset
      */
     public abstract void writeCALL(GPR reg, int offset);
+
+    /**
+     * Create a call to address stored at the given [reg+offset].
+     *
+     * @param reg
+     * @param offset
+     */
+    public abstract void writeCALL_FAR(GPR reg, int offset);
 
     /**
      * Create a relative call to a given label
@@ -1349,6 +1380,10 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
      */
     public abstract void writeIRET();
 
+    /**
+     * Create a iretq
+     */
+    public abstract void writeIRETQ();
 
     /**
      * Create a conditional jump to a label The opcode sequence is: 0x0f
@@ -2522,6 +2557,12 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
      * Create a STOSD
      */
     public abstract void writeSTOSD();
+
+
+    /**
+     * Create a STOSQ
+     */
+    public abstract void writeSTOSQ();
 
     /**
      * Create a STOSW

@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -31,6 +31,7 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.NativeStream.ObjectInfo;
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
@@ -101,12 +102,10 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      * The offset in our (java) image file to the initial jump to our
      * main-method.
      */
-    public static final int JUMP_MAIN_OFFSET32 = ObjectLayout
-        .objectAlign((ObjectLayout.HEADER_SLOTS + 1)
+    public static final int JUMP_MAIN_OFFSET32 = ObjectLayout.objectAlign((ObjectLayout.HEADER_SLOTS + 1)
             * VmX86Architecture32.SLOT_SIZE);
 
-    public static final int JUMP_MAIN_OFFSET64 = ObjectLayout
-        .objectAlign((ObjectLayout.HEADER_SLOTS + 1)
+    public static final int JUMP_MAIN_OFFSET64 = ObjectLayout.objectAlign((ObjectLayout.HEADER_SLOTS + 1)
             * VmX86Architecture64.SLOT_SIZE);
 
     public final int JUMP_MAIN_OFFSET() {
@@ -123,13 +122,11 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
     public static final int INITIALIZE_METHOD_OFFSET = 8;
 
     // private final Label vmInvoke = new Label("vm_invoke");
-    private final Label vmFindThrowableHandler = new Label(
-        "vm_findThrowableHandler");
+    private final Label vmFindThrowableHandler = new Label("vm_findThrowableHandler");
 
     private final Label vmReschedule = new Label("VmProcessor_reschedule");
 
-    private final Label sbcSystemException = new Label(
-        "SoftByteCodes_systemException");
+    private final Label sbcSystemException = new Label("SoftByteCodes_systemException");
 
     private final Label vmThreadRunThread = new Label("VmThread_runThread");
 
@@ -148,10 +145,9 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      * @return The native stream
      */
     protected NativeStream createNativeStream() {
-        X86Constants.Mode mode = ((VmX86Architecture) getArchitecture())
-            .getMode();
-        return new X86BinaryAssembler(getCPUID(), mode, LOAD_ADDR,
-            INITIAL_OBJREFS_CAPACITY, INITIAL_SIZE, INITIAL_SIZE);
+        X86Constants.Mode mode = ((VmX86Architecture) getArchitecture()).getMode();
+        return new X86BinaryAssembler(getCPUID(), mode, LOAD_ADDR, INITIAL_OBJREFS_CAPACITY, INITIAL_SIZE,
+            INITIAL_SIZE);
     }
 
     /**
@@ -168,14 +164,12 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
         if (processor == null) {
             switch (bits) {
                 case 32:
-                    processor = new VmX86Processor32(0,
-                        (VmX86Architecture32) getArchitecture(), statics, isolatedStatics, scheduler,
-                        getCPUID());
+                    processor = new VmX86Processor32(0, (VmX86Architecture32) getArchitecture(), statics,
+                        isolatedStatics, scheduler, getCPUID());
                     break;
                 case 64:
-                    processor = new VmX86Processor64(0,
-                        (VmX86Architecture64) getArchitecture(), statics, isolatedStatics, scheduler,
-                        getCPUID());
+                    processor = new VmX86Processor64(0, (VmX86Architecture64) getArchitecture(), statics,
+                        isolatedStatics, scheduler, getCPUID());
                     break;
                 default:
                     throw new BuildException("Unknown bits " + bits);
@@ -216,7 +210,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
         try {
             Elf elf = Elf.newFromFile(getKernelFile().getCanonicalPath());
             // elf.print();
-            new ElfLinker((X86BinaryAssembler) os).loadElfObject(elf);
+            new ElfLinker((X86Assembler) os).loadElfObject(elf);
         } catch (IOException ex) {
             throw new BuildException(ex);
         }
@@ -236,7 +230,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      * @throws BuildException
      */
     protected void pageAlign(NativeStream os) throws BuildException {
-        ((X86BinaryAssembler) os).align(4096);
+        ((X86Assembler) os).align(4096);
     }
 
     /**
@@ -247,25 +241,23 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      * @param pluginRegistry
      * @throws BuildException
      */
-    protected void initImageHeader(NativeStream os, Label clInitCaller, Vm vm,
-                                   PluginRegistry pluginRegistry) throws BuildException {
+    protected void initImageHeader(NativeStream os, Label clInitCaller, Vm vm, PluginRegistry pluginRegistry)
+        throws BuildException {
         try {
             int startLength = os.getLength();
 
             VmType<?> vmCodeClass = loadClass(VmMethodCode.class);
-            final X86BinaryAssembler.ObjectInfo initObject = os
-                .startObject(vmCodeClass);
+            final NativeStream.ObjectInfo initObject = os.startObject(vmCodeClass);
             final int offset = os.getLength() - startLength;
             if (offset != JUMP_MAIN_OFFSET()) {
-                throw new BuildException("JUMP_MAIN_OFFSET is incorrect ["
-                    + offset + " instead of " + JUMP_MAIN_OFFSET()
-                    + "] (set to Object headersize)");
+                throw new BuildException("JUMP_MAIN_OFFSET is incorrect [" + offset + " instead of " +
+                    JUMP_MAIN_OFFSET() + "] (set to Object headersize)");
             }
 
-            final X86BinaryAssembler os86 = (X86BinaryAssembler) os;
-            final Label introCode = new Label("$$introCode");
+            final X86Assembler os86 = (X86Assembler) os;
+            final Label introCode = new Label("_$$introCode");
 
-            os86.setObjectRef(new Label("$$jmp-introCode"));
+            os86.setObjectRef(new Label("_$$jmp_introCode"));
             os86.writeJMP(introCode);
             initObject.markEnd();
 
@@ -282,15 +274,14 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
             loadClass(VmSystem.class);
             loadClass(VmSystemObject.class);
 
-            final X86BinaryAssembler.ObjectInfo initCodeObject = os
-                .startObject(vmCodeClass);
+            final NativeStream.ObjectInfo initCodeObject = os.startObject(vmCodeClass);
             os86.setObjectRef(introCode);
             initMain(os86, pluginRegistry);
             initVm(os86, vm);
             // initHeapManager(os86, vm);
             initVmThread(os86);
 
-            os.setObjectRef(new Label("$$Initial call to clInitCaller"));
+            os.setObjectRef(new Label("_$$Initial_call_to_clInitCaller"));
             os86.writeCALL(clInitCaller);
 
             initCallMain(os86);
@@ -321,13 +312,11 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
         final VmType<?> vmThreadClass = loadClass(VmThread.class);
 
         /* Link VmThread_systemException */
-        refJava = os.getObjectRef(vmThreadClass.getMethod("systemException",
-            "(II)Ljava/lang/Throwable;"));
+        refJava = os.getObjectRef(vmThreadClass.getMethod("systemException", "(II)Ljava/lang/Throwable;"));
         os.getObjectRef(sbcSystemException).link(refJava);
 
         /* Link VmThread_runThread */
-        refJava = os.getObjectRef(vmThreadClass.getMethod("runThread",
-            "(Lorg/jnode/vm/scheduler/VmThread;)V"));
+        refJava = os.getObjectRef(vmThreadClass.getMethod("runThread", "(Lorg/jnode/vm/scheduler/VmThread;)V"));
         os.getObjectRef(vmThreadRunThread).link(refJava);
 
         /* Link VmProcessor_reschedule */
@@ -341,18 +330,13 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
 
         /* Set statics index of VmSystem_currentTimeMillis */
         final VmType<?> vmSystemClass = loadClass(VmSystem.class);
-        final int staticsIdx = ((VmStaticField) vmSystemClass
-            .getField("currentTimeMillis")).getSharedStaticsIndex();
-        final X86BinaryAssembler os86 = (X86BinaryAssembler) os;
-        os86.set32(os.getObjectRef(new Label("currentTimeMillisStaticsIdx"))
-            .getOffset(), staticsIdx);
+        final int staticsIdx = ((VmStaticField) vmSystemClass.getField("currentTimeMillis")).getSharedStaticsIndex();
+        final X86Assembler os86 = (X86Assembler) os;
+        os86.set32(os.getObjectRef(new Label("currentTimeMillisStaticsIdx")).getOffset(), staticsIdx);
 
         /* Link vm_findThrowableHandler */
-        refJava = os
-            .getObjectRef(vmSystemClass
-                .getMethod(
-                    "findThrowableHandler",
-                    "(Ljava/lang/Throwable;Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Address;)" +
+        refJava = os.getObjectRef(vmSystemClass.getMethod("findThrowableHandler",
+            "(Ljava/lang/Throwable;Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Address;)" +
                         "Lorg/vmmagic/unboxed/Address;"));
         os.getObjectRef(vmFindThrowableHandler).link(refJava);
 
@@ -374,16 +358,12 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
 
         // Link VmX86Processor_applicationProcessorMain
         final VmType<?> x86ProcessorClass = loadClass(VmX86Processor.class);
-        refJava = os.getObjectRef(x86ProcessorClass.getMethod(
-            "applicationProcessorMain", "()V"));
-        os.getObjectRef(new Label("VmX86Processor_applicationProcessorMain"))
-            .link(refJava);
+        refJava = os.getObjectRef(x86ProcessorClass.getMethod("applicationProcessorMain", "()V"));
+        os.getObjectRef(new Label("VmX86Processor_applicationProcessorMain")).link(refJava);
 
         // Link VmX86Processor_broadcastTimeSliceInterrupt
-        refJava = os.getObjectRef(x86ProcessorClass.getMethod(
-            "broadcastTimeSliceInterrupt", "()V"));
-        os.getObjectRef(new Label("VmX86Processor_broadcastTimeSliceInterrupt"))
-            .link(refJava);
+        refJava = os.getObjectRef(x86ProcessorClass.getMethod("broadcastTimeSliceInterrupt", "()V"));
+        os.getObjectRef(new Label("VmX86Processor_broadcastTimeSliceInterrupt")).link(refJava);
     }
 
     /**
@@ -393,14 +373,12 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      * @throws BuildException
      * @throws ClassNotFoundException
      */
-    protected void initCallMain(X86BinaryAssembler os) throws BuildException,
-        ClassNotFoundException {
+    protected void initCallMain(X86Assembler os) throws BuildException, ClassNotFoundException {
         final VmType<?> vmMethodClass = loadClass(VmMethod.class);
         final VmType<?> vmMainClass = loadClass(Main.class);
         final VmMethod mainMethod = vmMainClass.getMethod(
             Main.MAIN_METHOD_NAME, Main.MAIN_METHOD_SIGNATURE);
-        final VmInstanceField nativeCodeField = (VmInstanceField) vmMethodClass
-            .getField("nativeCode");
+        final VmInstanceField nativeCodeField = (VmInstanceField) vmMethodClass.getField("nativeCode");
 
         final GPR aax = os.isCode32() ? (GPR) X86Register.EAX : X86Register.RAX;
 
@@ -416,23 +394,19 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      * @throws BuildException
      * @throws ClassNotFoundException
      */
-    protected void initVmThread(X86BinaryAssembler os) throws BuildException,
-        ClassNotFoundException {
+    protected void initVmThread(X86Assembler os) throws BuildException, ClassNotFoundException {
         final VmType<?> vmThreadClass = loadClass(VmThread.class);
-        final VmInstanceField threadStackField = (VmInstanceField) vmThreadClass
-            .getField("stack");
-        final VmInstanceField threadStackEndField = (VmInstanceField) vmThreadClass
-            .getField("stackEnd");
+        final VmInstanceField threadStackField = (VmInstanceField) vmThreadClass.getField("stack");
+        final VmInstanceField threadStackEndField = (VmInstanceField) vmThreadClass.getField("stackEnd");
         final VmType<?> vmProcessorClass = loadClass(VmProcessor.class);
-        final VmInstanceField procStackEndField = (VmInstanceField) vmProcessorClass
-            .getField("stackEnd");
+        final VmInstanceField procStackEndField = (VmInstanceField) vmProcessorClass.getField("stackEnd");
         final VmThread initialThread = processor.getCurrentThread();
 
-        final GPR abx = os.isCode32() ? (GPR) X86Register.EBX : X86Register.RBX;
-        final GPR adx = os.isCode32() ? (GPR) X86Register.EDX : X86Register.RDX;
+        final GPR abx = os.isCode32() ? X86Register.EBX : X86Register.RBX;
+        final GPR adx = os.isCode32() ? X86Register.EDX : X86Register.RDX;
         final int slotSize = arch.getReferenceSize();
 
-        os.setObjectRef(new Label("$$Setup initial thread"));
+        os.setObjectRef(new Label("_$$Setup_initial_thread"));
         os.writeMOV_Const(abx, initialThread);
 
         /** Initialize initialStack.stack to Luser_stack */
@@ -460,8 +434,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
     protected void createInitialStack(NativeStream os, Label stackLabel,
                                       Label stackPtrLabel) throws BuildException, ClassNotFoundException,
         UnresolvedObjectRefException {
-        final ObjectInfo objectInfo = os
-            .startObject(loadClass(VmSystemObject.class));
+        final ObjectInfo objectInfo = os.startObject(loadClass(VmSystemObject.class));
         final int stackOffset = os.setObjectRef(stackLabel).getOffset();
         final int stackAddr = stackOffset + (int) os.getBaseAddr();
         final int slotSize = arch.getReferenceSize();
@@ -485,14 +458,13 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      * @throws BuildException
      * @throws ClassNotFoundException
      */
-    protected void initVm(X86BinaryAssembler os, Vm vm) throws BuildException,
-        ClassNotFoundException {
-        os.setObjectRef(new Label("$$Initialize Vm"));
+    protected void initVm(X86Assembler os, Vm vm) throws BuildException, ClassNotFoundException {
+        os.setObjectRef(new Label("_$$Initialize_Vm"));
         VmType<?> vmClass = loadClass(VmUtils.class);
         VmStaticField vmField = (VmStaticField) vmClass.getField("VM_INSTANCE");
 
-        final GPR abx = os.isCode32() ? (GPR) X86Register.EBX : X86Register.RBX;
-        final GPR adi = os.isCode32() ? (GPR) X86Register.EDI : X86Register.RDI;
+        final GPR abx = os.isCode32() ? X86Register.EBX : X86Register.RBX;
+        final GPR adi = os.isCode32() ? X86Register.EDI : X86Register.RDI;
         final int slotSize = os.isCode32() ? 4 : 8;
 
         // Setup STATICS register (EDI/RDI)
@@ -500,8 +472,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
 
         /* Set Vm.instance */
         os.writeMOV_Const(abx, vm);
-        final int vmOffset = (VmArray.DATA_OFFSET * slotSize)
-            + (vmField.getSharedStaticsIndex() << 2);
+        final int vmOffset = (VmArray.DATA_OFFSET * slotSize) + (vmField.getSharedStaticsIndex() << 2);
         log("vmOffset " + NumberUtils.hex(vmOffset), Project.MSG_VERBOSE);
         os.writeMOV(abx.getSize(), adi, vmOffset, abx);
     }
@@ -514,15 +485,13 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      * @throws BuildException
      * @throws ClassNotFoundException
      */
-    protected void initMain(X86BinaryAssembler os, PluginRegistry registry)
-        throws BuildException, ClassNotFoundException {
-        os.setObjectRef(new Label("$$Initialize Main"));
+    protected void initMain(X86Assembler os, PluginRegistry registry) throws BuildException, ClassNotFoundException {
+        os.setObjectRef(new Label("_$$Initialize_Main"));
         final VmType<?> mainClass = loadClass(Main.class);
-        final VmStaticField registryField = (VmStaticField) mainClass
-            .getField(Main.REGISTRY_FIELD_NAME);
+        final VmStaticField registryField = (VmStaticField) mainClass.getField(Main.REGISTRY_FIELD_NAME);
 
-        final GPR abx = os.isCode32() ? (GPR) X86Register.EBX : X86Register.RBX;
-        final GPR adi = os.isCode32() ? (GPR) X86Register.EDI : X86Register.RDI;
+        final GPR abx = os.isCode32() ? X86Register.EBX : X86Register.RBX;
+        final GPR adi = os.isCode32() ? X86Register.EDI : X86Register.RDI;
         final int slotSize = os.isCode32() ? 4 : 8;
 
         // Setup STATICS register (EDI/RDI)
@@ -530,32 +499,28 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
 
         /* Set Main.pluginRegistry */
         os.writeMOV_Const(abx, registry);
-        final int rfOffset = (VmArray.DATA_OFFSET * slotSize)
-            + (registryField.getSharedStaticsIndex() << 2);
+        final int rfOffset = (VmArray.DATA_OFFSET * slotSize) + (registryField.getSharedStaticsIndex() << 2);
         log("rfOffset " + NumberUtils.hex(rfOffset), Project.MSG_VERBOSE);
         os.writeMOV(abx.getSize(), adi, rfOffset, abx);
     }
 
-    protected void emitStaticInitializerCalls(NativeStream nativeOs,
-                                              VmType<?>[] bootClasses, Object clInitCaller)
+    protected void emitStaticInitializerCalls(NativeStream nativeOs, VmType<?>[] bootClasses, Object clInitCaller)
         throws ClassNotFoundException {
 
-        final X86BinaryAssembler os = (X86BinaryAssembler) nativeOs;
-        X86BinaryAssembler.ObjectInfo initCallerObject = os
-            .startObject(loadClass(VmMethodCode.class));
+        final X86Assembler os = (X86Assembler) nativeOs;
+        NativeStream.ObjectInfo initCallerObject = os.startObject(loadClass(VmMethodCode.class));
 
         os.setObjectRef(clInitCaller);
 
         // Call VmClass.loadFromBootClassArray
         final VmType<?> vmClassClass = loadClass(VmType.class);
-        final VmMethod lfbcaMethod = vmClassClass.getMethod(
-            "loadFromBootClassArray", "([Lorg/jnode/vm/classmgr/VmType;)V");
+        final VmMethod lfbcaMethod = vmClassClass.getMethod("loadFromBootClassArray",
+            "([Lorg/jnode/vm/classmgr/VmType;)V");
         final VmType<?> vmMethodClass = loadClass(VmMethod.class);
-        final VmInstanceField nativeCodeField = (VmInstanceField) vmMethodClass
-            .getField("nativeCode");
+        final VmInstanceField nativeCodeField = (VmInstanceField) vmMethodClass.getField("nativeCode");
 
-        final GPR aax = os.isCode32() ? (GPR) X86Register.EAX : X86Register.RAX;
-        final GPR abx = os.isCode32() ? (GPR) X86Register.EBX : X86Register.RBX;
+        final GPR aax = os.isCode32() ? X86Register.EAX : X86Register.RAX;
+        final GPR abx = os.isCode32() ? X86Register.EBX : X86Register.RBX;
 
         os.writeMOV_Const(aax, bootClasses);
         os.writePUSH(aax);
@@ -566,13 +531,11 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
         // Now call all static initializers
         for (int i = 0; (i < bootClasses.length); i++) {
             VmType<?> vmClass = bootClasses[i];
-            if ((vmClass instanceof VmClassType)
-                && (((VmClassType<?>) vmClass).getInstanceCount() > 0)) {
+            if ((vmClass instanceof VmClassType) && (((VmClassType<?>) vmClass).getInstanceCount() > 0)) {
                 VmMethod clInit = vmClass.getMethod("<clinit>", "()V");
                 if (clInit != null) {
                     // os.setObjectRef(clInitCaller + "$$" + vmClass.getName());
-                    log("Missing static initializer in class "
-                        + vmClass.getName(), Project.MSG_WARN);
+                    log("Missing static initializer in class " + vmClass.getName(), Project.MSG_WARN);
                 }
             }
         }
@@ -635,7 +598,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
      * @throws BuildException
      */
     protected void patchHeader(NativeStream nativeOs) throws BuildException {
-        final X86BinaryAssembler os = (X86BinaryAssembler) nativeOs;
+        final X86Assembler os = (X86Assembler) nativeOs;
         int mb_hdr = -1;
         for (int i = 0; i < 1024; i += 4) {
             if (os.get32(i) == MB_MAGIC) {
@@ -649,15 +612,12 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
 
         int loadAddr = os.get32(mb_hdr + MB_LOAD_ADDR);
         if (loadAddr != os.getBaseAddr()) {
-            throw new BuildException("Non-matching load address, found 0x"
-                + Integer.toHexString(loadAddr) + ", expected 0x"
-                + Long.toHexString(os.getBaseAddr()));
+            throw new BuildException("Non-matching load address, found 0x" + Integer.toHexString(loadAddr)
+                + ", expected 0x" + Long.toHexString(os.getBaseAddr()));
         }
 
-        os.set32(mb_hdr + MB_LOAD_END_ADDR, (int) os.getBaseAddr()
-            + os.getLength());
-        os.set32(mb_hdr + MB_BSS_END_ADDR, (int) os.getBaseAddr()
-            + os.getLength());
+        os.set32(mb_hdr + MB_LOAD_END_ADDR, (int) os.getBaseAddr() + os.getLength());
+        os.set32(mb_hdr + MB_BSS_END_ADDR, (int) os.getBaseAddr() + os.getLength());
     }
 
     /**
@@ -679,16 +639,15 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
     }
 
     protected void logStatistics(NativeStream os) {
-        final X86BinaryAssembler os86 = (X86BinaryAssembler) os;
+        final X86Assembler os86 = (X86Assembler) os;
         final int count = os86.getObjectRefsCount();
         if (count > INITIAL_OBJREFS_CAPACITY) {
-            log("Increase BootImageBuilder.INITIAL_OBJREFS_CAPACITY to "
-                + count + " for faster build.", Project.MSG_WARN);
+            log("Increase BootImageBuilder.INITIAL_OBJREFS_CAPACITY to " + count + " for faster build.",
+                Project.MSG_WARN);
         }
         final int size = os86.getLength();
         if (size > INITIAL_SIZE) {
-            log("Increase BootImageBuilder.INITIAL_SIZE to " + size
-                + " for faster build.", Project.MSG_WARN);
+            log("Increase BootImageBuilder.INITIAL_SIZE to " + size + " for faster build.", Project.MSG_WARN);
         }
     }
 
@@ -763,6 +722,14 @@ public class BootImageBuilder extends AbstractBootImageBuilder {
 
             log("Compiling native kernel with JNAsm, Version " + version + ", " + i_bist + " bits");
             JNAsm.assembler(os, sourceInfo, symbols);
+            log("Compiling native kernel with JNAsm, Version " + version + ", " + i_bist + " bits done");
+
+            // Link the jump table entries
+            for (int i = 0; i < X86JumpTable.TABLE_LENGTH; i++) {
+                final Label lbl = new Label(X86JumpTable.TABLE_ENTRY_LABELS[i]);
+                final int idx = (arch.getMode().is32()) ? i : i * 2;
+                sharedStatics.setAddress(idx, lbl);
+            }
         } catch (Exception e) {
             throw new BuildException(e);
         }

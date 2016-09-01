@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -33,6 +33,10 @@ public class FloatConstant<T> extends Constant<T> {
 
     public float getValue() {
         return value;
+    }
+
+    public int getIntBits() {
+        return Float.floatToRawIntBits(value);
     }
 
     public String toString() {

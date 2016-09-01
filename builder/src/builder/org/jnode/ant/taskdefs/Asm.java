@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -95,6 +95,8 @@ public class Asm extends MatchingTask {
 
     private boolean enableJNasm;
 
+    private boolean jnasmCompatibilityEnabled;
+
     private String version;
 
     /**
@@ -125,6 +127,10 @@ public class Asm extends MatchingTask {
             cmdLine.add("nasmw.exe");
         } else {
             cmdLine.add("nasm");
+        }
+
+        if (jnasmCompatibilityEnabled) {
+            cmdLine.add("-O1");
         }
 
         cmdLine.add("-o");
@@ -184,6 +190,8 @@ public class Asm extends MatchingTask {
      * @throws BuildException Description of Exception
      */
     public void execute() throws BuildException {
+        if (enableJNasm)
+            return;
 
         if (srcdir == null) {
             throw new BuildException("Error: srcdir attribute must be set!",
@@ -202,9 +210,7 @@ public class Asm extends MatchingTask {
         }
 
         try {
-            if (!enableJNasm) {
-                executeAsm();
-            }
+            executeAsm();
         } catch (IOException ex) {
             throw new BuildException(ex);
         }
@@ -304,6 +310,9 @@ public class Asm extends MatchingTask {
 
         for (int c = 0; c < files.length; c++) {
             File aFile = new File(srcdir, files[c]);
+
+            if (!aFile.getName().endsWith(".asm"))
+                continue;
 
             // get the path within the uriroot
             String fileDirString = aFile.getParentFile().toString();
@@ -429,5 +438,9 @@ public class Asm extends MatchingTask {
      */
     public final void setVersion(String version) {
         this.version = version;
+    }
+
+    public void setJnasmCompatibilityEnabled(boolean jnasmCompatibilityEnabled) {
+        this.jnasmCompatibilityEnabled = jnasmCompatibilityEnabled;
     }
 }

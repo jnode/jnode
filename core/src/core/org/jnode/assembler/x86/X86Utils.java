@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -26,6 +26,16 @@ package org.jnode.assembler.x86;
  * @author epr
  */
 public class X86Utils {
+
+    /**
+     * Does the given value fit in an 8-bit signed byte?
+     *
+     * @param value
+     * @return boolean
+     */
+    public static boolean isUByte(int value) {
+        return ((value >= 0) && (value <= 255));
+    }
 
     /**
      * Does the given value fit in an 8-bit signed byte?

@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -1377,7 +1377,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
             writeResolveAndLoadClassToReg(classRef, classr);
             helper.writeClassInitialize(curInstrLabel, classr, tmpr, resolvedType);
 
-            final Label okLabel = new Label(curInstrLabel + "cc-ok");
+            final Label okLabel = new Label(curInstrLabel + "cc_ok");
 
             /* Is objectref null? */
             os.writeTEST(refr, refr);
@@ -1415,7 +1415,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
             final GPR tmpr = (GPR) L1AHelper.requestRegister(eContext,
                 JvmType.REFERENCE, false);
 
-            final Label okLabel = new Label(curInstrLabel + "cc-ok");
+            final Label okLabel = new Label(curInstrLabel + "cc_ok");
 
             // Is objectref null?
             os.writeTEST(refr, refr);
@@ -2670,8 +2670,8 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor {
             writeResolveAndLoadClassToReg(classRef, classr);
             helper.writeClassInitialize(curInstrLabel, classr, tmpr, resolvedType);
 
-            final Label trueLabel = new Label(curInstrLabel + "io-true");
-            final Label endLabel = new Label(curInstrLabel + "io-end");
+            final Label trueLabel = new Label(curInstrLabel + "io_true");
+            final Label endLabel = new Label(curInstrLabel + "io_end");
 
             /* Is instanceof? */
             instanceOf(refr, classr, tmpr, cntr, trueLabel, false);

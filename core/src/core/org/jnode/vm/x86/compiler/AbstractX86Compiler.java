@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -100,14 +100,14 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler {
                 .getVmMethodCodeClass());
             // Start the code creation
             cm.setCodeStart(os.setObjectRef(new Label(method.getMangledName()
-                + "$$abstract-start")));
+                + "$$abstract_start")));
             // Call abstract method error method
             helper.writeJumpTableJMP(X86JumpTable.VM_INVOKE_ABSTRACT_IDX);
             // Close the "object"
             objectInfo.markEnd();
             // The end
             cm.setCodeEnd(os.setObjectRef(new Label(method.getMangledName()
-                + "$$abstract-end")));
+                + "$$abstract_end")));
 
             return cm;
         } else {

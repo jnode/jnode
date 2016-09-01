@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -188,12 +188,10 @@ public class Elf {
             sections.addElement(bssSection = Section.newBssSection(this));
 
             // Add a .rel.text section
-            sections.addElement(reltextSection = Section.newRelTabSection(this,
-                symSection, textSection));
+            sections.addElement(reltextSection = Section.newRelTabSection(this, symSection, textSection));
 
             // Add a .rel.data section
-            sections.addElement(reldataSection = Section.newRelTabSection(this,
-                symSection, dataSection));
+            sections.addElement(reldataSection = Section.newRelTabSection(this, symSection, dataSection));
         }
     }
 
@@ -241,8 +239,7 @@ public class Elf {
             final Symbol sym;
             if (ref.isResolved()) {
                 try {
-                    sym = new Symbol(elf, obj.toString(), ref.getOffset(),
-                        textSection);
+                    sym = new Symbol(elf, obj.toString(), ref.getOffset(), textSection);
                 } catch (UnresolvedObjectRefException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -376,8 +373,7 @@ public class Elf {
     }
 
     public Section getSection(int index) {
-        return ((index >= 0) && (index < getNoSections())) ? (Section) sections
-            .elementAt(index) : null;
+        return ((index >= 0) && (index < getNoSections())) ? sections.elementAt(index) : null;
     }
 
     public Section getSectionByName(String name) {
@@ -430,15 +426,13 @@ public class Elf {
             e_shnum = LoadUtil.little16(in);
             e_shstrndx = LoadUtil.little16(in);
 
-            if (!((e_ident[0] == 0x7F) && (e_ident[1] == 'E')
-                && (e_ident[2] == 'L') && (e_ident[3] == 'F'))) {
+            if (!((e_ident[0] == 0x7F) && (e_ident[1] == 'E') && (e_ident[2] == 'L') && (e_ident[3] == 'F'))) {
                 throw new IOException("Not Elf Format :" + filename);
             }
 
             final int expectedMachine = (isClass32()) ? EM_386 : EM_X86_64;
             if (e_machine != expectedMachine) {
-                throw new IOException("Not Match CPU Type (" + e_machine + "):"
-                    + filename);
+                throw new IOException("Not Match CPU Type (" + e_machine + "):" + filename);
             }
 
             // Load the program header (ignored for now)
@@ -524,18 +518,15 @@ public class Elf {
         for (i = 1; i < getNoSections(); i++) {
             Section s = getSection(i);
             if (s.getOffset() != ofs) {
-                throw new RuntimeException(
-                    "Strange, offset mismatch in section-body (section="
-                        + i + ", ofs=" + ofs + ", expected="
-                        + s.getOffset());
+                throw new RuntimeException("Strange, offset mismatch in section-body (section=" + i + ", ofs=" + ofs
+                    + ", expected=" + s.getOffset());
             }
             ofs += s.storeBody(out);
             // align
             while ((ofs % ALIGN) != 0) {
                 ofs += StoreUtil.little8(out, 0);
             }
-            System.out.println("store section " + i + ", ofs=" + ofs
-                + ", name=" + s.getName());
+            System.out.println("store section " + i + ", ofs=" + ofs + ", name=" + s.getName());
         }
 
         // Write the section headers
@@ -551,20 +542,16 @@ public class Elf {
     public void print() {
         System.out.println("----- Elf Header -----");
         System.out.println("e_type        : " + Integer.toString(e_type, 16));
-        System.out
-            .println("e_machine     : " + Integer.toString(e_machine, 16));
-        System.out
-            .println("e_version     : " + Integer.toString(e_version, 16));
+        System.out.println("e_machine     : " + Integer.toString(e_machine, 16));
+        System.out.println("e_version     : " + Integer.toString(e_version, 16));
         System.out.println("e_entry       : " + Long.toString(e_entry, 16));
         // System.out.println( "e_phentsize : " + Integer.toString( e_phentsize,
         // 16));
         // System.out.println( "e_phnum : " + Integer.toString( e_phnum, 16));
         System.out.println("e_phoff       : " + Long.toString(e_phoff, 16));
-        System.out.println("e_shnum       : "
-            + Integer.toString(getNoSections(), 16));
+        System.out.println("e_shnum       : " + Integer.toString(getNoSections(), 16));
         System.out.println("e_shoff       : " + Long.toString(e_shoff, 16));
-        System.out.println("e_shstrndx    : "
-            + Integer.toString(e_shstrndx, 16));
+        System.out.println("e_shstrndx    : " + Integer.toString(e_shstrndx, 16));
         System.out.println(" ----- BRK ----- ");
         // System.out.println(" strtab = [" + strtab + "]");
         for (int i = 1; i < getNoSections(); i++) {

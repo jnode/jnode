@@ -2,7 +2,7 @@
 <!--
     $Id$
 
-    Copyright (C) 2003-2014 JNode.org
+    Copyright (C) 2003-2015 JNode.org
 
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
@@ -192,6 +192,7 @@
 		<pathelement location="${jnode-gui-test.jar}"/>
 		<pathelement location="${jnode-cli-test.jar}"/>
 		<pathelement location="${jnode-textui-test.jar}"/>
+		<pathelement location="${root.dir}/builder/build/testclasses"/>
 		<pathelement location="${root.dir}/shell/lib/nanoxml-2.2.3.jar"/>
 		<path refid="cp-jnode"/>
 	</path>
@@ -221,12 +222,13 @@
 			</condition>
 		</fail>
 
-		<fail message="Java Runtime version 1.6 or 1.7 needed. Your version is: ${java.runtime.version}">
+		<fail message="Java Runtime version 1.6, 1.7 or 1.8 needed. Your version is: ${java.runtime.version}">
 			<condition>
 				<not>
 					<or>
 						<contains string="${java.runtime.version}" substring="1.6" casesensitive="false"/>
 						<contains string="${java.runtime.version}" substring="1.7" casesensitive="false"/>
+						<contains string="${java.runtime.version}" substring="1.8" casesensitive="false"/>
 					</or>
 				</not>
 			</condition>
@@ -237,6 +239,7 @@
 		<!-- Set overwritable properties -->
 		<property name="jnode.memmgr.plugin.id" value="org.jnode.vm.memmgr.def"/>
 		<property name="compilerarg" value="-nowarn"/>
+		<property name="jnode.enable.jnasm" value="true"/>
 
 		<!-- Derive properties -->
 		<property name="jnode-mmtk.jar" value="${root.dir}/core/build/classes-plan/${jnode.memmgr.plugin.id}"/>
@@ -844,25 +847,52 @@ clean             Remove all intermediate build results.
 	<target name="hotswap" depends="check-debugger-properties,assemble-projects" description="hotswap the modified classes">
 		<taskdef name="hotswap" classname="org.jnode.ant.taskdefs.Hotswap" classpathref="cp-jnode" />
 		<hotswap verbose="true" host="${jnode.debugger.host}" port="${jnode.debugger.port}">
+			<fileset dir="../cli/build/classes/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
+			<fileset dir="../cli/build/testclasses/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
 			<fileset dir="../core/build/classes/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
+			<fileset dir="../core/build/testclasses/" includes="**/*.class">
 				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
 			</fileset>
 			<fileset dir="../distr/build/classes/" includes="**/*.class">
 				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
 			</fileset>
+			<fileset dir="../distr/build/testclasses/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
 			<fileset dir="../fs/build/classes/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
+			<fileset dir="../fs/build/testclasses/" includes="**/*.class">
 				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
 			</fileset>
 			<fileset dir="../gui/build/classes/" includes="**/*.class">
 				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
 			</fileset>
+			<fileset dir="../gui/build/testclasses/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
 			<fileset dir="../net/build/classes/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
+			<fileset dir="../net/build/testclasses/" includes="**/*.class">
 				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
 			</fileset>
 			<fileset dir="../shell/build/classes/" includes="**/*.class">
 				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
 			</fileset>
+			<fileset dir="../shell/build/testclasses/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
 			<fileset dir="../textui/build/classes/" includes="**/*.class">
+				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
+			<fileset dir="../textui/build/testclasses/" includes="**/*.class">
 				<date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
 			</fileset>
 		</hotswap>
@@ -1091,6 +1121,7 @@ clean             Remove all intermediate build results.
 		<checkstyle config="jnode_checks.xml">
 			<fileset dir="../builder/src/builder" includes="**/*.java"/>
 			<fileset dir="../builder/src/configure" includes="**/*.java"/>
+			<fileset dir="../builder/src/test" includes="**/*.java"/>
 			<fileset dir="../cli/src/commands" includes="**/*.java"/>
 			<fileset dir="../core/src/core" includes="**/*.java"/>
 			<fileset dir="../core/src/driver" includes="**/*.java"/>
@@ -1153,6 +1184,10 @@ clean             Remove all intermediate build results.
 			<class location="./build/plugins/org.jnode.security_${jnode-ver}.jar"/>
 			<class location="./build/plugins/org.jnode.system.repository_${jnode-ver}.jar"/>
 		</findbugs>
+	</target>
+
+	<target name="regression-tests" depends="assemble-plugins">
+		<ant target="regression-tests" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
 	</target>
 
 	<!-- TODO Create a patch create replacement SVN task -->

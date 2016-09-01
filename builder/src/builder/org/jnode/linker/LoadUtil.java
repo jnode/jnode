@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -198,8 +198,7 @@ public class LoadUtil {
      * @return the address
      * @throws IOException
      */
-    public static long loadAddr(RandomAccessFile in, byte[] e_ident)
-        throws IOException {
+    public static long loadAddr(RandomAccessFile in, byte[] e_ident) throws IOException {
         if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
             return little32(in);
         } else {
@@ -215,8 +214,7 @@ public class LoadUtil {
      * @return the address
      * @throws IOException
      */
-    public static long loadAddr(InputStream in, byte[] e_ident)
-        throws IOException {
+    public static long loadAddr(InputStream in, byte[] e_ident) throws IOException {
         if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
             return little32(in);
         } else {
@@ -232,8 +230,7 @@ public class LoadUtil {
      * @return the offset
      * @throws IOException
      */
-    public static long loadOff(RandomAccessFile in, byte[] e_ident)
-        throws IOException {
+    public static long loadOff(RandomAccessFile in, byte[] e_ident) throws IOException {
         if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
             return little32(in);
         } else {
@@ -249,8 +246,7 @@ public class LoadUtil {
      * @return the offset
      * @throws IOException
      */
-    public static long loadOff(InputStream in, byte[] e_ident)
-        throws IOException {
+    public static long loadOff(InputStream in, byte[] e_ident) throws IOException {
         if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
             return little32(in);
         } else {
@@ -266,8 +262,7 @@ public class LoadUtil {
      * @return the xword
      * @throws IOException
      */
-    public static long loadXword(RandomAccessFile in, byte[] e_ident)
-        throws IOException {
+    public static long loadXword(RandomAccessFile in, byte[] e_ident) throws IOException {
         if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
             return little32(in);
         } else {
@@ -283,13 +278,11 @@ public class LoadUtil {
      * @return the xword
      * @throws IOException
      */
-    public static long loadXword(InputStream in, byte[] e_ident)
-        throws IOException {
+    public static long loadXword(InputStream in, byte[] e_ident) throws IOException {
         if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
             return little32(in);
         } else {
             return little64(in);
         }
     }
-
 }

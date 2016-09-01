@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -100,7 +100,6 @@ public class TaskBar extends JPanel {
         awtMenu.add(createMenuItem("AWTMenuBuilderTest", "org.jnode.test.gui.AWTMenuBuilderTest"));
         awtMenu.add(createMenuItem("AWTMenuTest", "org.jnode.test.gui.AWTMenuTest"));
         awtMenu.add(createMenuItem("AWTTest", "org.jnode.test.gui.AWTTest"));
-        awtMenu.add(createMenuItem("AWTTest2", "org.jnode.test.gui.AWTTest2"));
         awtMenu.add(createMenuItem("RobotTest", "org.jnode.test.gui.RobotTest"));
 
         JMenu swingMenu = new JMenu("Swing tests");
@@ -264,6 +263,7 @@ public class TaskBar extends JPanel {
         @Override
         public void run() {
             ((JNodeToolkit) Toolkit.getDefaultToolkit()).changeScreenSize(config);
+            desktop.desktopFrame.getAwtRoot().repaint();
             AccessController.doPrivileged(new SetPropertyAction("jnode.awt.screensize", config.toString()));
         }
 

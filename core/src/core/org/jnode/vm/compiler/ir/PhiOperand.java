@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,6 +21,7 @@
 package org.jnode.vm.compiler.ir;
 
 import java.util.List;
+import org.jnode.vm.compiler.ir.quad.AssignQuad;
 import org.jnode.vm.objects.BootableArrayList;
 
 /**
@@ -49,9 +50,11 @@ public class PhiOperand<T> extends Operand<T> {
             setType(source.getType());
             Variable<T> v = source;
             varIndex = v.getIndex();
-        } else if (type != source.getType()) {
-            throw new AssertionError("phi operand source types don't match");
         }
+        //todo investigate this case
+//        else if (type != source.getType()) {
+//            throw new AssertionError("phi operand source types don't match");
+//        }
     }
 
     public String toString() {
@@ -98,7 +101,10 @@ public class PhiOperand<T> extends Operand<T> {
             if (op instanceof StackVariable || op instanceof LocalVariable) {
                 sources.set(i, op);
             } else {
-                src.getAssignQuad().setDeadCode(false);
+                AssignQuad<T> assignQuad = src.getAssignQuad();
+                if (assignQuad != null) {
+                    assignQuad.setDeadCode(false);
+                }
             }
         }
         return this;

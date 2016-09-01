@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -27,7 +27,7 @@ import org.jnode.fs.ext2.INode;
 /**
  * @author Andras Nagy
  */
-public class INodeCache extends Hashtable<Object, INode> {
+public class INodeCache extends Hashtable<Long, INode> {
     private static final long serialVersionUID = 1L;
 
     public INodeCache(int initialCapacity, float loadFactor) {

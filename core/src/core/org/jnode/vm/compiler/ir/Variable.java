@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -136,6 +136,8 @@ public abstract class Variable<T> extends Operand<T> implements Cloneable {
             return AddressingMode.STACK;
         } else if (location instanceof RegisterLocation) {
             return AddressingMode.REGISTER;
+        } else if (location instanceof TopStackLocation) {
+            return AddressingMode.TOPS;
         } else {
             throw new IllegalArgumentException("Undefined location: " + toString());
         }

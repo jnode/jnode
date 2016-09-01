@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -61,6 +61,14 @@ public abstract class Operand<T> {
      * @param type
      */
     public void setType(int type) {
+        this.type = type;
+    }
+
+    /**
+     * @param type
+     */
+    public void setTypeFromJvmType(int type) {
+        //operand type and JVM type are the same
         this.type = type;
     }
 

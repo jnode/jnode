@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -22,37 +22,45 @@ package org.jnode.vm.compiler.ir.quad;
 
 public enum BinaryOperation {
     IADD("+"),
-    LADD("+"),
-    FADD("+"),
-    DADD("+"),
     ISUB("-"),
-    LSUB("-"),
-    FSUB("-"),
-    DSUB("-"),
     IMUL("*"),
-    LMUL("*"),
-    FMUL("*"),
-    DMUL("*"),
     IDIV("/"),
-    LDIV("/"),
-    FDIV("/"),
-    DDIV("/"),
     IREM("%"),
-    LREM("%"),
-    FREM("%"),
-    DREM("%"),
     ISHL("<<"),
-    LSHL("<<"),
     ISHR(">>"),
-    LSHR(">>"),
     IUSHR(">>>"),
-    LUSHR(">>>"),
     IAND("&"),
-    LAND("&"),
     IOR("|"),
-    LOR("|"),
     IXOR("^"),
-    LXOR("^");
+
+    LADD("+"),
+    LSUB("-"),
+    LMUL("*"),
+    LDIV("/"),
+    LREM("%"),
+    LSHL("<<"),
+    LSHR(">>"),
+    LUSHR(">>>"),
+    LAND("&"),
+    LOR("|"),
+    LXOR("^"),
+    LCMP("lcmp"),
+
+    FADD("+"),
+    FSUB("-"),
+    FMUL("*"),
+    FDIV("/"),
+    FREM("%"),
+    FCMPG("fcmpg"),
+    FCMPL("fcmpl"),
+
+    DADD("+"),
+    DSUB("-"),
+    DMUL("*"),
+    DDIV("/"),
+    DREM("%"),
+    DCMPG("dcmpg"),
+    DCMPL("dcmpl");
 
     private final String v;
 

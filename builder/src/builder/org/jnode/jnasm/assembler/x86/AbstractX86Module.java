@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003-2014 JNode.org
+ * Copyright (C) 2003-2015 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -28,6 +28,7 @@ import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.jnasm.assembler.Address;
 import org.jnode.jnasm.assembler.AssemblerModule;
+import org.jnode.jnasm.assembler.Instruction;
 import org.jnode.jnasm.assembler.Register;
 
 /**
@@ -51,9 +52,11 @@ public abstract class AbstractX86Module extends AssemblerModule {
     static final int C_ADDR = CON_ARG;
     static final int R_ADDR = REG_ARG;
     static final int RR_ADDR = REG_ARG | REG_ARG << DISP;
+    static final int RRR_ADDR = REG_ARG | REG_ARG << DISP | REG_ARG << 2 * DISP;
     static final int RRC_ADDR = REG_ARG | REG_ARG << DISP | CON_ARG << 2 * DISP;
     static final int RC_ADDR = REG_ARG | CON_ARG << DISP;
     static final int RE_ADDR = REG_ARG | REL_ARG << DISP;
+    static final int REC_ADDR = REG_ARG | REL_ARG << DISP | CON_ARG << 2 * DISP;
     static final int RA_ADDR = REG_ARG | ABS_ARG << DISP;
     static final int RS_ADDR = REG_ARG | SCL_ARG << DISP;
     static final int RZ_ADDR = REG_ARG | ZSC_ARG << DISP;
@@ -71,6 +74,7 @@ public abstract class AbstractX86Module extends AssemblerModule {
     static final int GC_ADDR = SEG_ARG | CON_ARG << DISP;
     static final int RG_ADDR = REG_ARG | SEG_ARG << DISP;
     final Object[] args = new Object[3];
+    Instruction instruction;
     List<Object> operands;
     int operandSize;
     X86Assembler stream;
@@ -108,14 +112,12 @@ public abstract class AbstractX86Module extends AssemblerModule {
                         ret |= SEG_ARG << DISP * i;
                     } else if (ind.reg != null && ind.sreg != null) {
                         ret |= SCL_ARG << DISP * i;
-                    } else if (ind.reg != null && ind.sreg == null) {
+                    } else if (ind.reg != null) {
                         ret |= REL_ARG << DISP * i;
-                    } else if (ind.reg == null && ind.sreg != null) {
+                    } else if (ind.sreg != null) {
                         ret |= ZSC_ARG << DISP * i;
-                    } else if (ind.reg == null && ind.sreg == null) {
-                        ret |= ABS_ARG << DISP * i;
                     } else {
-                        throw new IllegalArgumentException("Unknown indirect: " + ind);
+                        ret |= ABS_ARG << DISP * i;
                     }
                 } else {
                     throw new IllegalArgumentException("Unknown operand: " + o + " " + o.getClass().getName());
@@ -131,7 +133,7 @@ public abstract class AbstractX86Module extends AssemblerModule {
     }
 
     final int getInt(int i) {
-        return ((Integer) args[i]).intValue();
+        return (Integer) args[i];
     }
 
     final X86Register.GPR getReg(int i) {
@@ -154,11 +156,15 @@ public abstract class AbstractX86Module extends AssemblerModule {
             "Unknown addressing mode " + addressing + " (" + err + " ) for " + getMnemonics()[instruction]);
     }
 
-    static final X86Register.GPR getRegister(String name) {
+    static X86Register.GPR getRegister(String name) {
         return X86Register.getGPR(name);
     }
 
-    static final X86Register.MMX getRegisterMMX(String name) {
+    static X86Register.MMX getRegisterMMX(String name) {
         return (X86Register.MMX) X86Register.getRegister(name);
+    }
+
+    static X86Register.FPU getRegisterFPU(String name) {
+        return (X86Register.FPU) X86Register.getRegister(name);
     }
 }
