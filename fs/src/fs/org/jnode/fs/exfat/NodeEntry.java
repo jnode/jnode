@@ -137,6 +137,15 @@ public final class NodeEntry extends AbstractFSObject implements FSEntry, FSEntr
         return node;
     }
 
+    /**
+     * Gets the index of this node entry.
+     *
+     * @return the index.
+     */
+    public int getIndex() {
+        return index;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
