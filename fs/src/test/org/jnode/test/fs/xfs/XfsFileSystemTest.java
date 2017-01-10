@@ -54,9 +54,9 @@ public class XfsFileSystemTest {
         String expectedStructure =
             "type: XFS vol:null total:0 free:0\n" +
             "  /; \n" +
-            "    Respect.jpg; 15277; 0c40d6e47da5da196e3bd85026512262\n" +
+            "    Respect.jpg; 15277; c044bc1808d00fce44c8b7fa75d347df\n" +
             "    info; \n" +
-            "      failed_debian_boot.jpg; 416928; c99acf3886d8ee9a1ffe7c796cdd0006\n";
+            "      failed_debian_boot.jpg; 416928; 269ba81ff51ab6686ab97dbdcceb3d03\n";
 
         DataStructureAsserts.assertStructure(fs, expectedStructure);
     }

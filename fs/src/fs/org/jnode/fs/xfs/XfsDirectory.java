@@ -1,15 +1,17 @@
 package org.jnode.fs.xfs;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import org.jnode.fs.FSDirectoryId;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.spi.AbstractFSDirectory;
 import org.jnode.fs.spi.FSEntryTable;
+import org.jnode.fs.xfs.directory.DirectoryDataEntry;
+import org.jnode.fs.xfs.directory.DirectoryDataHeader;
 import org.jnode.fs.xfs.inode.INode;
-import org.jnode.fs.xfs.inode.ShortFormDirectoryEntry;
-import org.jnode.util.BigEndian;
+import org.jnode.fs.xfs.directory.ShortFormDirectoryEntry;
 
 /**
  * A XFS directory.
@@ -53,7 +55,8 @@ public class XfsDirectory extends AbstractFSDirectory implements FSDirectoryId {
 
     @Override
     public FSEntry getEntryById(String id) throws IOException {
-        return null;
+        checkEntriesLoaded();
+        return getEntryTable().getById(id);
     }
 
     @Override
@@ -64,11 +67,22 @@ public class XfsDirectory extends AbstractFSDirectory implements FSDirectoryId {
             case XfsConstants.XFS_DINODE_FMT_LOCAL:
                 // Entries are stored within the inode record itself
 
-                int fourByteEntries = BigEndian.getUInt8(inode.getData(), INode.DATA_OFFSET);
-                int eightByteEntries = BigEndian.getUInt8(inode.getData(), INode.DATA_OFFSET + 1);
+                int fourByteEntries = inode.getUInt8(INode.DATA_OFFSET);
+                int eightByteEntries = inode.getUInt8(INode.DATA_OFFSET + 1);
                 int recordSize = fourByteEntries > 0 ? 4 : 8;
                 int entryCount = fourByteEntries > 0 ? fourByteEntries : eightByteEntries;
                 int offset = INode.DATA_OFFSET + inode.getOffset() + 0x6;
+
+                // The local storage doesn't store the relative directory entries, so add these in manually
+                XfsDirectory parent = (XfsDirectory) entry.getParent();
+                entries.add(new XfsEntry(inode, ".", 0, fileSystem, parent));
+                if (parent == null) {
+                    // This is the root, just add it again
+                    entries.add(new XfsEntry(inode, "..", 1, fileSystem, null));
+                } else {
+                    entries.add(new XfsEntry(parent.inode, "..", 1, fileSystem, parent.entry.getParent()));
+                }
+                entryCount += entries.size();
 
                 while (entries.size() < entryCount) {
                     ShortFormDirectoryEntry entry = new ShortFormDirectoryEntry(inode.getData(), offset, recordSize);
@@ -86,11 +100,16 @@ public class XfsDirectory extends AbstractFSDirectory implements FSDirectoryId {
                 break;
 
             case XfsConstants.XFS_DINODE_FMT_EXTENTS:
-                /*
-                The actual directory entries are located in another filesystem
-                                block, the inode contains an array of extents to these filesystem blocks (xfs_bmbt_rec_t*).
-                 */
-                throw new UnsupportedOperationException();
+                ByteBuffer buffer = ByteBuffer.allocate((int) entry.getINode().getSize());
+                entry.read(0, buffer);
+
+                DirectoryDataHeader header = new DirectoryDataHeader(buffer.array(), 0);
+                for (DirectoryDataEntry dataEntry : header.readEntries(fileSystem.getSuperblock().getBlockSize())) {
+                    INode childInode = fileSystem.getInodeBTree().getINode(dataEntry.getINumber());
+                    entries.add(new XfsEntry(childInode, dataEntry.getName(), entries.size(), fileSystem, this));
+                }
+
+                break;
 
             case XfsConstants.XFS_DINODE_FMT_BTREE:
                 /*

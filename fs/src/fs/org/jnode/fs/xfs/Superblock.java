@@ -2,9 +2,8 @@ package org.jnode.fs.xfs;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
-
-import static org.jnode.emu.DeviceManager.log;
 
 /**
  * The XFS superblock ('xfs_sb').
@@ -12,6 +11,11 @@ import static org.jnode.emu.DeviceManager.log;
  * @author Luke Quinane
  */
 public class Superblock extends XfsRecord {
+
+    /**
+     * The logger.
+     */
+    private static final Logger log = Logger.getLogger(Superblock.class);
 
     /**
      * The size of the super block.
@@ -53,8 +57,8 @@ public class Superblock extends XfsRecord {
      *
      * @return the block size.
      */
-    public long getBlockSize() {
-        return getUInt32(0x4);
+    public int getBlockSize() {
+        return (int) getUInt32(0x4);
     }
 
     /**

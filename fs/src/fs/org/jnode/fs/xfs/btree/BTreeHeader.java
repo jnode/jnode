@@ -66,4 +66,10 @@ public abstract class BTreeHeader<T extends BTreeRecord> extends XfsRecord {
      * @return the records.
      */
     public abstract List<T> readRecords();
+
+    @Override
+    public String toString() {
+        return String.format("btree-header:[level:%d records:%d left:%x right:%x]", getLevel(), getRecordCount(),
+            getLeftSib(), getRightSib());
+    }
 }

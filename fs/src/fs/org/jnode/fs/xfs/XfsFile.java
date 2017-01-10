@@ -33,7 +33,7 @@ public class XfsFile extends AbstractFSFile {
 
     @Override
     public void read(long fileOffset, ByteBuffer dest) throws IOException {
-        // TODO
+        entry.read(fileOffset, dest);
     }
 
     @Override

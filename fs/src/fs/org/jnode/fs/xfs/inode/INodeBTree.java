@@ -19,6 +19,11 @@ public class INodeBTree {
     private static final int ROOT_INODES_OFFSET = 0x8000;
 
     /**
+     * The number of inodes per-chunk.
+     */
+    public static final int INODE_CHUNK_COUNT = 64;
+
+    /**
      * The root header record.
      */
     private INodeBTreeHeader header;
@@ -38,7 +43,7 @@ public class INodeBTree {
     public INodeBTree(XfsFileSystem fileSystem, AllocationGroupINode agINode) throws IOException {
         this.fileSystem = fileSystem;
 
-        ByteBuffer buffer = ByteBuffer.allocate((int) fileSystem.getSuperblock().getBlockSize());
+        ByteBuffer buffer = ByteBuffer.allocate(fileSystem.getSuperblock().getBlockSize());
         fileSystem.readBlocks(agINode.getRootBlock(), buffer);
         header = new INodeBTreeHeader(buffer.array());
     }
@@ -52,24 +57,31 @@ public class INodeBTree {
      */
     public INode getINode(long inode) throws IOException {
         List<INodeBTreeRecord> records = header.readRecords();
+        int chunkNumber = 0;
+        boolean foundMatch = false;
+
         for (int i = 0; i < records.size(); i++) {
             INodeBTreeRecord record = records.get(i);
-            long startInode = record.getStartIno();
 
-            if (startInode + 64 < inode) {
+            if (record.containsInode(inode)) {
                 // Matching block...
-                // TODO: use this block
+                foundMatch = true;
+                break;
             }
 
+            chunkNumber++;
         }
 
+        int blockSize = fileSystem.getSuperblock().getBlockSize();
         int inodeSize = fileSystem.getSuperblock().getInodeSize();
-        int offset = (int) ((inode - 128) * inodeSize);
+        int chunkSize = inodeSize * INODE_CHUNK_COUNT;
+        int offset = (int) ((inode % INODE_CHUNK_COUNT) * inodeSize);
 
-        byte[] data = new byte[(int) fileSystem.getSuperblock().getBlockSize()];
+
+        byte[] data = new byte[chunkSize];
 
         ByteBuffer buffer = ByteBuffer.allocate(data.length);
-        fileSystem.getApi().read(ROOT_INODES_OFFSET, buffer);
+        fileSystem.getApi().read(ROOT_INODES_OFFSET + chunkNumber * chunkSize, buffer);
         buffer.position(0);
         buffer.get(data);
 

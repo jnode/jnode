@@ -35,6 +35,15 @@ public class INodeBTreeRecord extends XfsObject implements BTreeRecord {
     }
 
     /**
+     * Gets the number of used inodes.
+     *
+     * @return the used count.
+     */
+    public long getRecordCount() {
+        return INodeBTree.INODE_CHUNK_COUNT - getFreeCount();
+    }
+
+    /**
      * Gets the number of free inodes.
      *
      * @return the free count.
@@ -50,5 +59,21 @@ public class INodeBTreeRecord extends XfsObject implements BTreeRecord {
      */
     public long getFree() {
         return getInt64(0x8);
+    }
+
+    /**
+     * Checks whether an inode is contained within this B-tree record.
+     *
+     * @param inode the inode to check.
+     * @return {@code true} if the inode is contained in this record.
+     */
+    public boolean containsInode(long inode) {
+        return inode >= getStartIno() && inode < getStartIno() + getRecordCount();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("b-tree record:[start-ino:%d free-count:%d free-mask:%x]", getStartIno(), getFreeCount(),
+            getFree());
     }
 }

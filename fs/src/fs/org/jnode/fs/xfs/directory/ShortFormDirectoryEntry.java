@@ -1,4 +1,4 @@
-package org.jnode.fs.xfs.inode;
+package org.jnode.fs.xfs.directory;
 
 import java.io.UnsupportedEncodingException;
 import org.jnode.fs.xfs.XfsObject;
@@ -75,5 +75,10 @@ public class ShortFormDirectoryEntry extends XfsObject {
      */
     public int getLength() {
         return getNameLength() + 0x7;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("short-dir-entry:[inum: %d name:%s]", getINumber(), getName());
     }
 }

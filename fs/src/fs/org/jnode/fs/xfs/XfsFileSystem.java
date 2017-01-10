@@ -108,7 +108,19 @@ public class XfsFileSystem extends AbstractFileSystem<XfsEntry> {
      * @throws IOException if an error occurs.
      */
     public void readBlocks(long startBlock, ByteBuffer dest) throws IOException {
-        getApi().read(superblock.getBlockSize() * startBlock, dest);
+        readBlocks(startBlock, 0, dest);
+    }
+
+    /**
+     * Reads block from the file system.
+     *
+     * @param startBlock the start block.
+     * @param blockOffset the offset within the block to start reading from.
+     * @param dest the destination to read into.
+     * @throws IOException if an error occurs.
+     */
+    public void readBlocks(long startBlock, int blockOffset, ByteBuffer dest) throws IOException {
+        getApi().read(superblock.getBlockSize() * startBlock + blockOffset, dest);
     }
 
     /**

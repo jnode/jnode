@@ -50,11 +50,25 @@ public class AllocationGroupINode extends XfsRecord {
     }
 
     /**
+     * Gets the
+     *
+     * @return the
+     */
+    public long getLength() {
+        return getUInt32(0xc);
+    }
+
+    /**
      * Gets the root block number.
      *
      * @return the root block number.
      */
     public long getRootBlock() {
         return getUInt32(0x14);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("AI-inode:[length:%d root-block:0x%x]", getLength(), getRootBlock());
     }
 }

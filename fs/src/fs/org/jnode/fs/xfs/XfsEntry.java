@@ -1,11 +1,15 @@
 package org.jnode.fs.xfs;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntryCreated;
 import org.jnode.fs.FSEntryLastAccessed;
 import org.jnode.fs.spi.AbstractFSEntry;
 import org.jnode.fs.util.UnixFSConstants;
+import org.jnode.fs.xfs.extent.DataExtent;
 import org.jnode.fs.xfs.inode.INode;
 
 /**
@@ -26,6 +30,16 @@ public class XfsEntry extends AbstractFSEntry implements FSEntryCreated, FSEntry
     private final long directoryRecordId;
 
     /**
+     * The file system.
+     */
+    private final XfsFileSystem fileSystem;
+
+    /**
+     * The list of extents when the data format is 'XFS_DINODE_FMT_EXTENTS'.
+     */
+    private List<DataExtent> extentList;
+
+    /**
      * Creates a new entry.
      *
      * @param inode the inode.
@@ -39,6 +53,7 @@ public class XfsEntry extends AbstractFSEntry implements FSEntryCreated, FSEntry
 
         this.inode = inode;
         this.directoryRecordId = directoryRecordId;
+        this.fileSystem = fileSystem;
     }
 
     @Override
@@ -68,6 +83,89 @@ public class XfsEntry extends AbstractFSEntry implements FSEntryCreated, FSEntry
      */
     public INode getINode() {
         return inode;
+    }
+
+    /**
+     * Reads from this entry's data.
+     *
+     * @param offset the offset to read from.
+     * @param destBuf the destination buffer.
+     * @throws IOException if an error occurs reading.
+     */
+    public void read(long offset, ByteBuffer destBuf) throws IOException {
+        if (offset + destBuf.remaining() > inode.getSize()) {
+            throw new IOException("Reading past the end of the entry. Offset: " + offset + " entry: " + this);
+        }
+
+        readUnchecked(offset, destBuf);
+    }
+
+    /**
+     * A read implementation that doesn't check the file length.
+     *
+     * @param offset the offset to read from.
+     * @param destBuf the destination buffer.
+     * @throws IOException if an error occurs reading.
+     */
+    public void readUnchecked(long offset, ByteBuffer destBuf) throws IOException {
+        switch (inode.getFormat()) {
+            case XfsConstants.XFS_DINODE_FMT_LOCAL:
+                throw new UnsupportedOperationException();
+
+            case XfsConstants.XFS_DINODE_FMT_EXTENTS:
+                if (extentList == null) {
+                    extentList = new ArrayList<DataExtent>();
+
+                    for (int i = 0; i < inode.getExtentCount(); i++) {
+                        int extentOffset = inode.getOffset() + INode.DATA_OFFSET + i * DataExtent.PACKED_LENGTH;
+                        DataExtent extent = new DataExtent(inode.getData(), extentOffset);
+                        extentList.add(extent);
+                    }
+                }
+
+                readFromExtentList(offset, destBuf);
+                return;
+
+            case XfsConstants.XFS_DINODE_FMT_BTREE:
+                throw new UnsupportedOperationException();
+
+            default:
+                throw new IllegalStateException("Unexpected format: " + inode.getFormat());
+        }
+    }
+
+    /**
+     * Reads from the entry's extent list.
+     *
+     * @param offset the offset to read from.
+     * @param destBuf the destination buffer.
+     * @throws IOException if an error occurs reading.
+     */
+    private void readFromExtentList(long offset, ByteBuffer destBuf) throws IOException {
+        int blockSize = fileSystem.getSuperblock().getBlockSize();
+
+        for (DataExtent extent : extentList) {
+            if (!destBuf.hasRemaining()) {
+                return;
+            }
+
+            if (extent.isWithinExtent(offset, blockSize)) {
+                ByteBuffer readBuffer = destBuf.duplicate();
+
+                int offsetWithinBlock = (int) (offset % blockSize);
+                int bytesToRead = (int) Math.min(extent.getBlockCount() * blockSize, destBuf.remaining());
+                readBuffer.limit(bytesToRead);
+
+                fileSystem.readBlocks(extent.getStartBlock(), offsetWithinBlock, readBuffer);
+
+                offset += bytesToRead;
+            }
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "xfs-entry:[" + getName() + "] " + inode;
     }
 
     private static int getFSEntryType(String name, INode inode) {

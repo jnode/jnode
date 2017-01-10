@@ -170,6 +170,20 @@ public class INode extends XfsObject {
      * @return the extent length.
      */
     public long getExtentLength() {
-        return getUInt32(0x44);
+        return getUInt32(0x48);
+    }
+
+    /**
+     * Gets the number of extents.
+     *
+     * @return the extent count.
+     */
+    public long getExtentCount() {
+        return getUInt32(0x4c);
+    }
+
+    @Override
+    public String toString() {
+        return "inode:" + inodeNr;
     }
 }
