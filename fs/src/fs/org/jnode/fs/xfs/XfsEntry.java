@@ -143,6 +143,7 @@ public class XfsEntry extends AbstractFSEntry implements FSEntryCreated, FSEntry
      */
     private void readFromExtentList(long offset, ByteBuffer destBuf) throws IOException {
         int blockSize = fileSystem.getSuperblock().getBlockSize();
+        long extentOffset = 0;
 
         for (DataExtent extent : extentList) {
             if (!destBuf.hasRemaining()) {
@@ -152,14 +153,18 @@ public class XfsEntry extends AbstractFSEntry implements FSEntryCreated, FSEntry
             if (extent.isWithinExtent(offset, blockSize)) {
                 ByteBuffer readBuffer = destBuf.duplicate();
 
+                long blockOffset = (offset - extentOffset) / blockSize;
                 int offsetWithinBlock = (int) (offset % blockSize);
                 int bytesToRead = (int) Math.min(extent.getBlockCount() * blockSize, destBuf.remaining());
                 readBuffer.limit(bytesToRead);
 
-                fileSystem.readBlocks(extent.getStartBlock(), offsetWithinBlock, readBuffer);
+                fileSystem.readBlocks(extent.getStartBlock() + blockOffset, offsetWithinBlock, readBuffer);
 
                 offset += bytesToRead;
             }
+
+            long extentLength = extent.getBlockCount() * blockSize;
+            extentOffset += extentLength;
         }
     }
 
