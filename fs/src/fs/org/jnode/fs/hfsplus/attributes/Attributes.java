@@ -72,9 +72,10 @@ public class Attributes {
         SuperBlock sb = fs.getVolumeHeader();
         attributesFile = sb.getAttributesFile();
 
-        if (!attributesFile.getExtent(0).isEmpty()) {
-            ByteBuffer buffer = ByteBuffer.allocate(NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH +
-                BTHeaderRecord.BT_HEADER_RECORD_LENGTH);
+        int readLength = NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH + BTHeaderRecord.BT_HEADER_RECORD_LENGTH;
+
+        if (!attributesFile.getExtent(0).isEmpty() && attributesFile.getTotalSize() > readLength) {
+            ByteBuffer buffer = ByteBuffer.allocate(readLength);
             attributesFile.read(fs, 0, buffer);
             buffer.rewind();
             byte[] data = ByteBufferUtils.toArray(buffer);
