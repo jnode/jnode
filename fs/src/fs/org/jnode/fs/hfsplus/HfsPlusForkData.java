@@ -26,14 +26,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
 import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
 import org.jnode.fs.hfsplus.extent.ExtentKey;
+import org.jnode.fs.util.FSUtils;
 import org.jnode.util.BigEndian;
 
 public class HfsPlusForkData {
     public static final int FORK_DATA_LENGTH = 80;
     private static final int EXTENT_OFFSET = 16;
+
+    /**
+     * The logger.
+     */
+    protected static final Logger log = Logger.getLogger(HfsPlusForkData.class);
+
     /**
      * The size in bytes of the valid data in the fork.
      */
@@ -118,13 +126,19 @@ public class HfsPlusForkData {
         return dest;
     }
 
+    @Override
     public final String toString() {
+        return String.format("HFS+ fork-data:[total-size:%d clump-size:%d total-blocks: %d extents:%d]",
+            totalSize, clumpSize, totalBlock, extents.length);
+    }
+
+    public final String toDebugString() {
         StringBuffer s = new StringBuffer();
         s.append("Total size : ").append(totalSize).append("\n");
         s.append("Clump size : ").append(clumpSize).append("\n");
         s.append("Total Blocks : ").append(totalBlock).append("\n");
         for (int i = 0; i < extents.length; i++) {
-            s.append("Extent[" + i + "]: " + extents[i].toString());
+            s.append("Extent[" + i + "]: " + extents[i].toString() + "\n");
         }
         return s.toString();
     }
@@ -183,6 +197,10 @@ public class HfsPlusForkData {
         int limit = buffer.limit();
         int remaining = buffer.remaining();
 
+        if (log.isDebugEnabled()) {
+            log.debug("read: offset " + offset + " length " + buffer.remaining() + ": " + this);
+        }
+
         Collection<ExtentDescriptor> allExtents = getAllExtents(fileSystem);
 
         for (ExtentDescriptor extentDescriptor : allExtents) {
@@ -192,11 +210,23 @@ public class HfsPlusForkData {
                 if (offset != 0 && length < offset) {
                     offset -= length;
                 } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("reading: offset " + offset + " extent: " + extentDescriptor);
+                    }
+
                     long firstOffset = extentDescriptor.getStartOffset(blockSize);
 
                     while (remaining > 0 && offset < length) {
                         int byteCount = Math.min(remaining, blockSize);
-                        byteCount = Math.min(byteCount, (int) (length - offset));
+                        int extentRemaining = FSUtils.checkedCast(length - offset);
+                        byteCount = Math.min(byteCount, extentRemaining);
+
+                        // Sanity check
+                        if (byteCount < 0) {
+                            throw new IllegalStateException(
+                                String.format("byteCount is -ve, offset:%d, length:%d, remaining:%d",
+                                    offset, length, remaining));
+                        }
 
                         buffer.limit(buffer.position() + byteCount);
                         fileSystem.getApi().read(firstOffset + offset, buffer);
