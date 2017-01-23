@@ -37,7 +37,7 @@ public class INode extends XfsObject {
         this.inodeNr = inodeNr;
 
         if (getMagic() != MAGIC) {
-            throw new IllegalStateException("Invalid inode magic: " + getMagic());
+            throw new IllegalStateException("Invalid inode magic: " + getMagic() + " for inode: " + inodeNr);
         }
     }
 

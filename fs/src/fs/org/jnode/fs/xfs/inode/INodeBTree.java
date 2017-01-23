@@ -57,19 +57,21 @@ public class INodeBTree {
      */
     public INode getINode(long inode) throws IOException {
         List<INodeBTreeRecord> records = header.readRecords();
-        int chunkNumber = 0;
+        int chunkNumber;
         boolean foundMatch = false;
 
-        for (int i = 0; i < records.size(); i++) {
-            INodeBTreeRecord record = records.get(i);
+        for (chunkNumber = 0; chunkNumber < records.size(); chunkNumber++) {
+            INodeBTreeRecord record = records.get(chunkNumber);
 
             if (record.containsInode(inode)) {
                 // Matching block...
                 foundMatch = true;
                 break;
             }
+        }
 
-            chunkNumber++;
+        if (!foundMatch) {
+            throw new IOException("Failed to find an inode for: " + inode);
         }
 
         int blockSize = fileSystem.getSuperblock().getBlockSize();

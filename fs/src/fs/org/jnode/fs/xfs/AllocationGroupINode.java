@@ -50,9 +50,18 @@ public class AllocationGroupINode extends XfsRecord {
     }
 
     /**
-     * Gets the
+     * Gets the AG number for the sector.
      *
-     * @return the
+     * @return the the AG number for the sector.
+     */
+    public long getSeqNo() {
+        return getUInt32(0x8);
+    }
+
+    /**
+     * Gets the length of the allocation group in blocks.
+     *
+     * @return the length in blocks.
      */
     public long getLength() {
         return getUInt32(0xc);
@@ -67,8 +76,18 @@ public class AllocationGroupINode extends XfsRecord {
         return getUInt32(0x14);
     }
 
+    /**
+     * Gets the number of levels in the b-tree.
+     *
+     * @return the number of levels.
+     */
+    public long getLevel() {
+        return getUInt32(0x18);
+    }
+
     @Override
     public String toString() {
-        return String.format("AI-inode:[length:%d root-block:0x%x]", getLength(), getRootBlock());
+        return String.format("AI-inode:[seqno:0x%x length:%d root-block:0x%x levels:%d]",
+            getSeqNo(), getLength(), getRootBlock(), getLevel());
     }
 }
