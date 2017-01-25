@@ -14,9 +14,9 @@ import org.jnode.fs.xfs.XfsFileSystem;
 public class INodeBTree {
 
     /**
-     * The offset to the root inodes.
+     * The block offset to the root inode.
      */
-    private static final int ROOT_INODES_OFFSET = 0x8000;
+    private static final int ROOT_INODE_BLOCK = 0x8;
 
     /**
      * The number of inodes per-chunk.
@@ -83,7 +83,8 @@ public class INodeBTree {
         byte[] data = new byte[chunkSize];
 
         ByteBuffer buffer = ByteBuffer.allocate(data.length);
-        fileSystem.getApi().read(ROOT_INODES_OFFSET + chunkNumber * chunkSize, buffer);
+        int rootInodeOffset = ROOT_INODE_BLOCK * blockSize;
+        fileSystem.getApi().read(rootInodeOffset + chunkNumber * chunkSize, buffer);
         buffer.position(0);
         buffer.get(data);
 

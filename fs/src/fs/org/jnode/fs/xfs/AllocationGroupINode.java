@@ -68,6 +68,15 @@ public class AllocationGroupINode extends XfsRecord {
     }
 
     /**
+     * Gets the number of inodes allocated for the AGI.
+     *
+     * @return the number of inodes.
+     */
+    public long getCount() {
+        return getUInt32(0x10);
+    }
+
+    /**
      * Gets the root block number.
      *
      * @return the root block number.
@@ -87,7 +96,7 @@ public class AllocationGroupINode extends XfsRecord {
 
     @Override
     public String toString() {
-        return String.format("AI-inode:[seqno:0x%x length:%d root-block:0x%x levels:%d]",
-            getSeqNo(), getLength(), getRootBlock(), getLevel());
+        return String.format("AI-inode:[seqno:0x%x length:%d count:%d root-block:0x%x levels:%d]",
+            getSeqNo(), getLength(), getCount(), getRootBlock(), getLevel());
     }
 }

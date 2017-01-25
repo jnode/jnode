@@ -117,7 +117,9 @@ public class XfsEntry extends AbstractFSEntry implements FSEntryCreated, FSEntry
                     extentList = new ArrayList<DataExtent>();
 
                     for (int i = 0; i < inode.getExtentCount(); i++) {
-                        int extentOffset = inode.getOffset() + INode.DATA_OFFSET + i * DataExtent.PACKED_LENGTH;
+                        int inodeDataOffset = inode.getVersion() >= 3 ? INode.V3_DATA_OFFSET : INode.DATA_OFFSET;
+                        int inodeOffset = inode.getOffset() + inodeDataOffset;
+                        int extentOffset = inodeOffset + i * DataExtent.PACKED_LENGTH;
                         DataExtent extent = new DataExtent(inode.getData(), extentOffset);
                         extentList.add(extent);
                     }
@@ -156,11 +158,12 @@ public class XfsEntry extends AbstractFSEntry implements FSEntryCreated, FSEntry
                 long blockOffset = (offset - extentOffset) / blockSize;
                 int offsetWithinBlock = (int) (offset % blockSize);
                 int bytesToRead = (int) Math.min(extent.getBlockCount() * blockSize, destBuf.remaining());
-                readBuffer.limit(bytesToRead);
+                readBuffer.limit(readBuffer.position() + bytesToRead);
 
                 fileSystem.readBlocks(extent.getStartBlock() + blockOffset, offsetWithinBlock, readBuffer);
 
                 offset += bytesToRead;
+                destBuf.position(destBuf.position() + bytesToRead);
             }
 
             long extentLength = extent.getBlockCount() * blockSize;

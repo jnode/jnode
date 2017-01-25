@@ -20,6 +20,11 @@ public class INode extends XfsObject {
     public static final int DATA_OFFSET = 0x64;
 
     /**
+     * The offset to the v3 inode data.
+     */
+    public static final int V3_DATA_OFFSET = 0xb0;
+
+    /**
      * The inode number.
      */
     private final long inodeNr;
@@ -38,6 +43,13 @@ public class INode extends XfsObject {
 
         if (getMagic() != MAGIC) {
             throw new IllegalStateException("Invalid inode magic: " + getMagic() + " for inode: " + inodeNr);
+        }
+
+        if (getVersion() >= 3) {
+            if (getV3INodeNumber() != inodeNr) {
+                throw new IllegalStateException("Stored inode (" + getV3INodeNumber() +
+                    ") does not match passed in number:" + inodeNr);
+            }
         }
     }
 
@@ -182,8 +194,37 @@ public class INode extends XfsObject {
         return getUInt32(0x4c);
     }
 
+    /**
+     * Gets the time the inode was created for a v3 inode.
+     *
+     * @return the created time.
+     */
+    public long getV3CreatedTime() {
+        return getInt64(0x98);
+    }
+
+    /**
+     * Gets the stored inode number if this is a v3 inode.
+     *
+     * @return the number.
+     */
+    public long getV3INodeNumber() {
+        return getInt64(0x98);
+    }
+
+    /**
+     * Gets the v3 inode file system UUID.
+     *
+     * @return the UUID.
+     */
+    public long getV3Uuid() {
+        return getInt64(0xa0);
+    }
+
     @Override
     public String toString() {
-        return "inode:" + inodeNr;
+        return String.format(
+            "inode:[%d version:%d format:%d size:%d uid:%d gid:%d]",
+            inodeNr, getVersion(), getFormat(), getSize(), getUid(), getGid());
     }
 }

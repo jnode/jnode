@@ -86,8 +86,8 @@ public class DataExtent extends XfsObject {
      */
     public boolean isWithinExtent(long fileOffset, long blockSize) {
         return
-            fileOffset >= startOffset &&
-            fileOffset < startOffset + blockSize * blockCount;
+            fileOffset >= startOffset * blockSize &&
+            fileOffset < (startOffset + blockCount) * blockSize;
     }
 
     @Override

@@ -205,4 +205,12 @@ public class Superblock extends XfsRecord {
     public boolean isUsingExtendedFeatures() {
         return hasFeature(XfsConstants.XFS_SB_VERSION_MOREBITSBIT);
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format(
+            "xfs-sb:[block-size:%d inode-size:%d root-ino:%d ag-size:%d ag-count: %d version:%d features2:0x%x]",
+            getBlockSize(), getInodeSize(), getRootInode(), getAGSize(), getAGCount(), getVersion(), getFeatures2());
+    }
 }
