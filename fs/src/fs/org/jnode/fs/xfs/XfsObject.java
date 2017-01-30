@@ -1,11 +1,17 @@
 package org.jnode.fs.xfs;
 
+import java.nio.charset.Charset;
 import org.jnode.util.BigEndian;
 
 /**
  * An object in a XFS file system.
  */
 public class XfsObject {
+
+    /**
+     * The UTF-8 charset.
+     */
+    public static Charset UTF8 = Charset.forName("UTF-8");
 
     /**
      * The data for this record.

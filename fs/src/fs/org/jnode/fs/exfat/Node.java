@@ -37,7 +37,7 @@ public final class Node {
     public static Node createRoot(ExFatSuperBlock sb)
         throws IOException {
 
-        final Node result = new Node(sb, sb.getRootDirCluster(), null);
+        final Node result = new Node(sb, sb.getRootDirCluster(), new EntryTimes(null, null, null));
 
         result.clusterCount = result.rootDirSize();
         result.flags = ATTRIB_DIR;
