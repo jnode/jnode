@@ -218,8 +218,8 @@ public class HfsPlusForkData {
 
                     while (remaining > 0 && offset < length) {
                         int byteCount = Math.min(remaining, blockSize);
-                        int extentRemaining = FSUtils.checkedCast(length - offset);
-                        byteCount = Math.min(byteCount, extentRemaining);
+                        long extentRemaining = length - offset;
+                        byteCount = FSUtils.checkedCast(Math.min(byteCount, extentRemaining));
 
                         // Sanity check
                         if (byteCount < 0) {
