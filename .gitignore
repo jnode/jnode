@@ -6,7 +6,7 @@
 .project
 *.iws
 *.patch
-jnode.properties
+/jnode.properties
 local/
 classlib.jar
 all/lib/classlib-src.jar

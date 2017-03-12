@@ -7,7 +7,7 @@ lib
 .project
 src.jpx
 *.patch
-jnode.properties
+/jnode.properties
 udpout.log
 local
 bin
