@@ -1,0 +1,8 @@
+# GRUB Configuration
+default 0
+timeout 0
+
+# ---------------------------
+title JNode (minimal shell)
+kernel /jnode32.gz mp=no kdb lkd cmd=halt
+module /shell.jgz
