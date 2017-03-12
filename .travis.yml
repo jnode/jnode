@@ -3,4 +3,8 @@ jdk:
   - oraclejdk7
 install:
   - sudo apt-get -y install nasm
-script: "./build.sh clean cd-x86-lite regression-tests"
+script: "./.travis/travis.sh"
+addons:
+  apt:
+    packages:
+      - qemu
