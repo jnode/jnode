@@ -42,6 +42,7 @@
 	<property name="java.encoding" value="US-ASCII"/>
 
 	<property name="build.dir" value="${basedir}/build"/>
+	<property name="build.properties.file" value="${root.dir}/jnode.properties"/>
 	<property name="reports.dir" value="${build.dir}/reports"/>
 	<property name="cdroms.dir" value="${build.dir}/cdroms"/>
 	<property name="descriptors.dir" value="${build.dir}/descriptors"/>
@@ -235,7 +236,7 @@
 		</fail>
 
 		<!-- Initialize all project directories -->
-		<property file="${root.dir}/jnode.properties"/>
+		<property file="${build.properties.file}"/>
 		<!-- Set overwritable properties -->
 		<property name="jnode.memmgr.plugin.id" value="org.jnode.vm.memmgr.def"/>
 		<property name="compilerarg" value="-nowarn"/>
