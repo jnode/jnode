@@ -365,6 +365,12 @@ public final class VmSystem {
             final int cmdLineSize = Unsafe.getCmdLine(null);
             final byte[] cmdLineArr = new byte[cmdLineSize];
             Unsafe.getCmdLine(cmdLineArr);
+            //command line may contain 0, replace it with space
+            for (int i = 0; i < cmdLineSize; i++) {
+                if (cmdLineArr[i] == 0) {
+                    cmdLineArr[i] = (byte) ' ';
+                }
+            }
             cmdLine = new String(cmdLineArr).trim();
         }
         return cmdLine;
