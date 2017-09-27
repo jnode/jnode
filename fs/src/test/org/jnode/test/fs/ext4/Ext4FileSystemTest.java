@@ -34,6 +34,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 public class Ext4FileSystemTest {
 
     private Device device;
@@ -168,6 +171,36 @@ public class Ext4FileSystemTest {
                 "    why.jpg; 30965; 9b82ac413bb4204a4cf6d3e801af38fd\n";
 
         DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
+
+    @Test
+    public void testReadExt4M64Bit() throws Exception {
+
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/ext4/ext4-64bit.dd"), "r");
+        Ext2FileSystemType type = fss.getFileSystemType(Ext2FileSystemType.ID);
+        Ext2FileSystem fs = type.create(device, true);
+
+        String expectedStructure =
+            "type: EXT2 vol:VDI-FTW total:9437184 free:7313408\n" +
+            "  /; \n" +
+            "    lost+found; \n" +
+            "    COPYING; 18693; d7810fab7487fb0aad327b76f1be7cd7\n" +
+            "    CREDITS; 98277; 19f7db100be5bc0bf2b13877667bc0bb\n" +
+            "    Kbuild; 2888; f70ebd21ac6daa2a7adfd0d1b382726a\n" +
+            "    Kconfig; 252; 2370b55729048373f46fb6367e2e3dba\n" +
+            "    MAINTAINERS; 382615; a38d5e144061abb5fe67bfba3e73ec81\n" +
+            "    Makefile; 59015; 3069a09ff10793d0e05f12503a495828\n" +
+            "    README; 18372; 50a2a143e6733ed6dadde20d94b31109\n" +
+            "    REPORTING-BUGS; 7490; 066e4510a216b82a632a6c5d4c67e8d9\n" +
+            "    test; \n" +
+            "      .bashrc; 3771; 1f98b8f3f3c8f8927eca945d59dcc1c6\n" +
+            "      remote-region.sh; 345; 7d9e35dd5f8467f652c99236da8df412\n" +
+            "      .xsession-errors; 3691; a8cdad2838879b61e739db5dec9d9c1a\n" +
+            "      Makefile; 9830; 115b7ff3e0a550f90923db7c748da7f9\n";
+
+        DataStructureAsserts.assertStructure(fs, expectedStructure);
+
+        assertThat(fs.getSuperblock().getBlocksCount(), is(9216L));
     }
 }
 

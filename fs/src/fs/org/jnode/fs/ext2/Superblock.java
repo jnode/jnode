@@ -213,7 +213,11 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getBlocksCount() {
-        return LittleEndian.getUInt32(data, 4);
+        if (fs.hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_64BIT)) {
+            return LittleEndian.getUInt32(data, 0x150) << 32 | LittleEndian.getUInt32(data, 4);
+        } else {
+            return LittleEndian.getUInt32(data, 4);
+        }
     }
 
     public void setBlocksCount(long count) {
@@ -224,7 +228,11 @@ public class Superblock {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getRBlocksCount() {
-        return LittleEndian.getUInt32(data, 8);
+        if (fs.hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_64BIT)) {
+            return LittleEndian.getUInt32(data, 0x154) << 32 | LittleEndian.getUInt32(data, 8);
+        } else {
+            return LittleEndian.getUInt32(data, 8);
+        }
     }
 
     public void setRBlocksCount(long count) {
@@ -233,7 +241,11 @@ public class Superblock {
     }
 
     public synchronized long getFreeBlocksCount() {
-        return LittleEndian.getUInt32(data, 12);
+        if (fs.hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_64BIT)) {
+            return LittleEndian.getUInt32(data, 0x158) << 32 | LittleEndian.getUInt32(data, 0xc);
+        } else {
+            return LittleEndian.getUInt32(data, 0xc);
+        }
     }
 
     public synchronized void setFreeBlocksCount(long count) {
@@ -688,6 +700,15 @@ public class Superblock {
 
     public long getLastOrphan() {
         return LittleEndian.getUInt8(data, 232);
+    }
+
+    /**
+     * Gets the group descriptor size if the 64bit feature is set (EXT4_FEATURE_INCOMPAT_64BIT).
+     *
+     * @return the group descriptor size.
+     */
+    public int getGroupDescriptorSize() {
+        return LittleEndian.getUInt16(data, 0xfe);
     }
 
     /**

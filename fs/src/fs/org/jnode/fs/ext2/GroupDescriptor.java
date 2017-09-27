@@ -31,14 +31,19 @@ import org.jnode.util.LittleEndian;
 public class GroupDescriptor {
     public static final int GROUPDESCRIPTOR_LENGTH = 32;
 
+    private final int size;
     private byte data[];
     private Ext2FileSystem fs;
     private int groupNr;
     private boolean dirty;
     private final Logger log = Logger.getLogger(getClass());
 
-    public GroupDescriptor() {
-        data = new byte[GROUPDESCRIPTOR_LENGTH];
+    public GroupDescriptor(Ext2FileSystem fs) {
+        size = fs.hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_64BIT)
+            ? fs.getSuperblock().getGroupDescriptorSize()
+            : GROUPDESCRIPTOR_LENGTH;
+
+        data = new byte[size];
     }
 
     /*
@@ -48,10 +53,10 @@ public class GroupDescriptor {
     public void read(int groupNr, Ext2FileSystem fs) throws IOException {
         // read the group descriptors from the main copy in block group 0
         long baseBlock = fs.getSuperblock().getFirstDataBlock() + 1;
-        long blockOffset = (groupNr * GROUPDESCRIPTOR_LENGTH) / fs.getBlockSize();
-        long offset = (groupNr * GROUPDESCRIPTOR_LENGTH) % fs.getBlockSize();
+        long blockOffset = (groupNr * size) / fs.getBlockSize();
+        long offset = (groupNr * size) % fs.getBlockSize();
         byte[] blockData = fs.getBlock(baseBlock + blockOffset);
-        System.arraycopy(blockData, (int) offset, data, 0, GROUPDESCRIPTOR_LENGTH);
+        System.arraycopy(blockData, (int) offset, data, 0, size);
         this.groupNr = groupNr;
         this.fs = fs;
         setDirty(false);
@@ -72,7 +77,7 @@ public class GroupDescriptor {
         else
             desc =
                     1 + /* superblock */
-                    Ext2Utils.ceilDiv(fs.getGroupCount() * GroupDescriptor.GROUPDESCRIPTOR_LENGTH,
+                    Ext2Utils.ceilDiv(fs.getGroupCount() * size,
                             fs.getBlockSize()); /* GDT */
         Superblock superblock = fs.getSuperblock();
         setBlockBitmap(superblock.getFirstDataBlock() + groupNr * superblock.getBlocksPerGroup() + desc);
@@ -127,12 +132,12 @@ public class GroupDescriptor {
                     continue;
 
                 long block = superblock.getFirstDataBlock() + 1 + superblock.getBlocksPerGroup() * i; 
-                long pos = groupNr * GROUPDESCRIPTOR_LENGTH;
+                long pos = groupNr * size;
                 block += pos / fs.getBlockSize();
                 long offset = pos % fs.getBlockSize();
                 byte[] blockData = fs.getBlock(block);
                 // update the block with the new group descriptor
-                System.arraycopy(data, 0, blockData, (int) offset, GROUPDESCRIPTOR_LENGTH);
+                System.arraycopy(data, 0, blockData, (int) offset, size);
                 fs.writeBlock(block, blockData, true);
             }
             setDirty(false);
@@ -140,13 +145,26 @@ public class GroupDescriptor {
     }
 
     public int size() {
-        return GROUPDESCRIPTOR_LENGTH;
+        return size;
+    }
+
+    /**
+     * Checks whether this group descriptor is in a 64-bit file system.
+     *
+     * @return {@code true} if 64-bit.
+     */
+    public boolean is64Bit() {
+        return size > GROUPDESCRIPTOR_LENGTH;
     }
 
     // this field is only written during format (so no synchronization issues
     // here)
     public long getBlockBitmap() {
-        return LittleEndian.getUInt32(data, 0);
+        if (is64Bit()) {
+            return LittleEndian.getUInt32(data, 0x20) << 32 | LittleEndian.getUInt32(data, 0);
+        } else {
+            return LittleEndian.getUInt32(data, 0);
+        }
     }
 
     public void setBlockBitmap(long l) {
@@ -157,7 +175,11 @@ public class GroupDescriptor {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getInodeBitmap() {
-        return LittleEndian.getUInt32(data, 4);
+        if (is64Bit()) {
+            return LittleEndian.getUInt32(data, 0x24) << 32 | LittleEndian.getUInt32(data, 4);
+        } else {
+            return LittleEndian.getUInt32(data, 4);
+        }
     }
 
     public void setInodeBitmap(long l) {
@@ -168,7 +190,11 @@ public class GroupDescriptor {
     // this field is only written during format (so no synchronization issues
     // here)
     public long getInodeTable() {
-        return LittleEndian.getUInt32(data, 8);
+        if (is64Bit()) {
+            return LittleEndian.getUInt32(data, 0x28) << 32 | LittleEndian.getUInt32(data, 8);
+        } else {
+            return LittleEndian.getUInt32(data, 8);
+        }
     }
 
     public void setInodeTable(long l) {
@@ -177,7 +203,11 @@ public class GroupDescriptor {
     }
 
     public synchronized int getFreeBlocksCount() {
-        return LittleEndian.getUInt16(data, 12);
+        if (is64Bit()) {
+            return LittleEndian.getUInt16(data, 0x2c) << 16 | LittleEndian.getUInt16(data, 0xc);
+        } else {
+            return LittleEndian.getUInt16(data, 0xc);
+        }
     }
 
     public synchronized void setFreeBlocksCount(int count) {
@@ -186,7 +216,11 @@ public class GroupDescriptor {
     }
 
     public synchronized int getFreeInodesCount() {
-        return LittleEndian.getUInt16(data, 14);
+        if (is64Bit()) {
+            return LittleEndian.getUInt16(data, 0x2e) << 16 | LittleEndian.getUInt16(data, 0xe);
+        } else {
+            return LittleEndian.getUInt16(data, 0xe);
+        }
     }
 
     public synchronized void setFreeInodesCount(int count) {
@@ -195,7 +229,11 @@ public class GroupDescriptor {
     }
 
     public synchronized int getUsedDirsCount() {
-        return LittleEndian.getUInt16(data, 16);
+        if (is64Bit()) {
+            return LittleEndian.getUInt16(data, 0x30) << 16 | LittleEndian.getUInt16(data, 0x10);
+        } else {
+            return LittleEndian.getUInt16(data, 0x10);
+        }
     }
 
     public synchronized void setUsedDirsCount(int count) {

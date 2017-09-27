@@ -111,8 +111,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
             iNodeTables = new INodeTable[groupCount];
 
             for (int i = 0; i < groupCount; i++) {
-                // groupDescriptors[i]=new GroupDescriptor(i, this);
-                groupDescriptors[i] = new GroupDescriptor();
+                groupDescriptors[i] = new GroupDescriptor(this);
                 groupDescriptors[i].read(i, this);
 
                 iNodeTables[i] = new INodeTable(this, (int) groupDescriptors[i].getInodeTable());
@@ -135,8 +134,10 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
         // throw new FileSystemException(getDevice().getId() +
         // " Unsupported filesystem feature (RECOVER) disallows mounting");
 
-        if (hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_64BIT)) throw new FileSystemException(
-            getDevice().getId() + " Unsupported filesystem feature (64BIT) disallows mounting");
+        if (hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_64BIT))  {
+            log.info(getDevice().getId() + " Unsupported filesystem feature (64BIT) forces readonly mode");
+            setReadOnly(true);
+        }
 
         if (hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_MMP)) {
             // TODO: this should really update the MMP block now, and periodically, to indicate that the filesystem is in use
@@ -237,7 +238,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
             iNodeTables = new INodeTable[groupCount];
 
             for (int i = 0; i < groupCount; i++) {
-                groupDescriptors[i] = new GroupDescriptor();
+                groupDescriptors[i] = new GroupDescriptor(this);
                 groupDescriptors[i].create(i, this);
             }
 
