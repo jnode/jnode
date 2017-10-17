@@ -36,7 +36,7 @@ public class GroupDescriptor {
     private Ext2FileSystem fs;
     private int groupNr;
     private boolean dirty;
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(GroupDescriptor.class);
 
     public GroupDescriptor(Ext2FileSystem fs) {
         size = fs.hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_64BIT)

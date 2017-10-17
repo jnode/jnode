@@ -64,7 +64,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
 
     private MultipleMountProtection multipleMountProtection;
 
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(Ext2FileSystem.class);
 
     // private Object groupDescriptorLock;
     // private Object superblockLock;

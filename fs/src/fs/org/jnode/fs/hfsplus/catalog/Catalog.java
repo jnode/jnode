@@ -40,7 +40,7 @@ import org.jnode.util.NumberUtils;
 
 public class Catalog {
 
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(Catalog.class);
     private HfsPlusFileSystem fs;
 
     /**

@@ -37,7 +37,7 @@ import org.jnode.util.ByteBufferUtils;
 import org.jnode.util.NumberUtils;
 
 public class Extent {
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(Extent.class);
 
     /**
      * B-Tree node descriptor

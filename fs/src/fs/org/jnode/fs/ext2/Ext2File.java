@@ -37,7 +37,7 @@ public class Ext2File extends AbstractFSFile implements FSFileSlackSpace {
     String name;
     INode iNode;
 
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(Ext2File.class);
 
     public Ext2File(Ext2Entry entry) {
         this((Ext2FileSystem) entry.getFileSystem(), entry.getINode(), entry.getName());

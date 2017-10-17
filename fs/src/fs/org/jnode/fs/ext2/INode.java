@@ -42,7 +42,7 @@ import org.jnode.util.LittleEndian;
 public class INode {
     public static final int EXT2_GOOD_OLD_INODE_SIZE = 128;
 
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(INode.class);
 
     /**
      * the data constituting the inode itself

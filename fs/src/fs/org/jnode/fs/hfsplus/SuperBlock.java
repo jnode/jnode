@@ -54,7 +54,7 @@ public class SuperBlock extends HfsPlusObject {
     public static final int HFSPLUS_VOL_JOURNALED_BIT = 13;
     public static final int HFSPLUS_VOL_SOFTLOCK_BIT = 15;
 
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(SuperBlock.class);
 
     /**
      * Volume header data length

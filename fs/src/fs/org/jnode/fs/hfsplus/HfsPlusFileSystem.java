@@ -42,7 +42,7 @@ import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.AbstractFileSystem;
 
 public class HfsPlusFileSystem extends AbstractFileSystem<HfsPlusEntry> {
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(HfsPlusFileSystem.class);
 
     /**
      * HFS volume header

@@ -45,7 +45,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
 
     protected Ext2Entry entry;
 
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(Ext2Directory.class);
 
     /**
      * @param entry the Ext2Entry representing this directory

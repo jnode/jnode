@@ -51,7 +51,7 @@ public class Superblock {
     private byte data[];
     private boolean dirty;
     private Ext2FileSystem fs;
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(Superblock.class);
 
     public Superblock() {
         data = new byte[SUPERBLOCK_LENGTH];
