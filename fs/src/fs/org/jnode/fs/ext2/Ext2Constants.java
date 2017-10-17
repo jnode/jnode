@@ -80,6 +80,7 @@ public class Ext2Constants {
     public static final long EXT2_INDEX_FL = 0x00010000; // hash indexed directory
     public static final long EXT4_HUGE_FILE_FL = 0x00040000;
     public static final long EXT4_INODE_EXTENTS_FLAG = 0x00080000;
+    public static final long EXT4_INLINE_DATA_FL = 0x10000000;
 
     // Filesystem state constants
     public static final int EXT2_VALID_FS = 0x0001; // cleanly unmounted
@@ -110,6 +111,7 @@ public class Ext2Constants {
     public static final long EXT4_FEATURE_INCOMPAT_64BIT = 0x0080;
     public static final long EXT4_FEATURE_INCOMPAT_MMP = 0x0100;
     public static final long EXT4_FEATURE_INCOMPAT_FLEX_BG = 0X0200;
+    public static final long EXT4_FEATURE_INCOMPAT_INLINE_DATA = 0X8000;
 
     // constants specific to this (JNode) implementation
     /**

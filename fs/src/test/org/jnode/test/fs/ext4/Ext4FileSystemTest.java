@@ -202,5 +202,23 @@ public class Ext4FileSystemTest {
 
         assertThat(fs.getSuperblock().getBlocksCount(), is(9216L));
     }
+
+    @Test
+    public void testInlineData() throws Exception {
+
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/ext4/inline.dd"), "r");
+        Ext2FileSystemType type = fss.getFileSystemType(Ext2FileSystemType.ID);
+        Ext2FileSystem fs = type.create(device, true);
+
+        String expectedStructure =
+            "type: EXT2 vol: total:4194304 free:2866176\n" +
+            "  /; \n" +
+            "    lost+found; \n" +
+            "    inline.txt; 31; 85da5521483449f0687b626cb376e8f8\n" +
+            "    small-dir; \n" +
+            "      peanut-butter.txt; 80; 93ec2ee1c7e10363d5b2e3ecc1caaef0\n";
+
+        DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
 }
 

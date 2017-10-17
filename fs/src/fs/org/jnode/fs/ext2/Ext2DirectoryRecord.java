@@ -33,7 +33,7 @@ import org.jnode.util.LittleEndian;
  * @author Andras Nagy
  */
 public class Ext2DirectoryRecord {
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(Ext2DirectoryRecord.class);
     /*
      * private int iNodeNr; private int recLen; private short nameLen; private
      * short type; private StringBuffer name;
@@ -58,7 +58,11 @@ public class Ext2DirectoryRecord {
         // make a copy of the data
         synchronized (data) {
             byte[] newData = new byte[Math.max(8, getRecLen())];
-            System.arraycopy(data, offset, newData, 0, getRecLen());
+            int copySize = getRecLen();
+            if (copySize + offset > data.length) {
+                copySize = Math.max(0, copySize - offset);
+            }
+            System.arraycopy(data, offset, newData, 0, copySize);
             this.data = newData;
             setOffset(0);
         }
@@ -215,5 +219,10 @@ public class Ext2DirectoryRecord {
             throw new FileSystemException("The directory record does not fit into the block!");
         }
         log.debug("expandRecord(): newLength: " + getRecLen());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("dir-record:[inode:%d %s]", getINodeNr(), getName());
     }
 }

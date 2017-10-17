@@ -139,6 +139,11 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
             setReadOnly(true);
         }
 
+        if (hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_INLINE_DATA))  {
+            log.info(getDevice().getId() + " Unsupported filesystem feature (INLINE_DATA) forces readonly mode");
+            setReadOnly(true);
+        }
+
         if (hasIncompatFeature(Ext2Constants.EXT4_FEATURE_INCOMPAT_MMP)) {
             // TODO: this should really update the MMP block now, and periodically, to indicate that the filesystem is in use
             log.info(getDevice().getId() + " file system has multi-mount protection, forcing readonly mode");

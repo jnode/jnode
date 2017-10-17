@@ -16,7 +16,7 @@ public class XAttrEntry {
     /**
      * The logger.
      */
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(XAttrEntry.class);
 
     /**
      * The minimum size of the entry structure.
@@ -151,5 +151,10 @@ public class XAttrEntry {
         byte[] value = new byte[(int) getValueSize()];
         System.arraycopy(data, getValueOffset(), value, 0, value.length);
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("xattr:[%s] %d bytes", getName(), getValueSize());
     }
 }

@@ -712,6 +712,15 @@ public class Superblock {
     }
 
     /**
+     * Gets the first metablock group if the meta_bg feature is set.
+     *
+     * @return the first metablock group.
+     */
+    public long getFirstMetablockGroup() {
+        return LittleEndian.getUInt32(data, 0x104);
+    }
+
+    /**
      * Gets the block number that contains the multi-mount protection (MMP) data.
      *
      * @return the block number.

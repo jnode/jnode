@@ -197,6 +197,22 @@ public class INode {
     }
 
     /**
+     * Gets an attribute by its name.
+     *
+     * @param name the name of the attribute to look up.
+     * @return the attribute, or {@code null} if no match is found.
+     */
+    public XAttrEntry getAttribute(String name) {
+        for (XAttrEntry attribute : getAttributes()) {
+            if (name.equals(attribute.getName())) {
+                return attribute;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Gets a list of inline attributes associated with this inode.
      *
      * @return the list of attributes.
@@ -213,7 +229,7 @@ public class INode {
             XAttrHeader xAttrHeader = new XAttrHeader(xattrBuffer);
 
             if (xAttrHeader.getMagic() == XAttrHeader.MAGIC) {
-                for (int offset = XAttrHeader.SIZE; offset + XAttrEntry.MINIMUM_SIZE < xattrBuffer.length; ) {
+                for (int offset = 4; offset + XAttrEntry.MINIMUM_SIZE < xattrBuffer.length; ) {
                     if (LittleEndian.getUInt32(xattrBuffer, offset) == 0) {
                         break;
                     }

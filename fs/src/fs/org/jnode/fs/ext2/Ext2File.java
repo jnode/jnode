@@ -196,8 +196,10 @@ public class Ext2File extends AbstractFSFile implements FSFileSlackSpace {
         // so synchronize to the inode
         synchronized (iNode) {
             try {
-                if ((iNode.getMode() & Ext2Constants.EXT2_S_IFLNK) == Ext2Constants.EXT2_S_IFLNK) {
+                if ((iNode.getMode() & Ext2Constants.EXT2_S_IFLNK) == Ext2Constants.EXT2_S_IFLNK ||
+                    (iNode.getFlags() & Ext2Constants.EXT4_INLINE_DATA_FL) == Ext2Constants.EXT4_INLINE_DATA_FL) {
                     // Sym-links are a special case: the data seems to be stored inline in the iNode
+                    // Also the case for inline data
                     System.arraycopy(iNode.getINodeBlockData(), 0, dest, 0, Math.min(64, dest.length));
                 } else {
                     long blockSize = iNode.getExt2FileSystem().getBlockSize();
