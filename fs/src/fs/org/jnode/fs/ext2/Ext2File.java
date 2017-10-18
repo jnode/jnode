@@ -20,13 +20,16 @@
  
 package org.jnode.fs.ext2;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSFileSlackSpace;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.ReadOnlyFileSystemException;
+import org.jnode.fs.ext2.xattr.XAttrEntry;
 import org.jnode.fs.spi.AbstractFSFile;
+import org.jnode.fs.spi.AbstractFileSystem;
 import org.jnode.util.ByteBufferUtils;
 
 /**
@@ -34,19 +37,17 @@ import org.jnode.util.ByteBufferUtils;
  */
 public class Ext2File extends AbstractFSFile implements FSFileSlackSpace {
 
-    String name;
-    INode iNode;
+    private final Ext2Entry entry;
+    private final String name;
+    private INode iNode;
 
     private static final Logger log = Logger.getLogger(Ext2File.class);
 
     public Ext2File(Ext2Entry entry) {
-        this((Ext2FileSystem) entry.getFileSystem(), entry.getINode(), entry.getName());
-    }
-
-    public Ext2File(Ext2FileSystem fs, INode iNode, String name) {
-        super(fs);
-        this.iNode = iNode;
-        this.name = name;
+        super((AbstractFileSystem<?>) entry.getFileSystem());
+        this.entry = entry;
+        this.iNode = entry.getINode();
+        this.name = entry.getName();
     }
 
     @Override
@@ -196,11 +197,31 @@ public class Ext2File extends AbstractFSFile implements FSFileSlackSpace {
         // so synchronize to the inode
         synchronized (iNode) {
             try {
-                if ((iNode.getMode() & Ext2Constants.EXT2_S_IFLNK) == Ext2Constants.EXT2_S_IFLNK ||
-                    (iNode.getFlags() & Ext2Constants.EXT4_INLINE_DATA_FL) == Ext2Constants.EXT4_INLINE_DATA_FL) {
+                if ((iNode.getMode() & Ext2Constants.EXT2_S_IFLNK) == Ext2Constants.EXT2_S_IFLNK) {
                     // Sym-links are a special case: the data seems to be stored inline in the iNode
-                    // Also the case for inline data
                     System.arraycopy(iNode.getINodeBlockData(), 0, dest, 0, Math.min(64, dest.length));
+                } else if ((iNode.getFlags() & Ext2Constants.EXT4_INLINE_DATA_FL) == Ext2Constants.EXT4_INLINE_DATA_FL) {
+                    // Inline file data can be stored in both the inode i_block data, and also in a system.data
+                    // attribute. If the inode is for a directory, then the data can only be in one or the other
+                    XAttrEntry dataAttribute = iNode.getAttribute("system.data");
+                    if (dataAttribute != null && dataAttribute.getValueSize() > 0) {
+                        byte[] buffer;
+
+                        if (entry.isDirectory()) {
+                            log.debug("inline directory, length " + dataAttribute.getValueSize());
+                            buffer = dataAttribute.getValue();
+                        } else {
+                            log.debug("inline file/directory in i_block/xattr, xattr len: " + dataAttribute.getValueSize());
+                            ByteArrayOutputStream boas = new ByteArrayOutputStream();
+                            boas.write(iNode.getINodeBlockData(), 0, Math.min(60, iNode.getINodeBlockData().length));
+                            boas.write(dataAttribute.getValue());
+                            buffer = boas.toByteArray();
+                        }
+                        System.arraycopy(buffer, 0, dest, 0, Math.min(buffer.length, dest.length));
+                    } else {
+                        log.debug("inline file/directory in i_block");
+                        System.arraycopy(iNode.getINodeBlockData(), 0, dest, 0, Math.min(60, dest.length));
+                    }
                 } else {
                     long blockSize = iNode.getExt2FileSystem().getBlockSize();
                     long bytesRead = 0;

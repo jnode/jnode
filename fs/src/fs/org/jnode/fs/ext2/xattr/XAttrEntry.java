@@ -149,7 +149,7 @@ public class XAttrEntry {
         }
 
         byte[] value = new byte[(int) getValueSize()];
-        System.arraycopy(data, getValueOffset(), value, 0, value.length);
+        System.arraycopy(data, offset + getValueOffset(), value, 0, value.length);
         return value;
     }
 

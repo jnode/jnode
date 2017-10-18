@@ -216,7 +216,10 @@ public class Ext4FileSystemTest {
             "    lost+found; \n" +
             "    inline.txt; 31; 85da5521483449f0687b626cb376e8f8\n" +
             "    small-dir; \n" +
-            "      peanut-butter.txt; 80; 93ec2ee1c7e10363d5b2e3ecc1caaef0\n";
+            "      peanut-butter.txt; 80; c9d85be191c94f8605bd9f798d6c2354\n" +
+            "    xattr.txt; 90; 84cddc714c783ed1544fba5433328c08\n" +
+            "    tiny-dir; \n" +
+            "      a; 0; d41d8cd98f00b204e9800998ecf8427e\n";
 
         DataStructureAsserts.assertStructure(fs, expectedStructure);
     }

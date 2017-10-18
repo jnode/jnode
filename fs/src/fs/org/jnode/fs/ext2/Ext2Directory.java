@@ -363,19 +363,11 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
             index = 0;
 
             if ((entry.getINode().getFlags() & Ext2Constants.EXT4_INLINE_DATA_FL) == Ext2Constants.EXT4_INLINE_DATA_FL) {
-                // The first four bytes are the parent inode
-                index = 4;
-
                 XAttrEntry dataAttribute = entry.getINode().getAttribute("system.data");
-                if (dataAttribute != null) {
-
-                    // Depending on the size, the data can either be stored inline in the
-                    // inode's i_block data, or in an extended attribute
-                    if (dataAttribute.getValueSize() == 0) {
-                        data = ByteBuffer.wrap(entry.getINode().getINodeBlockData());
-                    } else {
-                        data = ByteBuffer.wrap(dataAttribute.getValue());
-                    }
+                if (dataAttribute == null || dataAttribute.getValueSize() == 0) {
+                    // If the directory listings are stored in the inode's i_block
+                    // data then the first four bytes are the parent inode
+                    index = 4;
                 }
             }
         }
