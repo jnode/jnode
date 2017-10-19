@@ -230,24 +230,15 @@ public class FatShortDirEntry extends FatDirEntry {
         lFstClusHi = entry.getUInt16(20);
         lFstClusLo = entry.getUInt16(26);
 
-        /*
-         * be sure startCluster is not larger than 28 bits FAT32 is actually a
-         * FAT28 ;-) should't happen at all ... but who knows?
-         */
-        if (lFstClusLo > 0xFFFF)
-            throw new IllegalArgumentException("FstClusLo too large: " +
-                NumberUtils.hex(lFstClusLo, 4));
+        if (fs.getBootSector().isFat32()) {
+            if (lFstClusHi > 0xFFF) {
+                log.warn("FstClusHi too large: 0x" + NumberUtils.hex(lFstClusHi, 4));
+            }
+        } else {
+            // FstClusHi contains an access mask for FAT12/FAT16.
+        }
 
-        if (lFstClusHi > 0xFFF)
-            throw new IllegalArgumentException("FstClusHi too large: " +
-                NumberUtils.hex(lFstClusHi, 4));
-
-        /*
-         * FstClusHi have to be "zero" for FAT12/FAT16 remind to add a check
-         * here
-         */
-
-        cluster = (lFstClusHi << 16) + lFstClusLo;
+        cluster = ((lFstClusHi & 0xFFF) << 16) + lFstClusLo;
     }
 
     private void encodeCluster() {
