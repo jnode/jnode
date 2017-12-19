@@ -18,12 +18,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jnode.fs.ntfs;
+package org.jnode.fs.ntfs.datarun;
 
 import java.io.IOException;
 import java.util.Arrays;
 import org.apache.log4j.Logger;
-import org.jnode.fs.ntfs.attribute.NTFSNonResidentAttribute;
+import org.jnode.fs.ntfs.NTFSStructure;
+import org.jnode.fs.ntfs.NTFSVolume;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -89,7 +90,7 @@ public final class DataRun implements DataRunInterface {
      * @param vcn         First VCN of this datarun.
      * @param previousLCN
      */
-    public DataRun(NTFSNonResidentAttribute attr, int offset, long vcn, long previousLCN) {
+    public DataRun(NTFSStructure attr, int offset, long vcn, long previousLCN) {
         NTFSStructure dataRunStructure = new NTFSStructure(attr, offset);
 
         // read first byte in type attribute

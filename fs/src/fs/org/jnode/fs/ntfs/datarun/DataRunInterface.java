@@ -18,9 +18,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.fs.ntfs;
+package org.jnode.fs.ntfs.datarun;
 
 import java.io.IOException;
+import org.jnode.fs.ntfs.NTFSVolume;
 
 /**
  * @author Daniel Noll (daniel@noll.id.au)

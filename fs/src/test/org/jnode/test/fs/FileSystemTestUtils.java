@@ -119,4 +119,21 @@ public class FileSystemTestUtils {
         ep.addExtension(extension);
         return new FileSystemPlugin(desc);
     }
+
+    /**
+     * Converts a string of hex bytes to a byte array.
+     *
+     * @param hexBytes the hex bytes to decode, e.g. "00 F8 EC".
+     * @return the byte array.
+     */
+    public static byte[] toByteArray(String hexBytes) {
+        String[] parts = hexBytes.trim().split(" ");
+        byte[] bytes = new byte[parts.length];
+
+        for (int i = 0; i < parts.length; i++) {
+            bytes[i] = (byte)(Integer.parseInt(parts[i], 16) & 0xff);
+        }
+
+        return bytes;
+    }
 }
