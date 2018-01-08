@@ -25,8 +25,10 @@ import org.jnode.driver.Device;
 import org.jnode.driver.block.FileDevice;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.ext2.Ext2Entry;
 import org.jnode.fs.ext2.Ext2FileSystem;
 import org.jnode.fs.ext2.Ext2FileSystemType;
+import org.jnode.fs.ext2.xattr.XAttrEntry;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.test.fs.DataStructureAsserts;
 import org.jnode.test.fs.FileSystemTestUtils;
@@ -222,6 +224,30 @@ public class Ext4FileSystemTest {
             "      a; 0; d41d8cd98f00b204e9800998ecf8427e\n";
 
         DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
+
+    @Test
+    public void testSelinuxXattr() throws Exception {
+
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/ext4/ext4-selinux.dd"), "r");
+        Ext2FileSystemType type = fss.getFileSystemType(Ext2FileSystemType.ID);
+        Ext2FileSystem fs = type.create(device, true);
+
+        String expectedStructure =
+            "type: EXT2 vol: total:98304 free:76800\n" +
+                "  /; \n" +
+                "    lost+found; \n" +
+                "    foo; 0; d41d8cd98f00b204e9800998ecf8427e\n" +
+                "    1; 3; acbd18db4cc2f85cedef654fccc4a4d8\n" +
+                "    2; 3; acbd18db4cc2f85cedef654fccc4a4d8\n" +
+                "    3; 3; acbd18db4cc2f85cedef654fccc4a4d8\n" +
+                "    4; 3; acbd18db4cc2f85cedef654fccc4a4d8\n";
+
+        DataStructureAsserts.assertStructure(fs, expectedStructure);
+
+        Ext2Entry fileEntry = (Ext2Entry) fs.getRootEntry().getDirectory().getEntry("1");
+        XAttrEntry selinuxAttribute = fileEntry.getINode().getAttribute("selinux");
+        assertThat(new String(selinuxAttribute.getValue(), "US-ASCII"), is("system_u:object_r:unlabeled_t\0"));
     }
 }
 

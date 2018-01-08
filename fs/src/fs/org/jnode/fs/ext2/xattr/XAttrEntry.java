@@ -41,12 +41,12 @@ public class XAttrEntry {
     /**
      * The data for the attribute entry.
      */
-    private final byte[] data;
+    protected final byte[] data;
 
     /**
      * The offset into the data.
      */
-    private final int offset;
+    protected final int offset;
 
     /**
      * Creates a new entry with the given data.
@@ -149,7 +149,7 @@ public class XAttrEntry {
         }
 
         byte[] value = new byte[(int) getValueSize()];
-        System.arraycopy(data, offset + getValueOffset(), value, 0, value.length);
+        System.arraycopy(data, getValueOffset(), value, 0, value.length);
         return value;
     }
 

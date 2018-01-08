@@ -29,6 +29,7 @@ import org.jnode.fs.FileSystemException;
 import org.jnode.fs.ext2.exception.UnallocatedBlockException;
 import org.jnode.fs.ext2.xattr.XAttrEntry;
 import org.jnode.fs.ext2.xattr.XAttrHeader;
+import org.jnode.fs.ext2.xattr.XAttrInlineEntry;
 import org.jnode.fs.ext4.ExtentHeader;
 import org.jnode.fs.util.FSUtils;
 import org.jnode.util.LittleEndian;
@@ -234,7 +235,7 @@ public class INode {
                         break;
                     }
 
-                    XAttrEntry entry = new XAttrEntry(xattrBuffer, offset);
+                    XAttrEntry entry = new XAttrInlineEntry(xattrBuffer, offset);
                     attributes.add(entry);
 
                     offset += FSUtils.roundUpToBoundary(4, entry.getNameLength() + XAttrEntry.MINIMUM_SIZE);
