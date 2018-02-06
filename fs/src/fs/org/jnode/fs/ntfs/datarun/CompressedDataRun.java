@@ -153,8 +153,8 @@ public final class CompressedDataRun implements DataRunInterface {
      * @param uncompressed the uncompressed data (out.)
      * @throws IOException if the decompression fails.
      */
-    private static void unCompressUnit(final byte[] compressed,
-                                       final byte[] uncompressed) throws IOException {
+    public static void unCompressUnit(final byte[] compressed,
+                                      final byte[] uncompressed) throws IOException {
 
         // This is just a convenient way to simulate the original code's pointer arithmetic.
         // I tried using buffers but positions in those are always from the beginning and
