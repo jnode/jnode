@@ -127,7 +127,7 @@ public class FileSystemTestUtils {
      * @return the byte array.
      */
     public static byte[] toByteArray(String hexBytes) {
-        String[] parts = hexBytes.trim().split(" ");
+        String[] parts = hexBytes.replace("\n", " ").trim().split(" ");
         byte[] bytes = new byte[parts.length];
 
         for (int i = 0; i < parts.length; i++) {
