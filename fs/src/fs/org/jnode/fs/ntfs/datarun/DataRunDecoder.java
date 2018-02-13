@@ -81,6 +81,7 @@ public class DataRunDecoder {
         boolean firstDataRun = true;
         int lastCompressedSize = 0;
         int compUnitSize = compressed ? compressionUnit : 1;
+        CompressedDataRun lastCompressedRun = null;
 
         while (parent.getUInt8(offset) != 0x0) {
             final DataRun dataRun = new DataRun(parent, offset, vcn, previousLCN);
@@ -140,8 +141,18 @@ public class DataRunDecoder {
                         vcn += dataRun.getLength();
                     }
 
+                } else if (expectingSparseRunNext) {
+                    // If a sparse data run was expected, but instead we got another regular data run, then this is
+                    // likely a list of compressed data run parts inside the same compressed run. Create an adjusted
+                    // run and add it to the parent run
+                    long adjustedVcn = lastCompressedRun.getFirstVcn() + lastCompressedSize;
+                    DataRun adjustedRun = new DataRun(parent, offset, adjustedVcn, previousLCN);
+                    lastCompressedRun.addDataRun(adjustedRun);
+                    lastCompressedSize += dataRun.getLength();
+
                 } else {
-                    dataRuns.add(new CompressedDataRun(dataRun, compUnitSize));
+                    lastCompressedRun = new CompressedDataRun(dataRun, compUnitSize);
+                    dataRuns.add(lastCompressedRun);
                     expectingSparseRunNext = true;
                     lastCompressedSize = dataRun.getLength();
 
@@ -149,7 +160,7 @@ public class DataRunDecoder {
                     vcn += compUnitSize;
                 }
             } else {
-                // map VCN-> datarun
+                // map VCN -> datarun
                 dataRuns.add(dataRun);
                 this.numberOfVCNs += dataRun.getLength();
                 vcn += dataRun.getLength();

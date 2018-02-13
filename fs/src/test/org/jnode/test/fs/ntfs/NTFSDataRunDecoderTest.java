@@ -69,10 +69,10 @@ public class NTFSDataRunDecoderTest {
         assertThat(dataRunDecoder.getNumberOfVCNs(), is(64));
 
         String expectedRuns =
-            "[compressed-run vcn:0-15 [data-run vcn:0-6 cluster:2228]]\n" +
-            "[compressed-run vcn:16-31 [data-run vcn:16-22 cluster:2244]]\n" +
-            "[compressed-run vcn:32-47 [data-run vcn:32-38 cluster:2260]]\n" +
-            "[compressed-run vcn:48-63 [data-run vcn:48-51 cluster:2276]]\n";
+            "[compressed-run vcn:0-15 [[data-run vcn:0-6 cluster:2228]]]\n" +
+            "[compressed-run vcn:16-31 [[data-run vcn:16-22 cluster:2244]]]\n" +
+            "[compressed-run vcn:32-47 [[data-run vcn:32-38 cluster:2260]]]\n" +
+            "[compressed-run vcn:48-63 [[data-run vcn:48-51 cluster:2276]]]\n";
         assertDataRuns(dataRuns, expectedRuns);
     }
 
@@ -93,29 +93,63 @@ public class NTFSDataRunDecoderTest {
         assertThat(dataRunDecoder.getNumberOfVCNs(), is(544));
 
         String expectedRuns =
-            "[compressed-run vcn:0-15 [data-run vcn:0-5 cluster:181033]]\n" +
-            "[compressed-run vcn:16-31 [data-run vcn:16-21 cluster:181039]]\n" +
-            "[compressed-run vcn:32-47 [data-run vcn:32-37 cluster:181045]]\n" +
-            "[compressed-run vcn:48-63 [data-run vcn:48-53 cluster:181051]]\n" +
-            "[compressed-run vcn:64-79 [data-run vcn:64-69 cluster:181057]]\n" +
-            "[compressed-run vcn:80-95 [data-run vcn:80-85 cluster:181063]]\n" +
-            "[compressed-run vcn:96-111 [data-run vcn:96-101 cluster:181069]]\n" +
-            "[compressed-run vcn:112-127 [data-run vcn:112-117 cluster:181075]]\n" +
-            "[compressed-run vcn:128-143 [data-run vcn:128-133 cluster:181081]]\n" +
-            "[compressed-run vcn:144-159 [data-run vcn:144-149 cluster:181087]]\n" +
-            "[compressed-run vcn:160-175 [data-run vcn:160-165 cluster:181093]]\n" +
-            "[compressed-run vcn:176-191 [data-run vcn:176-181 cluster:181099]]\n" +
-            "[compressed-run vcn:192-207 [data-run vcn:192-197 cluster:181105]]\n" +
-            "[compressed-run vcn:208-223 [data-run vcn:208-213 cluster:181111]]\n" +
-            "[compressed-run vcn:224-239 [data-run vcn:224-229 cluster:7186912]]\n" +
-            "[compressed-run vcn:240-255 [data-run vcn:240-245 cluster:7192116]]\n" +
-            "[compressed-run vcn:256-271 [data-run vcn:256-261 cluster:7195041]]\n" +
-            "[compressed-run vcn:272-287 [data-run vcn:272-277 cluster:7945000]]\n" +
-            "[compressed-run vcn:288-303 [data-run vcn:288-293 cluster:6022724]]\n" +
-            "[compressed-run vcn:304-319 [data-run vcn:304-309 cluster:5305292]]\n" +
-            "[compressed-run vcn:320-335 [data-run vcn:320-321 cluster:3088312]]\n" +
+            "[compressed-run vcn:0-15 [[data-run vcn:0-5 cluster:181033]]]\n" +
+            "[compressed-run vcn:16-31 [[data-run vcn:16-21 cluster:181039]]]\n" +
+            "[compressed-run vcn:32-47 [[data-run vcn:32-37 cluster:181045]]]\n" +
+            "[compressed-run vcn:48-63 [[data-run vcn:48-53 cluster:181051]]]\n" +
+            "[compressed-run vcn:64-79 [[data-run vcn:64-69 cluster:181057]]]\n" +
+            "[compressed-run vcn:80-95 [[data-run vcn:80-85 cluster:181063]]]\n" +
+            "[compressed-run vcn:96-111 [[data-run vcn:96-101 cluster:181069]]]\n" +
+            "[compressed-run vcn:112-127 [[data-run vcn:112-117 cluster:181075]]]\n" +
+            "[compressed-run vcn:128-143 [[data-run vcn:128-133 cluster:181081]]]\n" +
+            "[compressed-run vcn:144-159 [[data-run vcn:144-149 cluster:181087]]]\n" +
+            "[compressed-run vcn:160-175 [[data-run vcn:160-165 cluster:181093]]]\n" +
+            "[compressed-run vcn:176-191 [[data-run vcn:176-181 cluster:181099]]]\n" +
+            "[compressed-run vcn:192-207 [[data-run vcn:192-197 cluster:181105]]]\n" +
+            "[compressed-run vcn:208-223 [[data-run vcn:208-213 cluster:181111]]]\n" +
+            "[compressed-run vcn:224-239 [[data-run vcn:224-229 cluster:7186912]]]\n" +
+            "[compressed-run vcn:240-255 [[data-run vcn:240-245 cluster:7192116]]]\n" +
+            "[compressed-run vcn:256-271 [[data-run vcn:256-261 cluster:7195041]]]\n" +
+            "[compressed-run vcn:272-287 [[data-run vcn:272-277 cluster:7945000]]]\n" +
+            "[compressed-run vcn:288-303 [[data-run vcn:288-293 cluster:6022724]]]\n" +
+            "[compressed-run vcn:304-319 [[data-run vcn:304-309 cluster:5305292]]]\n" +
+            "[compressed-run vcn:320-335 [[data-run vcn:320-321 cluster:3088312]]]\n" +
             "[data-run vcn:336-527 cluster:7189545]\n" +
-            "[compressed-run vcn:528-543 [data-run vcn:528-528 cluster:7189737]]\n";
+            "[compressed-run vcn:528-543 [[data-run vcn:528-528 cluster:7189737]]]\n";
+        assertDataRuns(dataRuns, expectedRuns);
+    }
+
+    @Test
+    public void testCompressedRuns_WithoutSparseRuns() {
+        // Arrange
+        byte[] buffer = toByteArray(
+            "31 03 EE 0A 01 11 01 F5\n" +
+                "01 0C 21 04 8A CB 01 0C 21 04 D5 0F 01 0C 21 04\n" +
+                "F7 AB 01 0C 21 04 80 17 01 0C 21 04 A2 13 01 0C\n" +
+                "21 04 6D 01 01 0C 21 04 AA 14 01 0C 21 04 E4 02\n" +
+                "01 0C 21 04 05 03 01 0C 21 03 7B 0A 21 01 75 F7\n" +
+                "01 0C 21 03 66 03 21 01 D4 F9 01 0C 31 04 B0 40\n" +
+                "FF 01 00 00 00 00");
+        DataRunDecoder dataRunDecoder = new DataRunDecoder(new NTFSStructure(buffer, 0), 0, true, 16);
+
+        // Act
+        List<DataRunInterface> dataRuns = dataRunDecoder.getDataRuns();
+
+        // Assert
+        String expectedRuns =
+            "[compressed-run vcn:0-15 [[data-run vcn:0-2 cluster:68334], [data-run vcn:3-3 cluster:68323]]]\n" +
+            "[compressed-run vcn:16-31 [[data-run vcn:16-19 cluster:54893]]]\n" +
+            "[compressed-run vcn:32-47 [[data-run vcn:32-35 cluster:58946]]]\n" +
+            "[compressed-run vcn:48-63 [[data-run vcn:48-51 cluster:37433]]]\n" +
+            "[compressed-run vcn:64-79 [[data-run vcn:64-67 cluster:43449]]]\n" +
+            "[compressed-run vcn:80-95 [[data-run vcn:80-83 cluster:48475]]]\n" +
+            "[compressed-run vcn:96-111 [[data-run vcn:96-99 cluster:48840]]]\n" +
+            "[compressed-run vcn:112-127 [[data-run vcn:112-115 cluster:54130]]]\n" +
+            "[compressed-run vcn:128-143 [[data-run vcn:128-131 cluster:54870]]]\n" +
+            "[compressed-run vcn:144-159 [[data-run vcn:144-147 cluster:55643]]]\n" +
+            "[compressed-run vcn:160-175 [[data-run vcn:160-162 cluster:58326], [data-run vcn:163-163 cluster:56139]]]\n" +
+            "[compressed-run vcn:176-191 [[data-run vcn:176-178 cluster:57009], [data-run vcn:179-179 cluster:55429]]]\n" +
+            "[compressed-run vcn:192-207 [[data-run vcn:192-195 cluster:6453]]]\n";
         assertDataRuns(dataRuns, expectedRuns);
     }
 

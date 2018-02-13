@@ -21,7 +21,9 @@
 package org.jnode.fs.ntfs.datarun;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.jnode.fs.ntfs.NTFSVolume;
 import org.jnode.util.LittleEndian;
@@ -42,9 +44,9 @@ public final class CompressedDataRun implements DataRunInterface {
     private static final Logger log = Logger.getLogger(CompressedDataRun.class);
 
     /**
-     * The underlying data run containing the compressed data.
+     * The underlying data runs containing the compressed data.
      */
-    private final DataRun compressedRun;
+    private final List<DataRun> compressedRuns = new ArrayList<DataRun>();
 
     /**
      * The number of clusters which make up a compression unit.
@@ -59,7 +61,7 @@ public final class CompressedDataRun implements DataRunInterface {
      * @param compressionUnitSize the number of clusters which make up a compression unit.
      */
     public CompressedDataRun(DataRun compressedRun, int compressionUnitSize) {
-        this.compressedRun = compressedRun;
+        this.compressedRuns.add(compressedRun);
         this.compressionUnitSize = compressionUnitSize;
     }
 
@@ -89,7 +91,7 @@ public final class CompressedDataRun implements DataRunInterface {
 
         // Logic to determine whether we own the VCN which has been requested.
         // XXX: Lifted from DataRun.  Consider moving to some good common location.
-        final long myFirstVcn = compressedRun.getFirstVcn();
+        final long myFirstVcn = getFirstVcn();
         final long myLastVcn = getLastVcn();
         final long reqLastVcn = vcn + nrClusters - 1;
         log.debug("me:" + myFirstVcn + "-" + myLastVcn + ", req:" + vcn + "-" + reqLastVcn);
@@ -101,22 +103,29 @@ public final class CompressedDataRun implements DataRunInterface {
         // Now we know it's in our data run, here's the actual fragment to read.
         final long actFirstVcn = Math.max(myFirstVcn, vcn);
         final int actLength = (int) (Math.min(myLastVcn, reqLastVcn) - actFirstVcn + 1);
-
-        // This is the actual number of stored clusters after compression.
-        // If the number of stored clusters is the same as the compression unit size,
-        // then the data can be read directly without decompressing it.
-        final int compClusters = compressedRun.getLength();
-        if (compClusters == compressionUnitSize) {
-            return compressedRun.readClusters(vcn, dst, dstOffset, compClusters, clusterSize, volume);
-        }
-
-        // Now we know the data is compressed.  Read in the compressed block...
         final int vcnOffsetWithinUnit = (int) (actFirstVcn % compressionUnitSize);
         final byte[] tempCompressed = new byte[compressionUnitSize * clusterSize];
-        final int read = compressedRun.readClusters(myFirstVcn, tempCompressed, 0,
-            compClusters, clusterSize, volume);
-        if (read != compClusters) {
-            throw new IOException("Needed " + compClusters + " clusters but could " + "only read " + read);
+        long readVcn = myFirstVcn;
+        int tempCompressedOffset = 0;
+
+        for (DataRun compressedRun : compressedRuns) {
+            // This is the actual number of stored clusters after compression.
+            // If the number of stored clusters is the same as the compression unit size,
+            // then the data can be read directly without decompressing it.
+            final int compClusters = compressedRun.getLength();
+            if (compClusters == compressionUnitSize) {
+                return compressedRun.readClusters(vcn, dst, dstOffset, compClusters, clusterSize, volume);
+            }
+
+            // Now we know the data is compressed.  Read in the compressed block...
+            final int read = compressedRun.readClusters(readVcn, tempCompressed, tempCompressedOffset,
+                compClusters, clusterSize, volume);
+            if (read != compClusters) {
+                throw new IOException("Needed " + compClusters + " clusters but could " + "only read " + read);
+            }
+
+            tempCompressedOffset += clusterSize * compClusters;
+            readVcn += compClusters;
         }
 
         // Uncompress it, and copy into the destination.
@@ -248,7 +257,7 @@ public final class CompressedDataRun implements DataRunInterface {
 
     @Override
     public long getFirstVcn() {
-        return compressedRun.getFirstVcn();
+        return compressedRuns.get(0).getFirstVcn();
     }
 
     @Override
@@ -266,12 +275,21 @@ public final class CompressedDataRun implements DataRunInterface {
     }
 
     /**
-     * Gets the underlying data run containing the compressed data.
+     * Gets the underlying data runs containing the compressed data.
      *
-     * @return the data run.
+     * @return the data runs.
      */
-    public DataRun getCompressedRun() {
-        return compressedRun;
+    public List<DataRun> getCompressedRuns() {
+        return compressedRuns;
+    }
+
+    /**
+     * Adds a data run to this compressed run.
+     *
+     * @param dataRun the data run to add.
+     */
+    public void addDataRun(DataRun dataRun) {
+        compressedRuns.add(dataRun);
     }
 
     /**
@@ -375,6 +393,6 @@ public final class CompressedDataRun implements DataRunInterface {
 
     @Override
     public String toString() {
-        return String.format("[compressed-run vcn:%d-%d %s]", getFirstVcn(), getLastVcn(), compressedRun);
+        return String.format("[compressed-run vcn:%d-%d %s]", getFirstVcn(), getLastVcn(), compressedRuns);
     }
 }
