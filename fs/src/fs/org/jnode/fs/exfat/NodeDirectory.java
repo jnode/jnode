@@ -35,29 +35,29 @@ import org.jnode.fs.spi.AbstractFSObject;
  */
 public class NodeDirectory extends AbstractFSObject implements FSDirectory, FSDirectoryId {
 
-    private final Node node;
+    private final NodeEntry nodeEntry;
     private final Map<String, NodeEntry> nameToNode;
     private final Map<String, NodeEntry> idToNode;
     private final UpcaseTable upcase;
 
-    public NodeDirectory(ExFatFileSystem fs, Node node)
+    public NodeDirectory(ExFatFileSystem fs, NodeEntry nodeEntry)
         throws IOException {
 
-        this(fs, node, false);
+        this(fs, nodeEntry, false);
     }
 
-    public NodeDirectory(ExFatFileSystem fs, Node node, boolean showDeleted)
+    public NodeDirectory(ExFatFileSystem fs, NodeEntry nodeEntry, boolean showDeleted)
         throws IOException {
 
         super(fs);
 
-        this.node = node;
+        this.nodeEntry = nodeEntry;
         this.upcase = fs.getUpcase();
         this.nameToNode = new LinkedHashMap<String, NodeEntry>();
         this.idToNode = new LinkedHashMap<String, NodeEntry>();
 
         DirectoryParser.
-            create(node, showDeleted).
+            create(nodeEntry.getNode(), showDeleted).
             setUpcase(this.upcase).
             parse(new VisitorImpl());
 
@@ -65,7 +65,7 @@ public class NodeDirectory extends AbstractFSObject implements FSDirectory, FSDi
 
     @Override
     public String getDirectoryId() {
-        return Long.toString(node.getStartCluster());
+        return Long.toString(nodeEntry.getNode().getStartCluster());
     }
 
     @Override
@@ -91,17 +91,17 @@ public class NodeDirectory extends AbstractFSObject implements FSDirectory, FSDi
     }
 
     @Override
-    public FSEntry addFile(String name) throws IOException {
+    public FSEntry addFile(String name) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public FSEntry addDirectory(String name) throws IOException {
+    public FSEntry addDirectory(String name) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void remove(String name) throws IOException {
+    public void remove(String name) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -116,26 +116,35 @@ public class NodeDirectory extends AbstractFSObject implements FSDirectory, FSDi
      * @return the node.
      */
     public Node getNode() {
-        return node;
+        return nodeEntry.getNode();
+    }
+
+    /**
+     * Gets the parent directory.
+     *
+     * @return the parent directory, or {@code null} if this is the root directory.
+     */
+    public FSDirectory getParent() {
+        return nodeEntry.getParent();
     }
 
     private class VisitorImpl implements DirectoryParser.Visitor {
 
         @Override
-        public void foundLabel(String label) throws IOException {
+        public void foundLabel(String label) {
             /* ignore */
         }
 
         @Override
         public void foundBitmap(
-            long startCluster, long size) throws IOException {
+            long startCluster, long size) {
 
             /* ignore */
         }
 
         @Override
         public void foundUpcaseTable(DirectoryParser parser, long checksum,
-                                     long startCluster, long size) throws IOException {
+                                     long startCluster, long size) {
             
             /* ignore */
         }
