@@ -18,145 +18,30 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.fs.ntfs;
+package org.jnode.fs.ntfs.usnjrnl;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.jnode.fs.ntfs.NTFSStructure;
 
 /**
- * An entry in the USN journal file ($Extend\$UsnJrnl).
+ * Items related to the USN journal file ($Extend\$UsnJrnl).
  *
  * @author Luke Quinane
  */
-public class UsnJournalEntry extends NTFSStructure {
+public class UsnJournal {
 
     /**
-     * Creates a new journal entry at the given offset.
+     * Gets the major version for a USN record entry.
      *
-     * @param buffer the buffer containing the journal data.
-     * @param offset the offset in the buffer to read from.
-     */
-    public UsnJournalEntry(byte[] buffer, int offset) {
-        super(buffer, offset);
-    }
-
-    /**
-     * Gets the size of this entry.
-     *
-     * @return the size.
-     */
-    public long getSize() {
-        return getUInt32(0x0);
-    }
-
-    /**
-     * Gets the major version number.
-     *
+     * @param structure the structure to read from.
      * @return the major version number.
      */
-    public int getMajorVersion() {
-        return getUInt16(0x4);
-    }
-
-    /**
-     * Gets the minor version number.
-     *
-     * @return the minor version number.
-     */
-    public int getMinorVersion() {
-        return getUInt16(0x6);
-    }
-
-    /**
-     * Gets the MFT reference.
-     *
-     * @return the MFT reference.
-     */
-    public long getMftReference() {
-        return getInt48(0x8);
-    }
-
-    /**
-     * Gets the parent MFT reference.
-     *
-     * @return the parent MFT reference.
-     */
-    public long getParentMtfReference() {
-        return getInt48(0x10);
-    }
-
-    /**
-     * Gets the timestamp for this entry.
-     *
-     * @return the timestamp.
-     */
-    public long getTimestamp() {
-        return NTFSUTIL.filetimeToMillis(getInt64(0x20));
-    }
-
-    /**
-     * Gets the reason for the entry.
-     *
-     * @return the reason.
-     */
-    public long getReason() {
-        return getUInt32(0x28);
-    }
-
-    /**
-     * Gets the source info.
-     *
-     * @return the source info.
-     */
-    public int getSourceInfo() {
-        return getInt32(0x2b);
-    }
-
-    public int getSecurityId() {
-        return getInt32(0x30);
-    }
-
-    public int getFileAttributes() {
-        return getInt32(0x34);
-    }
-
-    /**
-     * Gets the size of the file name stored in this entry.
-     *
-     * @return the size of the file name text.
-     */
-    public int getFileNameSize() {
-        return getInt16(0x38);
-    }
-
-    /**
-     * Gets the file name stored in this entry.
-     *
-     * @return the file name.
-     */
-    public String getFileName() {
-        byte[] buffer = new byte[getFileNameSize()];
-        getData(0x3c, buffer, 0, buffer.length);
-
-        try {
-            return new String(buffer, "UTF-16LE");
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("UTF-16LE charset missing from JRE", e);
-        }
-    }
-
-    @Override
-    public String toString() {
-        return String.format("MFT: 0x%x parent MFT: 0x%x, %s version: %d.%d, size: %d source: 0x%x security: 0x%x "
-            + "attributes: %s time: %s, name:%s", getMftReference(), getParentMtfReference(),
-            Reason.lookupReasons(getReason()), getMajorVersion(), getMinorVersion(), getSize(), getSourceInfo(),
-            getSecurityId(), FileAttribute.lookupAttributes(getFileAttributes()), new Date(getTimestamp()),
-            getFileName());
+    public static int getMajorVersion(NTFSStructure structure) {
+        return structure.getUInt16(0x4);
     }
 
     /**
