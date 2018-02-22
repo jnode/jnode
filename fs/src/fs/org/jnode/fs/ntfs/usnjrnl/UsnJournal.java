@@ -45,6 +45,16 @@ public class UsnJournal {
     }
 
     /**
+     * Gets the minor version for a USN record entry.
+     *
+     * @param structure the structure to read from.
+     * @return the minor version number.
+     */
+    public static int getMinorVersion(NTFSStructure structure) {
+        return structure.getUInt16(0x6);
+    }
+
+    /**
      * File attribute constants
      */
     public static class FileAttribute {

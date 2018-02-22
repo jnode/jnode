@@ -36,6 +36,7 @@
     <library name="jnode-fs.jar">
       <export name="org.jnode.fs.ntfs.*"/>
       <export name="org.jnode.fs.ntfs.attribute.*"/>
+      <export name="org.jnode.fs.ntfs.datarun.*"/>
       <export name="org.jnode.fs.ntfs.index.*"/>
       <export name="org.jnode.fs.ntfs.logfile.*"/>
       <export name="org.jnode.fs.ntfs.security.*"/>

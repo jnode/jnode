@@ -77,6 +77,15 @@ public class FileId128 {
         return result;
     }
 
+    /**
+     * Gets the ID.
+     *
+     * @return the ID.
+     */
+    public byte[] getId() {
+        return id;
+    }
+
     @Override
     public String toString() {
         return String.format("file_id_128:[0x%x]", new BigInteger(id));
