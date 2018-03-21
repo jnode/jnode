@@ -49,7 +49,7 @@ public class AttributeZlibCompression implements HfsPlusCompression {
             uncompressed = ByteBuffer.allocate((int) decmpfsDiskHeader.getUncompressedSize());
 
             if (compressed.array()[0] == (byte) 0xff) {
-                // 0xff seems to be a marker for uncompressed data. Skip this byte any just copy the data out.
+                // 0xff seems to be a marker for uncompressed data. Skip this byte and just copy the data out.
                 // I have no idea why they didn't use 'CMP_Type1' which is meant for uncompressed data according to the
                 // headers
                 compressed.position(1);
