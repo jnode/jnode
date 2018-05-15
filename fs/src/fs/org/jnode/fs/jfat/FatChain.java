@@ -59,6 +59,17 @@ public class FatChain {
         this.dirty = false;
     }
 
+    /**
+     * Performs validation on the chain.
+     *
+     * @throws IllegalStateException if the validation fails.
+     */
+    public void validate() {
+        if ((head < 0) || (head > fat.size())) {
+            throw new IllegalStateException("illegal head: " + head);
+        }
+    }
+
     private void mylog(String msg) {
         log.debug(msg);
     }
@@ -72,9 +83,6 @@ public class FatChain {
     }
 
     private void setStartCluster(int value) {
-        if ((value < 0) || (value > fat.size()))
-            throw new IllegalArgumentException("illegal head: " + value);
-
         head = value;
 
         iterator.reset();
@@ -345,9 +353,7 @@ public class FatChain {
         try {
             i.setPosition(p.getIndex());
         } catch (NoSuchElementException ex) {
-            final IOException ioe = new IOException("attempt to seek after End Of Chain " + offset);
-            ioe.initCause(ex);
-            throw ioe;
+            throw new IOException("attempt to seek after End Of Chain " + offset, ex);
         }
 
         for (int l = dst.remaining(), sz = p.getPartial(), ofs = p.getOffset(), size; l > 0; l -=
@@ -422,7 +428,7 @@ public class FatChain {
 
                 if (cluster != 0) {
                     fat.set(cluster, last);
-                    ((ChainIterator) i).appendChain(last);
+                    i.appendChain(last);
                 } else {
                     setStartCluster(last);
                     // i = listIterator ( clidx );
@@ -454,7 +460,7 @@ public class FatChain {
 
                     if (cluster != 0) {
                         fat.set(cluster, last);
-                        ((ChainIterator) i).appendChain(last);
+                        i.appendChain(last);
                     } else {
                         setStartCluster(last);
                         // i = listIterator ( 0 );

@@ -50,23 +50,27 @@ public class FatEntry extends FatObject implements FSEntry, FSEntryCreated, FSEn
         super(fs);
     }
 
-    public FatEntry(FatFileSystem fs, FatDirectory parent, FatRecord record) {
+    public FatEntry(FatFileSystem fs, FatDirectory parent, FatRecord record, boolean performValidation) {
         this(fs);
         this.name = record.getLongName();
         this.record = record;
         this.entry = record.getShortEntry();
         this.parent = parent;
         this.chain = new FatChain(fs, entry.getStartCluster());
+
+        if (performValidation) {
+            chain.validate();
+        }
     }
 
-    private final void setRoot() {
+    private void setRoot() {
         this.name = "";
         this.record = null;
         this.entry = null;
         this.parent = null;
     }
 
-    protected final void setRoot32(int startCluster) {
+    public final void setRoot32(int startCluster) {
         setRoot();
         this.chain = new FatChain(getFatFileSystem(), startCluster);
     }
@@ -221,7 +225,7 @@ public class FatEntry extends FatObject implements FSEntry, FSEntryCreated, FSEn
 
     public String getPath() {
         StringBuilder path = new StringBuilder(1024);
-        FatDirectory parent = (FatDirectory) getParent();
+        FatDirectory parent = getParent();
 
         if (getName().length() != 0)
             path.append(getName());
@@ -230,7 +234,7 @@ public class FatEntry extends FatObject implements FSEntry, FSEntryCreated, FSEn
 
         while (parent != null) {
             path.insert(0, parent.getName() + "\\");
-            parent = (FatDirectory) parent.getParent();
+            parent = parent.getParent();
         }
 
         return path.toString();
@@ -266,6 +270,10 @@ public class FatEntry extends FatObject implements FSEntry, FSEntryCreated, FSEn
     }
 
     public String toString() {
+        return String.format("FatEntry:[dir:%b start-cluster:%d]:%s", isDirectory(), getStartCluster(), getName());
+    }
+
+    public String toDebugString() {
         StrWriter out = new StrWriter();
 
         out.println("*******************************************");

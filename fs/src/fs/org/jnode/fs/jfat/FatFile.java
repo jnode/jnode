@@ -31,7 +31,11 @@ public class FatFile extends FatEntry implements FSFile, FSFileSlackSpace {
     private static final Logger log = Logger.getLogger(FatFile.class);
 
     public FatFile(FatFileSystem fs, FatDirectory parent, FatRecord record) {
-        super(fs, parent, record);
+        this(fs, parent, record, true);
+    }
+
+    public FatFile(FatFileSystem fs, FatDirectory parent, FatRecord record, boolean performValidation) {
+        super(fs, parent, record, performValidation);
     }
 
     public boolean isFile() {

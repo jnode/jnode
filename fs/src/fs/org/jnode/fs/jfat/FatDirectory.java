@@ -47,11 +47,27 @@ public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId
         super(fs);
     }
 
-    /*
-     * from a directory record;
+    /**
+     * Constructs a new FAT directory from a directory record.
+     *
+     * @param fs the file system.
+     * @param parent the parent directory.
+     * @param record the FAT record.
      */
     public FatDirectory(FatFileSystem fs, FatDirectory parent, FatRecord record) {
-        super(fs, parent, record);
+        super(fs, parent, record, true);
+    }
+
+    /**
+     * Constructs a new FAT directory from a directory record.
+     *
+     * @param fs the file system.
+     * @param parent the parent directory.
+     * @param record the FAT record.
+     * @param performValidation a flag indicating whether to perform validation on the data passed in.
+     */
+    public FatDirectory(FatFileSystem fs, FatDirectory parent, FatRecord record, boolean performValidation) {
+        super(fs, parent, record, performValidation);
     }
 
     /*
@@ -165,7 +181,7 @@ public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId
     public FatDirEntry[] getFatFreeEntries(int n) throws IOException {
         int i = 0;
         int index = 0;
-        FatDirEntry entry = null;
+        FatDirEntry entry;
         FatDirEntry[] entries = new FatDirEntry[n];
 
         while (i < n) {

@@ -182,7 +182,11 @@ public class FatShortDirEntry extends FatDirEntry {
         lCrtTime = entry.getUInt16(14);
         lCrtDate = entry.getUInt16(16);
 
-        created = FatUtils.decodeDateTime(lCrtDate, lCrtTime, lCrtTimeTenth);
+        try {
+            created = FatUtils.decodeDateTime(lCrtDate, lCrtTime, lCrtTimeTenth);
+        } catch (Exception e) {
+            log.debug("Invalid created date/time", e);
+        }
     }
 
     private void encodeCreated() {
@@ -203,7 +207,11 @@ public class FatShortDirEntry extends FatDirEntry {
     protected void decodeAccessed() {
         lLstAccDate = entry.getUInt16(18);
 
-        accessed = FatUtils.decodeDateTime(lLstAccDate, 0);
+        try {
+            accessed = FatUtils.decodeDateTime(lLstAccDate, 0);
+        } catch (Exception e) {
+            log.debug("Invalid access date", e);
+        }
     }
 
     private void encodeAccessed() {
@@ -215,7 +223,11 @@ public class FatShortDirEntry extends FatDirEntry {
         lWrtTime = entry.getUInt16(22);
         lWrtDate = entry.getUInt16(24);
 
-        modified = FatUtils.decodeDateTime(lWrtDate, lWrtTime);
+        try {
+            modified = FatUtils.decodeDateTime(lWrtDate, lWrtTime);
+        } catch (Exception e) {
+            log.debug("Invalid modified date/time", e);
+        }
     }
 
     private void encodeModified() {
