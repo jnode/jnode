@@ -243,8 +243,8 @@ public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId
     protected void scanDirectory() {
         FatEntriesFactory f = createEntriesFactory(false);
 
-        while (f.hasNextEntry())
-            f.createNextEntry();
+        while (f.hasNext())
+            f.next();
     }
 
     public synchronized FSEntry getEntry(String name) {
@@ -253,8 +253,8 @@ public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId
         if (child == null) {
             FatEntriesFactory f = createEntriesFactory(false);
 
-            while (f.hasNextEntry()) {
-                FatEntry entry = f.createNextEntry();
+            while (f.hasNext()) {
+                FatEntry entry = f.next();
                 if (FatUtils.compareIgnoreCase(entry.getName(), name)) {
                     child = children.put(entry);
                     break;
@@ -272,8 +272,8 @@ public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId
         if (child == null) {
             FatEntriesFactory f = createEntriesFactory(true);
 
-            while (f.hasNextEntry()) {
-                FatEntry entry = f.createNextEntry();
+            while (f.hasNext()) {
+                FatEntry entry = f.next();
                 idMap.put(entry.getId(), entry);
             }
 
@@ -287,8 +287,8 @@ public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId
         FatEntry child = null;
         FatEntriesFactory f = createEntriesFactory(false);
 
-        while (f.hasNextEntry()) {
-            FatEntry entry = f.createNextEntry();
+        while (f.hasNext()) {
+            FatEntry entry = f.next();
             if (entry.isShortName(shortName)) {
                 child = entry;
                 break;
@@ -302,8 +302,8 @@ public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId
         FatEntry child = null;
         FatEntriesFactory f = createEntriesFactory(false);
 
-        while (f.hasNextEntry()) {
-            FatEntry entry = f.createNextEntry();
+        while (f.hasNext()) {
+            FatEntry entry = f.next();
             if (FatUtils.compareIgnoreCase(entry.getName(), name)) {
                 child = entry;
                 break;

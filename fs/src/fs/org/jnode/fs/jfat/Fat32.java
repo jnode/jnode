@@ -29,7 +29,7 @@ import org.jnode.driver.block.BlockDeviceAPI;
  * @author gvt
  */
 public class Fat32 extends Fat {
-    protected Fat32(BootSector bs, BlockDeviceAPI api) {
+    public Fat32(BootSector bs, BlockDeviceAPI api) {
         super(bs, api);
     }
 

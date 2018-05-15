@@ -1,10 +1,11 @@
 package org.jnode.fs.jfat;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import org.apache.log4j.Logger;
 
-public class FatEntriesFactory {
+public class FatEntriesFactory implements Iterator<FatEntry> {
 
     private static final Logger log = Logger.getLogger(FatEntriesFactory.class);
 
@@ -12,10 +13,18 @@ public class FatEntriesFactory {
     private int index;
     private int next;
     private FatEntry entry;
+
+    /**
+     * A flag indicating whether to include deleted entries.
+     */
     protected boolean includeDeleted;
+
+    /**
+     * The parent directory.
+     */
     private FatDirectory directory;
 
-    protected FatEntriesFactory(FatDirectory directory, boolean includeDeleted) {
+    public FatEntriesFactory(FatDirectory directory, boolean includeDeleted) {
         label = false;
         index = 0;
         next = 0;
@@ -24,7 +33,17 @@ public class FatEntriesFactory {
         this.directory = directory;
     }
 
-    protected boolean hasNextEntry() {
+    /**
+     * Returns the index of the entry the factory is up to.
+     *
+     * @return the index.
+     */
+    public int getIndex() {
+        return index;
+    }
+
+    @Override
+    public boolean hasNext() {
         int i;
         FatDirEntry dirEntry;
         FatRecord record = new FatRecord();
@@ -128,9 +147,10 @@ public class FatEntriesFactory {
         return new FatFile(directory.getFatFileSystem(), directory, record);
     }
 
-    protected FatEntry createNextEntry() {
+    @Override
+    public FatEntry next() {
         if (index == next) {
-            hasNextEntry();
+            hasNext();
         }
 
         if (entry == null) {
@@ -139,5 +159,10 @@ public class FatEntriesFactory {
 
         index = next;
         return entry;
+    }
+
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException();
     }
 }

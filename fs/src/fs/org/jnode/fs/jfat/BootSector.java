@@ -161,7 +161,7 @@ public class BootSector {
             type = IFAT32;
     }
 
-    private void decode() {
+    public void decode() {
         BS_jmpBoot = getBytes(0, 3);
         BS_OEMName = getString(3, 8);
         BPB_BytsPerSec = get16(11);
@@ -207,7 +207,7 @@ public class BootSector {
     }
 
     @SuppressWarnings("unused")
-    private void encode() {
+    public void encode() {
         setBytes(0, 3, BS_jmpBoot);
         setString(3, 8, BS_OEMName);
         set16(11, BPB_BytsPerSec);

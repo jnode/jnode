@@ -160,7 +160,7 @@ public class FatEntry extends FatObject implements FSEntry, FSEntryCreated, FSEn
         return entry;
     }
 
-    protected void setEntry(FatShortDirEntry value) {
+    public void setEntry(FatShortDirEntry value) {
         this.entry = value;
     }
 

@@ -24,14 +24,14 @@ public class FatEntriesIterator implements Iterator<FSEntry> {
     }
 
     public boolean hasNext() {
-        return entriesFactory.hasNextEntry();
+        return entriesFactory.hasNext();
     }
 
     public FSEntry next() {
         if (includeDeleted) {
-            return entriesFactory.createNextEntry();
+            return entriesFactory.next();
         } else {
-            return fatTable.look(entriesFactory.createNextEntry());
+            return fatTable.look(entriesFactory.next());
         }
     }
 
