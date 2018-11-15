@@ -94,7 +94,11 @@ public final class CompressedDataRun implements DataRunInterface {
         final long myFirstVcn = getFirstVcn();
         final long myLastVcn = getLastVcn();
         final long reqLastVcn = vcn + nrClusters - 1;
-        log.debug("me:" + myFirstVcn + "-" + myLastVcn + ", req:" + vcn + "-" + reqLastVcn);
+
+        if (log.isDebugEnabled()) {
+            log.debug("me:" + myFirstVcn + "-" + myLastVcn + ", req:" + vcn + "-" + reqLastVcn);
+        }
+
         if ((vcn > myLastVcn) || (myFirstVcn > reqLastVcn)) {
             // Not my region
             return 0;
@@ -203,8 +207,10 @@ public final class CompressedDataRun implements DataRunInterface {
         final int rawLen = compressed.getShort(cpos);
         cpos += 2;
         final int len = rawLen & 0xFFF;
-        log.debug("ntfs_uncompblock: block length: " + len + " + 3, 0x" +
-            Integer.toHexString(len) + ",0x" + Integer.toHexString(rawLen));
+        if (log.isDebugEnabled()) {
+            log.debug("ntfs_uncompblock: block length: " + len + " + 3, 0x" +
+                Integer.toHexString(len) + ",0x" + Integer.toHexString(rawLen));
+        }
 
         if (rawLen == 0) {
             // End of sequence, rest is zero.  For some reason there is nothing
