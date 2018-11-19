@@ -158,8 +158,8 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      * Read a number of clusters starting from a given virtual cluster number
      * (vcn).
      *
-     * @param vcn
-     * @param nrClusters
+     * @param vcn the virtual cluster to read.
+     * @param nrClusters the number of clusters to read.
      * @return The number of clusters read.
      * @throws IOException
      */

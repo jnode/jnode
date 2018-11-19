@@ -583,8 +583,7 @@ public class FileRecord extends NTFSRecord {
 
         // Grab the initialised size (if that is itself initialised)
         long initialisedSize = ((NTFSNonResidentAttribute) attr).getAttributeInitializedSize();
-        if (initialisedSize == 0)
-        {
+        if (initialisedSize == 0) {
             limitToInitialised = false;
         }
 
@@ -615,7 +614,7 @@ public class FileRecord extends NTFSRecord {
 
                 if (endOffset > initialisedSize && limitToInitialised) {
                     int delta = (int)(endOffset - initialisedSize);
-                    int startIndex = Math.max((int)(tmp.length - delta), 0);
+                    int startIndex = Math.max((tmp.length - delta), 0);
 
                     if (startIndex < tmp.length) {
                         Arrays.fill(tmp, startIndex, tmp.length, (byte) 0);
