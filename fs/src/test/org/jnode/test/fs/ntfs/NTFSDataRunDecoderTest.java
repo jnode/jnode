@@ -20,9 +20,10 @@ public class NTFSDataRunDecoderTest {
     public void testSingleRunDecoding() {
         // Arrange
         byte[] buffer = toByteArray("21 40 AA 06 00");
-        DataRunDecoder dataRunDecoder = new DataRunDecoder(new NTFSStructure(buffer, 0), 0, false, 1);
+        DataRunDecoder dataRunDecoder = new DataRunDecoder(false, 1);
 
         // Act
+        dataRunDecoder.readDataRuns(new NTFSStructure(buffer, 0), 0);
         List<DataRunInterface> dataRuns = dataRunDecoder.getDataRuns();
 
         // Assert
@@ -37,9 +38,10 @@ public class NTFSDataRunDecoderTest {
     public void testMultiRunDecoding() {
         // Arrange
         byte[] buffer = toByteArray("21 04 B0 00 21 04 93 20 21 04 37 EF 21 08 77 2A 21 04 EC 08 21 04 19 04 21 04 62 01 00");
-        DataRunDecoder dataRunDecoder = new DataRunDecoder(new NTFSStructure(buffer, 0), 0, false, 1);
+        DataRunDecoder dataRunDecoder = new DataRunDecoder(false, 1);
 
         // Act
+        dataRunDecoder.readDataRuns(new NTFSStructure(buffer, 0), 0);
         List<DataRunInterface> dataRuns = dataRunDecoder.getDataRuns();
 
         // Assert
@@ -60,9 +62,10 @@ public class NTFSDataRunDecoderTest {
     public void testCompressedRuns() {
         // Arrange
         byte[] buffer = toByteArray("21 07 B4 08 01 09 11 07 10 01 09 11 07 10 01 09 11 04 10 01 0C 00");
-        DataRunDecoder dataRunDecoder = new DataRunDecoder(new NTFSStructure(buffer, 0), 0, true, 16);
+        DataRunDecoder dataRunDecoder = new DataRunDecoder(true, 16);
 
         // Act
+        dataRunDecoder.readDataRuns(new NTFSStructure(buffer, 0), 0);
         List<DataRunInterface> dataRuns = dataRunDecoder.getDataRuns();
 
         // Assert
@@ -84,9 +87,10 @@ public class NTFSDataRunDecoderTest {
             "11 06 06 01 0A 11 06 06 01 0A 11 06 06 01 0A 31 06 69 E6 6A 01 0A 21 06 54 14 01 0A 21 06 6D 0B 01 0A " +
             "31 06 87 71 0B 01 0A 31 06 1C AB E2 01 0A 31 06 88 0D F5 01 0A 31 02 EC 2B DE 01 0E 32 C1 00 71 94 3E " +
             "01 0F 00");
-        DataRunDecoder dataRunDecoder = new DataRunDecoder(new NTFSStructure(buffer, 0), 0, true, 16);
+        DataRunDecoder dataRunDecoder = new DataRunDecoder(true, 16);
 
         // Act
+        dataRunDecoder.readDataRuns(new NTFSStructure(buffer, 0), 0);
         List<DataRunInterface> dataRuns = dataRunDecoder.getDataRuns();
 
         // Assert
@@ -130,9 +134,10 @@ public class NTFSDataRunDecoderTest {
                 "01 0C 21 04 05 03 01 0C 21 03 7B 0A 21 01 75 F7\n" +
                 "01 0C 21 03 66 03 21 01 D4 F9 01 0C 31 04 B0 40\n" +
                 "FF 01 00 00 00 00");
-        DataRunDecoder dataRunDecoder = new DataRunDecoder(new NTFSStructure(buffer, 0), 0, true, 16);
+        DataRunDecoder dataRunDecoder = new DataRunDecoder(true, 16);
 
         // Act
+        dataRunDecoder.readDataRuns(new NTFSStructure(buffer, 0), 0);
         List<DataRunInterface> dataRuns = dataRunDecoder.getDataRuns();
 
         // Assert

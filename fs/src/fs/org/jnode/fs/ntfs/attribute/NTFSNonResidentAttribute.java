@@ -63,9 +63,9 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         final int dataRunsOffset = getDataRunsOffset();
         if (dataRunsOffset > 0) {
             int compressionUnit = getCompressionUnitSize(fallbackCompressionUnit);
-            DataRunDecoder dataRunDecoder = new DataRunDecoder(fileRecord, offset + dataRunsOffset,
-                isCompressedAttribute(), compressionUnit);
+            DataRunDecoder dataRunDecoder = new DataRunDecoder(isCompressedAttribute(), compressionUnit);
 
+            dataRunDecoder.readDataRuns(fileRecord, offset + dataRunsOffset);
             dataRuns.addAll(dataRunDecoder.getDataRuns());
             numberOfVCNs = dataRunDecoder.getNumberOfVCNs();
 

@@ -31,19 +31,9 @@ public class DataRunDecoder {
     private final int compressionUnit;
 
     /**
-     * The parent structure, passed into the data runs.
-     */
-    private final NTFSStructure parent;
-
-    /**
-     * The offset in the parent.
-     */
-    private int offsetInParent;
-
-    /**
      * The decoded data runs.
      */
-    private List<DataRunInterface> dataRuns;
+    private final List<DataRunInterface> dataRuns = new ArrayList<DataRunInterface>();
 
     /**
      * The number of virtual clusters decoded.
@@ -53,23 +43,22 @@ public class DataRunDecoder {
     /**
      * Creates a new data run decoder.
      *
-     * @param parent the parent structure.
-     * @param offsetInParent the offset within the parent.
      * @param compressed a flag indicating whether the data runs are from a compressed data attribute.
      * @param compressionUnit the compression unit size. 2 to the power of this value is the number of clusters
      *                        per compression unit.
      */
-    public DataRunDecoder(NTFSStructure parent, int offsetInParent, boolean compressed, int compressionUnit) {
-        this.parent = parent;
-        this.offsetInParent = offsetInParent;
+    public DataRunDecoder(boolean compressed, int compressionUnit) {
         this.compressed = compressed;
         this.compressionUnit = compressionUnit;
     }
 
     /**
      * Read the data runs and decodes them.
+     *
+     * @param parent the parent structure.
+     * @param offsetInParent the offset within the parent.
      */
-    private void readDataRuns() {
+    public void readDataRuns(NTFSStructure parent, int offsetInParent) {
         int offset = offsetInParent;
 
         long previousLCN = 0;
@@ -183,9 +172,6 @@ public class DataRunDecoder {
      * @param clusterSize the cluster size.
      */
     public void checkDecoding(int clusterSize, long attributeAllocatedSize) {
-
-        getDataRuns();
-
         // Rounds up but won't work for 0, which shouldn't occur here.
         final long allocatedVCNs = (attributeAllocatedSize - 1) / clusterSize + 1;
         if (this.numberOfVCNs != allocatedVCNs) {
@@ -202,11 +188,6 @@ public class DataRunDecoder {
      * @return Returns the data runs.
      */
     public List<DataRunInterface> getDataRuns() {
-        if (dataRuns == null) {
-            dataRuns = new ArrayList<DataRunInterface>();
-            readDataRuns();
-        }
-
         return dataRuns;
     }
 
