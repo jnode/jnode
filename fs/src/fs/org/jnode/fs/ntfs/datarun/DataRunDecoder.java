@@ -41,6 +41,32 @@ public class DataRunDecoder {
     private int numberOfVCNs;
 
     /**
+     * The current virtual cluster number.
+     */
+    private long vcn;
+
+    /**
+     * Whether a sparse run is expected. If the attribute is compressed we will coalesce compressed/sparse
+     * data run pairs into a single data run object for convenience when reading.
+     */
+    private boolean expectingSparseRunNext = false;
+
+    /**
+     * Whether this is the first data-run in the list.
+     */
+    private boolean firstDataRun = true;
+
+    /**
+     * The last compressed run size.
+     */
+    private int lastCompressedSize = 0;
+
+    /**
+     * The last compressed run to append to.
+     */
+    private CompressedDataRun lastCompressedRun;
+
+    /**
      * Creates a new data run decoder.
      *
      * @param compressed a flag indicating whether the data runs are from a compressed data attribute.
@@ -49,7 +75,7 @@ public class DataRunDecoder {
      */
     public DataRunDecoder(boolean compressed, int compressionUnit) {
         this.compressed = compressed;
-        this.compressionUnit = compressionUnit;
+        this.compressionUnit = compressed ? compressionUnit : 1;
     }
 
     /**
@@ -60,17 +86,7 @@ public class DataRunDecoder {
      */
     public void readDataRuns(NTFSStructure parent, int offsetInParent) {
         int offset = offsetInParent;
-
         long previousLCN = 0;
-        long vcn = 0;
-
-        // If this attribute is compressed we will coalesce compressed/sparse
-        // data run pairs into a single data run object for convenience when reading.
-        boolean expectingSparseRunNext = false;
-        boolean firstDataRun = true;
-        int lastCompressedSize = 0;
-        int compUnitSize = compressed ? compressionUnit : 1;
-        CompressedDataRun lastCompressedRun = null;
 
         while (parent.getUInt8(offset) != 0x0) {
             final DataRun dataRun = new DataRun(parent, offset, vcn, previousLCN);
@@ -89,22 +105,22 @@ public class DataRunDecoder {
 
                     // Also the sparse run following a compressed run can be coalesced with a subsequent 'real' sparse
                     // run. So add that in if we hit one
-                    if (dataRun.getLength() + lastCompressedSize > compUnitSize) {
-                        int length = dataRun.getLength() - (compUnitSize - lastCompressedSize);
+                    if (dataRun.getLength() + lastCompressedSize > compressionUnit) {
+                        int length = dataRun.getLength() - (compressionUnit - lastCompressedSize);
                         dataRuns.add(new DataRun(0, length, true, 0, vcn));
 
                         this.numberOfVCNs += length;
                         vcn += length;
                         lastCompressedSize = 0;
                     }
-                } else if (dataRun.getLength() >= compUnitSize) {
+                } else if (dataRun.getLength() >= compressionUnit) {
                     // Compressed/sparse pairs always add to the compression unit size.  If
                     // the unit only compresses to 16, the system will store it uncompressed.
                     // Also if one-or more of these uncompressed runs happen next to each other then they can be
                     // coalesced into a single run and even coalesced into the next compressed run. In that case the
                     // compressed run needs to be split off
 
-                    int remainder = dataRun.getLength() % compUnitSize;
+                    int remainder = dataRun.getLength() % compressionUnit;
 
                     if (remainder != 0) {
                         // Uncompressed run coalesced with compressed run. First add in the uncompressed portion:
@@ -117,12 +133,12 @@ public class DataRunDecoder {
                         // Next add in the compressed portion
                         DataRun compressedRun =
                             new DataRun(dataRun.getCluster() + uncompressedLength, remainder, false, 0, vcn);
-                        dataRuns.add(new CompressedDataRun(compressedRun, compUnitSize));
+                        dataRuns.add(new CompressedDataRun(compressedRun, compressionUnit));
                         expectingSparseRunNext = true;
                         lastCompressedSize = remainder;
 
-                        this.numberOfVCNs += compUnitSize;
-                        vcn += compUnitSize;
+                        this.numberOfVCNs += compressionUnit;
+                        vcn += compressionUnit;
 
                     } else {
                         dataRuns.add(dataRun);
@@ -140,13 +156,13 @@ public class DataRunDecoder {
                     lastCompressedSize += dataRun.getLength();
 
                 } else {
-                    lastCompressedRun = new CompressedDataRun(dataRun, compUnitSize);
+                    lastCompressedRun = new CompressedDataRun(dataRun, compressionUnit);
                     dataRuns.add(lastCompressedRun);
                     expectingSparseRunNext = true;
                     lastCompressedSize = dataRun.getLength();
 
-                    this.numberOfVCNs += compUnitSize;
-                    vcn += compUnitSize;
+                    this.numberOfVCNs += compressionUnit;
+                    vcn += compressionUnit;
                 }
             } else {
                 // map VCN -> datarun
