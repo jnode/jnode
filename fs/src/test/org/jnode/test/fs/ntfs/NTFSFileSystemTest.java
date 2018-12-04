@@ -24,6 +24,7 @@ import org.jnode.driver.Device;
 import org.jnode.driver.block.FileDevice;
 import org.jnode.fs.FSFileSlackSpace;
 import org.jnode.fs.ntfs.FileRecord;
+import org.jnode.fs.ntfs.MasterFileTable;
 import org.jnode.fs.ntfs.NTFSEntry;
 import org.jnode.fs.ntfs.NTFSFileSystem;
 import org.jnode.fs.ntfs.NTFSFileSystemType;
@@ -78,6 +79,22 @@ public class NTFSFileSystemTest {
                 "    test.txt; 18; fd99fcfc86ba71118bd64c2d9f4b54a4\n";
 
         DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
+
+    @Test
+    public void testComplexCompression() throws Exception {
+
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/ntfs/complex-compression.dd"), "r");
+        NTFSFileSystemType type = fss.getFileSystemType(NTFSFileSystemType.ID);
+        NTFSFileSystem fs = type.create(device, true);
+        MasterFileTable mft = fs.getNTFSVolume().getMFT();
+
+        // This record has a compressed unit (16 virtual clusters) split across two $DATA attributes, and required
+        // merging the lists of data-runs before reading and decompressing
+        FileRecord r = mft.getRecordUnchecked(68);
+
+        DataStructureAsserts.assertStructure(new NTFSEntry(fs, r, 5),
+            "file_0022.txt; 27852285; 992751cfac3ed9dd2d15a3d43d3829a7\n");
     }
 
     @Test

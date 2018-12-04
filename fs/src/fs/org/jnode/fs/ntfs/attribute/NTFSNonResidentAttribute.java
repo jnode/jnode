@@ -21,7 +21,6 @@
 package org.jnode.fs.ntfs.attribute;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import org.jnode.fs.ntfs.FileRecord;
 import org.jnode.fs.ntfs.NTFSVolume;
@@ -39,40 +38,31 @@ import org.jnode.fs.util.FSUtils;
  */
 public class NTFSNonResidentAttribute extends NTFSAttribute {
 
-    private final int numberOfVCNs;
-
     /**
-     * The list of decoded data runs.
+     * The data run decoder.
      */
-    private final List<DataRunInterface> dataRuns = new ArrayList<DataRunInterface>();
+    private final DataRunDecoder dataRunDecoder;
 
     /**
      * Creates a new non-resident attribute and reads in the associated data runs.
      *
      * @param fileRecord the file record that owns this attribute.
      * @param offset the offset to read from.
-     * @param fallbackCompressionUnit the fallback compression unit to use if the attribute is compressed but doesn't
-     *   have a compression unit stored.
      */
-    public NTFSNonResidentAttribute(FileRecord fileRecord, int offset, int fallbackCompressionUnit) {
+    public NTFSNonResidentAttribute(FileRecord fileRecord, int offset) {
         super(fileRecord, offset);
-        /*
-         * process the dataruns...all non resident attributes have their data
-         * outside. can find where using data runs
-         */
-        final int dataRunsOffset = getDataRunsOffset();
-        if (dataRunsOffset > 0) {
-            int compressionUnit = getCompressionUnitSize(fallbackCompressionUnit);
-            DataRunDecoder dataRunDecoder = new DataRunDecoder(isCompressedAttribute(), compressionUnit);
 
-            dataRunDecoder.readDataRuns(fileRecord, offset + dataRunsOffset);
-            dataRuns.addAll(dataRunDecoder.getDataRuns());
-            numberOfVCNs = dataRunDecoder.getNumberOfVCNs();
+        int compressionUnit = getCompressionUnitSize();
+        dataRunDecoder = new DataRunDecoder(isCompressedAttribute(), compressionUnit);
+    }
 
-            dataRunDecoder.checkDecoding(fileRecord.getClusterSize(), getAttributeAllocatedSize());
-        } else {
-            numberOfVCNs = 0;
-        }
+    /**
+     * Gets the data run decoder.
+     *
+     * @return the decoder.
+     */
+    public DataRunDecoder getDataRunDecoder() {
+        return dataRunDecoder;
     }
 
     /**
@@ -103,17 +93,8 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         return getUInt16(0x22);
     }
 
-    private int getCompressionUnitSize(int fallbackCompressionUnit) {
-        int compressionUnitSize = getStoredCompressionUnitSize();
-
-        if (compressionUnitSize == 0) {
-            // It seems like in some situations the compression unit size is only stored onto the first attribute of a
-            // certain type in the list. For example if there are three compressed DATA attributes, the second and third
-            // attributes may not have this set. In that situation use the first attribute's compression unit size.
-            return fallbackCompressionUnit;
-        }
-
-        return 1 << compressionUnitSize;
+    private int getCompressionUnitSize() {
+        return 1 << getStoredCompressionUnitSize();
     }
 
     /**
@@ -151,7 +132,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      * @return Returns the data runs.
      */
     public List<DataRunInterface> getDataRuns() {
-        return dataRuns;
+        return dataRunDecoder.getDataRuns();
     }
 
     /**
@@ -171,13 +152,13 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
 
         if (log.isDebugEnabled()) {
             log.debug("readVCN: wants start " + vcn + " length " + nrClusters +
-                ", we have start " + getStartVCN() + " length " + getNumberOfVCNs());
+                ", we have start " + getStartVCN() + " length " + dataRunDecoder.getNumberOfVCNs());
         }
 
         final NTFSVolume volume = getFileRecord().getVolume();
         final int clusterSize = volume.getClusterSize();
         int readClusters = 0;
-        for (DataRunInterface dataRun : this.getDataRuns()) {
+        for (DataRunInterface dataRun : getDataRuns()) {
             readClusters += dataRun.readClusters(vcn, dst, dstOffset, nrClusters, clusterSize, volume);
             if (readClusters == nrClusters) {
                 break;
@@ -189,13 +170,6 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         }
 
         return readClusters;
-    }
-
-    /**
-     * @return Returns the numberOfVNCs.
-     */
-    public int getNumberOfVCNs() {
-        return numberOfVCNs;
     }
 
     /**
