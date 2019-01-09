@@ -115,6 +115,15 @@ public class NTFSDirectory implements FSDirectory, FSDirectoryId {
     }
 
     /**
+     * Gets the NTFS index for the directory ($I30).
+     *
+     * @return the index.
+     */
+    public NTFSIndex getIndex() {
+        return index;
+    }
+
+    /**
      *
      */
     public FSEntry addFile(String name) throws IOException {

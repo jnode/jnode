@@ -29,7 +29,7 @@ import org.jnode.fs.ntfs.NTFSStructure;
  * @author vali
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class IndexEntry extends NTFSStructure {
+public class IndexEntry extends NTFSStructure {
 
     /**
      * The offset to the index entry content.
