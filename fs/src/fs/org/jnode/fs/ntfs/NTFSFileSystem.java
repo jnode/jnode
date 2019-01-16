@@ -154,33 +154,41 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
     }
 
     public long getFreeSpace() throws IOException {
+        BootRecord bootRecord = getNTFSVolume().getBootRecord();
+        long totalClusters = bootRecord.getTotalSectors() % bootRecord.getSectorsPerCluster();
+
         FileRecord bitmapRecord = getNTFSVolume().getMFT().getRecord(MasterFileTable.SystemFiles.BITMAP);
 
         int bitmapSize = (int) bitmapRecord.getAttributeTotalSize(NTFSAttribute.Types.DATA, null);
         byte[] buffer = new byte[bitmapSize];
         bitmapRecord.readData(0, buffer, 0, buffer.length);
 
-        int usedBlocks = 0;
+        int usedClusters = 0;
+        long cluster = 0;
 
         for (byte b : buffer) {
             for (int i = 0; i < 8; i++) {
+                cluster++;
+
+                if (cluster > totalClusters) {
+                    break;
+                }
+
                 if ((b & 0x1) != 0) {
-                    usedBlocks++;
+                    usedClusters++;
                 }
 
                 b >>= 1;
             }
         }
 
-        long usedSpace = (long) usedBlocks * getNTFSVolume().getClusterSize();
-
-        return getTotalSpace() - usedSpace;
+        return (totalClusters - usedClusters) * getNTFSVolume().getClusterSize();
     }
 
-    public long getTotalSpace() throws IOException {
-        FileRecord bitmapRecord = getNTFSVolume().getMFT().getRecord(MasterFileTable.SystemFiles.BITMAP);
-        long bitmapSize = bitmapRecord.getFileNameAttribute().getRealSize();
-        return bitmapSize * 8 * getNTFSVolume().getClusterSize();
+    public long getTotalSpace() {
+        BootRecord bootRecord = getNTFSVolume().getBootRecord();
+        long totalClusters = bootRecord.getTotalSectors() / bootRecord.getSectorsPerCluster();
+        return totalClusters * bootRecord.getClusterSize();
     }
 
     public long getUsableSpace() {
