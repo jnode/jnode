@@ -155,7 +155,7 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
 
     public long getFreeSpace() throws IOException {
         BootRecord bootRecord = getNTFSVolume().getBootRecord();
-        long totalClusters = bootRecord.getTotalSectors() % bootRecord.getSectorsPerCluster();
+        long totalClusters = bootRecord.getTotalSectors() / bootRecord.getSectorsPerCluster();
 
         FileRecord bitmapRecord = getNTFSVolume().getMFT().getRecord(MasterFileTable.SystemFiles.BITMAP);
 

@@ -54,7 +54,7 @@ public class NTFSFileSystemTest {
         NTFSFileSystem fs = type.create(device, true);
 
         String expectedStructure =
-            "type: NTFS vol: total:104857600 free:102283264\n" +
+            "type: NTFS vol: total:104857088 free:102283264\n" +
                 "  .; \n" +
                 "    $AttrDef; 2560; ad617ac3906958de35eacc3d90d31043\n" +
                 "    $BadClus; 0; d41d8cd98f00b204e9800998ecf8427e\n" +
@@ -105,7 +105,7 @@ public class NTFSFileSystemTest {
         NTFSFileSystem fs = type.create(device, true);
 
         String expectedStructure =
-            "type: NTFS vol:COMPRESS total:26214400 free:15031296\n" +
+            "type: NTFS vol:COMPRESS total:26213376 free:15031296\n" +
                 "  .; \n" +
                 "    OBJS2.PRS; 57439; 46d0c5fe8dd36c0f1ecc042a38188740\n" +
                 "    PICTURES.DBF; 275; 18c0dceeb707590e8c8348e725494993\n" +
@@ -241,7 +241,7 @@ public class NTFSFileSystemTest {
         NTFSFileSystem fs = type.create(device, true);
 
         String expectedStructure =
-            "type: NTFS vol:links total:20971520 free:14782464\n" +
+            "type: NTFS vol:links total:20967424 free:14782464\n" +
             "  .; \n" +
             "    $AttrDef; 2560; ad617ac3906958de35eacc3d90d31043\n" +
             "    $BadClus; 0; d41d8cd98f00b204e9800998ecf8427e\n" +
