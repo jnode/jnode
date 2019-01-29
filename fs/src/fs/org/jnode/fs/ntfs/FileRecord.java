@@ -32,6 +32,7 @@ import org.jnode.fs.ntfs.attribute.AttributeListEntry;
 import org.jnode.fs.ntfs.attribute.NTFSAttribute;
 import org.jnode.fs.ntfs.attribute.NTFSNonResidentAttribute;
 import org.jnode.fs.ntfs.attribute.NTFSResidentAttribute;
+import org.jnode.fs.util.FSUtils;
 import org.jnode.util.NumberUtils;
 
 /**
@@ -578,32 +579,42 @@ public class FileRecord extends NTFSRecord {
 
         // At this point we know that at least the first attribute is non-resident...
 
+        // Limit to the initialised size for compressed attributes
+        limitToInitialised = limitToInitialised || attr.isCompressedAttribute();
+
         // Grab the initialised size (if that is itself initialised)
         long initialisedSize = ((NTFSNonResidentAttribute) attr).getAttributeInitializedSize();
         if (initialisedSize == 0) {
             limitToInitialised = false;
         }
 
-        // calculate start and end cluster
+        // Calculate start and end offsets and clusters
         int clusterSize = getClusterSize();
         long startCluster = fileOffset / clusterSize;
-        long endCluster = (fileOffset + len - 1) / clusterSize;
+        long endOffset = (fileOffset + len - 1);
+        long endCluster = endOffset / clusterSize;
         int nrClusters = (int) (endCluster - startCluster + 1);
+        int clustersToRead = nrClusters;
+
+        if (limitToInitialised && endOffset >= initialisedSize) {
+            long lastInitialisedCluster = FSUtils.roundUpToBoundary(clusterSize, initialisedSize);
+            clustersToRead = Math.max((int) ((lastInitialisedCluster / clusterSize) - startCluster), 0);
+        }
+
         byte[] tmp = new byte[nrClusters * clusterSize];
 
-        long clusterOffset = 0;
-        int readClusters = 0;
         NTFSNonResidentAttribute nresData = (NTFSNonResidentAttribute) attr;
 
-        readClusters += nresData.readVCN(startCluster, tmp, 0, nrClusters);
+        int clustersRead = nresData.readVCN(startCluster, tmp, 0, clustersToRead);
 
-        if (readClusters > 0) {
+        if (clustersRead > 0) {
             // If if the data is past the 'initialised' part of the attribute. If it is uninitialised then it must
             // be read as zeros. Annoyingly the initialised portion isn't even cluster aligned...
-            long endOffset = (clusterOffset + startCluster + nrClusters) * clusterSize;
 
-            if (endOffset > initialisedSize && limitToInitialised) {
-                int delta = (int) (endOffset - initialisedSize);
+            long readUpToOffset = (startCluster + clustersToRead) * clusterSize;
+
+            if (readUpToOffset > initialisedSize && limitToInitialised) {
+                int delta = (int) (readUpToOffset - initialisedSize);
                 int startIndex = Math.max((tmp.length - delta), 0);
 
                 if (startIndex < tmp.length) {
@@ -613,11 +624,11 @@ public class FileRecord extends NTFSRecord {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("readData: read " + readClusters + " from non-resident attributes");
+            log.debug("readData: read " + clustersRead + " from non-resident attributes");
         }
 
-        if (readClusters != nrClusters) {
-            throw new IOException("Requested " + nrClusters + " clusters but only read " + readClusters +
+        if (clustersRead != clustersToRead) {
+            throw new IOException("Requested " + clustersToRead + " clusters but only read " + clustersRead +
                 ", file offset = " + fileOffset + ", file record = " + this);
         }
 
