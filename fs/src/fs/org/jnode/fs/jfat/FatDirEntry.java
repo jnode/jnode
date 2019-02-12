@@ -112,6 +112,10 @@ public class FatDirEntry {
         this.freeDirEntry = freeDirEntry;
     }
 
+    public FatMarshal getEntry() {
+        return entry;
+    }
+
     @Override
     public String toString() {
         return String.format("FatDirEntry [%s] index:%d", entry, index);

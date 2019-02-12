@@ -24,14 +24,14 @@ package org.jnode.fs.jfat;
  * @author gvt
  */
 public class FatAttr {
-    private static final int READONLY = 0x01;
-    private static final int HIDDEN = 0x02;
-    private static final int SYSTEM = 0x04;
-    private static final int LABEL = 0x08;
-    private static final int DIRECTORY = 0x10;
-    private static final int ARCHIVE = 0x20;
-    private static final int LONGNAME = READONLY | HIDDEN | SYSTEM | LABEL; // 0x0F
-    private static final int MASK = LONGNAME | DIRECTORY | ARCHIVE; // 0x3F
+    public static final int READONLY = 0x01;
+    public static final int HIDDEN = 0x02;
+    public static final int SYSTEM = 0x04;
+    public static final int LABEL = 0x08;
+    public static final int DIRECTORY = 0x10;
+    public static final int ARCHIVE = 0x20;
+    public static final int LONGNAME = READONLY | HIDDEN | SYSTEM | LABEL; // 0x0F
+    public static final int MASK = LONGNAME | DIRECTORY | ARCHIVE; // 0x3F
 
     private int attr;
 
