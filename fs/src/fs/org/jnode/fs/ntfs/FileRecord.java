@@ -424,16 +424,22 @@ public class FileRecord extends NTFSRecord {
      * @return the attribute.
      */
     public NTFSAttribute findAttributeByType(int attrTypeID) {
-        log.debug("findAttributeByType(0x" + NumberUtils.hex(attrTypeID, 4) + ")");
+        if (log.isDebugEnabled()) {
+            log.debug("findAttributeByType(0x" + NumberUtils.hex(attrTypeID, 4) + ")");
+        }
 
         for (NTFSAttribute attr : getAllAttributes()) {
             if (attr.getAttributeType() == attrTypeID) {
-                log.debug("findAttributeByType(0x" + NumberUtils.hex(attrTypeID, 4) + ") found");
+                if (log.isDebugEnabled()) {
+                    log.debug("findAttributeByType(0x" + NumberUtils.hex(attrTypeID, 4) + ") found");
+                }
                 return attr;
             }
         }
 
-        log.debug("findAttributeByType(0x" + NumberUtils.hex(attrTypeID, 4) + ") not found");
+        if (log.isDebugEnabled()) {
+            log.debug("findAttributeByType(0x" + NumberUtils.hex(attrTypeID, 4) + ") not found");
+        }
         return null;
     }
 
@@ -444,7 +450,9 @@ public class FileRecord extends NTFSRecord {
      * @return an iterator for the matching the attributes.
      */
     public Iterator<NTFSAttribute> findAttributesByType(final int attrTypeID) {
-        log.debug("findAttributesByType(0x" + NumberUtils.hex(attrTypeID, 4) + ")");
+        if (log.isDebugEnabled()) {
+            log.debug("findAttributesByType(0x" + NumberUtils.hex(attrTypeID, 4) + ")");
+        }
 
         return new FilteredAttributeIterator(getAllAttributes().iterator()) {
             @Override
@@ -462,15 +470,19 @@ public class FileRecord extends NTFSRecord {
      * @return an iterator for the matching the attributes.
      */
     public Iterator<NTFSAttribute> findAttributesByTypeAndName(final int attrTypeID, final String name) {
-        log.debug("findAttributesByTypeAndName(0x" + NumberUtils.hex(attrTypeID, 4) + "," + name + ")");
+        if (log.isDebugEnabled()) {
+            log.debug("findAttributesByTypeAndName(0x" + NumberUtils.hex(attrTypeID, 4) + "," + name + ")");
+        }
         return new FilteredAttributeIterator(getAllAttributes().iterator()) {
             @Override
             protected boolean matches(NTFSAttribute attr) {
                 if (attr.getAttributeType() == attrTypeID) {
                     String attrName = attr.getAttributeName();
                     if (name == null ? attrName == null : name.equals(attrName)) {
-                        log.debug("findAttributesByTypeAndName(0x" + NumberUtils.hex(attrTypeID, 4) + "," + name
-                            + ") found");
+                        if (log.isDebugEnabled()) {
+                            log.debug("findAttributesByTypeAndName(0x" + NumberUtils.hex(attrTypeID, 4) + "," + name
+                                + ") found");
+                        }
                         return true;
                     }
                 }
