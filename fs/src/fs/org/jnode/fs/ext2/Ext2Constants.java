@@ -92,6 +92,14 @@ public class Ext2Constants {
     public static final int EXT2_ERRORS_PANIC = 0x0003;
     public static final int EXT2_ERRORS_DEFAULT = EXT2_ERRORS_CONTINUE;
 
+    // S_FEATURE_COMPAT constants
+    public static final long EXT2_FEATURE_COMPAT_DIR_PREALLOC = 0x0001;
+    public static final long EXT2_FEATURE_COMPAT_IMAGIC_INODES = 0x0002;
+    public static final long EXT3_FEATURE_COMPAT_HAS_JOURNAL = 0x0004;
+    public static final long EXT2_FEATURE_COMPAT_EXT_ATTR = 0x0008;
+    public static final long EXT2_FEATURE_COMPAT_RESIZE_INO = 0x0010;
+    public static final long EXT2_FEATURE_COMPAT_DIR_INDEX = 0x0020;
+
     // S_FEATURE_RO_COMPAT constants
     public static final long EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER = 0x0001;
     public static final long EXT2_FEATURE_RO_COMPAT_LARGE_FILE = 0x0002;
