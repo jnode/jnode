@@ -102,7 +102,7 @@ public class Extent {
      * @return the overflow extents.
      * @throws IOException if an error occurs.
      */
-    public final ExtentDescriptor[] getOverflowExtents(final ExtentKey key) throws IOException {
+    public final List<ExtentDescriptor> getOverflowExtents(final ExtentKey key) throws IOException {
         return getOverflowExtents(key, bthr.getRootNode());
     }
 
@@ -114,7 +114,7 @@ public class Extent {
      * @return the overflow extents.
      * @throws IOException if an error occurs.
      */
-    public final ExtentDescriptor[] getOverflowExtents(final ExtentKey key, long nodeNumber) throws IOException {
+    public final List<ExtentDescriptor> getOverflowExtents(final ExtentKey key, long nodeNumber) throws IOException {
         try {
             long currentNodeNumber = nodeNumber;
             int nodeSize = bthr.getNodeSize();
@@ -129,10 +129,10 @@ public class Extent {
                 IndexRecord[] records = extentNode.findAll(key);
                 List<ExtentDescriptor> overflowExtents = new LinkedList<ExtentDescriptor>();
                 for (IndexRecord record : records) {
-                    Collections.addAll(overflowExtents, getOverflowExtents(key, record.getIndex()));
+                    overflowExtents.addAll(getOverflowExtents(key, record.getIndex()));
                 }
 
-                return overflowExtents.toArray(new ExtentDescriptor[overflowExtents.size()]);
+                return overflowExtents;
 
             } else if (nd.isLeafNode()) {
                 ExtentLeafNode node = new ExtentLeafNode(nodeData.array(), nodeSize);
@@ -140,7 +140,7 @@ public class Extent {
 
             } else {
                 log.info(String.format("Node %d wasn't a leaf or index: %s\n%s", nodeNumber, nd, NumberUtils.hex(data)));
-                return new ExtentDescriptor[0];
+                return Collections.emptyList();
             }
 
         } catch (Exception e) {

@@ -22,6 +22,10 @@ package org.jnode.fs.hfsplus.attributes;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
 import org.jnode.fs.hfsplus.HfsPlusForkData;
@@ -90,11 +94,34 @@ public class Attributes {
     }
 
     /**
+     * Gets all attributes for the given file.
+     *
+     * @param fileId the ID of the file to look up the attributes.
+     * @return the list of attributes.
+     * @throws IOException if an error occurs.
+     */
+    public List<String> getAllAttributes(CatalogNodeId fileId) throws IOException {
+        if (bthr == null) {
+            return null;
+        }
+
+        List<String> attributes = new ArrayList<String>();
+
+        for (LeafRecord record : getAttributeLeafRecords(fileId, null, bthr.getRootNode())) {
+            if (record != null) {
+                attributes.add(((AttributeKey) record.getKey()).getAttributeName().getUnicodeString());
+            }
+        }
+
+        return attributes;
+    }
+
+    /**
      * Looks up an attribute in the attributes file.
      *
-     * @param fileId the ID of the file to look up the attribute on.
+     * @param fileId        the ID of the file to look up the attribute on.
      * @param attributeName the name of the attribute to lookup.
-     * @return the leaf record, or possibly {code null}.
+     * @return the attribute data, or possibly {code null}.
      * @throws IOException if an error occurs.
      */
     public AttributeData getAttribute(CatalogNodeId fileId, String attributeName) throws IOException {
@@ -102,25 +129,34 @@ public class Attributes {
             return null;
         }
 
-        return getAttribute(fileId, attributeName, bthr.getRootNode());
+        List<LeafRecord> records = getAttributeLeafRecords(fileId, attributeName, bthr.getRootNode());
+        if (records.isEmpty()) {
+            return null;
+        }
+
+        if (records.size() > 1) {
+            log.warn("Expected a single attribute but got: " + records);
+        }
+
+        return toAttributeData(fileId, records.get(0));
     }
 
     /**
      * Looks up an attribute in the attributes file.
      *
-     * @param fileId the ID of the file to look up the attribute on.
+     * @param fileId        the ID of the file to look up the attribute on.
      * @param attributeName the name of the attribute to lookup.
-     * @param nodeNumber the index of node where the search begin.
-     * @return the leaf record, or possibly {code null}.
+     * @param nodeNumber    the index of node where the search begin.
+     * @return the attribute data, or possibly {code null}.
      * @throws IOException if an error occurs.
      */
-    public AttributeData getAttribute(CatalogNodeId fileId, String attributeName, long nodeNumber) throws IOException {
+    public List<LeafRecord> getAttributeLeafRecords(CatalogNodeId fileId, String attributeName, long nodeNumber)
+        throws IOException {
         if (attributesFile.getExtent(0).isEmpty()) {
             // No attributes
-            return null;
+            return Collections.emptyList();
         }
 
-        LeafRecord leafRecord = null;
         int nodeSize = bthr.getNodeSize();
         ByteBuffer nodeData = ByteBuffer.allocate(nodeSize);
         attributesFile.read(fs, (nodeNumber * nodeSize), nodeData);
@@ -132,21 +168,28 @@ public class Attributes {
             AttributeIndexNode node = new AttributeIndexNode(data, nodeSize);
             IndexRecord[] records = node.findAll(new AttributeKey(fileId, attributeName));
 
+            List<LeafRecord> leafRecords = new LinkedList<LeafRecord>();
             for (IndexRecord indexRecord : records) {
-                AttributeData attributeData = getAttribute(fileId, attributeName, indexRecord.getIndex());
-                if (attributeData != null) {
-                    return attributeData;
-                }
+                leafRecords.addAll(getAttributeLeafRecords(fileId, attributeName, indexRecord.getIndex()));
             }
+            return leafRecords;
 
         } else if (nodeDescriptor.isLeafNode()) {
             AttributeLeafNode node = new AttributeLeafNode(data, nodeSize);
-            leafRecord = node.find(new AttributeKey(fileId, attributeName));
+            return node.findAll(new AttributeKey(fileId, attributeName));
+        } else {
+            return Collections.emptyList();
         }
+    }
 
-        if (leafRecord == null) {
-            return null;
-        }
+    /**
+     * Converts a leaf record into an attribute data.
+     *
+     * @param fileId     the file ID.
+     * @param leafRecord the leaf record.
+     * @return the attribute data, or {@code null} if the record cannot be converted.
+     */
+    public AttributeData toAttributeData(CatalogNodeId fileId, LeafRecord leafRecord) {
 
         long type = BigEndian.getUInt32(leafRecord.getData(), 0);
 

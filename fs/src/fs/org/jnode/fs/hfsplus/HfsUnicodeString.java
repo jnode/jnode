@@ -55,7 +55,7 @@ public class HfsUnicodeString {
      */
     public HfsUnicodeString(String string) {
         this.string = string;
-        this.length = string.length();
+        this.length = string == null ? 0 : string.length();
     }
 
     public final int getLength() {

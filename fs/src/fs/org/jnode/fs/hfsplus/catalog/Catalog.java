@@ -246,7 +246,7 @@ public class Catalog {
      * @return Array of LeafRecord
      * @throws IOException
      */
-    public final LeafRecord[] getRecords(final CatalogNodeId parentID) throws IOException {
+    public final List<LeafRecord> getRecords(final CatalogNodeId parentID) throws IOException {
         return getRecords(parentID, getBTHeaderRecord().getRootNode());
     }
 
@@ -259,7 +259,7 @@ public class Catalog {
      * @return Array of LeafRecord
      * @throws IOException
      */
-    public final LeafRecord[] getRecords(final CatalogNodeId parentID, final long nodeNumber)
+    public final List<LeafRecord> getRecords(final CatalogNodeId parentID, final long nodeNumber)
         throws IOException {
         try {
             long currentNodeNumber = nodeNumber;
@@ -273,16 +273,16 @@ public class Catalog {
                 IndexRecord[] records = node.findAll(new CatalogKey(parentID));
                 List<LeafRecord> lfList = new LinkedList<LeafRecord>();
                 for (IndexRecord rec : records) {
-                    LeafRecord[] lfr = getRecords(parentID, rec.getIndex());
-                    Collections.addAll(lfList, lfr);
+                    List<LeafRecord> lfr = getRecords(parentID, rec.getIndex());
+                    lfList.addAll(lfr);
                 }
-                return lfList.toArray(new LeafRecord[lfList.size()]);
+                return lfList;
             } else if (nd.isLeafNode()) {
                 CatalogLeafNode node = new CatalogLeafNode(nodeData.array(), nodeSize);
                 return node.findAll(new CatalogKey(parentID));
             } else {
                 log.info(String.format("Node %d wasn't a leaf or index: %s\n%s", nodeNumber, nd, NumberUtils.hex(datas)));
-                return new LeafRecord[0];
+                return Collections.emptyList();
             }
 
         } catch (Exception e) {

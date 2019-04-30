@@ -22,16 +22,21 @@ package org.jnode.test.fs.hfsplus;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.List;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FileDevice;
+import org.jnode.fs.FSDirectory;
 import org.jnode.fs.hfsplus.HFSPlusParams;
+import org.jnode.fs.hfsplus.HfsPlusEntry;
+import org.jnode.fs.hfsplus.HfsPlusFile;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
 import org.jnode.fs.hfsplus.HfsPlusFileSystemType;
 import org.jnode.fs.hfsplus.SuperBlock;
-import org.jnode.test.fs.DataStructureAsserts;
-import org.jnode.fs.FSDirectory;
-import org.jnode.test.fs.FileSystemTestUtils;
+import org.jnode.fs.hfsplus.attributes.AttributeData;
 import org.jnode.fs.service.FileSystemService;
+import org.jnode.test.fs.DataStructureAsserts;
+import org.jnode.test.fs.FileSystemTestUtils;
 import org.jnode.test.support.TestUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -170,6 +175,54 @@ public class HfsPlusFileSystemTest {
             "    \u0000\u0000\u0000\u0000HFS+ Private Data; \n";
 
         DataStructureAsserts.assertStructure(fs, expectedStructure);
+    }
+
+    @Test
+    public void testDiskAttributes() throws Exception {
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/hfsplus/attributes.dd"), "r");
+        HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
+        HfsPlusFileSystem fs = type.create(device, true);
+
+        String expectedStructure =
+            "type: HFS+ vol:attributes total:99983360 free:97062912\n" +
+            "  /; \n" +
+            "    .DS_Store; 6148; 7e2a612ff5e605e73b2078557c9aa5c5\n" +
+            "    .fseventsd; \n" +
+            "      0000000000219f17; 135; b518731969693d10590124b27c8b50cf\n" +
+            "      0000000000219f18; 70; e899edc609e2d4bac697bc207b7ee5ad\n" +
+            "      0000000000219f19; 38; ebb12e59f60c213f883d07e17ff3f2d5\n" +
+            "      0000000000219f1a; 71; 4732d018d8011a207fce3f127a2e6e5d\n" +
+            "      0000000000219f1b; 38; ebb12e59f60c213f883d07e17ff3f2d5\n" +
+            "      0000000000219f1c; 71; b619c8d189af0a632e91dec707774d44\n" +
+            "      fseventsd-uuid; 36; 8f91e1c548e1eed2edb44694d8a5c5db\n" +
+            "    .HFS+ Private Directory Data\r; \n" +
+            "    .journal; 524288; 3e87e55c8d321c611f18197770a523e7\n" +
+            "    .journal_info_block; 4096; 469270564228a832e83d2ad16e6d8edc\n" +
+            "    isoparser-1.1.22.pom; 6652; 6c04a5fb9540f1b558dc9465ab3a7ad4\n" +
+            "    \u0000\u0000\u0000\u0000HFS+ Private Data; \n";
+
+        DataStructureAsserts.assertStructure(fs, expectedStructure);
+
+        HfsPlusEntry entry = (HfsPlusEntry) fs.getRootEntry().getDirectory().getEntry("isoparser-1.1.22.pom");
+        HfsPlusFile file = (HfsPlusFile) entry.getFile();
+
+        List<String> attributes = fs.getAttributes().getAllAttributes(file.getCatalogFile().getFileId());
+        AttributeData whereFromAttr = fs.getAttributes().getAttribute(file.getCatalogFile().getFileId(),
+            "com.apple.metadata:kMDItemWhereFroms");
+        ByteBuffer whereFromBuffer = ByteBuffer.allocate(6);
+        whereFromAttr.read(fs, 0, whereFromBuffer);
+        String whereFrom = new String(whereFromBuffer.array(), "UTF-8");
+
+        AttributeData quarantineAttr = fs.getAttributes().getAttribute(file.getCatalogFile().getFileId(),
+            "com.apple.quarantine");
+        ByteBuffer quarantineBuffer = ByteBuffer.allocate((int) quarantineAttr.getSize());
+        quarantineAttr.read(fs, 0, quarantineBuffer);
+        String quarantine = new String(quarantineBuffer.array(), "UTF-8");
+
+        Assert.assertEquals("[com.apple.metadata:kMDItemWhereFroms, com.apple.quarantine]", attributes.toString());
+        Assert.assertEquals(144, whereFromAttr.getSize());
+        Assert.assertEquals("bplist", whereFrom);
+        Assert.assertEquals("0081;5cc8ba96;Chrome;3792716B-4DE2-4A43-BFA3-516714DD5764", quarantine);
     }
 
     @Test

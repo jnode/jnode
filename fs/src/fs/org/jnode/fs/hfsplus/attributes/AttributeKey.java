@@ -103,7 +103,8 @@ public class AttributeKey extends AbstractKey {
 
         return
             fileId.getId() == otherKey.fileId.getId() &&
-            attributeName.getUnicodeString().equals(otherKey.getAttributeName().getUnicodeString());
+                (attributeName.getUnicodeString() == null || otherKey.getAttributeName().getUnicodeString() == null ||
+                    attributeName.getUnicodeString().equals(otherKey.getAttributeName().getUnicodeString()));
     }
 
     @Override
