@@ -166,7 +166,7 @@ public class INode {
      * @return the extra size.
      */
     public int getExtraISize() {
-        if (getExt2FileSystem().hasROFeature(Ext2Constants.EXT4_FEATURE_RO_COMPAT_EXTRA_ISIZE)) {
+        if (getExt2FileSystem().hasROFeature(Ext2Constants.EXT4_FEATURE_RO_COMPAT_EXTRA_ISIZE) && data.length > 0x82) {
             return LittleEndian.getInt16(data, 0x80);
         }
 
