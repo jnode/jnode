@@ -649,11 +649,15 @@ public class FileRecord extends NTFSRecord {
 
     @Override
     public String toString() {
-        if (isInUse()) {
-            return String.format("FileRecord [%d fileName='%s']", referenceNumber, getFileName());
-        } else {
-            return String.format("FileRecord [%d unused]", referenceNumber);
+        try {
+            if (isInUse()) {
+                return String.format("FileRecord [%d fileName='%s']", referenceNumber, getFileName());
+            }
+        } catch (Exception e) {
+            log.debug("Error getting file name for file record: " + referenceNumber, e);
         }
+
+        return String.format("FileRecord [%d unused]", referenceNumber);
     }
 
     /**
