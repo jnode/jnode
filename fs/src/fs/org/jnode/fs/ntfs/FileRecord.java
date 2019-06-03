@@ -129,20 +129,22 @@ public class FileRecord extends NTFSRecord {
      * @throws IOException if an error occurs.
      */
     public void checkIfValid() throws IOException {
-        // check for the magic number to see if we have a filerecord
+        // check for the magic number to see if we have a file record
         if (getMagic() != Magic.FILE) {
-            log.debug("Invalid magic number found for FILE record: " + getMagic() + " -- dumping buffer");
-            for (int off = 0; off < getBuffer().length; off += 32) {
-                StringBuilder builder = new StringBuilder();
-                for (int i = off; i < off + 32 && i < getBuffer().length; i++) {
-                    String hex = Integer.toHexString(getBuffer()[i]);
-                    while (hex.length() < 2) {
-                        hex = '0' + hex;
-                    }
+            if (log.isDebugEnabled()) {
+                log.debug("Invalid magic number found for FILE record: " + getMagic() + " -- dumping buffer");
+                for (int off = 0; off < getBuffer().length; off += 32) {
+                    StringBuilder builder = new StringBuilder();
+                    for (int i = off; i < off + 32 && i < getBuffer().length; i++) {
+                        String hex = Integer.toHexString(getBuffer()[i]);
+                        while (hex.length() < 2) {
+                            hex = '0' + hex;
+                        }
 
-                    builder.append(' ').append(hex);
+                        builder.append(' ').append(hex);
+                    }
+                    log.debug(builder.toString());
                 }
-                log.debug(builder.toString());
             }
 
             throw new IOException("Invalid magic found: " + getMagic());
@@ -410,7 +412,7 @@ public class FileRecord extends NTFSRecord {
                     readAttributeListAttributes();
                 }
             } catch (Exception e) {
-                log.error("Error getting attributes for entry: " + this, e);
+                log.error("Error getting attributes for file record: " + referenceNumber, e);
             }
         }
 
@@ -686,7 +688,9 @@ public class FileRecord extends NTFSRecord {
                     attribute = findStoredAttributeByID(entry.getAttributeID());
                     attributeListBuilder.add(attribute);
                 } else {
-                    log.debug("Looking up MFT entry for: " + entry.getFileReferenceNumber());
+                    if (log.isDebugEnabled()) {
+                        log.debug("Looking up MFT entry for: " + entry.getFileReferenceNumber());
+                    }
 
                     // When reading the MFT itself don't attempt to check the index is in range (we won't know the total
                     // MFT length yet)
