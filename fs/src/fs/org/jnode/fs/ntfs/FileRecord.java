@@ -412,7 +412,9 @@ public class FileRecord extends NTFSRecord {
                     readAttributeListAttributes();
                 }
             } catch (Exception e) {
-                log.error("Error getting attributes for file record: " + referenceNumber, e);
+                log.error("Error getting attributes for file record: " + referenceNumber +
+                    ", returning stored attributes", e);
+                attributeList = new ArrayList<NTFSAttribute>(getAllStoredAttributes());
             }
         }
 
