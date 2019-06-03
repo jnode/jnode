@@ -702,8 +702,8 @@ public class FileRecord extends NTFSRecord {
                     attribute = holdingRecord.findStoredAttributeByID(entry.getAttributeID());
 
                     if (attribute == null) {
-                        log.error(String.format("Failed to find an attribute matching entry '%s' in the holding record",
-                            entry));
+                        log.error(String.format("Failed to find an attribute matching entry '%s' in the holding record, ref=%d",
+                            entry, referenceNumber));
                     } else {
                         attributeListBuilder.add(attribute);
                     }
