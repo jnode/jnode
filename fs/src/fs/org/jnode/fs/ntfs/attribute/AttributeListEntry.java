@@ -131,16 +131,11 @@ public final class AttributeListEntry extends NTFSStructure {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder(super.toString());
-        builder.append("[type=").append(getType());
-        builder.append(",name=").append(getName());
-        if (getStartingVCN() == 0) {
-            builder.append(",resident");
-        } else {
-            builder.append(",ref=").append(getFileReferenceNumber());
-            builder.append(",vcn=").append(getStartingVCN());
-        }
-        builder.append(",id=").append(getAttributeID()).append("]");
-        return builder.toString();
+        return String.format("attr-list-entry:[type=0x%x,name='%s',ref=%d,%s,id=0x%x]",
+            getType(),
+            getName(),
+            getFileReferenceNumber(),
+            getStartingVCN() == 0 ? "resident" : "vcn=" + getStartingVCN(),
+            getAttributeID());
     }
 }
