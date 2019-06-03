@@ -671,8 +671,8 @@ public class FileRecord extends NTFSRecord {
         try {
             entryIterator = attributeListAttribute.getAllEntries();
         } catch (Exception e) {
-            throw new IllegalStateException("Error getting attributes from attribute list, file record " +
-                FileRecord.this, e);
+            throw new IllegalStateException("Error getting attributes from attribute list, file record: " +
+                referenceNumber, e);
         }
 
         AttributeListBuilder attributeListBuilder = new AttributeListBuilder();
