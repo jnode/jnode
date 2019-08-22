@@ -232,14 +232,10 @@ public class DirectoryParser {
         int nameLen = DeviceAccess.getUint8(chunk);
         final int nameHash = DeviceAccess.getUint16(chunk);
         skip(2); /* unknown */
-        final long realSize = DeviceAccess.getUint64(chunk);
+        final long size = DeviceAccess.getUint64(chunk);
         skip(4); /* unknown */
         final long startCluster = DeviceAccess.getUint32(chunk);
-        final long size = DeviceAccess.getUint64(chunk);
-
-        if (realSize != size) {
-            throw new IOException("real size does not equal size");
-        }
+        final long allocatedSize = DeviceAccess.getUint64(chunk);
 
         conts--;
 
@@ -288,7 +284,7 @@ public class DirectoryParser {
                 " != " + Integer.toHexString(nameHash) + ")");
         }
 
-        v.foundNode(Node.create(sb, startCluster, attrib, name, (flag == FLAG_CONTIGUOUS), realSize, times, deleted),
+        v.foundNode(Node.create(sb, startCluster, attrib, name, (flag == FLAG_CONTIGUOUS), size, allocatedSize, times, deleted),
             index);
     }
 
