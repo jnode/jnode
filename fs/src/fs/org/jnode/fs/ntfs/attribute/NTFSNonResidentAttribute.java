@@ -159,10 +159,10 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         final int clusterSize = volume.getClusterSize();
         int readClusters = 0;
         for (DataRunInterface dataRun : getDataRuns()) {
-            readClusters += dataRun.readClusters(vcn, dst, dstOffset, nrClusters, clusterSize, volume);
-            if (readClusters == nrClusters) {
+            if (readClusters >= nrClusters) {
                 break;
             }
+            readClusters += dataRun.readClusters(vcn, dst, dstOffset, nrClusters, clusterSize, volume);
         }
 
         if (log.isDebugEnabled()) {
