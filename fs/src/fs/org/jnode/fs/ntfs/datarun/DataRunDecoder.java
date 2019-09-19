@@ -133,7 +133,8 @@ public class DataRunDecoder {
                         // Next add in the compressed portion
                         DataRun compressedRun =
                             new DataRun(dataRun.getCluster() + uncompressedLength, remainder, false, 0, vcn);
-                        dataRuns.add(new CompressedDataRun(compressedRun, compressionUnit));
+                        lastCompressedRun = new CompressedDataRun(compressedRun, compressionUnit);
+                        dataRuns.add(lastCompressedRun);
                         expectingSparseRunNext = true;
                         lastCompressedSize = remainder;
 

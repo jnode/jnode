@@ -33,9 +33,6 @@ import org.jnode.fs.util.FSUtils;
 public final class DataRun implements DataRunInterface {
 
     /**
-     * Type of this datarun
-     */
-    /**
      * logger
      */
     protected static final Logger log = Logger.getLogger(DataRun.class);

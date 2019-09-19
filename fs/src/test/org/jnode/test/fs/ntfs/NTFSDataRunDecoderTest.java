@@ -456,6 +456,24 @@ public class NTFSDataRunDecoderTest {
         assertDataRuns(dataRuns, expectedRuns);
     }
 
+    @Test
+    public void testCompressedExpectingSparseAfterMerge() {
+        // Arrange
+        byte[] buffer = toByteArray(
+            "41 13 D5 68 A2 0B 21 09 68 FF 01 04 00");
+        DataRunDecoder dataRunDecoder = new DataRunDecoder(true, 16);
+
+        // Act
+        dataRunDecoder.readDataRuns(new NTFSStructure(buffer, 0), 0);
+        List<DataRunInterface> dataRuns = dataRunDecoder.getDataRuns();
+
+        // Assert
+        String expectedRuns =
+            "[data-run vcn:0-15 cluster:195193045]\n" +
+            "[compressed-run vcn:16-31 [[data-run vcn:16-18 cluster:195193061], [data-run vcn:19-27 cluster:195192893]]]\n";
+        assertDataRuns(dataRuns, expectedRuns);
+    }
+
     /**
      * Asserts the list of data runs is correct.
      *
