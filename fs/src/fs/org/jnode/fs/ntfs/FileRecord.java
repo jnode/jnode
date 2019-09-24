@@ -116,11 +116,6 @@ public class FileRecord extends NTFSRecord {
         this.volume = volume;
         this.clusterSize = clusterSize;
         this.referenceNumber = referenceNumber;
-
-        storedAttributeList = readStoredAttributes();
-
-        // Linux NTFS docs say there can only be one of these, so I'll believe them.
-        attributeListAttribute = (AttributeListAttribute) findStoredAttributeByType(NTFSAttribute.Types.ATTRIBUTE_LIST);
     }
 
     /**
@@ -361,6 +356,9 @@ public class FileRecord extends NTFSRecord {
      * @return an iterator over attributes stored in this file record.
      */
     public List<NTFSAttribute> getAllStoredAttributes() {
+        if (storedAttributeList == null) {
+            storedAttributeList = readStoredAttributes();
+        }
         return storedAttributeList;
     }
 
@@ -371,7 +369,7 @@ public class FileRecord extends NTFSRecord {
      * @return the attribute found, or {@code null} if not found.
      */
     private NTFSAttribute findStoredAttributeByID(int id) {
-        for (NTFSAttribute attr : storedAttributeList) {
+        for (NTFSAttribute attr : getAllStoredAttributes()) {
             if (attr != null && attr.getAttributeID() == id) {
                 return attr;
             }
@@ -387,12 +385,27 @@ public class FileRecord extends NTFSRecord {
      * @see NTFSAttribute.Types
      */
     private NTFSAttribute findStoredAttributeByType(int typeID) {
-        for (NTFSAttribute attr : storedAttributeList) {
+        for (NTFSAttribute attr : getAllStoredAttributes()) {
             if (attr != null && attr.getAttributeType() == typeID) {
                 return attr;
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the attributes list attribute, if the record has one.
+     *
+     * @return the attribute, or {@code null}.
+     */
+    public AttributeListAttribute getAttributeListAttribute() {
+        if (attributeListAttribute == null) {
+            // Linux NTFS docs say there can only be one of these, so I'll believe them.
+            attributeListAttribute =
+                (AttributeListAttribute) findStoredAttributeByType(NTFSAttribute.Types.ATTRIBUTE_LIST);
+        }
+
+        return attributeListAttribute;
     }
 
     /**
@@ -404,7 +417,7 @@ public class FileRecord extends NTFSRecord {
     public synchronized List<NTFSAttribute> getAllAttributes() {
         if (attributeList == null) {
             try {
-                if (attributeListAttribute == null) {
+                if (getAttributeListAttribute() == null) {
                     log.debug("All attributes stored");
                     attributeList = new ArrayList<NTFSAttribute>(getAllStoredAttributes());
                 } else {
@@ -671,7 +684,7 @@ public class FileRecord extends NTFSRecord {
         Iterator<AttributeListEntry> entryIterator;
 
         try {
-            entryIterator = attributeListAttribute.getAllEntries();
+            entryIterator = getAttributeListAttribute().getAllEntries();
         } catch (Exception e) {
             throw new IllegalStateException("Error getting attributes from attribute list, file record: " +
                 referenceNumber, e);
