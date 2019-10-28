@@ -649,10 +649,21 @@ public class FileRecord extends NTFSRecord {
 
     @Override
     public String toString() {
+        // Only look at stored attributes to determine the file name to avoid a possible stack overflow
+        String fileName = null;
+        for (NTFSAttribute attribute : getAllStoredAttributes()) {
+            if (attribute.getAttributeType() == NTFSAttribute.Types.FILE_NAME) {
+                FileNameAttribute fileNameAttribute = (FileNameAttribute) attribute;
+                if (fileName == null || fileNameAttribute.getNameSpace() == FileNameAttribute.NameSpace.WIN32) {
+                    fileName = fileNameAttribute.getFileName();
+                }
+            }
+        }
+
         if (isInUse()) {
-            return String.format("FileRecord [%d fileName='%s']", referenceNumber, getFileName());
+            return String.format("FileRecord [%d name='%s']", referenceNumber, fileName);
         } else {
-            return String.format("FileRecord [%d unused]", referenceNumber);
+            return String.format("FileRecord [%d unused name='%s']", referenceNumber, fileName);
         }
     }
 
