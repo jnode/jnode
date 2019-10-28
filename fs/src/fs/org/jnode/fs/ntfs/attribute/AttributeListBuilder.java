@@ -58,6 +58,10 @@ public class AttributeListBuilder {
      * @param attribute the attribute to add.
      */
     public void add(NTFSAttribute attribute) {
+        if (attribute == null) {
+            return;
+        }
+
         if (attribute.isResident()) {
             attributeList.add(attribute);
         } else {

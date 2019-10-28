@@ -33,7 +33,7 @@ public interface DataRunInterface {
      *
      * @return the length of the run in clusters.
      */
-    int getLength();
+    long getLength();
 
     /**
      * Reads clusters from this datarun.

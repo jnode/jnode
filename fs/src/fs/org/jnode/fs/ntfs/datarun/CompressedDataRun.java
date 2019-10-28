@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.jnode.fs.ntfs.NTFSVolume;
+import org.jnode.fs.util.FSUtils;
 import org.jnode.util.LittleEndian;
 
 /**
@@ -70,7 +71,7 @@ public final class CompressedDataRun implements DataRunInterface {
      *
      * @return the length of the run in clusters.
      */
-    public int getLength() {
+    public long getLength() {
         return compressionUnitSize;
     }
 
@@ -116,7 +117,7 @@ public final class CompressedDataRun implements DataRunInterface {
             // This is the actual number of stored clusters after compression.
             // If the number of stored clusters is the same as the compression unit size,
             // then the data can be read directly without decompressing it.
-            final int compClusters = compressedRun.getLength();
+            int compClusters = FSUtils.checkedCast(compressedRun.getLength());
             if (compClusters == compressionUnitSize) {
                 return compressedRun.readClusters(vcn, dst, dstOffset, compClusters, clusterSize, volume);
             }

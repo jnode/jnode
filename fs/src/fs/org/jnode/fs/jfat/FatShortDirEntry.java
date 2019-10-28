@@ -308,7 +308,7 @@ public class FatShortDirEntry extends FatDirEntry {
         return true;
     }
 
-    private FatCase getNameCase() {
+    public FatCase getNameCase() {
         return ncase;
     }
 
@@ -409,6 +409,10 @@ public class FatShortDirEntry extends FatDirEntry {
 
     public String getBase() {
         return base;
+    }
+
+    protected void setBase(String base) {
+        this.base = base;
     }
 
     public String getExt() {

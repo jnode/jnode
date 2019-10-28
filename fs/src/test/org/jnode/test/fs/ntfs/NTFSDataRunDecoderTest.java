@@ -414,6 +414,66 @@ public class NTFSDataRunDecoderTest {
         assertDataRuns(dataRuns, expectedRuns);
     }
 
+    @Test
+    public void testDataRunWithLargeNegativeOffset() {
+        // Arrange
+        byte[] buffer = toByteArray(
+            "33 C0 3B 01 00 00 0C 43 14 C8 00 2C 43 F5 1E 43 F1 15 01 63 63 EB 25 42 A7 77 FA 5E E8 " +
+                "0E 42 94 4A 6E 7B BA 0D 43 70 CA 00 09 FF 50 19 43 A5 0F 01 FC FF D1 B3 42 16 65 AE 99 F8 2A 43 " +
+                "6C C8 00 EA 1D 94 15 43 0C C8 00 BF CB 9F B3 43 1D D2 00 71 EE BA 0D 43 03 C8 00 D9 43 B2 00 43 " +
+                "32 C9 00 6C F8 B1 5D 43 08 C8 00 AF E4 2A 8E 43 06 C8 00 E2 CB 2F 1F 43 25 C8 00 66 A1 F0 30 43 " +
+                "0F C8 00 2B 04 B4 08 43 2D C9 00 D0 A6 87 E0 43 1A C8 00 0B 97 E0 29 52 C2 08 C9 D2 B8 7F FF 43 " +
+                "00 88 00 68 5C CC 6B 00");
+        DataRunDecoder dataRunDecoder = new DataRunDecoder(false, 1);
+
+        // Act
+        dataRunDecoder.readDataRuns(new NTFSStructure(buffer, 0), 0);
+        List<DataRunInterface> dataRuns = dataRunDecoder.getDataRuns();
+
+        // Assert
+        String expectedRuns =
+            "[data-run vcn:0-80831 cluster:786432]\n" +
+            "[data-run vcn:80832-132051 cluster:520176428]\n" +
+            "[data-run vcn:132052-203204 cluster:1156359823]\n" +
+            "[data-run vcn:203205-233835 cluster:1406469513]\n" +
+            "[data-run vcn:233836-252927 cluster:1636794615]\n" +
+            "[data-run vcn:252928-304751 cluster:2061533184]\n" +
+            "[data-run vcn:304752-374292 cluster:783450108]\n" +
+            "[data-run vcn:374293-400170 cluster:1504385450]\n" +
+            "[data-run vcn:400171-451478 cluster:1866413972]\n" +
+            "[data-run vcn:451479-502690 cluster:585040723]\n" +
+            "[data-run vcn:502691-556479 cluster:815395268]\n" +
+            "[data-run vcn:556480-607682 cluster:827078045]\n" +
+            "[data-run vcn:607683-659188 cluster:2399022601]\n" +
+            "[data-run vcn:659189-710396 cluster:489231032]\n" +
+            "[data-run vcn:710397-761602 cluster:1012457114]\n" +
+            "[data-run vcn:761603-812839 cluster:1833533440]\n" +
+            "[data-run vcn:812840-864054 cluster:1979548715]\n" +
+            "[data-run vcn:864055-915555 cluster:1451567867]\n" +
+            "[data-run vcn:915556-966781 cluster:2154152454]\n" +
+            "[data-run vcn:966782-969023 cluster:2004175]\n" +
+            "[data-run vcn:969024-1003839 cluster:1810559287]\n";
+        assertDataRuns(dataRuns, expectedRuns);
+    }
+
+    @Test
+    public void testCompressedExpectingSparseAfterMerge() {
+        // Arrange
+        byte[] buffer = toByteArray(
+            "41 13 D5 68 A2 0B 21 09 68 FF 01 04 00");
+        DataRunDecoder dataRunDecoder = new DataRunDecoder(true, 16);
+
+        // Act
+        dataRunDecoder.readDataRuns(new NTFSStructure(buffer, 0), 0);
+        List<DataRunInterface> dataRuns = dataRunDecoder.getDataRuns();
+
+        // Assert
+        String expectedRuns =
+            "[data-run vcn:0-15 cluster:195193045]\n" +
+            "[compressed-run vcn:16-31 [[data-run vcn:16-18 cluster:195193061], [data-run vcn:19-27 cluster:195192893]]]\n";
+        assertDataRuns(dataRuns, expectedRuns);
+    }
+
     /**
      * Asserts the list of data runs is correct.
      *

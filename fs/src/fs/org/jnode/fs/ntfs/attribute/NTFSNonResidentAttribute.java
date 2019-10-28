@@ -26,7 +26,6 @@ import org.jnode.fs.ntfs.FileRecord;
 import org.jnode.fs.ntfs.NTFSVolume;
 import org.jnode.fs.ntfs.datarun.DataRunDecoder;
 import org.jnode.fs.ntfs.datarun.DataRunInterface;
-import org.jnode.fs.util.FSUtils;
 
 /**
  * An NTFS file attribute that has its data stored outside the attribute.
@@ -159,10 +158,10 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         final int clusterSize = volume.getClusterSize();
         int readClusters = 0;
         for (DataRunInterface dataRun : getDataRuns()) {
-            readClusters += dataRun.readClusters(vcn, dst, dstOffset, nrClusters, clusterSize, volume);
-            if (readClusters == nrClusters) {
+            if (readClusters >= nrClusters) {
                 break;
             }
+            readClusters += dataRun.readClusters(vcn, dst, dstOffset, nrClusters, clusterSize, volume);
         }
 
         if (log.isDebugEnabled()) {
@@ -170,18 +169,6 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         }
 
         return readClusters;
-    }
-
-    /**
-     * Generates a hex dump of the attribute's data.
-     *
-     * @return the hex dump.
-     */
-    public String hexDump() {
-        int length = getBuffer().length - getOffset();
-        byte[] data = new byte[length];
-        getData(0, data, 0, data.length);
-        return FSUtils.toString(data);
     }
 
     @Override

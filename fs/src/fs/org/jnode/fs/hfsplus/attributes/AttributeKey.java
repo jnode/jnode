@@ -81,8 +81,7 @@ public class AttributeKey extends AbstractKey {
                 // Note: this is unlikely to be correct. See TN1150 section "Unicode Subtleties" for details
                 // For reading in data is should be safe since the B-Tree will be pre-sorted, but for adding new entries
                 // it will cause the order to be wrong.
-                result = this.getAttributeName().getUnicodeString()
-                    .compareTo(otherKey.getAttributeName().getUnicodeString());
+                result = this.getAttributeName().compareTo(otherKey.getAttributeName());
             }
         }
         return result;

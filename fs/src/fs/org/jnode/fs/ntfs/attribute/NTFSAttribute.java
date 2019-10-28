@@ -26,6 +26,7 @@ import org.jnode.fs.ntfs.NTFSStructure;
 import org.jnode.fs.ntfs.StandardInformationAttribute;
 import org.jnode.fs.ntfs.index.IndexAllocationAttribute;
 import org.jnode.fs.ntfs.index.IndexRootAttribute;
+import org.jnode.fs.util.FSUtils;
 
 /**
  * @author Chira
@@ -171,6 +172,18 @@ public abstract class NTFSAttribute extends NTFSStructure {
      */
     public int getSize() {
         return getUInt32AsInt(4);
+    }
+
+    /**
+     * Generates a hex dump of the attribute's data.
+     *
+     * @return the hex dump.
+     */
+    public String hexDump() {
+        int length = getBuffer().length - getOffset();
+        byte[] data = new byte[length];
+        getData(0, data, 0, data.length);
+        return FSUtils.toString(data);
     }
 
     /**

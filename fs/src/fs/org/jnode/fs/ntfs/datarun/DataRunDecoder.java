@@ -59,7 +59,7 @@ public class DataRunDecoder {
     /**
      * The last compressed run size.
      */
-    private int lastCompressedSize = 0;
+    private long lastCompressedSize = 0;
 
     /**
      * The last compressed run to append to.
@@ -106,7 +106,7 @@ public class DataRunDecoder {
                     // Also the sparse run following a compressed run can be coalesced with a subsequent 'real' sparse
                     // run. So add that in if we hit one
                     if (dataRun.getLength() + lastCompressedSize > compressionUnit) {
-                        int length = dataRun.getLength() - (compressionUnit - lastCompressedSize);
+                        long length = dataRun.getLength() - (compressionUnit - lastCompressedSize);
                         dataRuns.add(new DataRun(0, length, true, 0, vcn));
 
                         this.numberOfVCNs += length;
@@ -120,11 +120,11 @@ public class DataRunDecoder {
                     // coalesced into a single run and even coalesced into the next compressed run. In that case the
                     // compressed run needs to be split off
 
-                    int remainder = dataRun.getLength() % compressionUnit;
+                    long remainder = dataRun.getLength() % compressionUnit;
 
                     if (remainder != 0) {
                         // Uncompressed run coalesced with compressed run. First add in the uncompressed portion:
-                        int uncompressedLength = dataRun.getLength() - remainder;
+                        long uncompressedLength = dataRun.getLength() - remainder;
                         DataRun uncompressed = new DataRun(dataRun.getCluster(), uncompressedLength, false, 0, vcn);
                         dataRuns.add(uncompressed);
                         vcn += uncompressedLength;
@@ -133,7 +133,8 @@ public class DataRunDecoder {
                         // Next add in the compressed portion
                         DataRun compressedRun =
                             new DataRun(dataRun.getCluster() + uncompressedLength, remainder, false, 0, vcn);
-                        dataRuns.add(new CompressedDataRun(compressedRun, compressionUnit));
+                        lastCompressedRun = new CompressedDataRun(compressedRun, compressionUnit);
+                        dataRuns.add(lastCompressedRun);
                         expectingSparseRunNext = true;
                         lastCompressedSize = remainder;
 

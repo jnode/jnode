@@ -21,6 +21,7 @@
 package org.jnode.fs.exfat;
 
 import java.io.IOException;
+import org.apache.log4j.Logger;
 
 /**
  * @author Matthias Treydte &lt;waldheinz at gmail.com&gt;
@@ -47,15 +48,20 @@ public final class Node {
 
     public static Node create(
         ExFatSuperBlock sb, long startCluster, int flags,
-        String name, boolean isContiguous, long size, EntryTimes times, boolean deleted) {
+        String name, boolean isContiguous, long size, long allocatedSize, EntryTimes times, boolean deleted) {
 
         final Node result = new Node(sb, startCluster, times);
 
         result.name = name;
         result.isContiguous = isContiguous;
         result.size = size;
+        result.allocatedSize = allocatedSize;
         result.flags = flags;
         result.deleted = deleted;
+
+        if (allocatedSize < size) {
+            Logger.getLogger(Node.class).warn("Allocated size less than file size: " + result);
+        }
 
         return result;
     }
@@ -69,7 +75,17 @@ public final class Node {
     private long clusterCount;
     private int flags;
     private String name;
+
+    /**
+     * The size of the file in bytes.
+     */
     private long size;
+
+    /**
+     * The size allocated for the file in bytes. This may be larger than {@code size} if the OS has reserved some space
+     * for the file to grow into.
+     */
+    private long allocatedSize;
     private boolean deleted;
 
     private Node(ExFatSuperBlock sb, long startCluster, EntryTimes times) {
@@ -125,6 +141,10 @@ public final class Node {
         return size;
     }
 
+    public long getAllocatedSize() {
+        return allocatedSize;
+    }
+
     public boolean isDeleted() {
         return deleted;
     }
@@ -170,6 +190,10 @@ public final class Node {
         result.append(this.name);
         result.append(", contiguous=");
         result.append(this.isContiguous);
+        result.append(", size=");
+        result.append(size);
+        result.append(", allocated-size=");
+        result.append(allocatedSize);
         result.append("]");
 
         return result.toString();

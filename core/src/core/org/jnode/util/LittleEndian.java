@@ -127,6 +127,23 @@ public class LittleEndian {
     }
 
     /**
+     * Gets a 40-bit signed integer from the given byte array at the given offset.
+     *
+     * @param src
+     * @param offset
+     */
+    public static long getInt40(byte[] src, int offset) {
+        final long v0 = src[offset + 0] & 0xFF;
+        final long v1 = src[offset + 1] & 0xFF;
+        final long v2 = src[offset + 2] & 0xFF;
+        final long v3 = src[offset + 3] & 0xFF;
+        final long v4 = src[offset + 4] & 0xFF;
+        long tmp = (v4 << 32) | (v3 << 24) | (v2 << 16) | (v1 << 8) | v0;
+        tmp <<= 24; // Shift the value to the top of the 8 bytes in the long, and back to extend any -ve sign
+        return tmp >> 24;
+    }
+
+    /**
      * Gets a 48-bit unsigned integer from the given byte array at the given offset.
      *
      * @param src

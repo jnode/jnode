@@ -24,6 +24,8 @@ import org.jnode.fs.hfsplus.HfsUnicodeString;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class HfsUnicodeStringTest {
     private byte[] STRING_AS_BYTES_ARRAY =
@@ -49,4 +51,35 @@ public class HfsUnicodeStringTest {
         }
     }
 
+    @Test
+    public void testEquals() {
+        HfsUnicodeString string1 = new HfsUnicodeString(STRING_AS_TEXT);
+        HfsUnicodeString string2 = new HfsUnicodeString(STRING_AS_TEXT);
+        HfsUnicodeString string3 = new HfsUnicodeString(null);
+        HfsUnicodeString string4 = new HfsUnicodeString(null);
+
+        assertEquals(string1, string2);
+        assertEquals(string3, string4);
+        assertFalse(string1.equals(string3));
+        assertFalse(string4.equals(string2));
+    }
+
+    @Test
+    public void testCompareTo() {
+        HfsUnicodeString nullStr = new HfsUnicodeString(null);
+        HfsUnicodeString emptyStr = new HfsUnicodeString("");
+        HfsUnicodeString string1 = new HfsUnicodeString("test");
+        HfsUnicodeString string2 = new HfsUnicodeString("test");
+        HfsUnicodeString longerStr = new HfsUnicodeString("testzzz");
+
+        assertEquals(-1, nullStr.compareTo(emptyStr));
+        assertEquals(1, emptyStr.compareTo(nullStr));
+
+        assertEquals(0, string1.compareTo(string2));
+        assertTrue(string1.compareTo(longerStr) < 0);
+        assertTrue(longerStr.compareTo(string1) > 0);
+
+        assertEquals(1, string1.compareTo(nullStr));
+        assertEquals(-1, nullStr.compareTo(string1));
+    }
 }
