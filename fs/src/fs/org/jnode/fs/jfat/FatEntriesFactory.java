@@ -11,7 +11,6 @@ public class FatEntriesFactory implements Iterator<FatEntry> {
 
     private boolean label;
     private int index;
-    private int next;
     private FatEntry entry;
 
     /**
@@ -25,42 +24,39 @@ public class FatEntriesFactory implements Iterator<FatEntry> {
     private FatDirectory directory;
 
     public FatEntriesFactory(FatDirectory directory, boolean includeDeleted) {
-        label = false;
-        index = 0;
-        next = 0;
-        entry = null;
         this.includeDeleted = includeDeleted;
         this.directory = directory;
     }
 
-    /**
-     * Returns the index of the entry the factory is up to.
-     *
-     * @return the index.
-     */
-    public int getIndex() {
-        return index;
-    }
-
     @Override
     public boolean hasNext() {
-        int i;
+        if (entry == null) {
+            fetchNext();
+        }
+
+        return entry != null;
+    }
+
+    /**
+     * Fetches the next entry into {@link #entry}.
+     */
+    protected void fetchNext() {
+        if (index > FatDirectory.MAXENTRIES) {
+            log.debug("Full Directory: invalid index " + index);
+        }
+
         FatDirEntry dirEntry;
         FatRecord record = new FatRecord();
+        int i = index;
 
-        if (index > FatDirectory.MAXENTRIES)
-            log.debug("Full Directory: invalid index " + index);
-
-        for (i = index;; ) {
-                /*
-                 * create a new entry from the chain
-                 */
+        while (true) {
             try {
+                // Read the next entry
                 dirEntry = directory.getFatDirEntry(i, includeDeleted);
                 i++;
             } catch (NoSuchElementException ex) {
                 entry = null;
-                return false;
+                return;
             } catch (IOException ex) {
                 log.debug("cannot read entry " + i);
                 i++;
@@ -101,30 +97,25 @@ public class FatEntriesFactory implements Iterator<FatEntry> {
                 }
             } else if (dirEntry.isLastDirEntry()) {
                 entry = null;
-                return false;
-            } else
-                throw new UnsupportedOperationException(
-                    "FatDirEntry is of unknown type, shouldn't happen");
+                return;
+            } else {
+                throw new UnsupportedOperationException("FatDirEntry is of unknown type, shouldn't happen");
+            }
         }
 
-        if (!dirEntry.isShortDirEntry())
+        if (!dirEntry.isShortDirEntry()) {
             throw new UnsupportedOperationException("shouldn't happen");
+        }
 
         record.close((FatShortDirEntry) dirEntry);
 
-            /*
-             * here recursion is in action for the entries factory it creates
-             * directory nodes and file leafs
-             */
         if (((FatShortDirEntry) dirEntry).isDirectory()) {
             this.entry = createFatDirectory(record);
         } else {
             this.entry = createFatFile(record);
         }
 
-        this.next = i;
-
-        return true;
+        index = i;
     }
 
     /**
@@ -149,15 +140,14 @@ public class FatEntriesFactory implements Iterator<FatEntry> {
 
     @Override
     public FatEntry next() {
-        if (index == next) {
-            hasNext();
+        if (entry == null) {
+            fetchNext();
         }
 
         if (entry == null) {
             throw new NoSuchElementException();
         }
 
-        index = next;
         return entry;
     }
 

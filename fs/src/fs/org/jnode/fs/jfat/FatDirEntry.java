@@ -38,7 +38,7 @@ public class FatDirEntry {
 
     protected final FatFileSystem fs;
     protected final FatMarshal entry;
-    protected int index;
+    protected final int index;
 
     private boolean lastDirEntry = false;
     private boolean freeDirEntry = false;
@@ -68,12 +68,6 @@ public class FatDirEntry {
 
     public int getIndex() {
         return index;
-    }
-
-    protected void setIndex(int value) {
-        if (value < 0)
-            throw new IllegalArgumentException("value<0");
-        index = value;
     }
 
     public int length() {

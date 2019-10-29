@@ -40,10 +40,7 @@ public class FatDotDirEntry extends FatShortDirEntry {
             int startCluster) throws IOException {
         super(fs);
         init(parent, startCluster);
-        if (!dotDot) {
-            setIndex(0);
-        } else {
-            setIndex(1);
+        if (dotDot) {
             lName[1] = dot;
         }
         encodeName();
