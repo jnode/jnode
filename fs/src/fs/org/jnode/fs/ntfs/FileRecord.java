@@ -666,15 +666,20 @@ public class FileRecord extends NTFSRecord {
 
     @Override
     public String toString() {
-        // Only look at stored attributes to determine the file name to avoid a possible stack overflow
         String fileName = null;
-        for (NTFSAttribute attribute : getAllStoredAttributes()) {
-            if (attribute.getAttributeType() == NTFSAttribute.Types.FILE_NAME) {
-                FileNameAttribute fileNameAttribute = (FileNameAttribute) attribute;
-                if (fileName == null || fileNameAttribute.getNameSpace() == FileNameAttribute.NameSpace.WIN32) {
-                    fileName = fileNameAttribute.getFileName();
+
+        try {
+            // Only look at stored attributes to determine the file name to avoid a possible stack overflow
+            for (NTFSAttribute attribute : getAllStoredAttributes()) {
+                if (attribute.getAttributeType() == NTFSAttribute.Types.FILE_NAME) {
+                    FileNameAttribute fileNameAttribute = (FileNameAttribute) attribute;
+                    if (fileName == null || fileNameAttribute.getNameSpace() == FileNameAttribute.NameSpace.WIN32) {
+                        fileName = fileNameAttribute.getFileName();
+                    }
                 }
             }
+        } catch (Exception e) {
+            log.debug("Error getting file name for file record: " + referenceNumber, e);
         }
 
         if (isInUse()) {
