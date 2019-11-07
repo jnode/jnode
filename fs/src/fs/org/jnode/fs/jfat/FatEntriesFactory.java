@@ -148,7 +148,9 @@ public class FatEntriesFactory implements Iterator<FatEntry> {
             throw new NoSuchElementException();
         }
 
-        return entry;
+        FatEntry result = entry;
+        entry = null;
+        return result;
     }
 
     @Override
