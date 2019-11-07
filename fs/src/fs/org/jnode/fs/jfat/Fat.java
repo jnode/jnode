@@ -218,7 +218,9 @@ public abstract class Fat {
     }
 
     byte[] readSector(long sector) throws IOException {
-        byte[] buffer = new byte[512];
+        // FAT-12 reads in two byte chunks so add an extra element to prevent an array index out of bounds exception
+        // when reading in the last element
+        byte[] buffer = new byte[512 + 1];
         api.read(sector * 512, ByteBuffer.wrap(buffer));
         return buffer;
     }
