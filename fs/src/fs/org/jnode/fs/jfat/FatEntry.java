@@ -270,7 +270,8 @@ public class FatEntry extends FatObject implements FSEntry, FSEntryCreated, FSEn
     }
 
     public String toString() {
-        return String.format("FatEntry:[dir:%b start-cluster:%d]:%s", isDirectory(), getStartCluster(), getName());
+        return String.format("FatEntry:[dir:%b del:%b start-cluster:%d]:%s", isDirectory(), entry.isFreeDirEntry(),
+            getStartCluster(), getName());
     }
 
     public String toDebugString() {

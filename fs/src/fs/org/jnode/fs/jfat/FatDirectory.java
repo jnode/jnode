@@ -8,29 +8,35 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jfat;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSDirectoryId;
 import org.jnode.fs.FSEntry;
 
 public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId {
+    private static final Logger log = Logger.getLogger(FatEntriesFactory.class);
+
+    private static final boolean debugEntries = Boolean.getBoolean("org.jnode.fs.jfat.dir.debugEntries");
+
     public static final int MAXENTRIES = 65535; // 2^16-1; fatgen 1.03, page 33
 
     private final FatTable children = new FatTable();
@@ -287,6 +293,10 @@ public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId
             FatEntry child = idMap.get(id);
 
             if (child == null) {
+                if (debugEntries) {
+                    dumpEntriesToLog();
+                }
+
                 FatEntriesFactory f = createEntriesFactory(true);
 
                 while (f.hasNext()) {
@@ -299,6 +309,20 @@ public class FatDirectory extends FatEntry implements FSDirectory, FSDirectoryId
 
             return child;
         }
+    }
+
+    private void dumpEntriesToLog() {
+        StringBuilder builder = new StringBuilder();
+        FatEntriesFactory factory = createEntriesFactory(true);
+
+        while (factory.hasNext()) {
+            FatEntry entry = factory.next();
+            builder.append(String.format(Locale.ROOT, "%s index:%d\n", entry, entry.getIndex()));
+        }
+
+        log.info("Directory Entries for: " + this + "\n" +
+            "--------------------------------------------------------------------------\n" +
+            builder + "\n\n\n");
     }
 
     public FatEntry getEntryByShortName(byte[] shortName) {
