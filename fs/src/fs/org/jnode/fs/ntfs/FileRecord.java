@@ -23,6 +23,7 @@ package org.jnode.fs.ntfs;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -422,7 +423,17 @@ public class FileRecord extends NTFSRecord {
                     attributeList = new ArrayList<NTFSAttribute>(getAllStoredAttributes());
                 } else {
                     log.debug("Attributes in attribute list");
-                    readAttributeListAttributes();
+                    attributeList = readAttributeListAttributes(new FileRecordSupplier() {
+                        @Override
+                        public FileRecord getRecord(long referenceNumber) throws IOException {
+                            // When reading the MFT itself don't attempt to check the index is in range
+                            // (we won't know the total MFT length yet)
+                            MasterFileTable mft = getVolume().getMFT();
+                            return getReferenceNumber() == MasterFileTable.SystemFiles.MFT
+                                ? mft.getRecordUnchecked(referenceNumber)
+                                : mft.getRecord(referenceNumber);
+                        }
+                    });
                 }
             } catch (Exception e) {
                 log.error("Error getting attributes for file record: " + referenceNumber +
@@ -490,7 +501,24 @@ public class FileRecord extends NTFSRecord {
         if (log.isDebugEnabled()) {
             log.debug("findAttributesByTypeAndName(0x" + NumberUtils.hex(attrTypeID, 4) + "," + name + ")");
         }
-        return new FilteredAttributeIterator(getAllAttributes().iterator()) {
+
+        Iterator<NTFSAttribute> attributeIterator = getAllAttributes().iterator();
+
+        if (attrTypeID == NTFSAttribute.Types.DATA && referenceNumber == MasterFileTable.SystemFiles.MFT) {
+            List<NTFSAttribute> attributes = new ArrayList<NTFSAttribute>();
+            attributes.addAll(getAllStoredAttributes());
+            attributes.addAll(readAttributeListAttributes(new FileRecordSupplier() {
+                @Override
+                public FileRecord getRecord(long referenceNumber) {
+                    // When trying to get the $DATA attribute of the MFT, don't attempt to look up any other records
+                    // to avoid possible infinite recursion
+                    return null;
+                }
+            }));
+            attributeIterator = attributes.iterator();
+        }
+
+        return new FilteredAttributeIterator(attributeIterator) {
             @Override
             protected boolean matches(NTFSAttribute attr) {
                 if (attr.getAttributeType() == attrTypeID) {
@@ -691,12 +719,19 @@ public class FileRecord extends NTFSRecord {
 
     /**
      * Reads in all attributes referenced by the attribute-list attribute.
+     *
+     * @param recordSupplier the FILE record supplier.
+     * @return the list of attributes.
      */
-    private synchronized void readAttributeListAttributes() {
+    private List<NTFSAttribute> readAttributeListAttributes(FileRecordSupplier recordSupplier) {
         Iterator<AttributeListEntry> entryIterator;
 
         try {
-            entryIterator = getAttributeListAttribute().getAllEntries();
+            AttributeListAttribute attributeListAttribute = getAttributeListAttribute();
+            if (attributeListAttribute == null) {
+                return Collections.emptyList();
+            }
+            entryIterator = attributeListAttribute.getAllEntries();
         } catch (Exception e) {
             throw new IllegalStateException("Error getting attributes from attribute list, file record: " +
                 referenceNumber, e);
@@ -719,20 +754,19 @@ public class FileRecord extends NTFSRecord {
                         log.debug("Looking up MFT entry for: " + entry.getFileReferenceNumber());
                     }
 
-                    // When reading the MFT itself don't attempt to check the index is in range (we won't know the total
-                    // MFT length yet)
-                    MasterFileTable mft = getVolume().getMFT();
-                    FileRecord holdingRecord = getReferenceNumber() == MasterFileTable.SystemFiles.MFT
-                        ? mft.getRecordUnchecked(entry.getFileReferenceNumber())
-                        : mft.getRecord(entry.getFileReferenceNumber());
-
-                    attribute = holdingRecord.findStoredAttributeByID(entry.getAttributeID());
-
-                    if (attribute == null) {
-                        log.error(String.format("Failed to find an attribute matching entry '%s' in the holding record, ref=%d",
-                            entry, referenceNumber));
+                    FileRecord holdingRecord = recordSupplier.getRecord(entry.getFileReferenceNumber());
+                    if (holdingRecord == null) {
+                        log.error(String.format("Failed to look up holding record %d for entry '%s'", referenceNumber,
+                            entry));
                     } else {
-                        attributeListBuilder.add(attribute);
+                        attribute = holdingRecord.findStoredAttributeByID(entry.getAttributeID());
+
+                        if (attribute == null) {
+                            log.error(String.format("Failed to find an attribute matching entry '%s' in the holding " +
+                                    "record, ref=%d", entry, referenceNumber));
+                        } else {
+                            attributeListBuilder.add(attribute);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -741,7 +775,7 @@ public class FileRecord extends NTFSRecord {
             }
         }
 
-        attributeList = attributeListBuilder.toList();
+        return attributeListBuilder.toList();
     }
 
     /**
