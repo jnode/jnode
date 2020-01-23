@@ -502,7 +502,7 @@ public class FileRecord extends NTFSRecord {
             log.debug("findAttributesByTypeAndName(0x" + NumberUtils.hex(attrTypeID, 4) + "," + name + ")");
         }
 
-        Iterator<NTFSAttribute> attributeIterator = getAllAttributes().iterator();
+        Iterator<NTFSAttribute> attributeIterator;
 
         if (attrTypeID == NTFSAttribute.Types.DATA && referenceNumber == MasterFileTable.SystemFiles.MFT) {
             List<NTFSAttribute> attributes = new ArrayList<NTFSAttribute>();
@@ -516,6 +516,8 @@ public class FileRecord extends NTFSRecord {
                 }
             }));
             attributeIterator = attributes.iterator();
+        } else {
+            attributeIterator = getAllAttributes().iterator();
         }
 
         return new FilteredAttributeIterator(attributeIterator) {
