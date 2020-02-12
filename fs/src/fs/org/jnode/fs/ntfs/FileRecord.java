@@ -752,6 +752,11 @@ public class FileRecord extends NTFSRecord {
                     attribute = findStoredAttributeByID(entry.getAttributeID());
                     attributeListBuilder.add(attribute);
                 } else {
+                    if (entry.getFileReferenceNumber() == 0) {
+                        log.debug("Skipping lookup for entry: " + entry);
+                        continue;
+                    }
+
                     if (log.isDebugEnabled()) {
                         log.debug("Looking up MFT entry for: " + entry.getFileReferenceNumber());
                     }
