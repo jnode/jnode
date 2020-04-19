@@ -17,50 +17,52 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build.packager;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.Writer;
+import java.security.AllPermission;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
-
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.Path;
+import org.jnode.build.AbstractPluginTask.LibAlias;
 import org.jnode.build.BuildException;
 import org.jnode.build.PluginTask;
-import org.jnode.build.AbstractPluginTask.LibAlias;
+import org.jnode.plugin.AutoUnzipPlugin;
+import org.jnode.plugin.model.PluginDescriptorBuilder;
 
 /**
  * Class building new jnode plugins from third party jars/resources.
- * 
- * @author fabien
  *
+ * @author Fabien DUMINY (fduminy at jnode.org)
  */
 public class PluginBuilder extends PackagerTask {
     private final Task parent;
-   
+
     /**
      * List of user plugin ids.
      */
-    private StringBuilder userPluginIds = new StringBuilder();
-    
+    private StringBuffer userPluginIds = new StringBuffer();
+
     /**
      * {@link Path} to third party jars for compilation purpose.
      */
     private Path path;
-    
+
     /**
-     * Construct a PluginBuilder from the given {@link Task}, 
+     * Construct a PluginBuilder from the given {@link Task},
      * which will be used as a delegate to access ant context.
-     * 
+     *
      * @param parent
      */
     public PluginBuilder(Task parent) {
@@ -69,15 +71,16 @@ public class PluginBuilder extends PackagerTask {
 
     /**
      * Define the path reference for compilation.
+     *
      * @param pathRefId
      */
     public void setPathRefId(String pathRefId) {
         this.path = (Path) parent.getProject().getReference(pathRefId);
     }
-    
+
     /**
      * Main method for build the jnode plugin.
-     * 
+     *
      * @param executor
      * @param descriptors
      */
@@ -86,7 +89,7 @@ public class PluginBuilder extends PackagerTask {
             if (path == null) {
                 throw new BuildException("pathRefId is mandatory");
             }
-            
+
             File[] userJars = userApplicationsDir.listFiles(new FileFilter() {
 
                 @Override
@@ -95,7 +98,7 @@ public class PluginBuilder extends PackagerTask {
                 }
 
             });
-            
+
             for (File userJar : userJars) {
                 processUserJar(executor, descriptors, userJar, userPluginIds);
             }
@@ -109,8 +112,8 @@ public class PluginBuilder extends PackagerTask {
         if (isEnabled()) {
             if ((userPluginIds.length() > 0) && (userPluginIds.charAt(userPluginIds.length() - 1) == ',')) {
                 userPluginIds.deleteCharAt(userPluginIds.length() - 1);
-            }        
-            
+            }
+
             // write properties
             Properties properties = getProperties();
             properties.put(USER_PLUGIN_IDS, userPluginIds.toString());
@@ -133,120 +136,115 @@ public class PluginBuilder extends PackagerTask {
     }
 
     /**
-     * Attention : userPluginList must be a StringBuilder because it's accessed from multiple threads.
+     * Attention : userPluginList must be a StringBuffer because it's accessed from multiple threads.
+     *
      * @param executor
      * @param descriptors
      * @param userJar
      * @param userPluginList
      */
-    private void processUserJar(ExecutorService executor, final Map<String, File> descriptors, final File userJar, 
-            final StringBuilder userPluginList) {
+    private void processUserJar(ExecutorService executor, final Map<String, File> descriptors, final File userJar,
+                                final StringBuffer userPluginList) {
         final PluginTask task = (PluginTask) parent;
         executor.execute(new Runnable() {
             public void run() {
                 final String jarName = userJar.getName();
                 final String pluginId;
-                
+
                 if (userJar.isFile()) {
                     pluginId = jarName.substring(0, jarName.length() - 4); // remove ".jar"
                 } else {
                     pluginId = jarName; // use directory name as plugin id
                 }
-                
+
                 userPluginList.append(pluginId + ",");
-                
+
                 // replace ".jar" by ".xml"
-                final String pluginDesc =  pluginId + ".xml";
-                
+                final String pluginDesc = pluginId + ".xml";
+
                 path.createPathElement().setLocation(userJar);
-                                
+
                 // create the lib alias
                 final String alias = pluginId + ".jar";
                 LibAlias libAlias = task.createLibAlias();
                 libAlias.setName(alias);
                 libAlias.setAlias(userJar);
-                                
+
                 final File descriptorFile = new File(userJar.getParent(), pluginDesc);
                 if (!descriptorFile.exists()) {
                     // build the descriptor from scratch
                     buildDescriptor(userJar, descriptorFile, pluginId, alias);
                 }
-                
+
                 if (userJar.isDirectory()) {
                     ScriptBuilder.build(userJar, getProperties());
                 }
-                
+
                 task.buildPlugin(descriptors, descriptorFile);
             }
         });
     }
-    
+
     /**
      * Build the plugin descriptor.
-     * 
+     *
      * @param userJar
      * @param descriptorFile
      * @param pluginId
      * @param alias
      */
     private void buildDescriptor(File userJar, File descriptorFile, String pluginId, String alias) {
-        PrintStream out = null;
+        Writer out = null;
         boolean success = false;
         try {
-            out = new PrintStream(descriptorFile);
-            
-            out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            out.println("<!DOCTYPE plugin SYSTEM \"jnode.dtd\">");
-    
-            out.println("<plugin id=\"" + pluginId + "\"");
-            out.println("  name=\"" + pluginId + "\"");
-            out.println("  version=\"\"");
-            out.println("  class=\"org.jnode.plugin.AutoUnzipPlugin\"");
-            out.println("  auto-start=\"true\"");            
-            out.println("  license-name=\"unspecified\">");
-    
-            out.println("  <runtime>");
-            out.println("    <library name=\"" + alias + "\">");
-            out.println("      <export name=\"*\"/>");
-            out.println("    </library>");
-            out.println("  </runtime>");
-    
+            PluginDescriptorBuilder builder = new PluginDescriptorBuilder(pluginId, pluginId, "unspecified", "1.0");
+            builder.setPluginClass(AutoUnzipPlugin.class);
+            builder.setAutoStart(true);
+            builder.addRuntimeLibrary(alias, "*");
+
             if (userJar.isFile()) {
                 List<String> mainClasses = MainFinder.searchMain(userJar);
                 if (!mainClasses.isEmpty()) {
-                    out.println("  <extension point=\"org.jnode.shell.aliases\">");
+                    PluginDescriptorBuilder.ExtensionBuilder
+                        extension = builder.addExtension("org.jnode.shell.aliases", "alias");
                     for (String mainClass : mainClasses) {
                         int idx = mainClass.lastIndexOf('.');
                         String name = (idx < 0) ? mainClass : mainClass.substring(idx + 1);
-                        out.println("    <alias name=\"" + name + "\" class=\"" + mainClass + "\"/>");
+                        extension.newElement().addAttribute("name", name).addAttribute("class", mainClass);
                         log(pluginId + " : added alias " + name + " for class " + mainClass, Project.MSG_INFO);
                     }
-                    
-                    out.println("  </extension>");
                 } else {
                     log("no main found for plugin " + pluginId, Project.MSG_WARN);
                 }
             }
-            
-            out.println("  <!-- FIXME : use more restricted permissions -->");
-            out.println("  <extension point=\"org.jnode.security.permissions\">");
-            out.println("    <permission class=\"java.security.AllPermission\" />");
-            out.println("  </extension>");
-            
-            out.println("</plugin>");
+
+            // FIXME : use more restricted permissions
+            PluginDescriptorBuilder.ExtensionBuilder
+                extension = builder.addExtension("org.jnode.security.permissions", "permission");
+            extension.newElement().addAttribute("class", AllPermission.class);
+
+            out = new FileWriter(descriptorFile);
+            out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            out.write("<!DOCTYPE plugin SYSTEM \"jnode.dtd\">\n");
+            builder.buildXmlElement().write(out);
+
             success = true;
-        } catch (IOException ioe) {
+        } catch (Exception ioe) {
             throw new BuildException("failed to write plugin descriptor", ioe);
         } finally {
             if (out != null) {
-                out.close();
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    throw new BuildException("failed to close writer", e);
+                }
             }
-            
+
             if (!success) {
                 // in case of failure, delete the incomplete descriptor file
                 descriptorFile.delete();
             }
         }
     }
-    
+
 }

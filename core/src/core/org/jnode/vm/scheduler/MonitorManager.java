@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.scheduler;
 
 import org.jnode.annotation.Internal;
@@ -52,11 +52,12 @@ public final class MonitorManager {
         }
 
         // Prepare
-        final Word tid = Word.fromIntZeroExtend(VmMagic.currentProcessor().getCurrentThread().getId());
+        final VmThread currentThread = VmMagic.currentProcessor().getCurrentThread();
+        final Word tid = Word.fromIntZeroExtend(currentThread.getId());
         final Address objectPtr = ObjectReference.fromObject(object).toAddress();
         final Address statusPtr = objectPtr.add(ObjectLayout.FLAGS_SLOT * Address.size());
 
-        for (;;) {
+        for (; ; ) {
             // attempt fast path: object is not locked.
             final Word oldlockword = statusPtr.prepareWord();
 
@@ -64,6 +65,7 @@ public final class MonitorManager {
             if (statusPtr.attempt(statusFlags, statusFlags.or(tid))) {
                 // fast path succeeded, the object was not locked and
                 // has been locked by the current thread.
+                currentThread.addLockedObject(object);
                 return;
             }
 
@@ -72,6 +74,7 @@ public final class MonitorManager {
                 // slow path 2: high bit of lock word is set --> inflated lock
                 final Monitor m = getMonitor(oldlockword);
                 m.enter();
+                currentThread.addLockedObject(object);
                 return;
             } else if (oldlockword.and(Word.fromIntZeroExtend(ObjectFlags.THREAD_ID_MASK)).EQ(tid)) {
                 // Current thread owns the thinlock
@@ -80,6 +83,7 @@ public final class MonitorManager {
                     // thin lock entry counter == max, so we need to inflate
                     // ourselves.
                     installInflatedLock(object, null).enter();
+                    currentThread.addLockedObject(object);
                     return;
                 } else {
                     // not-quite-so-fast path: locked by current thread.
@@ -89,10 +93,10 @@ public final class MonitorManager {
                     // be cautious
                     final Word newlockword;
                     newlockword = oldlockword.add(Word.fromIntZeroExtend(ObjectFlags.LOCK_COUNT_INC));
-                    // Try to update lock, it may be inflated by some other
-                    // thread, so
-                    // be cautious
+                    // Try to update lock, it may be inflated by some other thread,
+                    // so be cautious
                     if (statusPtr.attempt(oldlockword, newlockword)) {
+                        currentThread.addLockedObject(object);
                         return;
                     }
                 }
@@ -105,10 +109,12 @@ public final class MonitorManager {
                     //the owner of the lock was destroyed               
                     //aquire the lock in fast fashion
                     statusPtr.store(statusFlags.or(tid));
+                    currentThread.addLockedObject(object);
                     return;
                 } else {
                     // install an inflated lock.
                     installInflatedLock(object, thread).enter();
+                    currentThread.addLockedObject(object);
                 }
                 return;
             }
@@ -129,11 +135,12 @@ public final class MonitorManager {
         }
 
         // Prepare
-        final Word tid = Word.fromIntZeroExtend(VmMagic.currentProcessor().getCurrentThread().getId());
+        final VmThread currentThread = VmMagic.currentProcessor().getCurrentThread();
+        final Word tid = Word.fromIntZeroExtend(currentThread.getId());
         final Address objectPtr = ObjectReference.fromObject(object).toAddress();
         final Address statusPtr = objectPtr.add(ObjectLayout.FLAGS_SLOT * Address.size());
 
-        for (;;) {
+        for (; ; ) {
             final Word oldlockword = statusPtr.prepareWord();
 
             // Unsafe.debug(" exit:");
@@ -146,6 +153,7 @@ public final class MonitorManager {
                 // inflated lock
                 final Monitor m = getMonitor(oldlockword);
                 m.exit();
+                currentThread.removeLockedObject(object);
                 return;
             } else if (oldlockword.and(Word.fromIntZeroExtend(ObjectFlags.THREAD_ID_MASK)).EQ(tid)) {
                 // owned by current thread
@@ -159,6 +167,7 @@ public final class MonitorManager {
                     newlockword = oldlockword.sub(Word.fromIntSignExtend(ObjectFlags.LOCK_COUNT_INC));
                 }
                 if (statusPtr.attempt(oldlockword, newlockword)) {
+                    currentThread.removeLockedObject(object);
                     return;
                 }
             } else {
@@ -250,7 +259,7 @@ public final class MonitorManager {
      * Installs an inflated lock on the given object. Uses a spin-loop to wait
      * until the object is unlocked or inflated.
      *
-     * @param k the object for which the inflated lock is installed
+     * @param k      the object for which the inflated lock is installed
      * @param thread
      * @return the Monitor object representing the lock
      */
@@ -261,7 +270,7 @@ public final class MonitorManager {
         final Address kPtr = ObjectReference.fromObject(k).toAddress();
         final Address statusPtr = kPtr.add(ObjectLayout.FLAGS_SLOT * Address.size());
 
-        for (;;) {
+        for (; ; ) {
             final Word oldlockword = statusPtr.prepareWord();
             if (!oldlockword.and(Word.fromIntZeroExtend(ObjectFlags.LOCK_EXPANDED)).isZero()) {
                 // inflated by another thread, use that one.
@@ -269,7 +278,7 @@ public final class MonitorManager {
             }
 
             if (m == null) {
-                m = new Monitor(VmMagic.currentProcessor().getCurrentThread(), 1);
+                m = new Monitor(VmMagic.currentProcessor().getCurrentThread(), 1, k);
                 monAddr = ObjectReference.fromObject(m).toAddress().toWord();
                 if (!monAddr.and(Word.fromIntZeroExtend(ObjectFlags.LOCK_EXPANDED
                     | ObjectFlags.STATUS_FLAGS_MASK)).isZero()) {
@@ -319,7 +328,7 @@ public final class MonitorManager {
      *
      * @param object
      * @return The inflated monitor of the given object, or null if the given
-     *         object has no inflated monitor.
+     * object has no inflated monitor.
      */
     @Internal
     public static Monitor getInflatedMonitor(Object object) {

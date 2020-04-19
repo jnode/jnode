@@ -17,15 +17,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.mmtk;
 
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.bootlog.BootLogInstance;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.resource.MemoryResource;
@@ -41,6 +39,7 @@ import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.facade.HeapStatistics;
 import org.jnode.vm.facade.ObjectFilter;
+import org.jnode.vm.facade.ObjectVisitor;
 import org.jnode.vm.facade.VmArchitecture;
 import org.jnode.vm.facade.VmProcessor;
 import org.jnode.vm.facade.VmUtils;
@@ -64,24 +63,36 @@ import org.vmmagic.unboxed.Word;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public abstract class BaseMmtkHeapManager extends VmHeapManager implements
-        Uninterruptible {
+    Uninterruptible {
 
-    /** <code>true</code> if built with GCSpy */
+    /**
+     * <code>true</code> if built with GCSpy
+     */
     private static final boolean WITH_GCSPY = false;
 
-    /** Used by mmtypes for arrays */
+    /**
+     * Used by mmtypes for arrays
+     */
     private final int[] EMPY_INT_ARRAY = new int[0];
 
-    /** Offset in bytes of the flags from the object reference */
+    /**
+     * Offset in bytes of the flags from the object reference
+     */
     private final int flagsOffset;
 
-    /** Offset in bytes of the TIB reference from the object reference */
+    /**
+     * Offset in bytes of the TIB reference from the object reference
+     */
     private final int tibOffset;
 
-    /** Size of the java header in bytes */
+    /**
+     * Size of the java header in bytes
+     */
     private final int headerSize;
 
-    /** Resource used to claim the memory region occupied by the available heap */
+    /**
+     * Resource used to claim the memory region occupied by the available heap
+     */
     private MemoryResource heapResource;
 
     /**
@@ -105,10 +116,10 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
 
     public final Object createProcessorHeapData(VmProcessor cpu) {
         try {
-            final Class[] types = { HeapHelper.class };
+            final Class[] types = {HeapHelper.class};
             final Class cls = Class.forName("org.mmtk.vm.Plan");
             final Constructor cons = cls.getConstructor(types);
-            return cons.newInstance(new Object[] { helper });
+            return cons.newInstance(new Object[]{helper});
         } catch (ClassNotFoundException ex) {
             throw new InternalError("Plan class not found");
         } catch (NoSuchMethodException ex) {
@@ -120,19 +131,19 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
             throw new InternalError("Cannot access Plan");
         } catch (InvocationTargetException ex) {
             throw (InternalError) new InternalError("Error instantiating Plan")
-                    .initCause(ex.getTargetException());
+                .initCause(ex.getTargetException());
         }
     }
 
-    protected Object allocObject(VmClassType< ? > vmClass, int size) {
+    protected Object allocObject(VmClassType<?> vmClass, int size) {
         if (false) {
             Unsafe.debug("allocObject: ");
             Unsafe.debug(vmClass.getName());
             Unsafe.debug('\n');
         }
         if (false) {
-        	getCurrentProcessor().getArchitecture().getStackReader()
-                    .debugStackTrace();
+            getCurrentProcessor().getArchitecture().getStackReader()
+                .debugStackTrace();
         }
 
         final int align = ObjectLayout.OBJECT_ALIGN;
@@ -151,7 +162,7 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
         // Initialize the header
         final Address objPtr = ptr.add(headerSize);
         final ObjectReference tibRef = ObjectReference.fromObject(vmClass
-                .getTIB());
+            .getTIB());
         objPtr.store(tibRef, tibOffset);
         objPtr.store((int) 0, flagsOffset);
 
@@ -163,7 +174,7 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
             Unsafe.debug('\n');
         }
         postAlloc(ObjectReference.fromObject(result), ObjectReference
-                .fromObject(vmClass), size, allocator);
+            .fromObject(vmClass), size, allocator);
 
         return result;
     }
@@ -187,6 +198,13 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void accept(ObjectVisitor visitor) {
+        //TODO implement this.
+    }
+
     public long getTotalMemory() {
         return BasePlan.totalMemory().toLong();
     }
@@ -194,8 +212,8 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
     protected void initialize() {
         Unsafe.debug("MmtkHeapManager#initialize\n");
         if (initializing) {
-        	getCurrentProcessor().getArchitecture().getStackReader()
-                    .debugStackTrace();
+            getCurrentProcessor().getArchitecture().getStackReader()
+                .debugStackTrace();
             Unsafe.die("Recursive initialize");
         }
         initializing = true;
@@ -235,7 +253,7 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
             final Address start = Memory.AVAILABLE_START();
             final Extent size = Memory.AVAILABLE_END().toWord().sub(start.toWord()).toExtent();
             heapResource = rm.claimMemoryResource(ResourceOwner.SYSTEM, start,
-                    size, ResourceManager.MEMMODE_NORMAL);
+                size, ResourceManager.MEMMODE_NORMAL);
         } catch (NameNotFoundException ex) {
             BootLogInstance.get().fatal("Cannot find resource manager", ex);
         } catch (ResourceNotFreeException ex) {
@@ -244,17 +262,17 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
 
     }
 
-    public void notifyClassResolved(VmType< ? > vmType) {
+    public void notifyClassResolved(VmType<?> vmType) {
         final MMType type;
         final boolean acyclic = false; // TODO understand me
         if (vmType.isArray()) {
-            final VmArrayClass< ? > arrType = (VmArrayClass< ? >) vmType;
+            final VmArrayClass<?> arrType = (VmArrayClass<?>) vmType;
             type = new MMType(false, !arrType.isPrimitiveArray(), acyclic,
-                    pickAllocatorForType(vmType), EMPY_INT_ARRAY);
+                pickAllocatorForType(vmType), EMPY_INT_ARRAY);
         } else if (!vmType.isInterface()) {
-            final VmNormalClass< ? > clsType = (VmNormalClass< ? >) vmType;
+            final VmNormalClass<?> clsType = (VmNormalClass<?>) vmType;
             type = new MMType(false, false, acyclic,
-                    pickAllocatorForType(vmType), clsType.getReferenceOffsets());
+                pickAllocatorForType(vmType), clsType.getReferenceOffsets());
         } else {
             type = null;
         }
@@ -263,23 +281,22 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
 
     /**
      * Determine the default allocator to be used for a given type.
-     * 
-     * @param type
-     *            The type in question
+     *
+     * @param type The type in question
      * @return The allocator to use for allocating instances of type
-     *         <code>type</code>.
+     * <code>type</code>.
      */
-    private static int pickAllocatorForType(VmType< ? > type) {
+    private static int pickAllocatorForType(VmType<?> type) {
         int allocator = BasePlan.ALLOC_DEFAULT;
         final String clsName = type.getName();
         if (WITH_GCSPY) {
             if (clsName.startsWith("org.mmtk.vm.gcspy")
-                    || clsName.startsWith("[Lorg.mmtk.vm.gcspy")) {
+                || clsName.startsWith("[Lorg.mmtk.vm.gcspy")) {
                 allocator = BasePlan.ALLOC_GCSPY;
             }
         }
         if (clsName.startsWith("org.mmtk")
-                || clsName.startsWith("org.jnode.vm.VmProcessor")) {
+            || clsName.startsWith("org.jnode.vm.VmProcessor")) {
             allocator = BasePlan.ALLOC_IMMORTAL;
         }
         return allocator;
@@ -298,7 +315,7 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
 
     /**
      * Call plan.alloc
-     * 
+     *
      * @param bytes
      * @param align
      * @param offset
@@ -306,22 +323,22 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
      * @return the start address of the allocated memory region
      */
     protected abstract Address alloc(int bytes, int align, int offset,
-            int allocator);
+                                     int allocator);
 
     /**
      * Call plan.postAlloc.
-     * 
+     *
      * @param object
      * @param typeRef
      * @param bytes
      * @param allocator
      */
     protected abstract void postAlloc(ObjectReference object,
-            ObjectReference typeRef, int bytes, int allocator);
+                                      ObjectReference typeRef, int bytes, int allocator);
 
     /**
      * Call Plan.checkAllocator.
-     * 
+     *
      * @param bytes
      * @param align
      * @param allocator

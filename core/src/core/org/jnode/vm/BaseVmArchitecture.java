@@ -21,7 +21,6 @@
 package org.jnode.vm;
 
 import java.nio.ByteOrder;
-
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.MagicPermission;
@@ -110,9 +109,7 @@ public abstract class BaseVmArchitecture extends VmSystemObject implements org.j
     public abstract TypeSizeInfo getTypeSizeInfo();
 
     /**
-     * Gets the stackreader for this architecture.
-     *
-     * @return the architecture's stack reader
+     * {@inheritDoc}
      */
     @KernelSpace
     public final VmStackReader getStackReader() {

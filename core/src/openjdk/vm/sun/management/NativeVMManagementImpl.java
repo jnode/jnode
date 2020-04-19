@@ -17,11 +17,15 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package sun.management;
 
+import org.jnode.vm.NativeHelper;
+import org.jnode.vm.VmReflection;
+import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.facade.VmUtils;
 import org.jnode.vm.isolate.VmIsolate;
+import org.jnode.vm.scheduler.VmThread;
 
 /**
  * @see sun.management.VMManagementImpl
@@ -34,12 +38,28 @@ class NativeVMManagementImpl {
         //for java 6
         return "1.2";
     }
+
     /**
      * @see sun.management.VMManagementImpl#initOptionalSupportFields()
      */
     private static void initOptionalSupportFields() {
-        //todo implement it
+        // objectMonitorUsageSupport = true
+        VmField field = NativeHelper.findDeclaredField(VMManagementImpl.class, "objectMonitorUsageSupport");
+        VmReflection.setBoolean(field, null, true);
+
+        // synchronizerUsageSupport = true
+        field = NativeHelper.findDeclaredField(VMManagementImpl.class, "synchronizerUsageSupport");
+        VmReflection.setBoolean(field, null, true);
+
+        // currentThreadCpuTimeSupport = true
+        field = NativeHelper.findDeclaredField(VMManagementImpl.class, "currentThreadCpuTimeSupport");
+        VmReflection.setBoolean(field, null, true);
+
+        // otherThreadCpuTimeSupport = true
+        field = NativeHelper.findDeclaredField(VMManagementImpl.class, "otherThreadCpuTimeSupport");
+        VmReflection.setBoolean(field, null, true);
     }
+
     /**
      * @see sun.management.VMManagementImpl#isThreadContentionMonitoringEnabled()
      */
@@ -47,6 +67,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return false;
     }
+
     /**
      * @see sun.management.VMManagementImpl#isThreadCpuTimeEnabled()
      */
@@ -54,6 +75,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return false;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getTotalClassCount()
      */
@@ -61,6 +83,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return 0;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getUnloadedClassCount()
      */
@@ -68,6 +91,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return 0;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getVerboseClass()
      */
@@ -75,6 +99,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return false;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getVerboseGC()
      */
@@ -82,12 +107,14 @@ class NativeVMManagementImpl {
         //todo implement it
         return false;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getProcessId()
      */
     private static int getProcessId(VMManagementImpl instance) {
         return VmIsolate.currentIsolate().getId();
     }
+
     /**
      * @see sun.management.VMManagementImpl#getVmArguments0()
      */
@@ -95,6 +122,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return null;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getStartupTime()
      */
@@ -102,12 +130,14 @@ class NativeVMManagementImpl {
         //todo implement it
         return 0;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getAvailableProcessors()
      */
     private static int getAvailableProcessors(VMManagementImpl instance) {
         return VmUtils.getVm().availableProcessors();
     }
+
     /**
      * @see sun.management.VMManagementImpl#getTotalCompileTime()
      */
@@ -115,34 +145,35 @@ class NativeVMManagementImpl {
         //todo implement it
         return 0;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getTotalThreadCount()
      */
     private static long getTotalThreadCount(VMManagementImpl instance) {
-        //todo implement it
-        return 0;
+        return VmThread.getTotalStartedThreadCount();
     }
+
     /**
      * @see sun.management.VMManagementImpl#getLiveThreadCount()
      */
     private static int getLiveThreadCount(VMManagementImpl instance) {
-        //todo implement it
-        return 0;
+        return VmThread.getLiveThreadCount();
     }
+
     /**
      * @see sun.management.VMManagementImpl#getPeakThreadCount()
      */
     private static int getPeakThreadCount(VMManagementImpl instance) {
-        //todo implement it
-        return 0;
+        return VmThread.getPeakThreadCount();
     }
+
     /**
      * @see sun.management.VMManagementImpl#getDaemonThreadCount()
      */
     private static int getDaemonThreadCount(VMManagementImpl instance) {
-        //todo implement it
-        return 0;
+        return VmThread.getDaemonThreadCount();
     }
+
     /**
      * @see sun.management.VMManagementImpl#getSafepointCount()
      */
@@ -150,6 +181,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return 0;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getTotalSafepointTime()
      */
@@ -157,6 +189,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return 0;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getSafepointSyncTime()
      */
@@ -164,6 +197,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return 0;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getTotalApplicationNonStoppedTime()
      */
@@ -171,6 +205,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return 0;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getLoadedClassSize()
      */
@@ -178,6 +213,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return 0;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getUnloadedClassSize()
      */
@@ -185,6 +221,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return 0;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getClassLoadingTime()
      */
@@ -192,6 +229,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return 0;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getMethodDataSize()
      */
@@ -199,6 +237,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return 0;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getInitializedClassCount()
      */
@@ -206,6 +245,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return 0;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getClassInitializationTime()
      */
@@ -213,6 +253,7 @@ class NativeVMManagementImpl {
         //todo implement it
         return 0;
     }
+
     /**
      * @see sun.management.VMManagementImpl#getClassVerificationTime()
      */

@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.annotation.MagicPermission;
@@ -26,7 +26,7 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.vmmagic.unboxed.Address;
 
 @MagicPermission
-final class VmStackFrameEnumerator {
+public final class VmStackFrameEnumerator {
 
     /**
      * Stack frame reader
@@ -149,7 +149,7 @@ final class VmStackFrameEnumerator {
     }
 
     private void initializeCodeIndex(Address instrPtr) {
-        cc = reader.getCompiledCode(framePtr);
+        cc = framePtr.isZero() ? null : reader.getCompiledCode(framePtr);
         if (cc != null) {
             codeIndex = cc.getAddressMapIndex(instrPtr);
         } else {

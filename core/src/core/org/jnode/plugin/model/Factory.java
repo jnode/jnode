@@ -17,13 +17,16 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import java.net.URL;
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
+
+import static org.jnode.plugin.model.XMLConstants.FRAGMENT;
+import static org.jnode.plugin.model.XMLConstants.PLUGIN;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -58,14 +61,14 @@ public class Factory {
      * Parse an xml descriptor, returning its contents as a PluginDescriptorModel.
      *
      * @param root the root element of the descriptor
-     * @param jar the PluginJar for the descriptor
+     * @param jar  the PluginJar for the descriptor
      * @return the plugin descriptor
      * @throws PluginException
      */
     static PluginDescriptorModel parseDescriptor(PluginJar jar, XMLElement root) throws PluginException {
-        if (root.getName().equals("plugin")) {
+        if (root.getName().equals(PLUGIN)) {
             return new PluginDescriptorModel(jar, root);
-        } else if (root.getName().equals("fragment")) {
+        } else if (root.getName().equals(FRAGMENT)) {
             return new FragmentDescriptorModel(jar, root);
         } else {
             throw new PluginException("Unknown root tag " + root.getName());

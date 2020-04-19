@@ -17,8 +17,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package sun.misc;
+
+import org.jnode.vm.scheduler.VmThread;
 
 /**
  * @author Levente S\u00e1ntha
@@ -26,14 +28,15 @@ package sun.misc;
 class NativeVM {
     /**
      * @see VM#getThreadStateValues(int[][], String[][])
+     * @see sun.misc.VM#initThreadStateMap()
      */
     private static void getThreadStateValues(int[][] vmThreadStateValues,
-                                                    String[][] vmThreadStateNames){
-        throw new UnsupportedOperationException();
+                                             String[][] vmThreadStateNames) {
+        VmThread.getThreadStateValues(vmThreadStateValues, vmThreadStateNames);
     }
 
     /**
-     * @see sun.misc.VM#initialize() 
+     * @see sun.misc.VM#initialize()
      */
     private static void initialize() {
         //throw new UnsupportedOperationException();

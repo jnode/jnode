@@ -21,7 +21,7 @@
 package org.jnode.vm.facade;
 
 import java.nio.ByteOrder;
-
+import org.jnode.vm.VmStackReader;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 
@@ -128,4 +128,11 @@ public interface VmArchitecture {
      * @return the architecture's type size information descriptor
      */
     TypeSizeInfo getTypeSizeInfo();
+
+    /**
+     * Gets the stackreader for this architecture.
+     *
+     * @return the architecture's stack reader
+     */
+    VmStackReader getStackReader();
 }

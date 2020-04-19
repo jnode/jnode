@@ -26,14 +26,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
 /**
  * Abstract class used for common stuff among packager tasks.
- * 
- * @author fabien
+ *
+ * @author Fabien DUMINY (fduminy at jnode.org)
  *
  */
 public class PackagerTask extends Task {    

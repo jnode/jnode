@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import java.util.ArrayList;
@@ -28,6 +28,9 @@ import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.ExtensionPointListener;
 import org.jnode.plugin.PluginException;
+
+import static org.jnode.plugin.model.XMLConstants.ID;
+import static org.jnode.plugin.model.XMLConstants.NAME;
 
 /**
  * @author epr
@@ -50,8 +53,8 @@ final class ExtensionPointModel extends PluginModelObject implements
     public ExtensionPointModel(PluginDescriptorModel plugin, XMLElement e)
         throws PluginException {
         super(plugin);
-        id = getAttribute(e, "id", true);
-        name = getAttribute(e, "name", true);
+        id = getAttribute(e, ID, true);
+        name = getAttribute(e, NAME, true);
         uniqueId = plugin.getId() + '.' + id;
         if (id.indexOf('.') >= 0) {
             throw new PluginException("id cannot contain a '.'");

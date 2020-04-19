@@ -67,7 +67,7 @@ public final class VmStackFrame extends VmSystemObject {
      *
      * @return The line number, or -1 if not found.
      */
-    public final String getLocationInfo() {
+    public final int getLocationInfo() {
         int lineNo = -1;
         if (sfMethod != null) {
             final VmByteCode bc = sfMethod.getBytecode();
@@ -75,11 +75,7 @@ public final class VmStackFrame extends VmSystemObject {
                 lineNo = bc.getLineNr(programCounter);
             }
         }
-        if (lineNo >= 0) {
-            return String.valueOf(lineNo);
-        } else {
-            return "?";
-        }
+        return lineNo;
     }
 
     /**
@@ -92,7 +88,7 @@ public final class VmStackFrame extends VmSystemObject {
         final VmType<?> vmClass = (method == null) ? null : method.getDeclaringClass();
         final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
         final String mname = (method == null) ? "<unknown method>" : method.getName();
-        final String location = getLocationInfo();
+        final int location = getLocationInfo();
 
         return cname + '!' + mname + " (" + location + ')';
     }

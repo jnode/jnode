@@ -21,32 +21,37 @@
 package org.jnode.command.system;
 
 import java.io.PrintWriter;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
-import org.jnode.shell.syntax.IntegerArgument;
+import org.jnode.shell.syntax.ThreadArgument;
+
+import static org.jnode.shell.syntax.Argument.MANDATORY;
+import static org.jnode.shell.syntax.Argument.MULTIPLE;
 
 /**
  * @author Andreas H\u00e4nel
  * @author crawley@jnode.org
  */
 public class KillCommand extends AbstractCommand {
-    
-    private static final String help_tid = "the id of the thread to kill";
+
+    private static final String help_tid = "the id or name of the threads to kill";
     private static final String help_debug = "if set, print debug information";
-    private static final String help_super = "Kill the thread with the supplied ID";
-    private static final String fmt_prep_kill = "Preparing to kill thread with ID(%d)%n";
-    private static final String str_found = "Found the Thread: ";
-    private static final String fmt_killed = "Killed thread %d%n";
-    private static final String fmt_not_found = "Thread %d not found%n";
-    
-    private final IntegerArgument argThreadID;
+    private static final String help_super = "Kill the threads with the supplied ID or name";
+    private static final String fmt_prep_kill = "Preparing to kill threads with ID or name(%s)%n";
+    private static final String str_found = "Found the Threads: %s%n";
+    private static final String fmt_killed = "Killed thread %s%n";
+    private static final String fmt_not_found = "Threads %s not found%n";
+
+    private final ThreadArgument argThreadID;
     private final FlagArgument argDebug;
 
     public KillCommand() {
         super(help_super);
-        argThreadID = new IntegerArgument("threadId", Argument.MANDATORY, help_tid);
+        argThreadID =
+            new ThreadArgument("threadNameOrId", MANDATORY | MULTIPLE, help_tid, ThreadArgument.Option.NAME_OR_ID);
         argDebug    = new FlagArgument("debug", Argument.OPTIONAL, help_debug);
         registerArguments(argThreadID, argDebug);
     }
@@ -59,31 +64,46 @@ public class KillCommand extends AbstractCommand {
     public void execute() throws Exception {
         PrintWriter out = getError().getPrintWriter();
         boolean debug = argDebug.isSet();
-        int threadId = argThreadID.getValue();
+        String[] threadIdOrNames = argThreadID.getValues();
         if (debug) {
-            out.format(fmt_prep_kill, threadId);
+            out.format(fmt_prep_kill, threadIdOrNames);
         }
-        // In order to kill the thread, we need to traverse the thread group tree, looking
-        // for the thread whose 'id' matches the supplied one.  First, find the tree root.
+        // In order to kill the threads, we need to traverse the thread group tree, looking
+        // for the threads whose 'id' or name matches the supplied ones.  First, find the tree root.
         ThreadGroup grp = Thread.currentThread().getThreadGroup();
         while (grp.getParent() != null) {
             grp = grp.getParent();
         }
         // Next search the tree
-        Thread t = findThread(grp, threadId);
-        // Finally, kill the thread if we found one.
-        if (t != null) {
-            if (debug) {
-                out.print(str_found);
+        List<Thread> threads = new ArrayList<Thread>();
+        StringBuilder threadList = new StringBuilder();
+        for (String idOrName : threadIdOrNames) {
+            Thread t = findThread(grp, idOrName);
+            if (t != null) {
+                threads.add(t);
+
+                if (threadList.length() > 0) {
+                    threadList.append(", ");
+                }
+                threadList.append(argThreadID.toString(t));
             }
-            out.println(threadId);
-            // FIXME ... this is bad.  Killing a thread this way could in theory bring down the
-            // entire system if we do it at a point where the application thread is executing
-            // a method that is updating OS data structures.
-            t.stop(new ThreadDeath());
-            out.format(fmt_killed, threadId);
+        }
+
+        // Finally, kill the threads if we found ones.
+        if (!threads.isEmpty()) {
+            if (debug) {
+                out.format(str_found, threadList.toString());
+            }
+
+            for (Thread t : threads) {
+                // FIXME ... this is bad.  Killing a thread this way could in theory bring down the
+                // entire system if we do it at a point where the application thread is executing
+                // a method that is updating OS data structures.
+                t.stop(new ThreadDeath());
+                out.format(fmt_killed, argThreadID.toString(t));
+            }
         } else {
-            out.format(fmt_not_found, threadId);
+            out.format(fmt_not_found, threadList.toString());
             exit(1);
         }
     }
@@ -91,10 +111,10 @@ public class KillCommand extends AbstractCommand {
     /**
      * Search thread group 'grp' and its dependents groups for a given thread.
      * @param grp the thread group to search
-     * @param id the id of the thread we are looking for
+     * @param idOrName the id or name of the thread we are looking for
      * @return the Thread found or <code>null</code>
      */
-    private Thread findThread(ThreadGroup grp, int id) {
+    private Thread findThread(ThreadGroup grp, String idOrName) {
         // Search the current thread group
         final int max = grp.activeCount() * 2;
         final Thread[] ts = new Thread[max];
@@ -102,7 +122,7 @@ public class KillCommand extends AbstractCommand {
         for (int i = 0; i < max; i++) {
             final Thread t = ts[i];
             if (t != null) {
-                if (t.getId() == id) {
+                if (argThreadID.accept(t, idOrName)) {
                     return t;
                 }
             }
@@ -114,7 +134,7 @@ public class KillCommand extends AbstractCommand {
         for (int i = 0; i < gmax; i++) {
             final ThreadGroup tg = tgs[i];
             if (tg != null) {
-                Thread t = findThread(tg, id);
+                Thread t = findThread(tg, idOrName);
                 if (t != null) {
                     return t;
                 }

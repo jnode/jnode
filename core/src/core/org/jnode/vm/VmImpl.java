@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import java.lang.reflect.Constructor;
@@ -25,7 +25,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.jnode.annotation.Internal;
 import org.jnode.annotation.KernelSpace;
 import org.jnode.annotation.SharedStatics;
@@ -35,7 +34,9 @@ import org.jnode.plugin.PluginRegistry;
 import org.jnode.system.resource.ResourceManager;
 import org.jnode.vm.classmgr.CompiledCodeList;
 import org.jnode.vm.classmgr.VmClassLoader;
+import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmSharedStatics;
+import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.facade.VmProcessor;
 import org.jnode.vm.facade.VmThreadVisitor;
 import org.jnode.vm.facade.VmUtils;
@@ -399,5 +400,25 @@ final class VmImpl extends VmSystemObject implements Statistics, org.jnode.vm.fa
     @Override
     public void accept(VmThreadVisitor vmThreadVisitor) {
         scheduler.visitAllThreads(vmThreadVisitor);
+    }
+
+    public static StackTraceElement getStackTraceElement(VmStackFrame frame) {
+        final int lineNumber = frame.getLocationInfo();
+        final VmMethod method = frame.getMethod();
+        final VmType<?> vmClass = (method == null) ? null : method.getDeclaringClass();
+        final String fname = (vmClass == null) ? null : vmClass.getSourceFile();
+        final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
+        final String mname = (method == null) ? "<unknown method>" : method.getName();
+        return new StackTraceElement(cname, mname, fname, method == null || method.isNative() ? -2 : lineNumber);
+    }
+
+    public static StackTraceElement[] backTrace2stackTrace(Object[] backtrace) {
+        final VmStackFrame[] vm_trace = (VmStackFrame[]) backtrace;
+        final int length = vm_trace.length;
+        final StackTraceElement[] trace = new StackTraceElement[length];
+        for (int i = length; i-- > 0; ) {
+            trace[i] = getStackTraceElement(vm_trace[i]);
+        }
+        return trace;
     }
 }

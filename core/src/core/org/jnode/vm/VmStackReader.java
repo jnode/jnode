@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.annotation.Internal;
@@ -74,7 +74,7 @@ public abstract class VmStackReader extends VmSystemObject {
                 // for a 'native' method call is on the stack.  A panic is not a 
                 // good idea.  It is better to generate a stack trace with a missing
                 // method name.)
-                
+
                 // Unsafe.die("Unknown ccid found on stack");
                 return null;
             } else {
@@ -143,9 +143,9 @@ public abstract class VmStackReader extends VmSystemObject {
     /**
      * Gets the stacktrace for a given current frame.
      *
-     * @param frame    The address of the current frame.
-     * @param ip       The instruction pointer of the given frame
-     * @param limit    Maximum length of returned array.
+     * @param frame The address of the current frame.
+     * @param ip    The instruction pointer of the given frame
+     * @param limit Maximum length of returned array.
      * @return VmStackFrame[]
      */
     @Internal
@@ -202,79 +202,56 @@ public abstract class VmStackReader extends VmSystemObject {
      * Show the current stacktrace using Screen.debug.
      */
     @KernelSpace
-    public final void debugStackTrace(int max) {
+    public final VmMethod getStackTraceAt(int level) {
         Address f = VmMagic.getCurrentFrame();
-        Unsafe.debug("\nDebug stacktrace: ");
         boolean first = true;
-        while (isValid(f) && (max > 0)) {
+        VmMethod result = null;
+        while (isValid(f) && (level > 0)) {
             if (first) {
                 first = false;
-            } else {
-                Unsafe.debug(", ");
             }
-            final VmMethod method = getMethod(f);
-            final VmType<?> vmClass = method.getDeclaringClass();
+            result = getMethod(f);
+            f = getPrevious(f);
+            level--;
+        }
+        return result;
+    }
+
+    /**
+     * Display the current stacktrace using the kernel debugger.
+     */
+    @KernelSpace
+    public final void debugStackTrace(int max) {
+        debugStackTrace(VmMagic.getCurrentFrame(), max);
+    }
+
+    /**
+     * Display the current stacktrace using the kernel debugger.
+     */
+    @KernelSpace
+    public final void debugStackTrace(VmThread thread) {
+        debugStackTrace(thread.getStackFrame(), Integer.MAX_VALUE);
+    }
+
+    /**
+     * Display the current stacktrace using the kernel debugger.
+     */
+    @KernelSpace
+    private final void debugStackTrace(Address stackFrame, int max) {
+        Unsafe.debug("Debug stacktrace:\n");
+        while (isValid(stackFrame) && (max > 0)) {
+            final VmMethod method = getMethod(stackFrame);
+            final VmType vmClass = method.getDeclaringClass();
+            Unsafe.debug("  ");
             Unsafe.debug(vmClass.getName());
             Unsafe.debug("::");
             Unsafe.debug(method.getName());
             Unsafe.debug('\n');
-            f = getPrevious(f);
+            stackFrame = getPrevious(stackFrame);
             max--;
         }
-        if (isValid(f)) {
-            Unsafe.debug("...");
-        }
-    }
-
-    /**
-     * Show the current stacktrace using Screen.debug.
-     * TODO that method only exist to have line numbers : find a way to add line numbers to debugStackTrace(max)
-     */
-    @KernelSpace
-    public final void debugStackTraceWithLineNumbers(int max) {
-        final VmThread current = VmThread.currentThread();
-        final VmStackFrame[] frames = (VmStackFrame[]) VmThread.getStackTrace(current);
-        if (frames == null) {
-            Unsafe.debug("Debug stacktrace:<no stack trace>\n");
-        } else {
-            Unsafe.debug("Debug stacktrace: ");
-            for (VmStackFrame frame : frames) {
-                final VmStackFrame s = (VmStackFrame) frame;
-                Unsafe.debug(s.getMethod().getDeclaringClass().getName());
-                Unsafe.debug("::");
-                Unsafe.debug(s.getMethod().getName());
-                Unsafe.debug(":");
-                Unsafe.debug(s.getLocationInfo());
-                Unsafe.debug('\n');
-            }
-        }
-    }
-
-    /**
-     * Show the stacktrace of the given thread using Screen.debug.
-     */
-    @KernelSpace
-    public final void debugStackTrace(VmThread thread) {
-        Address f = thread.getStackFrame();
-        Unsafe.debug("Debug stacktrace: ");
-        boolean first = true;
-        int max = 20;
-        while (isValid(f) && (max > 0)) {
-            if (first) {
-                first = false;
-            } else {
-                Unsafe.debug(", ");
-            }
-            final VmMethod method = getMethod(f);
-            final VmType vmClass = method.getDeclaringClass();
-            Unsafe.debug(vmClass.getName());
-            Unsafe.debug("::");
-            Unsafe.debug(method.getName());
-            f = getPrevious(f);
-            max--;
-        }
-        if (isValid(f)) {
-            Unsafe.debug("...");
+        if (isValid(stackFrame)) {
+            Unsafe.debug("  ...\n");
         }
     }
 

@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.service.def;
 
 import java.io.IOException;
@@ -25,7 +25,6 @@ import java.io.VMOpenMode;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSFile;
 
@@ -41,7 +40,7 @@ final class FileHandleManager {
 
     /**
      * Create a filehandle for a given file entry.
-     * 
+     *
      * @param file
      * @param mode
      * @throws IOException
@@ -58,9 +57,9 @@ final class FileHandleManager {
 
     /**
      * Close a filehandle.
-     * 
+     *
      * @param handle file handle to close.
-     * 
+     *
      * @throws IOException if file is not already open.
      */
     public synchronized void close(FileHandleImpl handle) throws IOException {
@@ -78,10 +77,10 @@ final class FileHandleManager {
 
     /**
      * Duplicate a filehandle.
-     * 
-     * @param handle file handle to duplicate.
+     *
+     * @param handle  file handle to duplicate.
      * @param newMode new file open mode.
-     * 
+     *
      * @throws IOException if file is not already open.
      */
     public synchronized FileHandleImpl dup(FileHandleImpl handle, VMOpenMode newMode)
@@ -93,6 +92,10 @@ final class FileHandleManager {
         } else {
             throw new IOException("FileHandle tried to dup an unknown file!!");
         }
+    }
+
+    public int getOpenFileDescriptorCount() {
+        return openFiles.size();
     }
 
     class FileData {
@@ -113,9 +116,9 @@ final class FileHandleManager {
 
         /**
          * Open an extra handle for this file.
-         * 
+         *
          * @param mode file open mode.
-         * 
+         *
          * @throws IOException if file is already open in write mode.
          */
         public FileHandleImpl open(VMOpenMode mode) throws IOException {
@@ -133,12 +136,12 @@ final class FileHandleManager {
 
         /**
          * Duplicate the given handle for this file.
-         * 
-         * @param handle file handle.
+         *
+         * @param handle  file handle.
          * @param newMode new open mode.
-         * 
+         *
          * @return duplicate file handle.
-         * 
+         *
          * @throws IOException if handle doesn't exists or file is already open in write mode.
          */
         public FileHandleImpl dup(FileHandleImpl handle, VMOpenMode newMode) throws IOException {
@@ -161,9 +164,9 @@ final class FileHandleManager {
 
         /**
          * Close the given handle for this file.
-         * 
+         *
          * @param handle file handle.
-         * 
+         *
          * @throws IOException if handle doesn't exists.
          */
         public void close(FileHandleImpl handle) throws IOException {
@@ -179,7 +182,7 @@ final class FileHandleManager {
 
         /**
          * Are there open handles for this file?
-         * 
+         *
          * @return <tt>true</tt> if there are open handles.
          */
         public boolean hasHandles() {

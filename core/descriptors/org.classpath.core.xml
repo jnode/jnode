@@ -21,176 +21,177 @@
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
 <plugin id="rt"
-  name="Core java classes"
-  version="@VERSION@"
-  system="true"
-  provider-name="Classpath"
-  provider-url="http://classpath.org"
-  license-name="classpath">
+        name="Core java classes"
+        version="@VERSION@"
+        system="true"
+        provider-name="Classpath"
+        provider-url="http://classpath.org"
+        license-name="classpath">
 
-  <runtime>
-    <library name="classlib.jar">
-	  <export name="com.sun.beans.*"/>
-	  <export name="com.sun.beans.finder.*"/>
-	  <export name="com.sun.java.util.jar.pack.*"/>
-	  <export name="com.sun.naming.internal.*"/>
-      <export name="com.sun.security.auth.PolicyFile"/>
-      <export name="com.sun.security.auth.PolicyParser"/>
-      <export name="com.sun.security.auth.PolicyPermissions"/>
-      <export name="com.sun.security.auth.PrincipalComparator"/>  
-      <export name="com.sun.security.auth.SubjectCodeSource"/>
-      <export name="com.sun.security.auth.UserPrincipal"/>
-      
-	  <export name="sun.awt.EventListenerAggregate" />
-      <export name="sun.misc.*"/>
-      <export name="sun.reflect.*"/>
-      <export name="sun.reflect.annotation.*"/>
-      <export name="sun.reflect.generics.*"/>
-      <export name="sun.reflect.generics.factory.*"/>
-      <export name="sun.reflect.generics.parser.*"/>
-      <export name="sun.reflect.generics.reflectiveObjects.*"/>
-      <export name="sun.reflect.generics.repository.*"/>
-      <export name="sun.reflect.generics.scope.*"/>
-      <export name="sun.reflect.generics.tree.*"/>
-      <export name="sun.reflect.generics.visitor.*"/>
-      <export name="sun.reflect.misc.*"/>
-      <export name="sun.net.InetAddressCachePolicy"/>
-      <export name="sun.net.idn.Punycode"/>
-      <export name="sun.net.idn.StringPrep"/>
-      <export name="sun.net.util.IPAddressUtil"/>
-      <export name="sun.net.www.*"/>
-      <export name="sun.net.www.protocol.jar.*"/>
-      <export name="sun.net.www.protocol.http.InMemoryCookieStore"/>
-      <export name="sun.net.spi.nameservice.NameService"/>
-      <export name="sun.net.spi.nameservice.NameServiceDescriptor"/>
-      <export name="sun.nio.ByteBuffered"/>
-      <export name="sun.nio.ch.Interruptible"/>
-      <export name="sun.security.acl.GroupImpl"/>
-      <export name="sun.security.action.*"/>
-      <export name="sun.security.jca.*"/>
-      <export name="sun.security.pkcs.ParsingException"/>
-      <export name="sun.security.provider.SecureRandom"/>
-      <export name="sun.security.provider.PolicyFile"/>
-      <export name="sun.security.provider.PolicyParser"/>
-      <export name="sun.security.util.*"/>
+    <runtime>
+        <library name="classlib.jar">
+            <export name="com.sun.beans.*"/>
+            <export name="com.sun.beans.finder.*"/>
+            <export name="com.sun.java.util.jar.pack.*"/>
+            <export name="com.sun.naming.internal.*"/>
+            <export name="com.sun.security.auth.PolicyFile"/>
+            <export name="com.sun.security.auth.PolicyParser"/>
+            <export name="com.sun.security.auth.PolicyPermissions"/>
+            <export name="com.sun.security.auth.PrincipalComparator"/>
+            <export name="com.sun.security.auth.SubjectCodeSource"/>
+            <export name="com.sun.security.auth.UserPrincipal"/>
 
-      <export name="sun.misc.Service"/>
-      <export name="sun.misc.ServiceConfigurationError"/>
-      <export name="sun.misc.VM"/>
+            <export name="sun.awt.EventListenerAggregate"/>
+            <export name="sun.misc.*"/>
+            <export name="sun.reflect.*"/>
+            <export name="sun.reflect.annotation.*"/>
+            <export name="sun.reflect.generics.*"/>
+            <export name="sun.reflect.generics.factory.*"/>
+            <export name="sun.reflect.generics.parser.*"/>
+            <export name="sun.reflect.generics.reflectiveObjects.*"/>
+            <export name="sun.reflect.generics.repository.*"/>
+            <export name="sun.reflect.generics.scope.*"/>
+            <export name="sun.reflect.generics.tree.*"/>
+            <export name="sun.reflect.generics.visitor.*"/>
+            <export name="sun.reflect.misc.*"/>
+            <export name="sun.net.InetAddressCachePolicy"/>
+            <export name="sun.net.idn.Punycode"/>
+            <export name="sun.net.idn.StringPrep"/>
+            <export name="sun.net.util.IPAddressUtil"/>
+            <export name="sun.net.www.*"/>
+            <export name="sun.net.www.protocol.jar.*"/>
+            <export name="sun.net.www.protocol.http.InMemoryCookieStore"/>
+            <export name="sun.net.spi.nameservice.NameService"/>
+            <export name="sun.net.spi.nameservice.NameServiceDescriptor"/>
+            <export name="sun.nio.ByteBuffered"/>
+            <export name="sun.nio.ch.Interruptible"/>
+            <export name="sun.security.acl.GroupImpl"/>
+            <export name="sun.security.action.*"/>
+            <export name="sun.security.jca.*"/>
+            <export name="sun.security.pkcs.ParsingException"/>
+            <export name="sun.security.provider.SecureRandom"/>
+            <export name="sun.security.provider.PolicyFile"/>
+            <export name="sun.security.provider.PolicyParser"/>
+            <export name="sun.security.util.*"/>
 
-      <export name="sun.net.ApplicationProxy*"/>
-      <export name="sun.nio.cs.*"/>
+            <export name="sun.misc.Service"/>
+            <export name="sun.misc.ServiceConfigurationError"/>
+            <export name="sun.misc.VM"/>
 
-      <export name="sun.text.*"/>
-      <export name="sun.text.normalizer.*"/>
-      <export name="sun.text.resources.*"/>
+            <export name="sun.net.ApplicationProxy*"/>
+            <export name="sun.nio.cs.*"/>
 
-      <export name="sun.util.calendar.*"/>
-      <export name="sun.util.*"/>
-      <export name="sun.util.resources.*"/>
+            <export name="sun.text.*"/>
+            <export name="sun.text.normalizer.*"/>
+            <export name="sun.text.resources.*"/>
 
-      <export name="gnu.classpath.*"/>
-      <export name="gnu.classpath.debug.*"/>      
+            <export name="sun.util.calendar.*"/>
+            <export name="sun.util.*"/>
+            <export name="sun.util.resources.*"/>
 
-      <export name="gnu.java.io.*"/>
-      <export name="gnu.java.math.*"/>
-      <export name="gnu.java.net.*"/>      
-      <export name="gnu.java.nio.*"/>
-      <export name="gnu.java.nio.channels.*"/>
-      <export name="gnu.java.nio.charset.*"/>
-      <export name="gnu.java.lang.*"/>
-      <export name="gnu.java.lang.reflect.*"/>
-      <export name="org.jnode.java.nio.VmChannel"/>
-      
-      <export name="gnu.java.security.*"/>
-      <export name="gnu.java.security.action.*"/>
-      <export name="gnu.java.security.provider.*"/>
-      <export name="gnu.java.security.util.*"/>
+            <export name="gnu.classpath.*"/>
+            <export name="gnu.classpath.debug.*"/>
 
-      <export name="gnu.java.util.*"/>
+            <export name="gnu.java.io.*"/>
+            <export name="gnu.java.math.*"/>
+            <export name="gnu.java.net.*"/>
+            <export name="gnu.java.nio.*"/>
+            <export name="gnu.java.nio.channels.*"/>
+            <export name="gnu.java.nio.charset.*"/>
+            <export name="gnu.java.lang.*"/>
+            <export name="gnu.java.lang.reflect.*"/>
+            <export name="org.jnode.java.nio.VmChannel"/>
 
-      <export name="java.awt.AWTPermission"/>
-      <export name="java.beans.ChangeListenerMap" />
-      <export name="java.beans.PropertyChangeListener" />
-      <export name="java.beans.PropertyChangeListenerProxy" />
-      <export name="java.beans.PropertyChangeSupport" />
-      <export name="java.beans.PropertyChangeEvent" />
+            <export name="gnu.java.security.*"/>
+            <export name="gnu.java.security.action.*"/>
+            <export name="gnu.java.security.provider.*"/>
+            <export name="gnu.java.security.util.*"/>
 
-      <export name="java.io.*"/>
-      <export name="java.lang.*"/>
-      <export name="java.lang.annotation.*"/>
-      <export name="java.lang.instrument.*"/>
-      <export name="java.lang.ref.*"/>
-      <export name="java.lang.reflect.*"/>
-      <export name="java.math.*"/>
-      <export name="java.net.*"/>
-      <export name="java.nio.*"/>
-      <export name="java.nio.channels.*"/>
-      <export name="java.nio.channels.spi.*"/>
-      <export name="java.nio.charset.*"/>
-      <export name="java.nio.charset.spi.*"/>      
-      <export name="java.security.*"/>
-      <export name="java.security.acl.*"/>
-      <export name="java.security.cert.*"/>
-      <export name="java.security.interfaces.*"/>
-      <export name="java.security.spec.*"/>      
-      <export name="java.text.*"/>
-      <export name="java.text.spi.*"/>
-      <export name="java.util.*"/>
-      <export name="java.util.jar.*"/>
-      <export name="java.util.logging.*"/>
-      <export name="java.util.prefs.*"/>
-      <export name="java.util.regex.*"/>
-      <export name="java.util.spi.*"/>
-      <export name="java.util.zip.*"/>
+            <export name="gnu.java.util.*"/>
 
-      <export name="java.util.concurrent.*"/>
-      <export name="java.util.concurrent.atomic.*"/>
-      <export name="java.util.concurrent.locks.*"/>  
+            <export name="java.awt.AWTPermission"/>
+            <export name="java.beans.ChangeListenerMap"/>
+            <export name="java.beans.PropertyChangeListener"/>
+            <export name="java.beans.PropertyChangeListenerProxy"/>
+            <export name="java.beans.PropertyChangeSupport"/>
+            <export name="java.beans.PropertyChangeEvent"/>
 
-	  <export name="javax.naming.*"/>
-      <export name="javax.naming.spi.*"/>
+            <export name="java.io.*"/>
+            <export name="java.lang.*"/>
+            <export name="java.lang.annotation.*"/>
+            <export name="java.lang.management.*"/>
+            <export name="java.lang.instrument.*"/>
+            <export name="java.lang.ref.*"/>
+            <export name="java.lang.reflect.*"/>
+            <export name="java.math.*"/>
+            <export name="java.net.*"/>
+            <export name="java.nio.*"/>
+            <export name="java.nio.channels.*"/>
+            <export name="java.nio.channels.spi.*"/>
+            <export name="java.nio.charset.*"/>
+            <export name="java.nio.charset.spi.*"/>
+            <export name="java.security.*"/>
+            <export name="java.security.acl.*"/>
+            <export name="java.security.cert.*"/>
+            <export name="java.security.interfaces.*"/>
+            <export name="java.security.spec.*"/>
+            <export name="java.text.*"/>
+            <export name="java.text.spi.*"/>
+            <export name="java.util.*"/>
+            <export name="java.util.jar.*"/>
+            <export name="java.util.logging.*"/>
+            <export name="java.util.prefs.*"/>
+            <export name="java.util.regex.*"/>
+            <export name="java.util.spi.*"/>
+            <export name="java.util.zip.*"/>
 
-        <!--
-      <export name="javax.naming.Name"/>
-      <export name="javax.naming.InvalidNameException"/>
-      <export name="javax.naming.NameAlreadyBoundException"/>
-      <export name="javax.naming.NamingException"/>
-      <export name="javax.naming.NameNotFoundException"/>
-      <export name="javax.naming.CompositeName"/>
-      <export name="javax.naming.NameImpl"/>
-      <export name="javax.naming.NameImplEnumerator"/>
-      -->
+            <export name="java.util.concurrent.*"/>
+            <export name="java.util.concurrent.atomic.*"/>
+            <export name="java.util.concurrent.locks.*"/>
 
-      <export name="javax.net.ssl.SSLException"/>  
-      <export name="javax.net.ssl.SSLPeerUnverifiedException"/>
+            <export name="javax.naming.*"/>
+            <export name="javax.naming.spi.*"/>
 
-      <export name="javax.xml.parsers.*"/>
-      <export name="javax.xml.transform.*"/>
-      <export name="javax.xml.transform.dom.*"/>
-      <export name="javax.xml.transform.stream.*"/>
-      <export name="javax.xml.stream.*"/>
-      <export name="javax.xml.stream.events.*"/>
-      <export name="javax.xml.stream.util.*"/>
+            <!--
+          <export name="javax.naming.Name"/>
+          <export name="javax.naming.InvalidNameException"/>
+          <export name="javax.naming.NameAlreadyBoundException"/>
+          <export name="javax.naming.NamingException"/>
+          <export name="javax.naming.NameNotFoundException"/>
+          <export name="javax.naming.CompositeName"/>
+          <export name="javax.naming.NameImpl"/>
+          <export name="javax.naming.NameImplEnumerator"/>
+          -->
 
-      <export name="javax.crypto.*"/>
-      <export name="javax.crypto.interfaces.*"/>
-      <export name="javax.crypto.spec.*"/>
-        
-      <export name="javax.security.auth.*"/>
-      <export name="javax.security.auth.callback.*"/>
-      <export name="javax.security.auth.login.*"/>
-      <export name="javax.security.auth.x500.*"/>
+            <export name="javax.net.ssl.SSLException"/>
+            <export name="javax.net.ssl.SSLPeerUnverifiedException"/>
 
-      <export name="org.xml.sax.*"/>
-      
-      <export name="org.jnode.java.io.*"/>
-      <export name="org.jnode.annotation.*"/>
+            <export name="javax.xml.parsers.*"/>
+            <export name="javax.xml.transform.*"/>
+            <export name="javax.xml.transform.dom.*"/>
+            <export name="javax.xml.transform.stream.*"/>
+            <export name="javax.xml.stream.*"/>
+            <export name="javax.xml.stream.events.*"/>
+            <export name="javax.xml.stream.util.*"/>
 
-      <export name="org.w3c.dom.*"/>
-      <export name="org.w3c.dom.bootstrap.*"/>
-      <export name="org.w3c.dom.ls.*"/>
-        
-    </library>
-  </runtime>
+            <export name="javax.crypto.*"/>
+            <export name="javax.crypto.interfaces.*"/>
+            <export name="javax.crypto.spec.*"/>
+
+            <export name="javax.security.auth.*"/>
+            <export name="javax.security.auth.callback.*"/>
+            <export name="javax.security.auth.login.*"/>
+            <export name="javax.security.auth.x500.*"/>
+
+            <export name="org.xml.sax.*"/>
+
+            <export name="org.jnode.java.io.*"/>
+            <export name="org.jnode.annotation.*"/>
+
+            <export name="org.w3c.dom.*"/>
+            <export name="org.w3c.dom.bootstrap.*"/>
+            <export name="org.w3c.dom.ls.*"/>
+
+        </library>
+    </runtime>
 </plugin>
