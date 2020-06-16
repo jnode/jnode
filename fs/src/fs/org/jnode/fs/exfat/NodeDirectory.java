@@ -43,10 +43,10 @@ public class NodeDirectory extends AbstractFSObject implements FSDirectory, FSDi
     public NodeDirectory(ExFatFileSystem fs, NodeEntry nodeEntry)
         throws IOException {
 
-        this(fs, nodeEntry, false);
+        this(fs, nodeEntry, false, false);
     }
 
-    public NodeDirectory(ExFatFileSystem fs, NodeEntry nodeEntry, boolean showDeleted)
+    public NodeDirectory(ExFatFileSystem fs, NodeEntry nodeEntry, boolean showDeleted, boolean performChecks)
         throws IOException {
 
         super(fs);
@@ -57,7 +57,7 @@ public class NodeDirectory extends AbstractFSObject implements FSDirectory, FSDi
         this.idToNode = new LinkedHashMap<String, NodeEntry>();
 
         DirectoryParser.
-            create(nodeEntry.getNode(), showDeleted).
+            create(nodeEntry.getNode(), showDeleted, performChecks).
             setUpcase(this.upcase).
             parse(new VisitorImpl());
 
@@ -145,7 +145,7 @@ public class NodeDirectory extends AbstractFSObject implements FSDirectory, FSDi
         @Override
         public void foundUpcaseTable(DirectoryParser parser, long checksum,
                                      long startCluster, long size) {
-            
+
             /* ignore */
         }
 
