@@ -2,7 +2,6 @@ package org.jnode.fs.ntfs.logfile;
 
 import java.io.IOException;
 import org.jnode.fs.ntfs.NTFSRecord;
-import org.jnode.fs.ntfs.NTFSVolume;
 
 /**
  * $LogFile restart page header
@@ -29,13 +28,12 @@ public class RestartPageHeader extends NTFSRecord {
     /**
      * Creates a new log file restart page header.
      *
-     * @param volume the volume that contains this record.
      * @param buffer the buffer.
      * @param offset the offset to create the structure at.
      * @throws IOException if an error occurs during fixup.
      */
-    public RestartPageHeader(NTFSVolume volume, byte[] buffer, int offset) throws IOException {
-        super(volume.getBootRecord().getBytesPerSector(), true, buffer, offset);
+    public RestartPageHeader(byte[] buffer, int offset) throws IOException {
+        super(true, buffer, offset);
     }
 
     /**

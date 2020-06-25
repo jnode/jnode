@@ -2,7 +2,6 @@ package org.jnode.fs.ntfs.logfile;
 
 import java.io.IOException;
 import org.jnode.fs.ntfs.NTFSRecord;
-import org.jnode.fs.ntfs.NTFSVolume;
 
 /**
  * $LogFile record page header.
@@ -29,13 +28,12 @@ public class RecordPageHeader extends NTFSRecord {
     /**
      * Creates a new log file record page header.
      *
-     * @param volume the volume that contains this record.
      * @param buffer the buffer.
      * @param offset the offset.
      * @throws IOException if an error occurs during fixup.
      */
-    public RecordPageHeader(NTFSVolume volume, byte[] buffer, int offset) throws IOException {
-        super(volume.getBootRecord().getBytesPerSector(), true, buffer, offset);
+    public RecordPageHeader(byte[] buffer, int offset) throws IOException {
+        super(true, buffer, offset);
     }
 
     /**

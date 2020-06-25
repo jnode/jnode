@@ -94,7 +94,7 @@ public class FileRecord extends NTFSRecord {
      * @param offset          offset into the buffer.
      */
     public FileRecord(NTFSVolume volume, long referenceNumber, byte[] buffer, int offset) throws IOException {
-        this(volume, volume.getBootRecord().getBytesPerSector(), volume.getClusterSize(), true, referenceNumber,
+        this(volume, volume.getClusterSize(), true, referenceNumber,
             buffer, offset);
     }
 
@@ -102,17 +102,16 @@ public class FileRecord extends NTFSRecord {
      * Initialize this instance.
      *
      * @param volume          reference to the NTFS volume.
-     * @param bytesPerSector  the number of bytes-per-sector in this volume.
      * @param clusterSize     the cluster size for the volume containing this record.
      * @param strictFixUp     indicates whether an exception should be throw if fix-up values don't match.
      * @param referenceNumber the reference number of the file within the MFT.
      * @param buffer          data buffer.
      * @param offset          offset into the buffer.
      */
-    public FileRecord(NTFSVolume volume, int bytesPerSector, int clusterSize, boolean strictFixUp, long referenceNumber,
+    public FileRecord(NTFSVolume volume, int clusterSize, boolean strictFixUp, long referenceNumber,
                       byte[] buffer, int offset) throws IOException {
 
-        super(bytesPerSector, strictFixUp, buffer, offset);
+        super(strictFixUp, buffer, offset);
 
         this.volume = volume;
         this.clusterSize = clusterSize;
