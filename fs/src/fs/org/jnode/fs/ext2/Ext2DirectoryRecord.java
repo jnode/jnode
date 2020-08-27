@@ -59,8 +59,8 @@ public class Ext2DirectoryRecord {
         synchronized (data) {
             byte[] newData = new byte[Math.max(8, getRecLen())];
             int copySize = getRecLen();
-            if (copySize + offset > data.length) {
-                copySize = Math.max(0, copySize - offset);
+            if (offset + copySize > data.length) {
+                copySize = data.length - offset;
             }
             System.arraycopy(data, offset, newData, 0, copySize);
             this.data = newData;
