@@ -24,7 +24,7 @@ package org.jnode.fs.jfat;
  * @author gvt
  */
 public class FatCase {
-    private static final int MASK = 0x18;
+    public static final int MASK = 0x18;
 
     private static final int UPPER_UPPER = 0x00;
     private static final int LOWER_UPPER = 0x01;

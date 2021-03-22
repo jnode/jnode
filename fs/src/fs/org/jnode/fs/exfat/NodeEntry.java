@@ -115,7 +115,7 @@ public final class NodeEntry extends AbstractFSObject implements FSEntry, FSEntr
             throw new UnsupportedOperationException("not a directory");
         }
 
-        return new NodeDirectory((ExFatFileSystem) getFileSystem(), node);
+        return new NodeDirectory((ExFatFileSystem) getFileSystem(), this);
     }
 
     @Override
@@ -135,6 +135,15 @@ public final class NodeEntry extends AbstractFSObject implements FSEntry, FSEntr
      */
     public Node getNode() {
         return node;
+    }
+
+    /**
+     * Gets the index of this node entry.
+     *
+     * @return the index.
+     */
+    public int getIndex() {
+        return index;
     }
 
     @Override

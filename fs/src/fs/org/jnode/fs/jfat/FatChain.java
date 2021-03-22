@@ -42,8 +42,6 @@ public class FatChain {
     private int head;
     private boolean dirty;
 
-    private boolean dolog = false;
-
     private ChainPosition position;
     private ChainIterator iterator;
 
@@ -59,8 +57,15 @@ public class FatChain {
         this.dirty = false;
     }
 
-    private void mylog(String msg) {
-        log.debug(msg);
+    /**
+     * Performs validation on the chain.
+     *
+     * @throws IllegalStateException if the validation fails.
+     */
+    public void validate() {
+        if ((head < 0) || (head > fat.size())) {
+            throw new IllegalStateException("illegal head: " + head);
+        }
     }
 
     public FatFileSystem getFatFileSystem() {
@@ -72,9 +77,6 @@ public class FatChain {
     }
 
     private void setStartCluster(int value) {
-        if ((value < 0) || (value > fat.size()))
-            throw new IllegalArgumentException("illegal head: " + value);
-
         head = value;
 
         iterator.reset();
@@ -132,8 +134,9 @@ public class FatChain {
         if (offset < 0)
             throw new IllegalArgumentException("offset<0");
 
-        if (dolog)
-            mylog("n[" + n + "] m[" + m + "] offset[" + offset + "]");
+        if (log.isDebugEnabled()) {
+            log.debug("n[" + n + "] m[" + m + "] offset[" + offset + "]");
+        }
 
         final int last;
         int i, found = 0, l = 0;
@@ -162,16 +165,16 @@ public class FatChain {
 
         last = l;
 
-        if (dolog)
-            mylog("found[" + found + "] last[" + last + "]");
+        if (log.isDebugEnabled())
+            log.debug("found[" + found + "] last[" + last + "]");
 
         fat.set(last, fat.eofChain());
-        if (dolog)
-            mylog(n + "\t|allo|\t" + last + " " + fat.eofChain());
+        if (log.isDebugEnabled())
+            log.debug(n + "\t|allo|\t" + last + " " + fat.eofChain());
 
         if (zero) {
-            if (dolog)
-                mylog(n + "\t|ZERO|\t" + last + " " + fat.eofChain());
+            if (log.isDebugEnabled())
+                log.debug(n + "\t|ZERO|\t" + last + " " + fat.eofChain());
             fat.clearCluster(last);
         }
 
@@ -183,8 +186,8 @@ public class FatChain {
         for (; found < (n - m - k); i--) {
             if (fat.isFreeEntry(i)) {
                 fat.set(i, l);
-                if (dolog)
-                    mylog((n - found - 1) + "\t|allo|\t" + i + " " + l);
+                if (log.isDebugEnabled())
+                    log.debug((n - found - 1) + "\t|allo|\t" + i + " " + l);
                 l = i;
                 found++;
             }
@@ -195,8 +198,8 @@ public class FatChain {
                 if (fat.isFreeEntry(i)) {
                     fat.clearCluster(i, 0, offset);
                     fat.set(i, l);
-                    if (dolog)
-                        mylog((n - found - 1) + "\t|part|\t" + i + " " + l);
+                    if (log.isDebugEnabled())
+                        log.debug((n - found - 1) + "\t|part|\t" + i + " " + l);
                     l = i;
                     found++;
                     break;
@@ -209,8 +212,8 @@ public class FatChain {
             if (fat.isFreeEntry(i)) {
                 fat.clearCluster(i);
                 fat.set(i, l);
-                if (dolog)
-                    mylog((n - found - 1) + "\t|zero|\t" + i + " " + l);
+                if (log.isDebugEnabled())
+                    log.debug((n - found - 1) + "\t|zero|\t" + i + " " + l);
                 l = i;
                 found++;
             }
@@ -226,8 +229,8 @@ public class FatChain {
             }
         }
 
-        if (dolog)
-            mylog("LastFree: " + fat.getLastFree());
+        if (log.isDebugEnabled())
+            log.debug("LastFree: " + fat.getLastFree());
 
         return l;
     }
@@ -255,14 +258,14 @@ public class FatChain {
             int last = allocateTail(n, n - 1, 0, true);
             int first = getEndCluster();
 
-            if (dolog)
-                mylog(first + ":" + last);
+            if (log.isDebugEnabled())
+                log.debug(first + ":" + last);
 
             if (first != 0)
                 fat.set(first, last);
             else {
-                if (dolog)
-                    mylog("allocate chain");
+                if (log.isDebugEnabled())
+                    log.debug("allocate chain");
                 setStartCluster(last);
             }
         } finally {
@@ -279,8 +282,8 @@ public class FatChain {
         if (count < n)
             throw new IOException("not enough cluster: count[" + count + "] n[" + n + "]");
 
-        if (dolog)
-            mylog("count[" + count + "] n[" + n + "]");
+        if (log.isDebugEnabled())
+            log.debug("count[" + count + "] n[" + n + "]");
 
         ChainIterator i;
 
@@ -289,16 +292,16 @@ public class FatChain {
                 i = listIterator(count - n - 1);
                 int l = i.next();
                 fat.set(l, fat.eofChain());
-                if (dolog)
-                    mylog(l + ":" + fat.eofChain());
+                if (log.isDebugEnabled())
+                    log.debug(l + ":" + fat.eofChain());
             } else
                 i = listIterator(0);
 
             while (i.hasNext()) {
                 int l = i.next();
                 fat.set(l, fat.freeEntry());
-                if (dolog)
-                    mylog(l + ":" + fat.freeEntry());
+                if (log.isDebugEnabled())
+                    log.debug(l + ":" + fat.freeEntry());
             }
         } finally {
             fat.flush();
@@ -306,8 +309,8 @@ public class FatChain {
 
         if (count == n) {
             setStartCluster(0);
-            if (dolog)
-                mylog("zero");
+            if (log.isDebugEnabled())
+                log.debug("zero");
         }
     }
 
@@ -345,20 +348,18 @@ public class FatChain {
         try {
             i.setPosition(p.getIndex());
         } catch (NoSuchElementException ex) {
-            final IOException ioe = new IOException("attempt to seek after End Of Chain " + offset);
-            ioe.initCause(ex);
-            throw ioe;
+            throw new IOException("attempt to seek after End Of Chain " + offset, ex);
         }
 
-        for (int l = dst.remaining(), sz = p.getPartial(), ofs = p.getOffset(), size; l > 0; l -=
-                size, sz = p.getSize(), ofs = 0) {
+        for (int l = dst.remaining(), sz = p.getPartial(), ofs = p.getOffset(), size; l > 0;
+             l -= size, sz = p.getSize(), ofs = 0) {
 
             int cluster = i.next();
 
             size = Math.min(sz, l);
 
-            if (dolog)
-                mylog("read " + size + " bytes from cluster " + cluster + " at offset " + ofs);
+            if (log.isDebugEnabled())
+                log.debug("read " + size + " bytes from cluster " + cluster + " at offset " + ofs);
 
             int limit = dst.limit();
 
@@ -422,7 +423,7 @@ public class FatChain {
 
                 if (cluster != 0) {
                     fat.set(cluster, last);
-                    ((ChainIterator) i).appendChain(last);
+                    i.appendChain(last);
                 } else {
                     setStartCluster(last);
                     // i = listIterator ( clidx );
@@ -454,7 +455,7 @@ public class FatChain {
 
                     if (cluster != 0) {
                         fat.set(cluster, last);
-                        ((ChainIterator) i).appendChain(last);
+                        i.appendChain(last);
                     } else {
                         setStartCluster(last);
                         // i = listIterator ( 0 );
@@ -468,8 +469,8 @@ public class FatChain {
 
             size = Math.min(sz, l);
 
-            if (dolog)
-                mylog("write " + size + " bytes to cluster " + cluster + " at offset " + ofs);
+            if (log.isDebugEnabled())
+                log.debug("write " + size + " bytes to cluster " + cluster + " at offset " + ofs);
 
             int limit = src.limit();
 

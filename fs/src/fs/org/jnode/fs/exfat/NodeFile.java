@@ -39,6 +39,10 @@ public class NodeFile extends AbstractFSObject implements FSFile {
         this.node = node;
     }
 
+    public Node getNode() {
+        return node;
+    }
+
     @Override
     public long getLength() {
         return this.node.getSize();

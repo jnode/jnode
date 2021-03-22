@@ -1,8 +1,9 @@
 # Welcome to JNode!
 
-[![Build Status](https://travis-ci.org/jnode/jnode.svg?branch=master)](https://travis-ci.org/jnode/jnode)
+## Archived
 
-In this file, you find the instructions needed to setup a JNode development environment.
+This project has been archived, and moved to https://github.com/Nuix/jnode-fs
+
 
 ## Sub-Projects
 

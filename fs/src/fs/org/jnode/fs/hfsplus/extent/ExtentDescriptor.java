@@ -79,8 +79,9 @@ public class ExtentDescriptor {
         return dest;
     }
 
+    @Override
     public final String toString() {
-        return "Start block : " + startBlock + "\tBlock count : " + blockCount + "\n";
+        return String.format("extent-desc:[start-block:%d count:%d]", startBlock, blockCount);
     }
 
     /**

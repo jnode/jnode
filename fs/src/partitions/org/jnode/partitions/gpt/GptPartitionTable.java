@@ -61,9 +61,20 @@ public class GptPartitionTable implements PartitionTable<GptPartitionTableEntry>
      * @param device the drive device.
      */
     public GptPartitionTable(GptPartitionTableType tableType, byte[] first16KiB, Device device) {
-        this.tableType = tableType;
+        this(tableType, detectBlockSize(first16KiB), first16KiB, device);
+    }
 
-        blockSize = detectBlockSize(first16KiB);
+    /**
+     * Create a new instance
+     *
+     * @param tableType the partition table type.
+     * @param blockSize the block size to use.
+     * @param first16KiB the first 16,384 bytes of the disk.
+     * @param device the drive device.
+     */
+    public GptPartitionTable(GptPartitionTableType tableType, int blockSize, byte[] first16KiB, Device device) {
+        this.tableType = tableType;
+        this.blockSize = blockSize;
 
         if (blockSize != -1) {
             long entries = LittleEndian.getUInt32(first16KiB, blockSize + 0x50);
@@ -90,25 +101,63 @@ public class GptPartitionTable implements PartitionTable<GptPartitionTableEntry>
      * @param first16KiB the start of the disk to search for the GPT partition in.
      * @return the detected block size or {@code -1} if no GPT partition is found.
      */
+    public static boolean hasSignature(byte[] first16KiB, int blockSize) {
+        if (first16KiB.length < blockSize + 8) {
+            // Not enough data to check for a valid partition table
+            return false;
+        }
+
+        byte[] signatureBytes = new byte[8];
+        System.arraycopy(first16KiB, blockSize, signatureBytes, 0, signatureBytes.length);
+        String signature = new String(signatureBytes, Charset.forName("US-ASCII"));
+
+        if ("EFI PART".equals(signature)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Detects the block size of the GPT partition.
+     *
+     * @param first16KiB the start of the disk to search for the GPT partition in.
+     * @return the detected block size or {@code -1} if no GPT partition is found.
+     */
     private static int detectBlockSize(byte[] first16KiB) {
         int[] detectionSizes = new int[] {0x200, 0x1000, 0x2000 };
 
         for (int blockSize : detectionSizes) {
-            if (first16KiB.length < blockSize + 8) {
-                // Not enough data to check for a valid partition table
-                return -1;
-            }
-
-            byte[] signatureBytes = new byte[8];
-            System.arraycopy(first16KiB, blockSize, signatureBytes, 0, signatureBytes.length);
-            String signature = new String(signatureBytes, Charset.forName("US-ASCII"));
-
-            if ("EFI PART".equals(signature)) {
+            if (hasSignature(first16KiB, blockSize)) {
                 return blockSize;
             }
         }
 
         return -1;
+    }
+
+    /**
+     * Checks if the given boot sector contain a GPT protective MBR partition table.
+     *
+     * @param first16KiB the first 16,384 bytes of the disk.
+     * @return {@code true} if the boot sector contains a protective MBR partition table.
+     */
+    public static boolean containsProtectiveMbr(byte[] first16KiB) {
+        List<IBMPartitionTableEntry> entries = new ArrayList<IBMPartitionTableEntry>();
+        for (int partitionNumber = 0; partitionNumber < IBMPartitionTable.TABLE_SIZE; partitionNumber++) {
+            IBMPartitionTableEntry partition = new IBMPartitionTableEntry(null, first16KiB, partitionNumber);
+
+            if (partition.isValid()) {
+                entries.add(partition);
+            }
+        }
+
+        if (entries.isEmpty() || entries.get(0).getSystemIndicator() != IBMPartitionTypes.PARTTYPE_EFI_GPT) {
+            log.debug("No protective MBR found: " + entries);
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -119,23 +168,26 @@ public class GptPartitionTable implements PartitionTable<GptPartitionTableEntry>
      * @return {@code true} if the boot sector contains a GPT partition table.
      */
     public static boolean containsPartitionTable(byte[] first16KiB, boolean requireProtectiveMbr) {
-        if (requireProtectiveMbr) {
-            List<IBMPartitionTableEntry> entries = new ArrayList<IBMPartitionTableEntry>();
-            for (int partitionNumber = 0; partitionNumber < IBMPartitionTable.TABLE_SIZE; partitionNumber++) {
-                IBMPartitionTableEntry partition = new IBMPartitionTableEntry(null, first16KiB, partitionNumber);
-
-                if (partition.isValid()) {
-                    entries.add(partition);
-                }
-            }
-
-            if (entries.isEmpty() || entries.get(0).getSystemIndicator() != IBMPartitionTypes.PARTTYPE_EFI_GPT) {
-                log.debug("No protective MBR found: " + entries);
-                return false;
-            }
+        if (requireProtectiveMbr && !containsProtectiveMbr(first16KiB)) {
+            return false;
         }
 
         return detectBlockSize(first16KiB) != -1;
+    }
+
+    /**
+     * Checks if the given boot sector contain a GPT partition table.
+     *
+     * @param first16KiB the first 16,384 bytes of the disk.
+     * @param requireProtectiveMbr {@code true} if the protective MBR must be present.
+     * @return {@code true} if the boot sector contains a GPT partition table.
+     */
+    public static boolean containsPartitionTable(byte[] first16KiB, boolean requireProtectiveMbr, int blockSize) {
+        if (requireProtectiveMbr && !containsProtectiveMbr(first16KiB)) {
+            return false;
+        }
+
+        return hasSignature(first16KiB, blockSize);
     }
 
     @Override

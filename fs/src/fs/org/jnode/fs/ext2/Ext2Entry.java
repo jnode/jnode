@@ -39,7 +39,7 @@ import org.jnode.fs.spi.AbstractFSEntry;
  */
 public class Ext2Entry extends AbstractFSEntry implements FSEntryLastChanged, FSEntryLastAccessed {
 
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(Ext2Entry.class);
     private INode iNode = null;
     private long directoryRecordId;
     private int type;

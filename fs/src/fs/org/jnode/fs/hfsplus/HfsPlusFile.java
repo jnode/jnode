@@ -36,12 +36,15 @@ import org.jnode.fs.hfsplus.compression.DecmpfsDiskHeader;
 
 public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
 
-    private HfsPlusEntry entry;
+    /**
+     * The associated entry.
+     */
+    private final HfsPlusEntry entry;
 
     /**
      * The associated catalog file.
      */
-    private CatalogFile file;
+    private final CatalogFile file;
 
     /**
      * The hardlink file which contains the actual file data if this file is a hard link.
@@ -54,9 +57,17 @@ public class HfsPlusFile implements FSFile, FSFileSlackSpace, FSFileStreams {
     private CompressedAttributeData compressedData;
 
     public HfsPlusFile(HfsPlusEntry entry) {
-        this.entry = entry;
         this.file = new CatalogFile(entry.getData());
         this.entry = entry;
+    }
+
+    /**
+     * Gets the associated entry.
+     *
+     * @return the entry.
+     */
+    public HfsPlusEntry getEntry() {
+        return entry;
     }
 
     @Override

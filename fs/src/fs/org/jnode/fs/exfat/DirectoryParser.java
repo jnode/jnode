@@ -51,13 +51,13 @@ public class DirectoryParser {
     private static final int FLAG_CONTIGUOUS = 3;
 
     public static DirectoryParser create(Node node) throws IOException {
-        return create(node, false);
+        return create(node, false, false);
     }
 
-    public static DirectoryParser create(Node node, boolean showDeleted) throws IOException {
+    public static DirectoryParser create(Node node, boolean showDeleted, boolean performChecks) throws IOException {
         assert (node.isDirectory()) : "not a directory"; //NOI18N
 
-        final DirectoryParser result = new DirectoryParser(node, showDeleted);
+        final DirectoryParser result = new DirectoryParser(node, showDeleted, performChecks);
         result.init();
         return result;
     }
@@ -66,13 +66,15 @@ public class DirectoryParser {
     private final ByteBuffer chunk;
     private final Node node;
     private boolean showDeleted;
+    private boolean performChecks;
     private long cluster;
     private UpcaseTable upcase;
     private int index;
 
-    private DirectoryParser(Node node, boolean showDeleted) {
+    private DirectoryParser(Node node, boolean showDeleted, boolean performChecks) {
         this.node = node;
         this.showDeleted = showDeleted;
+        this.performChecks = performChecks;
         this.sb = node.getSuperBlock();
         this.chunk = ByteBuffer.allocate(sb.getBytesPerCluster());
         this.chunk.order(ByteOrder.LITTLE_ENDIAN);
@@ -232,14 +234,10 @@ public class DirectoryParser {
         int nameLen = DeviceAccess.getUint8(chunk);
         final int nameHash = DeviceAccess.getUint16(chunk);
         skip(2); /* unknown */
-        final long realSize = DeviceAccess.getUint64(chunk);
+        final long size = DeviceAccess.getUint64(chunk);
         skip(4); /* unknown */
         final long startCluster = DeviceAccess.getUint32(chunk);
-        final long size = DeviceAccess.getUint64(chunk);
-
-        if (realSize != size) {
-            throw new IOException("real size does not equal size");
-        }
+        final long allocatedSize = DeviceAccess.getUint64(chunk);
 
         conts--;
 
@@ -276,19 +274,19 @@ public class DirectoryParser {
             }
         }
 
-        if (!deleted && referenceChecksum != actualChecksum) {
+        if (performChecks && !deleted && referenceChecksum != actualChecksum) {
             throw new IOException("checksum mismatch");
         }
 
         final String name = nameBuilder.toString();
 
-        if ((this.upcase != null) && (hashName(name) != nameHash)) {
+        if (performChecks && (this.upcase != null) && (hashName(name) != nameHash)) {
             throw new IOException("name hash mismatch ("
                 + Integer.toHexString(hashName(name)) +
                 " != " + Integer.toHexString(nameHash) + ")");
         }
 
-        v.foundNode(Node.create(sb, startCluster, attrib, name, (flag == FLAG_CONTIGUOUS), realSize, times, deleted),
+        v.foundNode(Node.create(sb, startCluster, attrib, name, (flag == FLAG_CONTIGUOUS), size, allocatedSize, times, deleted),
             index);
     }
 

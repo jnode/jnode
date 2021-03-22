@@ -78,7 +78,9 @@ public class NTFSVolume {
     public void readCluster(long cluster, byte[] dst, int dstOffset) throws IOException {
         final int clusterSize = getClusterSize();
         final long clusterOffset = cluster * clusterSize;
-        log.debug("readCluster(" + cluster + ") " + (readClusterCount++));
+        if (log.isDebugEnabled()) {
+            log.debug("readCluster(" + cluster + ") " + (readClusterCount++));
+        }
         api.read(clusterOffset, ByteBuffer.wrap(dst, dstOffset, clusterSize));
     }
 
@@ -95,7 +97,9 @@ public class NTFSVolume {
      * @throws IOException
      */
     public void readClusters(long firstCluster, byte[] dst, int dstOffset, int nrClusters) throws IOException {
-        log.debug("readClusters(" + firstCluster + ", " + nrClusters + ") " + (readClustersCount++));
+        if (log.isDebugEnabled()) {
+            log.debug("readClusters(" + firstCluster + ", " + nrClusters + ") " + (readClustersCount++));
+        }
         final int clusterSize = getClusterSize();
         final long clusterOffset = firstCluster * clusterSize;
         api.read(clusterOffset, ByteBuffer.wrap(dst, dstOffset, nrClusters * clusterSize));

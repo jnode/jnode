@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.jnode.fs.ntfs.FileRecord;
-import org.jnode.fs.ntfs.NTFSVolume;
 import org.jnode.fs.ntfs.attribute.NTFSAttribute;
 import org.jnode.fs.util.FSUtils;
 import org.jnode.util.LittleEndian;
@@ -96,7 +95,7 @@ public class LogFile {
         fileRecord.readData(0, logFileBuffer, 0, (int) logFileLength);
 
         // Read in the restart area info
-        restartPageHeader = getNewestRestartPageHeader(fileRecord.getVolume(), logFileBuffer);
+        restartPageHeader = getNewestRestartPageHeader(logFileBuffer);
         int restartAreaOffset = restartPageHeader.getOffset() + restartPageHeader.getRestartOffset();
         logPageSize = restartPageHeader.getLogPageSize();
         restartArea = new RestartArea(logFileBuffer, restartAreaOffset);
@@ -125,7 +124,7 @@ public class LogFile {
             }
         }
 
-        oldestPageOffset = findOldestPageOffset(fileRecord.getVolume());
+        oldestPageOffset = findOldestPageOffset();
     }
 
     /**
@@ -266,11 +265,10 @@ public class LogFile {
     /**
      * Finds the offset to the oldest page, i.e. the one with the lowest LSN.
      *
-     * @param volume the volume that holds the log file.
      * @return the offset to the oldest page.
      * @throws IOException if an error occurs.
      */
-    private int findOldestPageOffset(NTFSVolume volume) throws IOException {
+    private int findOldestPageOffset() throws IOException {
         TreeMap<Long, RecordPageHeader> lsnPageMap = new TreeMap<Long, RecordPageHeader>();
         Map<RecordPageHeader, Integer> pageOffsetMap = new HashMap<RecordPageHeader, Integer>();
 
@@ -286,7 +284,7 @@ public class LogFile {
                 continue;
             }
 
-            RecordPageHeader pageHeader = new RecordPageHeader(volume, logFileBuffer, offset);
+            RecordPageHeader pageHeader = new RecordPageHeader(logFileBuffer, offset);
             offsetPageMap.put(offset, pageHeader);
 
             // If the last-end-LSN is zero then the page only contains data from the log record on the last page. I.e.
@@ -304,20 +302,19 @@ public class LogFile {
     /**
      * Gets the restart page header that corresponds to the restart page with the highest current LSN.
      *
-     * @param volume the volume that holds the log file.
      * @param buffer the buffer to read from.
      * @return the header.
      * @throws IOException if an error occurs.
      */
-    private RestartPageHeader getNewestRestartPageHeader(NTFSVolume volume, byte[] buffer) throws IOException {
-        RestartPageHeader restartPageHeader1 = new RestartPageHeader(volume, buffer, 0);
+    private RestartPageHeader getNewestRestartPageHeader(byte[] buffer) throws IOException {
+        RestartPageHeader restartPageHeader1 = new RestartPageHeader(buffer, 0);
         if (!restartPageHeader1.isValid()) {
             throw new IllegalStateException("Restart header has invalid magic: " + restartPageHeader1.getMagic());
         } else if (restartPageHeader1.getMagic() == RestartPageHeader.Magic.CHKD) {
             log.warn("First $LogFile restart header has check disk magic");
         }
 
-        RestartPageHeader restartPageHeader2 = new RestartPageHeader(volume, buffer, restartPageHeader1.getLogPageSize());
+        RestartPageHeader restartPageHeader2 = new RestartPageHeader(buffer, restartPageHeader1.getLogPageSize());
         if (!restartPageHeader2.isValid()) {
             throw new IllegalStateException("Second restart header has invalid magic: " + restartPageHeader2.getMagic());
         }  else if (restartPageHeader2.getMagic() == RestartPageHeader.Magic.CHKD) {

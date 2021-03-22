@@ -42,4 +42,16 @@ public class ObjectUtils {
             return false;
         }
     }
+
+    /**
+     * Returns the first non-null item.
+     *
+     * @param first the first item.
+     * @param second the second item.
+     * @param <T> the type.
+     * @return the first non-null of the two, or {@code null} if both are {@code null}.
+     */
+    public static <T> T firstNonNull(T first, T second) {
+        return first == null ? second : first;
+    }
 }

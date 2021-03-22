@@ -30,7 +30,7 @@ import org.jnode.driver.block.BlockDeviceAPI;
  */
 public class Fat12 extends Fat {
 
-    protected Fat12(BootSector bs, BlockDeviceAPI api) {
+    public Fat12(BootSector bs, BlockDeviceAPI api) {
         super(bs, api);
     }
 

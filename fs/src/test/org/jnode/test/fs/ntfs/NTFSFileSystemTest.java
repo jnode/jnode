@@ -24,6 +24,7 @@ import org.jnode.driver.Device;
 import org.jnode.driver.block.FileDevice;
 import org.jnode.fs.FSFileSlackSpace;
 import org.jnode.fs.ntfs.FileRecord;
+import org.jnode.fs.ntfs.MasterFileTable;
 import org.jnode.fs.ntfs.NTFSEntry;
 import org.jnode.fs.ntfs.NTFSFileSystem;
 import org.jnode.fs.ntfs.NTFSFileSystemType;
@@ -53,7 +54,7 @@ public class NTFSFileSystemTest {
         NTFSFileSystem fs = type.create(device, true);
 
         String expectedStructure =
-            "type: NTFS vol: total:104857600 free:102283264\n" +
+            "type: NTFS vol: total:104857088 free:102283264\n" +
                 "  .; \n" +
                 "    $AttrDef; 2560; ad617ac3906958de35eacc3d90d31043\n" +
                 "    $BadClus; 0; d41d8cd98f00b204e9800998ecf8427e\n" +
@@ -81,6 +82,22 @@ public class NTFSFileSystemTest {
     }
 
     @Test
+    public void testComplexCompression() throws Exception {
+
+        device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/ntfs/complex-compression.dd"), "r");
+        NTFSFileSystemType type = fss.getFileSystemType(NTFSFileSystemType.ID);
+        NTFSFileSystem fs = type.create(device, true);
+        MasterFileTable mft = fs.getNTFSVolume().getMFT();
+
+        // This record has a compressed unit (16 virtual clusters) split across two $DATA attributes, and required
+        // merging the lists of data-runs before reading and decompressing
+        FileRecord r = mft.getRecordUnchecked(68);
+
+        DataStructureAsserts.assertStructure(new NTFSEntry(fs, r, 5),
+            "file_0022.txt; 27852285; 992751cfac3ed9dd2d15a3d43d3829a7\n");
+    }
+
+    @Test
     public void testReadCompressedDisk() throws Exception {
 
         device = new FileDevice(FileSystemTestUtils.getTestFile("test/fs/ntfs/compressed.dd"), "r");
@@ -88,7 +105,7 @@ public class NTFSFileSystemTest {
         NTFSFileSystem fs = type.create(device, true);
 
         String expectedStructure =
-            "type: NTFS vol:COMPRESS total:26214400 free:15031296\n" +
+            "type: NTFS vol:COMPRESS total:26213376 free:15031296\n" +
                 "  .; \n" +
                 "    OBJS2.PRS; 57439; 46d0c5fe8dd36c0f1ecc042a38188740\n" +
                 "    PICTURES.DBF; 275; 18c0dceeb707590e8c8348e725494993\n" +
@@ -224,7 +241,7 @@ public class NTFSFileSystemTest {
         NTFSFileSystem fs = type.create(device, true);
 
         String expectedStructure =
-            "type: NTFS vol:links total:20971520 free:14782464\n" +
+            "type: NTFS vol:links total:20967424 free:14782464\n" +
             "  .; \n" +
             "    $AttrDef; 2560; ad617ac3906958de35eacc3d90d31043\n" +
             "    $BadClus; 0; d41d8cd98f00b204e9800998ecf8427e\n" +

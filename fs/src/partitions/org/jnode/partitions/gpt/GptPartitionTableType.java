@@ -23,7 +23,6 @@ package org.jnode.partitions.gpt;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.partitions.PartitionTable;
-import org.jnode.partitions.PartitionTableException;
 import org.jnode.partitions.PartitionTableType;
 
 /**
@@ -39,24 +38,35 @@ public class GptPartitionTableType implements PartitionTableType {
     private boolean requireProtectiveMbr;
 
     /**
+     * The block size to expect, or {@code 0} to detect a range of possible block sizes.
+     */
+    private int blockSize;
+
+    /**
      * Creates a new instance.
      */
     public GptPartitionTableType() {
-        this(true);
+        this(true, 0);
     }
 
     /**
      * Creates a new instance.
      *
      * @param requireProtectiveMbr indicates whether to require the protective MBR for detection.
+     * @param blockSize the block size to expect, or {@code 0} to expect a range of possible block sizes.
      */
-    public GptPartitionTableType(boolean requireProtectiveMbr) {
+    public GptPartitionTableType(boolean requireProtectiveMbr, int blockSize) {
         this.requireProtectiveMbr = requireProtectiveMbr;
+        this.blockSize = blockSize;
     }
 
     @Override
-    public PartitionTable<?> create(byte[] firstSector, Device device) throws PartitionTableException {
-        return new GptPartitionTable(this, firstSector, device);
+    public PartitionTable<?> create(byte[] firstSector, Device device) {
+        if (blockSize == 0) {
+            return new GptPartitionTable(this, firstSector, device);
+        } else {
+            return new GptPartitionTable(this, blockSize, firstSector, device);
+        }
     }
 
     @Override
@@ -66,6 +76,10 @@ public class GptPartitionTableType implements PartitionTableType {
 
     @Override
     public boolean supports(byte[] first16KiB, BlockDeviceAPI devApi) {
-        return GptPartitionTable.containsPartitionTable(first16KiB, requireProtectiveMbr);
+        if (blockSize == 0) {
+            return GptPartitionTable.containsPartitionTable(first16KiB, requireProtectiveMbr);
+        } else {
+            return GptPartitionTable.containsPartitionTable(first16KiB, requireProtectiveMbr, blockSize);
+        }
     }
 }

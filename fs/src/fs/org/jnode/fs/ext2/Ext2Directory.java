@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectoryId;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.ext2.xattr.XAttrEntry;
 import org.jnode.fs.spi.AbstractFSDirectory;
 import org.jnode.fs.spi.AbstractFileSystem;
 import org.jnode.fs.spi.FSEntryTable;
@@ -44,7 +45,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
 
     protected Ext2Entry entry;
 
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(Ext2Directory.class);
 
     /**
      * @param entry the Ext2Entry representing this directory
@@ -128,9 +129,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
             //update the new inode
             newINode.update();
         } catch (FileSystemException ex) {
-            final IOException ioe = new IOException();
-            ioe.initCause(ex);
-            throw ioe;
+            throw new IOException(ex);
         }
 
         return newEntry;
@@ -304,9 +303,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
 
                 return;
             } catch (Throwable ex) {
-                final IOException ioe = new IOException();
-                ioe.initCause(ex);
-                throw ioe;
+                throw new IOException(ex);
             } finally {
                 //unlock the inode from the cache
                 iNode.decLocked();
@@ -355,28 +352,37 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
 
         Ext2DirectoryRecord current;
 
-        public Ext2FSEntryIterator(Ext2Entry entry) throws IOException {
+        Ext2FSEntryIterator(Ext2Entry entry) throws IOException {
             //read itself as a file
             Ext2File directoryFile = new Ext2File(entry);
             //read the whole directory
 
             data = ByteBuffer.allocate((int) directoryFile.getLength());
             directoryFile.read(0, data);
-            //data = new byte[(int) directoryFile.getLength()];            
-            //directoryFile.read(0, data, 0, (int) directoryFile.getLength());
 
             index = 0;
+
+            if ((entry.getINode().getFlags() & Ext2Constants.EXT4_INLINE_DATA_FL) == Ext2Constants.EXT4_INLINE_DATA_FL) {
+                XAttrEntry dataAttribute = entry.getINode().getAttribute("system.data");
+                if (dataAttribute == null || dataAttribute.getValueSize() == 0) {
+                    // If the directory listings are stored in the inode's i_block
+                    // data then the first four bytes are the parent inode
+                    index = 4;
+                }
+            }
         }
 
         public boolean hasNext() {
-            Ext2DirectoryRecord dr = null;
+            Ext2DirectoryRecord dr;
             Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();
             try {
                 do {
-                    if (index >= iNode.getSize())
+                    if (index >= iNode.getSize()) {
                         return false;
+                    }
 
-                    if (data.capacity() < 8 || LittleEndian.getUInt16(data.array(), index + 4) == 0) {
+                    if (data.capacity() < 8 || index >= data.capacity() ||
+                        LittleEndian.getUInt16(data.array(), index + 4) == 0) {
                         return false;
                     }
 
@@ -425,7 +431,7 @@ public class Ext2Directory extends AbstractFSDirectory implements FSDirectoryId 
          *
          * @return
          */
-        protected Ext2DirectoryRecord nextDirectoryRecord() {
+        Ext2DirectoryRecord nextDirectoryRecord() {
             if (current == null) {
                 //hasNext actually reads the next element
                 if (!hasNext())

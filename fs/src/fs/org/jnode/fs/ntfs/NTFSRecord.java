@@ -63,35 +63,26 @@ public class NTFSRecord extends NTFSStructure {
     }
 
     /**
-     * The bytes-pre-sector in this NTFS volume.
-     */
-    private final int bytesPerSector;
-
-    /**
      * Creates a new record.
      *
-     * @param bytesPerSector the bytes-pre-sector in this NTFS volume.
      * @param strictFixUp indicates whether an exception should be throw if fix-up values don't match.
      * @param buffer the buffer to read from.
      * @param offset the offset in the buffer to read from.
      */
-    public NTFSRecord(int bytesPerSector, boolean strictFixUp, byte[] buffer, int offset) throws IOException {
+    public NTFSRecord(boolean strictFixUp, byte[] buffer, int offset) throws IOException {
         super(buffer, offset);
-        this.bytesPerSector = bytesPerSector;
         fixUp(strictFixUp);
     }
 
     /**
      * Creates a new record.
      *
-     * @param bytesPerSector the bytes-pre-sector in this NTFS volume.
      * @param strictFixUp indicates whether an exception should be throw if fix-up values don't match.
      * @param parent the parent structure.
      * @param offset the offset in the parent to read from.
      */
-    public NTFSRecord(int bytesPerSector, boolean strictFixUp, NTFSStructure parent, int offset) throws IOException {
+    public NTFSRecord(boolean strictFixUp, NTFSStructure parent, int offset) throws IOException {
         super(parent, offset);
-        this.bytesPerSector = bytesPerSector;
         fixUp(strictFixUp);
     }
 
@@ -138,7 +129,7 @@ public class NTFSRecord extends NTFSStructure {
             // header
 
             for (int i = 1/* intended */; i < usnCount; i++) {
-                final int bufOffset = (i * bytesPerSector) - 2;
+                final int bufOffset = (i * 512) - 2;
                 final int usnOffset = updateSequenceOffset + (i * 2);
                 if (getUInt16(bufOffset) == usn) {
                     setUInt16(bufOffset, getUInt16(usnOffset));

@@ -1,77 +1,92 @@
 package org.jnode.fs.jfat;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import org.apache.log4j.Logger;
 
-public class FatEntriesFactory {
+public class FatEntriesFactory implements Iterator<FatEntry> {
 
     private static final Logger log = Logger.getLogger(FatEntriesFactory.class);
 
     private boolean label;
     private int index;
-    private int next;
     private FatEntry entry;
+
+    /**
+     * A flag indicating whether to include deleted entries.
+     */
     protected boolean includeDeleted;
+
+    /**
+     * The parent directory.
+     */
     private FatDirectory directory;
 
-    protected FatEntriesFactory(FatDirectory directory, boolean includeDeleted) {
-        label = false;
-        index = 0;
-        next = 0;
-        entry = null;
+    public FatEntriesFactory(FatDirectory directory, boolean includeDeleted) {
         this.includeDeleted = includeDeleted;
         this.directory = directory;
     }
 
-    protected boolean hasNextEntry() {
-        int i;
-        FatDirEntry e;
-        FatRecord v = new FatRecord();
+    @Override
+    public boolean hasNext() {
+        if (entry == null) {
+            fetchNext();
+        }
 
-        if (index > FatDirectory.MAXENTRIES)
+        return entry != null;
+    }
+
+    /**
+     * Fetches the next entry into {@link #entry}.
+     */
+    protected void fetchNext() {
+        if (index > FatDirectory.MAXENTRIES) {
             log.debug("Full Directory: invalid index " + index);
+        }
 
-        for (i = index;; ) {
-                /*
-                 * create a new entry from the chain
-                 */
+        FatDirEntry dirEntry;
+        FatRecord record = new FatRecord();
+        int i = index;
+
+        while (true) {
             try {
-                e = directory.getFatDirEntry(i, includeDeleted);
+                // Read the next entry
+                dirEntry = directory.getFatDirEntry(i, includeDeleted);
                 i++;
             } catch (NoSuchElementException ex) {
                 entry = null;
-                return false;
+                return;
             } catch (IOException ex) {
                 log.debug("cannot read entry " + i);
                 i++;
                 continue;
             }
 
-            if (e.isFreeDirEntry() && e.isLongDirEntry() && includeDeleted) {
+            if (dirEntry.isFreeDirEntry() && dirEntry.isLongDirEntry() && includeDeleted) {
                 // Ignore damage on deleted long directory entries
-                ((FatLongDirEntry) e).setDamaged(false);
+                ((FatLongDirEntry) dirEntry).setDamaged(false);
             }
 
-            if (e.isFreeDirEntry() && !includeDeleted) {
-                v.clear();
-            } else if (e.isLongDirEntry()) {
-                FatLongDirEntry l = (FatLongDirEntry) e;
-                if (l.isDamaged()) {
+            if (dirEntry.isFreeDirEntry() && !includeDeleted) {
+                record.clear();
+            } else if (dirEntry.isLongDirEntry()) {
+                FatLongDirEntry longDirEntry = (FatLongDirEntry) dirEntry;
+                if (longDirEntry.isDamaged()) {
                     log.debug("Damaged entry at " + (i - 1));
-                    v.clear();
+                    record.clear();
                 } else {
-                    v.add(l);
+                    record.add(longDirEntry);
                 }
-            } else if (e.isShortDirEntry()) {
-                FatShortDirEntry s = (FatShortDirEntry) e;
-                if (s.isLabel()) {
+            } else if (dirEntry.isShortDirEntry()) {
+                FatShortDirEntry shortDirEntry = (FatShortDirEntry) dirEntry;
+                if (shortDirEntry.isLabel()) {
                     if (directory.isRoot()) {
-                        FatRootDirectory r = (FatRootDirectory) directory;
+                        FatRootDirectory root = (FatRootDirectory) directory;
                         if (label) {
                             log.debug("Duplicated label in root directory");
                         } else {
-                            r.setEntry(s);
+                            root.setEntry(shortDirEntry);
                             label = true;
                         }
                     } else {
@@ -80,39 +95,66 @@ public class FatEntriesFactory {
                 } else {
                     break;
                 }
-            } else if (e.isLastDirEntry()) {
+            } else if (dirEntry.isLastDirEntry()) {
                 entry = null;
-                return false;
-            } else
-                throw new UnsupportedOperationException(
-                    "FatDirEntry is of unknown type, shouldn't happen");
+                return;
+            } else {
+                throw new UnsupportedOperationException("FatDirEntry is of unknown type, shouldn't happen");
+            }
         }
 
-        if (!e.isShortDirEntry())
+        if (!dirEntry.isShortDirEntry()) {
             throw new UnsupportedOperationException("shouldn't happen");
+        }
 
-        v.close((FatShortDirEntry) e);
+        record.close((FatShortDirEntry) dirEntry);
 
-            /*
-             * here recursion is in action for the entries factory it creates
-             * directory nodes and file leafs
-             */
-        if (((FatShortDirEntry) e).isDirectory())
-            this.entry = new FatDirectory(directory.getFatFileSystem(), directory, v);
-        else
-            this.entry = new FatFile(directory.getFatFileSystem(), directory, v);
+        if (((FatShortDirEntry) dirEntry).isDirectory()) {
+            this.entry = createFatDirectory(record);
+        } else {
+            this.entry = createFatFile(record);
+        }
 
-        this.next = i;
-
-        return true;
+        index = i;
     }
 
-    protected FatEntry createNextEntry() {
-        if (index == next)
-            hasNextEntry();
-        if (entry == null)
+    /**
+     * Creates a new FAT directory for the given record.
+     *
+     * @param record the record to create the directory from.
+     * @return the directory.
+     */
+    protected FatEntry createFatDirectory(FatRecord record) {
+        return new FatDirectory(directory.getFatFileSystem(), directory, record);
+    }
+
+    /**
+     * Creates a new FAT file for the given record.
+     *
+     * @param record the record to create the file from.
+     * @return the file.
+     */
+    protected FatEntry createFatFile(FatRecord record) {
+        return new FatFile(directory.getFatFileSystem(), directory, record);
+    }
+
+    @Override
+    public FatEntry next() {
+        if (entry == null) {
+            fetchNext();
+        }
+
+        if (entry == null) {
             throw new NoSuchElementException();
-        index = next;
-        return entry;
+        }
+
+        FatEntry result = entry;
+        entry = null;
+        return result;
+    }
+
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException();
     }
 }

@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.jnode.util.BigEndian;
 
 public abstract class AbstractNode<K extends Key, T extends NodeRecord> implements Node<T> {
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(AbstractNode.class);
     protected NodeDescriptor descriptor;
     protected List<T> records;
     protected List<Integer> offsets;
@@ -37,7 +37,7 @@ public abstract class AbstractNode<K extends Key, T extends NodeRecord> implemen
         this.size = nodeSize;
         this.records = new ArrayList<T>(descriptor.getNumRecords());
         this.offsets = new ArrayList<Integer>(descriptor.getNumRecords() + 1);
-        this.offsets.add(Integer.valueOf(NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH));
+        this.offsets.add(NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH);
     }
 
     public AbstractNode(final byte[] nodeData, final int nodeSize) {

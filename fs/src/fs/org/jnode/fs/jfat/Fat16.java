@@ -29,7 +29,7 @@ import org.jnode.driver.block.BlockDeviceAPI;
  * @author Luke Quinane
  */
 public class Fat16 extends Fat {
-    protected Fat16(BootSector bs, BlockDeviceAPI api) {
+    public Fat16(BootSector bs, BlockDeviceAPI api) {
         super(bs, api);
     }
 

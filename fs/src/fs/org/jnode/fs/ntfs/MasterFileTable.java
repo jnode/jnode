@@ -142,15 +142,14 @@ public class MasterFileTable extends FileRecord {
      * Creates a new MFT instance.
      *
      * @param volume the NTFS volume.
-     * @param bytesPerSector the bytes per-sector.
      * @param clusterSize the cluster size.
      * @param strictFixUp indicates whether to throw an exception if a fix-up error is detected.
      * @param buffer the buffer to read from.
      * @param offset the offset to read at.
      * @throws IOException if an error occurs creating the MFT.
      */
-    public MasterFileTable(NTFSVolume volume, int bytesPerSector, int clusterSize, boolean strictFixUp, byte[] buffer, int offset) throws IOException {
-        super(volume, bytesPerSector, clusterSize, strictFixUp, SystemFiles.MFT, buffer, offset);
+    public MasterFileTable(NTFSVolume volume, int clusterSize, boolean strictFixUp, byte[] buffer, int offset) throws IOException {
+        super(volume, clusterSize, strictFixUp, SystemFiles.MFT, buffer, offset);
     }
 
     /**

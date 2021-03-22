@@ -29,6 +29,7 @@ import org.jnode.fs.FileSystemException;
 import org.jnode.fs.ext2.exception.UnallocatedBlockException;
 import org.jnode.fs.ext2.xattr.XAttrEntry;
 import org.jnode.fs.ext2.xattr.XAttrHeader;
+import org.jnode.fs.ext2.xattr.XAttrInlineEntry;
 import org.jnode.fs.ext4.ExtentHeader;
 import org.jnode.fs.util.FSUtils;
 import org.jnode.util.LittleEndian;
@@ -42,7 +43,7 @@ import org.jnode.util.LittleEndian;
 public class INode {
     public static final int EXT2_GOOD_OLD_INODE_SIZE = 128;
 
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(INode.class);
 
     /**
      * the data constituting the inode itself
@@ -165,7 +166,7 @@ public class INode {
      * @return the extra size.
      */
     public int getExtraISize() {
-        if (getExt2FileSystem().hasROFeature(Ext2Constants.EXT4_FEATURE_RO_COMPAT_EXTRA_ISIZE)) {
+        if (getExt2FileSystem().hasROFeature(Ext2Constants.EXT4_FEATURE_RO_COMPAT_EXTRA_ISIZE) && data.length > 0x82) {
             return LittleEndian.getInt16(data, 0x80);
         }
 
@@ -197,6 +198,22 @@ public class INode {
     }
 
     /**
+     * Gets an attribute by its name.
+     *
+     * @param name the name of the attribute to look up.
+     * @return the attribute, or {@code null} if no match is found.
+     */
+    public XAttrEntry getAttribute(String name) {
+        for (XAttrEntry attribute : getAttributes()) {
+            if (name.equals(attribute.getName())) {
+                return attribute;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Gets a list of inline attributes associated with this inode.
      *
      * @return the list of attributes.
@@ -213,12 +230,12 @@ public class INode {
             XAttrHeader xAttrHeader = new XAttrHeader(xattrBuffer);
 
             if (xAttrHeader.getMagic() == XAttrHeader.MAGIC) {
-                for (int offset = XAttrHeader.SIZE; offset + XAttrEntry.MINIMUM_SIZE < xattrBuffer.length; ) {
+                for (int offset = 4; offset + XAttrEntry.MINIMUM_SIZE < xattrBuffer.length; ) {
                     if (LittleEndian.getUInt32(xattrBuffer, offset) == 0) {
                         break;
                     }
 
-                    XAttrEntry entry = new XAttrEntry(xattrBuffer, offset);
+                    XAttrEntry entry = new XAttrInlineEntry(xattrBuffer, offset);
                     attributes.add(entry);
 
                     offset += FSUtils.roundUpToBoundary(4, entry.getNameLength() + XAttrEntry.MINIMUM_SIZE);

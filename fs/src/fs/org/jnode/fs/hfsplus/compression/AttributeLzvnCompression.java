@@ -53,7 +53,7 @@ public class AttributeLzvnCompression implements HfsPlusCompression {
                 compressed.position(1);
                 uncompressed.put(compressed);
             } else {
-                LzvnForkCompression.lzvnDecode(compressed, uncompressed);
+                LzvnDecode.decodeBuffer(compressed, uncompressed);
             }
         }
 

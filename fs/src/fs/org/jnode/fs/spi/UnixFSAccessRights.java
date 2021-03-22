@@ -22,13 +22,8 @@ package org.jnode.fs.spi;
 
 import java.security.Principal;
 import java.security.acl.Group;
-
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FileSystem;
-
-import sun.security.acl.GroupImpl;
-
-import com.sun.security.auth.UserPrincipal;
 
 /**
  * 
@@ -52,8 +47,8 @@ public class UnixFSAccessRights implements FSAccessRights {
         this.filesystem = filesystem;
 
         // TODO manages users & groups in JNode
-        owner = new UserPrincipal("root");
-        group = new GroupImpl("admins");
+        owner = new UnixFSPrincipal("root");
+        group = new UnixFSGroup("admins");
         group.addMember(owner);
     }
 

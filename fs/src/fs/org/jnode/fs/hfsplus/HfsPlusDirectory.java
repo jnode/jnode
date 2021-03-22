@@ -218,7 +218,7 @@ public class HfsPlusDirectory implements FSDirectory, FSDirectoryId {
         List<FSEntry> pathList = new LinkedList<FSEntry>();
         HfsPlusFileSystem fs = getFileSystem();
         if (fs.getVolumeHeader().getFolderCount() > 0) {
-            LeafRecord[] records;
+            List<LeafRecord> records;
 
             if ((folder.getFlags() & CatalogFile.FLAGS_HARDLINK_CHAIN) != 0) {
                 records = fs.getCatalog().getRecords(getHardLinkFolder().getFolderId());

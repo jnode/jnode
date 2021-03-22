@@ -21,7 +21,6 @@
 package org.jnode.fs.ntfs.attribute;
 
 import org.jnode.fs.ntfs.FileRecord;
-import org.jnode.fs.util.FSUtils;
 
 /**
  * An NTFS file attribute that has its data stored inside the attribute.
@@ -57,17 +56,6 @@ public class NTFSResidentAttribute extends NTFSAttribute {
 
     public int getAttributeLength() {
         return (int) getUInt32(0x10);
-    }
-
-    /**
-     * Generates a hex dump of the attribute's data.
-     *
-     * @return the hex dump.
-     */
-    public String hexDump() {
-        byte[] attributeData = new byte[getAttributeLength()];
-        getData(getAttributeOffset(), attributeData, 0, attributeData.length);
-        return FSUtils.toString(attributeData);
     }
 
     @Override

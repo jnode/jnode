@@ -123,7 +123,7 @@ final class EntryTimes {
     private final Date modified;
     private final Date accessed;
 
-    private EntryTimes(Date created, Date modified, Date accessed) {
+    public EntryTimes(Date created, Date modified, Date accessed) {
         this.created = created;
         this.modified = modified;
         this.accessed = accessed;

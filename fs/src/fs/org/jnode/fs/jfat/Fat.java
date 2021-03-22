@@ -25,6 +25,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.FileSystemException;
+import org.jnode.util.LittleEndian;
 
 
 /**
@@ -35,8 +36,6 @@ public abstract class Fat {
     private final BlockDeviceAPI api;
     private final BootSector bs;
 
-    private final FatCache cache;
-
     private int lastfree;
 
     private final ByteBuffer clearbuf;
@@ -44,11 +43,6 @@ public abstract class Fat {
     protected Fat(BootSector bs, BlockDeviceAPI api) {
         this.bs = bs;
         this.api = api;
-
-        /*
-         * create a suitable cache
-         */
-        cache = new FatCache(this, 8192, 512);
 
         /*
          * set lastfree
@@ -223,20 +217,48 @@ public abstract class Fat {
         return (entry == freeEntry());
     }
 
+    byte[] readSector(long sector) throws IOException {
+        // FAT-12 reads in two byte chunks so add an extra element to prevent an array index out of bounds exception
+        // when reading in the last element
+        byte[] buffer = new byte[512 + 1];
+        api.read(sector * 512, ByteBuffer.wrap(buffer));
+        return buffer;
+    }
+
     public long getUInt16(int index) throws IOException {
-        return cache.getUInt16(index);
+        long position = position(0, index);
+        int offset = (int) (position % 512);
+        byte[] data = readSector(position / 512);
+        return LittleEndian.getUInt16(data, offset);
     }
 
     public long getUInt32(int index) throws IOException {
-        return cache.getUInt32(index);
+        long position = position(0, index);
+        int offset = (int) (position % 512);
+        byte[] data = readSector(position / 512);
+        return LittleEndian.getUInt32(data, offset);
+    }
+
+    void writeSector(long sector, byte[] data) throws IOException {
+        api.write(sector * 512, ByteBuffer.wrap(data));
     }
 
     public void setInt16(int index, int element) throws IOException {
-        cache.setInt16(index, element);
+        long position = position(0, index);
+        int offset = (int) (position % 512);
+        byte[] data = readSector(position / 512);
+
+        LittleEndian.setInt16(data, offset, element);
+        writeSector(position / 512, data);
     }
 
     public void setInt32(int index, int element) throws IOException {
-        cache.setInt32(index, element);
+        long position = position(0, index);
+        int offset = (int) (position % 512);
+        byte[] data = readSector(position / 512);
+
+        LittleEndian.setInt32(data, offset, element);
+        writeSector(position / 512, data);
     }
 
     public abstract int get(int index) throws IOException;
@@ -244,7 +266,7 @@ public abstract class Fat {
     public abstract int set(int index, int element) throws IOException;
 
     public void flush() throws IOException {
-        cache.flush();
+        // Ignore, currently flushing each value as it is set
     }
 
     public final boolean isFreeEntry(int entry) throws IOException {
@@ -283,13 +305,6 @@ public abstract class Fat {
 
     public final boolean isFat12() {
         return getBootSector().isFat12();
-    }
-
-    public String getCacheStat() {
-        StrWriter out = new StrWriter();
-        out.println("Access: " + cache.getAccess() + " Hits: " + cache.getHit() + " Ratio: " +
-            cache.getRatio() * 100 + "%");
-        return out.toString();
     }
 
     public String toString() {

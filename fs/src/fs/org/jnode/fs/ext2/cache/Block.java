@@ -28,7 +28,7 @@ import org.jnode.fs.ext2.Ext2FileSystem;
  * @author Andras Nagy
  */
 public class Block {
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(Block.class);
 
     protected byte[] data;
     boolean dirty = false;

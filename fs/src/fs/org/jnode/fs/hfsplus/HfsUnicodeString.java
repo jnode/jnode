@@ -22,7 +22,7 @@ package org.jnode.fs.hfsplus;
 
 import org.jnode.util.BigEndian;
 
-public class HfsUnicodeString {
+public class HfsUnicodeString implements Comparable<HfsUnicodeString> {
     /**
      * Length of string in characters.
      */
@@ -55,7 +55,7 @@ public class HfsUnicodeString {
      */
     public HfsUnicodeString(String string) {
         this.string = string;
-        this.length = string.length();
+        this.length = string == null ? 0 : string.length();
     }
 
     public final int getLength() {
@@ -82,5 +82,33 @@ public class HfsUnicodeString {
     @Override
     public String toString() {
         return string;
+    }
+
+    @Override
+    public int hashCode() {
+        return string == null ? 0 : string.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof HfsUnicodeString)) {
+            return false;
+        }
+
+        HfsUnicodeString other = (HfsUnicodeString) obj;
+        return compareTo(other) == 0;
+    }
+
+    @Override
+    public int compareTo(HfsUnicodeString other) {
+        if (string == null && other.string == null) {
+            return 0;
+        } else if (string == null) {
+            return -1;
+        } else if (other.string == null) {
+            return 1;
+        }
+
+        return string.compareTo(other.string);
     }
 }

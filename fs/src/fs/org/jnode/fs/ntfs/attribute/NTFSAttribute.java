@@ -26,6 +26,7 @@ import org.jnode.fs.ntfs.NTFSStructure;
 import org.jnode.fs.ntfs.StandardInformationAttribute;
 import org.jnode.fs.ntfs.index.IndexAllocationAttribute;
 import org.jnode.fs.ntfs.index.IndexRootAttribute;
+import org.jnode.fs.util.FSUtils;
 
 /**
  * @author Chira
@@ -174,6 +175,18 @@ public abstract class NTFSAttribute extends NTFSStructure {
     }
 
     /**
+     * Generates a hex dump of the attribute's data.
+     *
+     * @return the hex dump.
+     */
+    public String hexDump() {
+        int length = getBuffer().length - getOffset();
+        byte[] data = new byte[length];
+        getData(0, data, 0, data.length);
+        return FSUtils.toString(data);
+    }
+
+    /**
      * Generates a debug string for the attribute.
      *
      * @return the debug string.
@@ -182,26 +195,12 @@ public abstract class NTFSAttribute extends NTFSStructure {
 
     /**
      * Create an NTFSAttribute instance suitable for the given attribute data.
-     * 
+     *
      * @param fileRecord the containing file record.
      * @param offset the offset to read from.
      * @return the attribute
      */
     public static NTFSAttribute getAttribute(FileRecord fileRecord, int offset) {
-        int fallbackCompressionUnit = 1; // '1 << 0' is the 'default' unit size
-        return getAttribute(fileRecord, offset, fallbackCompressionUnit);
-    }
-
-    /**
-     * Create an NTFSAttribute instance suitable for the given attribute data.
-     *
-     * @param fileRecord the containing file record.
-     * @param offset the offset to read from.
-     * @param fallbackCompressionUnit the fallback compression unit to use if the attribute is compressed but doesn't
-     *   have a compression unit stored.
-     * @return the attribute
-     */
-    public static NTFSAttribute getAttribute(FileRecord fileRecord, int offset, int fallbackCompressionUnit) {
         final boolean resident = (fileRecord.getUInt8(offset + 0x08) == 0);
         final int type = fileRecord.getUInt32AsInt(offset + 0x00);
 
@@ -212,14 +211,14 @@ public abstract class NTFSAttribute extends NTFSStructure {
                 if (resident) {
                     return new AttributeListAttributeRes(fileRecord, offset);
                 } else {
-                    return new AttributeListAttributeNonRes(fileRecord, offset, fallbackCompressionUnit);
+                    return new AttributeListAttributeNonRes(fileRecord, offset);
                 }
             case Types.FILE_NAME:
                 return new FileNameAttribute(fileRecord, offset);
             case Types.INDEX_ROOT:
                 return new IndexRootAttribute(fileRecord, offset);
             case Types.INDEX_ALLOCATION:
-                return new IndexAllocationAttribute(fileRecord, offset, fallbackCompressionUnit);
+                return new IndexAllocationAttribute(fileRecord, offset);
             case Types.REPARSE_POINT:
                 return new ReparsePointAttribute(fileRecord, offset);
         }
@@ -230,7 +229,7 @@ public abstract class NTFSAttribute extends NTFSStructure {
             return new NTFSResidentAttribute(fileRecord, offset);
         } else {
             // non resident
-            return new NTFSNonResidentAttribute(fileRecord, offset, fallbackCompressionUnit);
+            return new NTFSNonResidentAttribute(fileRecord, offset);
         }
     }
 }
